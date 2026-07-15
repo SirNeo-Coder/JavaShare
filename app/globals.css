@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root { --ink:#172033; --muted:#778196; --line:#e2e6ed; --blue:#3e67f4; --navy:#10192c; --panel:#f7f8fb; }
+* { box-sizing:border-box; }
+html, body { margin:0; min-height:100%; background:#eef1f5; color:var(--ink); font-family:Arial, Helvetica, sans-serif; }
+button, textarea, input { font:inherit; }
+button { cursor:pointer; }
+.app-shell { min-height:100vh; background:#fff; }
+.topbar { height:70px; display:grid; grid-template-columns:280px 1fr auto; align-items:center; padding:0 24px; border-bottom:1px solid var(--line); background:#fff; }
+.brand { display:flex; align-items:center; gap:9px; font-size:20px; font-weight:800; }
+.brand-mark,.java-icon { display:grid; place-items:center; background:#ff7a3d; color:#fff; font-weight:900; }
+.brand-mark { width:31px; height:34px; border-radius:9px 9px 11px 6px; font-family:Georgia,serif; }
+.teacher-pill { padding:5px 7px; font-size:9px; letter-spacing:1px; color:#3863d7; background:#edf2ff; border-radius:4px; }
+.class-context { padding-left:24px; border-left:1px solid var(--line); display:flex; gap:7px; flex-direction:column; font-size:13px; }
+.class-context span,.teacher-name span { font-size:11px; color:var(--muted); }
+.header-actions { display:flex; align-items:center; gap:10px; }
+.icon-button,.chevron { border:0; background:none; color:#647087; position:relative; font-size:20px; }
+.icon-button i { position:absolute; width:6px; height:6px; background:#ff5a5f; border-radius:50%; top:0; right:2px; }
+.teacher-avatar { width:35px; height:35px; display:grid; place-items:center; background:#ffe8dd; color:#c25027; border-radius:50%; font-size:11px; font-weight:800; }
+.teacher-name { display:flex; flex-direction:column; gap:2px; font-size:12px; }
+.workspace { display:grid; grid-template-columns:280px 1fr; height:calc(100vh - 70px); min-height:650px; }
+.sidebar { background:#fafbfc; border-right:1px solid var(--line); padding:20px 13px 14px; display:flex; flex-direction:column; overflow:auto; }
+.side-title { display:flex; justify-content:space-between; align-items:center; padding:0 10px 10px; color:#7e8799; font-size:10px; font-weight:800; letter-spacing:1.4px; }
+.side-title button { border:0; background:none; color:#6b7488; font-size:18px; }
+.team-list { display:grid; gap:4px; }
+.team-card { width:100%; border:0; background:transparent; border-radius:8px; display:grid; grid-template-columns:36px 1fr auto; align-items:center; gap:9px; padding:10px; text-align:left; color:var(--ink); }
+.team-card:hover,.team-card.active { background:#edf1ff; }
+.team-icon { width:35px; height:35px; border-radius:8px; display:grid; place-items:center; font-weight:800; color:#3154c8; background:#dce5ff; }
+.team-icon.orange { color:#d46922; background:#ffe6d1; }.team-icon.purple { color:#8054c8; background:#eadcff; }
+.team-copy { display:flex; flex-direction:column; gap:5px; font-size:12px; }.team-copy small { color:var(--muted); font-size:10px; }
+.online-dot { display:inline-block; width:7px; height:7px; margin-right:5px; border-radius:50%; background:#2ac681; }
+.status { font-size:8px; font-weight:800; text-transform:uppercase; padding:4px 6px; border-radius:4px; color:#3561dc; background:#dce5ff; }.status.submitted { color:#20835f; background:#daf5e9; }.status.needs-help { color:#b27118; background:#fff0ce; }
+.assignment-block { margin-top:26px; padding:17px 10px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.eyebrow { font-size:9px; letter-spacing:1.2px; font-weight:800; color:#9299a8; }.assignment-block h3 { margin:12px 0 6px; font-size:13px; }.assignment-block p { font-size:11px; line-height:1.5; margin:0 0 14px; color:var(--muted); }
+.due { display:flex; gap:9px; align-items:center; padding:10px; color:#d55d36; background:#fff2ec; border-radius:7px; }.due>span:first-child { font-size:18px; }.due span:last-child { display:flex; flex-direction:column; gap:2px; }.due small { font-size:9px; }.due b { font-size:10px; }
+.brief-button,.all-teams { border:0; background:transparent; color:#365dd6; font-weight:700; font-size:10px; }.brief-button { width:100%; display:flex; justify-content:space-between; margin-top:13px; text-align:left; }.all-teams { margin-top:auto; padding:13px 10px; text-align:left; color:#657085; }.all-teams span { float:right; background:#e8ebf0; padding:2px 6px; border-radius:10px; }
+.main-area { min-width:0; display:grid; grid-template-rows:76px 1fr 65px; background:#f4f6f9; overflow:hidden; }
+.team-header { background:#fff; border-bottom:1px solid var(--line); display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:25px; padding:0 22px; }
+.team-heading { display:flex; align-items:center; gap:12px; }.team-heading h1 { font-size:17px; margin:0 0 4px; }.team-heading p { font-size:10px; margin:0; color:var(--muted); }
+.presence { display:flex; align-items:center; gap:9px; }.avatars { display:flex; }.av { width:29px; height:29px; border:2px solid #fff; border-radius:50%; display:grid; place-items:center; margin-left:-7px; color:#fff; font-size:8px; font-weight:800; }.a1{background:#ef7864}.a2{background:#526cbe}.a3{background:#28a683}.a4{background:#edf0f5;color:#788296}.presence>span { display:flex; flex-direction:column; font-size:10px; }.presence small { margin-top:3px; color:var(--muted); }
+.team-buttons { display:flex; gap:8px; }.secondary { border:1px solid #d9dee7; background:#fff; border-radius:6px; padding:9px 11px; color:#566176; font-size:10px; font-weight:700; }.count { margin-left:5px; padding:2px 5px; border-radius:8px; background:#e6ebff; color:#3862df; }
+.content-grid { padding:14px; min-height:0; display:grid; grid-template-columns:minmax(480px, 1.55fr) minmax(265px,.65fr); gap:12px; }
+.editor-card,.right-panel { min-height:0; border:1px solid #dfe3ea; border-radius:8px; background:#fff; overflow:hidden; box-shadow:0 1px 2px #19233b0a; }
+.editor-card { display:grid; grid-template-rows:42px 1fr 29px; }.file-tabs { display:flex; align-items:stretch; background:#f7f8fa; border-bottom:1px solid var(--line); }.file-tab { border:0; border-right:1px solid var(--line); background:#fff; padding:0 15px; font-size:10px; color:#3f4960; }.java-icon { display:inline-grid; width:17px; height:17px; border-radius:4px; margin-right:7px; font-size:9px; }.unsaved { display:inline-block; width:5px; height:5px; margin-left:8px; background:#4e75ee; border-radius:50%; }.add-file { border:0; background:transparent; padding:0 14px; color:#8790a1; }.editing-now { margin-left:auto; display:flex; align-items:center; padding-right:15px; color:#717c90; font-size:9px; }
+.editor-wrap { min-height:0; display:grid; grid-template-columns:46px 1fr; background:#111827; }.line-numbers { padding:13px 11px 13px 0; overflow:hidden; border-right:1px solid #273247; color:#657087; text-align:right; font:12px/21px var(--font-geist-mono),monospace; }.line-numbers span { display:block; }.editor-wrap textarea { width:100%; height:100%; resize:none; border:0; outline:0; padding:13px 15px; background:#111827; color:#d9e3f4; caret-color:#86a4ff; font:12px/21px var(--font-geist-mono),Consolas,monospace; tab-size:4; white-space:pre; overflow:auto; }
+.editor-status { display:flex; align-items:center; gap:18px; padding:0 12px; background:#1a2538; color:#8290a8; font-size:8px; }.editor-status .saved { margin-left:auto; color:#5bc99a; }
+.right-panel { display:grid; grid-template-rows:42px minmax(160px,1fr) auto; }.panel-tabs { display:grid; grid-template-columns:1fr 1fr 37px; background:#fafbfc; border-bottom:1px solid var(--line); }.panel-tabs button { position:relative; border:0; background:none; color:#7c8597; font-size:10px; font-weight:700; }.panel-tabs button.active { color:#315cdb; background:#fff; box-shadow:inset 0 -2px #4169eb; }.panel-tabs i { position:absolute; width:5px; height:5px; border-radius:50%; background:#fa6d52; top:10px; margin-left:3px; }
+.console { margin:0; padding:17px; overflow:auto; background:#fff; color:#566074; font:10px/1.7 var(--font-geist-mono),monospace; white-space:pre-wrap; }.chat { padding:12px; overflow:auto; font-size:10px; }.chat div { margin-bottom:10px; }.chat b { color:#5065a3; }.chat p { margin:3px 0; padding:7px; background:#f2f4f8; border-radius:6px; line-height:1.4; }.chat .teacher-msg p { background:#edf2ff; }.chat input { width:100%; border:1px solid var(--line); border-radius:6px; padding:9px; outline:none; }
+.checks { padding:14px 16px; border-top:1px solid var(--line); background:#fafbfc; }.checks>div { display:flex; align-items:center; gap:9px; margin-top:11px; font-size:10px; }.checks>div>span { width:18px; height:18px; display:grid; place-items:center; border-radius:50%; color:#22a875; background:#dcf7ec; }.checks p { margin:0; display:flex; flex-direction:column; gap:3px; }.checks small { color:#28a576; font-size:8px; }.checks .pending>span { color:#a1a8b4; background:#eceff3; }.checks .pending small { color:#a1a8b4; }
+.actionbar { display:flex; justify-content:space-between; align-items:center; padding:0 20px; border-top:1px solid var(--line); background:#fff; }.actionbar>div { display:flex; align-items:center; gap:14px; }.sync { font-size:9px; color:#687387; }.link-button { border:0; background:none; color:#667185; font-size:9px; }.run-button,.submit-button { border-radius:6px; padding:10px 14px; font-size:10px; font-weight:800; }.run-button { border:1px solid #d9dee7; background:#fff; color:#414c61; }.run-button kbd { margin-left:13px; color:#9aa1ad; font-size:8px; }.submit-button { border:1px solid #3560e5; background:#456cec; color:#fff; }.submit-button.done { border-color:#23966d; background:#2ca979; }
+.toast { position:fixed; z-index:20; left:50%; bottom:24px; transform:translateX(-50%); padding:11px 18px; border-radius:7px; background:#10192c; color:#fff; font-size:11px; box-shadow:0 8px 30px #11182744; }
+@media (max-width:900px) { .topbar { grid-template-columns:220px 1fr; }.class-context { display:none; }.workspace { grid-template-columns:220px 1fr; }.content-grid { grid-template-columns:1fr; overflow:auto; }.right-panel { min-height:360px; }.main-area { overflow:auto; }.presence { display:none; } }
+@media (max-width:680px) { .topbar { grid-template-columns:1fr auto; padding:0 12px; }.teacher-name,.chevron,.teacher-pill { display:none; }.workspace { display:block; height:auto; }.sidebar { display:none; }.main-area { min-height:calc(100vh - 70px); grid-template-rows:auto 1fr auto; }.team-header { grid-template-columns:1fr; padding:12px; }.team-buttons { display:none; }.content-grid { padding:8px; grid-template-columns:1fr; }.editor-card { min-height:560px; }.actionbar { padding:10px; gap:8px; flex-wrap:wrap; }.sync,.link-button { display:none; } }
