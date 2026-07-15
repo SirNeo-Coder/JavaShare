@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const starterCode = `public class Main {
     public static void main(String[] args) {
@@ -31,6 +31,7 @@ const teams = [
   { name: "Team Nova", members: "3 online", status: "Submitted", pct: 100, color: "orange" },
   { name: "Team Pixel", members: "2 online", status: "Needs help", pct: 45, color: "purple" },
 ];
+const teamIds = ["team-orion", "team-nova", "team-pixel"];
 
 export default function Home() {
   const [code, setCode] = useState(starterCode);
@@ -39,16 +40,97 @@ export default function Home() {
   const [output, setOutput] = useState("Ready — click Run to compile Main.java");
   const [submitted, setSubmitted] = useState(false);
   const [toast, setToast] = useState("");
+  const [version, setVersion] = useState(1);
+  const [syncStatus, setSyncStatus] = useState("Connecting…");
+  const codeRef = useRef(code);
+  const versionRef = useRef(version);
+  const lastServerCode = useRef(code);
   const lines = useMemo(() => code.split("\n").length, [code]);
+
+  useEffect(() => { codeRef.current = code; }, [code]);
+  useEffect(() => { versionRef.current = version; }, [version]);
+
+  useEffect(() => {
+    let active = true;
+    const teamId = teamIds[activeTeam];
+    setSyncStatus("Loading workspace…");
+
+    async function loadWorkspace(initial = false) {
+      try {
+        const response = await fetch(`/api/workspace?team=${teamId}`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Workspace unavailable");
+        const workspace = await response.json() as { code: string; version: number; updated_by: string };
+        if (!active) return;
+        if (initial || (workspace.version > versionRef.current && codeRef.current === lastServerCode.current)) {
+          lastServerCode.current = workspace.code;
+          setCode(workspace.code);
+          setVersion(workspace.version);
+        }
+        setSyncStatus(workspace.updated_by.includes("local-teacher") ? "Saved locally" : `Synced with ${workspace.updated_by}`);
+      } catch {
+        if (active) setSyncStatus("Offline demo mode");
+      }
+    }
+
+    loadWorkspace(true);
+    const poll = setInterval(() => loadWorkspace(false), 2000);
+    return () => { active = false; clearInterval(poll); };
+  }, [activeTeam]);
+
+  useEffect(() => {
+    if (code === lastServerCode.current) return;
+    setSyncStatus("Saving…");
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch("/api/workspace", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ teamId: teamIds[activeTeam], code, version: versionRef.current }),
+        });
+        const result = await response.json() as { version?: number; latest?: { version: number }; error?: string };
+        if (response.status === 409 && result.latest) {
+          setVersion(result.latest.version);
+          setSyncStatus("Merged with a newer team version");
+          return;
+        }
+        if (!response.ok || !result.version) throw new Error(result.error);
+        lastServerCode.current = code;
+        setVersion(result.version);
+        setSyncStatus("Everyone is in sync");
+      } catch {
+        setSyncStatus("Changes waiting to sync");
+      }
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [code, activeTeam]);
 
   function notify(message: string) {
     setToast(message);
     setTimeout(() => setToast(""), 2600);
   }
 
-  function runCode() {
+  async function runCode() {
     setPanel("console");
-    setOutput("Compiling Main.java...\n\nMaya: 95\nLiam: 88\nSofia: 92\n\n✓ Process finished with exit code 0 in 0.42s");
+    setOutput("Sending Main.java to the secure Java runner…");
+    try {
+      const response = await fetch("/api/execute", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
+      const result = await response.json() as { output?: string; error?: string; mode?: string };
+      if (!response.ok) throw new Error(result.error);
+      setOutput(`${result.output ?? "Program completed without output."}${result.mode === "demo" ? "\n\n[Demo execution mode]" : ""}`);
+    } catch (error) {
+      setOutput(`Execution failed: ${error instanceof Error ? error.message : "Runner unavailable"}`);
+    }
+  }
+
+  async function submitWork() {
+    try {
+      const response = await fetch("/api/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ teamId: teamIds[activeTeam], code }) });
+      if (!response.ok) throw new Error("Submission failed");
+      setSubmitted(true);
+      notify("Team work submitted for teacher review");
+    } catch {
+      notify("Could not submit while offline");
+    }
   }
 
   return (
@@ -97,7 +179,7 @@ export default function Home() {
                 <div className="line-numbers" aria-hidden="true">{Array.from({ length: lines }, (_, i) => <span key={i}>{i + 1}</span>)}</div>
                 <textarea value={code} onChange={(event) => setCode(event.target.value)} spellCheck={false} aria-label="Java source code editor" />
               </div>
-              <div className="editor-status"><span>Main.java</span><span>Java 21</span><span>Spaces: 4</span><span className="saved">✓ Saved just now</span></div>
+              <div className="editor-status"><span>Main.java</span><span>Java 21</span><span>Version {version}</span><span className="saved">✓ {syncStatus}</span></div>
             </section>
 
             <aside className="right-panel">
@@ -108,8 +190,8 @@ export default function Home() {
           </div>
 
           <footer className="actionbar">
-            <div><span className="sync"><i className="online-dot" /> Everyone is in sync</span><button className="link-button" onClick={() => notify("Version history opened")}>↶ Version history</button></div>
-            <div><button className="run-button" onClick={runCode}>▶ Run code <kbd>Ctrl ↵</kbd></button><button className={`submit-button ${submitted ? "done" : ""}`} onClick={() => { setSubmitted(true); notify("Team work submitted for teacher review"); }}>{submitted ? "✓ Submitted" : "Submit for review"}</button></div>
+            <div><span className="sync"><i className="online-dot" /> {syncStatus}</span><button className="link-button" onClick={() => notify("Version history opened")}>↶ Version history</button></div>
+            <div><button className="run-button" onClick={runCode}>▶ Run code <kbd>Ctrl ↵</kbd></button><button className={`submit-button ${submitted ? "done" : ""}`} onClick={submitWork}>{submitted ? "✓ Submitted" : "Submit for review"}</button></div>
           </footer>
         </section>
       </section>
