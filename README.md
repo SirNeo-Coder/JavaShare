@@ -1,98 +1,97 @@
-# vinext-starter
+# JavaShare
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+JavaShare is a collaborative Java classroom with a Next.js frontend, a Node/Express backend, Supabase Auth/Postgres storage, Socket.IO collaboration, and optional Judge0 execution.
 
-## Prerequisites
+## Architecture
 
-- Node.js `>=22.13.0`
+- `app/` — Next.js classroom UI for local LAN use and Vercel
+- `backend/` — Express API, sessions, Socket.IO, Supabase repository, and Java execution gateway
+- `supabase/` — Postgres schema, Row Level Security, grants, and local Docker configuration
+- Supabase — users, classes, teams, projects, files, versions, chat, saved work, and submissions
 
-## Quick Start
+Students connect only to the JavaShare frontend and backend. The backend is the only component that uses the secret Supabase service-role key; never expose that key in a browser or a `NEXT_PUBLIC_` variable.
 
-```bash
+## Install and verify
+
+```powershell
 npm install
-npm run dev
-npm run build
+npm run build:all
+npm run lint
 ```
 
-This starter does not use `wrangler.jsonc`.
+## Hosted Supabase classroom (recommended)
 
-## Included Shape
+Create `backend/.env.online` from `backend/.env.online.example`, or use the existing ignored `backend/.env`, and provide the hosted project URL and keys. Then run:
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```powershell
+npm run classroom
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+`npm run classroom` is an alias for `npm run classroom:online`. Docker is not required for online mode.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+The launcher builds and starts the frontend on port `3000` and backend on port `4000`. Students open the LAN frontend address printed in the terminal. Next.js forwards API requests to the backend, while Socket.IO connects directly to port `4000` for realtime events. Keep the teacher computer awake and allow Node.js/ports `3000` and `4000` through Windows Firewall on private networks.
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+## Local Supabase classroom (offline)
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+Offline mode requires Docker Desktop. Start it, then run:
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+```powershell
+npm run classroom:offline
+```
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+The launcher starts the local Supabase stack and automatically obtains its URL and API keys. `backend/.env.offline` is optional; copy `backend/.env.offline.example` only when custom settings are needed.
 
-## Useful Commands
+To reset the local database manually:
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+```powershell
+npx.cmd supabase start
+npx.cmd supabase db reset
+```
 
-## Learn More
+## Database migrations
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+Apply pending migrations to the linked hosted Supabase project with:
+
+```powershell
+npx.cmd supabase db push
+```
+
+The schema and API role grants live in `supabase/migrations`.
+
+## Java execution
+
+For classroom use, `LOCAL_JAVA_EXECUTION=true` lets the backend use the teacher computer's JDK. It blocks common file, network, process, and system-control APIs and enforces time, memory, output, rate, and concurrency limits. It is still not a complete security sandbox and is forcibly disabled when `NODE_ENV=production`.
+
+For an internet deployment, configure Judge0 instead:
+
+```text
+JUDGE0_URL
+JUDGE0_API_KEY
+```
+
+## Internet deployment
+
+For the frontend, set:
+
+```text
+NEXT_PUBLIC_API_URL=https://your-backend.example.com
+```
+
+For the backend, configure:
+
+```text
+DATABASE_MODE=supabase-online
+SUPABASE_URL
+SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+JWT_SECRET
+FRONTEND_URL=https://your-frontend.example.com
+JUDGE0_URL
+JUDGE0_API_KEY
+```
+
+`render.yaml` contains the Render service definition. Never commit populated environment files, Supabase service-role keys, session secrets, or Judge0 keys.
+
+## Data model
+
+Current file content is stored as plain text in Postgres. Every accepted save records the previous content in `file_versions`, and every submission stores an immutable file snapshot. Supabase Auth owns credentials while `profiles` stores JavaShare roles and classroom identity.

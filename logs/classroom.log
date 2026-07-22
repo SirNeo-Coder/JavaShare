@@ -1,0 +1,1501 @@
+[2026-07-16T06:48:22.699Z] [backend] MongoDB connected
+[2026-07-16T06:48:22.704Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-16T06:48:23.623Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-16T06:48:23.624Z] [frontend] - Local:         http://localhost:3000
+[2026-07-16T06:48:23.624Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-16T06:48:23.625Z] [frontend] ✓ Ready in 437ms
+[2026-07-16T06:50:30.157Z] Starting JavaShare classroom mode
+[2026-07-16T06:50:31.547Z] [backend] MongoDB connected
+[2026-07-16T06:50:31.552Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-16T06:50:32.300Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-16T06:50:32.300Z] [frontend] - Local:         http://localhost:3000
+[2026-07-16T06:50:32.300Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-16T06:50:32.300Z] [frontend] ✓ Ready in 311ms
+[2026-07-16T06:50:48.034Z] Starting JavaShare classroom mode
+[2026-07-16T06:50:48.102Z] JavaShare is already running; reusing the existing classroom instance
+[2026-07-16T06:51:15.511Z] Starting JavaShare classroom mode
+[2026-07-16T06:51:16.912Z] [backend] MongoDB connected
+[2026-07-16T06:51:16.917Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-16T06:51:17.764Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-16T06:51:17.764Z] [frontend] - Local:         http://localhost:3000
+[2026-07-16T06:51:17.764Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-16T06:51:17.765Z] [frontend] ✓ Ready in 358ms
+[2026-07-16T06:52:04.498Z] Starting JavaShare classroom mode
+[2026-07-16T06:52:05.915Z] [backend] MongoDB connected
+[2026-07-16T06:52:05.920Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-16T06:52:06.751Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-16T06:52:06.751Z] [frontend] - Local:         http://localhost:3000
+[2026-07-16T06:52:06.751Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-16T06:52:06.752Z] [frontend] ✓ Ready in 352ms
+[2026-07-16T23:12:50.417Z] Starting JavaShare classroom mode
+[2026-07-16T23:12:51.591Z] [backend] MongoDB connected
+[2026-07-16T23:12:51.595Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-16T23:12:52.139Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-16T23:12:52.140Z] [frontend] - Local:         http://localhost:3000
+[2026-07-16T23:12:52.140Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-16T23:12:52.140Z] [frontend] ✓ Ready in 246ms
+[2026-07-16T23:18:29.987Z] Starting JavaShare classroom mode
+[2026-07-16T23:18:30.769Z] [backend] MongoDB connected
+[2026-07-16T23:18:30.773Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-16T23:18:31.150Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-16T23:18:31.150Z] [frontend] - Local:         http://localhost:3000
+[2026-07-16T23:18:31.150Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-16T23:18:31.150Z] [frontend] ✓ Ready in 197ms
+[2026-07-16T23:30:37.990Z] Starting JavaShare classroom mode
+[2026-07-16T23:30:39.353Z] [backend] MongoDB connected
+[2026-07-16T23:30:39.357Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-16T23:30:39.929Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-16T23:30:39.929Z] [frontend] - Local:         http://localhost:3000
+[2026-07-16T23:30:39.929Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-16T23:30:39.930Z] [frontend] ✓ Ready in 222ms
+[2026-07-16T23:45:44.440Z] frontend stopped unexpectedly (exit code: 3221225786, signal: none)
+[2026-07-17T00:29:48.286Z] Starting JavaShare classroom mode
+[2026-07-17T00:29:52.818Z] backend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-17T00:32:36.923Z] Starting JavaShare classroom mode
+[2026-07-17T00:32:37.844Z] [backend] mongodb database connected
+[2026-07-17T00:32:37.849Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T00:32:38.367Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T00:32:38.367Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T00:32:38.367Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T00:32:38.367Z] [frontend] ✓ Ready in 232ms
+[2026-07-17T01:59:58.999Z] frontend stopped unexpectedly (exit code: 3221225786, signal: none)
+[2026-07-17T02:08:31.637Z] Starting JavaShare classroom mode
+[2026-07-17T02:08:34.680Z] [backend] Database connection or migration failed: Supabase connection failed: permission denied for table profiles
+[2026-07-17T02:08:34.687Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T02:09:01.850Z] Classroom launcher crashed: Error: JavaShare backend did not become ready within 30 seconds
+    at waitForUrl (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/scripts/classroom.mjs:68:9)
+    at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/scripts/classroom.mjs:109:3
+[2026-07-17T02:17:58.859Z] Starting JavaShare classroom mode
+[2026-07-17T02:18:00.328Z] [backend] supabase-local database connected
+[2026-07-17T02:18:00.334Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T02:18:01.122Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T02:18:01.123Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T02:18:01.123Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T02:18:01.123Z] [frontend] ✓ Ready in 308ms
+[2026-07-17T02:39:08.526Z] Starting JavaShare classroom mode
+[2026-07-17T02:39:09.706Z] [backend] supabase-local database connected
+[2026-07-17T02:39:09.713Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T02:39:10.270Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T02:39:10.270Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T02:39:10.270Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T02:39:10.270Z] [frontend] ✓ Ready in 211ms
+[2026-07-17T02:51:47.800Z] Starting JavaShare classroom mode
+[2026-07-17T02:51:48.968Z] [backend] supabase-local database connected
+[2026-07-17T02:51:48.973Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T02:51:49.545Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T02:51:49.545Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T02:51:49.545Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T02:51:49.545Z] [frontend] ✓ Ready in 214ms
+[2026-07-17T03:10:35.152Z] Starting JavaShare classroom mode
+[2026-07-17T03:10:39.112Z] [backend] supabase-local database connected
+[2026-07-17T03:10:39.122Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T03:10:40.060Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T03:10:40.060Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T03:10:40.060Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T03:10:40.061Z] [frontend] ✓ Ready in 508ms
+[2026-07-17T03:35:20.515Z] Starting JavaShare classroom mode
+[2026-07-17T03:35:24.737Z] [backend] supabase-online database connected
+[2026-07-17T03:35:24.739Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T03:35:25.354Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T03:35:25.354Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T03:35:25.354Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T03:35:25.354Z] [frontend] ✓ Ready in 230ms
+[2026-07-17T03:56:29.727Z] Starting JavaShare classroom mode
+[2026-07-17T03:56:31.368Z] [backend] supabase-online database connected
+[2026-07-17T03:56:31.371Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T03:56:32.117Z] [frontend] ⨯ Failed to start server
+[2026-07-17T03:56:32.122Z] [frontend] Error: listen EADDRINUSE: address already in use 0.0.0.0:4000
+[2026-07-17T03:56:32.122Z] [frontend]     at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:4000) {
+[2026-07-17T03:56:32.123Z] [frontend]   code: 'EADDRINUSE',
+[2026-07-17T03:56:32.123Z] [frontend]   errno: -4091,
+[2026-07-17T03:56:32.123Z] [frontend]   syscall: 'listen',
+[2026-07-17T03:56:32.123Z] [frontend]   address: '0.0.0.0',
+[2026-07-17T03:56:32.123Z] [frontend]   port: 4000
+[2026-07-17T03:56:32.123Z] [frontend] }
+[2026-07-17T03:56:32.131Z] frontend stopped unexpectedly (exit code: 1, signal: none)
+[2026-07-17T04:04:55.214Z] Starting JavaShare classroom mode
+[2026-07-17T04:04:57.139Z] [backend] supabase-online database connected
+[2026-07-17T04:04:57.140Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T04:04:57.972Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T04:04:57.973Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T04:04:57.973Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T04:04:57.973Z] [frontend] ✓ Ready in 193ms
+[2026-07-17T04:38:14.340Z] Starting JavaShare classroom mode
+[2026-07-17T04:38:16.104Z] [backend] supabase-online database connected
+[2026-07-17T04:38:16.107Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T04:38:17.401Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T04:38:17.401Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T04:38:17.402Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T04:38:17.402Z] [frontend] ✓ Ready in 557ms
+[2026-07-17T04:41:11.197Z] [backend] PayloadTooLargeError: request entity too large
+[2026-07-17T04:41:11.197Z] [backend]     at readStream (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\raw-body\index.js:163:17)
+[2026-07-17T04:41:11.197Z] [backend]     at getRawBody (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\raw-body\index.js:116:12)
+[2026-07-17T04:41:11.197Z] [backend]     at read (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\body-parser\lib\read.js:113:3)
+[2026-07-17T04:41:11.197Z] [backend]     at jsonParser (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\body-parser\lib\types\json.js:60:5)
+[2026-07-17T04:41:11.197Z] [backend]     at Layer.handleRequest (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\lib\layer.js:152:17)
+[2026-07-17T04:41:11.197Z] [backend]     at trimPrefix (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:342:13)
+[2026-07-17T04:41:11.197Z] [backend]     at C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:297:9
+[2026-07-17T04:41:11.197Z] [backend]     at processParams (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:582:12)
+[2026-07-17T04:41:11.197Z] [backend]     at next (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:291:5)
+[2026-07-17T04:41:11.197Z] [backend]     at cors (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\cors\lib\index.js:188:7) {
+[2026-07-17T04:41:11.197Z] [backend]   expected: 360215,
+[2026-07-17T04:41:11.197Z] [backend]   length: 360215,
+[2026-07-17T04:41:11.197Z] [backend]   limit: 307200,
+[2026-07-17T04:41:11.197Z] [backend]   type: 'entity.too.large'
+[2026-07-17T04:41:11.197Z] [backend] }
+[2026-07-17T04:41:24.398Z] [backend] PayloadTooLargeError: request entity too large
+[2026-07-17T04:41:24.398Z] [backend]     at readStream (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\raw-body\index.js:163:17)
+[2026-07-17T04:41:24.398Z] [backend]     at getRawBody (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\raw-body\index.js:116:12)
+[2026-07-17T04:41:24.398Z] [backend]     at read (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\body-parser\lib\read.js:113:3)
+[2026-07-17T04:41:24.398Z] [backend]     at jsonParser (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\body-parser\lib\types\json.js:60:5)
+[2026-07-17T04:41:24.398Z] [backend]     at Layer.handleRequest (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\lib\layer.js:152:17)
+[2026-07-17T04:41:24.398Z] [backend]     at trimPrefix (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:342:13)
+[2026-07-17T04:41:24.398Z] [backend]     at C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:297:9
+[2026-07-17T04:41:24.398Z] [backend]     at processParams (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:582:12)
+[2026-07-17T04:41:24.398Z] [backend]     at next (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\router\index.js:291:5)
+[2026-07-17T04:41:24.398Z] [backend]     at cors (C:\Users\AdministratorAccount\Documents\GitHub\JavaShare\node_modules\cors\lib\index.js:188:7) {
+[2026-07-17T04:41:24.398Z] [backend]   expected: 360215,
+[2026-07-17T04:41:24.398Z] [backend]   length: 360215,
+[2026-07-17T04:41:24.398Z] [backend]   limit: 307200,
+[2026-07-17T04:41:24.398Z] [backend]   type: 'entity.too.large'
+[2026-07-17T04:41:24.398Z] [backend] }
+[2026-07-17T04:47:11.544Z] Starting JavaShare classroom mode
+[2026-07-17T04:47:46.221Z] Starting JavaShare classroom mode
+[2026-07-17T04:47:48.210Z] [backend] supabase-online database connected
+[2026-07-17T04:47:48.217Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T04:47:49.407Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T04:47:49.407Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T04:47:49.407Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T04:47:49.408Z] [frontend] ✓ Ready in 388ms
+[2026-07-17T04:48:11.885Z] [backend] [TypeError: fetch failed] {
+[2026-07-17T04:48:11.885Z] [backend]   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted addresses: 172.64.149.246:443, 104.18.38.10:443, timeout: 10000ms)
+[2026-07-17T04:48:11.885Z] [backend]       at onConnectTimeout (node:internal/deps/undici/undici:1981:23)
+[2026-07-17T04:48:11.885Z] [backend]       at Immediate._onImmediate (node:internal/deps/undici/undici:1947:35)
+[2026-07-17T04:48:11.885Z] [backend]       at process.processImmediate (node:internal/timers:504:21) {
+[2026-07-17T04:48:11.885Z] [backend]     code: 'UND_ERR_CONNECT_TIMEOUT'
+[2026-07-17T04:48:11.885Z] [backend]   }
+[2026-07-17T04:48:11.885Z] [backend] }
+[2026-07-17T04:48:15.931Z] [backend] [TypeError: fetch failed] {
+[2026-07-17T04:48:15.931Z] [backend]   [cause]: ConnectTimeoutError: Connect Timeout Error (attempted addresses: 172.64.149.246:443, 104.18.38.10:443, timeout: 10000ms)
+[2026-07-17T04:48:15.931Z] [backend]       at onConnectTimeout (node:internal/deps/undici/undici:1981:23)
+[2026-07-17T04:48:15.931Z] [backend]       at Immediate._onImmediate (node:internal/deps/undici/undici:1947:35)
+[2026-07-17T04:48:15.931Z] [backend]       at process.processImmediate (node:internal/timers:504:21) {
+[2026-07-17T04:48:15.931Z] [backend]     code: 'UND_ERR_CONNECT_TIMEOUT'
+[2026-07-17T04:48:15.931Z] [backend]   }
+[2026-07-17T04:48:15.931Z] [backend] }
+[2026-07-17T04:59:56.263Z] frontend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-17T05:03:03.330Z] Starting JavaShare classroom mode
+[2026-07-17T05:03:05.572Z] [backend] supabase-online database connected
+[2026-07-17T05:03:05.574Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T05:03:06.187Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T05:03:06.187Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T05:03:06.187Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T05:03:06.188Z] [frontend] ✓ Ready in 207ms
+[2026-07-17T05:03:47.206Z] frontend stopped unexpectedly (exit code: 3221225786, signal: none)
+[2026-07-17T05:37:28.771Z] Starting JavaShare classroom mode
+[2026-07-17T05:37:31.012Z] [backend] supabase-online database connected
+[2026-07-17T05:37:31.014Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T05:37:31.632Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T05:37:31.632Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T05:37:31.632Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T05:37:31.633Z] [frontend] ✓ Ready in 225ms
+[2026-07-17T06:06:49.638Z] frontend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-17T06:07:51.091Z] Starting JavaShare classroom mode
+[2026-07-17T06:07:55.119Z] [backend] supabase-online database connected
+[2026-07-17T06:07:55.123Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-17T06:07:56.276Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-17T06:07:56.277Z] [frontend] - Local:         http://localhost:3000
+[2026-07-17T06:07:56.277Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-17T06:07:56.277Z] [frontend] ✓ Ready in 505ms
+[2026-07-17T06:28:41.954Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/bootstrap Error: socket hang up
+[2026-07-17T06:28:41.954Z] [frontend]     at ignore-listed frames {
+[2026-07-17T06:28:41.954Z] [frontend]   code: 'ECONNRESET'
+[2026-07-17T06:28:41.954Z] [frontend] }
+[2026-07-17T06:28:41.954Z] [frontend] Error: socket hang up
+[2026-07-17T06:28:41.954Z] [frontend]     at ignore-listed frames {
+[2026-07-17T06:28:41.954Z] [frontend]   code: 'ECONNRESET'
+[2026-07-17T06:28:41.954Z] [frontend] }
+[2026-07-17T06:32:42.006Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: socket hang up
+[2026-07-17T06:32:42.006Z] [frontend]     at ignore-listed frames {
+[2026-07-17T06:32:42.006Z] [frontend]   code: 'ECONNRESET'
+[2026-07-17T06:32:42.006Z] [frontend] }
+[2026-07-17T06:32:42.007Z] [frontend] Error: socket hang up
+[2026-07-17T06:32:42.007Z] [frontend]     at ignore-listed frames {
+[2026-07-17T06:32:42.007Z] [frontend]   code: 'ECONNRESET'
+[2026-07-17T06:32:42.007Z] [frontend] }
+[2026-07-17T07:08:03.616Z] [backend] Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-17T07:08:03.616Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-17T07:08:03.616Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-17T07:08:03.616Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-17T07:08:03.616Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-17T07:08:03.616Z] [backend]     at async canAccessSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:155:13)
+[2026-07-17T07:08:03.616Z] [backend]     at async supabaseLiveSharePayload (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:330:10)
+[2026-07-17T07:08:03.616Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:262:25
+[2026-07-17T07:08:03.617Z] [backend] Could not broadcast presence: Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-17T07:08:03.617Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-17T07:08:03.617Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-17T07:08:03.617Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-17T07:08:03.617Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:26.035Z] [backend] Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-18T01:16:26.035Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:26.035Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-18T01:16:26.036Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:26.036Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:26.036Z] [backend]     at async canAccessSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:155:13)
+[2026-07-18T01:16:26.036Z] [backend]     at async supabaseLiveSharePayload (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:330:10)
+[2026-07-18T01:16:26.036Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:262:25
+[2026-07-18T01:16:26.397Z] [backend] Could not join classroom socket rooms: Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-18T01:16:26.397Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:26.397Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-18T01:16:26.397Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:26.397Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:26.399Z] [backend] Could not join team room: Error: Could not verify team classroom: TypeError: fetch failed
+[2026-07-18T01:16:26.400Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:26.400Z] [backend]     at canAccessSupabaseTeam (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:173:5)
+[2026-07-18T01:16:26.400Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:26.400Z] [backend]     at async Socket.<anonymous> (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:496:28)
+[2026-07-18T01:16:26.400Z] [backend] Could not join classroom room: Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-18T01:16:26.400Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:26.400Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-18T01:16:26.400Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:26.400Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:26.400Z] [backend]     at async canAccessSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:155:13)
+[2026-07-18T01:16:26.400Z] [backend]     at async Socket.<anonymous> (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:479:18)
+[2026-07-18T01:16:26.402Z] [backend] Could not join team room: Error: Could not verify team classroom: TypeError: fetch failed
+[2026-07-18T01:16:26.402Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:26.402Z] [backend]     at canAccessSupabaseTeam (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:173:5)
+[2026-07-18T01:16:26.402Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:26.402Z] [backend]     at async Socket.<anonymous> (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:496:28)
+[2026-07-18T01:16:26.402Z] [backend] Could not join classroom socket rooms: Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-18T01:16:26.402Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:26.402Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-18T01:16:26.402Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:26.402Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:26.407Z] [backend] Could not join classroom room: Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-18T01:16:26.407Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:26.407Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-18T01:16:26.407Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:26.407Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:26.407Z] [backend]     at async canAccessSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:155:13)
+[2026-07-18T01:16:26.407Z] [backend]     at async Socket.<anonymous> (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:479:18)
+[2026-07-18T01:16:33.076Z] [backend] Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-18T01:16:33.076Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:33.076Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-18T01:16:33.076Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:33.076Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:33.076Z] [backend]     at async canAccessSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:155:13)
+[2026-07-18T01:16:33.076Z] [backend]     at async supabaseLiveSharePayload (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:330:10)
+[2026-07-18T01:16:33.076Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:262:25
+[2026-07-18T01:16:40.120Z] [backend] Error: Could not load classrooms: TypeError: fetch failed
+[2026-07-18T01:16:40.120Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T01:16:40.120Z] [backend]     at loadClasses (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:139:9)
+[2026-07-18T01:16:40.120Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T01:16:40.120Z] [backend]     at async supabaseClassIds (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:152:13)
+[2026-07-18T01:16:40.120Z] [backend]     at async canAccessSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:155:13)
+[2026-07-18T01:16:40.120Z] [backend]     at async supabaseLiveSharePayload (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:330:10)
+[2026-07-18T01:16:40.120Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:262:25
+[2026-07-18T01:17:03.402Z] frontend stopped unexpectedly (exit code: 3221225786, signal: none)
+[2026-07-18T12:55:51.961Z] Starting JavaShare classroom mode
+[2026-07-18T12:55:55.410Z] [backend] supabase-online database connected
+[2026-07-18T12:55:55.414Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T12:55:56.314Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T12:55:56.315Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T12:55:56.315Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T12:55:56.316Z] [frontend] ✓ Ready in 483ms
+[2026-07-18T13:13:44.530Z] Starting JavaShare classroom mode
+[2026-07-18T13:13:46.645Z] [backend] supabase-online database connected
+[2026-07-18T13:13:46.647Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T13:13:47.532Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T13:13:47.534Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T13:13:47.534Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T13:13:47.534Z] [frontend] ✓ Ready in 369ms
+[2026-07-18T13:15:19.417Z] Starting JavaShare classroom mode
+[2026-07-18T13:15:21.244Z] [backend] supabase-online database connected
+[2026-07-18T13:15:21.247Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T13:15:22.295Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T13:15:22.296Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T13:15:22.296Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T13:15:22.296Z] [frontend] ✓ Ready in 512ms
+[2026-07-18T13:27:22.211Z] Starting JavaShare classroom mode
+[2026-07-18T13:27:23.899Z] [backend] supabase-online database connected
+[2026-07-18T13:27:23.901Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T13:27:25.187Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T13:27:25.188Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T13:27:25.189Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T13:27:25.189Z] [frontend] ✓ Ready in 545ms
+[2026-07-18T13:34:14.676Z] Starting JavaShare classroom mode
+[2026-07-18T13:34:15.976Z] [backend] supabase-online database connected
+[2026-07-18T13:34:15.978Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T13:34:16.678Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T13:34:16.678Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T13:34:16.678Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T13:34:16.679Z] [frontend] ✓ Ready in 301ms
+[2026-07-18T13:47:33.904Z] Starting JavaShare classroom mode
+[2026-07-18T13:47:35.712Z] [backend] supabase-online database connected
+[2026-07-18T13:47:35.715Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T13:47:36.672Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T13:47:36.672Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T13:47:36.672Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T13:47:36.673Z] [frontend] ✓ Ready in 461ms
+[2026-07-18T13:58:55.195Z] Starting JavaShare classroom mode
+[2026-07-18T13:58:57.255Z] [backend] supabase-online database connected
+[2026-07-18T13:58:57.258Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T13:58:58.230Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T13:58:58.230Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T13:58:58.231Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T13:58:58.231Z] [frontend] ✓ Ready in 352ms
+[2026-07-18T14:15:13.757Z] Starting JavaShare classroom mode
+[2026-07-18T14:15:15.492Z] [backend] supabase-online database connected
+[2026-07-18T14:15:15.495Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T14:15:16.418Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T14:15:16.419Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T14:15:16.419Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T14:15:16.419Z] [frontend] ✓ Ready in 270ms
+[2026-07-18T14:21:39.862Z] Starting JavaShare classroom mode
+[2026-07-18T14:21:41.080Z] [backend] supabase-online database connected
+[2026-07-18T14:21:41.083Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T14:21:41.842Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T14:21:41.842Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T14:21:41.842Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T14:21:41.843Z] [frontend] ✓ Ready in 282ms
+[2026-07-18T14:50:48.437Z] Starting JavaShare classroom mode
+[2026-07-18T14:50:49.666Z] [backend] supabase-online database connected
+[2026-07-18T14:50:49.670Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T14:50:50.542Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T14:50:50.542Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T14:50:50.542Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T14:50:50.542Z] [frontend] ✓ Ready in 385ms
+[2026-07-18T15:04:34.635Z] backend health check failed (1/3)
+[2026-07-18T15:04:36.350Z] [backend] Error: Could not version restored file: duplicate key value violates unique constraint "file_versions_file_id_version_key"
+[2026-07-18T15:04:36.350Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T15:04:36.350Z] [backend]     at restoreSupabaseSavedWork (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:899:13)
+[2026-07-18T15:04:36.350Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T15:04:36.350Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:366:25
+[2026-07-18T15:04:36.453Z] [backend] Error: Could not version restored file: duplicate key value violates unique constraint "file_versions_file_id_version_key"
+[2026-07-18T15:04:36.454Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T15:04:36.454Z] [backend]     at restoreSupabaseSavedWork (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:899:13)
+[2026-07-18T15:04:36.454Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T15:04:36.454Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:366:25
+[2026-07-18T15:04:41.742Z] backend health check recovered
+[2026-07-18T15:55:35.932Z] Starting JavaShare classroom mode
+[2026-07-18T15:55:38.417Z] [backend] supabase-online database connected
+[2026-07-18T15:55:38.420Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T15:55:39.465Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T15:55:39.466Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T15:55:39.466Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T15:55:39.466Z] [frontend] ✓ Ready in 408ms
+[2026-07-18T16:09:11.555Z] Starting JavaShare classroom mode
+[2026-07-18T16:09:13.940Z] [backend] supabase-online database connected
+[2026-07-18T16:09:13.943Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T16:09:15.559Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T16:09:15.561Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T16:09:15.561Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T16:09:15.561Z] [frontend] ✓ Ready in 856ms
+[2026-07-18T16:23:30.178Z] Starting JavaShare classroom mode
+[2026-07-18T16:23:31.911Z] [backend] supabase-online database connected
+[2026-07-18T16:23:31.917Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T16:23:33.369Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T16:23:33.371Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T16:23:33.371Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T16:23:33.373Z] [frontend] ✓ Ready in 674ms
+[2026-07-18T16:38:12.893Z] Starting JavaShare classroom mode
+[2026-07-18T16:38:14.659Z] [backend] supabase-online database connected
+[2026-07-18T16:38:14.661Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T16:38:15.745Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T16:38:15.746Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T16:38:15.746Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T16:38:15.747Z] [frontend] ✓ Ready in 516ms
+[2026-07-18T17:04:55.292Z] Starting JavaShare classroom mode
+[2026-07-18T17:04:57.215Z] [backend] supabase-online database connected
+[2026-07-18T17:04:57.217Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:04:58.185Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T17:04:58.185Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T17:04:58.185Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T17:04:58.186Z] [frontend] ✓ Ready in 342ms
+[2026-07-18T17:06:09.329Z] [backend] Error: Could not clear ended group activity: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:06:09.329Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:06:09.329Z] [backend]     at endSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:611:13)
+[2026-07-18T17:06:09.329Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:06:09.329Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:252:25
+[2026-07-18T17:06:14.648Z] [backend] Error: Could not clear ended group activity: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:06:14.648Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:06:14.648Z] [backend]     at endSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:611:13)
+[2026-07-18T17:06:14.648Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:06:14.648Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:252:25
+[2026-07-18T17:06:18.355Z] [backend] Error: Could not clear ended group activity: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:06:18.355Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:06:18.355Z] [backend]     at endSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:611:13)
+[2026-07-18T17:06:18.355Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:06:18.355Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:252:25
+[2026-07-18T17:06:24.619Z] [backend] Error: Could not clear ended group activity: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:06:24.619Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:06:24.619Z] [backend]     at endSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:611:13)
+[2026-07-18T17:06:24.619Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:06:24.619Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:252:25
+[2026-07-18T17:14:10.841Z] Starting JavaShare classroom mode
+[2026-07-18T17:14:12.296Z] [backend] supabase-online database connected
+[2026-07-18T17:14:12.300Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:14:13.448Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T17:14:13.449Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T17:14:13.449Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T17:14:13.449Z] [frontend] ✓ Ready in 535ms
+[2026-07-18T17:15:37.025Z] Starting JavaShare classroom mode
+[2026-07-18T17:15:38.554Z] [backend] supabase-online database connected
+[2026-07-18T17:15:38.557Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:15:39.389Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T17:15:39.389Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T17:15:39.389Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T17:15:39.390Z] [frontend] ✓ Ready in 390ms
+[2026-07-18T17:22:11.571Z] Starting JavaShare classroom mode
+[2026-07-18T17:22:13.772Z] [backend] supabase-online database connected
+[2026-07-18T17:22:13.779Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:22:14.898Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T17:22:14.900Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T17:22:14.900Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T17:22:14.901Z] [frontend] ✓ Ready in 580ms
+[2026-07-18T17:23:32.000Z] [backend] Error: Could not clear previous leader votes: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:23:32.000Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:23:32.000Z] [backend]     at autoGroupSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:715:9)
+[2026-07-18T17:23:32.000Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:23:32.000Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:225:24
+[2026-07-18T17:23:38.613Z] [backend] Error: Could not clear previous leader votes: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:23:38.613Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:23:38.613Z] [backend]     at autoGroupSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:715:9)
+[2026-07-18T17:23:38.613Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:23:38.613Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:225:24
+[2026-07-18T17:23:43.371Z] [backend] Error: Could not clear previous leader votes: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:23:43.371Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:23:43.371Z] [backend]     at autoGroupSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:715:9)
+[2026-07-18T17:23:43.371Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:23:43.371Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:225:24
+[2026-07-18T17:23:45.638Z] [backend] Error: Could not clear previous leader votes: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:23:45.638Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:23:45.638Z] [backend]     at autoGroupSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:715:9)
+[2026-07-18T17:23:45.638Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:23:45.638Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:225:24
+[2026-07-18T17:23:53.364Z] [backend] Error: Could not clear previous leader votes: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:23:53.364Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:23:53.364Z] [backend]     at autoGroupSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:715:9)
+[2026-07-18T17:23:53.364Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:23:53.364Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:225:24
+[2026-07-18T17:24:44.141Z] [backend] Error: Could not clear previous leader votes: Could not find the table 'public.group_leader_votes' in the schema cache
+[2026-07-18T17:24:44.141Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:24:44.141Z] [backend]     at autoGroupSupabaseClass (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:715:9)
+[2026-07-18T17:24:44.141Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:24:44.141Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:225:24
+[2026-07-18T17:26:53.079Z] Starting JavaShare classroom mode
+[2026-07-18T17:26:56.566Z] [backend] supabase-online database connected
+[2026-07-18T17:26:56.570Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:26:57.455Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T17:26:57.456Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T17:26:57.456Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T17:26:57.456Z] [frontend] ✓ Ready in 446ms
+[2026-07-18T17:28:27.858Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-18T17:28:27.858Z] [frontend]     at ignore-listed frames {
+[2026-07-18T17:28:27.858Z] [frontend]   errno: -4077,
+[2026-07-18T17:28:27.858Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T17:28:27.858Z] [frontend]   syscall: 'read'
+[2026-07-18T17:28:27.858Z] [frontend] }
+[2026-07-18T17:28:27.859Z] [frontend] Error: read ECONNRESET
+[2026-07-18T17:28:27.859Z] [frontend]     at ignore-listed frames {
+[2026-07-18T17:28:27.859Z] [frontend]   errno: -4077,
+[2026-07-18T17:28:27.859Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T17:28:27.859Z] [frontend]   syscall: 'read'
+[2026-07-18T17:28:27.859Z] [frontend] }
+[2026-07-18T17:28:27.861Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/auto-group Error: read ECONNRESET
+[2026-07-18T17:28:27.861Z] [frontend]     at ignore-listed frames {
+[2026-07-18T17:28:27.861Z] [frontend]   errno: -4077,
+[2026-07-18T17:28:27.861Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T17:28:27.861Z] [frontend]   syscall: 'read'
+[2026-07-18T17:28:27.861Z] [frontend] }
+[2026-07-18T17:28:27.862Z] [frontend] Error: read ECONNRESET
+[2026-07-18T17:28:27.862Z] [frontend]     at ignore-listed frames {
+[2026-07-18T17:28:27.862Z] [frontend]   errno: -4077,
+[2026-07-18T17:28:27.862Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T17:28:27.862Z] [frontend]   syscall: 'read'
+[2026-07-18T17:28:27.862Z] [frontend] }
+[2026-07-18T17:28:27.863Z] backend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-18T17:28:27.863Z] Restarting backend in 2 seconds…
+[2026-07-18T17:28:28.400Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:28.400Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:28.401Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:28.401Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:28.401Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:28.401Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:28.401Z] [frontend]   port: 4000
+[2026-07-18T17:28:28.401Z] [frontend] }
+[2026-07-18T17:28:28.401Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:28.401Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:28.401Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:28.401Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:28.401Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:28.401Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:28.401Z] [frontend]   port: 4000
+[2026-07-18T17:28:28.401Z] [frontend] }
+[2026-07-18T17:28:29.138Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:29.138Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:29.138Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:29.138Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:29.138Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:29.138Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:29.138Z] [frontend]   port: 4000
+[2026-07-18T17:28:29.138Z] [frontend] }
+[2026-07-18T17:28:29.138Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:29.138Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:29.138Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:29.138Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:29.138Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:29.138Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:29.138Z] [frontend]   port: 4000
+[2026-07-18T17:28:29.138Z] [frontend] }
+[2026-07-18T17:28:29.519Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:29.519Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:29.519Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:29.519Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:29.519Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:29.519Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:29.519Z] [frontend]   port: 4000
+[2026-07-18T17:28:29.519Z] [frontend] }
+[2026-07-18T17:28:29.520Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:29.520Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:29.520Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:29.520Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:29.520Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:29.520Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:29.520Z] [frontend]   port: 4000
+[2026-07-18T17:28:29.520Z] [frontend] }
+[2026-07-18T17:28:30.403Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:30.403Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:30.403Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:30.403Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:30.403Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:30.403Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:30.403Z] [frontend]   port: 4000
+[2026-07-18T17:28:30.403Z] [frontend] }
+[2026-07-18T17:28:30.403Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T17:28:30.403Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T17:28:30.403Z] [frontend]   errno: -4078,
+[2026-07-18T17:28:30.403Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T17:28:30.403Z] [frontend]   syscall: 'connect',
+[2026-07-18T17:28:30.403Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T17:28:30.403Z] [frontend]   port: 4000
+[2026-07-18T17:28:30.403Z] [frontend] }
+[2026-07-18T17:28:30.504Z] [backend] supabase-online database connected
+[2026-07-18T17:28:30.506Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:54:11.220Z] Starting JavaShare classroom mode
+[2026-07-18T17:54:13.353Z] [backend] supabase-online database connected
+[2026-07-18T17:54:13.356Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:54:14.652Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T17:54:14.652Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T17:54:14.652Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T17:54:14.653Z] [frontend] ✓ Ready in 721ms
+[2026-07-18T17:54:20.660Z] [backend] Error: Could not load group member permissions: Could not find the table 'public.group_member_permissions' in the schema cache
+[2026-07-18T17:54:20.660Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:54:20.660Z] [backend]     at bootstrapFromSupabase (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:269:5)
+[2026-07-18T17:54:20.660Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:54:20.660Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:215:25
+[2026-07-18T17:54:54.419Z] [backend] Error: Could not load group member permissions: Could not find the table 'public.group_member_permissions' in the schema cache
+[2026-07-18T17:54:54.419Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-18T17:54:54.419Z] [backend]     at bootstrapFromSupabase (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:269:5)
+[2026-07-18T17:54:54.420Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-18T17:54:54.420Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:215:25
+[2026-07-18T17:57:18.980Z] Starting JavaShare classroom mode
+[2026-07-18T17:57:20.735Z] [backend] supabase-online database connected
+[2026-07-18T17:57:20.738Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-18T17:57:21.898Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-18T17:57:21.899Z] [frontend] - Local:         http://localhost:3000
+[2026-07-18T17:57:21.899Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-18T17:57:21.899Z] [frontend] ✓ Ready in 396ms
+[2026-07-18T18:07:13.948Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/bootstrap?view=students Error: read ECONNRESET
+[2026-07-18T18:07:13.948Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.948Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.948Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.948Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.948Z] [frontend] }
+[2026-07-18T18:07:13.949Z] [frontend] Error: read ECONNRESET
+[2026-07-18T18:07:13.949Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.949Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.949Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.949Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.949Z] [frontend] }
+[2026-07-18T18:07:13.951Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/bootstrap Error: read ECONNRESET
+[2026-07-18T18:07:13.951Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.951Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.951Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.951Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.951Z] [frontend] }
+[2026-07-18T18:07:13.952Z] [frontend] Error: read ECONNRESET
+[2026-07-18T18:07:13.952Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.952Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.952Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.952Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.952Z] [frontend] }
+[2026-07-18T18:07:13.953Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/bootstrap?view=groups Error: read ECONNRESET
+[2026-07-18T18:07:13.953Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.953Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.953Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.953Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.953Z] [frontend] }
+[2026-07-18T18:07:13.954Z] [frontend] Error: read ECONNRESET
+[2026-07-18T18:07:13.954Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.954Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.954Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.954Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.954Z] [frontend] }
+[2026-07-18T18:07:13.955Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/bootstrap Error: read ECONNRESET
+[2026-07-18T18:07:13.955Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.955Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.955Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.955Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.955Z] [frontend] }
+[2026-07-18T18:07:13.956Z] [frontend] Error: read ECONNRESET
+[2026-07-18T18:07:13.956Z] [frontend]     at ignore-listed frames {
+[2026-07-18T18:07:13.956Z] [frontend]   errno: -4077,
+[2026-07-18T18:07:13.956Z] [frontend]   code: 'ECONNRESET',
+[2026-07-18T18:07:13.956Z] [frontend]   syscall: 'read'
+[2026-07-18T18:07:13.956Z] [frontend] }
+[2026-07-18T18:07:13.957Z] backend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-18T18:07:13.957Z] Restarting backend in 2 seconds…
+[2026-07-18T18:07:13.962Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/bootstrap?view=groups Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:13.962Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:13.962Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:13.962Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:13.962Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:13.962Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:13.962Z] [frontend]   port: 4000
+[2026-07-18T18:07:13.962Z] [frontend] }
+[2026-07-18T18:07:13.963Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:13.963Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:13.963Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:13.963Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:13.963Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:13.963Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:13.963Z] [frontend]   port: 4000
+[2026-07-18T18:07:13.963Z] [frontend] }
+[2026-07-18T18:07:14.007Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:14.007Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:14.007Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:14.007Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:14.007Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:14.007Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:14.007Z] [frontend]   port: 4000
+[2026-07-18T18:07:14.007Z] [frontend] }
+[2026-07-18T18:07:14.008Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:14.008Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:14.008Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:14.008Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:14.008Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:14.008Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:14.008Z] [frontend]   port: 4000
+[2026-07-18T18:07:14.008Z] [frontend] }
+[2026-07-18T18:07:14.159Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:14.159Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:14.159Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:14.159Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:14.159Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:14.159Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:14.159Z] [frontend]   port: 4000
+[2026-07-18T18:07:14.159Z] [frontend] }
+[2026-07-18T18:07:14.159Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:14.159Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:14.159Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:14.159Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:14.159Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:14.159Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:14.159Z] [frontend]   port: 4000
+[2026-07-18T18:07:14.159Z] [frontend] }
+[2026-07-18T18:07:15.060Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:15.060Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:15.060Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:15.060Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:15.060Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:15.060Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:15.060Z] [frontend]   port: 4000
+[2026-07-18T18:07:15.060Z] [frontend] }
+[2026-07-18T18:07:15.060Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:15.060Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:15.060Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:15.060Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:15.060Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:15.060Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:15.060Z] [frontend]   port: 4000
+[2026-07-18T18:07:15.060Z] [frontend] }
+[2026-07-18T18:07:16.021Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:16.021Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:16.021Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:16.021Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:16.021Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:16.021Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:16.021Z] [frontend]   port: 4000
+[2026-07-18T18:07:16.021Z] [frontend] }
+[2026-07-18T18:07:16.021Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:16.022Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:16.022Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:16.022Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:16.022Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:16.022Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:16.022Z] [frontend]   port: 4000
+[2026-07-18T18:07:16.022Z] [frontend] }
+[2026-07-18T18:07:16.172Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:16.172Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:16.172Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:16.172Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:16.172Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:16.172Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:16.172Z] [frontend]   port: 4000
+[2026-07-18T18:07:16.172Z] [frontend] }
+[2026-07-18T18:07:16.172Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-18T18:07:16.172Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-18T18:07:16.172Z] [frontend]   errno: -4078,
+[2026-07-18T18:07:16.172Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-18T18:07:16.172Z] [frontend]   syscall: 'connect',
+[2026-07-18T18:07:16.172Z] [frontend]   address: '127.0.0.1',
+[2026-07-18T18:07:16.172Z] [frontend]   port: 4000
+[2026-07-18T18:07:16.172Z] [frontend] }
+[2026-07-18T18:07:16.599Z] [backend] supabase-online database connected
+[2026-07-18T18:07:16.600Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T03:55:43.450Z] Starting JavaShare classroom mode
+[2026-07-20T03:56:07.502Z] [backend] supabase-online database connected
+[2026-07-20T03:56:07.504Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T03:56:08.665Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T03:56:08.666Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T03:56:08.666Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T03:56:08.666Z] [frontend] ✓ Ready in 421ms
+[2026-07-20T04:04:15.324Z] [backend] Error: Could not save activity roster: Could not find the table 'public.activity_workspace_members' in the schema cache
+[2026-07-20T04:04:15.325Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-20T04:04:15.325Z] [backend]     at syncRoster (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:605:13)
+[2026-07-20T04:04:15.325Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-20T04:04:15.325Z] [backend]     at async ensureSupabaseProject (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:631:5)
+[2026-07-20T04:04:15.325Z] [backend]     at async Promise.all (index 10)
+[2026-07-20T04:04:15.325Z] [backend]     at async createSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:665:5)
+[2026-07-20T04:04:15.325Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:242:25
+[2026-07-20T04:04:23.477Z] [backend] Error: Could not save activity roster: Could not find the table 'public.activity_workspace_members' in the schema cache
+[2026-07-20T04:04:23.477Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-20T04:04:23.477Z] [backend]     at syncRoster (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:605:13)
+[2026-07-20T04:04:23.477Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-20T04:04:23.477Z] [backend]     at async ensureSupabaseProject (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:631:5)
+[2026-07-20T04:04:23.477Z] [backend]     at async Promise.all (index 3)
+[2026-07-20T04:04:23.477Z] [backend]     at async createSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:665:5)
+[2026-07-20T04:04:23.477Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:242:25
+[2026-07-20T04:04:39.056Z] [backend] Error: Could not save activity roster: Could not find the table 'public.activity_workspace_members' in the schema cache
+[2026-07-20T04:04:39.056Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-20T04:04:39.056Z] [backend]     at syncRoster (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:605:13)
+[2026-07-20T04:04:39.056Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-20T04:04:39.056Z] [backend]     at async ensureSupabaseProject (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:631:5)
+[2026-07-20T04:04:39.056Z] [backend]     at async Promise.all (index 0)
+[2026-07-20T04:04:39.056Z] [backend]     at async createSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:665:5)
+[2026-07-20T04:04:39.056Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:242:25
+[2026-07-20T04:04:57.969Z] [backend] Error: Could not save activity roster: Could not find the table 'public.activity_workspace_members' in the schema cache
+[2026-07-20T04:04:57.969Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-20T04:04:57.969Z] [backend]     at syncRoster (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:605:13)
+[2026-07-20T04:04:57.969Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-20T04:04:57.969Z] [backend]     at async ensureSupabaseProject (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:631:5)
+[2026-07-20T04:04:57.969Z] [backend]     at async Promise.all (index 0)
+[2026-07-20T04:04:57.969Z] [backend]     at async createSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:665:5)
+[2026-07-20T04:04:57.969Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:242:25
+[2026-07-20T04:05:17.699Z] [backend] Error: Could not save activity roster: Could not find the table 'public.activity_workspace_members' in the schema cache
+[2026-07-20T04:05:17.699Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-20T04:05:17.699Z] [backend]     at syncRoster (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:605:13)
+[2026-07-20T04:05:17.699Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-20T04:05:17.699Z] [backend]     at async ensureSupabaseProject (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:631:5)
+[2026-07-20T04:05:17.699Z] [backend]     at async Promise.all (index 15)
+[2026-07-20T04:05:17.699Z] [backend]     at async createSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:665:5)
+[2026-07-20T04:05:17.699Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:242:25
+[2026-07-20T04:06:34.105Z] [backend] Error: Could not save activity roster: Could not find the table 'public.activity_workspace_members' in the schema cache
+[2026-07-20T04:06:34.105Z] [backend]     at fail (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:12:15)
+[2026-07-20T04:06:34.105Z] [backend]     at syncRoster (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:605:13)
+[2026-07-20T04:06:34.105Z] [backend]     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[2026-07-20T04:06:34.105Z] [backend]     at async ensureSupabaseProject (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:631:5)
+[2026-07-20T04:06:34.105Z] [backend]     at async Promise.all (index 0)
+[2026-07-20T04:06:34.105Z] [backend]     at async createSupabaseActivity (file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/supabase-repository.js:665:5)
+[2026-07-20T04:06:34.105Z] [backend]     at async file:///C:/Users/AdministratorAccount/Documents/GitHub/JavaShare/backend/dist/server.js:242:25
+[2026-07-20T04:09:06.476Z] Starting JavaShare classroom mode
+[2026-07-20T04:09:08.542Z] [backend] supabase-online database connected
+[2026-07-20T04:09:08.546Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T04:09:09.737Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T04:09:09.738Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T04:09:09.738Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T04:09:09.738Z] [frontend] ✓ Ready in 550ms
+[2026-07-20T04:19:54.017Z] backend health check failed (1/3)
+[2026-07-20T04:20:04.032Z] backend health check failed (2/3)
+[2026-07-20T04:20:14.031Z] backend health check failed (3/3)
+[2026-07-20T04:20:14.031Z] backend is unresponsive; restarting it now
+[2026-07-20T04:20:14.040Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:20:14.040Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.040Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.040Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.040Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.040Z] [frontend] }
+[2026-07-20T04:20:14.041Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:20:14.041Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.041Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.041Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.041Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.041Z] [frontend] }
+[2026-07-20T04:20:14.043Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:20:14.043Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.043Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.043Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.043Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.043Z] [frontend] }
+[2026-07-20T04:20:14.044Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:20:14.044Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.044Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.044Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.044Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.044Z] [frontend] }
+[2026-07-20T04:20:14.045Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:20:14.045Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.045Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.045Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.045Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.045Z] [frontend] }
+[2026-07-20T04:20:14.046Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:20:14.046Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.046Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.046Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.046Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.046Z] [frontend] }
+[2026-07-20T04:20:14.048Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:20:14.048Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.048Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.048Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.048Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.048Z] [frontend] }
+[2026-07-20T04:20:14.049Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:20:14.049Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.049Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.049Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.049Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.049Z] [frontend] }
+[2026-07-20T04:20:14.050Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:20:14.050Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.050Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.050Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.050Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.050Z] [frontend] }
+[2026-07-20T04:20:14.051Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:20:14.052Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:20:14.052Z] [frontend]   errno: -4077,
+[2026-07-20T04:20:14.052Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:20:14.052Z] [frontend]   syscall: 'read'
+[2026-07-20T04:20:14.052Z] [frontend] }
+[2026-07-20T04:20:14.056Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.056Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.056Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.056Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.056Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.056Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.056Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.056Z] [frontend] }
+[2026-07-20T04:20:14.057Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.057Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.057Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.057Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.057Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.057Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.057Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.057Z] [frontend] }
+[2026-07-20T04:20:14.061Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.062Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.062Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.062Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.062Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.062Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.062Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.062Z] [frontend] }
+[2026-07-20T04:20:14.062Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.062Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.062Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.062Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.062Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.062Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.062Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.062Z] [frontend] }
+[2026-07-20T04:20:14.066Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.066Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.066Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.066Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.066Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.066Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.066Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.066Z] [frontend] }
+[2026-07-20T04:20:14.067Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.067Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.067Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.067Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.067Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.067Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.067Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.067Z] [frontend] }
+[2026-07-20T04:20:14.071Z] backend stopped unexpectedly (exit code: none, signal: SIGTERM)
+[2026-07-20T04:20:14.071Z] Restarting backend in 2 seconds…
+[2026-07-20T04:20:14.072Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.072Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.072Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.072Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.072Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.072Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.072Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.072Z] [frontend] }
+[2026-07-20T04:20:14.072Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.072Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.072Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.072Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.072Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.072Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.072Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.072Z] [frontend] }
+[2026-07-20T04:20:14.076Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.076Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.076Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.076Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.076Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.076Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.076Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.076Z] [frontend] }
+[2026-07-20T04:20:14.076Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.076Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.076Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.076Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.076Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.076Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.076Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.076Z] [frontend] }
+[2026-07-20T04:20:14.078Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.078Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.078Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.078Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.078Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.078Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.078Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.078Z] [frontend] }
+[2026-07-20T04:20:14.078Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.078Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.078Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.078Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.078Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.078Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.078Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.078Z] [frontend] }
+[2026-07-20T04:20:14.080Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.080Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.080Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.080Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.080Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.080Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.080Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.080Z] [frontend] }
+[2026-07-20T04:20:14.080Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.080Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.080Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.080Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.080Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.080Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.080Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.080Z] [frontend] }
+[2026-07-20T04:20:14.082Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.082Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.082Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.082Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.082Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.082Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.082Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.082Z] [frontend] }
+[2026-07-20T04:20:14.082Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.082Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.082Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.082Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.082Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.082Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.082Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.082Z] [frontend] }
+[2026-07-20T04:20:14.085Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.085Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.085Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.085Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.085Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.085Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.085Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.085Z] [frontend] }
+[2026-07-20T04:20:14.085Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.085Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.085Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.085Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.085Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.085Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.085Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.085Z] [frontend] }
+[2026-07-20T04:20:14.087Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.087Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.087Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.087Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.087Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.087Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.087Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.087Z] [frontend] }
+[2026-07-20T04:20:14.087Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.087Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.087Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.087Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.087Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.087Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.087Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.087Z] [frontend] }
+[2026-07-20T04:20:14.089Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.089Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.089Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.089Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.089Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.089Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.089Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.089Z] [frontend] }
+[2026-07-20T04:20:14.089Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:14.089Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:14.089Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:14.089Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:14.089Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:14.089Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:14.089Z] [frontend]   port: 4000
+[2026-07-20T04:20:14.089Z] [frontend] }
+[2026-07-20T04:20:15.878Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:15.878Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:15.878Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:15.878Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:15.878Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:15.878Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:15.878Z] [frontend]   port: 4000
+[2026-07-20T04:20:15.878Z] [frontend] }
+[2026-07-20T04:20:15.878Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:15.878Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:15.878Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:15.878Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:15.878Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:15.878Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:15.878Z] [frontend]   port: 4000
+[2026-07-20T04:20:15.878Z] [frontend] }
+[2026-07-20T04:20:17.889Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:17.889Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:17.889Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:17.889Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:17.889Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:17.889Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:17.889Z] [frontend]   port: 4000
+[2026-07-20T04:20:17.889Z] [frontend] }
+[2026-07-20T04:20:17.889Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:20:17.889Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:20:17.889Z] [frontend]   errno: -4078,
+[2026-07-20T04:20:17.889Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:20:17.889Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:20:17.889Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:20:17.889Z] [frontend]   port: 4000
+[2026-07-20T04:20:17.889Z] [frontend] }
+[2026-07-20T04:20:18.057Z] [backend] supabase-online database connected
+[2026-07-20T04:20:18.059Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T04:21:37.246Z] frontend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-20T04:21:37.246Z] Restarting frontend in 2 seconds…
+[2026-07-20T04:21:39.603Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T04:21:39.603Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T04:21:39.603Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T04:21:39.603Z] [frontend] ✓ Ready in 217ms
+[2026-07-20T04:22:00.016Z] frontend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-20T04:22:00.016Z] Restarting frontend in 2 seconds…
+[2026-07-20T04:22:02.367Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T04:22:02.368Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T04:22:02.368Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T04:22:02.368Z] [frontend] ✓ Ready in 192ms
+[2026-07-20T04:23:36.255Z] frontend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-20T04:23:36.255Z] Restarting frontend in 2 seconds…
+[2026-07-20T04:23:38.613Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T04:23:38.613Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T04:23:38.613Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T04:23:38.613Z] [frontend] ✓ Ready in 209ms
+[2026-07-20T04:34:14.643Z] backend health check failed (1/3)
+[2026-07-20T04:34:21.752Z] backend health check recovered
+[2026-07-20T04:38:31.211Z] Starting JavaShare classroom mode
+[2026-07-20T04:38:32.877Z] [backend] supabase-online database connected
+[2026-07-20T04:38:32.879Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T04:38:33.886Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T04:38:33.886Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T04:38:33.886Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T04:38:33.887Z] [frontend] ✓ Ready in 405ms
+[2026-07-20T04:51:30.417Z] Starting JavaShare classroom mode
+[2026-07-20T04:51:31.686Z] [backend] supabase-online database connected
+[2026-07-20T04:51:31.688Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T04:51:32.349Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T04:51:32.349Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T04:51:32.349Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T04:51:32.350Z] [frontend] ✓ Ready in 274ms
+[2026-07-20T04:52:36.846Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/teams/3f59b4d7-f7dc-4096-b550-6c2f1f3fcfab/messages Error: read ECONNRESET
+[2026-07-20T04:52:36.846Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.846Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.846Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.846Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.846Z] [frontend] }
+[2026-07-20T04:52:36.847Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:52:36.847Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.847Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.847Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.847Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.847Z] [frontend] }
+[2026-07-20T04:52:36.849Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:52:36.849Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.849Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.849Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.849Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.849Z] [frontend] }
+[2026-07-20T04:52:36.849Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:52:36.849Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.849Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.849Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.849Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.849Z] [frontend] }
+[2026-07-20T04:52:36.850Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/auth/login Error: read ECONNRESET
+[2026-07-20T04:52:36.850Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.850Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.850Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.850Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.850Z] [frontend] }
+[2026-07-20T04:52:36.850Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:52:36.850Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.850Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.850Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.850Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.850Z] [frontend] }
+[2026-07-20T04:52:36.851Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:52:36.851Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.851Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.851Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.851Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.851Z] [frontend] }
+[2026-07-20T04:52:36.851Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:52:36.851Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.851Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.851Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.851Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.851Z] [frontend] }
+[2026-07-20T04:52:36.852Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: read ECONNRESET
+[2026-07-20T04:52:36.852Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.852Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.852Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.852Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.852Z] [frontend] }
+[2026-07-20T04:52:36.853Z] [frontend] Error: read ECONNRESET
+[2026-07-20T04:52:36.853Z] [frontend]     at ignore-listed frames {
+[2026-07-20T04:52:36.853Z] [frontend]   errno: -4077,
+[2026-07-20T04:52:36.853Z] [frontend]   code: 'ECONNRESET',
+[2026-07-20T04:52:36.853Z] [frontend]   syscall: 'read'
+[2026-07-20T04:52:36.853Z] [frontend] }
+[2026-07-20T04:52:36.854Z] backend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-20T04:52:36.854Z] Restarting backend in 2 seconds…
+[2026-07-20T04:52:37.020Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.020Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.020Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.020Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.020Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.020Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.020Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.020Z] [frontend] }
+[2026-07-20T04:52:37.020Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.020Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.020Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.020Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.020Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.020Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.020Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.020Z] [frontend] }
+[2026-07-20T04:52:37.283Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.283Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.283Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.283Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.283Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.283Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.283Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.283Z] [frontend] }
+[2026-07-20T04:52:37.283Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.283Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.283Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.283Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.283Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.283Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.283Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.283Z] [frontend] }
+[2026-07-20T04:52:37.313Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.313Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.313Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.313Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.313Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.313Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.313Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.313Z] [frontend] }
+[2026-07-20T04:52:37.314Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.314Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.314Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.314Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.314Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.314Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.314Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.314Z] [frontend] }
+[2026-07-20T04:52:37.618Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.618Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.618Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.618Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.618Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.618Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.618Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.618Z] [frontend] }
+[2026-07-20T04:52:37.618Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.618Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.618Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.618Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.618Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.618Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.618Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.618Z] [frontend] }
+[2026-07-20T04:52:37.623Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.623Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.623Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.623Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.623Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.623Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.623Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.623Z] [frontend] }
+[2026-07-20T04:52:37.623Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.623Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.623Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.623Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.623Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.623Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.623Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.623Z] [frontend] }
+[2026-07-20T04:52:37.640Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.640Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.640Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.640Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.640Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.640Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.640Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.640Z] [frontend] }
+[2026-07-20T04:52:37.640Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.640Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.640Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.640Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.640Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.640Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.640Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.640Z] [frontend] }
+[2026-07-20T04:52:37.744Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.744Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.744Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.744Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.744Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.744Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.744Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.744Z] [frontend] }
+[2026-07-20T04:52:37.744Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.744Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.744Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.744Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.744Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.744Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.744Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.744Z] [frontend] }
+[2026-07-20T04:52:37.775Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.775Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.775Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.775Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.775Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.775Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.775Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.775Z] [frontend] }
+[2026-07-20T04:52:37.775Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:37.775Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:37.775Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:37.775Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:37.775Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:37.775Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:37.775Z] [frontend]   port: 4000
+[2026-07-20T04:52:37.775Z] [frontend] }
+[2026-07-20T04:52:38.101Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.101Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.101Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.101Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.101Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.101Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.101Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.101Z] [frontend] }
+[2026-07-20T04:52:38.101Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.101Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.101Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.101Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.101Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.101Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.101Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.101Z] [frontend] }
+[2026-07-20T04:52:38.204Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.204Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.204Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.204Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.204Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.204Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.204Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.204Z] [frontend] }
+[2026-07-20T04:52:38.204Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.204Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.204Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.204Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.204Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.204Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.204Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.204Z] [frontend] }
+[2026-07-20T04:52:38.246Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.246Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.246Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.246Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.246Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.246Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.246Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.246Z] [frontend] }
+[2026-07-20T04:52:38.246Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.246Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.246Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.246Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.246Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.246Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.246Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.246Z] [frontend] }
+[2026-07-20T04:52:38.282Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.282Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.282Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.282Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.282Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.282Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.282Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.282Z] [frontend] }
+[2026-07-20T04:52:38.283Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.283Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.283Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.283Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.283Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.283Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.283Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.283Z] [frontend] }
+[2026-07-20T04:52:38.570Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.570Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.570Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.570Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.570Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.570Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.570Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.570Z] [frontend] }
+[2026-07-20T04:52:38.571Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.571Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.571Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.571Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.571Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.571Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.571Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.571Z] [frontend] }
+[2026-07-20T04:52:38.692Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.692Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.692Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.692Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.692Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.692Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.692Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.692Z] [frontend] }
+[2026-07-20T04:52:38.692Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.692Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.692Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.692Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.692Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.692Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.692Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.692Z] [frontend] }
+[2026-07-20T04:52:38.737Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.737Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.737Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.737Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.737Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.737Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.737Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.737Z] [frontend] }
+[2026-07-20T04:52:38.738Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:38.738Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:38.738Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:38.738Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:38.738Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:38.738Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:38.738Z] [frontend]   port: 4000
+[2026-07-20T04:52:38.738Z] [frontend] }
+[2026-07-20T04:52:39.024Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:39.024Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:39.024Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:39.024Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:39.024Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:39.024Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:39.024Z] [frontend]   port: 4000
+[2026-07-20T04:52:39.024Z] [frontend] }
+[2026-07-20T04:52:39.024Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:39.024Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:39.024Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:39.024Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:39.024Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:39.024Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:39.024Z] [frontend]   port: 4000
+[2026-07-20T04:52:39.024Z] [frontend] }
+[2026-07-20T04:52:39.281Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:39.281Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:39.281Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:39.281Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:39.281Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:39.281Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:39.281Z] [frontend]   port: 4000
+[2026-07-20T04:52:39.281Z] [frontend] }
+[2026-07-20T04:52:39.281Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:39.281Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:39.281Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:39.281Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:39.281Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:39.281Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:39.281Z] [frontend]   port: 4000
+[2026-07-20T04:52:39.281Z] [frontend] }
+[2026-07-20T04:52:39.304Z] [frontend] Failed to proxy http://127.0.0.1:4000/api/classes/d0fe148d-ef54-446d-81cf-c0a265c11260/live-share Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:39.304Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:39.304Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:39.304Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:39.304Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:39.304Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:39.304Z] [frontend]   port: 4000
+[2026-07-20T04:52:39.304Z] [frontend] }
+[2026-07-20T04:52:39.304Z] [frontend] Error: connect ECONNREFUSED 127.0.0.1:4000
+[2026-07-20T04:52:39.304Z] [frontend]     at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:4000) {
+[2026-07-20T04:52:39.304Z] [frontend]   errno: -4078,
+[2026-07-20T04:52:39.304Z] [frontend]   code: 'ECONNREFUSED',
+[2026-07-20T04:52:39.304Z] [frontend]   syscall: 'connect',
+[2026-07-20T04:52:39.304Z] [frontend]   address: '127.0.0.1',
+[2026-07-20T04:52:39.304Z] [frontend]   port: 4000
+[2026-07-20T04:52:39.304Z] [frontend] }
+[2026-07-20T04:52:39.527Z] [backend] supabase-online database connected
+[2026-07-20T04:52:39.529Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T04:53:31.518Z] backend stopped unexpectedly (exit code: 3221225786, signal: none)
+[2026-07-20T04:53:31.519Z] Restarting backend in 2 seconds…
+[2026-07-20T04:55:13.033Z] Starting JavaShare classroom mode
+[2026-07-20T04:55:15.329Z] [backend] supabase-online database connected
+[2026-07-20T04:55:15.333Z] [backend] JavaShare backend listening on http://0.0.0.0:4000
+[2026-07-20T04:55:16.412Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T04:55:16.412Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T04:55:16.412Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T04:55:16.413Z] [frontend] ✓ Ready in 475ms
+[2026-07-20T05:48:40.591Z] frontend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-20T05:48:40.591Z] Restarting frontend in 2 seconds…
+[2026-07-20T05:48:43.151Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T05:48:43.151Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T05:48:43.151Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T05:48:43.151Z] [frontend] ✓ Ready in 299ms
+[2026-07-20T05:56:24.195Z] frontend stopped unexpectedly (exit code: 3221226505, signal: none)
+[2026-07-20T05:56:24.195Z] Restarting frontend in 2 seconds…
+[2026-07-20T05:56:26.542Z] [frontend] ▲ Next.js 16.2.6
+[2026-07-20T05:56:26.542Z] [frontend] - Local:         http://localhost:3000
+[2026-07-20T05:56:26.542Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-07-20T05:56:26.542Z] [frontend] ✓ Ready in 201ms
