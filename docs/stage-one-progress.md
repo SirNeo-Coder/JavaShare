@@ -82,7 +82,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
     - the CSS was applied;
     - `console.log`, `warn`, `alert` and async errors appeared with the correct `file:line`;
     - the sandbox blocked `document.cookie`, the parent page and `localStorage`.
-- **Not tested yet:** the full app flow (New web project, then edit, save and Run). This needs local Supabase, which needs Docker. As of 2026-10-16, Docker is **not** installed on this laptop: the `docker.io` package is missing and there is no `docker` group. The teacher was asked to run `sudo apt install -y docker.io` and `sudo usermod -aG docker $USER`, then log out and back in.
+- **Not tested yet:** the full app flow (New web project, then edit, save and Run). Docker was installed on 2026-10-16 (Docker 29.1.3). The teacher's account is in the `docker` group, but sessions started before that need `sg docker -c "<command>"` until the next login. Local Supabase is being started for this test.
 - **Known limits (to tell the teacher in the PR):**
   - Teachers can't yet see students' web projects.
   - Teacher live share stays Java-only.
@@ -92,6 +92,14 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 ### PR (c) Cloudflare and Supabase Realtime: NOT STARTED
 
 Waiting for PR (b). First step: write the Socket.IO replacement proposal and get the teacher's answer.
+
+## Parked by the teacher (do later)
+
+- **Knowledge base like Project VMAS's:**
+  - `AGENTS.md` as the one rule file, and a `CLAUDE.md` that only says to read it.
+  - Bug records `CKB-NNN` under `docs/problem-knowledgebase/`, plus `docs/knowledgebase/` pages.
+  - The structure was proposed on 2026-10-16 but **not yet approved or built**. The teacher said to deal with it later; ask for approval after PR (b) testing.
+  - Planned first records: CKB-001, the leftover "Collaborative Java classroom" subtitle (fixed in PR a); CKB-002, wrong web preview line numbers after a linked stylesheet (caught by a test and fixed).
 
 ## Next steps
 
