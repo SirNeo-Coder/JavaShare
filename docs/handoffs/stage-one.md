@@ -2,8 +2,9 @@
 
 Keep this file current. After every finished step: update it, commit, and push the branch.
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
+The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-16 (PR b tested and opened)
+Last updated: 2026-10-16 (PR c proposal written)
 
 ## The job
 
@@ -30,7 +31,14 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 1. **Plan approved** (2026-10-16): the three PRs as described above.
 2. **Students create web projects with a "New web project" button** in their workspace sidebar. It makes a personal project with `index.html`, `style.css` and `script.js`. A later stage may let the teacher pick "Web" when handing out an activity.
-3. **Pull request (c) is not decided yet.** Before building it, propose how to replace Socket.IO (live code sharing, cursors, active file, chat, teacher live share). The teacher expects Supabase Realtime. Explain the trade-offs and **wait for the teacher's answer**.
+3. **Knowledge base** (2026-10-16): copy Project VMAS's structure with bug ids `CKB-NNN`. `AGENTS.md` is the one rule file, and `CLAUDE.md` only points to it. Every bug found or fixed gets a record, and every agreed rule goes into `AGENTS.md`. This progress file moved to `docs/handoffs/stage-one.md`.
+4. **PR (c) approach approved** (2026-10-16): move the server's `/api` routes into the Next.js app (Cloudflare online, `next start` offline, Java runner offline only), and replace Socket.IO with Supabase Realtime: private Broadcast channels `team:<id>` and `class:<id>`, plus Presence for who's online. Details: `docs/handoffs/stage-one-pr-c-proposal.md`. All four decisions made.
+5. **No sign-out on restart** (2026-10-16): drop the `serverSessionId` check everywhere. Sign-in lasts 7 days online and offline; restarting the laptop no longer signs students out. This is a workflow change; update `docs/knowledgebase/workflow-state.md` and `security-and-scoping.md` when it is built.
+6. **Live update caps** (2026-10-16), the same online and offline: typing at most 3 updates a second per student (about 1/4 second delay); cursors only when they move, at most 4 a second; teacher live share at most 2 updates a second (about 1/2 second delay, about 82 messages a second for a class of 40).
+7. **Split PR (c) into two pull requests** (2026-10-16), each tested offline before review.
+8. **Order swapped** (2026-10-16), so no temporary bridge code is needed:
+   - **c1 (Realtime):** live features move to Supabase Realtime inside today's Express server, Socket.IO is removed, and hosting stays Vercel and Render.
+   - **c2 (Cloudflare):** the `/api` routes move into Next.js, Next.js is upgraded to 16.4.2, the OpenNext adapter is added, sign-out on restart is dropped, and `docs/cloudflare-setup.md` is written.
 
 ## Facts found while reading the code (affect PR c)
 
@@ -104,23 +112,35 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - The hosted database needs the new migration applied (the teacher does this; never run `supabase db push`).
   - Ctrl+Enter only runs from the Java input box (existing behaviour).
 
-### PR (c) Cloudflare and Supabase Realtime: NOT STARTED
+### PR (c) Cloudflare and Supabase Realtime: PROPOSAL WRITTEN, waiting for the teacher's decision
 
-Waiting for PR (b). First step: write the Socket.IO replacement proposal and get the teacher's answer.
+Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. The decisions it asks for, one at a time:
 
-## Parked by the teacher (do later)
+1. ~~Approve moving the routes into Next.js plus Supabase Realtime.~~ Approved 2026-10-16.
+2. ~~Sign-out on restart.~~ Drop it everywhere (2026-10-16).
+3. ~~Throttling typing to stay under the free plan.~~ Caps approved (2026-10-16).
+4. ~~Splitting the PR.~~ Split into two (2026-10-16).
 
-- **Knowledge base like Project VMAS's:**
-  - `AGENTS.md` as the one rule file, and a `CLAUDE.md` that only says to read it.
-  - Bug records `CKB-NNN` under `docs/problem-knowledgebase/`, plus `docs/knowledgebase/` pages.
-  - The structure was proposed on 2026-10-16 but **not yet approved or built**. The teacher said to deal with it later; ask for approval after PR (b) testing.
-  - Planned first records: CKB-001, the leftover "Collaborative Java classroom" subtitle (fixed in PR a); CKB-002, wrong web preview line numbers after a linked stylesheet (caught by a test and fixed).
+### Knowledge base: DONE, waiting for teacher review
+
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/3
+- **Branch:** `codeshare-knowledge-base` (built on top of `web-workspace`).
+- **What it adds:**
+  - `AGENTS.md` (all the rules) and `CLAUDE.md` (points to `AGENTS.md`).
+  - `docs/knowledgebase/`: README, architecture, feature index, data model, backend, frontend, security and scoping, operations, workflow state.
+  - `docs/problem-knowledgebase/`: README, case template, index, CKB-001 to CKB-004, and `prompt-map/2026-10.md`.
+  - `docs/verification/`, `scripts/problem-kb-search.mjs` (`npm run kb:search`), and `tests/kb-search.test.mjs`.
+- **Left out of the VMAS copy, on purpose:**
+  - The User Manual rules (CodeShare has no user manual).
+  - A separate Object Relationships folder (`data-model.md` covers it).
+  - The old-history import (there's no earlier history).
+- **Tested:** `npm test` passes 9 of 9, including the 2 new search checks. `kb:search` finds CKB-002 for "preview line number wrong".
 
 ## Next steps
 
-1. The teacher reviews PR (a) and PR (b).
-2. Ask the teacher to approve the parked knowledge-base structure, then build it.
-3. Start PR (c): write the Socket.IO replacement proposal, then wait for the teacher's decision.
+1. The teacher reviews PR (a), PR (b), and the knowledge-base PR (#3).
+2. Build **c1 (Realtime)** on branch `realtime-c1`, stacked on `codeshare-knowledge-base`. Test it fully in offline mode with two browsers.
+3. Then **c2 (Cloudflare)**.
 
 ## Running offline mode on this laptop
 
@@ -134,3 +154,4 @@ Waiting for PR (b). First step: write the Socket.IO replacement proposal and get
 - **Branches:**
   - `rename-to-codeshare`: PR (a)
   - `web-workspace`: PR (b), stacked on (a)
+  - `codeshare-knowledge-base`: knowledge base, stacked on (b)

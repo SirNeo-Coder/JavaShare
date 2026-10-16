@@ -64,6 +64,13 @@ Students press **New web project** to get `index.html`, `style.css`, and `script
 
 Projects record their kind in `projects.language` (`java` or `web`; migration `20261016000100_project_language.sql`). In-browser Java (CheerpJ) and C# (.NET WebAssembly) runners will plug in next to `app/webPreview.ts` and be chosen in `runCode()` in `app/page.tsx`; the server Java runner below stays.
 
+## Knowledge base and working rules
+
+- `AGENTS.md`: the working rules for every coding assistant (`CLAUDE.md` points to it).
+- `docs/knowledgebase/README.md`: a map of the app.
+- `docs/problem-knowledgebase/`: past bugs as numbered `CKB-NNN` records. Search them with `npm run kb:search -- "words"`.
+- `docs/handoffs/stage-one.md`: where the current stage stands.
+
 ## Course modules
 
 The module file format for stage two is in [docs/course-format.md](docs/course-format.md).

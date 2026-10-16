@@ -19,7 +19,8 @@
     "build:all": "npm run build && npm --workspace backend run build",
     "start": "next start",
     "lint": "eslint . --ignore-pattern .next --ignore-pattern backend/dist",
-    "test": "node --test \"tests/*.test.mjs\""
+    "test": "node --test \"tests/*.test.mjs\"",
+    "kb:search": "node scripts/problem-kb-search.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.7",
