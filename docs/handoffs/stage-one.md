@@ -2,8 +2,9 @@
 
 Keep this file current. After every finished step: update it, commit, and push the branch.
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
+The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-16 (PR b tested and opened)
+Last updated: 2026-10-16 (knowledge base built)
 
 ## The job
 
@@ -30,7 +31,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 1. **Plan approved** (2026-10-16): the three PRs as described above.
 2. **Students create web projects with a "New web project" button** in their workspace sidebar. It makes a personal project with `index.html`, `style.css` and `script.js`. A later stage may let the teacher pick "Web" when handing out an activity.
-3. **Pull request (c) is not decided yet.** Before building it, propose how to replace Socket.IO (live code sharing, cursors, active file, chat, teacher live share). The teacher expects Supabase Realtime. Explain the trade-offs and **wait for the teacher's answer**.
+3. **Knowledge base** (2026-10-16): copy Project VMAS's structure with bug ids `CKB-NNN`. `AGENTS.md` is the one rule file, and `CLAUDE.md` only points to it. Every bug found or fixed gets a record, and every agreed rule goes into `AGENTS.md`. This progress file moved to `docs/handoffs/stage-one.md`.
+4. **Pull request (c) is not decided yet.** Before building it, propose how to replace Socket.IO (live code sharing, cursors, active file, chat, teacher live share). The teacher expects Supabase Realtime. Explain the trade-offs and **wait for the teacher's answer**.
 
 ## Facts found while reading the code (affect PR c)
 
@@ -108,19 +110,24 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 Waiting for PR (b). First step: write the Socket.IO replacement proposal and get the teacher's answer.
 
-## Parked by the teacher (do later)
+### Knowledge base: DONE, waiting for teacher review
 
-- **Knowledge base like Project VMAS's:**
-  - `AGENTS.md` as the one rule file, and a `CLAUDE.md` that only says to read it.
-  - Bug records `CKB-NNN` under `docs/problem-knowledgebase/`, plus `docs/knowledgebase/` pages.
-  - The structure was proposed on 2026-10-16 but **not yet approved or built**. The teacher said to deal with it later; ask for approval after PR (b) testing.
-  - Planned first records: CKB-001, the leftover "Collaborative Java classroom" subtitle (fixed in PR a); CKB-002, wrong web preview line numbers after a linked stylesheet (caught by a test and fixed).
+- **Branch:** `codeshare-knowledge-base` (built on top of `web-workspace`).
+- **What it adds:**
+  - `AGENTS.md` (all the rules) and `CLAUDE.md` (points to `AGENTS.md`).
+  - `docs/knowledgebase/`: README, architecture, feature index, data model, backend, frontend, security and scoping, operations, workflow state.
+  - `docs/problem-knowledgebase/`: README, case template, index, CKB-001 to CKB-004, and `prompt-map/2026-10.md`.
+  - `docs/verification/`, `scripts/problem-kb-search.mjs` (`npm run kb:search`), and `tests/kb-search.test.mjs`.
+- **Left out of the VMAS copy, on purpose:**
+  - The User Manual rules (CodeShare has no user manual).
+  - A separate Object Relationships folder (`data-model.md` covers it).
+  - The old-history import (there's no earlier history).
+- **Tested:** `npm test` passes 9 of 9, including the 2 new search checks. `kb:search` finds CKB-002 for "preview line number wrong".
 
 ## Next steps
 
-1. The teacher reviews PR (a) and PR (b).
-2. Ask the teacher to approve the parked knowledge-base structure, then build it.
-3. Start PR (c): write the Socket.IO replacement proposal, then wait for the teacher's decision.
+1. The teacher reviews PR (a), PR (b), and the knowledge-base PR.
+2. Start PR (c): write the Socket.IO replacement proposal, then wait for the teacher's decision. Follow `AGENTS.md`: search the bug records first and get approval before changing code.
 
 ## Running offline mode on this laptop
 
@@ -134,3 +141,4 @@ Waiting for PR (b). First step: write the Socket.IO replacement proposal and get
 - **Branches:**
   - `rename-to-codeshare`: PR (a)
   - `web-workspace`: PR (b), stacked on (a)
+  - `codeshare-knowledge-base`: knowledge base, stacked on (b)
