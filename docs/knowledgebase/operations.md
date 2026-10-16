@@ -41,7 +41,7 @@ Never commit filled-in env files or keys.
 - New files only, in `supabase/migrations/`, named `YYYYMMDDHHMMSS_description.sql`. Never edit or delete existing ones.
 - Offline: `npx supabase start` applies them to the local database. `npx supabase db reset` rebuilds the local database (this erases local data).
 - Online: the **teacher** applies them to the hosted project. Assistants never run `supabase db push`.
-- Pending for the hosted project, as of 2026-10-16: `20261016000100_project_language.sql` (needed before web projects work online) and `20261016000200_realtime_private_channels.sql` (needed before live features work online).
+- Applied to the hosted project by the teacher on 2026-10-17 (SQL Editor, by hand): `20261016000100_project_language.sql` and `20261016000200_realtime_private_channels.sql`. Applied by hand, so the hosted migration history doesn't list them.
 - `npx supabase migration up --local` applies new migrations to the local database without erasing it.
 
 ## Known repository clutter (not yet cleaned up)

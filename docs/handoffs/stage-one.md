@@ -4,7 +4,7 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-16 (PR c2 built and tested)
+Last updated: 2026-10-17 (hosted migrations applied; Cloudflare setup in progress)
 
 ## The job
 
@@ -215,6 +215,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 ## Next steps
 
 1. The teacher reviews PRs #1–#4 and the c2 PR, then follows `docs/cloudflare-setup.md` to test a Cloudflare preview.
+   - **Done 2026-10-17:** the teacher applied both new migrations (`20261016000100_project_language.sql`, `20261016000200_realtime_private_channels.sql`) to the hosted Supabase project in the SQL Editor. Both reported "Success. No rows returned". Applied by hand, so the hosted migration history doesn't list them; never run `supabase db push`.
+   - **In progress:** Part 1 of the guide (connect Cloudflare to GitHub).
 2. After the teacher confirms Cloudflare works:
    - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
    - Stage two (course modules) can start.
