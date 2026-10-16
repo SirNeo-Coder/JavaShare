@@ -9,18 +9,15 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
-import { Server } from "socket.io";
 import { z } from "zod";
 import { database } from "./database.js";
+import { broadcast, realtimePass } from "./realtime.js";
 import {
   approveSupabasePasswordReset,
   assignLateStudentToGroup,
   autoGroupSupabaseClass,
   bootstrapFromSupabase,
   canAccessSupabaseClass,
-  canAccessSupabaseTeam,
-  canEditSupabaseTeamFile,
-  canSendSupabaseLiveDraft,
   changeSupabaseResetPassword,
   createSupabaseActivity,
   createSupabaseFile,
@@ -48,8 +45,6 @@ import {
   submitSupabaseProject,
   supabaseActivitySummary,
   supabaseClassIds,
-  supabaseClassMemberIds,
-  supabaseFileBelongsToTeam,
   supabaseLiveSharePayload,
   SupabaseRepositoryError,
   updateSupabaseGroup,
@@ -67,11 +62,6 @@ const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3000").spl
 const serverSessionId = randomUUID();
 let activeExecutions = 0;
 const lastExecution = new Map<string, number>();
-const onlineConnections = new Map<string, number>();
-const fileOperationQueues = new Map<string, Promise<void>>();
-const fileOperationRevisions = new Map<string, number>();
-const liveFileSnapshots = new Map<string, { teamId: string; fileId: string; content: string; updatedById: string; updatedBy: string }>();
-const liveActiveFiles = new Map<string, { teamId: string; fileId: string; path: string; language: string; content: string; version: number; updatedById: string; updatedBy: string; changedAt: number }>();
 
 type SessionUser = { id: string; role: "teacher" | "student"; email: string; name: string; passwordResetRequired: boolean };
 type SessionToken = SessionUser & { serverSessionId: string };
@@ -93,18 +83,6 @@ function setSession(res: Response, user: SessionUser) {
     maxAge: 7 * 86400000,
     path: "/",
   });
-}
-
-function readToken(cookieHeader = "") {
-  const token = cookieHeader.split(";").map((part) => part.trim()).find((part) => part.startsWith("javashare_session="))?.split("=")[1];
-  if (!token) return null;
-  try {
-    const session = jwt.verify(decodeURIComponent(token), JWT_SECRET) as SessionToken;
-    if (session.serverSessionId !== serverSessionId) return null;
-    return sessionUserFromToken(session);
-  } catch {
-    return null;
-  }
 }
 
 function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {
@@ -130,7 +108,6 @@ function requireTeacher(req: AuthedRequest, res: Response, next: NextFunction) {
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, { cors: { origin: isProduction ? allowedOrigins : true, credentials: true } });
 app.use(cors({ origin: isProduction ? allowedOrigins : true, credentials: true }));
 app.use(express.json({ limit: "300kb" }));
 app.use(cookieParser());
@@ -175,6 +152,12 @@ app.post("/api/auth/logout", (_req, res) => {
 
 app.get("/api/auth/me", requireAuth, (req: AuthedRequest, res) => res.json({ user: req.user }));
 
+app.get("/api/realtime/pass", requireAuth, (req: AuthedRequest, res) => {
+  const pass = realtimePass(req.user!.id);
+  if (!pass) return res.status(503).json({ error: "Live features are not configured (SUPABASE_JWT_SECRET is missing)" });
+  return res.json(pass);
+});
+
 app.post("/api/auth/change-reset-password", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const { password } = z.object({ password: z.string().min(8).max(128) }).parse(req.body);
@@ -187,7 +170,7 @@ app.post("/api/auth/change-reset-password", requireAuth, async (req: AuthedReque
 app.get("/api/teacher/students", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
   try {
     const result = await listSupabaseStudents(req.user!);
-    return res.json({ students: result.students.map((student) => ({ ...student, online: onlineConnections.has(student.id) })) });
+    return res.json({ students: result.students, classroomIds: await supabaseClassIds(req.user!) });
   }
   catch (error) { next(error); }
 });
@@ -245,12 +228,23 @@ app.get("/api/bootstrap", requireAuth, async (req: AuthedRequest, res, next) => 
   } catch (error) { next(error); }
 });
 
+// Called when a browser opens a class: places a student who missed group forming into a group.
+app.post("/api/classes/:classroomId/arrive", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const classroomId = String(req.params.classroomId);
+    if (!await canAccessSupabaseClass(req.user!, classroomId)) return res.status(403).json({ error: "Classroom access denied" });
+    const lateAssignment = await assignLateStudentToGroup(req.user!, classroomId);
+    if (lateAssignment) broadcast(`class:${classroomId}`, "groups:updated", lateAssignment);
+    return res.json({ lateAssignment });
+  } catch (error) { next(error); }
+});
+
 app.post("/api/classes/:classroomId/auto-group", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const classroomId = String(req.params.classroomId);
-    const { groupSize, studentIds } = z.object({ groupSize: z.number().int().min(2).max(10).default(3), studentIds: z.array(z.string().uuid()).optional() }).parse(req.body || {});
-    const result = await autoGroupSupabaseClass(req.user!, classroomId, groupSize, studentIds || [...onlineConnections.keys()]);
-    io.to(`class:${classroomId}`).emit("groups:updated");
+    const { groupSize, studentIds } = z.object({ groupSize: z.number().int().min(2).max(10).default(3), studentIds: z.array(z.string().uuid()) }).parse(req.body || {});
+    const result = await autoGroupSupabaseClass(req.user!, classroomId, groupSize, studentIds);
+    broadcast(`class:${classroomId}`, "groups:updated");
     return res.json(result);
   } catch (error) { next(error); }
 });
@@ -265,7 +259,7 @@ app.post("/api/classes/:classroomId/activities", requireAuth, async (req: Authed
       starterCode: z.string().max(200000).optional().default(""),
     }).parse(req.body);
     const payload = await createSupabaseActivity(req.user!, classroomId, input);
-    io.to(`class:${classroomId}`).emit("class:activity-deployed", payload);
+    broadcast(`class:${classroomId}`, "class:activity-deployed", payload);
     return res.status(201).json(payload);
   } catch (error) { next(error); }
 });
@@ -274,7 +268,7 @@ app.post("/api/classes/:classroomId/end-activity", requireAuth, async (req: Auth
   try {
     const classroomId = String(req.params.classroomId);
     const payload = await endSupabaseActivity(req.user!, classroomId);
-    io.to(`class:${classroomId}`).emit("class:activity-ended", payload);
+    broadcast(`class:${classroomId}`, "class:activity-ended", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -284,7 +278,7 @@ app.post("/api/classes/:classroomId/activities/:activityId/reopen", requireAuth,
     const classroomId = String(req.params.classroomId);
     const activityId = z.string().uuid().parse(req.params.activityId);
     const payload = await reopenSupabaseActivity(req.user!, classroomId, activityId);
-    io.to(`class:${classroomId}`).emit("class:activity-deployed", payload);
+    broadcast(`class:${classroomId}`, "class:activity-deployed", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -311,8 +305,8 @@ app.put("/api/teams/:teamId/group-profile", requireAuth, async (req: AuthedReque
     const teamId = String(req.params.teamId);
     const input = z.object({ name: z.string().trim().min(2).max(60), leaderId: z.string().uuid() }).parse(req.body);
     const payload = await updateSupabaseGroup(req.user!, teamId, input);
-    io.to(`class:${payload.classroomId}`).emit("groups:updated", payload);
-    io.to(`team:${teamId}`).emit("team:profile-updated", payload);
+    broadcast(`class:${payload.classroomId}`, "groups:updated", payload);
+    broadcast(`team:${teamId}`, "team:profile-updated", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -322,8 +316,8 @@ app.put("/api/teams/:teamId/group-permissions", requireAuth, async (req: AuthedR
     const teamId = String(req.params.teamId);
     const input = z.object({ userId: z.string().uuid(), chatMuted: z.boolean(), editingLocked: z.boolean() }).parse(req.body);
     const payload = await updateSupabaseGroupPermissions(req.user!, teamId, input);
-    io.to(`team:${teamId}`).emit("team:permissions-updated", payload);
-    io.to(`class:${payload.classroomId}`).emit("groups:updated");
+    broadcast(`team:${teamId}`, "team:permissions-updated", payload);
+    broadcast(`class:${payload.classroomId}`, "groups:updated");
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -333,7 +327,7 @@ app.post("/api/teams/:teamId/messages", requireAuth, async (req: AuthedRequest, 
     const teamId = String(req.params.teamId);
     const { text } = z.object({ text: z.string().trim().min(1).max(1000) }).parse(req.body);
     const payload = await sendSupabaseMessage(req.user!, teamId, text);
-    io.to(`team:${teamId}`).emit("chat:message", payload);
+    broadcast(`team:${teamId}`, "chat:message", payload);
     return res.status(201).json(payload);
   } catch (error) { next(error); }
 });
@@ -342,7 +336,7 @@ app.put("/api/classes/:classroomId/chat-mute", requireAuth, requireTeacher, asyn
   try {
     const { muted } = z.object({ muted: z.boolean() }).parse(req.body);
     const payload = await setSupabaseClassroomChatMuted(req.user!, String(req.params.classroomId), muted);
-    io.to(`class:${payload.classroomId}`).emit("class:chat-muted", payload);
+    broadcast(`class:${payload.classroomId}`, "class:chat-muted", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -357,7 +351,7 @@ app.post("/api/classes/:classroomId/live-share", requireAuth, async (req: Authed
     const { projectId } = z.object({ projectId: z.string().uuid().nullable() }).parse(req.body);
     const classroomId = String(req.params.classroomId);
     const payload = await setSupabaseLiveShare(req.user!, classroomId, projectId);
-    io.to(`class:${classroomId}`).emit("class:live-share", payload);
+    broadcast(`class:${classroomId}`, "class:live-share", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -366,9 +360,8 @@ app.put("/api/files/:fileId", requireAuth, async (req: AuthedRequest, res, next)
   try {
     const input = z.object({ content: z.string().max(200000), version: z.number().int().positive() }).parse(req.body);
     const result = await saveSupabaseFile(req.user!, String(req.params.fileId), input);
-    liveFileSnapshots.set(result.update.fileId, { teamId: result.teamId, fileId: result.update.fileId, content: result.update.content, updatedById: req.user!.id, updatedBy: req.user!.name });
-    io.to(`team:${result.teamId}`).emit("file:updated", result.update);
-    if (result.presenting) io.to(`class:${result.classroomId}`).emit("class:live-share-update", { projectId: result.projectId, ...result.update });
+    broadcast(`team:${result.teamId}`, "file:updated", result.update);
+    if (result.presenting) broadcast(`class:${result.classroomId}`, "class:live-share-update", { projectId: result.projectId, ...result.update });
     return res.json(result.update);
   } catch (error) { next(error); }
 });
@@ -400,7 +393,7 @@ app.patch("/api/files/:fileId", requireAuth, async (req: AuthedRequest, res, nex
 app.post("/api/projects/:projectId/submit", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const payload = await submitSupabaseProject(req.user!, String(req.params.projectId));
-    io.to(`team:${payload.teamId}`).emit("team:submitted", payload);
+    broadcast(`team:${payload.teamId}`, "team:submitted", payload);
     return res.status(201).json(payload);
   } catch (error) { next(error); }
 });
@@ -521,131 +514,6 @@ app.post("/api/execute", requireAuth, async (req: AuthedRequest, res, next) => {
     const result = await response.json() as JudgeResult;
     return res.json({ mode: "judge0", output: result.compile_output || result.stderr || result.stdout || result.message || result.status?.description || "Program completed without output." });
   } catch (error) { next(error); }
-});
-
-io.use((socket, next) => {
-  const user = readToken(socket.handshake.headers.cookie);
-  if (!user) return next(new Error("Unauthorized"));
-  socket.data.user = user;
-  next();
-});
-
-io.on("connection", (socket) => {
-  const connectedUser = socket.data.user as SessionUser;
-  const connectionCount = (onlineConnections.get(connectedUser.id) || 0) + 1;
-  onlineConnections.set(connectedUser.id, connectionCount);
-
-  void supabaseClassIds(connectedUser)
-    .then((classIds) => classIds.forEach((classroomId) => {
-      void socket.join(`class:${classroomId}`);
-      if (connectionCount === 1) io.to(`class:${classroomId}`).emit("class:presence", { userId: connectedUser.id, online: true });
-    }))
-    .catch((error) => console.error("Could not join classroom socket rooms:", error));
-
-  socket.on("class:join", async (classroomId: string, acknowledge?: (payload: unknown) => void) => {
-    try {
-      if (!await canAccessSupabaseClass(connectedUser, classroomId)) return;
-      await socket.join(`class:${classroomId}`);
-      const lateAssignment = await assignLateStudentToGroup(connectedUser, classroomId);
-      if (lateAssignment) {
-        io.to(`class:${classroomId}`).emit("groups:updated", lateAssignment);
-        socket.emit("group:late-assigned", lateAssignment);
-      }
-      const memberIds = await supabaseClassMemberIds(connectedUser, classroomId);
-      socket.emit("class:presence-snapshot", memberIds.filter((id) => onlineConnections.has(id)));
-      const payload = await supabaseLiveSharePayload(connectedUser, classroomId);
-      if (typeof acknowledge === "function") acknowledge(payload);
-      else socket.emit("class:live-share", payload);
-    } catch (error) { console.error("Could not join classroom room:", error); }
-  });
-
-  socket.on("team:join", async (teamId: string, acknowledge?: (joined: boolean) => void) => {
-    try {
-      const joined = await canAccessSupabaseTeam(connectedUser, teamId);
-      if (joined) {
-        await socket.join(`team:${teamId}`);
-        const snapshots = [...liveFileSnapshots.values()].filter((snapshot) => snapshot.teamId === teamId);
-        if (snapshots.length) socket.emit("team:live-snapshots", snapshots);
-        const activeSelection = [...liveActiveFiles.values()].filter((selection) => selection.teamId === teamId).sort((a, b) => b.changedAt - a.changedAt)[0];
-        if (activeSelection) socket.emit("team:active-file", activeSelection);
-      }
-      if (typeof acknowledge === "function") acknowledge(joined);
-    } catch (error) {
-      console.error("Could not join team room:", error);
-      if (typeof acknowledge === "function") acknowledge(false);
-    }
-  });
-
-  socket.on("team:file-draft", async (draft: { teamId?: string; fileId?: string; content?: string; sequence?: number }) => {
-    try {
-      if (!draft || typeof draft.content !== "string" || draft.content.length > 200000 || !Number.isSafeInteger(draft.sequence) || (draft.sequence ?? 0) < 1) return;
-      if (!draft.teamId || !draft.fileId || !await canEditSupabaseTeamFile(connectedUser, draft.fileId, draft.teamId)) return;
-      socket.to(`team:${draft.teamId}`).emit("team:file-draft", {
-        fileId: draft.fileId,
-        content: draft.content,
-        sequence: draft.sequence,
-        updatedById: connectedUser.id,
-        updatedBy: connectedUser.name,
-      });
-    } catch (error) { console.error("Could not relay team draft:", error); }
-  });
-
-  socket.on("team:file-operation", (operation: { teamId?: string; fileId?: string; start?: { line?: number; column?: number }; end?: { line?: number; column?: number }; text?: string; content?: string; sequence?: number }) => {
-    const pointIsValid = (point: typeof operation.start) => point && Number.isSafeInteger(point.line) && Number.isSafeInteger(point.column) && (point.line ?? -1) >= 0 && (point.column ?? -1) >= 0;
-    if (!operation || typeof operation.text !== "string" || typeof operation.content !== "string" || operation.text.length > 200000 || operation.content.length > 200000 || !pointIsValid(operation.start) || !pointIsValid(operation.end) || !Number.isSafeInteger(operation.sequence) || (operation.sequence ?? 0) < 1 || !operation.teamId || !operation.fileId) return;
-    const fileId = operation.fileId;
-    const previous = fileOperationQueues.get(fileId) || Promise.resolve();
-    const queued = previous.catch(() => undefined).then(async () => {
-      if (!await canEditSupabaseTeamFile(connectedUser, fileId, operation.teamId!)) return;
-      const revision = (fileOperationRevisions.get(fileId) || 0) + 1;
-      fileOperationRevisions.set(fileId, revision);
-      liveFileSnapshots.set(fileId, { teamId: operation.teamId!, fileId, content: operation.content!, updatedById: connectedUser.id, updatedBy: connectedUser.name });
-      socket.to(`team:${operation.teamId}`).emit("team:file-operation", { ...operation, revision, updatedById: connectedUser.id, updatedBy: connectedUser.name });
-    }).catch((error) => console.error("Could not relay team operation:", error));
-    fileOperationQueues.set(fileId, queued);
-  });
-
-  socket.on("team:cursor", async (cursor: { teamId?: string; fileId?: string; line?: number; column?: number }) => {
-    try {
-      if (!cursor?.teamId || !cursor.fileId || !Number.isSafeInteger(cursor.line) || !Number.isSafeInteger(cursor.column) || (cursor.line ?? -1) < 0 || (cursor.column ?? -1) < 0) return;
-      if (!await supabaseFileBelongsToTeam(connectedUser, cursor.fileId, cursor.teamId)) return;
-      socket.to(`team:${cursor.teamId}`).emit("team:cursor", { fileId: cursor.fileId, line: cursor.line, column: cursor.column, userId: connectedUser.id, name: connectedUser.name });
-    } catch (error) { console.error("Could not relay team cursor:", error); }
-  });
-
-  socket.on("team:active-file", async (selection: { teamId?: string; fileId?: string; path?: string; language?: string; content?: string; version?: number }) => {
-    try {
-      if (connectedUser.role !== "student" || !selection?.teamId || !selection.fileId || typeof selection.path !== "string" || typeof selection.content !== "string" || selection.content.length > 200000 || !Number.isSafeInteger(selection.version) || (selection.version ?? 0) < 1) return;
-      if (!await supabaseFileBelongsToTeam(connectedUser, selection.fileId, selection.teamId)) return;
-      const payload = { teamId: selection.teamId, fileId: selection.fileId, path: selection.path, language: selection.language || "java", content: selection.content, version: selection.version!, updatedById: connectedUser.id, updatedBy: connectedUser.name, changedAt: Date.now() };
-      liveActiveFiles.set(`${selection.teamId}:${connectedUser.id}`, payload);
-      socket.to(`team:${selection.teamId}`).emit("team:active-file", payload);
-    } catch (error) { console.error("Could not relay active team file:", error); }
-  });
-
-  socket.on("class:live-share-draft", async (draft: { classroomId?: string; projectId?: string; fileId?: string; content?: string; sequence?: number }) => {
-    try {
-      if (!draft || typeof draft.content !== "string" || draft.content.length > 200000 || !Number.isSafeInteger(draft.sequence) || (draft.sequence ?? 0) < 1) return;
-      if (!draft.classroomId || !draft.projectId || !draft.fileId || !await canSendSupabaseLiveDraft(connectedUser, draft.classroomId, draft.projectId, draft.fileId)) return;
-      socket.to(`class:${draft.classroomId}`).emit("class:live-share-draft", {
-        projectId: draft.projectId,
-        fileId: draft.fileId,
-        content: draft.content,
-        sequence: draft.sequence,
-      });
-    } catch (error) { console.error("Could not relay live-share draft:", error); }
-  });
-
-  socket.on("disconnect", () => {
-    const remaining = Math.max(0, (onlineConnections.get(connectedUser.id) || 1) - 1);
-    if (remaining) onlineConnections.set(connectedUser.id, remaining);
-    else {
-      onlineConnections.delete(connectedUser.id);
-      void supabaseClassIds(connectedUser).then((classIds) => classIds.forEach((classroomId) => {
-        io.to(`class:${classroomId}`).emit("class:presence", { userId: connectedUser.id, online: false });
-      })).catch((error) => console.error("Could not broadcast presence:", error));
-    }
-  });
 });
 
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {

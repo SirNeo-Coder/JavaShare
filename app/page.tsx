@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { io, type Socket } from "socket.io-client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import CodeEditor, { languageLabel } from "./CodeEditor";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
+import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, throttle } from "./realtime";
 
 const DEPLOYED_API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 const FRESH_LESSON_CODE = `public class Main {
@@ -30,14 +31,6 @@ function getSavedFontScale() {
 
 function getApiUrl() {
   return DEPLOYED_API_URL;
-}
-
-function getSocketUrl() {
-  if (DEPLOYED_API_URL) return DEPLOYED_API_URL;
-  if (typeof window === "undefined") return "";
-  // Next.js rewrites handle REST reliably but do not consistently forward
-  // long-lived Socket.IO traffic. Connect directly to the teacher backend.
-  return `${window.location.protocol}//${window.location.hostname}:4000`;
 }
 
 type User = {
@@ -295,7 +288,8 @@ export default function Home() {
   >([]);
   const previewFrameRef = useRef<HTMLIFrameElement | null>(null);
   const lastSaved = useRef("");
-  const socketRef = useRef<Socket | null>(null);
+  const teamChannelRef = useRef<RealtimeChannel | null>(null);
+  const classChannelRef = useRef<RealtimeChannel | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const liveDraftSequenceRef = useRef(0);
   const receivedDraftSequenceRef = useRef(0);
@@ -303,16 +297,37 @@ export default function Home() {
   const receivedGroupDraftsRef = useRef(new Map<string, number>());
   const memberPhotoUrlsRef = useRef(new Map<string, string | null>());
   const remoteGroupDraftRef = useRef<string | null>(null);
-  const classRealtimeReadyRef = useRef(false);
-  const teamRealtimeReadyRef = useRef(false);
-  const pendingLiveDraftRef = useRef<{
-    classroomId: string;
-    projectId: string;
-    fileId: string;
-    content: string;
-    sequence: number;
-  } | null>(null);
-  const pendingGroupDraftRef = useRef<FileOperation | null>(null);
+  // Latest render values for live handlers and throttled senders, which outlive a single render.
+  const liveRef = useRef<{ code: string; activeFile: FileData | null; team?: TeamData; userId: string; userName: string }>({ code: "", activeFile: null, userId: "", userName: "" });
+  // Text of the file before the first local edit that teammates have not been sent yet.
+  const unsentBaseRef = useRef<{ fileId: string; content: string } | null>(null);
+  // Approved caps: typing 3 a second, cursors 4 a second, live share 2 a second (app/realtime.ts).
+  const [sendTyping] = useState(() =>
+    throttle((sendTeamId: string, fileId: string, content: string) => {
+      const channel = teamChannelRef.current;
+      const base = unsentBaseRef.current;
+      if (!base || base.fileId !== fileId) return;
+      if (!channel) return; // kept in unsentBaseRef; sent once the channel is ready
+      groupDraftSequenceRef.current += 1;
+      const operation = createOperation(base.content, content, sendTeamId, fileId, groupDraftSequenceRef.current);
+      unsentBaseRef.current = null;
+      void channel.send({
+        type: "broadcast",
+        event: "team:file-operation",
+        payload: { ...operation, updatedById: liveRef.current.userId, updatedBy: liveRef.current.userName },
+      });
+    }, LIVE_CAPS.typingMs),
+  );
+  const [sendCursor] = useState(() =>
+    throttle((cursor: TextPoint & { teamId: string; fileId: string; userId: string; name: string }) => {
+      void teamChannelRef.current?.send({ type: "broadcast", event: "team:cursor", payload: cursor });
+    }, LIVE_CAPS.cursorMs),
+  );
+  const [sendLiveShareDraft] = useState(() =>
+    throttle((draft: { projectId: string; fileId: string; content: string; sequence: number }) => {
+      void classChannelRef.current?.send({ type: "broadcast", event: "class:live-share-draft", payload: draft });
+    }, LIVE_CAPS.liveShareMs),
+  );
   const consoleInputRef = useRef<HTMLTextAreaElement | null>(null);
   const studentPhotoInputRef = useRef<HTMLInputElement | null>(null);
   const teacherPhotoInputRef = useRef<HTMLInputElement | null>(null);
@@ -540,6 +555,7 @@ export default function Home() {
         const message =
           error instanceof Error ? error.message : "Backend unavailable";
         if (message === "Sign in required" || message === "Session expired") {
+          forgetRealtimeClient();
           setUser(null);
           setData(null);
           return;
@@ -577,7 +593,7 @@ export default function Home() {
             next.projectId !== current.projectId
           )
             return next;
-          // Socket drafts are newer than the saved REST snapshot but have the same
+          // Live drafts are newer than the saved REST snapshot but have the same
           // version. Only accept files whose persisted version has moved forward.
           const files = next.files?.map((file) => {
             const existing = current.files?.find((item) => item.id === file.id);
@@ -597,8 +613,8 @@ export default function Home() {
     };
     window.addEventListener("focus", refreshWhenVisible);
     document.addEventListener("visibilitychange", refreshWhenVisible);
-    // Keep a lightweight REST safety net even when Socket.IO reports connected.
-    // Some proxies establish the transport but intermittently miss room events;
+    // Keep a lightweight REST safety net even when the live channel reports connected.
+    // A missed live message (for example while reconnecting) must not leave a stale share;
     // this guarantees share start/stop is reflected without requiring F5.
     const interval = window.setInterval(() => void refreshLiveShare(), 2000);
     return () => {
@@ -657,77 +673,54 @@ export default function Home() {
   }
 
   useEffect(() => {
+    liveRef.current = { code, activeFile, team, userId: user?.id || "", userName: user?.name || "" };
+  });
+  useEffect(() => {
     if (!teamId || !userId || !classroomId) return;
-    // Polling works reliably through the same-origin Next.js classroom proxy.
-    const socket = io(getSocketUrl(), {
-      withCredentials: true,
-      transports: ["websocket", "polling"],
-    });
-    socketRef.current = socket;
-    socket.on("connect", () => {
-      classRealtimeReadyRef.current = false;
-      teamRealtimeReadyRef.current = false;
-      setSyncStatus("Joining live classroom…");
-      socket.emit("team:join", teamId, (joined: boolean) => {
-        teamRealtimeReadyRef.current = joined;
-        if (!joined) return setSyncStatus("Could not join the live group");
-        if (user?.role === "student" && activeFile)
-          socket.emit("team:active-file", {
-            teamId,
-            fileId: activeFile.id,
-            path: activeFile.path,
-            language: activeFile.language,
-            content: code,
-            version: activeFile.version,
-          });
-        setSyncStatus("Live classroom connected");
-        if (pendingGroupDraftRef.current) {
-          socket.emit("team:file-operation", pendingGroupDraftRef.current);
-          pendingGroupDraftRef.current = null;
-        }
+    let cancelled = false;
+    const channels: RealtimeChannel[] = [];
+    // Live events arrive as Supabase Realtime broadcasts: "class:*" and "groups:*" events on the
+    // class channel, everything else on the team channel(s). See app/realtime.ts.
+    const handlers: { event: string; handler: (payload: never) => void }[] = [];
+    const on = <T,>(event: string, handler: (payload: T) => void) =>
+      handlers.push({ event, handler: handler as (payload: never) => void });
+    const isClassEvent = (event: string) =>
+      event.startsWith("class:") || event.startsWith("groups:");
+    const answerSyncRequest = () => {
+      const { code: current, activeFile: file, userName } = liveRef.current;
+      if (user?.role !== "student" || !file) return;
+      const channel = teamChannelRef.current;
+      void channel?.send({
+        type: "broadcast",
+        event: "team:active-file",
+        payload: { teamId, fileId: file.id, path: file.path, language: file.language, content: current, version: file.version, updatedById: userId, updatedBy: userName },
       });
-      if (chatTeamId && chatTeamId !== teamId)
-        socket.emit("team:join", chatTeamId);
-      socket.emit("class:join", classroomId, (share: LiveShare) => {
-        classRealtimeReadyRef.current = true;
-        setLiveShare(share);
-        if (pendingLiveDraftRef.current) {
-          socket.emit("class:live-share-draft", pendingLiveDraftRef.current);
-          pendingLiveDraftRef.current = null;
-        }
-      });
-    });
-    socket.on("disconnect", () => {
-      classRealtimeReadyRef.current = false;
-      teamRealtimeReadyRef.current = false;
-      setSyncStatus("Reconnecting…");
-    });
-    socket.on("connect_error", () =>
-      setSyncStatus("Live connection unavailable; retrying…"),
-    );
-    socket.on("class:live-share", (share: LiveShare) => {
+      if (current !== lastSaved.current)
+        void channel?.send({
+          type: "broadcast",
+          event: "team:live-snapshots",
+          payload: [{ fileId: file.id, content: current, updatedById: userId, updatedBy: userName }],
+        });
+    };
+    void api<{ lateAssignment: { teamName: string } | null }>(
+      `/api/classes/${classroomId}/arrive`,
+      { method: "POST" },
+    )
+      .then(({ lateAssignment }) => {
+        if (lateAssignment && !cancelled)
+          notify(`You reconnected and joined ${lateAssignment.teamName}`);
+      })
+      .catch(() => undefined);
+    on("class:live-share", (share: LiveShare) => {
       receivedDraftSequenceRef.current = 0;
       setLiveShare(share);
     });
-    socket.on("class:presence-snapshot", (ids: string[]) =>
-      setOnlineUserIds(ids),
-    );
-    socket.on("class:chat-muted", ({ muted }: { muted: boolean }) =>
+    on("class:chat-muted", ({ muted }: { muted: boolean }) =>
       setData((current) =>
         current ? { ...current, classroomChatMuted: muted } : current,
       ),
     );
-    socket.on(
-      "class:presence",
-      ({ userId, online }: { userId: string; online: boolean }) => {
-        setOnlineUserIds((ids) =>
-          online
-            ? [...new Set([...ids, userId])]
-            : ids.filter((id) => id !== userId),
-        );
-      },
-    );
-    socket.on(
+    on(
       "groups:updated",
       (assignment?: { studentName?: string; teamName?: string }) => {
         void loadWorkspace();
@@ -741,15 +734,12 @@ export default function Home() {
           );
       },
     );
-    socket.on("group:late-assigned", (assignment: { teamName: string }) =>
-      notify(`You reconnected and joined ${assignment.teamName}`),
-    );
-    socket.on("class:activity-deployed", (activity: { title: string }) => {
+    on("class:activity-deployed", (activity: { title: string }) => {
       setLiveShare({ active: false });
       void loadWorkspace();
       notify(`New activity: ${activity.title}`);
     });
-    socket.on(
+    on(
       "class:activity-ended",
       (activity: { title: string; mode: "individual" | "group" }) => {
         setLiveShare({ active: false });
@@ -767,14 +757,14 @@ export default function Home() {
         notify(`${activity.title} has ended`);
       },
     );
-    socket.on("chat:message", (message: ChatMessage) =>
+    on("chat:message", (message: ChatMessage) =>
       setMessages((items) =>
         items.some((item) => item.id === message.id)
           ? items
           : [...items, message],
       ),
     );
-    socket.on(
+    on(
       "team:submitted",
       (submission: {
         projectId: string;
@@ -804,7 +794,7 @@ export default function Home() {
         }
       },
     );
-    socket.on(
+    on(
       "class:live-share-update",
       (update: {
         projectId: string;
@@ -830,7 +820,7 @@ export default function Home() {
         );
       },
     );
-    socket.on(
+    on(
       "class:live-share-draft",
       (update: {
         projectId: string;
@@ -854,7 +844,7 @@ export default function Home() {
         );
       },
     );
-    socket.on(
+    on(
       "team:file-draft",
       (update: {
         fileId: string;
@@ -876,9 +866,15 @@ export default function Home() {
         });
       },
     );
-    socket.on(
+    on(
       "team:file-operation",
       (update: FileOperation & { updatedById: string; updatedBy: string }) => {
+        // The channel only checks team membership; ignore typing from a member the leader locked.
+        const liveTeam = liveRef.current.team;
+        const sender = liveTeam?.members.find((member) => member.id === update.updatedById);
+        if (liveTeam?.isGroup && sender?.editingLocked && liveTeam.leaderId !== sender.id) return;
+        if (unsentBaseRef.current?.fileId === update.fileId)
+          unsentBaseRef.current = { fileId: update.fileId, content: applyOperation(unsentBaseRef.current.content, update) };
         const previousSequence =
           receivedGroupDraftsRef.current.get(update.updatedById) || 0;
         if (update.sequence <= previousSequence) return;
@@ -895,7 +891,7 @@ export default function Home() {
         });
       },
     );
-    socket.on(
+    on(
       "team:live-snapshots",
       (
         snapshots: {
@@ -915,7 +911,7 @@ export default function Home() {
         setRemoteCursors([]);
       },
     );
-    socket.on(
+    on(
       "team:cursor",
       (cursor: {
         fileId: string;
@@ -935,7 +931,7 @@ export default function Home() {
         ]);
       },
     );
-    socket.on(
+    on(
       "team:active-file",
       (selection: {
         teamId: string;
@@ -969,7 +965,7 @@ export default function Home() {
         setSyncStatus(`Following ${selection.updatedBy}`);
       },
     );
-    socket.on(
+    on(
       "file:updated",
       (update: {
         fileId: string;
@@ -993,9 +989,59 @@ export default function Home() {
         });
       },
     );
+    realtimeClient(getApiUrl())
+      .then((client) => {
+        if (cancelled) return;
+        setSyncStatus("Joining live classroom…");
+        const join = (topic: string, presenceKey?: string) => {
+          const channel = privateChannel(client, topic, presenceKey);
+          for (const { event, handler } of handlers)
+            if (isClassEvent(event) === topic.startsWith("class:"))
+              channel.on("broadcast", { event }, ({ payload }) => handler(payload as never));
+          channels.push(channel);
+          return channel;
+        };
+        const classChannel = join(`class:${classroomId}`, userId);
+        classChannel.on("presence", { event: "sync" }, () =>
+          setOnlineUserIds(Object.keys(classChannel.presenceState())),
+        );
+        classChannel.subscribe((status) => {
+          if (status !== "SUBSCRIBED") {
+            classChannelRef.current = null;
+            return;
+          }
+          classChannelRef.current = classChannel;
+          void classChannel.track({ online: true });
+        });
+        const teamChannel = join(`team:${teamId}`);
+        teamChannel.on("broadcast", { event: "team:sync-request" }, answerSyncRequest);
+        teamChannel.subscribe((status) => {
+          if (status !== "SUBSCRIBED") {
+            teamChannelRef.current = null;
+            setSyncStatus(status === "CLOSED" ? "Reconnecting…" : "Live connection unavailable; retrying…");
+            return;
+          }
+          teamChannelRef.current = teamChannel;
+          setSyncStatus("Live classroom connected");
+          // Ask teammates for their unsaved typing and current file, and share ours.
+          void teamChannel.send({ type: "broadcast", event: "team:sync-request", payload: {} });
+          answerSyncRequest();
+          const unsent = unsentBaseRef.current;
+          const { code: current, activeFile: file } = liveRef.current;
+          if (unsent && file?.id === unsent.fileId) sendTyping(teamId, unsent.fileId, current);
+        });
+        if (chatTeamId && chatTeamId !== teamId) join(`team:${chatTeamId}`).subscribe();
+      })
+      .catch((error) =>
+        setSyncStatus(error instanceof Error ? error.message : "Live connection unavailable"),
+      );
     return () => {
-      socket.disconnect();
-      socketRef.current = null;
+      cancelled = true;
+      teamChannelRef.current = null;
+      classChannelRef.current = null;
+      void realtimeClient(getApiUrl())
+        .then((client) => channels.forEach((channel) => void client.removeChannel(channel)))
+        .catch(() => undefined);
     };
   }, [
     teamId,
@@ -1262,38 +1308,21 @@ export default function Home() {
     ) {
       liveDraftSequenceRef.current += 1;
       const draft = {
-        classroomId,
         projectId: presentationProjectId,
         fileId: activeFile.id,
         content: nextCode,
         sequence: liveDraftSequenceRef.current,
       };
-      if (classRealtimeReadyRef.current)
-        socketRef.current?.emit("class:live-share-draft", draft);
-      else pendingLiveDraftRef.current = draft;
+      sendLiveShareDraft(draft);
     }
     if (user?.role === "student" && teamId && activeFile) {
-      groupDraftSequenceRef.current += 1;
-      const operation = createOperation(
-        code,
-        nextCode,
-        teamId,
-        activeFile.id,
-        groupDraftSequenceRef.current,
-      );
-      if (teamRealtimeReadyRef.current)
-        socketRef.current?.emit("team:file-operation", operation);
-      else pendingGroupDraftRef.current = operation;
+      unsentBaseRef.current ??= { fileId: activeFile.id, content: code };
+      sendTyping(teamId, activeFile.id, nextCode);
     }
   }
   function updateCursor(offset: number) {
     if (user?.role !== "student" || !teamId || !activeFile) return;
-    const position = pointAt(code, offset);
-    socketRef.current?.emit("team:cursor", {
-      teamId,
-      fileId: activeFile.id,
-      ...position,
-    });
+    sendCursor({ teamId, fileId: activeFile.id, ...pointAt(code, offset), userId: user.id, name: user.name });
   }
   async function persistCurrentCode() {
     if (!activeFile || code === lastSaved.current) return;
@@ -1352,14 +1381,14 @@ export default function Home() {
       setSyncStatus("Your work is saved");
       setRemoteCursors([]);
       if (user?.role === "student" && teamId)
-        socketRef.current?.emit("team:active-file", {
+        void teamChannelRef.current?.send({ type: "broadcast", event: "team:active-file", payload: {
           teamId,
           fileId: file.id,
           path: file.path,
           language: file.language,
           content: file.content,
           version: file.version,
-        });
+        }, });
     } catch (error) {
       notify(error instanceof Error ? error.message : "Could not switch files");
     }
@@ -1695,6 +1724,7 @@ export default function Home() {
       }
     }
     await api("/api/auth/logout", { method: "POST" });
+    forgetRealtimeClient(); // the live pass belongs to the signed-out user
     setUser(null);
     setData(null);
   }

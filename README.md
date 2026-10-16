@@ -1,11 +1,11 @@
 # CodeShare
 
-CodeShare (formerly JavaShare) is a collaborative coding classroom with a Next.js frontend, a Node/Express backend, Supabase Auth/Postgres storage, Socket.IO collaboration, and optional Judge0 execution.
+CodeShare (formerly JavaShare) is a collaborative coding classroom with a Next.js frontend, a Node/Express backend, Supabase Auth/Postgres storage, Supabase Realtime collaboration, and optional Judge0 execution.
 
 ## Architecture
 
 - `app/` — Next.js classroom UI for local LAN use and Vercel
-- `backend/` — Express API, sessions, Socket.IO, Supabase repository, and Java execution gateway
+- `backend/` — Express API, sessions, live signals to Supabase Realtime, Supabase repository, and Java execution gateway
 - `supabase/` — Postgres schema, Row Level Security, grants, and local Docker configuration
 - Supabase — users, classes, teams, projects, files, versions, chat, saved work, and submissions
 
@@ -29,7 +29,7 @@ npm run classroom
 
 `npm run classroom` is an alias for `npm run classroom:online`. Docker is not required for online mode.
 
-The launcher builds and starts the frontend on port `3000` and backend on port `4000`. Students open the LAN frontend address printed in the terminal. Next.js forwards API requests to the backend, while Socket.IO connects directly to port `4000` for realtime events. Keep the teacher computer awake and allow Node.js/ports `3000` and `4000` through Windows Firewall on private networks.
+The launcher builds and starts the frontend on port `3000` and backend on port `4000`. Students open the LAN frontend address printed in the terminal. Next.js forwards API requests to the backend. Live features (typing, cursors, chat updates, live share) connect to Supabase Realtime: online to the hosted project, offline to port `54321` on the teacher computer. Keep the teacher computer awake and allow Node.js and ports `3000`, `4000`, and `54321` through Windows Firewall on private networks.
 
 ## Local Supabase classroom (offline)
 
@@ -101,6 +101,7 @@ DATABASE_MODE=supabase-online
 SUPABASE_URL
 SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_JWT_SECRET
 JWT_SECRET
 FRONTEND_URL=https://your-frontend.example.com
 JUDGE0_URL
