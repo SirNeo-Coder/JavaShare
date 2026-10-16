@@ -24,6 +24,7 @@ import {
   changeSupabaseResetPassword,
   createSupabaseActivity,
   createSupabaseFile,
+  createSupabaseWebProject,
   createSupabaseSavedWork,
   deleteSupabaseStudent,
   deleteSupabaseActivity,
@@ -372,21 +373,26 @@ app.put("/api/files/:fileId", requireAuth, async (req: AuthedRequest, res, next)
   } catch (error) { next(error); }
 });
 
-const javaFilePath = z.string().trim().min(1).max(160).transform((value) => value.replace(/\\/g, "/")).refine(
-  (value) => /^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/.test(value) && !value.includes(".."),
-  "Use a valid Java filename, for example src/Helper.java",
-);
+// The repository checks the name against the project's language (Java or web).
+const projectFilePath = z.string().trim().min(1).max(160).transform((value) => value.replace(/\\/g, "/"));
+
+app.post("/api/classes/:classroomId/web-projects", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { title } = z.object({ title: z.string().trim().min(1).max(60) }).parse(req.body);
+    return res.status(201).json(await createSupabaseWebProject(req.user!, String(req.params.classroomId), title));
+  } catch (error) { next(error); }
+});
 
 app.post("/api/projects/:projectId/files", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const input = z.object({ path: javaFilePath, content: z.string().max(200000).default("") }).parse(req.body);
+    const input = z.object({ path: projectFilePath, content: z.string().max(200000).default("") }).parse(req.body);
     return res.status(201).json(await createSupabaseFile(req.user!, String(req.params.projectId), input));
   } catch (error) { next(error); }
 });
 
 app.patch("/api/files/:fileId", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const { path } = z.object({ path: javaFilePath }).parse(req.body);
+    const { path } = z.object({ path: projectFilePath }).parse(req.body);
     return res.json(await renameSupabaseFile(req.user!, String(req.params.fileId), path));
   } catch (error) { next(error); }
 });

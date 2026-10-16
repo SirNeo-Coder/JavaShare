@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { io, type Socket } from "socket.io-client";
-import CodeEditor from "./CodeEditor";
+import CodeEditor, { languageLabel } from "./CodeEditor";
+import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
 
 const DEPLOYED_API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 const FRESH_LESSON_CODE = `public class Main {
@@ -79,6 +80,7 @@ type TeamData = {
     id: string;
     title: string;
     description: string;
+    language?: string;
     activityId?: string;
   } | null;
   files: FileData[];
@@ -283,6 +285,15 @@ export default function Home() {
   const [newFileOpen, setNewFileOpen] = useState(false);
   const [newFilePath, setNewFilePath] = useState("src/Helper.java");
   const [creatingFile, setCreatingFile] = useState(false);
+  const [newWebProjectOpen, setNewWebProjectOpen] = useState(false);
+  const [newWebProjectTitle, setNewWebProjectTitle] = useState("");
+  const [creatingWebProject, setCreatingWebProject] = useState(false);
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const [previewRun, setPreviewRun] = useState(0);
+  const [previewLogs, setPreviewLogs] = useState<
+    { kind: ConsoleMessage["kind"]; text: string; where: string }[]
+  >([]);
+  const previewFrameRef = useRef<HTMLIFrameElement | null>(null);
   const lastSaved = useRef("");
   const socketRef = useRef<Socket | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -320,6 +331,7 @@ export default function Home() {
       : teamId
     : data?.classroomChatTeamId;
   const activeProjectId = team?.project?.id;
+  const isWebProject = team?.project?.language === "web";
   const currentSavedCopy =
     activeSavedWork?.projectId === activeProjectId ? activeSavedWork : null;
   const workspaceTitle =
@@ -606,6 +618,31 @@ export default function Home() {
       .catch(() => setMessages([]));
   }, [chatTeamId]);
 
+  useEffect(() => {
+    if (!preview) return;
+    function receive(event: MessageEvent) {
+      // Only trust messages from the preview frame we created for this run.
+      if (!preview || event.source !== previewFrameRef.current?.contentWindow) return;
+      const message = event.data as ConsoleMessage;
+      if (message?.codeshare !== "console") return;
+      const origin = originOf(preview, message.line);
+      setPreviewLogs((logs) =>
+        logs.length >= 500
+          ? logs
+          : [
+              ...logs,
+              {
+                kind: message.kind,
+                text: String(message.text),
+                where: origin ? `${origin.file}:${origin.line}` : "",
+              },
+            ],
+      );
+    }
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [preview]);
+
   function chooseTeam(index: number) {
     const selected = data?.teams[index]?.files[0] ?? null;
     setActiveTeam(index);
@@ -615,6 +652,8 @@ export default function Home() {
     setSubmitted(Boolean(data?.teams[index]?.completed));
     setRemoteCursors([]);
     setActiveSavedWork(null);
+    setPreview(null);
+    setPreviewLogs([]);
   }
 
   useEffect(() => {
@@ -1327,7 +1366,7 @@ export default function Home() {
   }
   function openCreateFile() {
     if (!team?.project) return;
-    setNewFilePath("src/Helper.java");
+    setNewFilePath(isWebProject ? "about.html" : "src/Helper.java");
     setNewFileOpen(true);
   }
   async function createFile(event: React.FormEvent) {
@@ -1340,6 +1379,11 @@ export default function Home() {
         .split("/")
         .pop()
         ?.replace(/\.java$/i, "") || "Helper";
+    const content = !isWebProject
+      ? `public class ${className} {\n    \n}\n`
+      : path.endsWith(".html")
+        ? `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>${className.replace(/\.html$/, "")}</title>\n</head>\n<body>\n  \n</body>\n</html>\n`
+        : "";
     setCreatingFile(true);
     try {
       await persistCurrentCode();
@@ -1347,10 +1391,7 @@ export default function Home() {
         `/api/projects/${team.project.id}/files`,
         {
           method: "POST",
-          body: JSON.stringify({
-            path,
-            content: `public class ${className} {\n    \n}\n`,
-          }),
+          body: JSON.stringify({ path, content }),
         },
       );
       updateTeamFile(created);
@@ -1365,8 +1406,50 @@ export default function Home() {
       setCreatingFile(false);
     }
   }
+  async function createWebProject(event: React.FormEvent) {
+    event.preventDefault();
+    const title = newWebProjectTitle.trim();
+    if (!classroomId || !title || creatingWebProject) return;
+    if (code !== lastSaved.current) {
+      notify("Save your changes before opening another project");
+      return;
+    }
+    setCreatingWebProject(true);
+    try {
+      const created = await api<{ project: NonNullable<TeamData["project"]>; files: FileData[] }>(
+        `/api/classes/${classroomId}/web-projects`,
+        { method: "POST", body: JSON.stringify({ title }) },
+      );
+      // The new project lives in the student's personal workspace, next to "My Practice Code".
+      const personal = data?.teams.find(
+        (item) => !item.isGroup && item.project && !item.project.activityId,
+      );
+      if (!data || !personal) {
+        await loadWorkspace();
+      } else {
+        const entry: TeamData = { ...personal, name: created.project.title, completed: false, project: created.project, files: created.files };
+        setData({ ...data, teams: [...data.teams, entry] });
+        setActiveTeam(data.teams.length);
+        const first = created.files[0] ?? null;
+        setActiveFile(first);
+        setCode(first?.content ?? "");
+        lastSaved.current = first?.content ?? "";
+        setSubmitted(false);
+        setRemoteCursors([]);
+        setActiveSavedWork(null);
+        setPreview(null);
+        setPreviewLogs([]);
+      }
+      setNewWebProjectOpen(false);
+      notify(`Created ${created.project.title}. Press Run to see your page.`);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : "Could not create web project");
+    } finally {
+      setCreatingWebProject(false);
+    }
+  }
   async function renameFile(file: FileData) {
-    const entered = window.prompt("Rename Java file:", file.path);
+    const entered = window.prompt("Rename file:", file.path);
     if (!entered?.trim() || entered.trim() === file.path) return;
     try {
       if (file.id === activeFile?.id) await persistCurrentCode();
@@ -1517,6 +1600,25 @@ export default function Home() {
   async function runCode() {
     if (!team) return;
     setPanel("console");
+    // Web projects run in this browser (see app/webPreview.ts). In-browser Java (CheerpJ) and
+    // C# (.NET WebAssembly) runners will be chosen here by project language in a later stage.
+    if (isWebProject) {
+      try {
+        await persistCurrentCode();
+      } catch (error) {
+        notify(error instanceof Error ? error.message : "Could not save before running");
+      }
+      const next = buildPreview(
+        team.files.map((file) => ({
+          path: file.path,
+          content: file.id === activeFile?.id ? code : file.content,
+        })),
+      );
+      setPreview(next);
+      setPreviewLogs(next.warnings.map((text) => ({ kind: "warn", text, where: "" })));
+      setPreviewRun((run) => run + 1);
+      return;
+    }
     setRunning(true);
     setOutput("Sending Main.java to the classroom Java runner…");
     try {
@@ -1775,6 +1877,18 @@ export default function Home() {
                     ? "MY GROUP ACTIVITIES"
                     : "MY ACTIVITIES"}
             </span>
+            {user.role === "student" && (
+              <div className="teacher-tools">
+                <button
+                  onClick={() => {
+                    setNewWebProjectTitle("");
+                    setNewWebProjectOpen(true);
+                  }}
+                >
+                  New web project
+                </button>
+              </div>
+            )}
             {user.role === "teacher" && (
               <div className="teacher-tools">
                 {data.currentActivity && (
@@ -2174,7 +2288,9 @@ export default function Home() {
                         : "Double-click to rename"
                     }
                   >
-                    <span className="java-icon">J</span>
+                    <span className="java-icon">
+                      {{ html: "H", css: "C", javascript: "JS" }[file.language] ?? "J"}
+                    </span>
                     {file.path}
                     <i
                       className={
@@ -2188,13 +2304,15 @@ export default function Home() {
                 <button
                   className="add-file"
                   onClick={openCreateFile}
-                  aria-label="Create Java file"
+                  aria-label={isWebProject ? "Create web file" : "Create Java file"}
                   title={
                     team.isGroup &&
                     myGroupMembership?.editingLocked &&
                     team.leaderId !== user.id
                       ? "Group leader locked editing"
-                      : "Create Java file"
+                      : isWebProject
+                        ? "Create web file"
+                        : "Create Java file"
                   }
                   disabled={
                     team.isGroup &&
@@ -2225,6 +2343,7 @@ export default function Home() {
                 onChange={updateCode}
                 onCursorChange={updateCursor}
                 remoteCursors={remoteCursors}
+                language={activeFile?.language || "java"}
                 readOnly={
                   (user.role === "teacher" && !team.isTeacherWorkspace) ||
                   (team.isGroup &&
@@ -2245,7 +2364,7 @@ export default function Home() {
                 >
                   {activeFile?.path}
                 </button>
-                <span>Java</span>
+                <span>{languageLabel(activeFile?.language || "java")}</span>
                 <span>Version {activeFile?.version || 1}</span>
                 <span className="saved">
                   {code !== lastSaved.current ? "●" : "✓"} {syncStatus}
@@ -2285,7 +2404,37 @@ export default function Home() {
                   ↗
                 </button>
               </div>
-              {panel === "console" ? (
+              {panel === "console" && isWebProject ? (
+                <div className="web-preview">
+                  {preview?.html ? (
+                    <iframe
+                      key={previewRun}
+                      ref={previewFrameRef}
+                      title="Web page preview"
+                      sandbox="allow-scripts"
+                      srcDoc={preview.html}
+                    />
+                  ) : (
+                    <p className="web-preview-empty">
+                      Press <b>Run</b> to see your page here.
+                    </p>
+                  )}
+                  <ol className="preview-console" aria-label="Page console">
+                    {previewLogs.length ? (
+                      previewLogs.map((log, index) => (
+                        <li className={`log-${log.kind}`} key={index}>
+                          <span>{log.text}</span>
+                          {log.where && <small>{log.where}</small>}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="log-empty">
+                        console.log output and errors appear here
+                      </li>
+                    )}
+                  </ol>
+                </div>
+              ) : panel === "console" ? (
                 <div
                   className="console"
                   onClick={() => consoleInputRef.current?.focus()}
@@ -2468,8 +2617,8 @@ export default function Home() {
                 <div>
                   <span>✓</span>
                   <p>
-                    <b>Java execution enabled</b>
-                    <small>Teacher computer</small>
+                    <b>{isWebProject ? "Runs in your browser" : "Java execution enabled"}</b>
+                    <small>{isWebProject ? "Sandboxed preview" : "Teacher computer"}</small>
                   </p>
                 </div>
               </div>
@@ -2562,11 +2711,17 @@ export default function Home() {
             }}
           >
             <header>
-              <span className="java-icon">J</span>
+              <span className="java-icon">{isWebProject ? "W" : "J"}</span>
               <div>
-                <span className="eyebrow">JAVA SOURCE FILE</span>
+                <span className="eyebrow">
+                  {isWebProject ? "WEB PAGE FILE" : "JAVA SOURCE FILE"}
+                </span>
                 <h2>Create a new file</h2>
-                <p>Add another class to this repository.</p>
+                <p>
+                  {isWebProject
+                    ? "Add another page, stylesheet, or script."
+                    : "Add another class to this repository."}
+                </p>
               </div>
               <button
                 type="button"
@@ -2582,17 +2737,34 @@ export default function Home() {
               <input
                 value={newFilePath}
                 onChange={(event) => setNewFilePath(event.target.value)}
-                placeholder="src/Helper.java"
-                pattern="(?:[A-Za-z_$][A-Za-z0-9_$]*/)*[A-Za-z_$][A-Za-z0-9_$]*\.java"
-                title="Use a Java path such as src/Helper.java"
+                placeholder={isWebProject ? "about.html" : "src/Helper.java"}
+                pattern={
+                  isWebProject
+                    ? "(?:[A-Za-z0-9_\\-]+/)*[A-Za-z0-9_\\-]+(?:\\.[A-Za-z0-9_\\-]+)*\\.(?:html|css|js)"
+                    : "(?:[A-Za-z_$][A-Za-z0-9_$]*/)*[A-Za-z_$][A-Za-z0-9_$]*\\.java"
+                }
+                title={
+                  isWebProject
+                    ? "Use a name ending in .html, .css, or .js"
+                    : "Use a Java path such as src/Helper.java"
+                }
                 autoFocus
                 required
                 spellCheck={false}
               />
             </label>
             <small>
-              Use a unique Java filename, for example <b>src/Calculator.java</b>
-              .
+              {isWebProject ? (
+                <>
+                  Use a unique name ending in .html, .css, or .js, for example{" "}
+                  <b>about.html</b>.
+                </>
+              ) : (
+                <>
+                  Use a unique Java filename, for example{" "}
+                  <b>src/Calculator.java</b>.
+                </>
+              )}
             </small>
             <footer>
               <button
@@ -2608,6 +2780,69 @@ export default function Home() {
                 disabled={creatingFile || !newFilePath.trim()}
               >
                 {creatingFile ? "Creating…" : "Create file"}
+              </button>
+            </footer>
+          </form>
+        </div>
+      )}
+      {newWebProjectOpen && (
+        <div
+          className="activity-overlay file-dialog-overlay"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !creatingWebProject)
+              setNewWebProjectOpen(false);
+          }}
+        >
+          <form
+            className="file-dialog"
+            onSubmit={createWebProject}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && !creatingWebProject)
+                setNewWebProjectOpen(false);
+            }}
+          >
+            <header>
+              <span className="java-icon">W</span>
+              <div>
+                <span className="eyebrow">HTML · CSS · JAVASCRIPT</span>
+                <h2>New web project</h2>
+                <p>Starts with index.html, style.css, and script.js.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNewWebProjectOpen(false)}
+                aria-label="Close"
+                disabled={creatingWebProject}
+              >
+                ×
+              </button>
+            </header>
+            <label>
+              Project name
+              <input
+                value={newWebProjectTitle}
+                onChange={(event) => setNewWebProjectTitle(event.target.value)}
+                placeholder="My Web Page"
+                maxLength={60}
+                autoFocus
+                required
+              />
+            </label>
+            <small>Press Run to see your page. It runs only in your browser.</small>
+            <footer>
+              <button
+                type="button"
+                onClick={() => setNewWebProjectOpen(false)}
+                disabled={creatingWebProject}
+              >
+                Cancel
+              </button>
+              <button
+                className="create-file-button"
+                type="submit"
+                disabled={creatingWebProject || !newWebProjectTitle.trim()}
+              >
+                {creatingWebProject ? "Creating…" : "Create project"}
               </button>
             </footer>
           </form>
