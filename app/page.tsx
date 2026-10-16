@@ -1597,7 +1597,7 @@ export default function Home() {
     setData(null);
   }
 
-  if (loading) return <CenteredCard title="Starting JavaShare…" />;
+  if (loading) return <CenteredCard title="Starting CodeShare…" />;
   if (!user) return <AuthScreen onAuthenticated={setUser} />;
   if (user.passwordResetRequired)
     return <ResetPasswordScreen user={user} onChanged={setUser} />;
@@ -1635,12 +1635,12 @@ export default function Home() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark">J</span>
-          <span>JavaShare</span>
+          <span className="brand-mark">C</span>
+          <span>CodeShare</span>
           <span className="teacher-pill">{user.role.toUpperCase()}</span>
         </div>
         <div className="class-context">
-          <b>{classroom?.name || "JavaShare Classroom"}</b>
+          <b>{classroom?.name || "CodeShare Classroom"}</b>
           <span>
             {classroom?.subject || "Collaborative Java programming"}
             {classroom?.joinCode ? ` · Join code: ${classroom.joinCode}` : ""}
@@ -3086,10 +3086,10 @@ function AuthScreen({
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-mark">J</span>
+          <span className="brand-mark">C</span>
           <div>
-            <b>JavaShare</b>
-            <small>Collaborative Java classroom</small>
+            <b>CodeShare</b>
+            <small>Collaborative coding classroom</small>
           </div>
         </div>
         <h1>
@@ -3172,7 +3172,7 @@ function AuthScreen({
           onClick={() => switchMode(mode === "signin" ? "signup" : "signin")}
         >
           {mode === "signin"
-            ? "New to JavaShare? Create an account"
+            ? "New to CodeShare? Create an account"
             : mode === "signup"
               ? "Already have an account? Sign in"
               : "Back to sign in"}
@@ -3217,9 +3217,9 @@ function ResetPasswordScreen({
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-mark">J</span>
+          <span className="brand-mark">C</span>
           <div>
-            <b>JavaShare</b>
+            <b>CodeShare</b>
             <small>Signed in as {user.name}</small>
           </div>
         </div>
@@ -3299,9 +3299,9 @@ function JoinClass({
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-mark">J</span>
+          <span className="brand-mark">C</span>
           <div>
-            <b>JavaShare</b>
+            <b>CodeShare</b>
             <small>Signed in as {user.name}</small>
           </div>
         </div>
@@ -3336,7 +3336,7 @@ function CenteredCard({ title, message }: { title: string; message?: string }) {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <span className="brand-mark">J</span>
+        <span className="brand-mark">C</span>
         <h1>{title}</h1>
         {message && <p>{message}</p>}
       </div>

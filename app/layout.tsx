@@ -3,16 +3,16 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  title: "JavaShare — Collaborative Java Classroom",
-  description: "A shared Java coding workspace for students and teachers.",
+  title: "CodeShare — Collaborative Coding Classroom",
+  description: "A shared coding workspace for students and teachers.",
   openGraph: {
-    title: "JavaShare",
+    title: "CodeShare",
     description: "Code together. Learn together.",
-    images: [{ url: "/og.png", width: 1672, height: 941, alt: "JavaShare collaborative classroom" }],
+    images: [{ url: "/og.png", width: 1672, height: 941, alt: "CodeShare collaborative classroom" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "JavaShare",
+    title: "CodeShare",
     description: "Code together. Learn together.",
     images: ["/og.png"],
   },

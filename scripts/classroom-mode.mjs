@@ -79,7 +79,7 @@ if (checkOnly) {
   process.exit(0);
 }
 
-console.log(`Building JavaShare for Supabase ${mode} mode...`);
+console.log(`Building CodeShare for Supabase ${mode} mode...`);
 run(npm, ["run", "build:all"]);
 if (buildOnly) {
   console.log(`Supabase ${mode} mode build is ready.`);

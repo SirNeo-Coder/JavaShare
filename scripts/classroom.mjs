@@ -99,7 +99,7 @@ async function waitForUrl(url, serviceName) {
     }
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 250));
   }
-  throw new Error(`JavaShare ${serviceName} did not become ready within 30 seconds`);
+  throw new Error(`CodeShare ${serviceName} did not become ready within 30 seconds`);
 }
 
 async function urlIsReady(url) {
@@ -152,17 +152,17 @@ function openClassroom(url) {
   browser.unref();
 }
 
-log("Starting JavaShare classroom mode");
+log("Starting CodeShare classroom mode");
 const existingBackend = await urlIsReady("http://127.0.0.1:4000/api/health");
 const existingFrontend = await urlIsReady("http://127.0.0.1:3000");
 if (existingBackend && existingFrontend) {
-  log("JavaShare is already running; reusing the existing classroom instance");
+  log("CodeShare is already running; reusing the existing classroom instance");
   console.log(`Teacher and students open: http://${lanAddress}:3000`);
   console.log(`Persistent log:            ${logPath}`);
   await new Promise((resolveClosed) => logFile.end(resolveClosed));
 } else if (existingBackend || existingFrontend) {
   const occupied = [existingFrontend ? "3000 (frontend)" : "", existingBackend ? "4000 (backend)" : ""].filter(Boolean).join(" and ");
-  throw new Error(`A partial JavaShare instance is still using port ${occupied}. Close the previous classroom process, then run npm run classroom again.`);
+  throw new Error(`A partial CodeShare instance is still using port ${occupied}. Close the previous classroom process, then run npm run classroom again.`);
 } else {
   // The LAN backend uses HTTP, so keep development cookie settings (Secure=false).
   start("backend", process.execPath, [resolve("backend/dist/server.js")], resolve("backend"), "development");
@@ -176,7 +176,7 @@ if (existingBackend && existingFrontend) {
   process.on("SIGTERM", () => { stop(); process.exit(0); });
 
   console.log("");
-  console.log("JavaShare classroom mode (no development hot reload)");
+  console.log("CodeShare classroom mode (no development hot reload)");
   console.log(`Teacher and students open: http://${lanAddress}:3000`);
   console.log(`Health check:              http://${lanAddress}:3000/api/health`);
   console.log("Automatic recovery:        monitoring every 10 seconds");

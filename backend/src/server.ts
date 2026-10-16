@@ -659,7 +659,7 @@ async function startServer() {
     process.exitCode = 1;
     return;
   }
-  httpServer.listen(PORT, "0.0.0.0", () => console.log(`JavaShare backend listening on http://0.0.0.0:${PORT}`));
+  httpServer.listen(PORT, "0.0.0.0", () => console.log(`CodeShare backend listening on http://0.0.0.0:${PORT}`));
 }
 
 void startServer();

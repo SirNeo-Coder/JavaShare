@@ -35,7 +35,7 @@ function sessionUser(profile: Record<string, unknown>): SupabaseSessionUser {
 
 const starterCode = `public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, JavaShare!");
+        System.out.println("Hello, CodeShare!");
     }
 }`;
 
