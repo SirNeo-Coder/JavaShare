@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { networkInterfaces } from "node:os";
 import { resolve } from "node:path";
+import { loadEnvFile } from "node:process";
 
 function preferredLanAddress() {
   const candidates = Object.entries(networkInterfaces()).flatMap(([name, addresses]) =>
@@ -23,15 +24,11 @@ function preferredLanAddress() {
 }
 
 const lanAddress = preferredLanAddress();
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || `http://${lanAddress}:3000/api`;
+// Development mode: one Next.js dev server for the pages and the /api routes.
+// Server settings come from backend/.env (the same file the old standalone server used).
+if (existsSync(resolve("backend", ".env"))) loadEnvFile(resolve("backend", ".env"));
+process.env.CODESHARE_LAPTOP = "true";
 const children = [];
-
-const backend = spawn(process.execPath, [resolve("node_modules/tsx/dist/cli.mjs"), "watch", "src/server.ts"], {
-  cwd: resolve("backend"),
-  stdio: "inherit",
-  env: process.env,
-});
-children.push(backend);
 
 const frontend = spawn(process.execPath, [resolve("node_modules/next/dist/bin/next"), "dev", "--hostname", "0.0.0.0"], {
   stdio: ["inherit", "pipe", "pipe"],
@@ -65,5 +62,4 @@ process.on("SIGINT", () => { stop(); process.exit(0); });
 process.on("SIGTERM", () => { stop(); process.exit(0); });
 frontend.on("exit", (code) => { stop(); process.exit(code ?? 0); });
 
-console.log(`CodeShare LAN frontend: http://${lanAddress}:3000`);
-console.log(`CodeShare proxied API:   ${apiUrl}`);
+console.log(`CodeShare on the network: http://${lanAddress}:3000`);

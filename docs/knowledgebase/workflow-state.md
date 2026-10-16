@@ -23,6 +23,10 @@ What teachers and students can do today. Compare any proposed change with this p
 - **New activity** (individual or group, with starter code), **End activity**, reopen and delete, auto-grouping, Students/Groups views, following a student's active file live, viewing submissions, muting classroom chat.
 - Teachers do not yet see students' web projects.
 
+## Sign-in (PR c2)
+
+- Sign-in lasts 7 days, online and offline. Restarting the laptop or the server no longer signs anyone out.
+
 ## Live features (PR c1)
 
 - Teammates see typing about a quarter of a second later (at most 3 updates a second), and students see the teacher's live share about half a second behind (2 a second). Cursors update up to 4 times a second.

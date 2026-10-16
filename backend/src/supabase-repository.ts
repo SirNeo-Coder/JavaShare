@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.js";
-import { fileLanguage, projectPathError } from "./file-paths.js";
+import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
+import { fileLanguage, projectPathError } from "./file-paths.ts";
 
 export type SupabaseSessionUser = {
   id: string;
@@ -11,7 +11,8 @@ export type SupabaseSessionUser = {
 };
 
 export class SupabaseRepositoryError extends Error {
-  constructor(readonly status: number, message: string) { super(message); }
+  readonly status: number;
+  constructor(status: number, message: string) { super(message); this.status = status; }
 }
 
 type ClassroomRow = { id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean };

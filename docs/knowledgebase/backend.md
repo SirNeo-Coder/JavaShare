@@ -1,8 +1,8 @@
 # Backend (server)
 
-All in `backend/src/`: `server.ts` (routes, sign-in, Java runner), `realtime.ts` (`broadcast` live signals, `realtimePass` for browsers), `supabase-repository.ts` (every database read and write plus permission checks), `database.ts` (Supabase clients, `DATABASE_MODE`), `file-paths.ts` (file-name rules per project language).
+All in `backend/src/`: `routes.ts` (every route, sign-in, the Java endpoint; `handleApi` takes a web `Request`), `router.ts` (the tiny Express-style router), `java-runner.ts` (the laptop JDK runner, loaded only when allowed), `realtime.ts` (`broadcast` live signals, `realtimePass` for browsers), `server.ts` (Express wrapper for Render only). Next.js calls `handleApi` from `app/api/[...path]/route.ts`. Backend files import each other with `.ts` extensions; `tsc` rewrites them to `.js` for Render., `supabase-repository.ts` (every database read and write plus permission checks), `database.ts` (Supabase clients, `DATABASE_MODE`), `file-paths.ts` (file-name rules per project language).
 
-## Routes (`server.ts`)
+## Routes (`routes.ts`)
 
 | Area | Routes |
 | --- | --- |

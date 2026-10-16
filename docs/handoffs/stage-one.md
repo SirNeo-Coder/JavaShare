@@ -4,7 +4,7 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-16 (PR c1 built and tested)
+Last updated: 2026-10-16 (PR c2 built and tested)
 
 ## The job
 
@@ -160,6 +160,42 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - Group members' typing isn't checked per keystroke, but saving is.
 - **For c2:** every open page asks the server for live-share state every 2 seconds (existing code). On Cloudflare's free plan (100,000 requests a day) that is too many for a class of 40, so it needs changing in c2.
 
+### PR (c2) CodeShare on Cloudflare: DONE, waiting for teacher review
+
+- **Branch:** `cloudflare-c2` (built on top of `realtime-c1`).
+- **What it changes:**
+  - Next.js upgraded to **16.4.2**. Added `@opennextjs/cloudflare` 1.20.12, `wrangler`, `wrangler.jsonc` (Worker `codeshare`, `nodejs_compat`, `keep_vars`), `open-next.config.ts`, and the scripts `cf:build`, `cf:preview`, `cf:deploy`.
+  - **All `/api` routes are shared:** `backend/src/routes.ts` (the old `server.ts`) runs on a tiny Express-style router (`backend/src/router.ts`) over web Request/Response.
+    - Next.js serves them through `app/api/[...path]/route.ts`, offline and on Cloudflare.
+    - `backend/src/server.ts` is now a thin Express wrapper, so **Render keeps working** for Vercel's pages.
+    - The Java runner moved to `java-runner.ts` and is loaded only when allowed (`CODESHARE_LAPTOP=true` from the launcher).
+  - **Sign-in:** `jose` replaces `jsonwebtoken`, and there's no more sign-out on restart. The cookie is Secure only over https, or for Vercel to Render (`SameSite=None`). Old cookies stay valid.
+  - **Launcher:** offline runs one program (`next start`) on port 3000; port 4000 is no longer used. `npm run dev` is one Next.js dev server.
+  - **Live-share safety net:** no 2-second timer. The page checks on open, on returning to the tab, and when the class channel (re)connects. Teacher decision, 2026-10-16.
+  - **Smaller items:** `next.config.ts` rewrites removed; `.env.example` cleared (`NEXT_PUBLIC_API_URL` only for Vercel); `cookie-parser` and `jsonwebtoken` removed; backend imports use `.ts`, rewritten to `.js` by `tsc`.
+  - **New guide:** `docs/cloudflare-setup.md`, step by step for the teacher.
+- **Tested on 2026-10-16:**
+  - `npm test` passes 17 of 17. New `tests/api-router.test.mjs` has 3 router checks, plus 1 route check through `handleApi` against local Supabase: register, cookie, me, pass, forged cookie refused, logout.
+  - The route check was **shown failing** when the cookie was forced to always be Secure, and passing once restored.
+  - `build:all` passes, and lint shows 0 errors.
+  - **Cloudflare runtime locally** (`opennextjs-cloudflare preview`, workerd, port 8787, local Supabase):
+    - health, login (cookie `HttpOnly; SameSite=Lax`, no Secure on http), me, bootstrap, live pass, file save, image upload, a student refused on a teacher route, bad JSON gives 400, unknown routes give 404, Java gives demo mode;
+    - in the browser: sign-in, "Live classroom connected", and the web project Run console (`script.js:1/3/4`);
+    - the teacher on the offline server saw that student Online.
+  - **Bundle:** 1,200 KiB compressed (free limit 3 MB), from a `wrangler deploy --dry-run`; nothing was deployed.
+  - **Offline (`classroom:offline`):** one program on 3000, nothing on 4000.
+    - Teacher and student were still signed in from before the change.
+    - Java ran on the laptop.
+    - Live share start and stop reached the student within 2 seconds.
+    - The student page made no live-share requests while idle.
+  - **Render path** (`node backend/dist/server.js`, `NODE_ENV=production`): health, login (`Secure; SameSite=None`, CORS for the pages' origin), the cookie works, the teacher route is refused for a student, and Java gives demo mode.
+- **Not tested:**
+  - A real Cloudflare deployment. I have no access to the teacher's account; that's what the setup guide's preview step is for.
+  - Vercel's build of the new code.
+  - Windows.
+  - A real device on the Wi-Fi.
+- **Teacher must do:** follow `docs/cloudflare-setup.md`: apply both migrations, connect GitHub, add 5 secrets, test the `cloudflare-c2` preview, and only then merge.
+
 ### Knowledge base: DONE, waiting for teacher review
 
 - **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/3
@@ -177,17 +213,15 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 ## Next steps
 
-1. The teacher reviews PRs #1, #2, #3, and the c1 PR.
-2. Build **c2 (Cloudflare)** on a new branch stacked on `realtime-c1`:
-   - move the `/api` routes into Next.js;
-   - upgrade Next.js to 16.4.2 and add OpenNext;
-   - drop sign-out on restart;
-   - replace the 2-second live-share check;
-   - write `docs/cloudflare-setup.md`.
+1. The teacher reviews PRs #1–#4 and the c2 PR, then follows `docs/cloudflare-setup.md` to test a Cloudflare preview.
+2. After the teacher confirms Cloudflare works:
+   - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
+   - Stage two (course modules) can start.
 
 ## Running offline mode on this laptop
 
-- Run `sg docker -c "npm run classroom:offline"`. Use plain `npm run classroom:offline` once the teacher has logged out and back in.
+- Run `sg docker -c "npm run classroom:offline"` (one program on port 3000 since c2).
+- Cloudflare runtime locally: `npm run cf:preview` (port 8787; needs a git-ignored `.dev.vars` with the local Supabase values). Use plain `npm run classroom:offline` once the teacher has logged out and back in.
 - Test accounts live only in the local database: `test.teacher@example.test` and `test.student@example.test`. Their password is not stored in this repo.
 
 ## Where the work is
@@ -199,3 +233,4 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - `web-workspace`: PR (b), stacked on (a)
   - `codeshare-knowledge-base`: knowledge base, stacked on (b)
   - `realtime-c1`: PR (c1), stacked on the knowledge base
+  - `cloudflare-c2`: PR (c2), stacked on c1

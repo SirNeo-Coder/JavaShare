@@ -95,7 +95,7 @@ async function waitForUrl(url, serviceName) {
       const response = await fetch(url);
       if (response.ok) return;
     } catch {
-      // The backend process is still starting.
+      // The server is still starting.
     }
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 250));
   }
@@ -116,7 +116,7 @@ async function checkServiceHealth() {
   if (checkingHealth || stopping) return;
   checkingHealth = true;
   try {
-    for (const [name, url] of [["backend", "http://127.0.0.1:4000/api/health"], ["frontend", "http://127.0.0.1:3000"]]) {
+    for (const [name, url] of [["codeshare", "http://127.0.0.1:3000/api/health"]]) {
       const service = services.get(name);
       if (!service?.child || service.child.exitCode !== null) continue;
       if (await urlIsReady(url)) {
@@ -153,22 +153,18 @@ function openClassroom(url) {
 }
 
 log("Starting CodeShare classroom mode");
-const existingBackend = await urlIsReady("http://127.0.0.1:4000/api/health");
-const existingFrontend = await urlIsReady("http://127.0.0.1:3000");
-if (existingBackend && existingFrontend) {
+const existing = await urlIsReady("http://127.0.0.1:3000/api/health");
+if (existing) {
   log("CodeShare is already running; reusing the existing classroom instance");
   console.log(`Teacher and students open: http://${lanAddress}:3000`);
   console.log(`Persistent log:            ${logPath}`);
   await new Promise((resolveClosed) => logFile.end(resolveClosed));
-} else if (existingBackend || existingFrontend) {
-  const occupied = [existingFrontend ? "3000 (frontend)" : "", existingBackend ? "4000 (backend)" : ""].filter(Boolean).join(" and ");
-  throw new Error(`A partial CodeShare instance is still using port ${occupied}. Close the previous classroom process, then run npm run classroom again.`);
 } else {
-  // The LAN backend uses HTTP, so keep development cookie settings (Secure=false).
-  start("backend", process.execPath, [resolve("backend/dist/server.js")], resolve("backend"), "development");
-  await waitForUrl("http://127.0.0.1:4000/api/health", "backend");
-  start("frontend", process.execPath, [resolve("node_modules/next/dist/bin/next"), "start", "--hostname", "0.0.0.0", "--port", "3000"]);
-  await waitForUrl("http://127.0.0.1:3000", "frontend");
+  // One program: the pages and the /api routes (app/api/[...path]/route.ts) on port 3000.
+  // CODESHARE_LAPTOP lets the routes use this laptop's Java runner under next start.
+  process.env.CODESHARE_LAPTOP = "true";
+  start("codeshare", process.execPath, [resolve("node_modules/next/dist/bin/next"), "start", "--hostname", "0.0.0.0", "--port", "3000"]);
+  await waitForUrl("http://127.0.0.1:3000/api/health", "server");
   healthTimer = setInterval(() => { void checkServiceHealth(); }, 10000);
   openClassroom("http://127.0.0.1:3000");
 

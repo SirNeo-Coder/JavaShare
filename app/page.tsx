@@ -290,6 +290,7 @@ export default function Home() {
   const lastSaved = useRef("");
   const teamChannelRef = useRef<RealtimeChannel | null>(null);
   const classChannelRef = useRef<RealtimeChannel | null>(null);
+  const refreshLiveShareRef = useRef<(() => void) | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const liveDraftSequenceRef = useRef(0);
   const receivedDraftSequenceRef = useRef(0);
@@ -613,13 +614,13 @@ export default function Home() {
     };
     window.addEventListener("focus", refreshWhenVisible);
     document.addEventListener("visibilitychange", refreshWhenVisible);
-    // Keep a lightweight REST safety net even when the live channel reports connected.
-    // A missed live message (for example while reconnecting) must not leave a stale share;
-    // this guarantees share start/stop is reflected without requiring F5.
-    const interval = window.setInterval(() => void refreshLiveShare(), 2000);
+    // Safety net for a missed live message (decided 2026-10-16: no timer, to stay within
+    // Cloudflare's free request limit): check when the page opens, when the student returns
+    // to the tab, and whenever the class live channel (re)connects.
+    refreshLiveShareRef.current = () => void refreshLiveShare();
     return () => {
       cancelled = true;
-      window.clearInterval(interval);
+      refreshLiveShareRef.current = null;
       window.removeEventListener("focus", refreshWhenVisible);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
@@ -1012,6 +1013,7 @@ export default function Home() {
           }
           classChannelRef.current = classChannel;
           void classChannel.track({ online: true });
+          refreshLiveShareRef.current?.();
         });
         const teamChannel = join(`team:${teamId}`);
         teamChannel.on("broadcast", { event: "team:sync-request" }, answerSyncRequest);

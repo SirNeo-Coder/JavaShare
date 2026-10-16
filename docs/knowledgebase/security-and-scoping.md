@@ -2,8 +2,9 @@
 
 ## Sign-in
 
-- Supabase Auth checks the password (`loginWithSupabase`). The server then sets its own cookie, `javashare_session`: a JWT signed with `JWT_SECRET`, valid for 7 days, `httpOnly`.
-- The JWT carries `serverSessionId`, a random id made each time the server starts, so **restarting the server signs everyone out** on purpose.
+- Supabase Auth checks the password (`loginWithSupabase`). The server then sets its own cookie, `javashare_session`: a JWT (HS256, `jose`) signed with `JWT_SECRET`, valid for 7 days, `httpOnly`, `SameSite=Lax`, and `Secure` only over https (plain http on the classroom network must still work). Behind Render with pages on Vercel: `Secure; SameSite=None` (`apiConfig.crossSiteCookies`).
+- **A server restart no longer signs people out** (decided 2026-10-16; Cloudflare runs many short-lived copies of the server). Cookies issued before PR c2 stay valid when `JWT_SECRET` is unchanged.
+- Request bodies: JSON up to 300 KB, images up to 2 MB (`backend/src/router.ts`).
 - Teacher password reset: the teacher approves; the student signs in with a blank password and must set a new one.
 
 ## The secret key
@@ -42,4 +43,4 @@ Checked in `supabase-repository.ts` (row-level security exists but the server by
 
 ## Java runner
 
-Local runner only when `LOCAL_JAVA_EXECUTION=true` and not production. It blocks file, network, process and system APIs by pattern, with a 10-second compile limit, 5-second run limit, 128 MB memory, 64 KB output, at most 2 runs at once, and 1.5 seconds between a student's runs. It is not a full security sandbox.
+Local runner only when `LOCAL_JAVA_EXECUTION=true` and either `NODE_ENV` is not production or `CODESHARE_LAPTOP=true` (set by the classroom launcher). Render (production) and Cloudflare never run it. It blocks file, network, process and system APIs by pattern, with a 10-second compile limit, 5-second run limit, 128 MB memory, 64 KB output, at most 2 runs at once, and 1.5 seconds between a student's runs. It is not a full security sandbox.

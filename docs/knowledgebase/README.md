@@ -5,7 +5,7 @@ A compact map of CodeShare: where behaviour lives and how the parts fit. It poin
 ## Snapshot
 
 - Written: 2026-10-16
-- Base commit: `af1c6f1` (branch `web-workspace`, PR #2)
+- Base commit: `af1c6f1` (branch `web-workspace`, PR #2); updated for PR c1 (Realtime) and PR c2 (Cloudflare, shared `/api` routes)
 - Scope: `app/`, `backend/src/`, `supabase/`, `scripts/`, `tests/`, root config
 - Not indexed: `node_modules/`, `.next/`, `backend/dist/`, `logs/`, `supabase/.temp/`
 

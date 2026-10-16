@@ -1,0 +1,15 @@
+// Cloudflare Worker settings for CodeShare (docs/cloudflare-setup.md).
+// Secrets are NOT stored here: add SUPABASE_SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET and
+// JWT_SECRET as encrypted secrets in the Cloudflare dashboard.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "codeshare",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "observability": { "enabled": true },
+  // Keep settings added in the Cloudflare dashboard when a new version is deployed.
+  "keep_vars": true,
+  "vars": { "DATABASE_MODE": "supabase-online" }
+}
