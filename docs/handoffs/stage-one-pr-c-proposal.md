@@ -89,7 +89,7 @@ Because it is large, I may split it into (c1) the Next.js upgrade and route move
 1. ✅ Approved 2026-10-16: the approach above (move the routes into Next.js, and use Supabase Realtime Broadcast and Presence).
 2. ✅ Decided 2026-10-16: drop sign-out on server restart everywhere (7-day sign-in online and offline).
 3. ✅ Decided 2026-10-16: caps, the same online and offline. Typing at most 3 updates a second, cursors only on move at most 4 a second, live share at most 2 a second.
-4. ✅ Decided 2026-10-16: split into two pull requests.
+4. ✅ Decided 2026-10-16: split into two pull requests, **Realtime first (c1), then the Cloudflare move (c2)**. This order avoids temporary bridge code between the Next.js routes and the old Socket.IO server.
 
 ## Sources checked (2026-10-16)
 

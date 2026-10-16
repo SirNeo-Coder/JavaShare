@@ -35,7 +35,10 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 4. **PR (c) approach approved** (2026-10-16): move the server's `/api` routes into the Next.js app (Cloudflare online, `next start` offline, Java runner offline only), and replace Socket.IO with Supabase Realtime: private Broadcast channels `team:<id>` and `class:<id>`, plus Presence for who's online. Details: `docs/handoffs/stage-one-pr-c-proposal.md`. All four decisions made.
 5. **No sign-out on restart** (2026-10-16): drop the `serverSessionId` check everywhere. Sign-in lasts 7 days online and offline; restarting the laptop no longer signs students out. This is a workflow change; update `docs/knowledgebase/workflow-state.md` and `security-and-scoping.md` when it is built.
 6. **Live update caps** (2026-10-16), the same online and offline: typing at most 3 updates a second per student (about 1/4 second delay); cursors only when they move, at most 4 a second; teacher live share at most 2 updates a second (about 1/2 second delay, about 82 messages a second for a class of 40).
-7. **Split PR (c) into two pull requests** (2026-10-16), each tested offline before review. The order is being confirmed: see "Next steps".
+7. **Split PR (c) into two pull requests** (2026-10-16), each tested offline before review.
+8. **Order swapped** (2026-10-16), so no temporary bridge code is needed:
+   - **c1 (Realtime):** live features move to Supabase Realtime inside today's Express server, Socket.IO is removed, and hosting stays Vercel and Render.
+   - **c2 (Cloudflare):** the `/api` routes move into Next.js, Next.js is upgraded to 16.4.2, the OpenNext adapter is added, sign-out on restart is dropped, and `docs/cloudflare-setup.md` is written.
 
 ## Facts found while reading the code (affect PR c)
 
@@ -135,8 +138,9 @@ Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. 
 
 ## Next steps
 
-1. The teacher reviews PR (a), PR (b), and the knowledge-base PR.
-2. Start PR (c): write the Socket.IO replacement proposal, then wait for the teacher's decision. Follow `AGENTS.md`: search the bug records first and get approval before changing code.
+1. The teacher reviews PR (a), PR (b), and the knowledge-base PR (#3).
+2. Build **c1 (Realtime)** on branch `realtime-c1`, stacked on `codeshare-knowledge-base`. Test it fully in offline mode with two browsers.
+3. Then **c2 (Cloudflare)**.
 
 ## Running offline mode on this laptop
 
