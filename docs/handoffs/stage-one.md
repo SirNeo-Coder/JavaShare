@@ -162,6 +162,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 ### PR (c2) CodeShare on Cloudflare: DONE, waiting for teacher review
 
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/5
 - **Branch:** `cloudflare-c2` (built on top of `realtime-c1`).
 - **What it changes:**
   - Next.js upgraded to **16.4.2**. Added `@opennextjs/cloudflare` 1.20.12, `wrangler`, `wrangler.jsonc` (Worker `codeshare`, `nodejs_compat`, `keep_vars`), `open-next.config.ts`, and the scripts `cf:build`, `cf:preview`, `cf:deploy`.
