@@ -57,6 +57,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 ### PR (b) Web workspace: DONE, waiting for teacher review
 
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/2
 - **Branch:** `web-workspace` (built on top of `rename-to-codeshare`). The pull request targets `rename-to-codeshare`, so it shows only its own changes. Once PR (a) is merged, GitHub moves it onto `main`.
 - **What it adds:**
   - A new migration, `supabase/migrations/20261016000100_project_language.sql`, adds `projects.language` (`java` by default, `web` for web projects).
