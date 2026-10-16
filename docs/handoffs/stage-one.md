@@ -114,6 +114,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 ### PR (c1) Live features on Supabase Realtime: DONE, waiting for teacher review
 
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/4
 - **Branch:** `realtime-c1` (built on top of `codeshare-knowledge-base`).
 - **What it changes:**
   - **Socket.IO is removed** (both packages, and the `/socket.io` rewrite).
