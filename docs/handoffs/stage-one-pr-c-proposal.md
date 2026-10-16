@@ -1,6 +1,6 @@
 # PR (c) proposal: CodeShare on Cloudflare, live features on Supabase Realtime
 
-Status: **approach approved by the teacher on 2026-10-16** (decision 1). Decision 2 made; 3–4 pending. Nothing is built yet. Written 2026-10-16.
+Status: **approach approved by the teacher on 2026-10-16** (decision 1). Decisions 2–3 made; 4 pending. Nothing is built yet. Written 2026-10-16.
 
 ## What has to change, and why
 
@@ -88,7 +88,7 @@ Because it is large, I may split it into (c1) the Next.js upgrade and route move
 
 1. ✅ Approved 2026-10-16: the approach above (move the routes into Next.js, and use Supabase Realtime Broadcast and Presence).
 2. ✅ Decided 2026-10-16: drop sign-out on server restart everywhere (7-day sign-in online and offline).
-3. Throttling: OK with typing showing about a quarter of a second later for teammates, to stay under the free plan?
+3. ✅ Decided 2026-10-16: caps, the same online and offline. Typing at most 3 updates a second, cursors only on move at most 4 a second, live share at most 2 a second.
 4. Split PR (c) into two?
 
 ## Sources checked (2026-10-16)

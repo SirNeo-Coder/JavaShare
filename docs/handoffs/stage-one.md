@@ -32,8 +32,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 1. **Plan approved** (2026-10-16): the three PRs as described above.
 2. **Students create web projects with a "New web project" button** in their workspace sidebar. It makes a personal project with `index.html`, `style.css` and `script.js`. A later stage may let the teacher pick "Web" when handing out an activity.
 3. **Knowledge base** (2026-10-16): copy Project VMAS's structure with bug ids `CKB-NNN`. `AGENTS.md` is the one rule file, and `CLAUDE.md` only points to it. Every bug found or fixed gets a record, and every agreed rule goes into `AGENTS.md`. This progress file moved to `docs/handoffs/stage-one.md`.
-4. **PR (c) approach approved** (2026-10-16): move the server's `/api` routes into the Next.js app (Cloudflare online, `next start` offline, Java runner offline only), and replace Socket.IO with Supabase Realtime: private Broadcast channels `team:<id>` and `class:<id>`, plus Presence for who's online. Details: `docs/handoffs/stage-one-pr-c-proposal.md`. Still to decide, one at a time: typing throttle, splitting the PR.
+4. **PR (c) approach approved** (2026-10-16): move the server's `/api` routes into the Next.js app (Cloudflare online, `next start` offline, Java runner offline only), and replace Socket.IO with Supabase Realtime: private Broadcast channels `team:<id>` and `class:<id>`, plus Presence for who's online. Details: `docs/handoffs/stage-one-pr-c-proposal.md`. Still to decide: splitting the PR.
 5. **No sign-out on restart** (2026-10-16): drop the `serverSessionId` check everywhere. Sign-in lasts 7 days online and offline; restarting the laptop no longer signs students out. This is a workflow change; update `docs/knowledgebase/workflow-state.md` and `security-and-scoping.md` when it is built.
+6. **Live update caps** (2026-10-16), the same online and offline: typing at most 3 updates a second per student (about 1/4 second delay); cursors only when they move, at most 4 a second; teacher live share at most 2 updates a second (about 1/2 second delay, about 82 messages a second for a class of 40).
 
 ## Facts found while reading the code (affect PR c)
 
@@ -113,7 +114,7 @@ Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. 
 
 1. ~~Approve moving the routes into Next.js plus Supabase Realtime.~~ Approved 2026-10-16.
 2. ~~Sign-out on restart.~~ Drop it everywhere (2026-10-16).
-3. Throttling typing to stay under the free plan.
+3. ~~Throttling typing to stay under the free plan.~~ Caps approved (2026-10-16).
 4. Splitting the PR.
 
 ### Knowledge base: DONE, waiting for teacher review
