@@ -32,7 +32,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 1. **Plan approved** (2026-10-16): the three PRs as described above.
 2. **Students create web projects with a "New web project" button** in their workspace sidebar. It makes a personal project with `index.html`, `style.css` and `script.js`. A later stage may let the teacher pick "Web" when handing out an activity.
 3. **Knowledge base** (2026-10-16): copy Project VMAS's structure with bug ids `CKB-NNN`. `AGENTS.md` is the one rule file, and `CLAUDE.md` only points to it. Every bug found or fixed gets a record, and every agreed rule goes into `AGENTS.md`. This progress file moved to `docs/handoffs/stage-one.md`.
-4. **Pull request (c) is not decided yet.** Before building it, propose how to replace Socket.IO (live code sharing, cursors, active file, chat, teacher live share). The teacher expects Supabase Realtime. Explain the trade-offs and **wait for the teacher's answer**.
+4. **PR (c) approach approved** (2026-10-16): move the server's `/api` routes into the Next.js app (Cloudflare online, `next start` offline, Java runner offline only), and replace Socket.IO with Supabase Realtime: private Broadcast channels `team:<id>` and `class:<id>`, plus Presence for who's online. Details: `docs/handoffs/stage-one-pr-c-proposal.md`. Still to decide, one at a time: sign-out on restart, typing throttle, splitting the PR.
 
 ## Facts found while reading the code (affect PR c)
 
@@ -110,7 +110,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. The decisions it asks for, one at a time:
 
-1. Approve moving the routes into Next.js plus Supabase Realtime.
+1. ~~Approve moving the routes into Next.js plus Supabase Realtime.~~ Approved 2026-10-16.
 2. Sign-out on restart.
 3. Throttling typing to stay under the free plan.
 4. Splitting the PR.
