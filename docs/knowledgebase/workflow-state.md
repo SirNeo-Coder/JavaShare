@@ -22,3 +22,8 @@ What teachers and students can do today. Compare any proposed change with this p
 - **Live share** the demo workspace to every student, keystroke by keystroke.
 - **New activity** (individual or group, with starter code), **End activity**, reopen and delete, auto-grouping, Students/Groups views, following a student's active file live, viewing submissions, muting classroom chat.
 - Teachers do not yet see students' web projects.
+
+## Live features (PR c1)
+
+- Teammates see typing about a quarter of a second later (at most 3 updates a second), and students see the teacher's live share about half a second behind (2 a second). Cursors update up to 4 times a second.
+- "Online" (sidebar, auto-group roster, Student accounts) means the person has CodeShare open, via the live class channel. Student accounts shows "Connected to the live classroom".

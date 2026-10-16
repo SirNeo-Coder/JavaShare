@@ -10,7 +10,7 @@
 | web project, HTML, CSS, JavaScript, preview, console, sandbox | `createSupabaseWebProject`, `POST /api/classes/:id/web-projects` | `createWebProject`, `runCode`, `app/webPreview.ts` | `projects.language`, `tests/web-workspace.test.mjs` |
 | syntax colours, highlighting, brackets, semicolon hint | none | `app/CodeEditor.tsx` | none |
 | run Java, javac, Judge0, demo mode | `POST /api/execute`, `executeLocally` | `runCode` | none |
-| live typing, cursors, active file | Socket.IO `team:*` events | socket effect in `app/page.tsx` | memory only |
+| live typing, cursors, active file, who's online, live channel, Realtime | `backend/src/realtime.ts`, `GET /api/realtime/pass` | live effect in `app/page.tsx`, `app/realtime.ts` | migration `20261016000200_realtime_private_channels.sql`, `tests/realtime.test.mjs` |
 | chat, mute | messages routes, `chat-mute`, `chat:message` | chat panel | `messages` |
 | teacher live share | `live-share` routes, `class:live-share*` | live-share overlay | `classrooms.live_share_project_id` |
 | activities, groups, auto-group, leader, submit | activity and group routes | activity and group dialogs | `activities`, `teams`, `submissions`, `group_*` |

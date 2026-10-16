@@ -1,24 +1,30 @@
 # Backend (server)
 
-All in `backend/src/`: `server.ts` (routes, sign-in, Socket.IO, Java runner), `supabase-repository.ts` (every database read and write plus permission checks), `database.ts` (Supabase clients, `DATABASE_MODE`), `file-paths.ts` (file-name rules per project language).
+All in `backend/src/`: `server.ts` (routes, sign-in, Java runner), `realtime.ts` (`broadcast` live signals, `realtimePass` for browsers), `supabase-repository.ts` (every database read and write plus permission checks), `database.ts` (Supabase clients, `DATABASE_MODE`), `file-paths.ts` (file-name rules per project language).
 
 ## Routes (`server.ts`)
 
 | Area | Routes |
 | --- | --- |
 | Health | `GET /api/health` |
+| Live channels | `GET /api/realtime/pass` (one-hour pass for Supabase Realtime; 503 if `SUPABASE_JWT_SECRET` is missing), `POST /api/classes/:id/arrive` (called when a page opens a class; places a late student into a group) |
 | Sign-in | `POST /api/auth/register` (first account ever becomes the teacher and gets starter class `JAVA101`), `login`, `forgot-password`, `logout`, `GET /api/auth/me`, `POST /api/auth/change-reset-password` |
-| Teacher admin | `GET /api/teacher/students`, `POST .../:studentId/reset-password`, `PATCH`/`DELETE /api/teacher/students/:studentId`, `PUT .../photo`, `PUT /api/teacher/profile/photo`, `GET /api/teacher/activity-summary` |
+| Teacher admin | `GET /api/teacher/students` (also returns `classroomIds` for the live "Online" status), `POST .../:studentId/reset-password`, `PATCH`/`DELETE /api/teacher/students/:studentId`, `PUT .../photo`, `PUT /api/teacher/profile/photo`, `GET /api/teacher/activity-summary` |
 | Classes | `POST /api/classes/join`, `GET /api/bootstrap` (everything a screen needs), `POST /api/classes/:id/auto-group`, activities (`POST .../activities`, `end-activity`, `.../reopen`, `DELETE`), `PUT .../chat-mute`, `GET`/`POST .../live-share`, `POST .../web-projects` (students only) |
 | Teams | `GET`/`POST /api/teams/:id/messages`, `PUT .../group-profile`, `PUT .../group-permissions` |
 | Files and projects | `PUT /api/files/:id` (save; needs matching `version` for groups), `PATCH /api/files/:id` (rename), `POST /api/projects/:id/files`, `POST .../submit`, saved work (`GET`/`POST .../saved-work`, `PUT /api/saved-work/:id`, `POST .../restore`), `GET /api/submissions` |
 | Java | `POST /api/execute` |
 
-## Live events (Socket.IO, `server.ts`)
+## Live events (Supabase Realtime, since PR c1)
 
-Rooms: `class:<classroomId>` and `team:<teamId>`. Sign-in is read from the session cookie on connect.
+Private channels `team:<teamId>` and `class:<classroomId>` (policies in `supabase/migrations/20261016000200_realtime_private_channels.sql`). Browser code in `app/page.tsx` (the live effect) and `app/realtime.ts`.
 
-- **Browser to server:** `class:join`, `team:join`, `team:file-draft`, `team:file-operation` (typing as edit operations), `team:cursor`, `team:active-file`, `class:live-share-draft`.
-- **Server to browser:** `class:presence`, `class:presence-snapshot`, `class:live-share`, `class:live-share-update`, `class:live-share-draft`, `class:activity-deployed`, `class:activity-ended`, `class:chat-muted`, `groups:updated`, `group:late-assigned`, `chat:message`, `file:updated`, `team:file-draft`, `team:file-operation`, `team:live-snapshots`, `team:cursor`, `team:active-file`, `team:permissions-updated`, `team:profile-updated`, `team:submitted`.
+- **Server to browsers** (`broadcast()` in `backend/src/realtime.ts`, after the request succeeds):
+  - class channel: `class:live-share`, `class:live-share-update`, `class:activity-deployed`, `class:activity-ended`, `class:chat-muted`, `groups:updated`
+  - team channel: `chat:message`, `file:updated`, `team:submitted`, `team:profile-updated`, `team:permissions-updated`
+- **Browser to browsers** (sent directly on the channel; capped):
+  - team: `team:file-operation` (typing; 3 a second), `team:cursor` (4 a second), `team:active-file`, `team:sync-request` (a newcomer asks), answered with `team:active-file` and `team:live-snapshots` (unsaved typing)
+  - class (teacher only): `class:live-share-draft` (2 a second)
+- **Who's online:** Presence on the class channel, keyed by user id. Used by the workspace sidebar, the auto-group roster, and `/teacher/accounts`.
 
-**Kept in server memory only** (lost on restart; matters for the Cloudflare move): who is online, latest unsaved live text per file, each student's active file, per-file operation order.
+Nothing live is kept in server memory any more. A missed message is covered by saving (`file:updated`) and the 2-second live-share check in `app/page.tsx`.

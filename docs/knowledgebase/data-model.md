@@ -19,5 +19,6 @@ Source: `supabase/migrations/` (the code is authoritative). Every table has row-
 | `group_leader_votes`, `group_member_permissions`, `activity_workspace_members` | Group leader votes, per-member mute/lock, activity roster snapshot | team / project |
 
 Notes:
+- Since migration `20261016000200`, the `anon` and `authenticated` roles have no table privileges. Only the server (service role) reads and writes tables. Functions `can_join_realtime_topic` and `can_broadcast_realtime_topic` back the live-channel policies on `realtime.messages`.
 - A student's personal team can hold several personal projects ("My Practice Code" plus web projects). Activity projects have `activity_id` set.
 - Language values are free text on purpose so `csharp` and module languages need no schema change (see `../course-format.md`).

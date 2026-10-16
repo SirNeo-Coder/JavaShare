@@ -4,12 +4,11 @@
 
 - Supabase Auth checks the password (`loginWithSupabase`). The server then sets its own cookie, `javashare_session`: a JWT signed with `JWT_SECRET`, valid for 7 days, `httpOnly`.
 - The JWT carries `serverSessionId`, a random id made each time the server starts, so **restarting the server signs everyone out** on purpose.
-- Socket.IO reads the same cookie on connect.
 - Teacher password reset: the teacher approves; the student signs in with a blank password and must set a new one.
 
 ## The secret key
 
-`SUPABASE_SERVICE_ROLE_KEY` is used only in `backend/src/database.ts`. It must never appear in `app/` or a `NEXT_PUBLIC_` variable. The browser has no Supabase session at all today.
+`SUPABASE_SERVICE_ROLE_KEY` is used only in `backend/src/database.ts` and `backend/src/realtime.ts`. `SUPABASE_JWT_SECRET` (which signs live passes) is used only in `backend/src/realtime.ts`. Neither may appear in `app/` or a `NEXT_PUBLIC_` variable.
 
 ## Who can see what
 
@@ -21,6 +20,16 @@ Checked in `supabase-repository.ts` (row-level security exists but the server by
 - Live share drafts: only the teacher, only for the `teacher-demo` project.
 - Web projects: only students create them, at most 20 personal projects each.
 - File names: `backend/src/file-paths.ts` rejects names that don't fit the project language, plus `..` and hidden files.
+
+## Live channels (PR c1)
+
+- The browser gets a one-hour pass (`GET /api/realtime/pass`): a JWT with `sub` = user id and `role` = `authenticated`, signed with `SUPABASE_JWT_SECRET`. It is renewed 5 minutes before expiry, and forgotten on sign-out.
+- Policies on `realtime.messages`, using `can_join_realtime_topic` and `can_broadcast_realtime_topic`:
+  - **team channel:** team members and the class teacher join and send; for `teacher-demo` (classroom chat), every class member.
+  - **class channel:** members join and announce presence; **only the class teacher broadcasts**.
+- The same migration **revokes all direct table access** from `anon` and `authenticated`, so the pass can't read or change tables (tested: `403`, code `42501`).
+- Coarser than before: channels check membership only. Typing from a member the group leader locked is ignored by receivers (`app/page.tsx`), and saving is still fully checked by the server. Sender names in typing messages come from the sender's browser.
+- Tests: `tests/realtime.test.mjs` (needs local Supabase). Both rule checks were shown to fail when the rule was weakened.
 
 ## Web preview sandbox
 

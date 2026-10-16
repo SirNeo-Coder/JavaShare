@@ -64,6 +64,7 @@ if (mode === "offline") {
   process.env.SUPABASE_URL = local.get("API_URL") || local.get("SUPABASE_URL") || "";
   process.env.SUPABASE_ANON_KEY = local.get("ANON_KEY") || local.get("PUBLISHABLE_KEY") || "";
   process.env.SUPABASE_SERVICE_ROLE_KEY = local.get("SERVICE_ROLE_KEY") || local.get("SECRET_KEY") || "";
+  process.env.SUPABASE_JWT_SECRET = local.get("JWT_SECRET") || "";
 } else {
   process.env.DATABASE_MODE = "supabase-online";
 }
@@ -73,6 +74,10 @@ const missing = required.filter((name) => !process.env[name]?.trim());
 if (missing.length) {
   console.error(`Missing required ${mode} setting${missing.length > 1 ? "s" : ""}: ${missing.join(", ")}`);
   process.exit(1);
+}
+if (!process.env.SUPABASE_JWT_SECRET?.trim()) {
+  console.warn("SUPABASE_JWT_SECRET is not set: live typing, cursors, chat updates, and live share will be off.");
+  console.warn("Add it to the backend settings file (see docs/knowledgebase/operations.md).");
 }
 if (checkOnly) {
   console.log(`Supabase ${mode} mode configuration is ready.`);

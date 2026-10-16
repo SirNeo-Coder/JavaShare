@@ -4,7 +4,7 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-16 (PR c proposal written)
+Last updated: 2026-10-16 (PR c1 built and tested)
 
 ## The job
 
@@ -112,14 +112,53 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - The hosted database needs the new migration applied (the teacher does this; never run `supabase db push`).
   - Ctrl+Enter only runs from the Java input box (existing behaviour).
 
-### PR (c) Cloudflare and Supabase Realtime: PROPOSAL WRITTEN, waiting for the teacher's decision
+### PR (c1) Live features on Supabase Realtime: DONE, waiting for teacher review
 
-Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. The decisions it asks for, one at a time:
-
-1. ~~Approve moving the routes into Next.js plus Supabase Realtime.~~ Approved 2026-10-16.
-2. ~~Sign-out on restart.~~ Drop it everywhere (2026-10-16).
-3. ~~Throttling typing to stay under the free plan.~~ Caps approved (2026-10-16).
-4. ~~Splitting the PR.~~ Split into two (2026-10-16).
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/4
+- **Branch:** `realtime-c1` (built on top of `codeshare-knowledge-base`).
+- **What it changes:**
+  - **Socket.IO is removed** (both packages, and the `/socket.io` rewrite).
+  - The server sends its "this changed" signals with `broadcast()` (`backend/src/realtime.ts`, the Supabase Realtime REST API, service role).
+  - New routes: `GET /api/realtime/pass` (one-hour pass signed with `SUPABASE_JWT_SECRET`) and `POST /api/classes/:id/arrive` (late group assignment, which used to happen when a browser joined the class).
+  - `GET /api/teacher/students` returns `classroomIds`, and "online" comes from Presence.
+  - Removed: server-memory live state, and the repository functions only Socket.IO used.
+  - Browser:
+    - `app/realtime.ts` holds the client, pass renewal, private channels, `throttle` and `LIVE_CAPS`.
+    - The live effect in `app/page.tsx` keeps every old message handler, now attached to Realtime channels. Newcomers ask with `team:sync-request` instead of reading server memory.
+    - Typing is coalesced: one operation from the last sent text.
+    - Typing from a member the leader locked is ignored.
+    - `/teacher/accounts` gets "Online" from Presence.
+  - Migration `20261016000200_realtime_private_channels.sql`: channel policies (only the teacher broadcasts on the class channel), and **revokes all table privileges from `anon`/`authenticated`**.
+  - The launcher passes `SUPABASE_JWT_SECRET` offline, and warns if it is missing online. The env examples and `render.yaml` list it.
+- **Tested on 2026-10-16:**
+  - `npm test` passes 13 of 13 (`sg docker -c "npm test"`), including `tests/realtime.test.mjs`:
+    - laptop-address swap
+    - throttle
+    - channel rules against local Supabase
+    - the pass cannot read tables
+  - The two rule checks were each **shown failing** with the rule weakened (table grant re-added; class broadcast opened to students), then passing once restored.
+  - Build passes; lint shows 0 errors.
+  - **Two-browser offline test** (teacher on `127.0.0.1:3000`, student on `localhost:3000`):
+    - the student shows Online in the teacher's sidebar;
+    - the teacher opening the student's workspace shows "Following Test Student";
+    - student typing appears for the teacher, with the cursor and "Test Student is typing…";
+    - classroom chat is delivered;
+    - Present opens the student's live-share window;
+    - the teacher's typing reaches the student within a second;
+    - Stop presenting closes it;
+    - deploying an activity adds it to the student's sidebar live;
+    - `/teacher/accounts` shows Online 1, then Offline after the student's tab closed.
+  - **Cap measured:** 60 key presses produced 16 live-share updates (1.98 a second, smallest gap 499 ms), and the final text arrived complete.
+  - **Network path:** a Node client signed in through `192.168.0.113:3000`, got the pass, used `192.168.0.113:54321`, and joined the team channel. The in-app browser refused that cross-address connection (an app limitation; see operations.md), so a **real device on the Wi-Fi is still untested**.
+- **Teacher must do before using it online:**
+  1. Apply both new migrations to the hosted project.
+  2. Add `SUPABASE_JWT_SECRET` to `backend/.env.online` and to Render's environment (Supabase dashboard > Project Settings > JWT Keys > Legacy JWT secret).
+  - Without them, the app works but live features are off.
+- **Not tested:** online mode (hosted project not migrated); a real classroom device over Wi-Fi; Windows; browsers other than Chromium.
+- **Known limits:**
+  - Sender names in typing messages come from the sender's browser.
+  - Group members' typing isn't checked per keystroke, but saving is.
+- **For c2:** every open page asks the server for live-share state every 2 seconds (existing code). On Cloudflare's free plan (100,000 requests a day) that is too many for a class of 40, so it needs changing in c2.
 
 ### Knowledge base: DONE, waiting for teacher review
 
@@ -138,9 +177,13 @@ Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. 
 
 ## Next steps
 
-1. The teacher reviews PR (a), PR (b), and the knowledge-base PR (#3).
-2. Build **c1 (Realtime)** on branch `realtime-c1`, stacked on `codeshare-knowledge-base`. Test it fully in offline mode with two browsers.
-3. Then **c2 (Cloudflare)**.
+1. The teacher reviews PRs #1, #2, #3, and the c1 PR.
+2. Build **c2 (Cloudflare)** on a new branch stacked on `realtime-c1`:
+   - move the `/api` routes into Next.js;
+   - upgrade Next.js to 16.4.2 and add OpenNext;
+   - drop sign-out on restart;
+   - replace the 2-second live-share check;
+   - write `docs/cloudflare-setup.md`.
 
 ## Running offline mode on this laptop
 
@@ -155,3 +198,4 @@ Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. 
   - `rename-to-codeshare`: PR (a)
   - `web-workspace`: PR (b), stacked on (a)
   - `codeshare-knowledge-base`: knowledge base, stacked on (b)
+  - `realtime-c1`: PR (c1), stacked on the knowledge base

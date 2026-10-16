@@ -16,7 +16,7 @@ A compact map of CodeShare: where behaviour lives and how the parts fit. It poin
 | What CodeShare is, its parts, hosting, online and offline modes | [architecture.md](architecture.md) |
 | Find the files for a feature | [feature-index.md](feature-index.md) |
 | Tables and how they link | [data-model.md](data-model.md) |
-| Server addresses and live (Socket.IO) events | [backend.md](backend.md) |
+| Server addresses and live (Supabase Realtime) events | [backend.md](backend.md) |
 | Pages and screen parts | [frontend.md](frontend.md) |
 | Sign-in, the secret key, who can see what, the web preview sandbox | [security-and-scoping.md](security-and-scoping.md) |
 | Commands, settings, migrations, running each mode | [operations.md](operations.md) |

@@ -223,15 +223,7 @@ export async function canAccessSupabaseClass(user: SupabaseSessionUser, classroo
   return (await supabaseClassIds(user)).includes(classroomId);
 }
 
-export async function supabaseClassMemberIds(user: SupabaseSessionUser, classroomId: string) {
-  if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Classroom access denied");
-  const db = getSupabaseAdmin();
-  const { data, error } = await db.from("classroom_members").select("user_id").eq("classroom_id", classroomId);
-  fail(error, "Could not load classroom members");
-  return data.map((item) => item.user_id);
-}
-
-export async function canAccessSupabaseTeam(user: SupabaseSessionUser, teamId: string) {
+async function canAccessSupabaseTeam(user: SupabaseSessionUser, teamId: string) {
   const db = getSupabaseAdmin();
   const { data: requestedTeam, error: requestedTeamError } = await db.from("teams").select("classroom_id,slug").eq("id", teamId).maybeSingle();
   fail(requestedTeamError, "Could not verify team classroom");
@@ -602,39 +594,6 @@ export async function renameSupabaseFile(user: SupabaseSessionUser, fileId: stri
     .select("id,path,language,content,version").single();
   if (error) throw new SupabaseRepositoryError(error.code === "23505" ? 409 : 500, error.code === "23505" ? "A file with that name already exists" : error.message);
   return updated;
-}
-
-export async function supabaseFileBelongsToTeam(user: SupabaseSessionUser, fileId: string, teamId: string) {
-  if (!await canAccessSupabaseTeam(user, teamId)) return false;
-  const db = getSupabaseAdmin();
-  const { data: file } = await db.from("code_files").select("project_id").eq("id", fileId).maybeSingle();
-  if (!file) return false;
-  const { data: project } = await db.from("projects").select("id").eq("id", file.project_id).eq("team_id", teamId).maybeSingle();
-  return Boolean(project);
-}
-
-export async function canEditSupabaseTeamFile(user: SupabaseSessionUser, fileId: string, teamId: string) {
-  if (!await supabaseFileBelongsToTeam(user, fileId, teamId)) return false;
-  const db = getSupabaseAdmin();
-  const { data: team } = await db.from("teams").select("owner_id,leader_id").eq("id", teamId).maybeSingle();
-  if (!team) return false;
-  if (team.owner_id || team.leader_id === user.id) return true;
-  const { data: permission } = await db.from("group_member_permissions").select("editing_locked").eq("team_id", teamId).eq("user_id", user.id).maybeSingle();
-  return !permission?.editing_locked;
-}
-
-export async function canSendSupabaseLiveDraft(user: SupabaseSessionUser, classroomId: string, projectId: string, fileId: string) {
-  if (user.role !== "teacher") return false;
-  const db = getSupabaseAdmin();
-  const { data: classroom } = await db.from("classrooms").select("id").eq("id", classroomId).eq("teacher_id", user.id).eq("live_share_project_id", projectId).maybeSingle();
-  if (!classroom) return false;
-  const { data: project } = await db.from("projects").select("team_id").eq("id", projectId).eq("classroom_id", classroomId).maybeSingle();
-  if (!project) return false;
-  const [{ data: team }, { data: file }] = await Promise.all([
-    db.from("teams").select("slug").eq("id", project.team_id).maybeSingle(),
-    db.from("code_files").select("id").eq("id", fileId).eq("project_id", projectId).maybeSingle(),
-  ]);
-  return team?.slug === "teacher-demo" && Boolean(file);
 }
 
 async function teacherClassroom(user: SupabaseSessionUser, classroomId: string) {

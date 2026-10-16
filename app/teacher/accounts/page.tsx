@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import { privateChannel, realtimeClient } from "../../realtime";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -13,7 +15,7 @@ type Student = {
   passwordResetRequestedAt: string | null;
   joinedAt: string;
   hasWorkspace: boolean;
-  online: boolean;
+  online?: boolean;
 };
 
 async function api<T>(path: string, options: RequestInit = {}) {
@@ -24,7 +26,11 @@ async function api<T>(path: string, options: RequestInit = {}) {
 }
 
 export default function StudentAccountsPage() {
-  const [students, setStudents] = useState<Student[]>([]);
+  const [rawStudents, setStudents] = useState<Student[]>([]);
+  const [classroomIds, setClassroomIds] = useState<string[]>([]);
+  const [onlineIds, setOnlineIds] = useState<string[]>([]);
+  // "Online" comes from who is present on the class's live channel (see app/realtime.ts).
+  const students = useMemo(() => rawStudents.map((student) => ({ ...student, online: onlineIds.includes(student.id) })), [rawStudents, onlineIds]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,14 +48,34 @@ export default function StudentAccountsPage() {
 
   useEffect(() => {
     let active = true;
-    const loadStudents = (initial = false) => api<{ students: Student[] }>("/api/teacher/students")
-      .then((result) => { if (active) { setStudents(result.students); if (initial) setError(""); } })
+    const loadStudents = (initial = false) => api<{ students: Student[]; classroomIds: string[] }>("/api/teacher/students")
+      .then((result) => { if (active) { setStudents(result.students); setClassroomIds((current) => current.join() === result.classroomIds.join() ? current : result.classroomIds); if (initial) setError(""); } })
       .catch((loadError) => { if (active && initial) setError(loadError instanceof Error ? loadError.message : "Could not load student accounts"); })
       .finally(() => { if (active && initial) setLoading(false); });
     void loadStudents(true);
     const interval = window.setInterval(() => void loadStudents(), 5000);
     return () => { active = false; window.clearInterval(interval); };
   }, []);
+
+  useEffect(() => {
+    if (!classroomIds.length) return;
+    let cancelled = false;
+    const channels: RealtimeChannel[] = [];
+    void realtimeClient(API_URL).then((client) => {
+      if (cancelled) return;
+      for (const classroomId of classroomIds) {
+        const channel = privateChannel(client, `class:${classroomId}`);
+        channel.on("presence", { event: "sync" }, () =>
+          setOnlineIds([...new Set(channels.flatMap((item) => Object.keys(item.presenceState())))]));
+        channel.subscribe();
+        channels.push(channel);
+      }
+    }).catch(() => undefined);
+    return () => {
+      cancelled = true;
+      void realtimeClient(API_URL).then((client) => channels.forEach((channel) => void client.removeChannel(channel))).catch(() => undefined);
+    };
+  }, [classroomIds]);
 
   useEffect(() => {
     if (!pendingDelete) return;
@@ -112,7 +138,7 @@ export default function StudentAccountsPage() {
         <div className="student-account-row student-account-header"><span>Student</span><span>Live / account status</span><span>Actions</span></div>
         {loading ? <div className="account-empty">Loading student accounts…</div> : visibleStudents.length ? visibleStudents.map((student) => <div className="student-account-row" key={student.id}>
           <span className="student-identity"><i>{student.name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</i><span><b>{student.name}</b><small>{student.email}</small></span></span>
-          <span><i className={`account-status ${student.passwordResetRequestedAt ? "requested" : student.passwordResetRequired ? "reset" : student.online ? "active" : "offline"}`}>{student.passwordResetRequestedAt ? "Reset requested" : student.passwordResetRequired ? "Reset pending" : student.online ? "Online" : "Offline"}</i><small className="account-detail">{student.passwordResetRequestedAt ? `Requested ${new Date(student.passwordResetRequestedAt).toLocaleString()}` : student.passwordResetRequired ? "Must choose a new password" : student.online ? "Connected to this CodeShare server" : student.hasWorkspace ? "Account enabled · not connected" : "No workspace yet"}</small></span>
+          <span><i className={`account-status ${student.passwordResetRequestedAt ? "requested" : student.passwordResetRequired ? "reset" : student.online ? "active" : "offline"}`}>{student.passwordResetRequestedAt ? "Reset requested" : student.passwordResetRequired ? "Reset pending" : student.online ? "Online" : "Offline"}</i><small className="account-detail">{student.passwordResetRequestedAt ? `Requested ${new Date(student.passwordResetRequestedAt).toLocaleString()}` : student.passwordResetRequired ? "Must choose a new password" : student.online ? "Connected to the live classroom" : student.hasWorkspace ? "Account enabled · not connected" : "No workspace yet"}</small></span>
           <span className="account-actions"><button onClick={() => openEdit(student)} disabled={workingId === student.id}>Edit details</button><button className={student.passwordResetRequestedAt ? "approve-reset" : ""} onClick={() => resetPassword(student)} disabled={workingId === student.id}>{workingId === student.id ? "Working…" : student.passwordResetRequestedAt ? "Approve reset" : "Reset password"}</button><button className="delete-account" onClick={() => setPendingDelete(student)} disabled={workingId === student.id}>Delete account</button></span>
         </div>) : <div className="account-empty">{query ? "No students match your search." : "No students have joined your classroom yet."}</div>}
       </section>
