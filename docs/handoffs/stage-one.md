@@ -4,7 +4,7 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-16 (knowledge base built)
+Last updated: 2026-10-16 (PR c proposal written)
 
 ## The job
 
@@ -106,9 +106,14 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - The hosted database needs the new migration applied (the teacher does this; never run `supabase db push`).
   - Ctrl+Enter only runs from the Java input box (existing behaviour).
 
-### PR (c) Cloudflare and Supabase Realtime: NOT STARTED
+### PR (c) Cloudflare and Supabase Realtime: PROPOSAL WRITTEN, waiting for the teacher's decision
 
-Waiting for PR (b). First step: write the Socket.IO replacement proposal and get the teacher's answer.
+Proposal: `docs/handoffs/stage-one-pr-c-proposal.md` (2026-10-16). No code yet. The decisions it asks for, one at a time:
+
+1. Approve moving the routes into Next.js plus Supabase Realtime.
+2. Sign-out on restart.
+3. Throttling typing to stay under the free plan.
+4. Splitting the PR.
 
 ### Knowledge base: DONE, waiting for teacher review
 
