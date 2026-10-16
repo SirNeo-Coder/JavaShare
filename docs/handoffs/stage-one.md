@@ -112,6 +112,7 @@ Waiting for PR (b). First step: write the Socket.IO replacement proposal and get
 
 ### Knowledge base: DONE, waiting for teacher review
 
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/3
 - **Branch:** `codeshare-knowledge-base` (built on top of `web-workspace`).
 - **What it adds:**
   - `AGENTS.md` (all the rules) and `CLAUDE.md` (points to `AGENTS.md`).
