@@ -2128,7 +2128,7 @@ export default function Home() {
               <span>◷</span>
               <span>
                 <small>Repository</small>
-                <b>{team.files.length} Java file(s)</b>
+                <b>{team.files.length} {isWebProject ? "web" : "Java"} file(s)</b>
               </span>
             </div>
             <button className="brief-button">
@@ -2416,7 +2416,9 @@ export default function Home() {
                     />
                   ) : (
                     <p className="web-preview-empty">
-                      Press <b>Run</b> to see your page here.
+                      <span>
+                        Press <b>Run</b> to see your page here.
+                      </span>
                     </p>
                   )}
                   <ol className="preview-console" aria-label="Page console">

@@ -1499,3 +1499,17 @@
 [2026-07-20T05:56:26.542Z] [frontend] - Local:         http://localhost:3000
 [2026-07-20T05:56:26.542Z] [frontend] - Network:       http://0.0.0.0:3000
 [2026-07-20T05:56:26.542Z] [frontend] ✓ Ready in 201ms
+[2026-10-16T09:45:45.249Z] Starting CodeShare classroom mode
+[2026-10-16T09:45:45.558Z] [backend] supabase-local database connected
+[2026-10-16T09:45:45.562Z] [backend] CodeShare backend listening on http://0.0.0.0:4000
+[2026-10-16T09:45:45.971Z] [frontend] ▲ Next.js 16.2.6
+[2026-10-16T09:45:45.971Z] [frontend] - Local:         http://localhost:3000
+[2026-10-16T09:45:45.971Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-10-16T09:45:45.971Z] [frontend] ✓ Ready in 100ms
+[2026-10-16T09:48:59.545Z] Starting CodeShare classroom mode
+[2026-10-16T09:48:59.863Z] [backend] supabase-local database connected
+[2026-10-16T09:48:59.867Z] [backend] CodeShare backend listening on http://0.0.0.0:4000
+[2026-10-16T09:49:00.270Z] [frontend] ▲ Next.js 16.2.6
+[2026-10-16T09:49:00.270Z] [frontend] - Local:         http://localhost:3000
+[2026-10-16T09:49:00.270Z] [frontend] - Network:       http://0.0.0.0:3000
+[2026-10-16T09:49:00.270Z] [frontend] ✓ Ready in 97ms

@@ -3,7 +3,7 @@
 Keep this file current. After every finished step: update it, commit, and push the branch.
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 
-Last updated: 2026-10-16
+Last updated: 2026-10-16 (PR b tested and opened)
 
 ## The job
 
@@ -55,39 +55,53 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - **Tested:** build passes, lint shows 0 errors, and the built login, teacher summary and student accounts pages show CodeShare in a browser.
 - **Not tested:** signing in (no Supabase on this machine).
 
-### PR (b) Web workspace: BUILT, end-to-end test still to do
+### PR (b) Web workspace: DONE, waiting for teacher review
 
-- **Branch:** `web-workspace` (built on top of `rename-to-codeshare`). Pushed, but the pull request is **not opened yet**.
+- **Branch:** `web-workspace` (built on top of `rename-to-codeshare`). The pull request targets `rename-to-codeshare`, so it shows only its own changes. Once PR (a) is merged, GitHub moves it onto `main`.
 - **What it adds:**
   - A new migration, `supabase/migrations/20261016000100_project_language.sql`, adds `projects.language` (`java` by default, `web` for web projects).
   - Backend:
     - `POST /api/classes/:classroomId/web-projects` creates a web project (students only, at most 20 personal projects).
     - `backend/src/file-paths.ts` checks file names against the project's language.
-    - A file's language is saved from its name (`html`, `css` or `javascript`).
+    - A file's language is saved from its name.
   - Bootstrap:
-    - Students now see every personal project, not just "My Practice Code".
+    - Students see every personal project.
     - The teacher's student view keeps showing each student's original practice project.
-  - `app/webPreview.ts` builds the page for Run:
-    - Linked CSS and JS files are put inline, and nothing is loaded from the internet.
-    - It runs in `<iframe sandbox="allow-scripts">` without `allow-same-origin`.
-    - Console output, `alert` and errors are sent back with `postMessage` and mapped to the right file and line.
-    - The comment at the top of this file is where in-browser Java (CheerpJ) and C# (.NET WebAssembly) runners will plug in. They are chosen in `runCode()` in `app/page.tsx`.
-  - `app/CodeEditor.tsx` highlights HTML, CSS and JavaScript. The bracket and semicolon hints are limited to Java (and brackets to JavaScript).
-  - The new-file dialog and rename work for web file names.
-  - `docs/course-format.md` is added unchanged, and the README is updated.
-  - `npm test` runs `tests/web-workspace.test.mjs` (7 checks).
-- **Tested:**
+  - `app/webPreview.ts`:
+    - Runs the page in `<iframe sandbox="allow-scripts">` without `allow-same-origin`.
+    - Inlines the linked CSS and JS.
+    - Sends console output, `alert` and errors back with `postMessage`, mapped to file and line.
+    - The comment at the top is where in-browser Java (CheerpJ) and C# (.NET WebAssembly) runners will plug in. They are chosen in `runCode()` in `app/page.tsx`.
+  - `app/CodeEditor.tsx` highlights HTML, CSS and JavaScript.
+  - `docs/course-format.md` is added unchanged.
+  - `npm test` runs `tests/web-workspace.test.mjs`.
+- **Tested on 2026-10-16, offline mode, local Supabase in Docker:**
+  - `npm run classroom:offline` started, and the backend reported that local Supabase was connected.
+  - Every migration applied, including the new one.
+  - Registered a test teacher and a test student, and the student joined with code JAVA101.
+  - The Java practice project still runs on the laptop's `javac`.
+  - **New web project** created the 3 starter files.
+  - Run showed the styled page and `Hello from script.js`, with `script.js:1`.
+  - After editing `script.js`, Run saved it (version 2, with the old copy in `file_versions`). It showed `Total: 5` at `script.js:3` and `showTotal is not defined` at `script.js:4`, in red.
+  - Adding `about.html` worked, and so did renaming it to `pages/contact.html`.
+  - The server refuses `Main.java` in a web project, `index.html` in a Java project, `../x.html`, and a teacher creating a web project.
+  - The web project survives signing out and back in.
+  - The teacher still sees the student's "My Practice Code".
   - Build passes, lint shows 0 errors, and `npm test` passes 7 of 7.
-  - In a real Chromium browser, a test page using `buildPreview` showed:
-    - the CSS was applied;
-    - `console.log`, `warn`, `alert` and async errors appeared with the correct `file:line`;
-    - the sandbox blocked `document.cookie`, the parent page and `localStorage`.
-- **Not tested yet:** the full app flow (New web project, then edit, save and Run). Docker was installed on 2026-10-16 (Docker 29.1.3). The teacher's account is in the `docker` group, but sessions started before that need `sg docker -c "<command>"` until the next login. Local Supabase is being started for this test.
-- **Known limits (to tell the teacher in the PR):**
+- **Bugs found and fixed during testing.** These become CKB records when the knowledge base is built:
+  - The sidebar said "3 Java file(s)" for a web project. It now says "web file(s)".
+  - The "Press Run to see your page here" hint broke onto 3 lines. It now fits on one.
+- **Not tested:**
+  - Other browsers (only Chromium was used).
+  - A second device on the classroom Wi-Fi.
+  - The Windows launcher.
+  - Online mode, because the hosted database doesn't have the new migration yet.
+- **Known limits:**
   - Teachers can't yet see students' web projects.
   - Teacher live share stays Java-only.
   - An endless loop in student JavaScript can freeze that student's tab.
   - The hosted database needs the new migration applied (the teacher does this; never run `supabase db push`).
+  - Ctrl+Enter only runs from the Java input box (existing behaviour).
 
 ### PR (c) Cloudflare and Supabase Realtime: NOT STARTED
 
@@ -103,12 +117,14 @@ Waiting for PR (b). First step: write the Socket.IO replacement proposal and get
 
 ## Next steps
 
-1. **Once Docker works** (`docker --version` prints a version):
-   1. Run `npm run classroom:offline`, or `npx supabase start` and the app.
-   2. Register a teacher, then a student, and join the class.
-   3. Test New web project, then edit, save, Run, the console, adding and renaming files, and that Java projects still run.
-2. Open PR (b) from `web-workspace`, with a plain-English summary, test steps, and what could not be verified.
-3. Start PR (c) with the proposal, then wait for the teacher's decision.
+1. The teacher reviews PR (a) and PR (b).
+2. Ask the teacher to approve the parked knowledge-base structure, then build it.
+3. Start PR (c): write the Socket.IO replacement proposal, then wait for the teacher's decision.
+
+## Running offline mode on this laptop
+
+- Run `sg docker -c "npm run classroom:offline"`. Use plain `npm run classroom:offline` once the teacher has logged out and back in.
+- Test accounts live only in the local database: `test.teacher@example.test` and `test.student@example.test`. Their password is not stored in this repo.
 
 ## Where the work is
 
