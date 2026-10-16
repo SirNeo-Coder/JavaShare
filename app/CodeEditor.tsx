@@ -4,18 +4,51 @@ import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type UI
 
 const TAB = "    ";
 const JAVA_TOKEN = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|@[A-Za-z_$][\w$]*|\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|true|false|null)\b|\b(?:String|System|Object|Integer|Double|Float|Long|Boolean|Character|Math|Override|ArrayList|List|Map|Set|View|TextView|Activity|ViewGroup|ArrayAdapter)\b|\b\d+(?:\.\d+)?(?:[fFdDlL])?\b)/g;
+const JAVA_TYPE = /^(String|System|Object|Integer|Double|Float|Long|Boolean|Character|Math|Override|ArrayList|List|Map|Set|View|TextView|Activity|ViewGroup|ArrayAdapter)$/;
+const JS_TOKEN = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`|\b(?:async|await|break|case|catch|class|const|continue|default|delete|do|else|export|extends|finally|for|function|if|import|in|instanceof|let|new|of|return|super|switch|this|throw|try|typeof|var|void|while|yield|true|false|null|undefined)\b|\b(?:console|document|window|Math|JSON|Array|Object|String|Number|Promise|localStorage)\b|\b\d+(?:\.\d+)?\b)/g;
+const CSS_TOKEN = /(\/\*[\s\S]*?\*\/|"[^"\n]*"|'[^'\n]*'|@[\w-]+|#[0-9a-fA-F]{3,8}\b|[\w-]+(?=\s*:[^;{}]*[;}])|-?\b\d+(?:\.\d+)?(?:px|em|rem|%|vh|vw|vmin|vmax|s|ms|deg|fr)?)/g;
+// Attribute values only count as strings right after "=", so apostrophes in page text stay plain.
+const HTML_TOKEN = /(<!--[\s\S]*?-->|<!DOCTYPE[^>]*>|<\/?[A-Za-z][\w-]*|\/?>|[\w-]+(?==)|(?<==)"[^"]*"|(?<==)'[^']*')/gi;
 
-function tokenClass(token: string) {
-  if (token.startsWith("//") || token.startsWith("/*")) return "comment";
-  if (token.startsWith('"') || token.startsWith("'")) return "string";
-  if (token.startsWith("@")) return "annotation";
-  if (/^\d/.test(token)) return "number";
-  if (/^(String|System|Object|Integer|Double|Float|Long|Boolean|Character|Math|Override|ArrayList|List|Map|Set|View|TextView|Activity|ViewGroup|ArrayAdapter)$/.test(token)) return "type";
-  return "keyword";
+type Classify = (token: string) => string;
+const SYNTAX: Record<string, { pattern: RegExp; classify: Classify }> = {
+  java: {
+    pattern: JAVA_TOKEN,
+    classify: (token) => token.startsWith("//") || token.startsWith("/*") ? "comment"
+      : token.startsWith('"') || token.startsWith("'") ? "string"
+      : token.startsWith("@") ? "annotation"
+      : /^\d/.test(token) ? "number"
+      : JAVA_TYPE.test(token) ? "type" : "keyword",
+  },
+  javascript: {
+    pattern: JS_TOKEN,
+    classify: (token) => token.startsWith("//") || token.startsWith("/*") ? "comment"
+      : /^["'`]/.test(token) ? "string"
+      : /^\d/.test(token) ? "number"
+      : /^(?:console|document|window|Math|JSON|Array|Object|String|Number|Promise|localStorage)$/.test(token) ? "type" : "keyword",
+  },
+  css: {
+    pattern: CSS_TOKEN,
+    classify: (token) => token.startsWith("/*") ? "comment"
+      : /^["']/.test(token) ? "string"
+      : token.startsWith("@") ? "annotation"
+      : /^(?:#|-?\d)/.test(token) ? "number" : "type",
+  },
+  html: {
+    pattern: HTML_TOKEN,
+    classify: (token) => token.startsWith("<!--") ? "comment"
+      : /^["']/.test(token) ? "string"
+      : /^(?:<|\/?>)/.test(token) ? "keyword" : "type",
+  },
+};
+
+export function languageLabel(language: string) {
+  return ({ java: "Java", javascript: "JavaScript", css: "CSS", html: "HTML" } as Record<string, string>)[language] ?? language;
 }
 
-function HighlightedJava({ code, matched }: { code: string; matched: Set<number> }) {
-  const parts = code.split(JAVA_TOKEN);
+function Highlighted({ code, matched, language }: { code: string; matched: Set<number>; language: string }) {
+  const syntax = SYNTAX[language] ?? SYNTAX.java;
+  const parts = code.split(syntax.pattern);
   return <>{parts.map((part, index) => {
     const start = parts.slice(0, index).reduce((length, previous) => length + previous.length, 0);
     const content = Array.from(part).map((character, characterIndex) => {
@@ -23,7 +56,7 @@ function HighlightedJava({ code, matched }: { code: string; matched: Set<number>
       return matched.has(position) ? <mark className="matching-bracket" key={position}>{character}</mark> : character;
     });
     return index % 2 === 1
-      ? <span className={`token-${tokenClass(part)}`} key={index}>{content}</span>
+      ? <span className={`token-${syntax.classify(part)}`} key={index}>{content}</span>
       : <span key={index}>{content}</span>;
   })}</>;
 }
@@ -32,10 +65,12 @@ type Diagnostic = { line: number; message: string };
 const OPENING: Record<string, string> = { "(": ")", "[": "]", "{": "}" };
 const CLOSING: Record<string, string> = { ")": "(", "]": "[", "}": "{" };
 
-function analyze(code: string) {
+function analyze(code: string, language: string) {
   const pairs = new Map<number, number>();
   const diagnostics: Diagnostic[] = [];
   const stack: { character: string; position: number; line: number }[] = [];
+  // Bracket and semicolon hints understand Java and JavaScript only; HTML and CSS text would give false alarms.
+  if (language !== "java" && language !== "javascript") return { pairs, diagnostics };
   let line = 1;
   let state: "code" | "line-comment" | "block-comment" | "string" | "char" = "code";
 
@@ -62,6 +97,7 @@ function analyze(code: string) {
     }
   }
   stack.forEach((item) => diagnostics.push({ line: item.line, message: `Missing '${OPENING[item.character]}'` }));
+  if (language !== "java") return { pairs, diagnostics };
 
   code.split("\n").forEach((source, index) => {
     const text = source.replace(/\/\/.*$/, "").trim();
@@ -74,9 +110,9 @@ function analyze(code: string) {
 }
 
 type RemoteCursor = { userId: string; name: string; line: number; column: number; color: string; photoUrl?: string | null };
-type Props = { value: string; onChange: (value: string) => void; onCursorChange?: (offset: number) => void; remoteCursors?: RemoteCursor[]; readOnly?: boolean; ariaLabel?: string };
+type Props = { value: string; onChange: (value: string) => void; onCursorChange?: (offset: number) => void; remoteCursors?: RemoteCursor[]; readOnly?: boolean; language?: string };
 
-export default function CodeEditor({ value, onChange, onCursorChange, remoteCursors = [], readOnly = false, ariaLabel = "Java source code editor" }: Props) {
+export default function CodeEditor({ value, onChange, onCursorChange, remoteCursors = [], readOnly = false, language = "java" }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLPreElement>(null);
   const numbersRef = useRef<HTMLDivElement>(null);
@@ -87,7 +123,7 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
   const selectionRef = useRef({ start: 0, end: 0 });
   const [cursor, setCursor] = useState(0);
   const lineCount = Math.max(1, value.split("\n").length);
-  const analysis = useMemo(() => analyze(value), [value]);
+  const analysis = useMemo(() => analyze(value, language), [value, language]);
   const matched = useMemo(() => {
     const positions = new Set<number>();
     const bracketPosition = analysis.pairs.has(cursor) ? cursor : analysis.pairs.has(cursor - 1) ? cursor - 1 : -1;
@@ -184,7 +220,7 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
     </div>
     <div className="code-input">
       <div className="indent-guides" ref={guidesRef} aria-hidden="true">{guideLines.map((depth, lineIndex) => <span className="guide-row" key={lineIndex}>{Array.from({ length: depth }, (_, level) => <i style={{ left: `calc(15px + ${level + 1} * 4ch)` }} key={level} />)}</span>)}</div>
-      <pre className="code-highlight" ref={highlightRef} aria-hidden="true"><HighlightedJava code={value} matched={matched} />{"\n"}</pre>
+      <pre className="code-highlight" ref={highlightRef} aria-hidden="true"><Highlighted code={value} matched={matched} language={language} />{"\n"}</pre>
       <div className="remote-cursors" ref={cursorsRef} aria-hidden="true">{remoteCursors.map((remote) => <span className="remote-cursor" key={remote.userId} style={{ top: `calc(13px + ${remote.line} * 21px)`, left: `calc(15px + ${remote.column} * 1ch)`, borderColor: remote.color }}><b style={{ background: remote.color }}>{remote.photoUrl ? <img src={remote.photoUrl} alt="" /> : <i>{remote.name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()}</i>}<span>{remote.name}</span></b></span>)}</div>
       <textarea
         ref={textareaRef}
@@ -208,7 +244,7 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
         data-gramm="false"
         data-gramm_editor="false"
         data-enable-grammarly="false"
-        aria-label={ariaLabel}
+        aria-label={`${languageLabel(language)} source code editor`}
       />
       {analysis.diagnostics.length > 0 && <div className="code-diagnostics" role="status" title={analysis.diagnostics.map((item) => `Line ${item.line}: ${item.message}`).join("\n")}><b>{analysis.diagnostics.length}</b> {analysis.diagnostics[0].message} <span>Line {analysis.diagnostics[0].line}</span></div>}
     </div>

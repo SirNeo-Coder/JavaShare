@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.js";
+import { fileLanguage, projectPathError } from "./file-paths.js";
 
 export type SupabaseSessionUser = {
   id: string;
@@ -15,7 +16,7 @@ export class SupabaseRepositoryError extends Error {
 
 type ClassroomRow = { id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean };
 type TeamRow = { id: string; classroom_id: string; owner_id: string | null; slug: string; name: string; leader_id: string | null; chat_muted: boolean; editing_locked: boolean };
-type ProjectRow = { id: string; classroom_id: string; team_id: string; activity_id: string | null; title: string; description: string };
+type ProjectRow = { id: string; classroom_id: string; team_id: string; activity_id: string | null; title: string; description: string; language?: string };
 type ActivityRow = { id: string; classroom_id: string; title: string; mode: "individual" | "group"; ended_at: string | null };
 type ProfileSummary = { id: string; name: string; email: string; photo_path?: string | null; photoUrl?: string | null };
 
@@ -133,6 +134,58 @@ async function ensurePersonalWorkspace(classroom: ClassroomRow, user: SupabaseSe
   return team;
 }
 
+const webStarterFiles = [
+  { path: "index.html", language: "html", content: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Web Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Hello, CodeShare!</h1>
+  <p>Edit index.html, style.css, and script.js, then press Run.</p>
+  <script src="script.js"></script>
+</body>
+</html>
+` },
+  { path: "style.css", language: "css", content: `body {
+  font-family: Arial, sans-serif;
+  margin: 2rem;
+}
+
+h1 {
+  color: #2563eb;
+}
+` },
+  { path: "script.js", language: "javascript", content: `console.log("Hello from script.js");
+` },
+];
+
+export async function createSupabaseWebProject(user: SupabaseSessionUser, classroomId: string, title: string) {
+  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students can create web projects");
+  const db = getSupabaseAdmin();
+  const { data: team, error: teamError } = await db.from("teams").select("id").eq("classroom_id", classroomId).eq("owner_id", user.id).maybeSingle();
+  fail(teamError, "Could not load personal workspace");
+  if (!team) throw new SupabaseRepositoryError(404, "Join the class before creating a web project");
+  const { count, error: countError } = await db.from("projects").select("id", { count: "exact", head: true }).eq("team_id", team.id).is("activity_id", null);
+  fail(countError, "Could not count personal projects");
+  if ((count ?? 0) >= 20) throw new SupabaseRepositoryError(400, "You already have 20 personal projects");
+  const { data: project, error: projectError } = await db.from("projects").insert({
+    classroom_id: classroomId, team_id: team.id, title, language: "web",
+    description: "An HTML, CSS, and JavaScript page that runs in your browser.",
+  }).select("*").single();
+  fail(projectError, "Could not create web project");
+  const { data: files, error: fileError } = await db.from("code_files")
+    .insert(webStarterFiles.map((file) => ({ ...file, project_id: project.id, updated_by: user.id })))
+    .select("id,path,language,content,version").order("path");
+  if (fileError) {
+    await db.from("projects").delete().eq("id", project.id);
+    fail(fileError, "Could not create web project files");
+  }
+  return { project: { id: project.id, title: project.title, description: project.description, language: "web" }, files };
+}
+
 export async function joinSupabaseClass(user: SupabaseSessionUser, joinCode: string) {
   const db = getSupabaseAdmin();
   const { data: classroom, error } = await db.from("classrooms").select("*").eq("join_code", joinCode.toUpperCase()).maybeSingle();
@@ -248,9 +301,9 @@ export async function bootstrapFromSupabase(user: SupabaseSessionUser, teacherVi
     const teamProjects = projects.filter((project) => project.team_id === team.id);
     if (user.role === "student") {
       teamProjects.filter((project) => project.activity_id && activeActivityIds.has(project.activity_id)).forEach((project) => entries.push({ team, project }));
-      const personal = team.owner_id ? teamProjects.find((project) => !project.activity_id) : null;
-      if (personal) entries.push({ team, project: personal });
-      else if (!entries.some((entry) => entry.team.id === team.id)) entries.push({ team, project: teamProjects[0] || null });
+      const personal = team.owner_id ? teamProjects.filter((project) => !project.activity_id).reverse() : [];
+      personal.forEach((project) => entries.push({ team, project }));
+      if (!entries.some((entry) => entry.team.id === team.id)) entries.push({ team, project: teamProjects[0] || null });
       continue;
     }
     if (team.slug === "teacher-demo") {
@@ -264,7 +317,7 @@ export async function bootstrapFromSupabase(user: SupabaseSessionUser, teacherVi
       entries.push({ team, project: teamProjects.find((project) => project.activity_id === currentActivity?.id) || teamProjects.find((project) => !project.activity_id) || null });
     } else {
       if (!team.owner_id || currentActivity?.mode === "group") continue;
-      entries.push({ team, project: teamProjects.find((project) => project.activity_id === currentActivity?.id) || teamProjects.find((project) => !project.activity_id) || null });
+      entries.push({ team, project: teamProjects.find((project) => project.activity_id === currentActivity?.id) || teamProjects.filter((project) => !project.activity_id).at(-1) || null });
     }
   }
   const projectIds = entries.flatMap((entry) => entry.project ? [entry.project.id] : []);
@@ -299,11 +352,11 @@ export async function bootstrapFromSupabase(user: SupabaseSessionUser, teacherVi
     const isGroup = team.owner_id === null;
     return {
       id: team.id, slug: team.slug,
-      name: user.role === "student" && !isGroup ? (project?.activity_id ? project.title : "My Practice Code") : team.name,
+      name: user.role === "student" && !isGroup ? project?.title || "My Practice Code" : team.name,
       isGroup, isTeacherWorkspace: team.slug === "teacher-demo", leaderId: team.leader_id, myLeaderVoteId: voteResult.data.find((vote) => vote.team_id === team.id)?.candidate_id || null, chatMuted: Boolean(team.chat_muted), editingLocked: Boolean(team.editing_locked),
       members: members.map((member) => { const permission = permissionResult.data.find((item) => item.team_id === team.id && item.user_id === member.id); return { id: member.id, name: member.name, email: member.email, photoUrl: member.photoUrl || null, isLeader: member.id === team.leader_id, chatMuted: Boolean(permission?.chat_muted), editingLocked: Boolean(permission?.editing_locked) }; }),
       completed,
-      project: project ? { id: project.id, title: project.title, description: project.description, ...(project.activity_id ? { activityId: project.activity_id } : {}) } : null,
+      project: project ? { id: project.id, title: project.title, description: project.description, language: project.language || "java", ...(project.activity_id ? { activityId: project.activity_id } : {}) } : null,
       files: project ? filesResult.data.filter((file) => file.project_id === project.id).map((file) => ({ id: file.id, path: file.path, language: file.language, content: file.content, version: file.version })) : [],
     };
   });
@@ -533,15 +586,19 @@ export async function createSupabaseFile(user: SupabaseSessionUser, projectId: s
     fail(permissionError, "Could not load member editing permission");
     if (permission?.editing_locked) throw new SupabaseRepositoryError(403, "The group leader locked your code editing");
   }
-  const { data: file, error } = await db.from("code_files").insert({ project_id: project.id, path: input.path, content: input.content, language: "java", updated_by: user.id })
+  const pathError = projectPathError(project.language, input.path);
+  if (pathError) throw new SupabaseRepositoryError(400, pathError);
+  const { data: file, error } = await db.from("code_files").insert({ project_id: project.id, path: input.path, content: input.content, language: fileLanguage(input.path), updated_by: user.id })
     .select("id,path,language,content,version").single();
   if (error) throw new SupabaseRepositoryError(error.code === "23505" ? 409 : 500, error.code === "23505" ? "A file with that name already exists" : error.message);
   return file;
 }
 
 export async function renameSupabaseFile(user: SupabaseSessionUser, fileId: string, path: string) {
-  const { db, file } = await fileContext(user, fileId);
-  const { data: updated, error } = await db.from("code_files").update({ path, updated_by: user.id }).eq("id", file.id)
+  const { db, file, project } = await fileContext(user, fileId);
+  const pathError = projectPathError(project.language, path);
+  if (pathError) throw new SupabaseRepositoryError(400, pathError);
+  const { data: updated, error } = await db.from("code_files").update({ path, language: fileLanguage(path), updated_by: user.id }).eq("id", file.id)
     .select("id,path,language,content,version").single();
   if (error) throw new SupabaseRepositoryError(error.code === "23505" ? 409 : 500, error.code === "23505" ? "A file with that name already exists" : error.message);
   return updated;

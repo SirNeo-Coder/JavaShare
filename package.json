@@ -18,7 +18,8 @@
     "build": "next build",
     "build:all": "npm run build && npm --workspace backend run build",
     "start": "next start",
-    "lint": "eslint . --ignore-pattern .next --ignore-pattern backend/dist"
+    "lint": "eslint . --ignore-pattern .next --ignore-pattern backend/dist",
+    "test": "node --test \"tests/*.test.mjs\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.7",
