@@ -85,7 +85,7 @@ export default function TeacherActivityPage() {
   };
 
   return <main className="teacher-dashboard">
-    <header className="dashboard-topbar"><Link href="/" className="dashboard-brand"><span className="brand-mark">J</span><span><b>JavaShare</b><small>Teacher activity summary</small></span></Link><div className="dashboard-actions"><span>{summary?.teacher.name || "Teacher"}</span><button onClick={refresh} disabled={loading}>Refresh</button><Link href="/teacher/accounts">Student accounts</Link><Link href="/">Back to classroom</Link></div></header>
+    <header className="dashboard-topbar"><Link href="/" className="dashboard-brand"><span className="brand-mark">C</span><span><b>CodeShare</b><small>Teacher activity summary</small></span></Link><div className="dashboard-actions"><span>{summary?.teacher.name || "Teacher"}</span><button onClick={refresh} disabled={loading}>Refresh</button><Link href="/teacher/accounts">Student accounts</Link><Link href="/">Back to classroom</Link></div></header>
     <section className="dashboard-content">
       <div className="dashboard-heading"><div><span className="eyebrow">CLASSROOM OVERVIEW</span><h1>Submitted activities</h1><p>Review submissions, reopen ended work, or remove activities you no longer need.</p></div></div>
       {error && <div className="dashboard-error"><b>Activity action needs attention</b><span>{error}</span><button onClick={() => setError("")}>Dismiss</button></div>}

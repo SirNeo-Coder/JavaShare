@@ -1,6 +1,6 @@
-# JavaShare
+# CodeShare
 
-JavaShare is a collaborative Java classroom with a Next.js frontend, a Node/Express backend, Supabase Auth/Postgres storage, Socket.IO collaboration, and optional Judge0 execution.
+CodeShare (formerly JavaShare) is a collaborative coding classroom with a Next.js frontend, a Node/Express backend, Supabase Auth/Postgres storage, Socket.IO collaboration, and optional Judge0 execution.
 
 ## Architecture
 
@@ -9,7 +9,7 @@ JavaShare is a collaborative Java classroom with a Next.js frontend, a Node/Expr
 - `supabase/` — Postgres schema, Row Level Security, grants, and local Docker configuration
 - Supabase — users, classes, teams, projects, files, versions, chat, saved work, and submissions
 
-Students connect only to the JavaShare frontend and backend. The backend is the only component that uses the secret Supabase service-role key; never expose that key in a browser or a `NEXT_PUBLIC_` variable.
+Students connect only to the CodeShare frontend and backend. The backend is the only component that uses the secret Supabase service-role key; never expose that key in a browser or a `NEXT_PUBLIC_` variable.
 
 ## Install and verify
 
@@ -94,4 +94,13 @@ JUDGE0_API_KEY
 
 ## Data model
 
-Current file content is stored as plain text in Postgres. Every accepted save records the previous content in `file_versions`, and every submission stores an immutable file snapshot. Supabase Auth owns credentials while `profiles` stores JavaShare roles and classroom identity.
+Current file content is stored as plain text in Postgres. Every accepted save records the previous content in `file_versions`, and every submission stores an immutable file snapshot. Supabase Auth owns credentials while `profiles` stores CodeShare roles and classroom identity.
+
+## Names kept from JavaShare
+
+These internal names still say `javashare` on purpose. Renaming them would sign everyone out, reset saved settings, or start an empty database, and nobody sees them:
+
+- the sign-in cookie `javashare_session` and browser settings `javashare-theme` / `javashare-font-scale`
+- the local Supabase `project_id = "javashare"` in `supabase/config.toml` (offline database data is stored under this name)
+- the Render service name `javashare-backend` in `render.yaml`
+- database tables, columns, and existing migrations

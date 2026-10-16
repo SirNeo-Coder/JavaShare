@@ -65,5 +65,5 @@ process.on("SIGINT", () => { stop(); process.exit(0); });
 process.on("SIGTERM", () => { stop(); process.exit(0); });
 frontend.on("exit", (code) => { stop(); process.exit(code ?? 0); });
 
-console.log(`JavaShare LAN frontend: http://${lanAddress}:3000`);
-console.log(`JavaShare proxied API:   ${apiUrl}`);
+console.log(`CodeShare LAN frontend: http://${lanAddress}:3000`);
+console.log(`CodeShare proxied API:   ${apiUrl}`);
