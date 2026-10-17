@@ -40,6 +40,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
    - **c1 (Realtime):** live features move to Supabase Realtime inside today's Express server, Socket.IO is removed, and hosting stays Vercel and Render.
    - **c2 (Cloudflare):** the `/api` routes move into Next.js, Next.js is upgraded to 16.4.2, the OpenNext adapter is added, sign-out on restart is dropped, and `docs/cloudflare-setup.md` is written.
 
+9. **Online is the everyday mode; Java online will use CheerpJ** (2026-10-17, for a later stage, nothing built yet). CodeShare runs online day to day, in class too. Offline mode is only the backup when there's no internet, and it keeps running Java on the laptop's `javac`. Online, Java will run in each student's browser with CheerpJ (it never uses a JDK on the student's own computer). CheerpJ granted a free Community Licence (non-commercial education, no ads, no paid content), on condition that the CheerpJ logo shows on pages where Java runs. The free version loads from CheerpJ's site, so the teacher agreed an exception to rule 5, written into `AGENTS.md`. Hosting CheerpJ ourselves would cost money (offered at a discount); not chosen. The plug-in point is the comment at the top of `app/webPreview.ts` and `runCode()` in `app/page.tsx`.
+
 ## Facts found while reading the code (affect PR c)
 
 - **Cloudflare's adapter needs a newer Next.js.** OpenNext for Cloudflare 1.20.12 requires Next.js 16.4.1 or newer; the repo uses 16.2.6, so PR (c) must upgrade to 16.4.2 first.
