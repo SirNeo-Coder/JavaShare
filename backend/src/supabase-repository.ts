@@ -1176,6 +1176,7 @@ type ModuleProgressRow = {
   student_id: string; classroom_id: string; module_id: string;
   step_states: Record<string, ModuleStepStatus>;
   performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>>;
+  updated_at: string;
 };
 
 async function requireClassroomMember(user: SupabaseSessionUser, classroomId: string) {
@@ -1190,10 +1191,39 @@ async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId
   const { data: existing, error } = await db.from("module_progress").select("*").eq("student_id", user.id).eq("module_id", moduleId).maybeSingle();
   fail(error, "Could not load module progress");
   if (existing) return existing as ModuleProgressRow;
+  // Two simultaneous first touches of the same module both land here with no existing row.
+  // An upsert that does nothing on conflict (instead of a plain insert) lets the loser fetch the
+  // winner's row instead of throwing a raw unique-violation.
   const { data: created, error: insertError } = await db.from("module_progress")
-    .insert({ student_id: user.id, classroom_id: classroomId, module_id: moduleId }).select("*").single();
+    .upsert({ student_id: user.id, classroom_id: classroomId, module_id: moduleId }, { onConflict: "student_id,module_id", ignoreDuplicates: true })
+    .select("*").maybeSingle();
   fail(insertError, "Could not start module progress");
-  return created as ModuleProgressRow;
+  if (created) return created as ModuleProgressRow;
+  const { data: raceWinner, error: raceError } = await db.from("module_progress").select("*").eq("student_id", user.id).eq("module_id", moduleId).single();
+  fail(raceError, "Could not load module progress");
+  return raceWinner as ModuleProgressRow;
+}
+
+// step_states/performance_task are read-merge-written as whole jsonb columns, so two
+// near-simultaneous writes (e.g. submitting both performance-task variants close together) can
+// silently drop one if both read the same row before either writes. updated_at is trigger-managed
+// (set_updated_at) and changes on every write with no client input, so it doubles as an optimistic
+// lock: write back only if the row is still the version we read, otherwise reload and retry.
+async function updateModuleProgressWithMerge(
+  user: SupabaseSessionUser, classroomId: string, moduleId: string,
+  merge: (row: ModuleProgressRow) => Partial<Pick<ModuleProgressRow, "step_states" | "performance_task">>,
+  failMessage: string,
+): Promise<ModuleProgressRow> {
+  const db = getSupabaseAdmin();
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const row = await loadOrCreateModuleProgress(user, classroomId, moduleId);
+    const { data, error } = await db.from("module_progress").update(merge(row))
+      .eq("student_id", user.id).eq("module_id", moduleId).eq("updated_at", row.updated_at)
+      .select("*").maybeSingle();
+    fail(error, failMessage);
+    if (data) return data as ModuleProgressRow;
+  }
+  throw new SupabaseRepositoryError(409, "Module progress changed while saving. Please try again");
 }
 
 function moduleProgressView(row: ModuleProgressRow) {
@@ -1211,12 +1241,12 @@ export async function getSupabaseModuleProgress(user: SupabaseSessionUser, class
 export async function setSupabaseModuleStepState(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string, status: ModuleStepStatus) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  const row = await loadOrCreateModuleProgress(user, classroomId, moduleId);
-  const stepStates = { ...row.step_states, [stepId]: status };
-  const db = getSupabaseAdmin();
-  const { data, error } = await db.from("module_progress").update({ step_states: stepStates }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
-  fail(error, "Could not save step result");
-  return moduleProgressView(data as ModuleProgressRow);
+  const data = await updateModuleProgressWithMerge(
+    user, classroomId, moduleId,
+    (row) => ({ step_states: { ...row.step_states, [stepId]: status } }),
+    "Could not save step result",
+  );
+  return moduleProgressView(data);
 }
 
 export async function setSupabaseModulePerformanceTask(
@@ -1225,12 +1255,12 @@ export async function setSupabaseModulePerformanceTask(
 ) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  const row = await loadOrCreateModuleProgress(user, classroomId, moduleId);
-  const performanceTask = { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } };
-  const db = getSupabaseAdmin();
-  const { data, error } = await db.from("module_progress").update({ performance_task: performanceTask }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
-  fail(error, "Could not save performance task submission");
-  return moduleProgressView(data as ModuleProgressRow);
+  const data = await updateModuleProgressWithMerge(
+    user, classroomId, moduleId,
+    (row) => ({ performance_task: { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } } }),
+    "Could not save performance task submission",
+  );
+  return moduleProgressView(data);
 }
 
 // Course modules (docs/course-format.md): the teacher uploads a validated .codeshare.json file

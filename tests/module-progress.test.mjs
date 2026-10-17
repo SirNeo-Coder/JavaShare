@@ -96,3 +96,87 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     await admin.auth.admin.deleteUser(teacher.id);
   }
 });
+
+test("module progress: two simultaneous first touches of a module don't 500 (write race)", { skip: !local && "local Supabase is not running" }, async () => {
+  Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", JWT_SECRET: "module-progress-test-secret" });
+  const { handleApi } = await import("../backend/src/routes.ts");
+  const { getSupabaseAdmin } = await import("../backend/src/database.ts");
+  const call = (path, init = {}) => handleApi(new Request(`http://127.0.0.1:3000${path}`, { ...init, headers: { "content-type": "application/json", ...init.headers } }));
+
+  const admin = getSupabaseAdmin();
+  const password = randomUUID();
+  const { data: student, error: studentError } = await admin.auth.admin.createUser({ email: `${randomUUID()}@module-progress-test.example.test`, password, email_confirm: true, user_metadata: { name: "Race Student" } });
+  assert.equal(studentError, null);
+  const { data: classroom } = await admin.from("classrooms").insert({ name: "Write race test class", join_code: `MR${Date.now()}`.slice(0, 12).toUpperCase(), teacher_id: student.user.id }).select("id").single();
+  const classroomId = classroom.id;
+  const moduleId = fixture.id;
+
+  try {
+    await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: student.user.id });
+    const login = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: student.user.email, password }) });
+    const cookie = login.headers.get("set-cookie").split(";")[0];
+
+    // Two tabs/devices open the same module for the first time at once: both see no row yet and
+    // both try to create it. Neither request should 500.
+    const [first, second] = await Promise.all([
+      call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } }),
+      call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } }),
+    ]);
+    assert.notEqual(first.status, 500, "first concurrent first-touch must not 500");
+    assert.notEqual(second.status, 500, "second concurrent first-touch must not 500");
+    assert.equal(first.status, 200);
+    assert.equal(second.status, 200);
+
+    const { data: rows } = await admin.from("module_progress").select("id").eq("student_id", student.user.id).eq("module_id", moduleId);
+    assert.equal(rows.length, 1, "exactly one progress row must exist after the race");
+  } finally {
+    await admin.from("module_progress").delete().eq("student_id", student.user.id);
+    await admin.from("classrooms").delete().eq("id", classroomId);
+    await admin.auth.admin.deleteUser(student.user.id);
+  }
+});
+
+test("module progress: two simultaneous performance-task submissions don't lose one (write race)", { skip: !local && "local Supabase is not running" }, async () => {
+  Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", JWT_SECRET: "module-progress-test-secret" });
+  const { handleApi } = await import("../backend/src/routes.ts");
+  const { getSupabaseAdmin } = await import("../backend/src/database.ts");
+  const call = (path, init = {}) => handleApi(new Request(`http://127.0.0.1:3000${path}`, { ...init, headers: { "content-type": "application/json", ...init.headers } }));
+
+  const admin = getSupabaseAdmin();
+  const password = randomUUID();
+  const { data: student, error: studentError } = await admin.auth.admin.createUser({ email: `${randomUUID()}@module-progress-test.example.test`, password, email_confirm: true, user_metadata: { name: "Race Student 2" } });
+  assert.equal(studentError, null);
+  const { data: classroom } = await admin.from("classrooms").insert({ name: "Write race test class 2", join_code: `MR2${Date.now()}`.slice(0, 11).toUpperCase(), teacher_id: student.user.id }).select("id").single();
+  const classroomId = classroom.id;
+  const moduleId = fixture.id;
+  const task = fixture.performanceTask;
+
+  try {
+    await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: student.user.id });
+    const login = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: student.user.email, password }) });
+    const cookie = login.headers.get("set-cookie").split(";")[0];
+
+    // Force the row to already exist, so both submissions below race on the same read-merge-write
+    // instead of also racing on first-touch creation (that race is covered by the test above).
+    await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } });
+
+    // The student submits the sample-code run and their own version at nearly the same time
+    // (e.g. two browser tabs, or a slow network making two "Run" clicks overlap). Both submissions
+    // must be kept - a read-then-overwrite of the whole performance_task column can silently drop
+    // whichever one loses the race.
+    const [sampleResponse, ownResponse] = await Promise.all([
+      call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ variant: "sample", files: task.exampleFiles, status: "pass" }) }),
+      call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ variant: "own", files: [{ path: "Main.java", content: "public class Main { public static void main(String[] a) {} }" }], status: "fail" }) }),
+    ]);
+    assert.equal(sampleResponse.status, 200);
+    assert.equal(ownResponse.status, 200);
+
+    const final = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
+    assert.equal(final.performanceTask.sample?.status, "pass", "the sample submission must not be lost to the race");
+    assert.equal(final.performanceTask.own?.status, "fail", "the own-version submission must not be lost to the race");
+  } finally {
+    await admin.from("module_progress").delete().eq("student_id", student.user.id);
+    await admin.from("classrooms").delete().eq("id", classroomId);
+    await admin.auth.admin.deleteUser(student.user.id);
+  }
+});

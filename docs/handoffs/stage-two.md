@@ -1,30 +1,29 @@
 # Stage two handoff (course modules)
 
-Last updated: 2026-10-18 (fixing the two write races next, not done yet)
+Last updated: 2026-10-18 (the two write races are fixed; 7 other `/code-review` findings still open)
 
 Read `docs/course-format.md` first — it defines the weekly module JSON file.
 
-## In progress right now: fixing the two write races (not done, no code changed yet)
+## Done: the two write races (CKB-009)
 
-Branch: `module-viewer`. File: `backend/src/supabase-repository.ts`.
+Branch: `module-viewer`. File: `backend/src/supabase-repository.ts`. Full record:
+`docs/problem-knowledgebase/cases/CKB-009-module-progress-write-races.md`.
 
-1. **Lost-update race.** `setSupabaseModuleStepState` and `setSupabaseModulePerformanceTask`
-   read the row, merge one key into `step_states`/`performance_task` in JS, then overwrite the
-   whole jsonb column. Two near-simultaneous saves (e.g. both performance-task variants) can
-   silently drop one. Fix: do the merge on the DB side (jsonb concat in the update, e.g.
-   `step_states: db.raw` style merge or a Postgres function) instead of JS read-then-overwrite —
-   or add an optimistic check (`.eq` on a version/updated_at) and retry on conflict.
-2. **Unhandled 500 on first-write race.** `loadOrCreateModuleProgress` does select-then-insert,
-   not an upsert, on a `(student_id, module_id)` unique row. Two simultaneous first touches both
-   insert; the second hits a unique-violation that `fail()` turns into a plain `Error` → generic
-   500. Fix: use `.upsert(..., { onConflict: "student_id,module_id", ignoreDuplicates: true })`
-   (pattern already used by `joinSupabaseClass` in the same file) then select the row, instead of
-   select-then-insert.
+1. **Lost-update race** (`setSupabaseModuleStepState`/`setSupabaseModulePerformanceTask`
+   read-merge-overwrote the whole `step_states`/`performance_task` jsonb column) — fixed with a
+   new `updateModuleProgressWithMerge` helper that writes back conditioned on
+   `.eq("updated_at", row.updated_at)` (trigger-managed, changes on every write with no client
+   input, so it's a free optimistic lock) and retries up to 5 times on conflict. No migration.
+2. **Unhandled 500 on first-write race** (`loadOrCreateModuleProgress` did select-then-insert) —
+   fixed with `.upsert(..., { onConflict: "student_id,module_id", ignoreDuplicates: true })` then
+   a select of the winner's row when the upsert was ignored. No migration.
 
-Plan for both: pick one scoped migration-free fix (no schema change needed, both are query-shape
-fixes in `supabase-repository.ts`), write a test that proves the old code loses a write /
-500s under the race (mirror how CKB-007's test used two lessons to prove the bug class), then
-fix and show it pass.
+Two new regression tests in `tests/module-progress.test.mjs`, both shown failing against the old
+code (a raw 500 on the first-touch race, a dropped `sample` submission on the merge race) before
+the fix, passing after. `npm test`: 26/26 pass. `npm run build:all` / `npm run lint`: clean (0
+errors, same 8 pre-existing warnings as before). Not yet re-tested live in a browser — the fix is
+a pure backend query-shape change with no UI touched, and route-level behavior is what the two
+new tests exercise directly.
 
 Full finding text (both findings, plus the other 7 still-open findings from the
 `/code-review` of PR #6 and PR #7) is in "Other findings from the `/code-review`, not yet
@@ -124,17 +123,9 @@ browser both ways):
 ### Other findings from the `/code-review`, not yet fixed
 
 The review (10 findings each on PR #6 and PR #7, all confirmed against the code) surfaced several
-real issues beyond CKB-008 that are **not yet fixed** — flagging here so they aren't lost:
+real issues beyond CKB-008 that are **not yet fixed** — flagging here so they aren't lost. (The
+two write-race findings that were here are done — see CKB-009 above.)
 
-- **Lost-update races:** `setSupabaseModuleStepState`/`setSupabaseModulePerformanceTask` read the
-  whole `step_states`/`performance_task` jsonb column, merge in one key in JavaScript, then
-  overwrite the whole column — two near-simultaneous writes (e.g. submitting both performance-task
-  variants close together) can silently drop one. Needs either a DB-side jsonb merge or an
-  optimistic-concurrency check on the update.
-- **Unhandled 500 on a concurrent first write:** `loadOrCreateModuleProgress` does select-then-
-  insert, not an upsert, so two simultaneous first-touches of a module throw a raw unique-
-  violation instead of being handled the way `joinSupabaseClass`/`saveSupabaseFile` handle the
-  same race elsewhere in the file.
 - **Progress not scoped to classroom:** `module_progress` rows are keyed only by
   `(student_id, module_id)`, never `classroom_id` — a student in two classrooms that happen to
   share a module id would have progress leak/collide between them.
