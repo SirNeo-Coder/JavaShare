@@ -18,6 +18,7 @@ import {
   deleteSupabaseStudent,
   deleteSupabaseActivity,
   endSupabaseActivity,
+  getSupabaseModuleProgress,
   joinSupabaseClass,
   listSupabaseMessages,
   listSupabaseSavedWork,
@@ -34,6 +35,9 @@ import {
   sendSupabaseMessage,
   setSupabaseClassroomChatMuted,
   setSupabaseLiveShare,
+  setSupabaseModuleExitSlip,
+  setSupabaseModulePerformanceTask,
+  setSupabaseModuleStepState,
   submitSupabaseProject,
   supabaseActivitySummary,
   supabaseClassIds,
@@ -411,6 +415,39 @@ app.post("/api/saved-work/:savedWorkId/restore", requireAuth, async (req: Authed
 app.get("/api/submissions", requireAuth, async (req: AuthedRequest, res, next) => {
   try { return res.json(await listSupabaseSubmissions(req.user!)); }
   catch (error) { next(error); }
+});
+
+// Module progress (docs/course-format.md): the goal meter, per-step checklist, and the two
+// performance-task submissions (sample code run, student's own version). moduleId is the
+// module file's own "id" field.
+app.get("/api/classrooms/:classroomId/modules/:moduleId/progress", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseModuleProgress(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/step", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { stepId, status } = z.object({ stepId: z.string().trim().min(1).max(100), status: z.enum(["pass", "fail"]) }).parse(req.body);
+    return res.json(await setSupabaseModuleStepState(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId, status));
+  } catch (error) { next(error); }
+});
+
+app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/exit-slip", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { done } = z.object({ done: z.boolean() }).parse(req.body);
+    return res.json(await setSupabaseModuleExitSlip(req.user!, String(req.params.classroomId), String(req.params.moduleId), done));
+  } catch (error) { next(error); }
+});
+
+app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-task", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { variant, files, status } = z.object({
+      variant: z.enum(["sample", "own"]),
+      files: z.array(z.object({ path: z.string().trim().min(1).max(160), content: z.string().max(200000) })).min(1).max(50),
+      status: z.enum(["pass", "fail"]),
+    }).parse(req.body);
+    return res.json(await setSupabaseModulePerformanceTask(req.user!, String(req.params.classroomId), String(req.params.moduleId), variant, files, status));
+  } catch (error) { next(error); }
 });
 
 type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; message?: string; status?: { description?: string } };
