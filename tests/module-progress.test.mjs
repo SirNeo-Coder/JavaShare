@@ -38,6 +38,7 @@ test("module progress: step checklist, exit slip, and both performance-task vers
   const classroomId = classroom.id;
   const moduleId = fixture.id;
   const step = fixture.lessons[0].blocks[0];
+  const exitSlipId = fixture.lessons[0].exitSlip.id;
 
   try {
     const login = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: student.email, password }) });
@@ -49,7 +50,7 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: student.id });
 
     const empty = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
-    assert.deepEqual(empty, { moduleId, stepStates: {}, exitSlipDone: false, performanceTask: {} });
+    assert.deepEqual(empty, { moduleId, stepStates: {}, performanceTask: {} });
 
     const afterStep = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "pass" }) })).json();
     assert.deepEqual(afterStep.stepStates, { [step.id]: "pass" });
@@ -58,8 +59,17 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     const afterFail = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "fail" }) })).json();
     assert.deepEqual(afterFail.stepStates, { [step.id]: "fail" });
 
-    const afterSlip = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/exit-slip`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ done: true }) })).json();
-    assert.equal(afterSlip.exitSlipDone, true);
+    // An exit slip is marked done the same way as a step - through the same route, keyed by the
+    // exit slip's own id (CKB-007: one flag per module couldn't tell lessons apart).
+    const afterSlip = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: exitSlipId, status: "pass" }) })).json();
+    assert.equal(afterSlip.stepStates[exitSlipId], "pass");
+
+    // CKB-007 regression proof: the module has a second lesson with its own exit slip. Marking
+    // lesson 1's exit slip done must not mark lesson 2's - a single module-wide flag couldn't
+    // tell them apart.
+    const secondExitSlipId = fixture.lessons[1].exitSlip.id;
+    assert.notEqual(secondExitSlipId, exitSlipId);
+    assert.equal(afterSlip.stepStates[secondExitSlipId], undefined, "a different lesson's exit slip must not be marked done");
 
     const task = fixture.performanceTask;
     const afterSample = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ variant: "sample", files: task.exampleFiles, status: "pass" }) })).json();
@@ -71,8 +81,7 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     assert.equal(afterOwn.performanceTask.own.status, "fail");
 
     const final = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
-    assert.deepEqual(final.stepStates, { [step.id]: "fail" });
-    assert.equal(final.exitSlipDone, true);
+    assert.deepEqual(final.stepStates, { [step.id]: "fail", [exitSlipId]: "pass" });
     assert.equal(final.performanceTask.sample.status, "pass");
     assert.equal(final.performanceTask.own.status, "fail");
 

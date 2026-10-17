@@ -1,6 +1,7 @@
 import { Buffer } from "node:buffer";
 import { jwtVerify, SignJWT } from "jose";
 import { z } from "zod";
+import { courseModule } from "./course-module-schema.ts";
 import { database } from "./database.ts";
 import { broadcast, realtimePass } from "./realtime.ts";
 import { createRouter, type ApiRequest, type ApiResponse, type NextFn } from "./router.ts";
@@ -15,11 +16,14 @@ import {
   createSupabaseFile,
   createSupabaseWebProject,
   createSupabaseSavedWork,
+  deleteSupabaseModule,
   deleteSupabaseStudent,
   deleteSupabaseActivity,
   endSupabaseActivity,
+  getSupabaseModule,
   getSupabaseModuleProgress,
   joinSupabaseClass,
+  listSupabaseModules,
   listSupabaseMessages,
   listSupabaseSavedWork,
   listSupabaseStudents,
@@ -35,7 +39,6 @@ import {
   sendSupabaseMessage,
   setSupabaseClassroomChatMuted,
   setSupabaseLiveShare,
-  setSupabaseModuleExitSlip,
   setSupabaseModulePerformanceTask,
   setSupabaseModuleStepState,
   submitSupabaseProject,
@@ -46,6 +49,7 @@ import {
   updateSupabaseGroup,
   updateSupabaseGroupPermissions,
   updateSupabaseStudent,
+  uploadSupabaseModule,
   uploadSupabaseStudentPhoto,
   uploadSupabaseTeacherPhoto,
 } from "./supabase-repository.ts";
@@ -432,13 +436,6 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/step", requireA
   } catch (error) { next(error); }
 });
 
-app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/exit-slip", requireAuth, async (req: AuthedRequest, res, next) => {
-  try {
-    const { done } = z.object({ done: z.boolean() }).parse(req.body);
-    return res.json(await setSupabaseModuleExitSlip(req.user!, String(req.params.classroomId), String(req.params.moduleId), done));
-  } catch (error) { next(error); }
-});
-
 app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-task", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const { variant, files, status } = z.object({
@@ -448,6 +445,31 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-tas
     }).parse(req.body);
     return res.json(await setSupabaseModulePerformanceTask(req.user!, String(req.params.classroomId), String(req.params.moduleId), variant, files, status));
   } catch (error) { next(error); }
+});
+
+// Course modules (docs/course-format.md): the teacher uploads a weekly module file for a class;
+// members of that class (teacher and students) can list and view it.
+app.post("/api/classrooms/:classroomId/modules", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const parsed = courseModule.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: `This module file doesn't match the expected format: ${parsed.error.issues[0].message} (at ${parsed.error.issues[0].path.join(".") || "top level"})` });
+    return res.status(201).json(await uploadSupabaseModule(req.user!, String(req.params.classroomId), parsed.data));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/modules", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await listSupabaseModules(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/modules/:moduleId", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseModule(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.delete("/api/classrooms/:classroomId/modules/:moduleId", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await deleteSupabaseModule(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
 });
 
 type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; message?: string; status?: { description?: string } };

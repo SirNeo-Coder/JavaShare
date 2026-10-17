@@ -42,7 +42,7 @@ test("router: cookies, 204, unknown routes, bad JSON, and size limits", async ()
   assert.match(logout.headers.get("set-cookie"), /^javashare_session=; Path=\/; Max-Age=0/);
   assert.equal((await api.handle(new Request("http://x/missing"))).status, 404);
   assert.equal((await api.handle(new Request("http://x/echo", { method: "POST", headers: { "content-type": "application/json" }, body: "{oops" }))).status, 400);
-  const big = "x".repeat(300 * 1024 + 1);
+  const big = "x".repeat(2 * 1024 * 1024 + 1);
   assert.equal((await api.handle(new Request("http://x/echo", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(big) }))).status, 413);
   const photo = await api.handle(new Request("http://x/photo", { method: "PUT", headers: { "content-type": "image/png" }, body: new Uint8Array([1, 2, 3]) }));
   assert.deepEqual(await photo.json(), { bytes: 3, isBuffer: true });

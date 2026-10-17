@@ -1,10 +1,9 @@
 # Stage two handoff (course modules)
 
-Last updated: 2026-10-18 (module progress backend plumbing built and tested)
+Last updated: 2026-10-18 (module viewer built, tested as both teacher and student in a real
+browser against local Supabase)
 
-Read `docs/course-format.md` first — it defines the weekly module JSON file. This stage builds
-CodeShare's support for that file: loading it, showing it to students, and tracking their
-progress through it.
+Read `docs/course-format.md` first — it defines the weekly module JSON file.
 
 ## What the teacher asked for
 
@@ -14,67 +13,85 @@ checked off automatically by whether the student's code ran and matched the expe
 task tracked as two separate submissions — the student running the sample/example code, and
 the student's own version — both required to finish the module.
 
-## Done: module-progress backend (branch `module-progress`, stacked on `cloudflare-c2`)
+## Done: module-progress backend (branch `module-progress`, PR #6, stacked on `cloudflare-c2`)
 
-- **Migration:** `supabase/migrations/20261018000100_module_progress.sql` — new table
-  `module_progress` (one row per student per module). See `docs/knowledgebase/data-model.md`.
-- **Backend:** `backend/src/supabase-repository.ts` (`getSupabaseModuleProgress`,
-  `setSupabaseModuleStepState`, `setSupabaseModuleExitSlip`, `setSupabaseModulePerformanceTask`)
-  and four routes in `backend/src/routes.ts`
-  (`GET/PUT /api/classrooms/:classroomId/modules/:moduleId/progress[...]`).
-- **No execution code was added.** A step's pass/fail check reuses the existing
-  `POST /api/execute` route (Java) or the browser-side web preview (HTML/CSS/JS) — the caller
-  runs the code, compares the output to the module's `expectedOutput` itself, and reports the
-  pass/fail verdict to these new routes. Keeps CKB-005's online/offline Java distinction in one
-  place instead of two.
-- **Docs updated in this change:** `docs/knowledgebase/data-model.md`,
-  `docs/knowledgebase/feature-index.md`. `docs/knowledgebase/workflow-state.md` was **not**
-  touched — nothing a student or teacher can see changed yet (see "Not done" below).
+- Migration `supabase/migrations/20261018000100_module_progress.sql` — table `module_progress`
+  (one row per student per module).
+- `backend/src/supabase-repository.ts` / `routes.ts` — progress read/write routes.
+- No execution code added: a step's pass/fail check reuses the existing `POST /api/execute`
+  route (Java) or the browser's own web preview; the caller runs the code and reports the
+  verdict.
 
-### Tested 2026-10-18, local Supabase (offline-mode database path)
+## Done: the module viewer (branch `module-viewer`, stacked on `module-progress`)
 
-- `npm test`: 19 of 19 pass, including the new `tests/module-progress.test.mjs` (7 checks: a
-  non-member is refused, an empty progress row, a step passing then flipping to fail, the exit
-  slip, both performance-task variants submitted independently of each other, and a teacher has
-  no module progress of their own). Uses `tests/fixtures/sample-module.codeshare.json`, a small
-  module matching the `docs/course-format.md` schema, built only for this test.
-- `npm run build:all`: passes (Next.js build + backend `tsc`).
-- `npm run lint`: 0 errors (8 pre-existing warnings in unrelated files, same as before this
-  change).
-- Migration applied cleanly with `supabase db reset --local`.
-- **Not run:** the full `npm run classroom:offline` interactive launcher. This change adds no
-  offline-specific code (no changes to `java-runner.ts`, `database.ts`, or
-  `scripts/classroom-mode.mjs`); the route tests above already exercise the same
-  `DATABASE_MODE=supabase-local` path offline mode uses. Say so plainly rather than claiming the
-  full launcher was started.
-- **Not tested:** the Cloudflare preview (this PR doesn't touch anything Cloudflare-specific,
-  but hasn't been checked there).
+- **Teacher:** upload a `.codeshare.json` file (new `course_modules` table, validated against
+  `docs/course-format.md` by `backend/src/course-module-schema.ts` — a malformed file is
+  rejected with a plain-English error, not a 500), list and delete modules for their class.
+- **Student:** `app/ModuleViewer.tsx`, opened from the new **Modules** button in the header.
+  Shows the goal meter, each lesson's steps (run & auto-check for Java against
+  `expectedOutput`; other languages get a manual "mark done" button — no server-side runner
+  exists for them), the exit slip (manual "mark done", keyed per lesson), and the performance
+  task's two submission slots (Sample code / Your own version), each independently run and
+  submitted.
+- v1 renders `text`/`definition`/`note` blocks as plain text and `step` blocks fully;
+  `table`/`error`/`errorGuide` block types fall back to plain text (scoped out on purpose, per
+  the teacher's approval 2026-10-18).
+- Raised the shared JSON request-body cap from 300KB to 2MB (`backend/src/router.ts`) so an
+  upload with several lessons' worth of embedded Java fits — teacher approved; affects every
+  route, but nothing else sends anywhere near that size.
+- Code editing inside the viewer uses a plain `<textarea>`, not the full `CodeEditor` component.
+  `CodeEditor` is built for one full-height instance; nested many times inside this scrollable
+  modal its text rendered invisibly (confirmed in a real browser — correct DOM, correct computed
+  styles, never painted). Not worth chasing further; a plain textarea has no syntax highlighting
+  but is simple and reliably renders. If that's worth revisiting later, the symptom to search for
+  is "code editor box empty, scrollbar but no text, DOM/computed-style look correct".
 
-### Bugs found and fixed during this work
+### CKB-007, found and fixed during this work
 
-- The route test initially tried to register through `/api/auth/register`, racing other test
-  files for "the first account ever becomes the teacher with join code JAVA101" (same codepath
-  as `createStarterClass`). Fixed by building the test's own classroom and student directly via
-  the Supabase admin client, matching `tests/realtime.test.mjs`'s existing pattern — no app code
-  changed, this was a test-only fix.
+A module has several lessons, each with its own exit slip, but the first backend design
+(PR #6) stored exit-slip completion as a single `exit_slip_done` boolean for the whole module.
+Caught before release, while wiring the real multi-lesson viewer. Fixed by folding exit-slip
+completion into the same `step_states` map steps already used, keyed by the exit slip's own
+`id`. New migration `20261018000300_module_progress_exit_slip_fix.sql` drops the column (the
+earlier migration file itself was never touched, per rule 3). See
+`docs/problem-knowledgebase/cases/CKB-007-module-progress-exit-slip-one-flag.md` for the full
+record, including the regression test shown failing against the bug and passing after the fix.
 
-## Not done yet (separate, bigger piece — ask the teacher before starting)
+### Tested 2026-10-18
 
-There is still **no module viewer at all**: nothing loads a `.codeshare.json` file into
-CodeShare, and no screen renders a lesson, its blocks (`text`, `definition`, `analogy`, `note`,
-`table`, `step`, `error`, `errorGuide`), the exit slip, or the performance task. The goal meter,
-per-step checklist, and two-submission performance task UI described above all need that viewer
-to attach to — none of it is visible to a student yet. This was scoped out of the current PR on
-purpose (approved 2026-10-18: ship the backend plumbing first, against a test fixture, rather
-than one large PR building the viewer and the progress tracking together).
+- `npm test`: 24 of 24 pass (`tests/module-progress.test.mjs`, `tests/course-modules.test.mjs`,
+  `tests/course-module-schema.test.mjs`, plus everything from before). The CKB-007 regression
+  test uses a two-lesson fixture so it actually proves lessons are tracked independently.
+- `npm run build:all`: passes. `npm run lint`: 0 errors (8 pre-existing warnings, unrelated).
+- **Tested as both roles in a real browser**, against local Supabase (`npm run dev`, not the
+  full `classroom:offline` launcher — see below): registered a teacher and student directly via
+  the Supabase admin client (to avoid colliding with the "first account becomes teacher" rule),
+  joined a class, uploaded `tests/fixtures/sample-module.codeshare.json` as the teacher, then as
+  the student: opened the module, ran step 1 (real `javac`, real output, matched
+  `expectedOutput`, step marked PASSED), marked Monday's exit slip done and confirmed Tuesday's
+  stayed unchecked (CKB-007's fix holding live, not just in the test), submitted both
+  performance-task slots, watched the goal meter move 0% → 17% → 50% → 67% correctly as each
+  piece completed. A teacher opening a module correctly sees no progress UI ("Only students have
+  module progress" — the existing 403 surfaced cleanly instead of crashing).
+- **Not run:** the full `npm run classroom:offline` interactive launcher (used `npm run dev`
+  instead, which exercises the same `DATABASE_MODE=supabase-local` code path, against the
+  already-running local Supabase). Left `backend/.env` and `.claude/launch.json` in place
+  (both already git-ignored / untracked) for whoever picks this up next to repeat the check
+  quickly.
+- **Not tested:** the Cloudflare preview (this PR doesn't touch anything Cloudflare-specific).
 
-**Next step:** scope and approve the module viewer as its own piece of work — what loads a
-module file (teacher upload? a library like lessons have today?), which block types render for
-v1, and where the goal meter/checklist/performance-task UI actually appear on screen — then wire
-it to the routes already built here.
+## Not done yet (deliberately out of scope for this PR)
+
+- `table`, `error`, and `errorGuide` block types render as plain text, not their intended
+  layout.
+- The exit slip's actual questions aren't collected or graded — just a manual "mark done".
+- No teacher control over which lessons are open yet (course-format.md mentions this); the
+  whole module is visible at once, per the teacher's 2026-10-18 approval.
+- Teachers don't yet see student module progress anywhere (no dashboard for it).
 
 ## Where the work is
 
-- **Branch:** `module-progress`, stacked on `cloudflare-c2` (itself unmerged — pending the
-  teacher's Cloudflare preview review per `docs/handoffs/stage-one.md`).
+- **Branches:** `module-progress` (PR #6) → `module-viewer` (this work), stacked on
+  `cloudflare-c2` (itself unmerged — pending the teacher's Cloudflare preview review per
+  `docs/handoffs/stage-one.md`).
 - Local checkout and GitHub remote: same as `docs/handoffs/stage-one.md`.

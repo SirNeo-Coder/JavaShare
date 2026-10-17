@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
 import { fileLanguage, projectPathError } from "./file-paths.ts";
 
@@ -1174,7 +1175,6 @@ type ModulePerformanceEntry = { files: Array<{ path: string; content: string }>;
 type ModuleProgressRow = {
   student_id: string; classroom_id: string; module_id: string;
   step_states: Record<string, ModuleStepStatus>;
-  exit_slip_done: boolean;
   performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>>;
 };
 
@@ -1197,7 +1197,7 @@ async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId
 }
 
 function moduleProgressView(row: ModuleProgressRow) {
-  return { moduleId: row.module_id, stepStates: row.step_states, exitSlipDone: row.exit_slip_done, performanceTask: row.performance_task };
+  return { moduleId: row.module_id, stepStates: row.step_states, performanceTask: row.performance_task };
 }
 
 export async function getSupabaseModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
@@ -1206,6 +1206,8 @@ export async function getSupabaseModuleProgress(user: SupabaseSessionUser, class
   return moduleProgressView(await loadOrCreateModuleProgress(user, classroomId, moduleId));
 }
 
+// stepId is either a step block's own "id" (docs/course-format.md) or a lesson's exitSlip "id" -
+// both are just "something the student marked done", one map, one route (CKB-007).
 export async function setSupabaseModuleStepState(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string, status: ModuleStepStatus) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
@@ -1214,16 +1216,6 @@ export async function setSupabaseModuleStepState(user: SupabaseSessionUser, clas
   const db = getSupabaseAdmin();
   const { data, error } = await db.from("module_progress").update({ step_states: stepStates }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
   fail(error, "Could not save step result");
-  return moduleProgressView(data as ModuleProgressRow);
-}
-
-export async function setSupabaseModuleExitSlip(user: SupabaseSessionUser, classroomId: string, moduleId: string, done: boolean) {
-  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
-  await requireClassroomMember(user, classroomId);
-  await loadOrCreateModuleProgress(user, classroomId, moduleId);
-  const db = getSupabaseAdmin();
-  const { data, error } = await db.from("module_progress").update({ exit_slip_done: done }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
-  fail(error, "Could not save exit slip");
   return moduleProgressView(data as ModuleProgressRow);
 }
 
@@ -1239,4 +1231,48 @@ export async function setSupabaseModulePerformanceTask(
   const { data, error } = await db.from("module_progress").update({ performance_task: performanceTask }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
   fail(error, "Could not save performance task submission");
   return moduleProgressView(data as ModuleProgressRow);
+}
+
+// Course modules (docs/course-format.md): the teacher uploads a validated .codeshare.json file
+// for a class; students in that class can view it. The file is stored whole in `content` and
+// never edited by CodeShare, only replaced (course-format.md rule 2 keeps ids, swaps content).
+type CourseModuleRow = { classroom_id: string; module_id: string; content: CourseModule; created_at: string; updated_at: string };
+
+function courseModuleSummary(row: CourseModuleRow) {
+  return { moduleId: row.module_id, title: row.content.title, week: row.content.week, course: row.content.course, updatedAt: row.updated_at };
+}
+
+export async function uploadSupabaseModule(user: SupabaseSessionUser, classroomId: string, content: CourseModule) {
+  await teacherClassroom(user, classroomId);
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("course_modules")
+    .upsert({ classroom_id: classroomId, module_id: content.id, content, created_by: user.id }, { onConflict: "classroom_id,module_id" })
+    .select("classroom_id,module_id,content,created_at,updated_at").single();
+  fail(error, "Could not save module");
+  return courseModuleSummary(data as CourseModuleRow);
+}
+
+export async function listSupabaseModules(user: SupabaseSessionUser, classroomId: string) {
+  await requireClassroomMember(user, classroomId);
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("course_modules").select("classroom_id,module_id,content,created_at,updated_at").eq("classroom_id", classroomId).order("created_at", { ascending: false });
+  fail(error, "Could not list modules");
+  return (data as CourseModuleRow[]).map(courseModuleSummary);
+}
+
+export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  await requireClassroomMember(user, classroomId);
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("course_modules").select("content").eq("classroom_id", classroomId).eq("module_id", moduleId).maybeSingle();
+  fail(error, "Could not load module");
+  if (!data) throw new SupabaseRepositoryError(404, "Module not found");
+  return data.content as CourseModule;
+}
+
+export async function deleteSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  await teacherClassroom(user, classroomId);
+  const db = getSupabaseAdmin();
+  const { error } = await db.from("course_modules").delete().eq("classroom_id", classroomId).eq("module_id", moduleId);
+  fail(error, "Could not delete module");
+  return { deleted: true };
 }

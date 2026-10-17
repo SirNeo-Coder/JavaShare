@@ -24,7 +24,9 @@ export type NextFn = (error?: unknown) => void;
 export type Handler<R extends ApiRequest = ApiRequest> = (req: R, res: ApiResponse, next: NextFn) => unknown;
 export type ErrorHandler = (error: unknown, res: ApiResponse) => void;
 
-const JSON_LIMIT = 300 * 1024;
+// Raised from 300KB to fit an uploaded weekly course module (docs/course-format.md), whose
+// several lessons of embedded Java step files can add up past the old cap.
+const JSON_LIMIT = 2 * 1024 * 1024;
 const IMAGE_LIMIT = 2 * 1024 * 1024;
 
 export class HttpError extends Error {
