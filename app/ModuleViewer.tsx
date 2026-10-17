@@ -110,12 +110,15 @@ function meterPercent(module: CourseModule, progress: Progress) {
 }
 
 function StepView({
-  step, classroomId, moduleId, status, onChecked,
-}: { step: StepBlock; classroomId: string; moduleId: string; status?: StepStatus; onChecked: (status: StepStatus) => void }) {
+  step, classroomId, moduleId, status, onChecked, role,
+}: { step: StepBlock; classroomId: string; moduleId: string; status?: StepStatus; onChecked: (status: StepStatus) => void; role: "teacher" | "student" }) {
   const [files, setFiles] = useState(step.files);
   const [output, setOutput] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const canRun = step.language === "java";
+  // A teacher previewing a module has no progress of their own to save (module_progress is
+  // student-only) - they can still run a Java step to check it works, but nothing is persisted.
+  const canSaveProgress = role === "student";
 
   const run = async () => {
     setRunning(true);
@@ -123,10 +126,12 @@ function StepView({
       if (canRun) {
         const result = await api<{ mode: string; output: string }>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin: "" }) });
         setOutput(result.output);
-        const verdict: StepStatus = result.output.trim() === step.expectedOutput.trim() ? "pass" : "fail";
-        await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status: verdict }) });
-        onChecked(verdict);
-      } else {
+        if (canSaveProgress) {
+          const verdict: StepStatus = result.output.trim() === step.expectedOutput.trim() ? "pass" : "fail";
+          await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status: verdict }) });
+          onChecked(verdict);
+        }
+      } else if (canSaveProgress) {
         await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status: "pass" }) });
         onChecked("pass");
       }
@@ -136,6 +141,8 @@ function StepView({
       setRunning(false);
     }
   };
+
+  const showActions = canRun || canSaveProgress;
 
   return (
     <div className="module-step">
@@ -153,12 +160,14 @@ function StepView({
           />
         </div>
       ))}
-      <div className="module-step-actions">
-        <button type="button" onClick={run} disabled={running}>
-          {running ? "Running…" : canRun ? "Run & check" : "Mark done"}
-        </button>
-        {!canRun && <small>This language runs in your own project — run it there, then mark this step done.</small>}
-      </div>
+      {showActions && (
+        <div className="module-step-actions">
+          <button type="button" onClick={run} disabled={running}>
+            {running ? "Running…" : canRun ? (canSaveProgress ? "Run & check" : "Run") : "Mark done"}
+          </button>
+          {!canRun && canSaveProgress && <small>This language runs in your own project — run it there, then mark this step done.</small>}
+        </div>
+      )}
       {output !== null && <pre className="module-step-output">{output}</pre>}
       {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
     </div>
@@ -166,10 +175,10 @@ function StepView({
 }
 
 function PerformanceTaskSlot({
-  label, files: initialFiles, classroomId, moduleId, variant, submitted, onSubmitted,
+  label, files: initialFiles, classroomId, moduleId, variant, submitted, onSubmitted, role,
 }: {
   label: string; files: ModuleFile[]; classroomId: string; moduleId: string; variant: "sample" | "own";
-  submitted?: StepStatus; onSubmitted: (status: StepStatus) => void;
+  submitted?: StepStatus; onSubmitted: (status: StepStatus) => void; role: "teacher" | "student";
 }) {
   const [files, setFiles] = useState(initialFiles);
   const [output, setOutput] = useState<string | null>(null);
@@ -212,24 +221,32 @@ function PerformanceTaskSlot({
       ))}
       <div className="module-step-actions">
         {canRun && <button type="button" onClick={runIt} disabled={busy}>{busy ? "Running…" : "Run"}</button>}
-        <button type="button" onClick={submit} disabled={busy}>{busy ? "Submitting…" : "Submit this version"}</button>
+        {role === "student" && <button type="button" onClick={submit} disabled={busy}>{busy ? "Submitting…" : "Submit this version"}</button>}
       </div>
       {output !== null && <pre className="module-step-output">{output}</pre>}
     </div>
   );
 }
 
-function ModuleContent({ module, classroomId }: { module: CourseModule; classroomId: string }) {
-  const [progress, setProgress] = useState<Progress | null>(null);
+// module_progress is student-only (backend/src/supabase-repository.ts: getSupabaseModuleProgress
+// throws 403 for a teacher). A teacher previewing a module has no progress to load, so this never
+// fetches it for them - an empty stub keeps the rendering below (stepStates/performanceTask
+// lookups) uniform, and role flags below hide anything progress-dependent (goal meter, checkboxes,
+// submit buttons, status chips) for that role.
+const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {} });
+
+function ModuleContent({ module, classroomId, role }: { module: CourseModule; classroomId: string; role: "teacher" | "student" }) {
+  const [progress, setProgress] = useState<Progress | null>(role === "teacher" ? emptyProgress(module.id) : null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (role !== "student") return;
     let active = true;
     api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress`)
       .then((loaded) => { if (active) setProgress(loaded); })
       .catch((loadError) => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load progress"); });
     return () => { active = false; };
-  }, [classroomId, module.id]);
+  }, [classroomId, module.id, role]);
 
   if (error) return <p className="module-error">{error}</p>;
   if (!progress) return <p>Loading your progress…</p>;
@@ -241,10 +258,13 @@ function ModuleContent({ module, classroomId }: { module: CourseModule; classroo
 
   return (
     <div className="module-content">
-      <div className="activity-progress module-goal-meter">
-        <div><span>Module progress</span><b>{meterPercent(module, progress)}%</b></div>
-        <i><span style={{ width: `${meterPercent(module, progress)}%` }} /></i>
-      </div>
+      {role === "teacher" && <p className="module-preview-note">Previewing as teacher — nothing here is graded or saved.</p>}
+      {role === "student" && (
+        <div className="activity-progress module-goal-meter">
+          <div><span>Module progress</span><b>{meterPercent(module, progress)}%</b></div>
+          <i><span style={{ width: `${meterPercent(module, progress)}%` }} /></i>
+        </div>
+      )}
       {module.lessons.map((lesson) => (
         <section key={lesson.id} className="module-lesson">
           <h3>{lesson.dayLabel ? `${lesson.dayLabel} — ${lesson.title}` : lesson.title}</h3>
@@ -257,6 +277,7 @@ function ModuleContent({ module, classroomId }: { module: CourseModule; classroo
                 moduleId={module.id}
                 status={progress.stepStates[block.id]}
                 onChecked={(status) => setProgress((current) => current && { ...current, stepStates: { ...current.stepStates, [block.id]: status } })}
+                role={role}
               />
             ) : (
               <div key={index} className="module-text-block">
@@ -268,14 +289,16 @@ function ModuleContent({ module, classroomId }: { module: CourseModule; classroo
           <div className="module-exit-slip">
             <b>Exit slip</b>
             {lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}
-            <label>
-              <input
-                type="checkbox"
-                checked={progress.stepStates[lesson.exitSlip.id] === "pass"}
-                onChange={() => progress.stepStates[lesson.exitSlip.id] !== "pass" && markExitSlip(lesson.exitSlip.id)}
-              />
-              Mark exit slip done
-            </label>
+            {role === "student" && (
+              <label>
+                <input
+                  type="checkbox"
+                  checked={progress.stepStates[lesson.exitSlip.id] === "pass"}
+                  onChange={() => progress.stepStates[lesson.exitSlip.id] !== "pass" && markExitSlip(lesson.exitSlip.id)}
+                />
+                Mark exit slip done
+              </label>
+            )}
           </div>
         </section>
       ))}
@@ -285,12 +308,12 @@ function ModuleContent({ module, classroomId }: { module: CourseModule; classroo
           <Markdown markdown={module.performanceTask.markdown} />
           <ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
           <PerformanceTaskSlot
-            label="Sample code" files={module.performanceTask.exampleFiles} classroomId={classroomId} moduleId={module.id} variant="sample"
+            label="Sample code" files={module.performanceTask.exampleFiles} classroomId={classroomId} moduleId={module.id} variant="sample" role={role}
             submitted={progress.performanceTask.sample?.status}
             onSubmitted={(status) => setProgress((current) => current && { ...current, performanceTask: { ...current.performanceTask, sample: { status } } })}
           />
           <PerformanceTaskSlot
-            label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own"
+            label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role}
             submitted={progress.performanceTask.own?.status}
             onSubmitted={(status) => setProgress((current) => current && { ...current, performanceTask: { ...current.performanceTask, own: { status } } })}
           />
@@ -374,7 +397,7 @@ export default function ModuleViewer({ role, classroomId, onClose }: Props) {
             ))}
           </div>
         )}
-        {selected && <ModuleContent module={selected} classroomId={classroomId} />}
+        {selected && <ModuleContent module={selected} classroomId={classroomId} role={role} />}
       </div>
     </div>
   );

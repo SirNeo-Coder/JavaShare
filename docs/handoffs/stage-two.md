@@ -1,7 +1,6 @@
 # Stage two handoff (course modules)
 
-Last updated: 2026-10-18 (module viewer built, tested as both teacher and student in a real
-browser against local Supabase)
+Last updated: 2026-10-18 (PR #6 and PR #7 reviewed with `/code-review`; CKB-008 found and fixed)
 
 Read `docs/course-format.md` first — it defines the weekly module JSON file.
 
@@ -71,14 +70,68 @@ record, including the regression test shown failing against the bug and passing 
   `expectedOutput`, step marked PASSED), marked Monday's exit slip done and confirmed Tuesday's
   stayed unchecked (CKB-007's fix holding live, not just in the test), submitted both
   performance-task slots, watched the goal meter move 0% → 17% → 50% → 67% correctly as each
-  piece completed. A teacher opening a module correctly sees no progress UI ("Only students have
-  module progress" — the existing 403 surfaced cleanly instead of crashing).
+  piece completed. **A teacher opening a module originally saw only "Only students have module
+  progress" and nothing else** — this was CKB-008 (see below), found by code review and fixed the
+  same day; a teacher now sees the full module (lessons, steps, performance task), can press
+  **Run** on Java steps/files to check they work, and sees no progress-only UI (goal meter,
+  checkboxes, submit buttons, status chips) since none of that is theirs to have.
 - **Not run:** the full `npm run classroom:offline` interactive launcher (used `npm run dev`
   instead, which exercises the same `DATABASE_MODE=supabase-local` code path, against the
   already-running local Supabase). Left `backend/.env` and `.claude/launch.json` in place
   (both already git-ignored / untracked) for whoever picks this up next to repeat the check
   quickly.
 - **Not tested:** the Cloudflare preview (this PR doesn't touch anything Cloudflare-specific).
+
+### CKB-008, found and fixed during this work
+
+`/code-review` (high effort) on both PR #6 and PR #7 found that a teacher opening any module saw
+only an error — `ModuleContent` fetched student-only progress data unconditionally, and that one
+403 blanked the whole screen instead of just the progress-dependent pieces. Fixed in
+`app/ModuleViewer.tsx`: `ModuleContent`/`StepView`/`PerformanceTaskSlot` now take a `role` prop; a
+teacher's view never fetches progress at all (a static empty stub keeps rendering code uniform),
+and the goal meter / exit-slip checkbox / submit buttons / status chips only render for students.
+A teacher can still press **Run** on a Java step to check it works (same `/api/execute` call, no
+progress write). Full record, including before/after screenshots-equivalent (checked live in a
+browser both ways):
+`docs/problem-knowledgebase/cases/CKB-008-teacher-cannot-preview-module.md`.
+
+### Other findings from the `/code-review`, not yet fixed
+
+The review (10 findings each on PR #6 and PR #7, all confirmed against the code) surfaced several
+real issues beyond CKB-008 that are **not yet fixed** — flagging here so they aren't lost:
+
+- **Lost-update races:** `setSupabaseModuleStepState`/`setSupabaseModulePerformanceTask` read the
+  whole `step_states`/`performance_task` jsonb column, merge in one key in JavaScript, then
+  overwrite the whole column — two near-simultaneous writes (e.g. submitting both performance-task
+  variants close together) can silently drop one. Needs either a DB-side jsonb merge or an
+  optimistic-concurrency check on the update.
+- **Unhandled 500 on a concurrent first write:** `loadOrCreateModuleProgress` does select-then-
+  insert, not an upsert, so two simultaneous first-touches of a module throw a raw unique-
+  violation instead of being handled the way `joinSupabaseClass`/`saveSupabaseFile` handle the
+  same race elsewhere in the file.
+- **Progress not scoped to classroom:** `module_progress` rows are keyed only by
+  `(student_id, module_id)`, never `classroom_id` — a student in two classrooms that happen to
+  share a module id would have progress leak/collide between them.
+- **No id-uniqueness check:** nothing stops a module's step ids and exit-slip ids from colliding
+  with each other (course-module-schema.ts has zero `.refine()` calls) — this is CKB-007's exact
+  bug class, reachable again one layer up.
+- **Upload schema vs. `/api/execute` path rules disagree:** a module can pass upload validation
+  with a file path (e.g. with a space, or length 161-200 chars) that `/api/execute`'s stricter
+  regex will always reject — the step becomes permanently unrunnable for students with no warning
+  at upload time.
+- **Several handlers swallow errors silently** (`markExitSlip`, `removeModule`,
+  `PerformanceTaskSlot.submit`) — a failed request gives the student/teacher no feedback at all.
+- **A correct run's output can be overwritten:** in `StepView.run`, the real program output and
+  the progress-save PUT share one `try`; if the PUT fails, the catch replaces the correct output
+  on screen with a generic error message.
+- **The global JSON body cap (300KB → 2MB) isn't scoped** to the module-upload route — it applies
+  to every route in the app.
+- Two cleanup items: `StepView`/`PerformanceTaskSlot` duplicate their run/output logic almost
+  verbatim, and the new classroom-membership check duplicates an existing helper
+  (`canAccessSupabaseClass`).
+
+None of these have shipped to a student yet (both PRs are still open, unmerged). Ask the teacher
+which of these to fix before merging vs. track as follow-up work.
 
 ## Not done yet (deliberately out of scope for this PR)
 
