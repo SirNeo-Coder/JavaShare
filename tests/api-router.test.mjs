@@ -42,12 +42,26 @@ test("router: cookies, 204, unknown routes, bad JSON, and size limits", async ()
   assert.match(logout.headers.get("set-cookie"), /^javashare_session=; Path=\/; Max-Age=0/);
   assert.equal((await api.handle(new Request("http://x/missing"))).status, 404);
   assert.equal((await api.handle(new Request("http://x/echo", { method: "POST", headers: { "content-type": "application/json" }, body: "{oops" }))).status, 400);
-  const big = "x".repeat(300 * 1024 + 1);
+  const big = "x".repeat(2 * 1024 * 1024 + 1);
   assert.equal((await api.handle(new Request("http://x/echo", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(big) }))).status, 413);
   const photo = await api.handle(new Request("http://x/photo", { method: "PUT", headers: { "content-type": "image/png" }, body: new Uint8Array([1, 2, 3]) }));
   assert.deepEqual(await photo.json(), { bytes: 3, isBuffer: true });
   assert.equal((await api.handle(new Request("http://x/photo", { method: "PUT", headers: { "content-type": "image/png" }, body: new Uint8Array(2 * 1024 * 1024 + 1) }))).status, 413);
   assert.ok(new HttpError(413, "x") instanceof Error);
+});
+
+test("router: the larger JSON body cap is scoped to the module-upload route, not every route", async () => {
+  const api = createRouter(errors);
+  api.post("/api/classrooms/:classroomId/modules", (req, res) => res.json({ bytes: JSON.stringify(req.body).length }));
+  api.post("/api/other-route", (req, res) => res.json({ bytes: JSON.stringify(req.body).length }));
+  // Between the default 300KB cap and the 2MB module-upload cap - large enough that a module's
+  // several lessons of embedded Java step files could plausibly reach it, too large for anything
+  // else.
+  const midSize = JSON.stringify("x".repeat(500 * 1024));
+  const toModuleUpload = await api.handle(new Request("http://x/api/classrooms/c1/modules", { method: "POST", headers: { "content-type": "application/json" }, body: midSize }));
+  assert.equal(toModuleUpload.status, 200, "the module-upload route must accept a body over 300KB");
+  const toOtherRoute = await api.handle(new Request("http://x/api/other-route", { method: "POST", headers: { "content-type": "application/json" }, body: midSize }));
+  assert.equal(toOtherRoute.status, 413, "a non-upload route must still reject a body over 300KB");
 });
 
 function localSupabase() {

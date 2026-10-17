@@ -4,10 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import CodeEditor, { languageLabel } from "./CodeEditor";
+import ModuleViewer from "./ModuleViewer";
+import { api, getApiUrl } from "./apiClient";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
 import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, throttle } from "./realtime";
 
-const DEPLOYED_API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 const FRESH_LESSON_CODE = `public class Main {
     public static void main(String[] args) {
         // Start today's lesson here
@@ -27,10 +28,6 @@ function getSavedFontScale() {
   if (typeof window === "undefined") return 1.15;
   const saved = Number(localStorage.getItem("javashare-font-scale"));
   return saved >= 1 && saved <= 1.45 ? saved : 1.15;
-}
-
-function getApiUrl() {
-  return DEPLOYED_API_URL;
 }
 
 type User = {
@@ -206,21 +203,11 @@ function applyOperation(source: string, operation: FileOperation) {
   return source.slice(0, start) + operation.text + source.slice(end);
 }
 
-async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${getApiUrl()}${path}`, {
-    ...options,
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...options.headers },
-  });
-  const body = response.status === 204 ? null : await response.json();
-  if (!response.ok) throw new Error(body?.error || "Request failed");
-  return body as T;
-}
-
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark">(getSavedTheme);
   const [fontScale, setFontScale] = useState(getSavedFontScale);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [modulesOpen, setModulesOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<Bootstrap | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1791,6 +1778,16 @@ export default function Home() {
           </span>
         </div>
         <div className="header-actions">
+          {classroomId && (
+            <button
+              className="settings-button modules-button"
+              type="button"
+              onClick={() => setModulesOpen(true)}
+              title="This week's module"
+            >
+              Modules
+            </button>
+          )}
           <div className="display-settings">
             <button
               className="settings-button"
@@ -3305,6 +3302,9 @@ export default function Home() {
             </pre>
           </section>
         </div>
+      )}
+      {modulesOpen && classroomId && (
+        <ModuleViewer role={user.role} classroomId={classroomId} onClose={() => setModulesOpen(false)} />
       )}
       {toast && <div className="toast">{toast}</div>}
     </main>

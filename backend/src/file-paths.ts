@@ -1,5 +1,7 @@
 // File name rules per project language. Kept free of imports so it can be tested directly.
-const JAVA_PATH = /^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/;
+export const JAVA_PATH = /^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/;
+// /api/execute's own length cap (routes.ts) - a java file path longer than this can never run.
+export const JAVA_PATH_MAX_LENGTH = 160;
 // Letters, digits, _ and - in each folder/name part, so ".." and hidden files are impossible.
 const WEB_PATH = /^(?:[\w-]+\/)*[\w-]+(?:\.[\w-]+)*\.(?:html|css|js)$/;
 

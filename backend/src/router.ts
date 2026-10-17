@@ -26,6 +26,10 @@ export type ErrorHandler = (error: unknown, res: ApiResponse) => void;
 
 const JSON_LIMIT = 300 * 1024;
 const IMAGE_LIMIT = 2 * 1024 * 1024;
+// A weekly course module upload (docs/course-format.md) can have several lessons of embedded
+// Java step files that add up past the default cap - only that one route gets the larger limit.
+const MODULE_UPLOAD_JSON_LIMIT = 2 * 1024 * 1024;
+const MODULE_UPLOAD_PATTERN = /^\/api\/classrooms\/[^/]+\/modules$/;
 
 export class HttpError extends Error {
   readonly status: number;
@@ -52,7 +56,7 @@ function parseCookies(header: string | null) {
   return cookies;
 }
 
-async function readBody(request: Request) {
+async function readBody(request: Request, jsonLimit: number) {
   if (request.method === "GET" || request.method === "HEAD") return undefined;
   const type = (request.headers.get("content-type") || "").split(";")[0].trim();
   const bytes = new Uint8Array(await request.arrayBuffer());
@@ -61,7 +65,7 @@ async function readBody(request: Request) {
     if (bytes.length > IMAGE_LIMIT) throw new HttpError(413, "Images must be 2 MB or smaller");
     return Buffer.from(bytes);
   }
-  if (bytes.length > JSON_LIMIT) throw new HttpError(413, "Request is too large");
+  if (bytes.length > jsonLimit) throw new HttpError(413, "Request is too large");
   if (type !== "application/json") return undefined;
   try { return JSON.parse(new TextDecoder().decode(bytes)); }
   catch { throw new HttpError(400, "Invalid JSON"); }
@@ -99,7 +103,7 @@ export function createRouter<R extends ApiRequest = ApiRequest>(onError: ErrorHa
         query: Object.fromEntries(url.searchParams),
         headers: request.headers,
         cookies: parseCookies(request.headers.get("cookie")),
-        body: await readBody(request),
+        body: await readBody(request, request.method === "POST" && MODULE_UPLOAD_PATTERN.test(url.pathname) ? MODULE_UPLOAD_JSON_LIMIT : JSON_LIMIT),
       };
       // Express semantics: a handler either responds, or calls next() to pass on, or next(error).
       for (const handler of route.handlers) {

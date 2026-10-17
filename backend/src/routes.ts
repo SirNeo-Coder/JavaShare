@@ -1,7 +1,9 @@
 import { Buffer } from "node:buffer";
 import { jwtVerify, SignJWT } from "jose";
 import { z } from "zod";
+import { courseModule } from "./course-module-schema.ts";
 import { database } from "./database.ts";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "./file-paths.ts";
 import { broadcast, realtimePass } from "./realtime.ts";
 import { createRouter, type ApiRequest, type ApiResponse, type NextFn } from "./router.ts";
 import {
@@ -15,11 +17,14 @@ import {
   createSupabaseFile,
   createSupabaseWebProject,
   createSupabaseSavedWork,
+  deleteSupabaseModule,
   deleteSupabaseStudent,
   deleteSupabaseActivity,
   endSupabaseActivity,
+  getSupabaseModule,
   getSupabaseModuleProgress,
   joinSupabaseClass,
+  listSupabaseModules,
   listSupabaseMessages,
   listSupabaseSavedWork,
   listSupabaseStudents,
@@ -35,7 +40,6 @@ import {
   sendSupabaseMessage,
   setSupabaseClassroomChatMuted,
   setSupabaseLiveShare,
-  setSupabaseModuleExitSlip,
   setSupabaseModulePerformanceTask,
   setSupabaseModuleStepState,
   submitSupabaseProject,
@@ -46,6 +50,7 @@ import {
   updateSupabaseGroup,
   updateSupabaseGroupPermissions,
   updateSupabaseStudent,
+  uploadSupabaseModule,
   uploadSupabaseStudentPhoto,
   uploadSupabaseTeacherPhoto,
 } from "./supabase-repository.ts";
@@ -432,13 +437,6 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/step", requireA
   } catch (error) { next(error); }
 });
 
-app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/exit-slip", requireAuth, async (req: AuthedRequest, res, next) => {
-  try {
-    const { done } = z.object({ done: z.boolean() }).parse(req.body);
-    return res.json(await setSupabaseModuleExitSlip(req.user!, String(req.params.classroomId), String(req.params.moduleId), done));
-  } catch (error) { next(error); }
-});
-
 app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-task", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const { variant, files, status } = z.object({
@@ -450,11 +448,36 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-tas
   } catch (error) { next(error); }
 });
 
+// Course modules (docs/course-format.md): the teacher uploads a weekly module file for a class;
+// members of that class (teacher and students) can list and view it.
+app.post("/api/classrooms/:classroomId/modules", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const parsed = courseModule.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: `This module file doesn't match the expected format: ${parsed.error.issues[0].message} (at ${parsed.error.issues[0].path.join(".") || "top level"})` });
+    return res.status(201).json(await uploadSupabaseModule(req.user!, String(req.params.classroomId), parsed.data));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/modules", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await listSupabaseModules(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/modules/:moduleId", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseModule(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.delete("/api/classrooms/:classroomId/modules/:moduleId", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await deleteSupabaseModule(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
 type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; message?: string; status?: { description?: string } };
 
 app.post("/api/execute", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const javaPath = z.string().trim().min(1).max(160).transform((value) => value.replace(/\\/g, "/")).refine((value) => /^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/.test(value) && !value.includes(".."));
+    const javaPath = z.string().trim().min(1).max(JAVA_PATH_MAX_LENGTH).transform((value) => value.replace(/\\/g, "/")).refine((value) => JAVA_PATH.test(value) && !value.includes(".."));
     const { files, stdin = "" } = z.object({ files: z.array(z.object({ path: javaPath, content: z.string().max(200000) })).min(1).max(50), stdin: z.string().max(10000).optional() }).parse(req.body);
     if (!process.env.JUDGE0_URL && localJavaEnabled) {
       const lastRun = lastExecution.get(req.user!.id) || 0;
