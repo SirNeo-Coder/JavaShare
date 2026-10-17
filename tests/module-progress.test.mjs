@@ -136,6 +136,58 @@ test("module progress: two simultaneous first touches of a module don't 500 (wri
   }
 });
 
+test("module progress: a module in two classrooms doesn't share one student's progress (classroom scoping)", { skip: !local && "local Supabase is not running" }, async () => {
+  Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", JWT_SECRET: "module-progress-test-secret" });
+  const { handleApi } = await import("../backend/src/routes.ts");
+  const { getSupabaseAdmin } = await import("../backend/src/database.ts");
+  const call = (path, init = {}) => handleApi(new Request(`http://127.0.0.1:3000${path}`, { ...init, headers: { "content-type": "application/json", ...init.headers } }));
+
+  const admin = getSupabaseAdmin();
+  const password = randomUUID();
+  const { data: teacher, error: teacherError } = await admin.auth.admin.createUser({ email: `${randomUUID()}@module-progress-test.example.test`, password, email_confirm: true, user_metadata: { name: "Scoping Teacher" } });
+  assert.equal(teacherError, null);
+  await admin.from("profiles").update({ role: "teacher" }).eq("id", teacher.user.id);
+  const { data: student, error: studentError } = await admin.auth.admin.createUser({ email: `${randomUUID()}@module-progress-test.example.test`, password, email_confirm: true, user_metadata: { name: "Scoping Student" } });
+  assert.equal(studentError, null);
+
+  // The same module id, uploaded to two different classrooms - a teacher reusing one week's
+  // module across two sections of the same course. A student who is a member of both must get
+  // independent progress in each, since course_modules is correctly scoped per classroom too.
+  const moduleId = fixture.id;
+  const { data: classroomA } = await admin.from("classrooms").insert({ name: "Scoping test class A", join_code: `SA${Date.now()}`.slice(0, 12).toUpperCase(), teacher_id: teacher.user.id }).select("id").single();
+  const { data: classroomB } = await admin.from("classrooms").insert({ name: "Scoping test class B", join_code: `SB${Date.now()}`.slice(0, 12).toUpperCase(), teacher_id: teacher.user.id }).select("id").single();
+
+  try {
+    await admin.from("course_modules").insert([
+      { classroom_id: classroomA.id, module_id: moduleId, content: fixture, created_by: teacher.user.id },
+      { classroom_id: classroomB.id, module_id: moduleId, content: fixture, created_by: teacher.user.id },
+    ]);
+    await admin.from("classroom_members").insert([
+      { classroom_id: classroomA.id, user_id: student.user.id },
+      { classroom_id: classroomB.id, user_id: student.user.id },
+    ]);
+    const login = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: student.user.email, password }) });
+    const cookie = login.headers.get("set-cookie").split(";")[0];
+    const step = fixture.lessons[0].blocks[0];
+
+    await call(`/api/classrooms/${classroomA.id}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "pass" }) });
+
+    // Classroom B's copy of this module is a fresh start for this student - marking a step done
+    // in classroom A must not make classroom B's module look already-completed.
+    const progressInB = await (await call(`/api/classrooms/${classroomB.id}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
+    assert.deepEqual(progressInB.stepStates, {}, "classroom B's progress must not see classroom A's step state");
+
+    const progressInA = await (await call(`/api/classrooms/${classroomA.id}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
+    assert.deepEqual(progressInA.stepStates, { [step.id]: "pass" }, "classroom A's own progress must be unaffected");
+  } finally {
+    await admin.from("module_progress").delete().eq("student_id", student.user.id);
+    await admin.from("course_modules").delete().eq("module_id", moduleId).in("classroom_id", [classroomA.id, classroomB.id]);
+    await admin.from("classrooms").delete().in("id", [classroomA.id, classroomB.id]);
+    await admin.auth.admin.deleteUser(student.user.id);
+    await admin.auth.admin.deleteUser(teacher.user.id);
+  }
+});
+
 test("module progress: two simultaneous performance-task submissions don't lose one (write race)", { skip: !local && "local Supabase is not running" }, async () => {
   Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", JWT_SECRET: "module-progress-test-secret" });
   const { handleApi } = await import("../backend/src/routes.ts");

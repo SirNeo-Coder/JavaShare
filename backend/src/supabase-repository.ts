@@ -1188,18 +1188,21 @@ async function requireClassroomMember(user: SupabaseSessionUser, classroomId: st
 
 async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string): Promise<ModuleProgressRow> {
   const db = getSupabaseAdmin();
-  const { data: existing, error } = await db.from("module_progress").select("*").eq("student_id", user.id).eq("module_id", moduleId).maybeSingle();
+  // module_id is free text from a module's own JSON file, not unique across classrooms - the same
+  // id can be uploaded to two different classrooms, so every lookup/write here must also scope by
+  // classroom_id or a student in both would share one module's progress between them.
+  const { data: existing, error } = await db.from("module_progress").select("*").eq("student_id", user.id).eq("classroom_id", classroomId).eq("module_id", moduleId).maybeSingle();
   fail(error, "Could not load module progress");
   if (existing) return existing as ModuleProgressRow;
   // Two simultaneous first touches of the same module both land here with no existing row.
   // An upsert that does nothing on conflict (instead of a plain insert) lets the loser fetch the
   // winner's row instead of throwing a raw unique-violation.
   const { data: created, error: insertError } = await db.from("module_progress")
-    .upsert({ student_id: user.id, classroom_id: classroomId, module_id: moduleId }, { onConflict: "student_id,module_id", ignoreDuplicates: true })
+    .upsert({ student_id: user.id, classroom_id: classroomId, module_id: moduleId }, { onConflict: "student_id,classroom_id,module_id", ignoreDuplicates: true })
     .select("*").maybeSingle();
   fail(insertError, "Could not start module progress");
   if (created) return created as ModuleProgressRow;
-  const { data: raceWinner, error: raceError } = await db.from("module_progress").select("*").eq("student_id", user.id).eq("module_id", moduleId).single();
+  const { data: raceWinner, error: raceError } = await db.from("module_progress").select("*").eq("student_id", user.id).eq("classroom_id", classroomId).eq("module_id", moduleId).single();
   fail(raceError, "Could not load module progress");
   return raceWinner as ModuleProgressRow;
 }
@@ -1218,7 +1221,7 @@ async function updateModuleProgressWithMerge(
   for (let attempt = 0; attempt < 5; attempt++) {
     const row = await loadOrCreateModuleProgress(user, classroomId, moduleId);
     const { data, error } = await db.from("module_progress").update(merge(row))
-      .eq("student_id", user.id).eq("module_id", moduleId).eq("updated_at", row.updated_at)
+      .eq("student_id", user.id).eq("classroom_id", classroomId).eq("module_id", moduleId).eq("updated_at", row.updated_at)
       .select("*").maybeSingle();
     fail(error, failMessage);
     if (data) return data as ModuleProgressRow;

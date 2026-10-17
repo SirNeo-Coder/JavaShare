@@ -1,8 +1,23 @@
 # Stage two handoff (course modules)
 
-Last updated: 2026-10-18 (the two write races are fixed; 7 other `/code-review` findings still open)
+Last updated: 2026-10-18 (the two write races and the classroom-scoping gap are fixed; 6 other
+`/code-review` findings still open)
 
 Read `docs/course-format.md` first — it defines the weekly module JSON file.
+
+## Done: module progress not scoped to classroom (CKB-010)
+
+Branch: `module-viewer`. Teacher approved as an adjustment (invisible to students/teachers, no
+new screen or step). `module_progress` was unique only on `(student_id, module_id)`, but
+`module_id` is free text from a module's own file — the same id can exist in two classrooms
+(`course_modules` is correctly scoped). A student in both classrooms would share one module's
+progress between them. Fixed: new migration
+`20261018000400_module_progress_scope_to_classroom.sql` adds `classroom_id` to the unique
+constraint; `loadOrCreateModuleProgress`/`updateModuleProgressWithMerge` in
+`backend/src/supabase-repository.ts` now filter every query by it too. 1 new regression test
+(two classrooms, one module id, one student in both), shown failing before the fix. `npm test`:
+27/27 pass. `npm run build:all` / `npm run lint`: clean. Full record:
+`docs/problem-knowledgebase/cases/CKB-010-module-progress-not-scoped-to-classroom.md`.
 
 ## Done: the two write races (CKB-009)
 
@@ -124,11 +139,9 @@ browser both ways):
 
 The review (10 findings each on PR #6 and PR #7, all confirmed against the code) surfaced several
 real issues beyond CKB-008 that are **not yet fixed** — flagging here so they aren't lost. (The
-two write-race findings that were here are done — see CKB-009 above.)
+two write-race findings and the classroom-scoping finding that were here are done — see CKB-009
+and CKB-010 above.)
 
-- **Progress not scoped to classroom:** `module_progress` rows are keyed only by
-  `(student_id, module_id)`, never `classroom_id` — a student in two classrooms that happen to
-  share a module id would have progress leak/collide between them.
 - **No id-uniqueness check:** nothing stops a module's step ids and exit-slip ids from colliding
   with each other (course-module-schema.ts has zero `.refine()` calls) — this is CKB-007's exact
   bug class, reachable again one layer up.
