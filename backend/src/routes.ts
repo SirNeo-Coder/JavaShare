@@ -222,7 +222,7 @@ app.post("/api/classes/:classroomId/arrive", requireAuth, async (req: AuthedRequ
     const classroomId = String(req.params.classroomId);
     if (!await canAccessSupabaseClass(req.user!, classroomId)) return res.status(403).json({ error: "Classroom access denied" });
     const lateAssignment = await assignLateStudentToGroup(req.user!, classroomId);
-    if (lateAssignment) broadcast(`class:${classroomId}`, "groups:updated", lateAssignment);
+    if (lateAssignment) await broadcast(`class:${classroomId}`, "groups:updated", lateAssignment);
     return res.json({ lateAssignment });
   } catch (error) { next(error); }
 });
@@ -232,7 +232,7 @@ app.post("/api/classes/:classroomId/auto-group", requireAuth, async (req: Authed
     const classroomId = String(req.params.classroomId);
     const { groupSize, studentIds } = z.object({ groupSize: z.number().int().min(2).max(10).default(3), studentIds: z.array(z.string().uuid()) }).parse(req.body || {});
     const result = await autoGroupSupabaseClass(req.user!, classroomId, groupSize, studentIds);
-    broadcast(`class:${classroomId}`, "groups:updated");
+    await broadcast(`class:${classroomId}`, "groups:updated");
     return res.json(result);
   } catch (error) { next(error); }
 });
@@ -247,7 +247,7 @@ app.post("/api/classes/:classroomId/activities", requireAuth, async (req: Authed
       starterCode: z.string().max(200000).optional().default(""),
     }).parse(req.body);
     const payload = await createSupabaseActivity(req.user!, classroomId, input);
-    broadcast(`class:${classroomId}`, "class:activity-deployed", payload);
+    await broadcast(`class:${classroomId}`, "class:activity-deployed", payload);
     return res.status(201).json(payload);
   } catch (error) { next(error); }
 });
@@ -256,7 +256,7 @@ app.post("/api/classes/:classroomId/end-activity", requireAuth, async (req: Auth
   try {
     const classroomId = String(req.params.classroomId);
     const payload = await endSupabaseActivity(req.user!, classroomId);
-    broadcast(`class:${classroomId}`, "class:activity-ended", payload);
+    await broadcast(`class:${classroomId}`, "class:activity-ended", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -266,7 +266,7 @@ app.post("/api/classes/:classroomId/activities/:activityId/reopen", requireAuth,
     const classroomId = String(req.params.classroomId);
     const activityId = z.string().uuid().parse(req.params.activityId);
     const payload = await reopenSupabaseActivity(req.user!, classroomId, activityId);
-    broadcast(`class:${classroomId}`, "class:activity-deployed", payload);
+    await broadcast(`class:${classroomId}`, "class:activity-deployed", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -293,8 +293,8 @@ app.put("/api/teams/:teamId/group-profile", requireAuth, async (req: AuthedReque
     const teamId = String(req.params.teamId);
     const input = z.object({ name: z.string().trim().min(2).max(60), leaderId: z.string().uuid() }).parse(req.body);
     const payload = await updateSupabaseGroup(req.user!, teamId, input);
-    broadcast(`class:${payload.classroomId}`, "groups:updated", payload);
-    broadcast(`team:${teamId}`, "team:profile-updated", payload);
+    await broadcast(`class:${payload.classroomId}`, "groups:updated", payload);
+    await broadcast(`team:${teamId}`, "team:profile-updated", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -304,8 +304,8 @@ app.put("/api/teams/:teamId/group-permissions", requireAuth, async (req: AuthedR
     const teamId = String(req.params.teamId);
     const input = z.object({ userId: z.string().uuid(), chatMuted: z.boolean(), editingLocked: z.boolean() }).parse(req.body);
     const payload = await updateSupabaseGroupPermissions(req.user!, teamId, input);
-    broadcast(`team:${teamId}`, "team:permissions-updated", payload);
-    broadcast(`class:${payload.classroomId}`, "groups:updated");
+    await broadcast(`team:${teamId}`, "team:permissions-updated", payload);
+    await broadcast(`class:${payload.classroomId}`, "groups:updated");
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -315,7 +315,7 @@ app.post("/api/teams/:teamId/messages", requireAuth, async (req: AuthedRequest, 
     const teamId = String(req.params.teamId);
     const { text } = z.object({ text: z.string().trim().min(1).max(1000) }).parse(req.body);
     const payload = await sendSupabaseMessage(req.user!, teamId, text);
-    broadcast(`team:${teamId}`, "chat:message", payload);
+    await broadcast(`team:${teamId}`, "chat:message", payload);
     return res.status(201).json(payload);
   } catch (error) { next(error); }
 });
@@ -324,7 +324,7 @@ app.put("/api/classes/:classroomId/chat-mute", requireAuth, requireTeacher, asyn
   try {
     const { muted } = z.object({ muted: z.boolean() }).parse(req.body);
     const payload = await setSupabaseClassroomChatMuted(req.user!, String(req.params.classroomId), muted);
-    broadcast(`class:${payload.classroomId}`, "class:chat-muted", payload);
+    await broadcast(`class:${payload.classroomId}`, "class:chat-muted", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -339,7 +339,7 @@ app.post("/api/classes/:classroomId/live-share", requireAuth, async (req: Authed
     const { projectId } = z.object({ projectId: z.string().uuid().nullable() }).parse(req.body);
     const classroomId = String(req.params.classroomId);
     const payload = await setSupabaseLiveShare(req.user!, classroomId, projectId);
-    broadcast(`class:${classroomId}`, "class:live-share", payload);
+    await broadcast(`class:${classroomId}`, "class:live-share", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });
@@ -348,8 +348,8 @@ app.put("/api/files/:fileId", requireAuth, async (req: AuthedRequest, res, next)
   try {
     const input = z.object({ content: z.string().max(200000), version: z.number().int().positive() }).parse(req.body);
     const result = await saveSupabaseFile(req.user!, String(req.params.fileId), input);
-    broadcast(`team:${result.teamId}`, "file:updated", result.update);
-    if (result.presenting) broadcast(`class:${result.classroomId}`, "class:live-share-update", { projectId: result.projectId, ...result.update });
+    await broadcast(`team:${result.teamId}`, "file:updated", result.update);
+    if (result.presenting) await broadcast(`class:${result.classroomId}`, "class:live-share-update", { projectId: result.projectId, ...result.update });
     return res.json(result.update);
   } catch (error) { next(error); }
 });
@@ -381,7 +381,7 @@ app.patch("/api/files/:fileId", requireAuth, async (req: AuthedRequest, res, nex
 app.post("/api/projects/:projectId/submit", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const payload = await submitSupabaseProject(req.user!, String(req.params.projectId));
-    broadcast(`team:${payload.teamId}`, "team:submitted", payload);
+    await broadcast(`team:${payload.teamId}`, "team:submitted", payload);
     return res.status(201).json(payload);
   } catch (error) { next(error); }
 });

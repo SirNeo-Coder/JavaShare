@@ -19,7 +19,7 @@ All in `backend/src/`: `routes.ts` (every route, sign-in, the Java endpoint; `ha
 
 Private channels `team:<teamId>` and `class:<classroomId>` (policies in `supabase/migrations/20261016000200_realtime_private_channels.sql`). Browser code in `app/page.tsx` (the live effect) and `app/realtime.ts`.
 
-- **Server to browsers** (`broadcast()` in `backend/src/realtime.ts`, after the request succeeds):
+- **Server to browsers** (`broadcast()` in `backend/src/realtime.ts`, after the request succeeds; always `await` it before replying, or Cloudflare drops it, CKB-006):
   - class channel: `class:live-share`, `class:live-share-update`, `class:activity-deployed`, `class:activity-ended`, `class:chat-muted`, `groups:updated`
   - team channel: `chat:message`, `file:updated`, `team:submitted`, `team:profile-updated`, `team:permissions-updated`
 - **Browser to browsers** (sent directly on the channel; capped):

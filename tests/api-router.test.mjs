@@ -82,3 +82,32 @@ test("routes: register, stay signed in with the cookie, get a live pass, sign ou
     await getSupabaseAdmin().auth.admin.deleteUser(JSON.parse(atob(cookie.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).id);
   }
 });
+
+test("routes: a chat message's live signal finishes sending before the reply (CKB-006)", { skip: !local && "local Supabase is not running" }, async () => {
+  Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", JWT_SECRET: "route-test-secret" });
+  const { handleApi } = await import("../backend/src/routes.ts");
+  const { getSupabaseAdmin } = await import("../backend/src/database.ts");
+  const call = (path, init = {}) => handleApi(new Request(`http://127.0.0.1:3000${path}`, { ...init, headers: { "content-type": "application/json", ...init.headers } }));
+  const registered = await call("/api/auth/register", { method: "POST", body: JSON.stringify({ name: "Chat Signal Test", email: `chat-signal-${Date.now()}@example.test`, password: "route-test-password" }) });
+  const cookie = registered.headers.get("set-cookie").split(";")[0];
+  const userId = (await registered.json()).user.id;
+  const realFetch = globalThis.fetch;
+  try {
+    assert.equal((await call("/api/classes/join", { method: "POST", headers: { cookie }, body: JSON.stringify({ joinCode: "JAVA101" }) })).status, 200);
+    const { data } = await getSupabaseAdmin().from("team_members").select("team_id").eq("user_id", userId);
+    const sent = [];
+    // A slow live signal: Cloudflare cancels it if the route replies before it finishes.
+    globalThis.fetch = async (url, init) => {
+      if (!String(url).includes("/realtime/v1/api/broadcast")) return realFetch(url, init);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      sent.push(JSON.parse(init.body).messages[0].event);
+      return new Response("{}", { status: 202 });
+    };
+    const reply = await call(`/api/teams/${data[0].team_id}/messages`, { method: "POST", headers: { cookie }, body: JSON.stringify({ text: "signal test" }) });
+    assert.equal(reply.status, 201);
+    assert.deepEqual(sent, ["chat:message"], "the chat signal must have finished sending when the route replies");
+  } finally {
+    globalThis.fetch = realFetch;
+    await getSupabaseAdmin().auth.admin.deleteUser(userId);
+  }
+});
