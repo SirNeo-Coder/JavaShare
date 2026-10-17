@@ -43,18 +43,20 @@ Never paste a secret key into a chat, an email, or a GitHub file. Only into the 
    | Deploy command | `npx opennextjs-cloudflare deploy` |
    | Root directory | leave empty (the top of the repository) |
 
-6. Open **Advanced settings** (or the section about other branches):
-   - Turn on **Builds for non-production branches**.
-   - Set its deploy command to `npx opennextjs-cloudflare upload`. This makes a **preview** for other branches, without touching the main site.
-7. Click **Create and deploy**. The first build takes a few minutes. It may finish before you've added the settings in Part 2; that's fine, you'll redeploy afterwards.
+6. Set **Preview command** to `npx opennextjs-cloudflare upload` and leave **Enable Preview builds** on. This makes a **preview** for other branches, without touching the main site. (Older Cloudflare screens call this "Builds for non-production branches", with its own deploy command.)
+   - Leave **Protect with Cloudflare Access** off.
+   - Under **Advanced settings**, leave **Path** as `/`, the API token as **Create new token**, and the **Variable name / value** boxes **empty**. Those boxes are for building only; the secrets go in Part 2.
+7. Click **Create and deploy** (or **Deploy**). The first build takes a few minutes. If `main` doesn't have the Cloudflare changes yet, it fails with "could not determine executable to run". That's expected.
+8. Open **Settings**, then **Domains & Routes**. Under **Worker URL**, switch on **Preview** (`*-codeshare.<your-account>.workers.dev`). Without it, preview addresses give "error code: 1042".
 
 ---
 
 ## Part 2: Add CodeShare's private settings
 
 1. In **Workers & Pages**, click **codeshare**, then **Settings**.
-2. Find **Variables and Secrets** and click **Add**.
-3. For each row below, choose **Type: Secret**, type the **Variable name** exactly, paste the **Value**, and click **Deploy** (or **Save**). Add them all as **Secret**, even the ones that aren't really secret; secrets are kept safely between deploys.
+2. Find **Runtime variables and secrets** (near the top) and click **Add variable**. **Not** the "Variables and secrets" inside the **Build** section: the running app can't see those.
+3. In the form, tick **both** environments: **Production** and **Previews**. Previews have their own list, so the preview can't sign anyone in without them.
+4. For each row below, type the **Key** exactly, paste the **Value**, and tick **Secret**. Use **+ Add** for the next row. Then click **Add variables and deploy**. Add them all as **Secret**, even the ones that aren't really secret; secrets are kept safely between deploys.
 
 | Variable name | Where to find the value |
 | --- | --- |
@@ -68,7 +70,8 @@ Never paste a secret key into a chat, an email, or a GitHub file. Only into the 
 
 `DATABASE_MODE` is already set to `supabase-online` in `wrangler.jsonc`, so you don't need to add it.
 
-4. Redeploy so the settings take effect: open the **Deployments** tab, then **Builds**, find the latest build, and choose **Retry build**. Or just wait for the next change on GitHub.
+5. Rebuild the preview so it picks up the secrets: in **Deployments**, on the row for the branch, click **⋯**, then **Retry build**. (Not **Promote version**; that makes it the main site.)
+6. Check it: open `https://cloudflare-c2-codeshare.<your-account>.workers.dev/api/health`. It should say `"connected":true`.
 
 ---
 
@@ -76,7 +79,7 @@ Never paste a secret key into a chat, an email, or a GitHub file. Only into the 
 
 The Cloudflare changes are on the branch `cloudflare-c2` (pull request c2). Because you turned on builds for non-production branches, Cloudflare builds that branch too.
 
-1. In **codeshare**, open **Deployments** (or **Previews**). Find the newest build for the branch `cloudflare-c2` and open its **Preview URL**. It looks like `https://<something>-codeshare.<your-account>.workers.dev`. If nothing is listed yet, open the **Builds** tab and start a build for that branch, or push any small change to it.
+1. Open the preview: `https://cloudflare-c2-codeshare.<your-account>.workers.dev`. The end of each build's log also lists it as "Version Preview Alias URL". If nothing is built for that branch yet, push any small change to it.
 2. On the preview:
    1. **Sign in.** Use a real account from your hosted Supabase.
    2. **Live features.** The status at the bottom says **Live classroom connected**. If it says "Live features are not configured", `SUPABASE_JWT_SECRET` is missing.

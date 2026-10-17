@@ -217,8 +217,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 1. The teacher reviews PRs #1–#4 and the c2 PR, then follows `docs/cloudflare-setup.md` to test a Cloudflare preview.
    - **Done 2026-10-17:** the teacher applied both new migrations (`20261016000100_project_language.sql`, `20261016000200_realtime_private_channels.sql`) to the hosted Supabase project in the SQL Editor. Both reported "Success. No rows returned". Applied by hand, so the hosted migration history doesn't list them; never run `supabase db push`.
    - **Done 2026-10-17, Part 1:** Cloudflare Worker `codeshare` connected to `SirNeo-Coder/JavaShare`. Cloudflare's form now shows a "Preview command" box (set to `npx opennextjs-cloudflare upload`) with "Enable Preview builds" on, instead of a separate non-production deploy command. Its first build, of `main`, failed as expected ("could not determine executable to run"), because `main` doesn't have the Cloudflare tools yet.
-   - **Done 2026-10-17, Part 2:** the teacher added the 5 secrets under Settings > Variables and Secrets. Used the legacy anon and service_role keys, to match Render.
-   - **In progress:** Part 3 (test the `cloudflare-c2` preview).
+   - **Done 2026-10-17, Part 2:** the teacher added the 5 secrets, using the legacy anon and service_role keys to match Render. The first attempt put them in the **Build** section's variables, which the running app can't see (health said the keys were missing). They were redone under **Runtime variables and secrets**, as Secret, for **both Production and Previews**. Preview addresses also had to be switched on (Settings > Domains & Routes > Preview), because before that every address gave "error code: 1042". `docs/cloudflare-setup.md` was updated for all three points. Production's `workers.dev` address is still off, as it should be until merging.
+   - **Preview:** `https://cloudflare-c2-codeshare.ireneojrseraspe.workers.dev`. `/api/health` answered `connected: true` (checked with curl, 2026-10-17).
+   - **In progress:** Part 3. The teacher is testing sign-in, live features, saving, web projects and Java demo mode on the preview.
 2. After the teacher confirms Cloudflare works:
    - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
    - Stage two (course modules) can start.
