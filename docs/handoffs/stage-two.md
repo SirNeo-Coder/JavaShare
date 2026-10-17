@@ -1,9 +1,42 @@
 # Stage two handoff (course modules)
 
-Last updated: 2026-10-18 (the two write races, the classroom-scoping gap, and the id-collision
-gap are fixed; 5 other `/code-review` findings still open)
+Last updated: 2026-10-18 (all 9 open `/code-review` findings from PR #6/#7 are now resolved - see
+"All `/code-review` findings now fixed" below)
 
 Read `docs/course-format.md` first — it defines the weekly module JSON file.
+
+## Done: the last 5 open `/code-review` findings (CKB-012, CKB-013, CKB-014, CKB-015, 2 cleanup items)
+
+Branch: `module-viewer`. Teacher approved all as adjustments, fixed in one pass:
+
+1. **Upload schema vs. `/api/execute` path rules disagree (CKB-012).** `file-paths.ts` now
+   exports `JAVA_PATH`/`JAVA_PATH_MAX_LENGTH` as the one source of truth (routes.ts's
+   `/api/execute` now imports them too, instead of its own inline copy); `course-module-schema.ts`
+   rejects a java step file, or a `.java` performance-task file, whose path `/api/execute` could
+   never run. 3 new regression tests, shown failing before the fix.
+2. **Silent error swallowing (CKB-013).** `markExitSlip`, `removeModule`, and
+   `PerformanceTaskSlot.submit` in `app/ModuleViewer.tsx` now each have a try/catch surfacing
+   their failure, instead of throwing into nothing.
+3. **Output overwritten on save failure (CKB-014).** `StepView.run`'s save call moved into its
+   own `saveStepResult` helper with its own try/catch, so a failed save appends a note instead of
+   replacing the real program output.
+4. **Unscoped body cap (CKB-015).** `router.ts`'s `JSON_LIMIT` is back to 300KB by default; only
+   `POST /api/classrooms/:classroomId/modules` gets the 2MB `MODULE_UPLOAD_JSON_LIMIT`, selected
+   by the route already matched before the body is read. 1 new regression test, shown failing
+   against the old global-cap code.
+5. **Two cleanup items (no CKB - not bugs).** `requireClassroomMember` now calls
+   `canAccessSupabaseClass` instead of duplicating its query (existing tests confirm this
+   preserves behavior for both roles). `StepView`/`PerformanceTaskSlot` now share one `runFiles()`
+   helper and one `ModuleFileEditors` component instead of duplicating the `/api/execute` call and
+   file-editor JSX.
+
+Findings 1 and 4 have automated regression tests. Findings 2, 3, and the `ModuleFileEditors`/
+`runFiles` dedup have no automated frontend test harness in this repo, so they were verified live
+in a real browser (`npm run dev` against local Supabase): `window.fetch` was patched to simulate
+each failure in turn (exit-slip save, performance-task submit, step-result save), confirming the
+new error/output behavior, then restored to confirm the normal path (run a step, mark an exit
+slip, submit a performance task, delete a module as teacher) still works unchanged. `npm test`:
+33/33 pass. `npm run build:all` / `npm run lint`: clean (0 errors, same 8 pre-existing warnings).
 
 ## Done: no id-uniqueness check on module upload (CKB-011)
 
@@ -147,30 +180,15 @@ progress write). Full record, including before/after screenshots-equivalent (che
 browser both ways):
 `docs/problem-knowledgebase/cases/CKB-008-teacher-cannot-preview-module.md`.
 
-### Other findings from the `/code-review`, not yet fixed
+### All `/code-review` findings now fixed
 
-The review (10 findings each on PR #6 and PR #7, all confirmed against the code) surfaced several
-real issues beyond CKB-008 that are **not yet fixed** — flagging here so they aren't lost. (The
-two write-race findings, the classroom-scoping finding, and the id-collision finding that were
-here are done — see CKB-009, CKB-010, and CKB-011 above.)
-
-- **Upload schema vs. `/api/execute` path rules disagree:** a module can pass upload validation
-  with a file path (e.g. with a space, or length 161-200 chars) that `/api/execute`'s stricter
-  regex will always reject — the step becomes permanently unrunnable for students with no warning
-  at upload time.
-- **Several handlers swallow errors silently** (`markExitSlip`, `removeModule`,
-  `PerformanceTaskSlot.submit`) — a failed request gives the student/teacher no feedback at all.
-- **A correct run's output can be overwritten:** in `StepView.run`, the real program output and
-  the progress-save PUT share one `try`; if the PUT fails, the catch replaces the correct output
-  on screen with a generic error message.
-- **The global JSON body cap (300KB → 2MB) isn't scoped** to the module-upload route — it applies
-  to every route in the app.
-- Two cleanup items: `StepView`/`PerformanceTaskSlot` duplicate their run/output logic almost
-  verbatim, and the new classroom-membership check duplicates an existing helper
-  (`canAccessSupabaseClass`).
-
-None of these have shipped to a student yet (both PRs are still open, unmerged). Ask the teacher
-which of these to fix before merging vs. track as follow-up work.
+The review (10 findings each on PR #6 and PR #7, all confirmed against the code) surfaced 9 real
+issues beyond CKB-008 (2 write races, a classroom-scoping gap, an id-collision gap, a path-rule
+mismatch, 2 silent-error handlers, an output-overwrite bug, an unscoped body cap) plus 2 cleanup
+items. All are now fixed — see CKB-009 through CKB-015 above for the 7 bug-class findings, and
+"the last 5 open findings" section above for the last 5 (including the 2 cleanup items, which
+got no CKB number since they weren't bugs). None of these shipped to a student before being
+fixed (both PRs are still open, unmerged).
 
 ## Not done yet (deliberately out of scope for this PR)
 

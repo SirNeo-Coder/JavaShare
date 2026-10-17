@@ -1,6 +1,7 @@
 // Validates a module upload against docs/course-format.md so a malformed file is rejected with
 // a plain-English error instead of corrupting a class. Keep this in sync with that doc.
 import { z } from "zod";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "./file-paths.ts";
 
 const file = z.object({ path: z.string().trim().min(1).max(200), content: z.string().max(200000) });
 
@@ -87,6 +88,17 @@ export const courseModule = z.object({
     ...lesson.blocks.filter((block) => block.type === "step").map((block) => block.id),
   ]);
   return progressIds.length === new Set(progressIds).size;
-}, { message: "Two steps or exit slips in this module share the same id - each step's \"id\" and each lesson's exitSlip \"id\" must be unique across the whole module" });
+}, { message: "Two steps or exit slips in this module share the same id - each step's \"id\" and each lesson's exitSlip \"id\" must be unique across the whole module" })
+  .refine((module) => {
+    // /api/execute only runs java files whose path matches a strict identifier-style regex, at
+    // most JAVA_PATH_MAX_LENGTH characters (routes.ts). A java step's files, and any .java
+    // performance-task file (both always sent to /api/execute - app/ModuleViewer.tsx), must pass
+    // that same rule or the step becomes permanently unrunnable with no warning at upload time.
+    const javaFiles = [
+      ...module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? block.files : []))),
+      ...(module.performanceTask ? [...module.performanceTask.exampleFiles, ...module.performanceTask.starterFiles].filter((file) => file.path.endsWith(".java")) : []),
+    ];
+    return javaFiles.every((file) => file.path.length <= JAVA_PATH_MAX_LENGTH && JAVA_PATH.test(file.path));
+  }, { message: `A java step's file path (or a .java performance-task file) must be a valid Java filename of at most ${JAVA_PATH_MAX_LENGTH} characters, e.g. "src/Main.java" - no spaces or punctuation besides "/" and "_"` });
 
 export type CourseModule = z.infer<typeof courseModule>;

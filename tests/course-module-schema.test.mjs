@@ -46,3 +46,27 @@ test("course module schema: rejects a step id that collides with an exit slip's 
   const parsed = courseModule.safeParse(broken);
   assert.equal(parsed.success, false, "a step id reused as an exit slip's id must be rejected");
 });
+
+// /api/execute (routes.ts) only runs java files whose path matches a strict identifier-style
+// regex, at most 160 characters. A java step's file path that passes upload but fails that regex
+// would be permanently unrunnable for students, with no warning at upload time.
+test("course module schema: rejects a java step file path that /api/execute could never run (a space)", () => {
+  const broken = JSON.parse(JSON.stringify(fixture));
+  broken.lessons[0].blocks.find((block) => block.type === "step").files[0].path = "My File.java";
+  const parsed = courseModule.safeParse(broken);
+  assert.equal(parsed.success, false, "a java path with a space must be rejected at upload");
+});
+
+test("course module schema: rejects a java step file path over /api/execute's 160-character cap", () => {
+  const broken = JSON.parse(JSON.stringify(fixture));
+  broken.lessons[0].blocks.find((block) => block.type === "step").files[0].path = `${"a".repeat(157)}.java`;
+  const parsed = courseModule.safeParse(broken);
+  assert.equal(parsed.success, false, "a java path over 160 characters must be rejected at upload");
+});
+
+test("course module schema: rejects an unrunnable .java performance-task file path", () => {
+  const broken = JSON.parse(JSON.stringify(fixture));
+  broken.performanceTask.exampleFiles[0].path = "My File.java";
+  const parsed = courseModule.safeParse(broken);
+  assert.equal(parsed.success, false, "a performance-task .java path /api/execute could never run must be rejected");
+});

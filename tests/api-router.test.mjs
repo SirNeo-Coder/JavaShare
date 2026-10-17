@@ -50,6 +50,20 @@ test("router: cookies, 204, unknown routes, bad JSON, and size limits", async ()
   assert.ok(new HttpError(413, "x") instanceof Error);
 });
 
+test("router: the larger JSON body cap is scoped to the module-upload route, not every route", async () => {
+  const api = createRouter(errors);
+  api.post("/api/classrooms/:classroomId/modules", (req, res) => res.json({ bytes: JSON.stringify(req.body).length }));
+  api.post("/api/other-route", (req, res) => res.json({ bytes: JSON.stringify(req.body).length }));
+  // Between the default 300KB cap and the 2MB module-upload cap - large enough that a module's
+  // several lessons of embedded Java step files could plausibly reach it, too large for anything
+  // else.
+  const midSize = JSON.stringify("x".repeat(500 * 1024));
+  const toModuleUpload = await api.handle(new Request("http://x/api/classrooms/c1/modules", { method: "POST", headers: { "content-type": "application/json" }, body: midSize }));
+  assert.equal(toModuleUpload.status, 200, "the module-upload route must accept a body over 300KB");
+  const toOtherRoute = await api.handle(new Request("http://x/api/other-route", { method: "POST", headers: { "content-type": "application/json" }, body: midSize }));
+  assert.equal(toOtherRoute.status, 413, "a non-upload route must still reject a body over 300KB");
+});
+
 function localSupabase() {
   try {
     const output = execFileSync("npx", ["supabase", "status", "-o", "env"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });

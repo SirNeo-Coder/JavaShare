@@ -1180,10 +1180,7 @@ type ModuleProgressRow = {
 };
 
 async function requireClassroomMember(user: SupabaseSessionUser, classroomId: string) {
-  const db = getSupabaseAdmin();
-  const { data, error } = await db.from("classroom_members").select("user_id").eq("classroom_id", classroomId).eq("user_id", user.id).maybeSingle();
-  fail(error, "Could not check classroom membership");
-  if (!data) throw new SupabaseRepositoryError(403, "Join the class before tracking module progress");
+  if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Join the class before tracking module progress");
 }
 
 async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string): Promise<ModuleProgressRow> {

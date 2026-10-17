@@ -3,6 +3,7 @@ import { jwtVerify, SignJWT } from "jose";
 import { z } from "zod";
 import { courseModule } from "./course-module-schema.ts";
 import { database } from "./database.ts";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "./file-paths.ts";
 import { broadcast, realtimePass } from "./realtime.ts";
 import { createRouter, type ApiRequest, type ApiResponse, type NextFn } from "./router.ts";
 import {
@@ -476,7 +477,7 @@ type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; 
 
 app.post("/api/execute", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const javaPath = z.string().trim().min(1).max(160).transform((value) => value.replace(/\\/g, "/")).refine((value) => /^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/.test(value) && !value.includes(".."));
+    const javaPath = z.string().trim().min(1).max(JAVA_PATH_MAX_LENGTH).transform((value) => value.replace(/\\/g, "/")).refine((value) => JAVA_PATH.test(value) && !value.includes(".."));
     const { files, stdin = "" } = z.object({ files: z.array(z.object({ path: javaPath, content: z.string().max(200000) })).min(1).max(50), stdin: z.string().max(10000).optional() }).parse(req.body);
     if (!process.env.JUDGE0_URL && localJavaEnabled) {
       const lastRun = lastExecution.get(req.user!.id) || 0;

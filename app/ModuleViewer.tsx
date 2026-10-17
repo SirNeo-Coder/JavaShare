@@ -16,6 +16,25 @@ function SimpleCodeEditor({ value, onChange }: { value: string; onChange: (value
   return <textarea className="module-code-textarea" value={value} onChange={(event) => onChange(event.target.value)} spellCheck={false} />;
 }
 
+// Shared by StepView and PerformanceTaskSlot, which otherwise duplicated this almost verbatim.
+function ModuleFileEditors({ files, onChange }: { files: ModuleFile[]; onChange: (index: number, value: string) => void }) {
+  return (
+    <>
+      {files.map((file, index) => (
+        <div key={file.path} className="module-step-file">
+          <small>{file.path}</small>
+          <SimpleCodeEditor value={file.content} onChange={(value) => onChange(index, value)} />
+        </div>
+      ))}
+    </>
+  );
+}
+
+async function runFiles(files: ModuleFile[]) {
+  const result = await api<{ mode: string; output: string }>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin: "" }) });
+  return result.output;
+}
+
 type ModuleFile = { path: string; content: string };
 type StepBlock = {
   type: "step";
@@ -120,20 +139,26 @@ function StepView({
   // student-only) - they can still run a Java step to check it works, but nothing is persisted.
   const canSaveProgress = role === "student";
 
+  // Saving the step's result is a separate try/catch from running it: a save failure must not
+  // overwrite the real program output that already printed above it.
+  const saveStepResult = async (status: StepStatus) => {
+    try {
+      await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status }) });
+      onChecked(status);
+    } catch (saveError) {
+      setOutput((current) => `${current ?? ""}\n\n(Could not save this result: ${saveError instanceof Error ? saveError.message : "try again"})`);
+    }
+  };
+
   const run = async () => {
     setRunning(true);
     try {
       if (canRun) {
-        const result = await api<{ mode: string; output: string }>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin: "" }) });
-        setOutput(result.output);
-        if (canSaveProgress) {
-          const verdict: StepStatus = result.output.trim() === step.expectedOutput.trim() ? "pass" : "fail";
-          await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status: verdict }) });
-          onChecked(verdict);
-        }
+        const result = await runFiles(files);
+        setOutput(result);
+        if (canSaveProgress) await saveStepResult(result.trim() === step.expectedOutput.trim() ? "pass" : "fail");
       } else if (canSaveProgress) {
-        await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status: "pass" }) });
-        onChecked("pass");
+        await saveStepResult("pass");
       }
     } catch (error) {
       setOutput(error instanceof Error ? error.message : "Could not run this step");
@@ -151,15 +176,10 @@ function StepView({
         {status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Passed" : "Try again"}</span>}
       </div>
       <Markdown markdown={step.instruction} />
-      {files.map((file, index) => (
-        <div key={file.path} className="module-step-file">
-          <small>{file.path}</small>
-          <SimpleCodeEditor
-            value={file.content}
-            onChange={(value) => setFiles((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, content: value } : item)))}
-          />
-        </div>
-      ))}
+      <ModuleFileEditors
+        files={files}
+        onChange={(index, value) => setFiles((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, content: value } : item)))}
+      />
       {showActions && (
         <div className="module-step-actions">
           <button type="button" onClick={run} disabled={running}>
@@ -188,8 +208,7 @@ function PerformanceTaskSlot({
   const runIt = async () => {
     setBusy(true);
     try {
-      const result = await api<{ mode: string; output: string }>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin: "" }) });
-      setOutput(result.output);
+      setOutput(await runFiles(files));
     } catch (error) {
       setOutput(error instanceof Error ? error.message : "Could not run this");
     } finally {
@@ -202,6 +221,8 @@ function PerformanceTaskSlot({
     try {
       await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", body: JSON.stringify({ variant, files, status: "pass" }) });
       onSubmitted("pass");
+    } catch (error) {
+      setOutput(error instanceof Error ? error.message : "Could not submit this version");
     } finally {
       setBusy(false);
     }
@@ -213,12 +234,10 @@ function PerformanceTaskSlot({
         <b>{label}</b>
         {submitted && <span className="status-chip done">Submitted</span>}
       </div>
-      {files.map((file, index) => (
-        <div key={file.path} className="module-step-file">
-          <small>{file.path}</small>
-          <SimpleCodeEditor value={file.content} onChange={(value) => setFiles((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, content: value } : item)))} />
-        </div>
-      ))}
+      <ModuleFileEditors
+        files={files}
+        onChange={(index, value) => setFiles((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, content: value } : item)))}
+      />
       <div className="module-step-actions">
         {canRun && <button type="button" onClick={runIt} disabled={busy}>{busy ? "Running…" : "Run"}</button>}
         {role === "student" && <button type="button" onClick={submit} disabled={busy}>{busy ? "Submitting…" : "Submit this version"}</button>}
@@ -238,6 +257,7 @@ const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {
 function ModuleContent({ module, classroomId, role }: { module: CourseModule; classroomId: string; role: "teacher" | "student" }) {
   const [progress, setProgress] = useState<Progress | null>(role === "teacher" ? emptyProgress(module.id) : null);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (role !== "student") return;
@@ -252,12 +272,17 @@ function ModuleContent({ module, classroomId, role }: { module: CourseModule; cl
   if (!progress) return <p>Loading your progress…</p>;
 
   const markExitSlip = async (exitSlipId: string) => {
-    const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: exitSlipId, status: "pass" }) });
-    setProgress(updated);
+    try {
+      const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: exitSlipId, status: "pass" }) });
+      setProgress(updated);
+    } catch (markError) {
+      setActionError(markError instanceof Error ? markError.message : "Could not mark the exit slip done");
+    }
   };
 
   return (
     <div className="module-content">
+      {actionError && <p className="module-error">{actionError}</p>}
       {role === "teacher" && <p className="module-preview-note">Previewing as teacher — nothing here is graded or saved.</p>}
       {role === "student" && (
         <div className="activity-progress module-goal-meter">
@@ -361,9 +386,13 @@ export default function ModuleViewer({ role, classroomId, onClose }: Props) {
   };
 
   const removeModule = async (moduleId: string) => {
-    await api(`/api/classrooms/${classroomId}/modules/${moduleId}`, { method: "DELETE" });
-    if (selected?.id === moduleId) setSelected(null);
-    refreshList();
+    try {
+      await api(`/api/classrooms/${classroomId}/modules/${moduleId}`, { method: "DELETE" });
+      if (selected?.id === moduleId) setSelected(null);
+      refreshList();
+    } catch (removeError) {
+      setError(removeError instanceof Error ? removeError.message : "Could not delete this module");
+    }
   };
 
   return (
