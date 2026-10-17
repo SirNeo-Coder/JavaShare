@@ -1163,3 +1163,80 @@ export async function restoreSupabaseSavedWork(user: SupabaseSessionUser, savedW
   }
   return { restored: true };
 }
+
+// Progress through a weekly course module (docs/course-format.md). Modules live in JSON files,
+// not the database, so moduleId is the module's own "id" field (e.g. "java-2-w15"), not a
+// foreign key. The goal meter and checklist are computed client-side from this state plus the
+// module file; this just stores what the student has done.
+type ModuleStepStatus = "pass" | "fail";
+type ModulePerformanceVariant = "sample" | "own";
+type ModulePerformanceEntry = { files: Array<{ path: string; content: string }>; status: ModuleStepStatus; submittedAt: string };
+type ModuleProgressRow = {
+  student_id: string; classroom_id: string; module_id: string;
+  step_states: Record<string, ModuleStepStatus>;
+  exit_slip_done: boolean;
+  performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>>;
+};
+
+async function requireClassroomMember(user: SupabaseSessionUser, classroomId: string) {
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("classroom_members").select("user_id").eq("classroom_id", classroomId).eq("user_id", user.id).maybeSingle();
+  fail(error, "Could not check classroom membership");
+  if (!data) throw new SupabaseRepositoryError(403, "Join the class before tracking module progress");
+}
+
+async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string): Promise<ModuleProgressRow> {
+  const db = getSupabaseAdmin();
+  const { data: existing, error } = await db.from("module_progress").select("*").eq("student_id", user.id).eq("module_id", moduleId).maybeSingle();
+  fail(error, "Could not load module progress");
+  if (existing) return existing as ModuleProgressRow;
+  const { data: created, error: insertError } = await db.from("module_progress")
+    .insert({ student_id: user.id, classroom_id: classroomId, module_id: moduleId }).select("*").single();
+  fail(insertError, "Could not start module progress");
+  return created as ModuleProgressRow;
+}
+
+function moduleProgressView(row: ModuleProgressRow) {
+  return { moduleId: row.module_id, stepStates: row.step_states, exitSlipDone: row.exit_slip_done, performanceTask: row.performance_task };
+}
+
+export async function getSupabaseModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
+  await requireClassroomMember(user, classroomId);
+  return moduleProgressView(await loadOrCreateModuleProgress(user, classroomId, moduleId));
+}
+
+export async function setSupabaseModuleStepState(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string, status: ModuleStepStatus) {
+  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
+  await requireClassroomMember(user, classroomId);
+  const row = await loadOrCreateModuleProgress(user, classroomId, moduleId);
+  const stepStates = { ...row.step_states, [stepId]: status };
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("module_progress").update({ step_states: stepStates }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
+  fail(error, "Could not save step result");
+  return moduleProgressView(data as ModuleProgressRow);
+}
+
+export async function setSupabaseModuleExitSlip(user: SupabaseSessionUser, classroomId: string, moduleId: string, done: boolean) {
+  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
+  await requireClassroomMember(user, classroomId);
+  await loadOrCreateModuleProgress(user, classroomId, moduleId);
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("module_progress").update({ exit_slip_done: done }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
+  fail(error, "Could not save exit slip");
+  return moduleProgressView(data as ModuleProgressRow);
+}
+
+export async function setSupabaseModulePerformanceTask(
+  user: SupabaseSessionUser, classroomId: string, moduleId: string, variant: ModulePerformanceVariant,
+  files: Array<{ path: string; content: string }>, status: ModuleStepStatus,
+) {
+  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
+  await requireClassroomMember(user, classroomId);
+  const row = await loadOrCreateModuleProgress(user, classroomId, moduleId);
+  const performanceTask = { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } };
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("module_progress").update({ performance_task: performanceTask }).eq("student_id", user.id).eq("module_id", moduleId).select("*").single();
+  fail(error, "Could not save performance task submission");
+  return moduleProgressView(data as ModuleProgressRow);
+}

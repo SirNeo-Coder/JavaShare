@@ -17,6 +17,7 @@ Source: `supabase/migrations/` (the code is authoritative). Every table has row-
 | `submissions` (+ `submission_credits`) | Immutable snapshot of files sent to the teacher; credits for group members | `project_id`, `team_id` |
 | `messages` | Chat lines | `team_id` (classroom chat uses the `teacher-demo` team) |
 | `group_leader_votes`, `group_member_permissions`, `activity_workspace_members` | Group leader votes, per-member mute/lock, activity roster snapshot | team / project |
+| `module_progress` | A student's progress through one weekly course module (`docs/course-format.md`): `step_states` (jsonb, stepId -> `pass`/`fail`), `exit_slip_done`, `performance_task` (jsonb, `{sample, own}`, each `{files, status, submittedAt}` — the two tracked submissions: the sample/example code the student runs, and their own version). The goal meter and checklist are computed from this on read, not stored. `module_id` is the module file's own `id` field (modules are JSON files, not database rows) | `student_id` -> profiles, `classroom_id` -> classrooms; unique on `(student_id, module_id)` |
 
 Notes:
 - Since migration `20261016000200`, the `anon` and `authenticated` roles have no table privileges. Only the server (service role) reads and writes tables. Functions `can_join_realtime_topic` and `can_broadcast_realtime_topic` back the live-channel policies on `realtime.messages`.

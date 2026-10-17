@@ -18,5 +18,6 @@
 | photos | photo routes | photo inputs | Storage `student-photos` |
 | teacher dashboards | `activity-summary`, `teacher/students` | `app/teacher/` | none |
 | course modules (stage two) | none yet | none yet | `docs/course-format.md` |
+| module progress, goal meter, checklist, performance task sample vs own version | module-progress routes in `routes.ts` (`GET/PUT /api/classrooms/:id/modules/:id/progress*`), `supabase-repository.ts` (`getSupabaseModuleProgress`, `setSupabaseModuleStepState`, `setSupabaseModuleExitSlip`, `setSupabaseModulePerformanceTask`) | none yet (backend plumbing only; no module viewer exists to show it) | `module_progress`, migration `20261018000100_module_progress.sql`, `tests/module-progress.test.mjs`, `tests/fixtures/sample-module.codeshare.json` |
 | offline mode, launcher, LAN address | none | none | `scripts/classroom-mode.mjs`, `scripts/classroom.mjs` |
 | Cloudflare, hosting, deploy, OpenNext, wrangler, preview | `backend/src/router.ts`, `routes.ts` | `app/api/[...path]/route.ts` | `wrangler.jsonc`, `open-next.config.ts`, `docs/cloudflare-setup.md`, `tests/api-router.test.mjs` |
