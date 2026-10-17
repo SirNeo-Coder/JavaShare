@@ -1,8 +1,34 @@
 # Stage two handoff (course modules)
 
-Last updated: 2026-10-18 (PR #6 and PR #7 reviewed with `/code-review`; CKB-008 found and fixed)
+Last updated: 2026-10-18 (fixing the two write races next, not done yet)
 
 Read `docs/course-format.md` first — it defines the weekly module JSON file.
+
+## In progress right now: fixing the two write races (not done, no code changed yet)
+
+Branch: `module-viewer`. File: `backend/src/supabase-repository.ts`.
+
+1. **Lost-update race.** `setSupabaseModuleStepState` and `setSupabaseModulePerformanceTask`
+   read the row, merge one key into `step_states`/`performance_task` in JS, then overwrite the
+   whole jsonb column. Two near-simultaneous saves (e.g. both performance-task variants) can
+   silently drop one. Fix: do the merge on the DB side (jsonb concat in the update, e.g.
+   `step_states: db.raw` style merge or a Postgres function) instead of JS read-then-overwrite —
+   or add an optimistic check (`.eq` on a version/updated_at) and retry on conflict.
+2. **Unhandled 500 on first-write race.** `loadOrCreateModuleProgress` does select-then-insert,
+   not an upsert, on a `(student_id, module_id)` unique row. Two simultaneous first touches both
+   insert; the second hits a unique-violation that `fail()` turns into a plain `Error` → generic
+   500. Fix: use `.upsert(..., { onConflict: "student_id,module_id", ignoreDuplicates: true })`
+   (pattern already used by `joinSupabaseClass` in the same file) then select the row, instead of
+   select-then-insert.
+
+Plan for both: pick one scoped migration-free fix (no schema change needed, both are query-shape
+fixes in `supabase-repository.ts`), write a test that proves the old code loses a write /
+500s under the race (mirror how CKB-007's test used two lessons to prove the bug class), then
+fix and show it pass.
+
+Full finding text (both findings, plus the other 7 still-open findings from the
+`/code-review` of PR #6 and PR #7) is in "Other findings from the `/code-review`, not yet
+fixed" below.
 
 ## What the teacher asked for
 
