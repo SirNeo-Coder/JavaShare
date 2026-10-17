@@ -29,3 +29,20 @@ test("course module schema: rejects the wrong format tag", () => {
   const parsed = courseModule.safeParse(broken);
   assert.equal(parsed.success, false);
 });
+
+// Student progress (step_states) is one flat map per module, keyed by whichever id was marked -
+// a step block's own id or a lesson's exitSlip id (CKB-007's bug class). If two of those ids
+// collide, even across different lessons, marking one done silently marks the other done too.
+test("course module schema: rejects a step id reused by another lesson's step (CKB-007's bug class, reachable at upload)", () => {
+  const broken = JSON.parse(JSON.stringify(fixture));
+  broken.lessons[1].blocks.find((block) => block.type === "step").id = broken.lessons[0].blocks.find((block) => block.type === "step").id;
+  const parsed = courseModule.safeParse(broken);
+  assert.equal(parsed.success, false, "a step id reused by a different lesson's step must be rejected");
+});
+
+test("course module schema: rejects a step id that collides with an exit slip's id", () => {
+  const broken = JSON.parse(JSON.stringify(fixture));
+  broken.lessons[1].exitSlip.id = broken.lessons[0].blocks.find((block) => block.type === "step").id;
+  const parsed = courseModule.safeParse(broken);
+  assert.equal(parsed.success, false, "a step id reused as an exit slip's id must be rejected");
+});

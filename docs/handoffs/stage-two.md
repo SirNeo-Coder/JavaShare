@@ -1,9 +1,21 @@
 # Stage two handoff (course modules)
 
-Last updated: 2026-10-18 (the two write races and the classroom-scoping gap are fixed; 6 other
-`/code-review` findings still open)
+Last updated: 2026-10-18 (the two write races, the classroom-scoping gap, and the id-collision
+gap are fixed; 5 other `/code-review` findings still open)
 
 Read `docs/course-format.md` first — it defines the weekly module JSON file.
+
+## Done: no id-uniqueness check on module upload (CKB-011)
+
+Branch: `module-viewer`. Teacher approved as an adjustment. `course-module-schema.ts` validated
+each id's shape but never checked that ids were distinct across a module - student progress
+(`step_states`) is one flat map per module keyed by a step's `id` or a lesson's `exitSlip.id`, so
+a colliding id (even across different lessons) would make marking one done silently mark the
+other done too (CKB-007's bug class, reachable again at upload). Fixed: the top-level
+`courseModule` schema now has a `.refine()` collecting every step/exit-slip id and rejecting the
+upload on any collision. 2 new regression tests, both shown failing before the fix. `npm test`:
+29/29 pass. `npm run build:all` / `npm run lint`: clean. Full record:
+`docs/problem-knowledgebase/cases/CKB-011-module-upload-id-collision.md`.
 
 ## Done: module progress not scoped to classroom (CKB-010)
 
@@ -139,12 +151,9 @@ browser both ways):
 
 The review (10 findings each on PR #6 and PR #7, all confirmed against the code) surfaced several
 real issues beyond CKB-008 that are **not yet fixed** — flagging here so they aren't lost. (The
-two write-race findings and the classroom-scoping finding that were here are done — see CKB-009
-and CKB-010 above.)
+two write-race findings, the classroom-scoping finding, and the id-collision finding that were
+here are done — see CKB-009, CKB-010, and CKB-011 above.)
 
-- **No id-uniqueness check:** nothing stops a module's step ids and exit-slip ids from colliding
-  with each other (course-module-schema.ts has zero `.refine()` calls) — this is CKB-007's exact
-  bug class, reachable again one layer up.
 - **Upload schema vs. `/api/execute` path rules disagree:** a module can pass upload validation
   with a file path (e.g. with a space, or length 161-200 chars) that `/api/execute`'s stricter
   regex will always reject — the step becomes permanently unrunnable for students with no warning

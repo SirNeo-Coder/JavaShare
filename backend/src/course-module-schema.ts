@@ -77,6 +77,16 @@ export const courseModule = z.object({
   starterFiles: z.array(file).max(50).default([]),
   lessons: z.array(lesson).min(1).max(10),
   performanceTask: performanceTask.optional(),
-});
+}).refine((module) => {
+  // Student progress (step_states) is one flat map per module, keyed by whichever id was marked -
+  // a step block's own id or a lesson's exitSlip id (supabase-repository.ts). A collision between
+  // any two of those ids, even across different lessons, would make marking one done silently
+  // mark the other done too (CKB-007's bug class, reachable here if an upload isn't checked).
+  const progressIds = module.lessons.flatMap((lesson) => [
+    lesson.exitSlip.id,
+    ...lesson.blocks.filter((block) => block.type === "step").map((block) => block.id),
+  ]);
+  return progressIds.length === new Set(progressIds).size;
+}, { message: "Two steps or exit slips in this module share the same id - each step's \"id\" and each lesson's exitSlip \"id\" must be unique across the whole module" });
 
 export type CourseModule = z.infer<typeof courseModule>;
