@@ -223,7 +223,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
    - **Preview:** `https://cloudflare-c2-codeshare.ireneojrseraspe.workers.dev`. `/api/health` answered `connected: true` (checked with curl, 2026-10-17).
    - **Part 3 results so far (2026-10-17, the teacher on two devices):** pass: sign-in with the real class, Live classroom connected, teacher autosave survives reload and sign-out, student typing and cursor seen live by the teacher, student shown Online. **Fail: classroom chat arrived only after a refresh.** CKB-006: Cloudflare dropped the server's unawaited `broadcast()`. **Fixed 2026-10-17** (teacher approved, adjustment): every `broadcast()` is awaited, with a 3-second limit. 18/18 tests pass; the new regression test was shown failing first; checked on the local Cloudflare runtime and offline. CKB-005 (a misleading Java label) was also recorded.
    - **Still to test on the preview:** the chat fix; student Save work with a name; New web project + Run code; activity deploy and live share reaching students.
-   - **Don't merge #1–#5 until the teacher has re-tested chat on the preview.**
+   - **Chat re-test on the preview passed** (2026-10-17): it arrives live, about 2 seconds after sending. Typing is faster because it doesn't go through the server.
 2. After the teacher confirms Cloudflare works:
    - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
    - Stage two (course modules) can start.

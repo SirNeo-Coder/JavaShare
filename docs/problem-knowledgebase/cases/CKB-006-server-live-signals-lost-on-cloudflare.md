@@ -1,6 +1,6 @@
 # CKB-006 — Chat (and other server live signals) don't arrive on Cloudflare
 
-- Status: resolved locally; waiting for the teacher's re-test on the Cloudflare preview
+- Status: resolved
 - First recorded: 2026-10-17
 - Last verified: 2026-10-17
 - Area: `backend/src/realtime.ts` (`broadcast`), `backend/src/routes.ts` (15 callers), `app/api/[...path]/route.ts`
@@ -42,3 +42,4 @@ If the message appears after a reload, saving worked and only the live signal wa
 ## History
 
 - 2026-10-17 — Seen during the teacher's Cloudflare preview test (chat arrived only after a refresh). Cause reproduced locally; the teacher approved the fix as an adjustment; fixed on `cloudflare-c2`.
+- 2026-10-17 — The teacher re-tested on the Cloudflare preview with two devices: chat arrives live without a refresh, about 2 seconds after sending.
