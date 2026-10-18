@@ -4,7 +4,7 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-17 (Cloudflare connected and secrets added; testing the preview)
+Last updated: 2026-10-18 (Cloudflare preview testing complete; PR stack ready to merge in order)
 
 ## The job
 
@@ -162,7 +162,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - Group members' typing isn't checked per keystroke, but saving is.
 - **For c2:** every open page asks the server for live-share state every 2 seconds (existing code). On Cloudflare's free plan (100,000 requests a day) that is too many for a class of 40, so it needs changing in c2.
 
-### PR (c2) CodeShare on Cloudflare: DONE, waiting for teacher review
+### PR (c2) CodeShare on Cloudflare: DONE, preview testing passed, ready to merge (pending the PR stack below it)
 
 - **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/5
 - **Branch:** `cloudflare-c2` (built on top of `realtime-c1`).
@@ -222,11 +222,15 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
    - **Done 2026-10-17, Part 2:** the teacher added the 5 secrets, using the legacy anon and service_role keys to match Render. The first attempt put them in the **Build** section's variables, which the running app can't see (health said the keys were missing). They were redone under **Runtime variables and secrets**, as Secret, for **both Production and Previews**. Preview addresses also had to be switched on (Settings > Domains & Routes > Preview), because before that every address gave "error code: 1042". `docs/cloudflare-setup.md` was updated for all three points. Production's `workers.dev` address is still off, as it should be until merging.
    - **Preview:** `https://cloudflare-c2-codeshare.ireneojrseraspe.workers.dev`. `/api/health` answered `connected: true` (checked with curl, 2026-10-17).
    - **Part 3 results so far (2026-10-17, the teacher on two devices):** pass: sign-in with the real class, Live classroom connected, teacher autosave survives reload and sign-out, student typing and cursor seen live by the teacher, student shown Online. **Fail: classroom chat arrived only after a refresh.** CKB-006: Cloudflare dropped the server's unawaited `broadcast()`. **Fixed 2026-10-17** (teacher approved, adjustment): every `broadcast()` is awaited, with a 3-second limit. 18/18 tests pass; the new regression test was shown failing first; checked on the local Cloudflare runtime and offline. CKB-005 (a misleading Java label) was also recorded.
-   - **Still to test on the preview:** the chat fix; student Save work with a name; New web project + Run code; activity deploy and live share reaching students.
    - **Chat re-test on the preview passed** (2026-10-17): it arrives live, about 2 seconds after sending. Typing is faster because it doesn't go through the server.
-2. After the teacher confirms Cloudflare works:
+   - **Remaining Part 3 items, all passed on the preview (2026-10-18, teacher's own testing):**
+     - **Save and reload:** edited `src/Main.java` in the Teacher Demo Workspace, pressed **Save lesson**, reloaded the page — the edit survived. (Same save/reload mechanism a student's "Save work" uses; tested from the teacher's own workspace rather than a student's.)
+     - **New web project + Run code:** created a web project as a student (signed in with the class join code), pressed **Run** — the page and its console appeared.
+     - **Live typing, chat, and live share, both directions:** the student's typing was already confirmed live for the teacher; the teacher confirmed a chat message and live-shared code both reached the student's screen too.
+   - **All of Part 3 (`docs/cloudflare-setup.md`) is now checked off on the real preview.** Only CKB-005 (the misleading "Java execution enabled" label while Java is in demo mode) remains open — pre-existing, cosmetic, not a functional blocker, waiting on the teacher's decision on when to fix it.
+2. Cloudflare preview testing is done. **Next real step: merge the PR stack in order** — #1 (`rename-to-codeshare`) → #2 (`web-workspace`) → #3 (`codeshare-knowledge-base`) → #4 (`realtime-c1`) → #5 (`cloudflare-c2`) — since each is stacked on the one before it; none are merged yet. After that:
    - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
-   - Stage two (course modules) can start.
+   - Stage two (course modules) is already built on top of this stack (PR #6, PR #7) and is itself ready — see `docs/handoffs/stage-two.md`.
 
 ## Running offline mode on this laptop
 
