@@ -211,7 +211,7 @@ export default function Home() {
   const [fontScale, setFontScale] = useState(getSavedFontScale);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
-  const [pendingModuleId, setPendingModuleId] = useState<string | undefined>(undefined);
+  const [homeClassroomId, setHomeClassroomId] = useState<string | null>(null);
   const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<Bootstrap | null>(null);
@@ -1723,6 +1723,9 @@ export default function Home() {
     forgetRealtimeClient(); // the live pass belongs to the signed-out user
     setUser(null);
     setData(null);
+    setEnteredClassroomId(null);
+    setHomeClassroomId(null);
+    setModulesOpen(false);
   }
 
   if (loading) return <CenteredCard title="Starting CodeShare…" />;
@@ -1737,12 +1740,10 @@ export default function Home() {
         role={user.role}
         name={user.name}
         classrooms={data.classrooms}
-        onEnter={(classroomId, moduleId) => {
+        initialClassroomId={homeClassroomId}
+        onEnter={(classroomId) => {
+          setHomeClassroomId(classroomId);
           setEnteredClassroomId(classroomId);
-          if (moduleId) {
-            setPendingModuleId(moduleId);
-            setModulesOpen(true);
-          }
         }}
         onLogout={logout}
         onRefresh={() => void loadWorkspace()}
@@ -1805,12 +1806,12 @@ export default function Home() {
           <button
             className="settings-button"
             type="button"
-            onClick={() => setEnteredClassroomId(null)}
-            title="Back to the dashboard"
+            onClick={() => { setModulesOpen(false); setEnteredClassroomId(null); }}
+            title="Back to class home"
           >
-            Dashboard
+            Class home
           </button>
-          {classroomId && (
+          {classroomId && user.role === "student" && (
             <button
               className="settings-button modules-button"
               type="button"
@@ -3339,10 +3340,8 @@ export default function Home() {
         <ModuleViewer
           role={user.role}
           classroomId={classroomId}
-          initialModuleId={pendingModuleId}
           onClose={() => {
             setModulesOpen(false);
-            setPendingModuleId(undefined);
           }}
         />
       )}

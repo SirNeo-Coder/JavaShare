@@ -1,4 +1,4 @@
-# Workflow state (snapshot 2026-10-16, branch `web-workspace`)
+# Workflow state (updated 2026-10-18, branch `codex/class-home`)
 
 What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
 
@@ -8,12 +8,14 @@ What teachers and students can do today. Compare any proposed change with this p
 - Students join a class with its code; each gets a personal workspace with "My Practice Code" (Java).
 - Teachers manage student accounts at `/teacher/accounts` (edit, photo, approve password reset, delete) and see an activity summary at `/teacher`.
 
-## Classes (landing page)
+## Classes and class home
 
-- On login, everyone sees a class list before entering any classroom: a teacher sees every class they teach as a card (name, subject, join code, a "Live now" badge if an activity or live share is running), a student sees one card per class they've joined, each with that class's own module list and progress.
-- A teacher can **Create a class** (name + subject) from this screen - it gets its own join code and its own "Teacher Demo Workspace", independent of their other classes. A student can **Join another class** from the same screen the same way they joined their first one.
-- Clicking a class's **Enter classroom** opens today's live workspace (editor, live share, activities, chat) scoped to just that one class; a **Dashboard** button in the workspace header returns to the class list. Each classroom's teams, activities, and live-share state are isolated from every other classroom the same user belongs to.
-- A teacher's roster/module-progress drill-down (click "View students" on a class, then a student, for their module summary) lives on this same class list screen.
+- On login, everyone sees a class list. Each card shows the class name, subject, and a "Live now" badge if an activity or live share is running; teachers also see its join code. **Open class** opens that class's home, without entering the live workspace.
+- A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and "Teacher Demo Workspace". A student can **Join another class** from that same list.
+- A teacher's class home contains **Modules** (the **Upload module** file picker, module preview, and **Delete**) and **Students**. **View module progress** on a student shows that student's module summaries for this class. **Back to modules** leaves a teacher preview.
+- A student's class home shows **Your modules**, with each module's progress. Opening a module stays on class home; **Close** returns to the module cards and refreshes their progress.
+- **Enter classroom** opens the existing live workspace for that one class. **Class home** in its header returns to the same class home; **Classes** goes back to the class list. Students also retain the workspace's **Modules** shortcut. Teacher module upload and deletion now live on class home, rather than in the workspace header.
+- Each class's roster, modules, progress, teams, activities, and live-share state stay separate. Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
 
 ## Students
 

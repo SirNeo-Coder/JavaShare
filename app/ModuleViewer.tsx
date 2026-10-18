@@ -76,7 +76,7 @@ type Progress = {
   performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>>;
 };
 
-type Props = { role: "teacher" | "student"; classroomId: string; initialModuleId?: string; onClose: () => void };
+type Props = { role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; onClose?: () => void };
 
 function isStepBlock(block: Block): block is StepBlock {
   return block.type === "step";
@@ -348,7 +348,7 @@ function ModuleContent({ module, classroomId, role }: { module: CourseModule; cl
   );
 }
 
-export default function ModuleViewer({ role, classroomId, initialModuleId, onClose }: Props) {
+export default function ModuleViewer({ role, classroomId, initialModuleId, embedded = false, onClose }: Props) {
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [selected, setSelected] = useState<CourseModule | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -400,22 +400,27 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, onClo
     }
   };
 
-  return (
-    <div className="activity-overlay" onClick={(event) => event.target === event.currentTarget && onClose()}>
-      <div className="activity-modal module-viewer-modal">
+  const content = (
+    <>
         <header>
           <div>
             <span className="eyebrow">MODULES</span>
-            <h2>{selected ? selected.title : "This week's module"}</h2>
+            <h2>{selected ? selected.title : "Modules"}</h2>
           </div>
-          <button type="button" onClick={() => (selected ? setSelected(null) : onClose())} aria-label="Close">×</button>
+          {embedded ? (
+            selected && <button type="button" onClick={() => setSelected(null)}>Back to modules</button>
+          ) : (
+            <button type="button" onClick={() => selected && !initialModuleId ? setSelected(null) : onClose?.()} aria-label={selected && !initialModuleId ? "Back to modules" : "Close"}>×</button>
+          )}
         </header>
         {error && <p className="module-error">{error}</p>}
         {!selected && (
           <div className="module-list">
-            {role === "teacher" && (
+            {role === "teacher" && embedded && (
               <div className="module-upload">
+                <label>Upload module
                 <input ref={fileInput} type="file" accept=".json" onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])} disabled={uploading} />
+                </label>
                 {uploading && <small>Uploading…</small>}
               </div>
             )}
@@ -426,13 +431,19 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, onClo
                 <button type="button" onClick={() => openModule(module.moduleId)}>
                   Week {module.week} — {module.title}
                 </button>
-                {role === "teacher" && <button type="button" className="danger-button" onClick={() => removeModule(module.moduleId)}>Delete</button>}
+                {role === "teacher" && embedded && <button type="button" className="danger-button" onClick={() => removeModule(module.moduleId)}>Delete</button>}
               </div>
             ))}
           </div>
         )}
-        {selected && <ModuleContent module={selected} classroomId={classroomId} role={role} />}
-      </div>
+        {selected && <ModuleContent key={selected.id} module={selected} classroomId={classroomId} role={role} />}
+    </>
+  );
+
+  if (embedded) return <div className="activity-modal class-module-panel">{content}</div>;
+  return (
+    <div className="activity-overlay" onClick={(event) => event.target === event.currentTarget && onClose?.()}>
+      <div className="activity-modal module-viewer-modal">{content}</div>
     </div>
   );
 }

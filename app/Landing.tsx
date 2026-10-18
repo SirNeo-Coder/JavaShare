@@ -1,12 +1,9 @@
 "use client";
 
-// Landing page shown right after sign-in, before the classroom workspace: a teacher sees class
-// cards that drill into a student roster and, lazily per click, that student's module progress;
-// a student sees one card per class they've joined, each with its own module list and progress.
-// Nothing here is fetched until a card is clicked, except each class's own light summary (name,
-// subject, live status) already included in the initial response.
+// Class list and class home, kept separate from the live classroom workspace.
 import { useEffect, useState } from "react";
 import { api } from "./apiClient";
+import ModuleViewer from "./ModuleViewer";
 
 type LandingClassroom = { id: string; name: string; subject: string; joinCode?: string; hasActivity?: boolean; hasLiveShare?: boolean };
 type RosterStudent = { id: string; name: string; email: string; joinedAt?: string };
@@ -17,7 +14,8 @@ type Props = {
   role: "teacher" | "student";
   name: string;
   classrooms: LandingClassroom[];
-  onEnter: (classroomId: string, moduleId?: string) => void;
+  initialClassroomId?: string | null;
+  onEnter: (classroomId: string) => void;
   onLogout: () => void;
   onRefresh: () => void;
 };
@@ -144,110 +142,67 @@ function JoinAnotherClass({ onJoined }: { onJoined: () => void }) {
   );
 }
 
-function TeacherLanding({ name, classrooms, onEnter, onLogout, onRefresh }: Omit<Props, "role">) {
-  const [expandedClass, setExpandedClass] = useState<string | null>(null);
-  const [roster, setRoster] = useState<Record<string, RosterStudent[]>>({});
-  const [rosterError, setRosterError] = useState<Record<string, string>>({});
-  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
-
-  const toggleClass = (classroomId: string) => {
-    const opening = expandedClass !== classroomId;
-    setExpandedClass(opening ? classroomId : null);
-    setExpandedStudent(null);
-    if (opening && !roster[classroomId] && !rosterError[classroomId]) {
-      api<{ students: RosterStudent[] }>(`/api/classes/${classroomId}/students`)
-        .then((result) => setRoster((current) => ({ ...current, [classroomId]: result.students })))
-        .catch((loadError) => setRosterError((current) => ({ ...current, [classroomId]: loadError instanceof Error ? loadError.message : "Could not load students" })));
-    }
-  };
-
-  return (
-    <main className="teacher-dashboard">
-      <header className="dashboard-topbar">
-        <div className="dashboard-brand"><span className="brand-mark">C</span><span><b>CodeShare</b><small>Teacher dashboard</small></span></div>
-        <div className="dashboard-actions">
-          <span>{name}</span>
-          <button onClick={onLogout}>Sign out</button>
-        </div>
-      </header>
-      <section className="dashboard-content">
-        <div className="dashboard-heading">
-          <div><span className="eyebrow">YOUR CLASSES</span><h1>Classes</h1><p>Select a class to see its students and their module progress.</p></div>
-          <CreateClass onCreated={onRefresh} />
-        </div>
-        {!classrooms.length && <div className="empty-activities"><b>No classes yet</b></div>}
-        {classrooms.map((classroom) => (
-          <section className="class-summary" key={classroom.id}>
-            <header>
-              <div>
-                <h2>{classroom.name}</h2>
-                <p>{classroom.subject}{classroom.joinCode ? ` · Code ${classroom.joinCode}` : ""}</p>
-              </div>
-              <span>
-                <LiveBadge classroom={classroom} />
-                {" "}
-                <button onClick={() => toggleClass(classroom.id)}>{expandedClass === classroom.id ? "Hide students" : "View students"}</button>
-                {" "}
-                <button onClick={() => onEnter(classroom.id)}>Enter classroom</button>
-              </span>
-            </header>
-            {expandedClass === classroom.id && (
-              rosterError[classroom.id] ? <p className="dashboard-error"><span>{rosterError[classroom.id]}</span></p> :
-              !roster[classroom.id] ? <p className="dashboard-loading">Loading students…</p> :
-              !roster[classroom.id].length ? <div className="empty-activities">No students have joined this class yet.</div> :
-              <div className="activity-summary-list">
-                {roster[classroom.id].map((student) => (
-                  <div className="activity-summary-card" key={student.id}>
-                    <div className="activity-summary-head">
-                      <div><h3>{student.name}</h3><p>{student.email}</p></div>
-                      <button onClick={() => setExpandedStudent(expandedStudent === student.id ? null : student.id)}>
-                        {expandedStudent === student.id ? "Hide progress" : "View module progress"}
-                      </button>
-                    </div>
-                    {expandedStudent === student.id && <StudentModulePanel classroomId={classroom.id} studentId={student.id} />}
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        ))}
-      </section>
-    </main>
-  );
-}
-
-function StudentClassCard({ classroom, onEnter }: { classroom: LandingClassroom; onEnter: Props["onEnter"] }) {
-  const [modules, setModules] = useState<ModuleSummary[] | null>(null);
+function ClassRoster({ classroomId }: { classroomId: string }) {
+  const [roster, setRoster] = useState<RosterStudent[] | null>(null);
   const [error, setError] = useState("");
+  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    api<ModuleSummary[]>(`/api/classrooms/${classroom.id}/modules/summary`)
+    api<{ students: RosterStudent[] }>(`/api/classes/${classroomId}/students`)
+      .then((result) => { if (active) setRoster(result.students); })
+      .catch((loadError) => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load students"); });
+    return () => { active = false; };
+  }, [classroomId]);
+
+  return (
+    <section className="class-summary" aria-label="Students">
+      <h2>Students</h2>
+      {error ? <p className="dashboard-error" role="alert">{error}</p> :
+        roster === null ? <p className="dashboard-loading">Loading students…</p> :
+        !roster.length ? <div className="empty-activities">No students have joined this class yet.</div> :
+        <div className="activity-summary-list">
+          {roster.map((student) => (
+            <div className="activity-summary-card" key={student.id}>
+              <div className="activity-summary-head">
+                <div><h3>{student.name}</h3><p>{student.email}</p></div>
+                <button onClick={() => setExpandedStudent(expandedStudent === student.id ? null : student.id)} aria-expanded={expandedStudent === student.id}>
+                  {expandedStudent === student.id ? "Hide progress" : "View module progress"}
+                </button>
+              </div>
+              {expandedStudent === student.id && <StudentModulePanel classroomId={classroomId} studentId={student.id} />}
+            </div>
+          ))}
+        </div>
+      }
+    </section>
+  );
+}
+
+function StudentModules({ classroomId }: { classroomId: string }) {
+  const [modules, setModules] = useState<ModuleSummary[] | null>(null);
+  const [error, setError] = useState("");
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedModuleId) return;
+    let active = true;
+    api<ModuleSummary[]>(`/api/classrooms/${classroomId}/modules/summary`)
       .then((result) => { if (active) setModules(result); })
       .catch((loadError) => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load your modules"); });
     return () => { active = false; };
-  }, [classroom.id]);
+  }, [classroomId, selectedModuleId]);
 
   return (
-    <section className="class-summary">
-      <header>
-        <div>
-          <h2>{classroom.name}</h2>
-          <p>{classroom.subject}</p>
-        </div>
-        <span>
-          <LiveBadge classroom={classroom} />
-          {" "}
-          <button onClick={() => onEnter(classroom.id)}>Enter classroom</button>
-        </span>
-      </header>
+    <section className="class-summary" aria-label="Your modules">
+      <h2>Your modules</h2>
       {error && <p className="dashboard-error"><span>{error}</span></p>}
       {modules === null && !error && <p className="dashboard-loading">Loading your modules…</p>}
       {modules?.length === 0 && <div className="empty-activities">No module uploaded for this class yet.</div>}
       {modules && modules.length > 0 && (
         <div className="activity-summary-list">
           {modules.map((module) => (
-            <button type="button" className="activity-summary-card" key={module.moduleId} onClick={() => onEnter(classroom.id, module.moduleId)} style={{ textAlign: "left", cursor: "pointer" }}>
+            <button type="button" className="activity-summary-card" key={module.moduleId} onClick={() => setSelectedModuleId(module.moduleId)} style={{ textAlign: "left", cursor: "pointer" }}>
               <div className="activity-summary-head">
                 <div><span className={`activity-state ${module.status === "done" ? "active" : ""}`}>{statusLabel(module)}</span><h3>Week {module.week} — {module.title}</h3></div>
               </div>
@@ -256,34 +211,75 @@ function StudentClassCard({ classroom, onEnter }: { classroom: LandingClassroom;
           ))}
         </div>
       )}
+      {selectedModuleId && (
+        <ModuleViewer
+          role="student"
+          classroomId={classroomId}
+          initialModuleId={selectedModuleId}
+          onClose={() => setSelectedModuleId(null)}
+        />
+      )}
     </section>
   );
 }
 
-function StudentLanding({ name, classrooms, onEnter, onLogout, onRefresh }: Omit<Props, "role">) {
+export default function Landing({ role, name, classrooms, initialClassroomId, onEnter, onLogout, onRefresh }: Props) {
+  const [selectedClassroomId, setSelectedClassroomId] = useState(initialClassroomId ?? null);
+  const classroom = classrooms.find((item) => item.id === selectedClassroomId);
+
   return (
     <main className="teacher-dashboard">
       <header className="dashboard-topbar">
-        <div className="dashboard-brand"><span className="brand-mark">C</span><span><b>CodeShare</b><small>Your classes</small></span></div>
+        <div className="dashboard-brand"><span className="brand-mark">C</span><span><b>CodeShare</b><small>{role === "teacher" ? "Teacher dashboard" : "Your classes"}</small></span></div>
         <div className="dashboard-actions">
           <span>{name}</span>
           <button onClick={onLogout}>Sign out</button>
         </div>
       </header>
       <section className="dashboard-content">
-        <div className="dashboard-heading">
-          <div><span className="eyebrow">YOUR CLASSES</span><h1>Classes</h1><p>Pick a class to see this term&apos;s modules.</p></div>
-          <JoinAnotherClass onJoined={onRefresh} />
-        </div>
-        {!classrooms.length && <div className="empty-activities"><b>Join a class to see your modules</b></div>}
-        {classrooms.map((classroom) => <StudentClassCard key={classroom.id} classroom={classroom} onEnter={onEnter} />)}
+        {classroom ? (
+          <div key={classroom.id}>
+            <div className="dashboard-heading">
+              <div>
+                <button onClick={() => setSelectedClassroomId(null)}>Classes</button>
+                <h1>{classroom.name}</h1>
+                <p>{classroom.subject}{role === "teacher" && classroom.joinCode ? ` · Code ${classroom.joinCode}` : ""}</p>
+              </div>
+              <div className="dashboard-actions">
+                <LiveBadge classroom={classroom} />
+                <button onClick={() => onEnter(classroom.id)}>Enter classroom</button>
+              </div>
+            </div>
+            {role === "teacher" ? (
+              <>
+                <section className="class-summary" aria-label="Modules">
+                  <ModuleViewer role="teacher" classroomId={classroom.id} embedded />
+                </section>
+                <ClassRoster classroomId={classroom.id} />
+              </>
+            ) : <StudentModules classroomId={classroom.id} />}
+          </div>
+        ) : (
+          <>
+            <div className="dashboard-heading">
+              <div><span className="eyebrow">YOUR CLASSES</span><h1>Classes</h1><p>Open a class to see its modules{role === "teacher" ? " and students" : ""}.</p></div>
+              {role === "teacher" ? <CreateClass onCreated={onRefresh} /> : <JoinAnotherClass onJoined={onRefresh} />}
+            </div>
+            {!classrooms.length && <div className="empty-activities"><b>{role === "teacher" ? "No classes yet" : "Join a class to see your modules"}</b></div>}
+            {classrooms.map((item) => (
+              <section className="class-summary" key={item.id}>
+                <header>
+                  <div><h2>{item.name}</h2><p>{item.subject}{role === "teacher" && item.joinCode ? ` · Code ${item.joinCode}` : ""}</p></div>
+                  <div className="dashboard-actions">
+                    <LiveBadge classroom={item} />
+                    <button onClick={() => setSelectedClassroomId(item.id)}>Open class</button>
+                  </div>
+                </header>
+              </section>
+            ))}
+          </>
+        )}
       </section>
     </main>
   );
-}
-
-export default function Landing({ role, name, classrooms, onEnter, onLogout, onRefresh }: Props) {
-  return role === "teacher"
-    ? <TeacherLanding name={name} classrooms={classrooms} onEnter={onEnter} onLogout={onLogout} onRefresh={onRefresh} />
-    : <StudentLanding name={name} classrooms={classrooms} onEnter={onEnter} onLogout={onLogout} onRefresh={onRefresh} />;
 }

@@ -280,3 +280,8 @@ html[data-theme="dark"] .preview-console .log-warn,html[data-theme="dark"] .prev
 .module-preview-note { margin:0; padding:8px 10px; border-radius:6px; background:var(--panel); color:var(--muted); font-size:10px; font-weight:800; }
 html[data-theme="dark"] .module-check-yourself { background:#3d3315; color:#ffd479; }
 html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5; }
+
+/* Class-home module management uses the existing viewer without a modal overlay. */
+.class-module-panel { width:100%; max-height:none; box-shadow:none; }
+.class-module-panel header>button { font-size:11px; }
+@media (max-width:720px) { .dashboard-heading,.class-summary>header { flex-wrap:wrap; gap:14px; } }
