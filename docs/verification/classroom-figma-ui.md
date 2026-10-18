@@ -1,6 +1,7 @@
 # Classroom Figma UI verification — 2026-10-19
 
 Branch: `codex/classroom-figma-ui`, stacked on `feat/module-redesign-schema` (PR #13).
+Review: [PR #14](https://github.com/SirNeo-Coder/JavaShare/pull/14), implementation commit `12945c9`.
 Teacher approved this as a **workflow change**, retaining the existing top bar, the existing
 messaging system on the right and the module browser on the left.
 
@@ -235,3 +236,6 @@ included in the full-suite results above; they are not five additional tests.
 ![Final classroom: existing top bar, module catalog and real messaging](classroom-figma-ui.jpg)
 
 ![Phone layout in a 390-pixel real-app frame](classroom-figma-ui-mobile.jpg)
+
+Cleanup: signed out both browser sessions, removed the isolated class and all three generated
+local accounts, and closed temporary verification tabs. No real class data was changed.

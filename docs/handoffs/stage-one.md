@@ -7,7 +7,7 @@ The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowled
 Last updated: 2026-10-19. Current classroom UI work is on `codex/classroom-figma-ui`;
 see [stage-four.md](stage-four.md) and [classroom UI verification](../verification/classroom-figma-ui.md).
 The teacher approved this as a workflow change: retain the top bar, left module browser, right
-existing messaging system. Built and tested; preparing a PR stacked on schema/backend PR #13.
+existing messaging system. Built and tested; [PR #14](https://github.com/SirNeo-Coder/JavaShare/pull/14) is open, stacked on schema/backend PR #13.
 
 
 ## The job

@@ -1,6 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: schema/backend PR #13 open; classroom Figma UI implemented and verified on `codex/classroom-figma-ui`, preparing its stacked PR.** Last updated: 2026-10-19.
+**Status: schema/backend PR #13 open; classroom Figma UI implemented and verified on `codex/classroom-figma-ui`, PR #14 open for review.** Last updated: 2026-10-19.
 
 ## What the teacher asked for
 
@@ -118,7 +118,11 @@ module browser on the left, and use the Figma right-hand chat appearance for the
 already implemented. Explicitly classified **workflow change**. No second chat or AI assistant.
 
 **Branch:** `codex/classroom-figma-ui`, based on `feat/module-redesign-schema` (PR #13). The UI PR
-must target that branch so it does not duplicate PR #13's schema/backend diff.
+targets that branch so it does not duplicate PR #13's schema/backend diff.
+
+**Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/14
+**Implementation commit:** `12945c9`. Local test accounts and the isolated class were removed
+after verification; no real class data was touched.
 
 Done:
 
