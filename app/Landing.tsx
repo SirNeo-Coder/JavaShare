@@ -260,6 +260,12 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
   const displayedClassrooms = classrooms.map((item) => liveClassrooms[item.id] || item);
   const classroom = displayedClassrooms.find((item) => item.id === selectedClassroomId);
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+  // A module id from the previous classroom must never carry over (keyboard "Classes" bypasses
+  // the remount boundary the mouse "Close" path relies on to reset it).
+  const openClassroom = (id: string | null) => {
+    setSelectedClassroomId(id);
+    setSelectedModuleId(null);
+  };
   const [connectionError, setConnectionError] = useState("");
   const [connectionAttempt, setConnectionAttempt] = useState(0);
   const [refreshError, setRefreshError] = useState("");
@@ -306,9 +312,11 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
       try {
         const client = await realtimeClient(getApiUrl());
         if (cancelled) return;
-        stopListening = listenForLiveClasses(client, JSON.parse(classroomIds), () => void refresh(), (available) => {
+        const stop = await listenForLiveClasses(client, JSON.parse(classroomIds), () => void refresh(), (available) => {
           if (!cancelled) setConnectionError(available ? "" : "Live invitations are unavailable. You can still enter a classroom.");
         });
+        if (cancelled) { void stop(); return; }
+        stopListening = stop;
       } catch {
         if (!cancelled) setConnectionError("Live invitations are unavailable. You can still enter a classroom.");
       } finally { connecting = false; }
@@ -348,7 +356,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
           <div key={classroom.id}>
             <div className="dashboard-heading">
               <div>
-                <button onClick={() => setSelectedClassroomId(null)}>Classes</button>
+                <button onClick={() => openClassroom(null)}>Classes</button>
                 <h1>{classroom.name}</h1>
                 <p>{classroom.subject}{role === "teacher" && classroom.joinCode ? ` · Code ${classroom.joinCode}` : ""}</p>
               </div>
@@ -379,7 +387,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
                   <div><h2>{item.name}</h2><p>{item.subject}{role === "teacher" && item.joinCode ? ` · Code ${item.joinCode}` : ""}</p></div>
                   <div className="dashboard-actions">
                     <LiveBadge classroom={item} />
-                    <button onClick={() => setSelectedClassroomId(item.id)}>Open class</button>
+                    <button onClick={() => openClassroom(item.id)}>Open class</button>
                   </div>
                 </header>
               </section>

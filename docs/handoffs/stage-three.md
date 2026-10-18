@@ -1,6 +1,6 @@
 # Stage three handoff (Google-Classroom-style navigation)
 
-**Status: all five planned items built and tested. Items 1–4 are PRs #8–11; item 5 on `codex/teacher-web-projects` is preparing its stacked PR.** Last updated: 2026-10-18.
+**Status: all five planned items built and tested. Items 1–4 are PRs #8–11; item 5 on `codex/teacher-web-projects` is preparing its stacked PR. A second-opinion-review fix pass on `codex/stage-three-review-fixes` is also preparing its stacked PR.** Last updated: 2026-10-18.
 
 ## What the teacher asked for
 
@@ -150,8 +150,39 @@ workspace).
 - **[CKB-022](../problem-knowledgebase/cases/CKB-022-student-preview-network-requests.md): student preview allows network requests.** A local counter stayed empty for the new teacher preview, then received `/fetch` from the old student renderer running the same saved script. Teacher policy blocks it; student path unchanged. Needs a separate proposal/approval before changing that workflow. No internet endpoint or real student data was used in the probe.
 - Claude's separate `docs/handoffs/stage-three-review-findings.md` appeared locally during this work and remains untracked/unmodified by Codex. It concerns earlier items 1–3, is outside item 5, and has not been independently verified here. Do not treat its suggested fixes as already authorized. This feature's implementation/evidence do not depend on that local file being pushed.
 
+## Second-opinion review fixes — DONE, awaiting teacher review
+
+Claude Code's second-opinion reviews of items 1-3 (`docs/handoffs/stage-three-review-findings.md`)
+and item 5 (`docs/handoffs/stage-three-item5-review-findings.md`) found 5 confirmed bugs (4 in
+items 1-3, 1 in item 5; item 4 had none). Teacher approved fixing all 5 as adjustments (no
+workflow-state change) on a new branch stacked on top of item 5.
+
+- **Branch:** `codex/stage-three-review-fixes`, based on `2623be1` (`codex/teacher-web-projects`).
+- CKB-023: session-expiry recovery now resets the same state `logout()` does.
+- CKB-024: realtime channel cleanup scoped per topic instead of one global chain; cleared on
+  sign-out.
+- CKB-025: `selectedModuleId` now resets through the one helper both classroom-switch buttons call,
+  not just the mouse-click remount.
+- CKB-026: a failed live-class entry now reverts that invitation's dismissal.
+- CKB-027: the teacher web-preview CSP now allows `eval`/`Function`, matching the student's own
+  unrestricted preview.
+- **Checks:** CKB-024 and CKB-027 have automated regression tests, each shown failing before the
+  fix (stashed the source change, kept the new test, reran, restored); full suite **55/55 pass, no
+  skips**. `npm run build:all` and `npm run lint` (0 errors, 9 existing warnings) both pass.
+- **Not reproduced live:** CKB-023, CKB-025, and CKB-026 are pure frontend React state with no
+  test harness in this repo. Live-browser reproduction was skipped this round specifically to avoid
+  disrupting another concurrently running dev-server session that shares this browser profile's
+  session cookie and local Supabase instance (confirmed via `document.cookie`/server behavior
+  before deciding not to sign in/out on the shared profile). Verified by code reading only: each
+  fix is a small, mechanical, directly-traceable change (e.g. CKB-023 copies `logout()`'s existing
+  reset list line for line).
+- Noticed but out of this fix's approved scope: a failed or stuck classroom entry has no way back
+  to class home for either role (not just live-class invitations) - the "Preparing your
+  classroom…" screen has no back button. Pre-existing, not introduced by any of these fixes; flag
+  separately if the teacher wants it addressed.
+
 ## Where the work is
 
-- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, committed and pushed; PR #10 into `codex/class-home`) → `codex/lesson-availability` (item 4, committed and pushed; PR #11 into `codex/live-class-invitation`) → `codex/teacher-web-projects` (item 5, PR preparation; targets `codex/lesson-availability`). Keep this stack order when the teacher reviews it; do not merge automatically.
+- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, committed and pushed; PR #10 into `codex/class-home`) → `codex/lesson-availability` (item 4, committed and pushed; PR #11 into `codex/live-class-invitation`) → `codex/teacher-web-projects` (item 5, PR preparation; targets `codex/lesson-availability`) → `codex/stage-three-review-fixes` (second-opinion-review fixes, PR preparation; targets `codex/teacher-web-projects`). Keep this stack order when the teacher reviews it; do not merge automatically.
 - Local checkout and GitHub remote: same as `docs/handoffs/stage-one.md`.
 - Knowledge-base workflow/frontend/backend/security pages describe the completed teacher web-project view. All five feature items are implemented; reviews and separately approved fixes remain. Item 5 PR metadata will be recorded after creation. Item 4 still requires the teacher to apply its hosted migration before deploying that stack; item 5 adds no migration.

@@ -132,13 +132,18 @@ test("teacher web preview: blocks network resources before student code while pr
   ];
   const teacher = buildTeacherPreview(files), student = buildPreview(files);
   assert.match(teacher.html, /^<!DOCTYPE html><meta http-equiv="Content-Security-Policy"/);
-  assert.match(teacher.html, /default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'/);
+  assert.match(teacher.html, /default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline'/);
   assert.match(teacher.html, /base-uri 'none'; form-action 'none'/);
   assert.ok(teacher.html.indexOf('Content-Security-Policy') < teacher.html.indexOf('codeshare:'));
   assert.deepEqual(teacher.lineMap, student.lineMap);
   const errorLine = teacher.html.slice(0, teacher.html.indexOf("missing();")).split("\n").length;
   assert.deepEqual(originOf(teacher, errorLine), { file: "script.js", line: 2 });
   assert.ok(!student.html.includes('Content-Security-Policy'), "student renderer is unchanged by the teacher-only wrapper");
+});
+
+test("teacher web preview: allows eval/Function so a saved eval()-based calculator behaves the same as it does for the student", () => {
+  const preview = buildTeacherPreview([{ path: "index.html", content: "<script>eval(\"1\")</script>" }]);
+  assert.match(preview.html, /script-src 'unsafe-inline' 'unsafe-eval'/, "script-src must allow eval, matching the student's unrestricted preview");
 });
 
 test("teacher web preview: headless pages retain console locations and missing HTML keeps its existing warning", () => {

@@ -61,10 +61,11 @@ export default function StudentAccountsPage() {
     if (!classroomIds.length) return;
     let cancelled = false;
     const channels: RealtimeChannel[] = [];
-    void realtimeClient(API_URL).then((client) => {
+    void realtimeClient(API_URL).then(async (client) => {
       if (cancelled) return;
       for (const classroomId of classroomIds) {
-        const channel = privateChannel(client, `class:${classroomId}`);
+        const channel = await privateChannel(client, `class:${classroomId}`);
+        if (cancelled) return;
         channel.on("presence", { event: "sync" }, () =>
           setOnlineIds([...new Set(channels.flatMap((item) => Object.keys(item.presenceState())))]));
         channel.subscribe();

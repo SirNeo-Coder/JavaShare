@@ -20,12 +20,12 @@ export function retainLiveDismissals(classrooms: LiveClassroom[], dismissed: Rec
 }
 
 // Receive announcements only. Presence would incorrectly mark a student online in every class.
-export function listenForLiveClasses(client: SupabaseClient, classroomIds: string[], refresh: () => void, connectionChanged: (available: boolean) => void) {
+export async function listenForLiveClasses(client: SupabaseClient, classroomIds: string[], refresh: () => void, connectionChanged: (available: boolean) => void) {
   let stopped = false;
   const connected = new Set<string>();
   const ids = [...new Set(classroomIds)];
-  const channels = ids.map((id) => {
-    const channel = privateChannel(client, `class:${id}`);
+  const channels = await Promise.all(ids.map(async (id) => {
+    const channel = await privateChannel(client, `class:${id}`);
     for (const event of ["class:activity-deployed", "class:activity-ended", "class:live-share"]) {
       channel.on("broadcast", { event }, () => { if (!stopped) refresh(); });
     }
@@ -41,7 +41,7 @@ export function listenForLiveClasses(client: SupabaseClient, classroomIds: strin
       }
     });
     return channel;
-  });
+  }));
   return () => {
     stopped = true;
     return releaseRealtimeChannels(client, channels);

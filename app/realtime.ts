@@ -7,7 +7,10 @@ import { createClient, type RealtimeChannel, type SupabaseClient } from "@supaba
 type Pass = { token: string; expiresAt: number; url: string; anonKey: string };
 
 let clientPromise: Promise<SupabaseClient> | null = null;
-let channelCleanup = Promise.resolve();
+// Keyed by the SDK's prefixed topic ("realtime:<topic>"), so teardown of one topic never makes an
+// unrelated topic's subscriber wait, and resubscribing the same topic waits for its own removal
+// to finish (the SDK reuses a channel object by topic - see CKB-017).
+const channelCleanup = new Map<string, Promise<void>>();
 
 // Offline, the server knows local Supabase as 127.0.0.1; classroom devices must use the laptop's address.
 export function browserReachableUrl(url: string, pageHostname: string) {
@@ -51,26 +54,29 @@ export function realtimeClient(apiUrl: string) {
     clientPromise = null;
     throw error;
   });
-  return clientPromise.then(async (client) => {
-    // The SDK reuses a channel with the same topic; finish leaving the previous screen first.
-    await channelCleanup;
-    return client;
-  });
+  return clientPromise;
 }
 
-export function releaseRealtimeChannels(client: SupabaseClient, channels: RealtimeChannel[]) {
-  channelCleanup = channelCleanup.then(async () => {
-    await Promise.all(channels.map((channel) => client.removeChannel(channel)));
-  }).catch(() => undefined);
-  return channelCleanup;
+export function releaseRealtimeChannels(client: SupabaseClient, channels: RealtimeChannel[]): Promise<void> {
+  const removals = channels.map((channel) => {
+    const previous = channelCleanup.get(channel.topic) ?? Promise.resolve();
+    const next: Promise<void> = previous.then(() => client.removeChannel(channel)).then(() => undefined, () => undefined);
+    channelCleanup.set(channel.topic, next);
+    return next;
+  });
+  return Promise.all(removals).then(() => undefined);
 }
 
 export function forgetRealtimeClient() {
   void clientPromise?.then((client) => client.removeAllChannels());
   clientPromise = null;
+  // The old client's channels are being torn down with it; a new sign-in's client is unrelated.
+  channelCleanup.clear();
 }
 
-export function privateChannel(client: SupabaseClient, topic: string, presenceKey?: string): RealtimeChannel {
+export async function privateChannel(client: SupabaseClient, topic: string, presenceKey?: string): Promise<RealtimeChannel> {
+  // Finish leaving this exact topic before resubscribing it (the SDK reuses a channel by topic).
+  await (channelCleanup.get(`realtime:${topic}`) ?? Promise.resolve());
   return client.channel(topic, {
     config: { private: true, broadcast: { self: false }, ...(presenceKey ? { presence: { key: presenceKey } } : {}) },
   });

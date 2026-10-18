@@ -43,7 +43,7 @@ test("live invitations: receive-only listeners refresh on start, stop, and recon
   };
   let refreshes = 0;
   const availability = [];
-  const stop = listenForLiveClasses(client, ["A", "B", "A"], () => refreshes++, (value) => availability.push(value));
+  const stop = await listenForLiveClasses(client, ["A", "B", "A"], () => refreshes++, (value) => availability.push(value));
   assert.deepEqual(channels.map((c) => c.topic), ["class:A", "class:B"]);
   for (const channel of channels) {
     assert.equal(channel.options.config.private, true);
@@ -76,15 +76,19 @@ test("live invitations: entering or leaving the workspace waits for old channels
   const token = await new SignJWT({ role: "authenticated" }).setProtectedHeader({ alg: "HS256" }).setExpirationTime("1h").sign(new TextEncoder().encode("local-unit-test-secret"));
   t.mock.method(globalThis, "fetch", async () => new Response(JSON.stringify({ token, expiresAt: Date.now() + 3600000, url: "http://127.0.0.1:54321", anonKey: "unit-test-anon" }), { headers: { "content-type": "application/json" } }));
   const client = await realtimeClient("");
-  const oldChannel = privateChannel(client, "class:handoff");
-  assert.equal(privateChannel(client, "class:handoff"), oldChannel, "the installed SDK really does reuse an existing topic");
+  const oldChannel = await privateChannel(client, "class:handoff");
+  assert.equal(await privateChannel(client, "class:handoff"), oldChannel, "the installed SDK really does reuse an existing topic");
   let finishRemoval;
   const removalGate = new Promise((resolve) => { finishRemoval = resolve; });
   const removeChannel = client.removeChannel.bind(client);
   t.mock.method(client, "removeChannel", async (channel) => { await removalGate; return removeChannel(channel); });
   const leaving = releaseRealtimeChannels(client, [oldChannel]);
   let entered = false;
-  const entering = realtimeClient("").then((nextClient) => { entered = true; return privateChannel(nextClient, "class:handoff"); });
+  // Getting a client is no longer gated on any topic's teardown (only resubscribing the SAME
+  // topic is); "entered" must track the channel itself, not just reaching the .then callback.
+  const entering = realtimeClient("")
+    .then((nextClient) => privateChannel(nextClient, "class:handoff"))
+    .then((channel) => { entered = true; return channel; });
   try {
     await new Promise((resolve) => setImmediate(resolve));
     assert.equal(entered, false, "a new screen must wait for the old subscription to leave");

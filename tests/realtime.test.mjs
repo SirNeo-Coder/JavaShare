@@ -6,7 +6,56 @@ import { randomUUID } from "node:crypto";
 import { test } from "node:test";
 import { createClient } from "@supabase/supabase-js";
 import { SignJWT } from "jose";
-import { browserReachableUrl, throttle } from "../app/realtime.ts";
+import { browserReachableUrl, throttle, privateChannel, releaseRealtimeChannels, forgetRealtimeClient } from "../app/realtime.ts";
+
+// A fake client in the SDK's own shape: channel() returns an object keyed by the prefixed
+// "realtime:<topic>" the real SDK uses, removeChannel() resolves per a controllable gate per topic.
+function fakeClient() {
+  const gates = new Map();
+  const removed = [];
+  const client = {
+    channel: (topic) => ({ topic: `realtime:${topic}`, on: () => client }),
+    removeChannel: (channel) => new Promise((resolve) => {
+      gates.set(channel.topic, () => { removed.push(channel.topic); resolve("ok"); });
+    }),
+    removeAllChannels: async () => "ok",
+  };
+  return { client, removed, release: (topic) => gates.get(`realtime:${topic}`)?.() };
+}
+const settledWithin = async (promise, ms) => {
+  let settled = false;
+  void promise.then(() => { settled = true; });
+  await new Promise((resolve) => setTimeout(resolve, ms));
+  return settled;
+};
+
+test("realtime: an unrelated topic's subscriber never waits on another topic's pending removal", async () => {
+  const { client, release } = fakeClient();
+  const slow = await privateChannel(client, "class:slow-A");
+  releaseRealtimeChannels(client, [slow]); // never released during this test
+  assert.equal(await settledWithin(privateChannel(client, "class:fast-A"), 50), true);
+  release("class:slow-A"); // let the still-pending removal finish so it doesn't leak into later tests
+});
+
+test("realtime: resubscribing the same topic waits for its own pending removal to finish first (CKB-017)", async () => {
+  const { client, release } = fakeClient();
+  const channel = await privateChannel(client, "class:same-topic");
+  releaseRealtimeChannels(client, [channel]);
+  const resubscribed = privateChannel(client, "class:same-topic");
+  assert.equal(await settledWithin(resubscribed, 50), false, "must still be waiting while the removal is pending");
+  release("class:same-topic");
+  assert.equal(await settledWithin(resubscribed, 50), true, "resolves once the removal finishes");
+});
+
+test("realtime: signing out clears pending cleanup so the next sign-in's subscriber never waits on the discarded client's teardown", async () => {
+  const { client, release } = fakeClient();
+  const channel = await privateChannel(client, "class:shared-computer");
+  releaseRealtimeChannels(client, [channel]); // e.g. the outgoing user's screen unmounting
+  forgetRealtimeClient(); // sign-out, before that removal ever finishes
+  const nextClient = fakeClient().client;
+  assert.equal(await settledWithin(privateChannel(nextClient, "class:shared-computer"), 50), true);
+  release("class:shared-computer"); // tidy up the never-finished removal from the discarded client
+});
 
 test("offline: classroom devices reach local Supabase through the laptop's address", () => {
   assert.equal(browserReachableUrl("http://127.0.0.1:54321", "192.168.0.113"), "http://192.168.0.113:54321");

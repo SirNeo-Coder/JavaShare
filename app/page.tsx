@@ -557,7 +557,20 @@ export default function Home() {
           forgetRealtimeClient();
           setUser(null);
           setData(null);
+          setEnteredClassroomId(null);
+          setHomeClassroomId(null);
+          setDismissedLiveSessions({});
+          setModulesOpen(false);
           return;
+        }
+        // A failed scoped load must not leave a live-class invitation dismissed for a class the
+        // student never actually entered; a no-op if this class wasn't a dismissed invitation.
+        if (enteredClassroomId) {
+          setDismissedLiveSessions((current) =>
+            enteredClassroomId in current
+              ? Object.fromEntries(Object.entries(current).filter(([id]) => id !== enteredClassroomId))
+              : current,
+          );
         }
         setSyncStatus(message);
         setWorkspaceError(message);
@@ -990,19 +1003,20 @@ export default function Home() {
       },
     );
     realtimeClient(getApiUrl())
-      .then((client) => {
+      .then(async (client) => {
         if (cancelled) return;
         releaseChannels = () => releaseRealtimeChannels(client, channels);
         setSyncStatus("Joining live classroom…");
-        const join = (topic: string, presenceKey?: string) => {
-          const channel = privateChannel(client, topic, presenceKey);
+        const join = async (topic: string, presenceKey?: string) => {
+          const channel = await privateChannel(client, topic, presenceKey);
           for (const { event, handler } of handlers)
             if (isClassEvent(event) === topic.startsWith("class:"))
               channel.on("broadcast", { event }, ({ payload }) => handler(payload as never));
           channels.push(channel);
           return channel;
         };
-        const classChannel = join(`class:${classroomId}`, userId);
+        const classChannel = await join(`class:${classroomId}`, userId);
+        if (cancelled) return;
         classChannel.on("presence", { event: "sync" }, () =>
           setOnlineUserIds(Object.keys(classChannel.presenceState())),
         );
@@ -1015,7 +1029,8 @@ export default function Home() {
           void classChannel.track({ online: true });
           refreshLiveShareRef.current?.();
         });
-        const teamChannel = join(`team:${teamId}`);
+        const teamChannel = await join(`team:${teamId}`);
+        if (cancelled) return;
         teamChannel.on("broadcast", { event: "team:sync-request" }, answerSyncRequest);
         teamChannel.subscribe((status) => {
           if (status !== "SUBSCRIBED") {
@@ -1032,7 +1047,11 @@ export default function Home() {
           const { code: current, activeFile: file } = liveRef.current;
           if (unsent && file?.id === unsent.fileId) sendTyping(teamId, unsent.fileId, current);
         });
-        if (chatTeamId && chatTeamId !== teamId) join(`team:${chatTeamId}`).subscribe();
+        if (chatTeamId && chatTeamId !== teamId) {
+          const chatChannel = await join(`team:${chatTeamId}`);
+          if (cancelled) return;
+          chatChannel.subscribe();
+        }
       })
       .catch((error) =>
         setSyncStatus(error instanceof Error ? error.message : "Live connection unavailable"),
