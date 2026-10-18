@@ -1,4 +1,4 @@
-# Workflow state (updated 2026-10-18, branch `codex/lesson-availability`)
+# Workflow state (updated 2026-10-18, branch `codex/teacher-web-projects`)
 
 What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
 
@@ -42,7 +42,9 @@ What teachers and students can do today. Compare any proposed change with this p
 - Teacher Demo Workspace with autosave, **Save lesson**, **New lesson**, and the lesson library.
 - **Live share** the demo workspace to every student, keystroke by keystroke.
 - **New activity** (individual or group, with starter code), **End activity**, reopen and delete, auto-grouping, Students/Groups views, following a student's active file live, viewing submissions, muting classroom chat.
-- Teachers do not yet see students' web projects.
+- On class home under **Students**, **View web projects** opens that student's personal web projects saved in this class. Choose a project to view its saved HTML/CSS/JavaScript files read-only, then **Run preview** for an isolated page and console output with file/line locations. **Back to projects** returns to the list; **Close** or Escape returns to the roster.
+- This is a saved-file review: the student uses **Save work**, then the teacher presses **Refresh**. Refresh clears the previous preview; **Run preview** runs the refreshed files. Unsaved typing, group/activity projects, and named saved copies are not listed. No new submission step or student action was added.
+- Only the class teacher can use these new GET routes; current class membership is required. No migration or new live channel. The teacher preview blocks network resources and cannot access the parent app. Existing direct file-save permissions are a separate unresolved issue (CKB-021), despite read-only fields in the teacher UI.
 
 ## Sign-in (PR c2)
 

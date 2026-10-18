@@ -20,7 +20,8 @@ Checked in `supabase-repository.ts` (row-level security exists but the server by
 - `canEditSupabaseTeamFile`: personal teams always; in groups, the leader, or members not locked by the leader.
 - Live share drafts: only the teacher, only for the `teacher-demo` project.
 - Modules: only the class teacher changes availability; class members read them. Student responses omit closed lesson/task content server-side. Progress writes require an uploaded module and a known step/exit slip in an open lesson, or an existing open performance task. Closing preserves prior work and cannot revoke content already loaded. `tests/module-availability.test.mjs` checks student/foreign-teacher refusal, filtering, direct-save guards, and class separation (CKB-018/019).
-- Web projects: only students create them, at most 20 personal projects each.
+- Web projects: only students create them, at most 20 personal projects each. New teacher review GET routes verify the class owner, current student membership, personal team owner, project class, web language, and absence of an activity. Lists omit file content; detail fetches only that project. Repeated reads do not save.
+- **Open issue CKB-021:** the older `PUT /api/files/:fileId` allows the class teacher to overwrite a student file via a direct request. The new viewer has read-only fields and GET routes, but does not repair this existing server write-permission gap. Reproduced only with disposable local data; separate approval needed for permission changes.
 - File names: `backend/src/file-paths.ts` rejects names that don't fit the project language, plus `..` and hidden files.
 
 ## Live channels (PR c1)
@@ -41,6 +42,7 @@ Checked in `supabase-repository.ts` (row-level security exists but the server by
 - `<iframe sandbox="allow-scripts" srcdoc=...>` **without** `allow-same-origin`. The page gets a blank, isolated origin: no access to the CodeShare cookie, page, or storage. This was verified in a browser on 2026-10-16.
 - Linked project CSS and JS are inlined; `</script` and `</style` inside them are escaped so student code cannot break out of its tag.
 - Console messages come back with `postMessage`. The parent accepts only messages whose source is the current preview frame.
+- Teacher review uses `buildTeacherPreview` (`app/teacherWebPreview.ts`) to prepend a Content Security Policy before student code, on the same source line. It blocks network resources, forms, and base URLs while permitting inline project scripts/styles. Parent message handling checks the current iframe, accepted console kinds, text type, and caps output. **Run preview** is explicit, and **Refresh** removes the prior frame. The existing student renderer is unchanged. **Open issue CKB-022:** that older path permits network requests; the sandbox alone does not block them. This was reproduced against a local counter, and is not repaired by the teacher-only wrapper.
 - Known limit: an endless loop in student JavaScript can freeze that student's tab.
 
 ## Java runner

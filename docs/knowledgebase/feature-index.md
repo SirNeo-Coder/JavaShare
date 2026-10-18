@@ -7,6 +7,7 @@
 | workspace load, sidebar, teams list | `bootstrapFromSupabase` | `loadWorkspace`, team list in `app/page.tsx` | `teams`, `projects`, `code_files` |
 | save file, versions, conflict | `saveSupabaseFile`, `PUT /api/files/:id` | `persistCurrentCode` | `code_files`, `file_versions` |
 | new file, rename file, file name rules | `createSupabaseFile`, `renameSupabaseFile`, `file-paths.ts` | `createFile`, `renameFile`, new-file dialog | `tests/web-workspace.test.mjs` |
+| teacher sees student web projects, View web projects, saved source, Run preview, Refresh | `listSupabaseStudentWebProjects`, `getSupabaseStudentWebProject`, shared `teacherStudentWorkspace`; teacher-only GET routes under `/api/classes/:classroomId/students/:studentId/web-projects` | `app/Landing.tsx`, `app/TeacherWebProjects.tsx`, `app/teacherWebPreview.ts`; existing `CodeEditor`/`webPreview` | `tests/teacher-web-projects.test.mjs`, `tests/web-workspace.test.mjs`; CKB-020 keyboard fix; CKB-021 existing write gap; `docs/verification/stage-three-teacher-web-projects.md` |
 | web project, HTML, CSS, JavaScript, preview, console, sandbox | `createSupabaseWebProject`, `POST /api/classes/:id/web-projects` | `createWebProject`, `runCode`, `app/webPreview.ts` | `projects.language`, `tests/web-workspace.test.mjs` |
 | syntax colours, highlighting, brackets, semicolon hint | none | `app/CodeEditor.tsx` | none |
 | run Java, javac, Judge0, demo mode | `POST /api/execute` in `routes.ts`, `executeLocally` in `java-runner.ts` | `runCode` | none |

@@ -6,6 +6,7 @@ import { api, getApiUrl } from "./apiClient";
 import { realtimeClient } from "./realtime";
 import { listenForLiveClasses, pendingLiveClasses, type LiveClassroom } from "./liveClasses";
 import ModuleViewer from "./ModuleViewer";
+import TeacherWebProjects from "./TeacherWebProjects";
 
 type LandingClassroom = LiveClassroom;
 type RosterStudent = { id: string; name: string; email: string; joinedAt?: string };
@@ -151,6 +152,7 @@ function ClassRoster({ classroomId }: { classroomId: string }) {
   const [roster, setRoster] = useState<RosterStudent[] | null>(null);
   const [error, setError] = useState("");
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
+  const [webStudent, setWebStudent] = useState<RosterStudent | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -174,12 +176,14 @@ function ClassRoster({ classroomId }: { classroomId: string }) {
                 <button onClick={() => setExpandedStudent(expandedStudent === student.id ? null : student.id)} aria-expanded={expandedStudent === student.id}>
                   {expandedStudent === student.id ? "Hide progress" : "View module progress"}
                 </button>
+                <button type="button" onClick={() => setWebStudent(student)}>View web projects</button>
               </div>
               {expandedStudent === student.id && <StudentModulePanel classroomId={classroomId} studentId={student.id} />}
             </div>
           ))}
         </div>
       }
+      {webStudent && <TeacherWebProjects key={webStudent.id} classroomId={classroomId} student={webStudent} onClose={() => setWebStudent(null)} />}
     </section>
   );
 }

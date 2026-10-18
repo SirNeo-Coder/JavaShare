@@ -292,3 +292,13 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 
 .activity-modal .module-availability { display:flex; align-items:center; gap:8px; }
 .activity-modal .module-availability input { width:auto; }
+
+.teacher-web-projects { width:min(1000px,95vw); }
+.teacher-web-projects:not([open]) { display:none; }
+.teacher-web-projects::backdrop { background:#0b1020b8; backdrop-filter:blur(4px); }
+.teacher-web-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.teacher-web-actions button { padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--ink); font-size:11px; }
+.teacher-web-files { min-width:0; overflow:hidden; border:1px solid var(--line); border-radius:8px; }
+.teacher-web-files .code-editor { height:240px; }
+.teacher-web-projects .code-input textarea { min-height:100%; padding:13px 15px; border:0; border-radius:0; resize:none; background:transparent; font:12px/21px var(--font-geist-mono),monospace; box-shadow:none; }
+.teacher-web-preview { min-height:320px; grid-template-rows:240px minmax(80px,150px); border:1px solid var(--line); border-radius:8px; overflow:hidden; }

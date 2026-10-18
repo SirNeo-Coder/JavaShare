@@ -1338,6 +1338,41 @@ export async function listSupabaseClassroomStudents(user: SupabaseSessionUser, c
   return { students: students.map((student) => ({ id: student.id, name: student.name, email: student.email, joinedAt: joinedAt.get(student.id) })) };
 }
 
+async function teacherStudentWorkspace(user: SupabaseSessionUser, classroomId: string, studentId: string) {
+  await teacherClassroom(user, classroomId);
+  const db = getSupabaseAdmin();
+  const { data: membership, error: memberError } = await db.from("classroom_members").select("user_id").eq("classroom_id", classroomId).eq("user_id", studentId).maybeSingle();
+  fail(memberError, "Could not verify classroom student");
+  const { data: student, error: studentError } = await db.from("profiles").select("id").eq("id", studentId).eq("role", "student").maybeSingle();
+  fail(studentError, "Could not verify student account");
+  if (!membership || !student) throw new SupabaseRepositoryError(404, "Student is not in this classroom");
+  const { data: team, error } = await db.from("teams").select("id").eq("classroom_id", classroomId).eq("owner_id", studentId).maybeSingle();
+  fail(error, "Could not load student's personal workspace");
+  return team?.id as string | undefined;
+}
+
+export async function listSupabaseStudentWebProjects(user: SupabaseSessionUser, classroomId: string, studentId: string) {
+  const teamId = await teacherStudentWorkspace(user, classroomId, studentId);
+  if (!teamId) return { projects: [] };
+  const { data, error } = await getSupabaseAdmin().from("projects").select("id,title,description")
+    .eq("classroom_id", classroomId).eq("team_id", teamId).eq("language", "web").is("activity_id", null).order("created_at");
+  fail(error, "Could not load student's web projects");
+  return { projects: data };
+}
+
+export async function getSupabaseStudentWebProject(user: SupabaseSessionUser, classroomId: string, studentId: string, projectId: string) {
+  const teamId = await teacherStudentWorkspace(user, classroomId, studentId);
+  if (!teamId) throw new SupabaseRepositoryError(404, "Web project not found for this student in this class");
+  const db = getSupabaseAdmin();
+  const { data: project, error } = await db.from("projects").select("id,title,description")
+    .eq("id", projectId).eq("classroom_id", classroomId).eq("team_id", teamId).eq("language", "web").is("activity_id", null).maybeSingle();
+  fail(error, "Could not load web project");
+  if (!project) throw new SupabaseRepositoryError(404, "Web project not found for this student in this class");
+  const { data: files, error: fileError } = await db.from("code_files").select("id,path,language,content,version").eq("project_id", project.id).order("path");
+  fail(fileError, "Could not load web project files");
+  return { project, files };
+}
+
 // One percentage calculation for the viewer and class-home summaries, always against the
 // full module. Closing content neither deletes work nor changes the goal-meter denominator.
 function moduleCompletionPercent(module: CourseModule, progress: Pick<ModuleProgressRow, "step_states" | "performance_task">) {

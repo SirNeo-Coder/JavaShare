@@ -24,6 +24,7 @@ import {
   endSupabaseActivity,
   getSupabaseModule,
   getSupabaseModuleProgress,
+  getSupabaseStudentWebProject,
   joinSupabaseClass,
   listSupabaseClassroomStudents,
   listSupabaseModules,
@@ -31,6 +32,7 @@ import {
   listSupabaseMessages,
   listSupabaseSavedWork,
   listSupabaseStudents,
+  listSupabaseStudentWebProjects,
   listSupabaseSubmissions,
   loginWithSupabase,
   registerWithSupabase,
@@ -226,6 +228,20 @@ app.get("/api/classes/:classroomId/students/:studentId/modules-summary", require
   try {
     const studentId = z.string().uuid().parse(req.params.studentId);
     return res.json(await listSupabaseModuleProgressSummary(req.user!, String(req.params.classroomId), studentId));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classes/:classroomId/students/:studentId/web-projects", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { classroomId, studentId } = z.object({ classroomId: z.string().uuid(), studentId: z.string().uuid() }).parse(req.params);
+    return res.json(await listSupabaseStudentWebProjects(req.user!, classroomId, studentId));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classes/:classroomId/students/:studentId/web-projects/:projectId", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { classroomId, studentId, projectId } = z.object({ classroomId: z.string().uuid(), studentId: z.string().uuid(), projectId: z.string().uuid() }).parse(req.params);
+    return res.json(await getSupabaseStudentWebProject(req.user!, classroomId, studentId, projectId));
   } catch (error) { next(error); }
 });
 

@@ -170,7 +170,7 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
   }
 
   function handleTab(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key !== "Tab") return;
+    if (readOnly || event.key !== "Tab") return;
     event.preventDefault();
     const input = event.currentTarget;
     const start = input.selectionStart;
