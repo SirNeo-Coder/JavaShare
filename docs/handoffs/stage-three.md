@@ -1,6 +1,6 @@
 # Stage three handoff (Google-Classroom-style navigation)
 
-**Status: items 1 and 2 built and tested; item 1 is PR #8, item 2 is on `codex/class-home`.** Last updated: 2026-10-18.
+**Status: items 1 and 2 built and tested; item 1 is PR #8, item 2 is PR #9 on `codex/class-home`.** Last updated: 2026-10-18.
 
 ## What the teacher asked for
 
@@ -79,17 +79,19 @@ workspace).
 - **Not tested:** a second real device; Windows; the Cloudflare preview (this work doesn't touch
   anything Cloudflare-specific); online mode.
 
-## Item 2: class home — DONE, preparing review PR
+## Item 2: class home — DONE, waiting for teacher review
 
 **Proposal and workflow-change classification approved 2026-10-18** ("go ahead").
 
-- **Branch:** `codex/class-home`, based on `landing-pages` (PR #8). The review PR targets `landing-pages`, so it contains only item 2.
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/9
+- **Branch:** `codex/class-home`, based on `landing-pages` (PR #8), targeting `landing-pages` so the PR contains only item 2. Implementation and evidence committed as `cbfc518`, pushed.
+- **Current state:** item 2 is finished and awaiting teacher review; no implementation is in progress. Next is item 3, with a separate proposal before editing.
 - **What shipped:** sign-in → **Classes** → **Open class** → class home. Teacher class home has module upload, preview, deletion, and the class roster with **View module progress**. Student class home has module cards and personal progress; modules open there without entering the live workspace. **Close** refreshes student progress on the cards. **Enter classroom** opens the live workspace; **Class home** returns to the same class, and **Classes** returns to the class list. Students keep their workspace **Modules** shortcut; teacher module management has moved to class home.
 - **Implementation:** reused the existing roster, module, and progress routes. `Landing.tsx` owns class home; `ModuleViewer.tsx` can render inside the teacher's home or as the existing student modal. `page.tsx` remembers the class to return to and clears navigation on sign-out. No new table, route, dependency, or migration.
 - **Housekeeping:** removed the old expandable class-card roster, the per-class roster caches, and the pending-module handoff into the workspace. The teacher and student class lists now share their common layout.
 - **Prior cases checked first:** CKB-016 (workspace scoping) and CKB-010 (progress scoping); all six existing landing/progress tests passed before editing. This is feature work; no new defect diagnosed or CKB record added.
 - **Checks:** `npm test` via the Docker group: **35/35 pass, no skips**. `npm run lint`: **0 errors, 9 existing warnings**. `npm run build:all` passed through the offline launcher. Full test names, runner marks, limits, and browser steps: [verification evidence](../verification/stage-three-class-home.md).
-- **Real browser, production build + local Supabase:** teacher upload/preview/delete, Java preview (actual output `1/2/3`), student Run & check, card progress updated to 17% after close, the same module in class B stayed at 0%, distinct rosters, teacher saw the saved 17%, workspace round-trips for both roles, student workspace module shortcut, malformed-upload and removed-module errors, empty module lists, and sign-out/sign-in with a different role all checked.
+- **Real browser, production build + local Supabase:** teacher upload/preview/delete, Java preview (actual output `1/2/3`), student Run & check, card progress updated to 17% after close, the same module in class B stayed at 0%, distinct rosters, teacher saw the saved 17%, workspace round-trips for both roles, student workspace module shortcut, malformed-upload and removed-module errors, empty module lists, and sign-out/sign-in with a different role all checked. Disposable local test data was removed afterward.
 - **Offline launcher:** ran `sg docker -c 'npm run classroom:offline'`; configuration and build succeeded, then it reused the existing development server on port 3000. Left that server untouched. Browser checks instead used a separate `next start` on port 3001 with the launcher's local Supabase settings and laptop Java enabled. This proves the production app's local path; it was not a fresh launcher-owned server on port 3000.
 - **Not verified:** Cloudflare/online, Windows, a second physical device, other browsers. No frontend unit-test harness exists; interactive paths were checked in the real app. No fail-before/pass-after mutation proof was performed for this new screen; earlier CKB-010/016 proof remains in their case files.
 
@@ -104,6 +106,6 @@ Each of these needs its own before-code proposal before work starts, per `AGENTS
 
 ## Where the work is
 
-- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, this change, PR targeting `landing-pages`). Keep this stack order when the teacher reviews it; do not merge automatically.
+- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`). Keep this stack order when the teacher reviews it; do not merge automatically.
 - Local checkout and GitHub remote: same as `docs/handoffs/stage-one.md`.
 - `docs/knowledgebase/workflow-state.md`, `frontend.md`, and `feature-index.md` describe class home. Next: item 3, the live-class join popup, with its own before-code proposal and approval.
