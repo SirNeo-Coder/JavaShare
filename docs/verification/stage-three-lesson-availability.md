@@ -1,6 +1,7 @@
 # Stage-three item 4: lesson and performance-task opening controls
 
 Verified 2026-10-18 on `codex/lesson-availability`, based on `2311fab` (`codex/live-class-invitation`).
+Implementation/evidence commit: `0b0a76b`, [PR #11](https://github.com/SirNeo-Coder/JavaShare/pull/11).
 Teacher approved the detailed proposal as a workflow change. No hosted service was changed.
 
 ## Results and limits

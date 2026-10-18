@@ -34,7 +34,7 @@ The validator checks one module at a time, not every separately uploaded course 
 - **Passed after fix:** full `sg docker -c 'npm test'`: 46/46, no skips. Existing step/exit-slip
   collision cases also still pass.
 - This tests the upload rule on its own; API tests separately exercise real module uploads.
-- Commit: pending implementation commit on `codex/lesson-availability`; stage-three handoff records the PR.
+- Commit: `0b0a76b` on `codex/lesson-availability`, PR #11; see the stage-three handoff.
 
 ## Recurrence triage
 

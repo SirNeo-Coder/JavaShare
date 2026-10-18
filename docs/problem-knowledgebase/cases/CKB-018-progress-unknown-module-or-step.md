@@ -37,7 +37,7 @@ content and explicitly open it when testing the separate progress paths.
 - **Passed after fix:** full `sg docker -c 'npm test'`: 46/46, no skips. It also verifies
   unknown-step refusal and that invalid requests leave no progress rows.
 - These requests run the real API handlers and local Supabase; they do not click a browser.
-- Commit: pending implementation commit on `codex/lesson-availability`; stage-three handoff records the PR.
+- Commit: `0b0a76b` on `codex/lesson-availability`, PR #11; see the stage-three handoff.
 
 ## Recurrence triage
 

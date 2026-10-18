@@ -1,6 +1,6 @@
 # Stage three handoff (Google-Classroom-style navigation)
 
-**Status: items 1–4 built and tested; items 1–3 are PRs #8–10; item 4 is on `codex/lesson-availability`, preparing its stacked PR.** Last updated: 2026-10-18.
+**Status: items 1–4 built and tested; items 1–3 are PRs #8–10; item 4 is PR #11 on `codex/lesson-availability`.** Last updated: 2026-10-18.
 
 ## What the teacher asked for
 
@@ -111,12 +111,13 @@ workspace).
 - **Offline:** actual launcher config/build ran, then reused the existing dev server on 3000; it was left untouched. Real-browser checks instead used production `next start` on 3001 with the same local Supabase settings and laptop Java enabled. Recovery checks used a disposable port-3002 server. These were not fresh launcher-owned instances on port 3000.
 - **Not verified:** Cloudflare/online, Windows, mobile layout, another physical device, other browser engines, or physically cutting the network. Socket reconnect callback behavior is unit-tested; browser recovery used a deliberately unavailable pass endpoint, not a forced socket/network outage. UI clicks were checked in the real app; no frontend unit-test harness was added.
 
-## Item 4: lesson and performance-task opening controls — DONE, preparing teacher review
+## Item 4: lesson and performance-task opening controls — DONE, waiting for teacher review
 
 **Detailed proposal and workflow-change classification approved 2026-10-18** ("go ahead").
 
-- **Branch:** `codex/lesson-availability`, based on `2311fab` (`codex/live-class-invitation`, PR #10). Its PR targets that branch so only item 4 is shown. Implementation commit and PR link will be recorded after creation. Do not merge the stack automatically.
-- **Current state:** implementation and verification finished; committing and opening the PR. Next: item 5, teacher visibility of student web projects, with its own read-only investigation/proposal/approval before application edits.
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/11
+- **Branch:** `codex/lesson-availability`, based on `2311fab` (`codex/live-class-invitation`, PR #10), targeting `codex/live-class-invitation` so only item 4 is shown. Implementation/evidence committed as `0b0a76b`, pushed. Do not merge the stack automatically.
+- **Current state:** implementation and verification finished; PR #11 awaits teacher review. Next: item 5, teacher visibility of student web projects, with its own read-only investigation/proposal/approval before application edits.
 - **Approved decisions:** teacher controls each lesson and the performance task independently in the module preview; existing modules stay open, new uploads start closed. Students see closed titles with **Not open yet**, and refresh by closing/reopening. The meter counts the whole module. Closing preserves prior work. Corrections retain ids/settings/progress; newly added lessons start closed.
 - **What shipped:** **Open to students** checkboxes per lesson/task, saved per class/module. Server student responses withhold closed content and reject direct progress writes for closed content. Teacher preview stays complete and independent of student progress (CKB-008). The viewer gets the server's whole-module percentage rather than calculating from filtered content, and ignores older save responses. Concurrent teacher-tab switch changes retry without dropping each other.
 - **Database:** new additive migration `20261018000500_module_availability.sql` adds `open_lesson_ids` and `performance_task_open` outside original JSON. Applied **locally only**. Existing backfill, new defaults, safe rerun, and content/saved-work preservation verified with seeded isolated-schema SQL execution. Previous repository reader/writer also tested with the new columns. No new dependency, secret, schedule or availability live event.
@@ -134,6 +135,6 @@ workspace).
 
 ## Where the work is
 
-- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, committed and pushed; PR #10 into `codex/class-home`) → `codex/lesson-availability` (item 4, PR preparation; targets `codex/live-class-invitation`). Keep this stack order when the teacher reviews it; do not merge automatically.
+- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, committed and pushed; PR #10 into `codex/class-home`) → `codex/lesson-availability` (item 4, committed and pushed; PR #11 into `codex/live-class-invitation`). Keep this stack order when the teacher reviews it; do not merge automatically.
 - Local checkout and GitHub remote: same as `docs/handoffs/stage-one.md`.
-- Knowledge-base workflow/frontend/backend/data/security pages describe the opening controls. Next: item 5 proposal. Item 4 implementation and verification are finished; this handoff will record its commit and PR after they are created.
+- Knowledge-base workflow/frontend/backend/data/security pages describe the opening controls. Next: item 5 proposal. Item 4 implementation and verification are finished; PR #11 awaits teacher review. No implementation is in progress.
