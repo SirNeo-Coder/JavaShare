@@ -19,6 +19,7 @@ Checked in `supabase-repository.ts` (row-level security exists but the server by
 - `canAccessSupabaseTeam`: team members; the teacher of the class; anyone in the class for the `teacher-demo` workspace.
 - `canEditSupabaseTeamFile`: personal teams always; in groups, the leader, or members not locked by the leader.
 - Live share drafts: only the teacher, only for the `teacher-demo` project.
+- Modules: only the class teacher changes availability; class members read them. Student responses omit closed lesson/task content server-side. Progress writes require an uploaded module and a known step/exit slip in an open lesson, or an existing open performance task. Closing preserves prior work and cannot revoke content already loaded. `tests/module-availability.test.mjs` checks student/foreign-teacher refusal, filtering, direct-save guards, and class separation (CKB-018/019).
 - Web projects: only students create them, at most 20 personal projects each.
 - File names: `backend/src/file-paths.ts` rejects names that don't fit the project language, plus `..` and hidden files.
 

@@ -289,3 +289,6 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .live-class-invitation:not([open]) { display:none; }
 .live-class-invitation::backdrop { background:#0b1020b8; backdrop-filter:blur(4px); }
 .live-class-invitation>p { margin:0; color:var(--muted); font-size:12px; }
+
+.activity-modal .module-availability { display:flex; align-items:center; gap:8px; }
+.activity-modal .module-availability input { width:auto; }

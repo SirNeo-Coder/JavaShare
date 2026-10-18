@@ -70,3 +70,9 @@ test("course module schema: rejects an unrunnable .java performance-task file pa
   const parsed = courseModule.safeParse(broken);
   assert.equal(parsed.success, false, "a performance-task .java path /api/execute could never run must be rejected");
 });
+
+test("course module schema: rejects duplicate lesson ids before they can share an availability switch (CKB-019)", () => {
+  const broken = structuredClone(fixture);
+  broken.lessons[1].id = broken.lessons[0].id;
+  assert.equal(courseModule.safeParse(broken).success, false, "lesson ids must be unique even when their step and exit-slip ids differ");
+});

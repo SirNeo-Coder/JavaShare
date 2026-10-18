@@ -1,4 +1,4 @@
-# Workflow state (updated 2026-10-18, branch `codex/live-class-invitation`)
+# Workflow state (updated 2026-10-18, branch `codex/lesson-availability`)
 
 What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
 
@@ -20,6 +20,14 @@ What teachers and students can do today. Compare any proposed change with this p
 - Live status refreshes on announcements, connection/reconnection, and returning to the tab, without a repeating status timer. If live passes or the live connection fail, students see an error with **Reconnect** and can still enter a class manually. Listening outside a workspace does not mark students Online in every class.
 - Session identity reuses the current activity or presentation project id, without a new database column. If the same activity/presentation stops and restarts entirely while disconnected, a previously dismissed invitation may remain dismissed; a persisted session-start marker would be needed to distinguish that case.
 - Each class's roster, modules, progress, teams, activities, and live-share state stay separate. Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
+
+## Weekly modules: opening lessons (stage-three item 4, approved workflow change)
+
+- In a teacher's class home, opening a module shows **Open to students** beside each lesson and, separately, the performance task. The teacher can preview and run everything regardless of the switches.
+- Existing modules remain open when the new migration is first applied. Newly uploaded modules start with all lessons and the performance task closed. Choices belong to this class and module, separately from the uploaded file.
+- Students see closed titles with **Not open yet**; their browser is not sent the assigned instructions, questions, expected outputs or supplied code for closed content. They close and reopen the module to see availability changes. Already-loaded content cannot be taken back, but further saves are refused once closed.
+- Closing and reopening keeps saved progress and submissions. The percentage always uses the whole module, including closed lessons. Reuploading corrections with the same ids preserves choices and progress; added lesson ids start closed. Adding requirements can reduce the percentage without deleting work.
+- Setup and safe rollback: [lesson-availability-setup.md](../lesson-availability-setup.md). The teacher applies the hosted migration before deploying the new app; assistants only apply it locally.
 
 ## Students
 

@@ -44,6 +44,8 @@ Never commit filled-in env files or keys.
 - Applied to the hosted project by the teacher on 2026-10-17 (SQL Editor, by hand): `20261016000100_project_language.sql` and `20261016000200_realtime_private_channels.sql`. Applied by hand, so the hosted migration history doesn't list them.
 - `npx supabase migration up --local` applies new migrations to the local database without erasing it.
 
+- Lesson-open controls add `20261018000500_module_availability.sql`. Apply it after earlier module migrations and before the new app: existing modules open, new uploads closed, settings separate from source JSON. [Teacher setup and rollback steps](../lesson-availability-setup.md). Only local application was performed by the assistant.
+
 ## Known repository clutter (not yet cleaned up)
 
 `logs/classroom.log`, `test.txt` and `supabase/.temp/` are committed. `logs/classroom.log` changes whenever the classroom runs; don't commit those changes.

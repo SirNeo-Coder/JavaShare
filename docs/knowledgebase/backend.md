@@ -13,6 +13,7 @@ All in `backend/src/`: `routes.ts` (every route, sign-in, the Java endpoint; `ha
 | Classes | `POST /api/classes` (teacher-only, creates an additional class with its own join code), `POST /api/classes/join`, `GET /api/bootstrap` (no `classroomId`: the class list only, no workspace data; each summary includes `liveSessionId` derived from the current activity/presentation id for invitation dismissal; with `?classroomId=`: that one class's full workspace, scoped so no other classroom's teams/activities can appear), `POST /api/classes/:id/auto-group`, activities (`POST .../activities`, `end-activity`, `.../reopen`, `DELETE`), `PUT .../chat-mute`, `GET`/`POST .../live-share`, `POST .../web-projects` (students only) |
 | Teams | `GET`/`POST /api/teams/:id/messages`, `PUT .../group-profile`, `PUT .../group-permissions` |
 | Files and projects | `PUT /api/files/:id` (save; needs matching `version` for groups), `PATCH /api/files/:id` (rename), `POST /api/projects/:id/files`, `POST .../submit`, saved work (`GET`/`POST .../saved-work`, `PUT /api/saved-work/:id`, `POST .../restore`), `GET /api/submissions` |
+| Course modules | `GET`/`POST /api/classrooms/:classroomId/modules`, `GET`/`DELETE .../:moduleId`, `PATCH .../:moduleId/availability` (class teacher only; lesson id + boolean, or performance-task boolean), `GET .../summary`, `GET .../:moduleId/progress`, `PUT .../:moduleId/progress/step`, `PUT .../:moduleId/progress/performance-task` |
 | Java | `POST /api/execute` |
 
 ## Live events (Supabase Realtime, since PR c1)
@@ -29,3 +30,9 @@ Private channels `team:<teamId>` and `class:<classroomId>` (policies in `supabas
 - **Who's online:** Presence on the workspace's class channel, keyed by user id. Used by the workspace sidebar, the auto-group roster, and `/teacher/accounts`.
 
 Nothing live is kept in server memory any more. File saves emit `file:updated`. Live-share and invitation safety checks run on opening the screen, returning to the tab, and channel (re)connection; there is no 2-second polling timer.
+
+## Module availability
+
+`getSupabaseModule` returns full content to the class teacher. Students receive open lessons, closed lesson title stubs, and either the open performance task or its title stub. Closed instructions, questions, expected output and supplied code are withheld server-side, including top-level starter files. Original JSON stays intact.
+
+Progress reads/writes require an uploaded module; step writes also require a real step/exit-slip id in an open lesson, and task writes require an existing open task (CKB-018). Progress replies include `percent` from the whole module and `updatedAt`; the viewer ignores older save replies. Closing content preserves progress and submissions. Availability updates retry against `updated_at` so concurrent teacher tabs retain separate switch changes. No new live event: students close and reopen the module to refresh availability.

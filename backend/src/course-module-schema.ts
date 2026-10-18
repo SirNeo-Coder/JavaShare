@@ -83,12 +83,13 @@ export const courseModule = z.object({
   // a step block's own id or a lesson's exitSlip id (supabase-repository.ts). A collision between
   // any two of those ids, even across different lessons, would make marking one done silently
   // mark the other done too (CKB-007's bug class, reachable here if an upload isn't checked).
+  // Lesson ids also identify availability switches, so they must not collide (CKB-019).
   const progressIds = module.lessons.flatMap((lesson) => [
-    lesson.exitSlip.id,
+    lesson.id, lesson.exitSlip.id,
     ...lesson.blocks.filter((block) => block.type === "step").map((block) => block.id),
   ]);
   return progressIds.length === new Set(progressIds).size;
-}, { message: "Two steps or exit slips in this module share the same id - each step's \"id\" and each lesson's exitSlip \"id\" must be unique across the whole module" })
+}, { message: "Two lessons, steps or exit slips in this module share the same id - their ids must be unique across the whole module" })
   .refine((module) => {
     // /api/execute only runs java files whose path matches a strict identifier-style regex, at
     // most JAVA_PATH_MAX_LENGTH characters (routes.ts). A java step's files, and any .java

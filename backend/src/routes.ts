@@ -43,6 +43,7 @@ import {
   sendSupabaseMessage,
   setSupabaseClassroomChatMuted,
   setSupabaseLiveShare,
+  setSupabaseModuleAvailability,
   setSupabaseModulePerformanceTask,
   setSupabaseModuleStepState,
   submitSupabaseProject,
@@ -496,6 +497,16 @@ app.get("/api/classrooms/:classroomId/modules", requireAuth, async (req: AuthedR
 app.get("/api/classrooms/:classroomId/modules/summary", requireAuth, async (req: AuthedRequest, res, next) => {
   try { return res.json(await listSupabaseModuleProgressSummary(req.user!, String(req.params.classroomId))); }
   catch (error) { next(error); }
+});
+
+app.patch("/api/classrooms/:classroomId/modules/:moduleId/availability", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const change = z.discriminatedUnion("target", [
+      z.object({ target: z.literal("lesson"), lessonId: z.string().trim().min(1).max(100), open: z.boolean() }),
+      z.object({ target: z.literal("performance-task"), open: z.boolean() }),
+    ]).parse(req.body);
+    return res.json(await setSupabaseModuleAvailability(req.user!, String(req.params.classroomId), String(req.params.moduleId), change));
+  } catch (error) { next(error); }
 });
 
 app.get("/api/classrooms/:classroomId/modules/:moduleId", requireAuth, async (req: AuthedRequest, res, next) => {

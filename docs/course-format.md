@@ -64,3 +64,7 @@ One file per teaching week, named `<Course>_Week_NN.codeshare.json` (for example
 1. Every `id` is unique across the whole course and **never changes** once published — student progress is recorded against these ids.
 2. If content is corrected later, keep the same ids; CodeShare replaces the content and keeps progress.
 3. Code and outputs in this file must be **identical** to the printed module.
+
+### Availability in CodeShare
+
+The teacher's **Open to students** choices are stored per class and module, outside this file. New uploads start closed; corrections with the same ids keep previous choices and progress, and newly added lessons start closed. The upload validator rejects duplicate lesson, step and exit-slip ids within a module (CKB-019/011). It cannot enforce uniqueness across separate uploaded course files.

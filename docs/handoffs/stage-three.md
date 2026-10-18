@@ -1,6 +1,6 @@
 # Stage three handoff (Google-Classroom-style navigation)
 
-**Status: items 1–3 built and tested; item 1 is PR #8, item 2 is PR #9, item 3 is PR #10 on `codex/live-class-invitation`.** Last updated: 2026-10-18.
+**Status: items 1–4 built and tested; items 1–3 are PRs #8–10; item 4 is on `codex/lesson-availability`, preparing its stacked PR.** Last updated: 2026-10-18.
 
 ## What the teacher asked for
 
@@ -101,7 +101,7 @@ workspace).
 
 - **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/10
 - **Branch:** `codex/live-class-invitation`, based on `codex/class-home` (PR #9), targeting `codex/class-home` so it contains only item 3. Implementation/evidence committed as `abd287e`, pushed. Do not merge the branch stack automatically.
-- **Current state:** item 3 is finished and awaiting teacher review; no implementation is in progress. Next: item 4 (lesson-open controls), with its own proposal and approval first.
+- **Current state:** item 3 is finished and awaiting teacher review. Item 4 is implemented below.
 - **What shipped:** student-only **Your class is live** popup on Classes/class home for an activity or presentation already running at sign-in, or starting later. **Join live class** enters the chosen workspace; **Not now** / Escape dismisses the offered sessions. Several classes are listed as choices. An open module keeps its draft and defers the invitation until it closes. Joining/dismissal survives workspace round trips during this open page; reloading/sign-out resets it. Teachers get no popup.
 - **Live behavior:** receive-only listeners on existing private class channels, without Presence or team channels. Existing server broadcasts stay awaited (CKB-006). Refresh on start/stop, reconnect, and focus/visibility; no repeating status timer. A failed pass/connection displays an error and **Reconnect**, with manual classroom entry still available. Background status stays inside Landing, never replacing workspace teams/files.
 - **Class/session isolation:** existing class membership checks apply; server summaries provide `liveSessionId` from existing activity/project ids. No route, migration, dependency, or new secret setting. Stop observations clear dismissal; new activity ids invite again. **Known limit:** if a previously dismissed same-id activity/presentation stops and restarts entirely while disconnected, it cannot be distinguished without a persisted start marker, so it may remain dismissed.
@@ -111,15 +111,29 @@ workspace).
 - **Offline:** actual launcher config/build ran, then reused the existing dev server on 3000; it was left untouched. Real-browser checks instead used production `next start` on 3001 with the same local Supabase settings and laptop Java enabled. Recovery checks used a disposable port-3002 server. These were not fresh launcher-owned instances on port 3000.
 - **Not verified:** Cloudflare/online, Windows, mobile layout, another physical device, other browser engines, or physically cutting the network. Socket reconnect callback behavior is unit-tested; browser recovery used a deliberately unavailable pass endpoint, not a forced socket/network outage. UI clicks were checked in the real app; no frontend unit-test harness was added.
 
-## Not done yet (items 4–5 of the agreed plan)
+## Item 4: lesson and performance-task opening controls — DONE, preparing teacher review
 
-- **Item 4 - lesson-open controls.** Not started.
-- **Item 5 - teacher sees student web projects.** Not started.
+**Detailed proposal and workflow-change classification approved 2026-10-18** ("go ahead").
 
-Each of these needs its own before-code proposal before work starts, per `AGENTS.md`.
+- **Branch:** `codex/lesson-availability`, based on `2311fab` (`codex/live-class-invitation`, PR #10). Its PR targets that branch so only item 4 is shown. Implementation commit and PR link will be recorded after creation. Do not merge the stack automatically.
+- **Current state:** implementation and verification finished; committing and opening the PR. Next: item 5, teacher visibility of student web projects, with its own read-only investigation/proposal/approval before application edits.
+- **Approved decisions:** teacher controls each lesson and the performance task independently in the module preview; existing modules stay open, new uploads start closed. Students see closed titles with **Not open yet**, and refresh by closing/reopening. The meter counts the whole module. Closing preserves prior work. Corrections retain ids/settings/progress; newly added lessons start closed.
+- **What shipped:** **Open to students** checkboxes per lesson/task, saved per class/module. Server student responses withhold closed content and reject direct progress writes for closed content. Teacher preview stays complete and independent of student progress (CKB-008). The viewer gets the server's whole-module percentage rather than calculating from filtered content, and ignores older save responses. Concurrent teacher-tab switch changes retry without dropping each other.
+- **Database:** new additive migration `20261018000500_module_availability.sql` adds `open_lesson_ids` and `performance_task_open` outside original JSON. Applied **locally only**. Existing backfill, new defaults, safe rerun, and content/saved-work preservation verified with seeded isolated-schema SQL execution. Previous repository reader/writer also tested with the new columns. No new dependency, secret, schedule or availability live event.
+- **Bugs found before release:** [CKB-018](../problem-knowledgebase/cases/CKB-018-progress-unknown-module-or-step.md), arbitrary module/step ids accepted progress, now require an actual uploaded module/known step; [CKB-019](../problem-knowledgebase/cases/CKB-019-duplicate-lesson-ids.md), duplicate lesson ids accepted, now included in upload uniqueness validation. Both tests failed before the fix, then passed. Existing CKB-010 class scoping and CKB-009 save races remain tested.
+- **Housekeeping:** removed the duplicate browser meter calculation and its optimistic per-field updates; all saves use the authoritative response. Updated fixtures to upload/open actual modules instead of testing phantom ids. Swept touched imports/callers before testing.
+- **Checks:** **46/46 tests pass, no skips**; build passes through the actual offline launcher; lint 0 errors / 9 existing warnings; type check passes. Closed-content filtering and closed-save guards were deliberately removed one at a time, their test failed, and all six availability tests passed after restoration. [Full runner names, marks, and evidence](../verification/stage-three-lesson-availability.md).
+- **Real browser, local production app:** new upload closed; teacher opens Monday only; student laptop Java prints `1/2/3`, Passed, 17%; closing preserves 17% and rejects a cached save without replacing run output; reopening restores Passed. Task opens independently; sample submission gives 33%; closing rejects another cached submission. Corrected reupload preserves switches/Passed/Submitted/33%. Same module uploaded in another class stays fully closed at 0%. Temporary tabs/server/users/classes cleaned up; existing app/Docker services left running.
+- **Offline limit:** launcher configuration/build succeeded, then reused the existing dev server on 3000. Browser checks used a separate production server on 3001 with local Supabase/laptop Java; this was not a fresh launcher-owned server or physical internet-disconnection check.
+- **Teacher action before hosted use:** apply the new SQL after prior module migrations and before deploying this app. [Setup and rollback guide](../lesson-availability-setup.md). Assistant changed no hosted service. Rollback to the older app keeps stored data but shows all content again because the older app ignores availability.
+- **Not verified:** hosted/Cloudflare/online Java, Windows, mobile/other browsers, another physical device. Teacher-switch failure display was inspected but not forced in the browser. No frontend unit harness. Already-loaded content cannot be revoked; further saves are refused. No persistent draft storage was added. Historical duplicate lesson ids require a corrected upload; ids are never automatically renamed.
+
+## Not done yet (item 5 of the agreed plan)
+
+- **Item 5 - teacher sees student web projects.** Not started. Read the knowledge base/problem index, inspect the existing student-project access path, and present a specific proposal with workflow classification before editing. Approval for item 4 does not authorize this separate implementation.
 
 ## Where the work is
 
-- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, committed and pushed; PR #10 into `codex/class-home`). Keep this stack order when the teacher reviews it; do not merge automatically.
+- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, committed and pushed; PR #10 into `codex/class-home`) → `codex/lesson-availability` (item 4, PR preparation; targets `codex/live-class-invitation`). Keep this stack order when the teacher reviews it; do not merge automatically.
 - Local checkout and GitHub remote: same as `docs/handoffs/stage-one.md`.
-- `docs/knowledgebase/workflow-state.md`, `frontend.md`, and `feature-index.md` describe class home. Next: item 4, lesson-open controls, with its own before-code proposal and approval. Item 3 is finished; no implementation for item 4 has started.
+- Knowledge-base workflow/frontend/backend/data/security pages describe the opening controls. Next: item 5 proposal. Item 4 implementation and verification are finished; this handoff will record its commit and PR after they are created.

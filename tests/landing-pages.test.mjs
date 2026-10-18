@@ -43,7 +43,7 @@ test("landing pages: class roster, a student's own module summary, and a teacher
   ]);
   const moduleId = fixture.id;
   const step = fixture.lessons[0].blocks[0];
-  await admin.from("course_modules").upsert({ classroom_id: classroomId, module_id: moduleId, content: fixture, created_by: teacher.id });
+  await admin.from("course_modules").upsert({ classroom_id: classroomId, module_id: moduleId, content: fixture, created_by: teacher.id, open_lesson_ids: fixture.lessons.map((lesson) => lesson.id), performance_task_open: true });
 
   try {
     const login = async (user) => (await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: user.email, password }) })).headers.get("set-cookie").split(";")[0];

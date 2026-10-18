@@ -1217,10 +1217,9 @@ export async function restoreSupabaseSavedWork(user: SupabaseSessionUser, savedW
   return { restored: true };
 }
 
-// Progress through a weekly course module (docs/course-format.md). Modules live in JSON files,
-// not the database, so moduleId is the module's own "id" field (e.g. "java-2-w15"), not a
-// foreign key. The goal meter and checklist are computed client-side from this state plus the
-// module file; this just stores what the student has done.
+// Progress through a weekly course module (docs/course-format.md). moduleId is the uploaded
+// JSON file's own "id" field (e.g. "java-2-w15"), not a database foreign key. The server computes the goal meter against the full uploaded module, including
+// closed lessons; students must not receive closed content just to calculate a percentage.
 type ModuleStepStatus = "pass" | "fail";
 type ModulePerformanceVariant = "sample" | "own";
 type ModulePerformanceEntry = { files: Array<{ path: string; content: string }>; status: ModuleStepStatus; submittedAt: string };
@@ -1278,14 +1277,15 @@ async function updateModuleProgressWithMerge(
   throw new SupabaseRepositoryError(409, "Module progress changed while saving. Please try again");
 }
 
-function moduleProgressView(row: ModuleProgressRow) {
-  return { moduleId: row.module_id, stepStates: row.step_states, performanceTask: row.performance_task };
+function moduleProgressView(row: ModuleProgressRow, module: CourseModule) {
+  return { moduleId: row.module_id, stepStates: row.step_states, performanceTask: row.performance_task, percent: moduleCompletionPercent(module, row), updatedAt: row.updated_at };
 }
 
 export async function getSupabaseModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  return moduleProgressView(await loadOrCreateModuleProgress(user, classroomId, moduleId));
+  const courseRow = await loadCourseModuleRow(classroomId, moduleId);
+  return moduleProgressView(await loadOrCreateModuleProgress(user, classroomId, moduleId), courseRow.content);
 }
 
 // stepId is either a step block's own "id" (docs/course-format.md) or a lesson's exitSlip "id" -
@@ -1293,12 +1293,16 @@ export async function getSupabaseModuleProgress(user: SupabaseSessionUser, class
 export async function setSupabaseModuleStepState(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string, status: ModuleStepStatus) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
+  const courseRow = await loadCourseModuleRow(classroomId, moduleId);
+  const lesson = courseRow.content.lessons.find((item) => item.exitSlip.id === stepId || item.blocks.some((block) => block.type === "step" && block.id === stepId));
+  if (!lesson) throw new SupabaseRepositoryError(400, "Step or exit slip not found in this module");
+  if (!courseRow.open_lesson_ids.includes(lesson.id)) throw new SupabaseRepositoryError(403, "This lesson is not open yet");
   const data = await updateModuleProgressWithMerge(
     user, classroomId, moduleId,
     (row) => ({ step_states: { ...row.step_states, [stepId]: status } }),
     "Could not save step result",
   );
-  return moduleProgressView(data);
+  return moduleProgressView(data, courseRow.content);
 }
 
 export async function setSupabaseModulePerformanceTask(
@@ -1307,12 +1311,15 @@ export async function setSupabaseModulePerformanceTask(
 ) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
+  const courseRow = await loadCourseModuleRow(classroomId, moduleId);
+  if (!courseRow.content.performanceTask) throw new SupabaseRepositoryError(404, "Performance task not found in this module");
+  if (!courseRow.performance_task_open) throw new SupabaseRepositoryError(403, "The performance task is not open yet");
   const data = await updateModuleProgressWithMerge(
     user, classroomId, moduleId,
     (row) => ({ performance_task: { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } } }),
     "Could not save performance task submission",
   );
-  return moduleProgressView(data);
+  return moduleProgressView(data, courseRow.content);
 }
 
 // A single classroom's student roster, for the teacher landing page's class-card drill-down.
@@ -1331,10 +1338,8 @@ export async function listSupabaseClassroomStudents(user: SupabaseSessionUser, c
   return { students: students.map((student) => ({ id: student.id, name: student.name, email: student.email, joinedAt: joinedAt.get(student.id) })) };
 }
 
-// Mirrors app/ModuleViewer.tsx's meterPercent - duplicated rather than shared because that one
-// runs in the browser off a module the student is actively viewing, and this runs server-side,
-// scoped to whichever student a landing page is asking about, without sending the full module
-// content (lessons, step files, instructions) down just to show a percentage.
+// One percentage calculation for the viewer and class-home summaries, always against the
+// full module. Closing content neither deletes work nor changes the goal-meter denominator.
 function moduleCompletionPercent(module: CourseModule, progress: Pick<ModuleProgressRow, "step_states" | "performance_task">) {
   const steps = module.lessons.flatMap((lesson) => lesson.blocks.filter((block) => block.type === "step"));
   const total = steps.length + module.lessons.length + (module.performanceTask ? 2 : 0);
@@ -1383,7 +1388,38 @@ export async function listSupabaseModuleProgressSummary(user: SupabaseSessionUse
 // Course modules (docs/course-format.md): the teacher uploads a validated .codeshare.json file
 // for a class; students in that class can view it. The file is stored whole in `content` and
 // never edited by CodeShare, only replaced (course-format.md rule 2 keeps ids, swaps content).
-type CourseModuleRow = { classroom_id: string; module_id: string; content: CourseModule; created_at: string; updated_at: string };
+type CourseModuleRow = { classroom_id: string; module_id: string; content: CourseModule; open_lesson_ids: string[]; performance_task_open: boolean; created_at: string; updated_at: string };
+
+async function loadCourseModuleRow(classroomId: string, moduleId: string): Promise<CourseModuleRow> {
+  const { data, error } = await getSupabaseAdmin().from("course_modules").select("*").eq("classroom_id", classroomId).eq("module_id", moduleId).maybeSingle();
+  fail(error, "Could not load module");
+  if (!data) throw new SupabaseRepositoryError(404, "Module not found");
+  return data as CourseModuleRow;
+}
+
+function moduleAvailability(row: CourseModuleRow) {
+  return { openLessonIds: row.open_lesson_ids, performanceTaskOpen: row.performance_task_open };
+}
+
+type AvailabilityChange = { target: "lesson"; lessonId: string; open: boolean } | { target: "performance-task"; open: boolean };
+
+export async function setSupabaseModuleAvailability(user: SupabaseSessionUser, classroomId: string, moduleId: string, change: AvailabilityChange) {
+  await teacherClassroom(user, classroomId);
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const row = await loadCourseModuleRow(classroomId, moduleId);
+    if (change.target === "lesson" && !row.content.lessons.some((lesson) => lesson.id === change.lessonId)) throw new SupabaseRepositoryError(400, "Lesson not found in this module");
+    if (change.target === "performance-task" && !row.content.performanceTask) throw new SupabaseRepositoryError(400, "This module has no performance task");
+    const patch = change.target === "performance-task" ? { performance_task_open: change.open } : {
+      open_lesson_ids: change.open ? [...new Set([...row.open_lesson_ids, change.lessonId])] : row.open_lesson_ids.filter((id) => id !== change.lessonId),
+    };
+    // A second teacher tab may have changed another switch; retry from its latest row.
+    const { data, error } = await getSupabaseAdmin().from("course_modules").update(patch)
+      .eq("classroom_id", classroomId).eq("module_id", moduleId).eq("updated_at", row.updated_at).select("*").maybeSingle();
+    fail(error, "Could not save lesson availability");
+    if (data) return moduleAvailability(data as CourseModuleRow);
+  }
+  throw new SupabaseRepositoryError(409, "Module changed while saving. Please try again");
+}
 
 function courseModuleSummary(row: CourseModuleRow) {
   return { moduleId: row.module_id, title: row.content.title, week: row.content.week, course: row.content.course, updatedAt: row.updated_at };
@@ -1409,11 +1445,21 @@ export async function listSupabaseModules(user: SupabaseSessionUser, classroomId
 
 export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   await requireClassroomMember(user, classroomId);
-  const db = getSupabaseAdmin();
-  const { data, error } = await db.from("course_modules").select("content").eq("classroom_id", classroomId).eq("module_id", moduleId).maybeSingle();
-  fail(error, "Could not load module");
-  if (!data) throw new SupabaseRepositoryError(404, "Module not found");
-  return data.content as CourseModule;
+  const row = await loadCourseModuleRow(classroomId, moduleId);
+  const availability = moduleAvailability(row);
+  if (user.role === "teacher") return { ...row.content, availability };
+  // Construct closed rows explicitly: no instructions, questions, expected output or code.
+  // Empty blocks/questions also let an older viewer render the response without crashing.
+  const lessons = row.content.lessons.map((lesson) => row.open_lesson_ids.includes(lesson.id) ? lesson : {
+    id: lesson.id, order: lesson.order, dayLabel: lesson.dayLabel, title: lesson.title,
+    closed: true, blocks: [], exitSlip: { id: lesson.exitSlip.id, points: 0, afterStep: "", questions: [] },
+  });
+  return {
+    id: row.content.id, title: row.content.title, course: row.content.course, week: row.content.week,
+    lessons, availability,
+    ...(row.content.performanceTask ? row.performance_task_open ? { performanceTask: row.content.performanceTask }
+      : { closedPerformanceTask: { title: row.content.performanceTask.title } } : {}),
+  };
 }
 
 export async function deleteSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {

@@ -50,6 +50,7 @@ type OtherBlock = { type: string; markdown?: string; term?: string };
 type Block = StepBlock | OtherBlock;
 type Lesson = {
   id: string;
+  closed?: boolean;
   order: number;
   dayLabel: string;
   title: string;
@@ -65,11 +66,15 @@ type PerformanceTask = {
   starterFiles: ModuleFile[];
   totalPoints: number;
 };
-type CourseModule = { id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask };
+type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
+type AvailabilityChange = { target: "lesson"; lessonId: string; open: boolean } | { target: "performance-task"; open: boolean };
+type CourseModule = { id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
 type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string };
 type StepStatus = "pass" | "fail";
 type Progress = {
   moduleId: string;
+  percent: number;
+  updatedAt: string;
   // Covers both step blocks and a lesson's exitSlip, keyed by whichever's own "id" - one flag
   // per module couldn't tell lessons apart (CKB-007).
   stepStates: Record<string, StepStatus>;
@@ -116,21 +121,9 @@ function Markdown({ markdown }: { markdown: string }) {
   );
 }
 
-function meterPercent(module: CourseModule, progress: Progress) {
-  const steps = module.lessons.flatMap((lesson) => lesson.blocks.filter(isStepBlock));
-  const total = steps.length + module.lessons.length + (module.performanceTask ? 2 : 0);
-  if (total === 0) return 0;
-  const stepsDone = steps.filter((step) => progress.stepStates[step.id] === "pass").length;
-  const slipsDone = module.lessons.filter((lesson) => progress.stepStates[lesson.exitSlip.id] === "pass").length;
-  const taskDone = module.performanceTask
-    ? (progress.performanceTask.sample ? 1 : 0) + (progress.performanceTask.own ? 1 : 0)
-    : 0;
-  return Math.round(((stepsDone + slipsDone + taskDone) / total) * 100);
-}
-
 function StepView({
   step, classroomId, moduleId, status, onChecked, role,
-}: { step: StepBlock; classroomId: string; moduleId: string; status?: StepStatus; onChecked: (status: StepStatus) => void; role: "teacher" | "student" }) {
+}: { step: StepBlock; classroomId: string; moduleId: string; status?: StepStatus; onChecked: (progress: Progress) => void; role: "teacher" | "student" }) {
   const [files, setFiles] = useState(step.files);
   const [output, setOutput] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
@@ -143,8 +136,8 @@ function StepView({
   // overwrite the real program output that already printed above it.
   const saveStepResult = async (status: StepStatus) => {
     try {
-      await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status }) });
-      onChecked(status);
+      const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status }) });
+      onChecked(updated);
     } catch (saveError) {
       setOutput((current) => `${current ?? ""}\n\n(Could not save this result: ${saveError instanceof Error ? saveError.message : "try again"})`);
     }
@@ -198,7 +191,7 @@ function PerformanceTaskSlot({
   label, files: initialFiles, classroomId, moduleId, variant, submitted, onSubmitted, role,
 }: {
   label: string; files: ModuleFile[]; classroomId: string; moduleId: string; variant: "sample" | "own";
-  submitted?: StepStatus; onSubmitted: (status: StepStatus) => void; role: "teacher" | "student";
+  submitted?: StepStatus; onSubmitted: (progress: Progress) => void; role: "teacher" | "student";
 }) {
   const [files, setFiles] = useState(initialFiles);
   const [output, setOutput] = useState<string | null>(null);
@@ -219,8 +212,8 @@ function PerformanceTaskSlot({
   const submit = async () => {
     setBusy(true);
     try {
-      await api(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", body: JSON.stringify({ variant, files, status: "pass" }) });
-      onSubmitted("pass");
+      const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", body: JSON.stringify({ variant, files, status: "pass" }) });
+      onSubmitted(updated);
     } catch (error) {
       setOutput(error instanceof Error ? error.message : "Could not submit this version");
     } finally {
@@ -252,12 +245,14 @@ function PerformanceTaskSlot({
 // fetches it for them - an empty stub keeps the rendering below (stepStates/performanceTask
 // lookups) uniform, and role flags below hide anything progress-dependent (goal meter, checkboxes,
 // submit buttons, status chips) for that role.
-const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {} });
+const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {}, percent: 0, updatedAt: "" });
 
-function ModuleContent({ module, classroomId, role }: { module: CourseModule; classroomId: string; role: "teacher" | "student" }) {
+function ModuleContent({ module, classroomId, role, onAvailabilityChanged }: { module: CourseModule; classroomId: string; role: "teacher" | "student"; onAvailabilityChanged: (availability: Availability) => void }) {
   const [progress, setProgress] = useState<Progress | null>(role === "teacher" ? emptyProgress(module.id) : null);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [savingAvailability, setSavingAvailability] = useState(false);
+  const applyProgress = (updated: Progress) => setProgress((current) => !current || updated.updatedAt >= current.updatedAt ? updated : current);
 
   useEffect(() => {
     if (role !== "student") return;
@@ -274,25 +269,43 @@ function ModuleContent({ module, classroomId, role }: { module: CourseModule; cl
   const markExitSlip = async (exitSlipId: string) => {
     try {
       const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: exitSlipId, status: "pass" }) });
-      setProgress(updated);
+      applyProgress(updated);
     } catch (markError) {
       setActionError(markError instanceof Error ? markError.message : "Could not mark the exit slip done");
     }
   };
 
+  const changeAvailability = async (change: AvailabilityChange) => {
+    setSavingAvailability(true);
+    setActionError(null);
+    try {
+      const availability = await api<Availability>(`/api/classrooms/${classroomId}/modules/${module.id}/availability`, { method: "PATCH", body: JSON.stringify(change) });
+      onAvailabilityChanged(availability);
+    } catch (saveError) {
+      setActionError(saveError instanceof Error ? saveError.message : "Could not save lesson availability");
+    } finally { setSavingAvailability(false); }
+  };
+
   return (
     <div className="module-content">
       {actionError && <p className="module-error">{actionError}</p>}
-      {role === "teacher" && <p className="module-preview-note">Previewing as teacher — nothing here is graded or saved.</p>}
+      {role === "teacher" && <p className="module-preview-note">Teacher preview — running code does not save student progress. Availability switches are saved for this class.</p>}
       {role === "student" && (
         <div className="activity-progress module-goal-meter">
-          <div><span>Module progress</span><b>{meterPercent(module, progress)}%</b></div>
-          <i><span style={{ width: `${meterPercent(module, progress)}%` }} /></i>
+          <div><span>Module progress</span><b>{progress.percent}%</b></div>
+          <i><span style={{ width: `${progress.percent}%` }} /></i>
         </div>
       )}
       {module.lessons.map((lesson) => (
         <section key={lesson.id} className="module-lesson">
           <h3>{lesson.dayLabel ? `${lesson.dayLabel} — ${lesson.title}` : lesson.title}</h3>
+          {role === "teacher" && (
+            <label className="module-availability">
+              <input type="checkbox" checked={module.availability.openLessonIds.includes(lesson.id)} disabled={savingAvailability} onChange={(event) => void changeAvailability({ target: "lesson", lessonId: lesson.id, open: event.target.checked })} />
+              Open to students
+            </label>
+          )}
+          {lesson.closed ? <p className="module-preview-note">Not open yet</p> : <>
           {lesson.blocks.map((block, index) =>
             isStepBlock(block) ? (
               <StepView
@@ -301,7 +314,7 @@ function ModuleContent({ module, classroomId, role }: { module: CourseModule; cl
                 classroomId={classroomId}
                 moduleId={module.id}
                 status={progress.stepStates[block.id]}
-                onChecked={(status) => setProgress((current) => current && { ...current, stepStates: { ...current.stepStates, [block.id]: status } })}
+                onChecked={applyProgress}
                 role={role}
               />
             ) : (
@@ -325,24 +338,34 @@ function ModuleContent({ module, classroomId, role }: { module: CourseModule; cl
               </label>
             )}
           </div>
+          </>}
         </section>
       ))}
       {module.performanceTask && (
         <section className="module-lesson">
           <h3>{module.performanceTask.title}</h3>
+          {role === "teacher" && (
+            <label className="module-availability">
+              <input type="checkbox" checked={module.availability.performanceTaskOpen} disabled={savingAvailability} onChange={(event) => void changeAvailability({ target: "performance-task", open: event.target.checked })} />
+              Open to students
+            </label>
+          )}
           <Markdown markdown={module.performanceTask.markdown} />
           <ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
           <PerformanceTaskSlot
             label="Sample code" files={module.performanceTask.exampleFiles} classroomId={classroomId} moduleId={module.id} variant="sample" role={role}
             submitted={progress.performanceTask.sample?.status}
-            onSubmitted={(status) => setProgress((current) => current && { ...current, performanceTask: { ...current.performanceTask, sample: { status } } })}
+            onSubmitted={applyProgress}
           />
           <PerformanceTaskSlot
             label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role}
             submitted={progress.performanceTask.own?.status}
-            onSubmitted={(status) => setProgress((current) => current && { ...current, performanceTask: { ...current.performanceTask, own: { status } } })}
+            onSubmitted={applyProgress}
           />
         </section>
+      )}
+      {module.closedPerformanceTask && (
+        <section className="module-lesson"><h3>{module.closedPerformanceTask.title}</h3><p className="module-preview-note">Not open yet</p></section>
       )}
     </div>
   );
@@ -436,7 +459,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             ))}
           </div>
         )}
-        {selected && <ModuleContent key={selected.id} module={selected} classroomId={classroomId} role={role} />}
+        {selected && <ModuleContent key={selected.id} module={selected} classroomId={classroomId} role={role} onAvailabilityChanged={(availability) => setSelected((current) => current && { ...current, availability })} />}
     </>
   );
 

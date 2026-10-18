@@ -48,9 +48,11 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     assert.equal((await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).status, 403);
 
     await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: student.id });
+    await admin.from("course_modules").insert({ classroom_id: classroomId, module_id: moduleId, content: fixture, created_by: teacher.id, open_lesson_ids: fixture.lessons.map((lesson) => lesson.id), performance_task_open: true });
 
     const empty = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
-    assert.deepEqual(empty, { moduleId, stepStates: {}, performanceTask: {} });
+    assert.deepEqual(empty, { moduleId, stepStates: {}, performanceTask: {}, percent: 0, updatedAt: empty.updatedAt });
+    assert.equal(typeof empty.updatedAt, "string");
 
     const afterStep = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "pass" }) })).json();
     assert.deepEqual(afterStep.stepStates, { [step.id]: "pass" });
@@ -113,6 +115,7 @@ test("module progress: two simultaneous first touches of a module don't 500 (wri
 
   try {
     await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: student.user.id });
+    await admin.from("course_modules").insert({ classroom_id: classroomId, module_id: moduleId, content: fixture, created_by: student.user.id, open_lesson_ids: fixture.lessons.map((lesson) => lesson.id), performance_task_open: true });
     const login = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: student.user.email, password }) });
     const cookie = login.headers.get("set-cookie").split(";")[0];
 
@@ -159,8 +162,8 @@ test("module progress: a module in two classrooms doesn't share one student's pr
 
   try {
     await admin.from("course_modules").insert([
-      { classroom_id: classroomA.id, module_id: moduleId, content: fixture, created_by: teacher.user.id },
-      { classroom_id: classroomB.id, module_id: moduleId, content: fixture, created_by: teacher.user.id },
+      { classroom_id: classroomA.id, module_id: moduleId, content: fixture, created_by: teacher.user.id, open_lesson_ids: fixture.lessons.map((lesson) => lesson.id), performance_task_open: true },
+      { classroom_id: classroomB.id, module_id: moduleId, content: fixture, created_by: teacher.user.id, open_lesson_ids: fixture.lessons.map((lesson) => lesson.id), performance_task_open: true },
     ]);
     await admin.from("classroom_members").insert([
       { classroom_id: classroomA.id, user_id: student.user.id },
@@ -205,6 +208,7 @@ test("module progress: two simultaneous performance-task submissions don't lose 
 
   try {
     await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: student.user.id });
+    await admin.from("course_modules").insert({ classroom_id: classroomId, module_id: moduleId, content: fixture, created_by: student.user.id, open_lesson_ids: fixture.lessons.map((lesson) => lesson.id), performance_task_open: true });
     const login = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: student.user.email, password }) });
     const cookie = login.headers.get("set-cookie").split(";")[0];
 
