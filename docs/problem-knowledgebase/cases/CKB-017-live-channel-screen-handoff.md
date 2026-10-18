@@ -46,7 +46,7 @@ channel being removed. Merely starting cleanup is insufficient.
 - Real browser: joined class B from the two-class invitation, saw **Live classroom connected**,
   ran Java successfully, returned to class home, and repeated the round trip without channel
   errors. This checks both directions through the app; it does not simulate every network race.
-- Commit: implementation on `codex/live-class-invitation`; see the stage-three handoff.
+- Commit: `abd287e` on `codex/live-class-invitation`, PR #10; see the stage-three handoff.
 
 ## Recurrence triage
 

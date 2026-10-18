@@ -1,6 +1,6 @@
 # Stage three handoff (Google-Classroom-style navigation)
 
-**Status: items 1–3 built and tested; item 1 is PR #8, item 2 is PR #9, item 3 is on `codex/live-class-invitation` preparing its review PR.** Last updated: 2026-10-18.
+**Status: items 1–3 built and tested; item 1 is PR #8, item 2 is PR #9, item 3 is PR #10 on `codex/live-class-invitation`.** Last updated: 2026-10-18.
 
 ## What the teacher asked for
 
@@ -95,17 +95,19 @@ workspace).
 - **Offline launcher:** ran `sg docker -c 'npm run classroom:offline'`; configuration and build succeeded, then it reused the existing development server on port 3000. Left that server untouched. Browser checks instead used a separate `next start` on port 3001 with the launcher's local Supabase settings and laptop Java enabled. This proves the production app's local path; it was not a fresh launcher-owned server on port 3000.
 - **Not verified:** Cloudflare/online, Windows, a second physical device, other browsers. No frontend unit-test harness exists; interactive paths were checked in the real app. No fail-before/pass-after mutation proof was performed for this new screen; earlier CKB-010/016 proof remains in their case files.
 
-## Item 3: live-class join popup — DONE, preparing review PR
+## Item 3: live-class join popup — DONE, waiting for teacher review
 
 **Proposal and workflow-change classification approved 2026-10-18** ("go ahead").
 
-- **Branch:** `codex/live-class-invitation`, based on `codex/class-home` (PR #9). The new PR targets `codex/class-home`, so it contains only item 3. Do not merge the branch stack automatically.
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/10
+- **Branch:** `codex/live-class-invitation`, based on `codex/class-home` (PR #9), targeting `codex/class-home` so it contains only item 3. Implementation/evidence committed as `abd287e`, pushed. Do not merge the branch stack automatically.
+- **Current state:** item 3 is finished and awaiting teacher review; no implementation is in progress. Next: item 4 (lesson-open controls), with its own proposal and approval first.
 - **What shipped:** student-only **Your class is live** popup on Classes/class home for an activity or presentation already running at sign-in, or starting later. **Join live class** enters the chosen workspace; **Not now** / Escape dismisses the offered sessions. Several classes are listed as choices. An open module keeps its draft and defers the invitation until it closes. Joining/dismissal survives workspace round trips during this open page; reloading/sign-out resets it. Teachers get no popup.
 - **Live behavior:** receive-only listeners on existing private class channels, without Presence or team channels. Existing server broadcasts stay awaited (CKB-006). Refresh on start/stop, reconnect, and focus/visibility; no repeating status timer. A failed pass/connection displays an error and **Reconnect**, with manual classroom entry still available. Background status stays inside Landing, never replacing workspace teams/files.
 - **Class/session isolation:** existing class membership checks apply; server summaries provide `liveSessionId` from existing activity/project ids. No route, migration, dependency, or new secret setting. Stop observations clear dismissal; new activity ids invite again. **Known limit:** if a previously dismissed same-id activity/presentation stops and restarts entirely while disconnected, it cannot be distinguished without a persisted start marker, so it may remain dismissed.
 - **CKB-017:** the installed SDK reuses a channel object by topic. New `releaseRealtimeChannels` waits for old removals before subscribers get the shared client, covering both screen directions. Workspace subscriptions run only for the classroom actually entered. Full record: [CKB-017](../problem-knowledgebase/cases/CKB-017-live-channel-screen-handoff.md).
 - **Checks:** 39/39 automated tests pass, no skips; 4 new invitation tests and expanded bootstrap summary checks. Build passes. Lint: 0 errors, same 9 existing warnings. The handoff regression was deliberately broken by removing its wait, failed, then passed after restoration. Full runner names/marks and manual checks: [verification report](../verification/stage-three-live-class-invitation.md).
-- **Real browser, local production build:** teacher Present triggers the popup without reloading; Not now survives repeated same-session announcements; live stops remove the popup/badge; editing a module defers two invitations and preserves the draft; both A and B can be chosen correctly; returning home offers only the other session, then dismissal survives more round trips. Java ran after joining. Fresh sign-in during two live activities offered both. Missing live passes showed Reconnect, restoring them and clicking it recovered the popup on a subsequent announcement. Core join/deferral/dismissal and recovery checks were repeated after the final build. Disposable local test data was removed afterward.
+- **Real browser, local production build:** teacher Present triggers the popup without reloading; Not now survives repeated same-session announcements; live stops remove the popup/badge; editing a module defers two invitations and preserves the draft; both A and B can be chosen correctly; returning home offers only the other session, then dismissal survives more round trips. Java ran after joining. Fresh sign-in during two live activities offered both. Missing live passes showed Reconnect, restoring them and clicking it recovered the popup on a subsequent announcement. Core join/deferral/dismissal and recovery checks were repeated after the final build. Disposable local test data and temporary servers/tabs were cleaned up afterward; the pre-existing app and Docker services were left running.
 - **Offline:** actual launcher config/build ran, then reused the existing dev server on 3000; it was left untouched. Real-browser checks instead used production `next start` on 3001 with the same local Supabase settings and laptop Java enabled. Recovery checks used a disposable port-3002 server. These were not fresh launcher-owned instances on port 3000.
 - **Not verified:** Cloudflare/online, Windows, mobile layout, another physical device, other browser engines, or physically cutting the network. Socket reconnect callback behavior is unit-tested; browser recovery used a deliberately unavailable pass endpoint, not a forced socket/network outage. UI clicks were checked in the real app; no frontend unit-test harness was added.
 
@@ -118,6 +120,6 @@ Each of these needs its own before-code proposal before work starts, per `AGENTS
 
 ## Where the work is
 
-- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, this change, PR targeting `codex/class-home`). Keep this stack order when the teacher reviews it; do not merge automatically.
+- **Branches:** `landing-pages` (item 1, committed and pushed; PR #8 into `module-viewer`) → `codex/class-home` (item 2, committed and pushed; PR #9 into `landing-pages`) → `codex/live-class-invitation` (item 3, committed and pushed; PR #10 into `codex/class-home`). Keep this stack order when the teacher reviews it; do not merge automatically.
 - Local checkout and GitHub remote: same as `docs/handoffs/stage-one.md`.
 - `docs/knowledgebase/workflow-state.md`, `frontend.md`, and `feature-index.md` describe class home. Next: item 4, lesson-open controls, with its own before-code proposal and approval. Item 3 is finished; no implementation for item 4 has started.
