@@ -14,9 +14,13 @@ A feature-level plan (no code) was written and approved first - see the five num
 below. Build order agreed: class list + creation, then class home, then the live-class join
 popup, then lesson-open controls, then teacher web-project visibility.
 
-## Item 1: class list + teacher class creation — built and tested
+## Item 1: class list + teacher class creation — DONE, waiting for teacher review
 
-**Before-code proposal approved 2026-10-18.** Branch: `landing-pages` (uncommitted so far).
+**Before-code proposal approved 2026-10-18.**
+
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/8
+- **Branch:** `landing-pages` (into `module-viewer`, since it's built on that still-unmerged
+  stack - see "Where the work is" below).
 
 ### What shipped
 
