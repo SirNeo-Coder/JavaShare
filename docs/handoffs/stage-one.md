@@ -4,7 +4,11 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-17 (Cloudflare connected and secrets added; testing the preview)
+Last updated: 2026-10-19. Current classroom UI work is on `codex/classroom-figma-ui`;
+see [stage-four.md](stage-four.md) and [classroom UI verification](../verification/classroom-figma-ui.md).
+The teacher approved this as a workflow change: retain the top bar, left module browser, right
+existing messaging system. Built and tested; preparing a PR stacked on schema/backend PR #13.
+
 
 ## The job
 

@@ -1,4 +1,4 @@
-# Workflow state (updated 2026-10-18, branch `codex/teacher-web-projects`)
+# Workflow state (updated 2026-10-19, branch `codex/classroom-figma-ui`)
 
 What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
 
@@ -54,3 +54,31 @@ What teachers and students can do today. Compare any proposed change with this p
 
 - Teammates see typing about a quarter of a second later (at most 3 updates a second), and students see the teacher's live share about half a second behind (2 a second). Cursors update up to 4 times a second.
 - "Online" (sidebar, auto-group roster, Student accounts) means the person has CodeShare open, via the live class channel. Student accounts shows "Connected to the live classroom".
+
+## Classroom layout (approved workflow change, 2026-10-19)
+
+- The teacher retained CodeShare's existing top bar: brand, role, class, **Class home**, student
+  **Modules**, display settings, notifications and account. On phones those same visible controls
+  wrap into two rows so they fit the screen; desktop appearance stays the same.
+- The classroom uses the Figma reference's dark editor and Console with a yellow **Run code**
+  button. File editing, program input, saved work, submissions and teacher live share keep their
+  existing handlers and permissions.
+- **Module** on the left edge or **Modules** in the top bar opens the module browser. The weekly
+  pick appears first when one exists; cards show the student's saved percentage and server's live
+  lock. Selecting a lesson shows one lesson at a time; **Performance task** has its own page.
+  Closed lessons still show **Not open yet**. Navigation keeps editors mounted, so switching
+  lessons preserves unsaved drafts. This does not add persistence across reloading or leaving a module.
+- **Projects** on the left edge exposes the existing student projects/activity list and **New web
+  project**. Teachers use **Students / projects** for their existing student/group lists, activity
+  controls and demo workspace. This drawer and the module drawer share the left-hand space.
+- **Chat** on the right edge, or the existing conversation tab beside **Console**, opens the right
+  drawer. It is the existing messaging system: classroom chat outside an activity, private chat
+  during an individual activity, group chat in a group activity. Existing messages, live delivery,
+  teacher mute and group-leader permissions are reused. Both Enter and **Send message** submit
+  through the same existing handler. The Console remains available independently.
+- Drawer **×** or Escape from within the drawer closes it and restores the previous focus. At
+  wide desktop widths (1400 pixels and above), **Pin** reserves workspace space for a drawer;
+  narrower screens use overlays. The chat conversation area stays light in both saved themes,
+  matching the Figma reference, with a navy heading.
+- Class-home module upload, deletion, full teacher preview and availability controls stay where
+  they were. No new chat service, AI assistant, route, migration, dependency or internet asset.

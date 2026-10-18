@@ -5,8 +5,9 @@
 // expectedOutput), and the performance task's two tracked submissions (sample code, own
 // version). A teacher can upload a module here too. v1 renders "text" and "step" blocks plus the
 // exit slip and performance task; other block types fall back to plain text.
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./apiClient";
+import ModuleCatalogCard from "./ModuleCatalogCard";
 
 // CodeEditor (the full syntax-highlighted editor) renders invisible text when there are many
 // small instances nested inside this scrollable modal - confirmed in the browser (DOM and
@@ -69,7 +70,7 @@ type PerformanceTask = {
 type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
 type AvailabilityChange = { target: "lesson"; lessonId: string; open: boolean } | { target: "performance-task"; open: boolean };
 type CourseModule = { id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
-type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string };
+type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean };
 type StepStatus = "pass" | "fail";
 type Progress = {
   moduleId: string;
@@ -81,7 +82,7 @@ type Progress = {
   performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>>;
 };
 
-type Props = { role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; onClose?: () => void };
+type Props = { role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; onClose?: () => void };
 
 function isStepBlock(block: Block): block is StepBlock {
   return block.type === "step";
@@ -247,11 +248,12 @@ function PerformanceTaskSlot({
 // submit buttons, status chips) for that role.
 const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {}, percent: 0, updatedAt: "" });
 
-function ModuleContent({ module, classroomId, role, onAvailabilityChanged }: { module: CourseModule; classroomId: string; role: "teacher" | "student"; onAvailabilityChanged: (availability: Availability) => void }) {
+export function ModuleContent({ module, classroomId, role, onAvailabilityChanged, paged = false }: { paged?: boolean; module: CourseModule; classroomId: string; role: "teacher" | "student"; onAvailabilityChanged: (availability: Availability) => void }) {
   const [progress, setProgress] = useState<Progress | null>(role === "teacher" ? emptyProgress(module.id) : null);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [savingAvailability, setSavingAvailability] = useState(false);
+  const [lessonPage, setLessonPage] = useState(0);
   const applyProgress = (updated: Progress) => setProgress((current) => !current || updated.updatedAt >= current.updatedAt ? updated : current);
 
   useEffect(() => {
@@ -296,8 +298,15 @@ function ModuleContent({ module, classroomId, role, onAvailabilityChanged }: { m
           <i><span style={{ width: `${progress.percent}%` }} /></i>
         </div>
       )}
-      {module.lessons.map((lesson) => (
-        <section key={lesson.id} className="module-lesson">
+      {paged && <nav className="module-parts" aria-label="Module lessons">
+        {module.lessons.map((lesson, index) => {
+          const done = !lesson.closed && progress.stepStates[lesson.exitSlip.id] === "pass" && lesson.blocks.filter(isStepBlock).every((step) => progress.stepStates[step.id] === "pass");
+          return <button key={lesson.id} type="button" aria-current={lessonPage === index ? "step" : undefined} onClick={() => setLessonPage(index)} className={done ? "part-done" : ""}><i aria-hidden="true">{done ? "✓" : lesson.closed ? "⊘" : index + 1}</i><span>{lesson.title}</span></button>;
+        })}
+        {(module.performanceTask || module.closedPerformanceTask) && <button type="button" aria-current={lessonPage === module.lessons.length ? "step" : undefined} onClick={() => setLessonPage(module.lessons.length)}><i aria-hidden="true">★</i><span>Performance task</span></button>}
+      </nav>}
+      {module.lessons.map((lesson, index) => (
+        <section key={lesson.id} className="module-lesson" hidden={paged && index !== lessonPage}>
           <h3>{lesson.dayLabel ? `${lesson.dayLabel} — ${lesson.title}` : lesson.title}</h3>
           {role === "teacher" && (
             <label className="module-availability">
@@ -342,7 +351,7 @@ function ModuleContent({ module, classroomId, role, onAvailabilityChanged }: { m
         </section>
       ))}
       {module.performanceTask && (
-        <section className="module-lesson">
+        <section className="module-lesson" hidden={paged && lessonPage !== module.lessons.length}>
           <h3>{module.performanceTask.title}</h3>
           {role === "teacher" && (
             <label className="module-availability">
@@ -365,27 +374,28 @@ function ModuleContent({ module, classroomId, role, onAvailabilityChanged }: { m
         </section>
       )}
       {module.closedPerformanceTask && (
-        <section className="module-lesson"><h3>{module.closedPerformanceTask.title}</h3><p className="module-preview-note">Not open yet</p></section>
+        <section className="module-lesson" hidden={paged && lessonPage !== module.lessons.length}><h3>{module.closedPerformanceTask.title}</h3><p className="module-preview-note">Not open yet</p></section>
       )}
     </div>
   );
 }
 
-export default function ModuleViewer({ role, classroomId, initialModuleId, embedded = false, onClose }: Props) {
+export default function ModuleViewer({ role, classroomId, initialModuleId, embedded = false, drawer = false, active = true, onClose }: Props) {
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [selected, setSelected] = useState<CourseModule | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [summaries, setSummaries] = useState<Record<string, number>>({});
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const openModule = (moduleId: string) => {
+  const openModule = useCallback((moduleId: string) => {
     setError(null);
     api<CourseModule>(`/api/classrooms/${classroomId}/modules/${moduleId}`)
       .then(setSelected)
       .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Could not load module"));
-  };
+  }, [classroomId]);
 
-  const refreshList = () => {
+  const refreshList = useCallback(() => {
     api<ModuleSummary[]>(`/api/classrooms/${classroomId}/modules`)
       .then((list) => {
         setModules(list);
@@ -394,9 +404,24 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
         if (initialModuleId) openModule(initialModuleId);
       })
       .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Could not load modules"));
-  };
+  }, [classroomId, initialModuleId, openModule]);
 
-  useEffect(refreshList, [classroomId]);
+  useEffect(() => { if (!drawer) refreshList(); }, [drawer, refreshList]);
+
+  useEffect(() => {
+    if (!drawer || !active) return;
+    let cancelled = false;
+    Promise.all([
+      api<ModuleSummary[]>(`/api/classrooms/${classroomId}/modules`),
+      role === "student" ? api<{ moduleId: string; percent: number }[]>(`/api/classrooms/${classroomId}/modules/summary`) : Promise.resolve([]),
+    ]).then(([list, progress]) => {
+      if (cancelled) return;
+      setError(null);
+      setModules(list);
+      setSummaries(Object.fromEntries(progress.map((item) => [item.moduleId, item.percent])));
+    }).catch((loadError) => { if (!cancelled) setError(loadError instanceof Error ? loadError.message : "Could not load modules"); });
+    return () => { cancelled = true; };
+  }, [drawer, active, classroomId, role]);
 
   const upload = async (file: File) => {
     setUploading(true);
@@ -427,8 +452,9 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
     <>
         <header>
           <div>
-            <span className="eyebrow">MODULES</span>
-            <h2>{selected ? selected.title : "Modules"}</h2>
+            <span className="eyebrow">{drawer ? selected ? "MODULE LESSON" : "YOUR LEARNING" : "MODULES"}</span>
+            <h2>{selected ? selected.title : drawer ? "Your learning modules" : "Modules"}</h2>
+            {drawer && !selected && <p>Continue a lesson or revisit what you’ve learned.</p>}
           </div>
           {embedded ? (
             selected && <button type="button" onClick={() => setSelected(null)}>Back to modules</button>
@@ -439,7 +465,8 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
         {error && <p className="module-error">{error}</p>}
         {!selected && (
           <div className="module-list">
-            {role === "teacher" && embedded && (
+            {drawer && modules && role === "student" && <div className="catalog-progress"><span>{Object.values(summaries).filter((percent) => percent === 100).length} / {modules.length}</span> modules completed</div>}
+            {role === "teacher" && embedded && !drawer && (
               <div className="module-upload">
                 <label>Upload module
                 <input ref={fileInput} type="file" accept=".json" onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])} disabled={uploading} />
@@ -449,21 +476,19 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             )}
             {modules === null && <p>Loading…</p>}
             {modules?.length === 0 && <p>No module uploaded for this class yet.</p>}
-            {modules?.map((module) => (
-              <div key={module.moduleId} className="module-list-row">
-                <button type="button" onClick={() => openModule(module.moduleId)}>
-                  Week {module.week} — {module.title}
-                </button>
-                {role === "teacher" && embedded && <button type="button" className="danger-button" onClick={() => removeModule(module.moduleId)}>Delete</button>}
+            {(drawer ? modules?.toSorted((a, b) => Number(Boolean(b.isActive)) - Number(Boolean(a.isActive)) || b.week - a.week) : modules)?.map((module) => (
+              <div key={module.moduleId} className={`module-list-row${drawer ? " module-catalog-card" : ""}${drawer && module.isActive ? " module-weekly-card" : ""}`}>
+                {drawer ? <ModuleCatalogCard module={module} percent={summaries[module.moduleId] ?? 0} role={role} onOpen={() => openModule(module.moduleId)} /> : <button type="button" onClick={() => openModule(module.moduleId)}>Week {module.week} — {module.title}</button>}
+                {role === "teacher" && embedded && !drawer && <button type="button" className="danger-button" onClick={() => removeModule(module.moduleId)}>Delete</button>}
               </div>
             ))}
           </div>
         )}
-        {selected && <ModuleContent key={selected.id} module={selected} classroomId={classroomId} role={role} onAvailabilityChanged={(availability) => setSelected((current) => current && { ...current, availability })} />}
+        {selected && <ModuleContent key={selected.id} paged={drawer} module={selected} classroomId={classroomId} role={role} onAvailabilityChanged={(availability) => setSelected((current) => current && { ...current, availability })} />}
     </>
   );
 
-  if (embedded) return <div className="activity-modal class-module-panel">{content}</div>;
+  if (embedded) return <div className={`activity-modal class-module-panel${drawer ? " drawer-module-viewer" : ""}`}>{content}</div>;
   return (
     <div className="activity-overlay" onClick={(event) => event.target === event.currentTarget && onClose?.()}>
       <div className="activity-modal module-viewer-modal">{content}</div>

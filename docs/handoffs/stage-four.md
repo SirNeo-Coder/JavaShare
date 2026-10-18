@@ -1,6 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: PR 1 of 4 (schema + backend storage) built and tested, preparing its PR.** Last updated: 2026-10-19.
+**Status: schema/backend PR #13 open; classroom Figma UI implemented and verified on `codex/classroom-figma-ui`, preparing its stacked PR.** Last updated: 2026-10-19.
 
 ## What the teacher asked for
 
@@ -110,3 +110,41 @@ changed - it will be updated once PR 2-4 land UI that uses this.
 - **GitHub:** `SirNeo-Coder/JavaShare`
 - **Branch:** `feat/module-redesign-schema`, stacked on `codex/stage-three-review-fixes` (PR #12,
   open). Keep this stack order when the teacher reviews; do not merge automatically.
+
+## Classroom Figma UI — approved and implemented 2026-10-19
+
+Teacher clarified the reference in the current chat: retain CodeShare's existing top bar, put the
+module browser on the left, and use the Figma right-hand chat appearance for the messaging system
+already implemented. Explicitly classified **workflow change**. No second chat or AI assistant.
+
+**Branch:** `codex/classroom-figma-ui`, based on `feat/module-redesign-schema` (PR #13). The UI PR
+must target that branch so it does not duplicate PR #13's schema/backend diff.
+
+Done:
+
+- Dark editor and Console, yellow Run code, existing top bar, left module drawer, right chat
+  drawer. Projects / Students / projects retains the existing sidebar's controls.
+- Module cards use the existing list/summary routes for weekly flags, lock and actual progress.
+  Lesson pages and separate performance task keep all editors mounted. Teacher class-home
+  upload/delete/availability screens retain their existing layout and handlers.
+- Messaging is the existing send handler, message state, routes, channels, conversation selection,
+  teacher mute and group permissions. Added an explicit Send message button to the same form.
+- CKB-028: fixed draft loss introduced by the first lesson-page rendering, caught before release.
+  CKB-029: existing phone header overflow fixed with a two-row phone layout. CKB-030: corrected
+  old dark-theme selectors overriding the new light conversation backgrounds.
+
+Evidence: `docs/verification/classroom-figma-ui.md` records all test names by file, commands,
+regression failures/restoration, real browser scenarios, and limits. Full suite: **64 passed,
+0 failed/skipped**. Build passed. Lint: **0 errors, 8 existing warnings**. Offline launcher build
+passed against local Docker Supabase; the real local classroom ran Java and two-way messages.
+
+Open / next:
+
+- Review this UI PR and PR #13. Do not merge or deploy automatically.
+- The original stage-four shared central module project and author-defined `part` grouping are
+  still separate work. This UI reuses existing per-step editors, availability and progress rather
+  than changing those learning rules. The teacher student-card view is also still open.
+- Hosted migrations/deployment, a physical phone and a second physical LAN device were not tested.
+- The in-app browser does not support `prompt()`, so the Save work naming dialog could not be
+  exercised; existing file-save routes still pass integration checks. Wide pin interaction could
+  not be completed through the browser's iframe controls; see the verification note.

@@ -6,6 +6,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import CodeEditor, { languageLabel } from "./CodeEditor";
 import Landing from "./Landing";
 import ModuleViewer from "./ModuleViewer";
+import WorkspaceDrawer from "./WorkspaceDrawer";
 import { retainLiveDismissals } from "./liveClasses";
 import { api, getApiUrl } from "./apiClient";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
@@ -213,6 +214,8 @@ export default function Home() {
   const [fontScale, setFontScale] = useState(getSavedFontScale);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
+  const [projectsOpen, setProjectsOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [dismissedLiveSessions, setDismissedLiveSessions] = useState<Record<string, string>>({});
   const [homeClassroomId, setHomeClassroomId] = useState<string | null>(null);
   const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
@@ -224,7 +227,7 @@ export default function Home() {
   const [code, setCode] = useState("");
   const [syncStatus, setSyncStatus] = useState("Connecting…");
   const [panel, setPanel] = useState<
-    "console" | "chat" | "saved" | "submissions"
+    "console" | "saved" | "submissions"
   >("console");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [chatText, setChatText] = useState("");
@@ -481,14 +484,14 @@ export default function Home() {
   }, [theme, fontScale]);
 
   useEffect(() => {
-    if (panel !== "chat") return;
+    if (!chatOpen) return;
     const frame = requestAnimationFrame(() => {
       const chatMessages =
         document.querySelector<HTMLElement>(".chat-messages");
       if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
     });
     return () => cancelAnimationFrame(frame);
-  }, [messages, panel, chatTeamId]);
+  }, [messages, chatOpen, chatTeamId]);
 
   useEffect(() => {
     api<{ user: User }>("/api/auth/me")
@@ -558,6 +561,8 @@ export default function Home() {
           setUser(null);
           setData(null);
           setEnteredClassroomId(null);
+          setProjectsOpen(false);
+          setChatOpen(false);
           setHomeClassroomId(null);
           setDismissedLiveSessions({});
           setModulesOpen(false);
@@ -1153,7 +1158,7 @@ export default function Home() {
       setActivityStarter("");
       setActiveTeam(0);
       await loadWorkspace("groups");
-      setPanel("chat");
+      setChatOpen(true);
       notify(
         `Deployed ${activity.title} to ${result.students} students in ${result.groups} group${result.groups === 1 ? "" : "s"}`,
       );
@@ -1748,6 +1753,8 @@ export default function Home() {
     setUser(null);
     setData(null);
     setEnteredClassroomId(null);
+    setProjectsOpen(false);
+    setChatOpen(false);
     setHomeClassroomId(null);
     setDismissedLiveSessions({});
     setModulesOpen(false);
@@ -1834,7 +1841,7 @@ export default function Home() {
           <button
             className="settings-button"
             type="button"
-            onClick={() => { setModulesOpen(false); setEnteredClassroomId(null); }}
+            onClick={() => { setModulesOpen(false); setProjectsOpen(false); setChatOpen(false); setEnteredClassroomId(null); }}
             title="Back to class home"
           >
             Class home
@@ -1843,7 +1850,9 @@ export default function Home() {
             <button
               className="settings-button modules-button"
               type="button"
-              onClick={() => setModulesOpen(true)}
+              aria-expanded={modulesOpen}
+              aria-controls="classroom-modules"
+              onClick={() => { setProjectsOpen(false); setModulesOpen((open) => !open); }}
               title="This week's module"
             >
               Modules
@@ -1955,8 +1964,16 @@ export default function Home() {
           </button>
         </div>
       </header>
-      <section className="workspace">
-        <aside className="sidebar">
+      <section className="workspace classroom-workspace">
+        <nav className="workspace-rail rail-left" aria-label="Learning panels">
+          <button type="button" aria-expanded={modulesOpen} aria-controls="classroom-modules" onClick={() => { setProjectsOpen(false); setModulesOpen(!modulesOpen); }}><span aria-hidden="true">▤</span> Module <span aria-hidden="true">{modulesOpen ? "‹" : "›"}</span></button>
+          <button type="button" aria-expanded={projectsOpen} aria-controls="classroom-projects" onClick={() => { setModulesOpen(false); setProjectsOpen(!projectsOpen); }}><span aria-hidden="true">⌘</span> {user.role === "teacher" ? "Students / projects" : "Projects"}</button>
+        </nav>
+        <nav className="workspace-rail rail-right" aria-label="Chat panel">
+          <button type="button" aria-expanded={chatOpen} aria-controls="classroom-chat" onClick={() => setChatOpen(!chatOpen)}><span aria-hidden="true">☏</span> Chat <span aria-hidden="true">{chatOpen ? "›" : "‹"}</span></button>
+        </nav>
+        <aside id="classroom-projects" aria-label={user.role === "teacher" ? "Students and projects" : "Projects"} hidden={!projectsOpen} className="sidebar classroom-projects" onKeyDown={(event) => { if (event.key === "Escape") setProjectsOpen(false); }}>
+          <div className="projects-heading"><b>{user.role === "teacher" ? "Students and projects" : "My projects"}</b><button type="button" aria-label="Close projects" onClick={() => setProjectsOpen(false)}>×</button></div>
           <div className="side-title">
             <span>
               {teacherGroupView
@@ -2359,6 +2376,7 @@ export default function Home() {
           </div>
           <div className="content-grid">
             <section className="editor-card">
+              <div className="workspace-card-heading"><b><span aria-hidden="true">⌘</span> Code editor</b><span>{languageLabel(activeFile?.language || "java")}</span></div>
               <div className="file-tabs">
                 {team.files.map((file) => (
                   <button
@@ -2462,6 +2480,7 @@ export default function Home() {
               </div>
             </section>
             <aside className="right-panel">
+              <div className="workspace-card-heading"><b><span aria-hidden="true">›_</span> Console</b><span className="terminal-status">● Terminal</span></div>
               <div className="panel-tabs">
                 <button
                   className={panel === "console" ? "active" : ""}
@@ -2470,8 +2489,10 @@ export default function Home() {
                   Console
                 </button>
                 <button
-                  className={panel === "chat" ? "active" : ""}
-                  onClick={() => setPanel("chat")}
+                  aria-expanded={chatOpen}
+                  aria-controls="classroom-chat"
+                  className={chatOpen ? "active" : ""}
+                  onClick={() => setChatOpen((open) => !open)}
                 >
                   {!data.currentActivity
                     ? "Classroom chat"
@@ -2551,84 +2572,6 @@ export default function Home() {
                     />
                   </label>
                   <small>Ctrl+Enter runs with this input</small>
-                </div>
-              ) : panel === "chat" ? (
-                <div className="chat">
-                  <div className="chat-toolbar">
-                    <b>
-                      {activityChatUnavailable
-                        ? data.currentActivity?.mode === "individual"
-                          ? "Select a student to start a private chat"
-                          : "Select a group to open its chat"
-                        : !data.currentActivity
-                          ? "Everyone in the classroom"
-                          : data.currentActivity.mode === "individual"
-                            ? `Teacher and ${team.members[0]?.name || "student"}`
-                            : team.name}
-                    </b>
-                    {!data.currentActivity && user.role === "teacher" && (
-                      <button type="button" onClick={toggleClassroomChatMute}>
-                        {data.classroomChatMuted
-                          ? "Unmute students"
-                          : "Mute students"}
-                      </button>
-                    )}
-                    {!data.currentActivity &&
-                      user.role === "student" &&
-                      data.classroomChatMuted && (
-                        <span>Teacher muted chat</span>
-                      )}
-                  </div>
-                  <div className="chat-messages">
-                    {messages.length ? (
-                      messages.map((message) => (
-                        <div className="chat-message" key={message.id}>
-                          {message.author.photoUrl ? (
-                            <img src={message.author.photoUrl} alt="" />
-                          ) : (
-                            <i>
-                              {message.author.name
-                                .split(" ")
-                                .map((part) => part[0])
-                                .join("")
-                                .slice(0, 2)
-                                .toUpperCase()}
-                            </i>
-                          )}
-                          <div>
-                            <b>{message.author.name}</b>
-                            <p>{message.text}</p>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="chat-empty">
-                        No messages yet. Say hello to your group.
-                      </p>
-                    )}
-                  </div>
-                  <form onSubmit={sendMessage}>
-                    <input
-                      value={chatText}
-                      onChange={(event) => setChatText(event.target.value)}
-                      placeholder={
-                        !data.currentActivity
-                          ? "Message the classroom…"
-                          : data.currentActivity.mode === "individual"
-                            ? "Message your teacher…"
-                            : "Message your group…"
-                      }
-                      maxLength={1000}
-                      aria-label="Chat message"
-                      disabled={
-                        activityChatUnavailable ||
-                        (team.isGroup && Boolean(myGroupMembership?.chatMuted) && team.leaderId !== user.id) ||
-                        (!data.currentActivity &&
-                          user.role === "student" &&
-                          data.classroomChatMuted)
-                      }
-                    />
-                  </form>
                 </div>
               ) : panel === "saved" ? (
                 <div className="record-list">
@@ -2785,6 +2728,89 @@ export default function Home() {
             </div>
           </footer>
         </section>
+        <WorkspaceDrawer id="classroom-modules" title="Course modules" side="left" open={modulesOpen} onClose={() => setModulesOpen(false)}>
+          {classroomId && <ModuleViewer key={classroomId} role={user.role} classroomId={classroomId} embedded drawer active={modulesOpen} />}
+        </WorkspaceDrawer>
+        <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} onClose={() => setChatOpen(false)}>
+          <div className="chat">
+                  <div className="chat-toolbar">
+                    <b>
+                      {activityChatUnavailable
+                        ? data.currentActivity?.mode === "individual"
+                          ? "Select a student to start a private chat"
+                          : "Select a group to open its chat"
+                        : !data.currentActivity
+                          ? "Everyone in the classroom"
+                          : data.currentActivity.mode === "individual"
+                            ? `Teacher and ${team.members[0]?.name || "student"}`
+                            : team.name}
+                    </b>
+                    {!data.currentActivity && user.role === "teacher" && (
+                      <button type="button" onClick={toggleClassroomChatMute}>
+                        {data.classroomChatMuted
+                          ? "Unmute students"
+                          : "Mute students"}
+                      </button>
+                    )}
+                    {!data.currentActivity &&
+                      user.role === "student" &&
+                      data.classroomChatMuted && (
+                        <span>Teacher muted chat</span>
+                      )}
+                  </div>
+                  <div className="chat-messages">
+                    {messages.length ? (
+                      messages.map((message) => (
+                        <div className={`chat-message ${message.author.id === user.id ? "chat-own" : ""}`} key={message.id}>
+                          {message.author.photoUrl ? (
+                            <img src={message.author.photoUrl} alt="" />
+                          ) : (
+                            <i>
+                              {message.author.name
+                                .split(" ")
+                                .map((part) => part[0])
+                                .join("")
+                                .slice(0, 2)
+                                .toUpperCase()}
+                            </i>
+                          )}
+                          <div>
+                            <b>{message.author.name}</b>
+                            <p>{message.text}</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="chat-empty">
+                        No messages yet. Start a conversation here.
+                      </p>
+                    )}
+                  </div>
+                  <form onSubmit={sendMessage}>
+                    <input
+                      value={chatText}
+                      onChange={(event) => setChatText(event.target.value)}
+                      placeholder={
+                        !data.currentActivity
+                          ? "Message the classroom…"
+                          : data.currentActivity.mode === "individual"
+                            ? "Message your teacher…"
+                            : "Message your group…"
+                      }
+                      maxLength={1000}
+                      aria-label="Chat message"
+                      disabled={
+                        activityChatUnavailable ||
+                        (team.isGroup && Boolean(myGroupMembership?.chatMuted) && team.leaderId !== user.id) ||
+                        (!data.currentActivity &&
+                          user.role === "student" &&
+                          data.classroomChatMuted)
+                      }
+                    />
+                    <button type="submit" aria-label="Send message" disabled={!chatText.trim() || activityChatUnavailable || (team.isGroup && Boolean(myGroupMembership?.chatMuted) && team.leaderId !== user.id) || (!data.currentActivity && user.role === "student" && data.classroomChatMuted)}>➤</button>
+                  </form>
+                </div>
+        </WorkspaceDrawer>
       </section>
       {newFileOpen && (
         <div
@@ -3363,15 +3389,6 @@ export default function Home() {
             </pre>
           </section>
         </div>
-      )}
-      {modulesOpen && classroomId && (
-        <ModuleViewer
-          role={user.role}
-          classroomId={classroomId}
-          onClose={() => {
-            setModulesOpen(false);
-          }}
-        />
       )}
       {toast && <div className="toast">{toast}</div>}
     </main>
