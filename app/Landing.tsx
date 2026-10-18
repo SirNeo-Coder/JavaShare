@@ -1,11 +1,13 @@
 "use client";
 
 // Class list and class home, kept separate from the live classroom workspace.
-import { useEffect, useState } from "react";
-import { api } from "./apiClient";
+import { useEffect, useRef, useState } from "react";
+import { api, getApiUrl } from "./apiClient";
+import { realtimeClient } from "./realtime";
+import { listenForLiveClasses, pendingLiveClasses, type LiveClassroom } from "./liveClasses";
 import ModuleViewer from "./ModuleViewer";
 
-type LandingClassroom = { id: string; name: string; subject: string; joinCode?: string; hasActivity?: boolean; hasLiveShare?: boolean };
+type LandingClassroom = LiveClassroom;
 type RosterStudent = { id: string; name: string; email: string; joinedAt?: string };
 type ModuleStatus = "done" | "in-progress" | "not-started";
 type ModuleSummary = { moduleId: string; title: string; week: number; percent: number; status: ModuleStatus; isLatest: boolean };
@@ -17,7 +19,10 @@ type Props = {
   initialClassroomId?: string | null;
   onEnter: (classroomId: string) => void;
   onLogout: () => void;
-  onRefresh: () => void;
+  onRefresh: () => Promise<void>;
+  onLiveStatusChange: (classrooms: LiveClassroom[]) => void;
+  dismissedLiveSessions: Record<string, string>;
+  onDismissLiveClasses: (classrooms: LiveClassroom[]) => void;
 };
 
 function statusLabel(summary: ModuleSummary) {
@@ -179,10 +184,9 @@ function ClassRoster({ classroomId }: { classroomId: string }) {
   );
 }
 
-function StudentModules({ classroomId }: { classroomId: string }) {
+function StudentModules({ classroomId, selectedModuleId, onSelectModule }: { classroomId: string; selectedModuleId: string | null; onSelectModule: (moduleId: string | null) => void }) {
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [error, setError] = useState("");
-  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedModuleId) return;
@@ -202,7 +206,7 @@ function StudentModules({ classroomId }: { classroomId: string }) {
       {modules && modules.length > 0 && (
         <div className="activity-summary-list">
           {modules.map((module) => (
-            <button type="button" className="activity-summary-card" key={module.moduleId} onClick={() => setSelectedModuleId(module.moduleId)} style={{ textAlign: "left", cursor: "pointer" }}>
+            <button type="button" className="activity-summary-card" key={module.moduleId} onClick={() => onSelectModule(module.moduleId)} style={{ textAlign: "left", cursor: "pointer" }}>
               <div className="activity-summary-head">
                 <div><span className={`activity-state ${module.status === "done" ? "active" : ""}`}>{statusLabel(module)}</span><h3>Week {module.week} — {module.title}</h3></div>
               </div>
@@ -216,16 +220,109 @@ function StudentModules({ classroomId }: { classroomId: string }) {
           role="student"
           classroomId={classroomId}
           initialModuleId={selectedModuleId}
-          onClose={() => setSelectedModuleId(null)}
+          onClose={() => onSelectModule(null)}
         />
       )}
     </section>
   );
 }
 
-export default function Landing({ role, name, classrooms, initialClassroomId, onEnter, onLogout, onRefresh }: Props) {
+function LiveClassInvitation({ classrooms, onJoin, onDismiss }: { classrooms: LiveClassroom[]; onJoin: (classroom: LiveClassroom) => void; onDismiss: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    element?.showModal();
+    return () => element?.close();
+  }, []);
+
+  return (
+    <dialog ref={dialog} className="activity-modal live-class-invitation" aria-labelledby="live-class-title" onCancel={(event) => { event.preventDefault(); onDismiss(); }}>
+      <header><h2 id="live-class-title">Your class is live</h2></header>
+      <p>{classrooms.length > 1 ? "Choose the class you want to join." : "Your teacher has started an activity or live share."}</p>
+      {classrooms.map((classroom) => (
+        <div className="module-list-row" key={classroom.id}>
+          <b>{classroom.name}</b>
+          <button type="button" aria-label={`Join live class: ${classroom.name}`} onClick={() => onJoin(classroom)}>Join live class</button>
+        </div>
+      ))}
+      <footer><button type="button" onClick={onDismiss}>Not now</button></footer>
+    </dialog>
+  );
+}
+
+export default function Landing({ role, name, classrooms, initialClassroomId, onEnter, onLogout, onRefresh, onLiveStatusChange, dismissedLiveSessions, onDismissLiveClasses }: Props) {
   const [selectedClassroomId, setSelectedClassroomId] = useState(initialClassroomId ?? null);
-  const classroom = classrooms.find((item) => item.id === selectedClassroomId);
+  const [liveClassrooms, setLiveClassrooms] = useState<Record<string, LiveClassroom>>({});
+  const displayedClassrooms = classrooms.map((item) => liveClassrooms[item.id] || item);
+  const classroom = displayedClassrooms.find((item) => item.id === selectedClassroomId);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+  const [connectionError, setConnectionError] = useState("");
+  const [connectionAttempt, setConnectionAttempt] = useState(0);
+  const [refreshError, setRefreshError] = useState("");
+  const statusChangeRef = useRef(onLiveStatusChange);
+  useEffect(() => { statusChangeRef.current = onLiveStatusChange; }, [onLiveStatusChange]);
+  const classroomIds = JSON.stringify(classrooms.map((item) => item.id).sort());
+  const invitations = role === "student" ? pendingLiveClasses(displayedClassrooms, dismissedLiveSessions) : [];
+  const enterClassroom = (item: LiveClassroom) => {
+    onDismissLiveClasses([item]);
+    onEnter(item.id);
+  };
+
+  useEffect(() => {
+    if (role !== "student" || classroomIds === "[]") return;
+    let cancelled = false;
+    let refreshing = false;
+    let refreshAgain = false;
+    let connecting = false;
+    let stopListening: (() => Promise<void>) | null = null;
+    // Coalesce simultaneous channel joins and serialize refreshes so an older reply cannot
+    // overwrite newer class status. An announcement during a request gets a follow-up request.
+    const refresh = async () => {
+      if (cancelled) return;
+      if (refreshing) { refreshAgain = true; return; }
+      refreshing = true;
+      try {
+        // Keep background status local: a late class-list reply must never replace the
+        // workspace's teams/files after the student has chosen Join live class.
+        const result = await api<{ classrooms: LiveClassroom[] }>("/api/bootstrap");
+        if (cancelled) return;
+        setLiveClassrooms(Object.fromEntries(result.classrooms.map((item) => [item.id, item])));
+        statusChangeRef.current(result.classrooms);
+        setRefreshError("");
+      } catch (error) {
+        if (!cancelled) setRefreshError(error instanceof Error ? error.message : "Could not refresh live classes");
+      } finally {
+        refreshing = false;
+        if (refreshAgain) { refreshAgain = false; void refresh(); }
+      }
+    };
+    const connect = async () => {
+      if (connecting || stopListening || cancelled) return;
+      connecting = true;
+      try {
+        const client = await realtimeClient(getApiUrl());
+        if (cancelled) return;
+        stopListening = listenForLiveClasses(client, JSON.parse(classroomIds), () => void refresh(), (available) => {
+          if (!cancelled) setConnectionError(available ? "" : "Live invitations are unavailable. You can still enter a classroom.");
+        });
+      } catch {
+        if (!cancelled) setConnectionError("Live invitations are unavailable. You can still enter a classroom.");
+      } finally { connecting = false; }
+    };
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") { void refresh(); void connect(); }
+    };
+    void refresh();
+    void connect();
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      cancelled = true;
+      void stopListening?.();
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [role, classroomIds, connectionAttempt]);
 
   return (
     <main className="teacher-dashboard">
@@ -237,6 +334,12 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
         </div>
       </header>
       <section className="dashboard-content">
+        {role === "student" && (connectionError || refreshError) && (
+          <div className="dashboard-error" role="status">
+            <span>{refreshError || connectionError}</span>
+            <button onClick={() => setConnectionAttempt((attempt) => attempt + 1)}>Reconnect</button>
+          </div>
+        )}
         {classroom ? (
           <div key={classroom.id}>
             <div className="dashboard-heading">
@@ -247,7 +350,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
               </div>
               <div className="dashboard-actions">
                 <LiveBadge classroom={classroom} />
-                <button onClick={() => onEnter(classroom.id)}>Enter classroom</button>
+                <button onClick={() => enterClassroom(classroom)}>Enter classroom</button>
               </div>
             </div>
             {role === "teacher" ? (
@@ -257,7 +360,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
                 </section>
                 <ClassRoster classroomId={classroom.id} />
               </>
-            ) : <StudentModules classroomId={classroom.id} />}
+            ) : <StudentModules classroomId={classroom.id} selectedModuleId={selectedModuleId} onSelectModule={setSelectedModuleId} />}
           </div>
         ) : (
           <>
@@ -266,7 +369,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
               {role === "teacher" ? <CreateClass onCreated={onRefresh} /> : <JoinAnotherClass onJoined={onRefresh} />}
             </div>
             {!classrooms.length && <div className="empty-activities"><b>{role === "teacher" ? "No classes yet" : "Join a class to see your modules"}</b></div>}
-            {classrooms.map((item) => (
+            {displayedClassrooms.map((item) => (
               <section className="class-summary" key={item.id}>
                 <header>
                   <div><h2>{item.name}</h2><p>{item.subject}{role === "teacher" && item.joinCode ? ` · Code ${item.joinCode}` : ""}</p></div>
@@ -280,6 +383,9 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
           </>
         )}
       </section>
+      {!selectedModuleId && invitations.length > 0 && (
+        <LiveClassInvitation classrooms={invitations} onJoin={enterClassroom} onDismiss={() => onDismissLiveClasses(invitations)} />
+      )}
     </main>
   );
 }

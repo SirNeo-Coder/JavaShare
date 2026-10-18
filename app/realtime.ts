@@ -7,6 +7,7 @@ import { createClient, type RealtimeChannel, type SupabaseClient } from "@supaba
 type Pass = { token: string; expiresAt: number; url: string; anonKey: string };
 
 let clientPromise: Promise<SupabaseClient> | null = null;
+let channelCleanup = Promise.resolve();
 
 // Offline, the server knows local Supabase as 127.0.0.1; classroom devices must use the laptop's address.
 export function browserReachableUrl(url: string, pageHostname: string) {
@@ -50,7 +51,18 @@ export function realtimeClient(apiUrl: string) {
     clientPromise = null;
     throw error;
   });
-  return clientPromise;
+  return clientPromise.then(async (client) => {
+    // The SDK reuses a channel with the same topic; finish leaving the previous screen first.
+    await channelCleanup;
+    return client;
+  });
+}
+
+export function releaseRealtimeChannels(client: SupabaseClient, channels: RealtimeChannel[]) {
+  channelCleanup = channelCleanup.then(async () => {
+    await Promise.all(channels.map((channel) => client.removeChannel(channel)));
+  }).catch(() => undefined);
+  return channelCleanup;
 }
 
 export function forgetRealtimeClient() {

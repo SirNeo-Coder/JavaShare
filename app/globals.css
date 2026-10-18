@@ -285,3 +285,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .class-module-panel { width:100%; max-height:none; box-shadow:none; }
 .class-module-panel header>button { font-size:11px; }
 @media (max-width:720px) { .dashboard-heading,.class-summary>header { flex-wrap:wrap; gap:14px; } }
+
+.live-class-invitation:not([open]) { display:none; }
+.live-class-invitation::backdrop { background:#0b1020b8; backdrop-filter:blur(4px); }
+.live-class-invitation>p { margin:0; color:var(--muted); font-size:12px; }

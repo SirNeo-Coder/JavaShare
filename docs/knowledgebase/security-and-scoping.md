@@ -28,6 +28,7 @@ Checked in `supabase-repository.ts` (row-level security exists but the server by
 - Policies on `realtime.messages`, using `can_join_realtime_topic` and `can_broadcast_realtime_topic`:
   - **team channel:** team members and the class teacher join and send; for `teacher-demo` (classroom chat), every class member.
   - **class channel:** members join and announce presence; **only the class teacher broadcasts**.
+- On the class list and class home, student invitations only receive class announcements; they neither send broadcasts nor announce Presence. The existing membership policies still apply. Server summaries, not broadcast payloads, determine whether a class is live. Channels are released before a new screen reuses their topics (CKB-017).
 - The same migration **revokes all direct table access** from `anon` and `authenticated`, so the pass can't read or change tables (tested: `403`, code `42501`).
 - Coarser than before: channels check membership only. Typing from a member the group leader locked is ignored by receivers (`app/page.tsx`), and saving is still fully checked by the server. Sender names in typing messages come from the sender's browser.
 - Tests: `tests/realtime.test.mjs` (needs local Supabase). Both rule checks were shown to fail when the rule was weakened.

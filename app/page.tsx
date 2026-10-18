@@ -6,9 +6,10 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import CodeEditor, { languageLabel } from "./CodeEditor";
 import Landing from "./Landing";
 import ModuleViewer from "./ModuleViewer";
+import { retainLiveDismissals } from "./liveClasses";
 import { api, getApiUrl } from "./apiClient";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
-import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, throttle } from "./realtime";
+import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, releaseRealtimeChannels, throttle } from "./realtime";
 
 const FRESH_LESSON_CODE = `public class Main {
     public static void main(String[] args) {
@@ -91,6 +92,7 @@ type Bootstrap = {
     joinCode?: string;
     hasActivity?: boolean;
     hasLiveShare?: boolean;
+    liveSessionId?: string | null;
   }[];
   teams: TeamData[];
   groupCount?: number;
@@ -211,6 +213,7 @@ export default function Home() {
   const [fontScale, setFontScale] = useState(getSavedFontScale);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
+  const [dismissedLiveSessions, setDismissedLiveSessions] = useState<Record<string, string>>({});
   const [homeClassroomId, setHomeClassroomId] = useState<string | null>(null);
   const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -505,6 +508,7 @@ export default function Home() {
         const query = params.toString();
         const next = await api<Bootstrap>(`/api/bootstrap${query ? `?${query}` : ""}`);
         setData(next);
+        if (!enteredClassroomId) setDismissedLiveSessions((current) => retainLiveDismissals(next.classrooms, current));
         setUser(next.user);
         setWorkspaceError("");
         const currentActivity = next.currentActivity;
@@ -573,7 +577,7 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [user, loadWorkspace, teacherWorkspaceView, enteredClassroomId]);
   useEffect(() => {
-    if (!classroomId) return;
+    if (!enteredClassroomId || enteredClassroomId !== classroomId) return;
     let cancelled = false;
     const refreshLiveShare = async () => {
       try {
@@ -618,7 +622,7 @@ export default function Home() {
       window.removeEventListener("focus", refreshWhenVisible);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
-  }, [classroomId]);
+  }, [classroomId, enteredClassroomId]);
   useEffect(() => {
     if (!chatTeamId) {
       queueMicrotask(() => setMessages([]));
@@ -671,9 +675,10 @@ export default function Home() {
     liveRef.current = { code, activeFile, team, userId: user?.id || "", userName: user?.name || "" };
   });
   useEffect(() => {
-    if (!teamId || !userId || !classroomId) return;
+    if (!enteredClassroomId || enteredClassroomId !== classroomId || !teamId || !userId) return;
     let cancelled = false;
     const channels: RealtimeChannel[] = [];
+    let releaseChannels = () => Promise.resolve();
     // Live events arrive as Supabase Realtime broadcasts: "class:*" and "groups:*" events on the
     // class channel, everything else on the team channel(s). See app/realtime.ts.
     const handlers: { event: string; handler: (payload: never) => void }[] = [];
@@ -987,6 +992,7 @@ export default function Home() {
     realtimeClient(getApiUrl())
       .then((client) => {
         if (cancelled) return;
+        releaseChannels = () => releaseRealtimeChannels(client, channels);
         setSyncStatus("Joining live classroom…");
         const join = (topic: string, presenceKey?: string) => {
           const channel = privateChannel(client, topic, presenceKey);
@@ -1035,11 +1041,10 @@ export default function Home() {
       cancelled = true;
       teamChannelRef.current = null;
       classChannelRef.current = null;
-      void realtimeClient(getApiUrl())
-        .then((client) => channels.forEach((channel) => void client.removeChannel(channel)))
-        .catch(() => undefined);
+      void releaseChannels();
     };
   }, [
+    enteredClassroomId,
     teamId,
     chatTeamId,
     userId,
@@ -1725,6 +1730,7 @@ export default function Home() {
     setData(null);
     setEnteredClassroomId(null);
     setHomeClassroomId(null);
+    setDismissedLiveSessions({});
     setModulesOpen(false);
   }
 
@@ -1741,12 +1747,15 @@ export default function Home() {
         name={user.name}
         classrooms={data.classrooms}
         initialClassroomId={homeClassroomId}
+        onLiveStatusChange={(classes) => setDismissedLiveSessions((current) => retainLiveDismissals(classes, current))}
+        dismissedLiveSessions={dismissedLiveSessions}
+        onDismissLiveClasses={(classes) => setDismissedLiveSessions((current) => ({ ...current, ...Object.fromEntries(classes.filter((item) => item.liveSessionId).map((item) => [item.id, item.liveSessionId!])) }))}
         onEnter={(classroomId) => {
           setHomeClassroomId(classroomId);
           setEnteredClassroomId(classroomId);
         }}
         onLogout={logout}
-        onRefresh={() => void loadWorkspace()}
+        onRefresh={async () => { await loadWorkspace(); }}
       />
     );
   if (!data || !team)

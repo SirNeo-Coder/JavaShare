@@ -56,6 +56,7 @@ test("landing pages: class roster, a student's own module summary, and a teacher
     const bootstrap = await (await call("/api/bootstrap", { headers: { cookie: studentACookie } })).json();
     assert.equal(bootstrap.classrooms[0].hasActivity, false);
     assert.equal(bootstrap.classrooms[0].hasLiveShare, false);
+    assert.equal(bootstrap.classrooms[0].liveSessionId, null);
 
     // Student roster for one classroom: teacher-only, excludes the teacher themselves.
     assert.equal((await call(`/api/classes/${classroomId}/students`, { headers: { cookie: studentACookie } })).status, 403, "a student cannot list the roster");
@@ -174,6 +175,21 @@ test("class list and creation: a teacher creates classes, a student joins one, a
     const enteredB = await (await call(`/api/bootstrap?classroomId=${classroomBId}`, { headers: { cookie: teacherCookie } })).json();
     assert.equal(enteredB.currentActivity, null, "class B's workspace must not see class A's running activity");
     assert.equal(enteredB.teams.filter((team) => team.isTeacherWorkspace).length, 1, "class B's bootstrap must not also pull in class A's teacher-demo workspace");
+
+    // Invitations use the class's own active session, not the first classroom or a join code.
+    const activityList = await (await call("/api/bootstrap", { headers: { cookie: studentCookie } })).json();
+    assert.equal(activityList.classrooms[0].liveSessionId, `activity:${activityId}`);
+    assert.equal(activityList.classrooms[0].hasActivity, true);
+    assert.equal(activityList.classrooms[0].joinCode, undefined, "students must not receive teacher-only join codes");
+    const demoProjectId = enteredA.teams.find((team) => team.isTeacherWorkspace).project.id;
+    await admin.from("classrooms").update({ current_activity_id: null, live_share_project_id: demoProjectId }).eq("id", classroomAId);
+    const shareList = await (await call("/api/bootstrap", { headers: { cookie: studentCookie } })).json();
+    assert.equal(shareList.classrooms[0].liveSessionId, `share:${demoProjectId}`);
+    assert.equal(shareList.classrooms[0].hasLiveShare, true);
+    await call(`/api/classes/${classroomAId}/live-share`, { method: "POST", headers: { cookie: teacherCookie }, body: JSON.stringify({ projectId: null }) });
+    const endedList = await (await call("/api/bootstrap", { headers: { cookie: studentCookie } })).json();
+    assert.equal(endedList.classrooms[0].liveSessionId, null);
+    assert.equal(endedList.classrooms[0].hasLiveShare, false);
 
     // A classroomId the caller can't access (here, the student was never added to B) is refused.
     assert.equal((await call(`/api/bootstrap?classroomId=${classroomBId}`, { headers: { cookie: studentCookie } })).status, 403);

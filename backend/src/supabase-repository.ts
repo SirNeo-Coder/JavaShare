@@ -255,6 +255,10 @@ function classSummary(user: SupabaseSessionUser, classroom: ClassroomRow) {
   return {
     id: classroom.id, name: classroom.name, subject: classroom.subject,
     hasActivity: Boolean(classroom.current_activity_id), hasLiveShare: Boolean(classroom.live_share_project_id),
+    // shortcut: a same-project restart missed entirely while disconnected has the same id;
+    // add a persisted session start time if those restarts must be distinguished too.
+    liveSessionId: classroom.current_activity_id ? `activity:${classroom.current_activity_id}`
+      : classroom.live_share_project_id ? `share:${classroom.live_share_project_id}` : null,
     ...(user.role === "teacher" ? { joinCode: classroom.join_code } : {}),
   };
 }
