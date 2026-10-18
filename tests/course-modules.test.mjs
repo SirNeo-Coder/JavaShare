@@ -55,7 +55,7 @@ test("course modules: teacher uploads, class members read, only the teacher may 
     const uploaded = await call(`/api/classrooms/${classroomId}/modules`, { method: "POST", headers: { cookie: teacherCookie }, body: JSON.stringify(fixture) });
     assert.equal(uploaded.status, 201);
     const summary = await uploaded.json();
-    assert.deepEqual(summary, { moduleId: fixture.id, title: fixture.title, week: fixture.week, course: fixture.course, updatedAt: summary.updatedAt });
+    assert.deepEqual(summary, { moduleId: fixture.id, title: fixture.title, week: fixture.week, course: fixture.course, updatedAt: summary.updatedAt, isActive: false, locked: false });
 
     // An outsider (not in the class) sees nothing.
     assert.equal((await call(`/api/classrooms/${classroomId}/modules`, { headers: { cookie: outsiderCookie } })).status, 403);

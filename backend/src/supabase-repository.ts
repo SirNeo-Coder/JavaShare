@@ -16,7 +16,7 @@ export class SupabaseRepositoryError extends Error {
   constructor(status: number, message: string) { super(message); this.status = status; }
 }
 
-type ClassroomRow = { id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean };
+type ClassroomRow = { id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean; active_module_id: string | null };
 type TeamRow = { id: string; classroom_id: string; owner_id: string | null; slug: string; name: string; leader_id: string | null; chat_muted: boolean; editing_locked: boolean };
 type ProjectRow = { id: string; classroom_id: string; team_id: string; activity_id: string | null; title: string; description: string; language?: string };
 type ActivityRow = { id: string; classroom_id: string; title: string; mode: "individual" | "group"; ended_at: string | null };
@@ -1227,11 +1227,26 @@ type ModuleProgressRow = {
   student_id: string; classroom_id: string; module_id: string;
   step_states: Record<string, ModuleStepStatus>;
   performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>>;
+  project_files: Array<{ path: string; content: string }>;
   updated_at: string;
 };
 
 async function requireClassroomMember(user: SupabaseSessionUser, classroomId: string) {
   if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Join the class before tracking module progress");
+}
+
+// While a live activity is running for a class, a student's module catalog locks to just the
+// teacher's weekly pick (classrooms.active_module_id) - every other module stays unreachable for
+// the duration, not only hidden in the UI. Teachers previewing are never locked: they may need to
+// open any module regardless of what's live. No live activity running means no lock at all.
+async function enforceModuleLiveLock(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  if (user.role !== "student") return;
+  const db = getSupabaseAdmin();
+  const { data: classroom, error } = await db.from("classrooms").select("current_activity_id,active_module_id").eq("id", classroomId).maybeSingle();
+  fail(error, "Could not check class status");
+  if (!classroom?.current_activity_id) return;
+  if (classroom.active_module_id && moduleId === classroom.active_module_id) return;
+  throw new SupabaseRepositoryError(403, "Only this week's module is open while class is live");
 }
 
 async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string): Promise<ModuleProgressRow> {
@@ -1262,7 +1277,7 @@ async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId
 // lock: write back only if the row is still the version we read, otherwise reload and retry.
 async function updateModuleProgressWithMerge(
   user: SupabaseSessionUser, classroomId: string, moduleId: string,
-  merge: (row: ModuleProgressRow) => Partial<Pick<ModuleProgressRow, "step_states" | "performance_task">>,
+  merge: (row: ModuleProgressRow) => Partial<Pick<ModuleProgressRow, "step_states" | "performance_task" | "project_files">>,
   failMessage: string,
 ): Promise<ModuleProgressRow> {
   const db = getSupabaseAdmin();
@@ -1278,12 +1293,16 @@ async function updateModuleProgressWithMerge(
 }
 
 function moduleProgressView(row: ModuleProgressRow, module: CourseModule) {
-  return { moduleId: row.module_id, stepStates: row.step_states, performanceTask: row.performance_task, percent: moduleCompletionPercent(module, row), updatedAt: row.updated_at };
+  return {
+    moduleId: row.module_id, stepStates: row.step_states, performanceTask: row.performance_task,
+    projectFiles: row.project_files, percent: moduleCompletionPercent(module, row), updatedAt: row.updated_at,
+  };
 }
 
 export async function getSupabaseModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
+  await enforceModuleLiveLock(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   return moduleProgressView(await loadOrCreateModuleProgress(user, classroomId, moduleId), courseRow.content);
 }
@@ -1293,6 +1312,7 @@ export async function getSupabaseModuleProgress(user: SupabaseSessionUser, class
 export async function setSupabaseModuleStepState(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string, status: ModuleStepStatus) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
+  await enforceModuleLiveLock(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   const lesson = courseRow.content.lessons.find((item) => item.exitSlip.id === stepId || item.blocks.some((block) => block.type === "step" && block.id === stepId));
   if (!lesson) throw new SupabaseRepositoryError(400, "Step or exit slip not found in this module");
@@ -1311,6 +1331,7 @@ export async function setSupabaseModulePerformanceTask(
 ) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
+  await enforceModuleLiveLock(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   if (!courseRow.content.performanceTask) throw new SupabaseRepositoryError(404, "Performance task not found in this module");
   if (!courseRow.performance_task_open) throw new SupabaseRepositoryError(403, "The performance task is not open yet");
@@ -1318,6 +1339,23 @@ export async function setSupabaseModulePerformanceTask(
     user, classroomId, moduleId,
     (row) => ({ performance_task: { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } } }),
     "Could not save performance task submission",
+  );
+  return moduleProgressView(data, courseRow.content);
+}
+
+// The student's one shared project for this module (e.g. one Main.java replaced step by step),
+// separate from the two performance-task submissions above. No open-lesson check: unlike a step
+// result or a performance-task submission, saving the working copy of a file the student is
+// mid-edit on shouldn't be blocked by which lesson happens to be open right now.
+export async function setSupabaseModuleProjectFiles(user: SupabaseSessionUser, classroomId: string, moduleId: string, files: Array<{ path: string; content: string }>) {
+  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
+  await requireClassroomMember(user, classroomId);
+  await enforceModuleLiveLock(user, classroomId, moduleId);
+  const courseRow = await loadCourseModuleRow(classroomId, moduleId);
+  const data = await updateModuleProgressWithMerge(
+    user, classroomId, moduleId,
+    () => ({ project_files: files }),
+    "Could not save your project",
   );
   return moduleProgressView(data, courseRow.content);
 }
@@ -1456,30 +1494,52 @@ export async function setSupabaseModuleAvailability(user: SupabaseSessionUser, c
   throw new SupabaseRepositoryError(409, "Module changed while saving. Please try again");
 }
 
-function courseModuleSummary(row: CourseModuleRow) {
-  return { moduleId: row.module_id, title: row.content.title, week: row.content.week, course: row.content.course, updatedAt: row.updated_at };
+// isActive: this is the teacher's weekly pick (classrooms.active_module_id) for the class.
+// locked: a student may not open this module right now because a live activity is running and
+// this isn't the weekly pick - mirrors enforceModuleLiveLock so the catalog can grey it out
+// instead of a student discovering the lock only after tapping in.
+function courseModuleSummary(row: CourseModuleRow, classroom: Pick<ClassroomRow, "active_module_id" | "current_activity_id">, role: "teacher" | "student") {
+  const isActive = row.module_id === classroom.active_module_id;
+  const locked = role === "student" && Boolean(classroom.current_activity_id) && !isActive;
+  return { moduleId: row.module_id, title: row.content.title, week: row.content.week, course: row.content.course, updatedAt: row.updated_at, isActive, locked };
 }
 
 export async function uploadSupabaseModule(user: SupabaseSessionUser, classroomId: string, content: CourseModule) {
-  await teacherClassroom(user, classroomId);
+  const classroom = await teacherClassroom(user, classroomId);
   const db = getSupabaseAdmin();
   const { data, error } = await db.from("course_modules")
     .upsert({ classroom_id: classroomId, module_id: content.id, content, created_by: user.id }, { onConflict: "classroom_id,module_id" })
     .select("classroom_id,module_id,content,created_at,updated_at").single();
   fail(error, "Could not save module");
-  return courseModuleSummary(data as CourseModuleRow);
+  return courseModuleSummary(data as CourseModuleRow, classroom, user.role);
 }
 
 export async function listSupabaseModules(user: SupabaseSessionUser, classroomId: string) {
   await requireClassroomMember(user, classroomId);
   const db = getSupabaseAdmin();
+  const { data: classroom, error: classroomError } = await db.from("classrooms").select("active_module_id,current_activity_id").eq("id", classroomId).maybeSingle();
+  fail(classroomError, "Could not load class status");
+  if (!classroom) throw new SupabaseRepositoryError(404, "Classroom not found");
   const { data, error } = await db.from("course_modules").select("classroom_id,module_id,content,created_at,updated_at").eq("classroom_id", classroomId).order("created_at", { ascending: false });
   fail(error, "Could not list modules");
-  return (data as CourseModuleRow[]).map(courseModuleSummary);
+  return (data as CourseModuleRow[]).map((row) => courseModuleSummary(row, classroom, user.role));
+}
+
+// Teacher's weekly pick of one module for a class (docs/knowledgebase/workflow-state.md). null
+// clears the pick. Validates the module belongs to this classroom so a stale/foreign module_id
+// can't be set active.
+export async function setSupabaseClassroomActiveModule(user: SupabaseSessionUser, classroomId: string, moduleId: string | null) {
+  await teacherClassroom(user, classroomId);
+  const db = getSupabaseAdmin();
+  if (moduleId) await loadCourseModuleRow(classroomId, moduleId);
+  const { error } = await db.from("classrooms").update({ active_module_id: moduleId }).eq("id", classroomId);
+  fail(error, "Could not set this week's module");
+  return { activeModuleId: moduleId };
 }
 
 export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   await requireClassroomMember(user, classroomId);
+  await enforceModuleLiveLock(user, classroomId, moduleId);
   const row = await loadCourseModuleRow(classroomId, moduleId);
   const availability = moduleAvailability(row);
   if (user.role === "teacher") return { ...row.content, availability };
@@ -1498,9 +1558,15 @@ export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: 
 }
 
 export async function deleteSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
-  await teacherClassroom(user, classroomId);
+  const classroom = await teacherClassroom(user, classroomId);
   const db = getSupabaseAdmin();
   const { error } = await db.from("course_modules").delete().eq("classroom_id", classroomId).eq("module_id", moduleId);
   fail(error, "Could not delete module");
+  // active_module_id is plain text, not a foreign key (see migration), so deleting its target
+  // doesn't clear it automatically - do it here or the weekly pick points at nothing.
+  if (classroom.active_module_id === moduleId) {
+    const { error: clearError } = await db.from("classrooms").update({ active_module_id: null }).eq("id", classroomId);
+    fail(clearError, "Could not clear this week's module after deleting it");
+  }
   return { deleted: true };
 }

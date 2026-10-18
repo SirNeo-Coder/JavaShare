@@ -44,9 +44,11 @@ import {
   saveSupabaseFile,
   sendSupabaseMessage,
   setSupabaseClassroomChatMuted,
+  setSupabaseClassroomActiveModule,
   setSupabaseLiveShare,
   setSupabaseModuleAvailability,
   setSupabaseModulePerformanceTask,
+  setSupabaseModuleProjectFiles,
   setSupabaseModuleStepState,
   submitSupabaseProject,
   supabaseActivitySummary,
@@ -492,6 +494,17 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-tas
   } catch (error) { next(error); }
 });
 
+// The student's one shared project for a module (e.g. one Main.java replaced step by step) -
+// separate from the two performance-task submissions above.
+app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/project", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { files } = z.object({
+      files: z.array(z.object({ path: z.string().trim().min(1).max(160), content: z.string().max(200000) })).min(1).max(50),
+    }).parse(req.body);
+    return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files));
+  } catch (error) { next(error); }
+});
+
 // Course modules (docs/course-format.md): the teacher uploads a weekly module file for a class;
 // members of that class (teacher and students) can list and view it.
 app.post("/api/classrooms/:classroomId/modules", requireAuth, async (req: AuthedRequest, res, next) => {
@@ -522,6 +535,16 @@ app.patch("/api/classrooms/:classroomId/modules/:moduleId/availability", require
       z.object({ target: z.literal("performance-task"), open: z.boolean() }),
     ]).parse(req.body);
     return res.json(await setSupabaseModuleAvailability(req.user!, String(req.params.classroomId), String(req.params.moduleId), change));
+  } catch (error) { next(error); }
+});
+
+// Teacher's weekly pick of one module for a class (docs/knowledgebase/workflow-state.md). While
+// a live activity is running, a student's module catalog locks to just this pick - see
+// enforceModuleLiveLock in supabase-repository.ts.
+app.patch("/api/classrooms/:classroomId/active-module", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { moduleId } = z.object({ moduleId: z.string().trim().min(1).max(100).nullable() }).parse(req.body);
+    return res.json(await setSupabaseClassroomActiveModule(req.user!, String(req.params.classroomId), moduleId));
   } catch (error) { next(error); }
 });
 

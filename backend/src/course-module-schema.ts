@@ -23,6 +23,12 @@ const block = z.discriminatedUnion("type", [
     run: z.string().trim().min(1).max(200).optional(),
     expectedOutput: z.string().max(100000),
     checkYourself: z.string().max(5000).optional(),
+    // Groups this step (and any text/definition/analogy/table/note blocks leading into it) under
+    // one named, gated part of the module viewer - a part can span several lessons (e.g. a
+    // "Reading files" part covering both a Tuesday and a Wednesday lesson) because grouping
+    // follows the discussion, not the day. Optional and omitted by every module uploaded before
+    // this field existed; the viewer falls back to one part per lesson when a step has no part.
+    part: z.string().trim().min(1).max(200).optional(),
   }),
   z.object({ type: z.literal("error"), language, markdown: z.string().max(5000), message: z.string().max(5000) }),
   z.object({

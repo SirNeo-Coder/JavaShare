@@ -76,3 +76,25 @@ test("course module schema: rejects duplicate lesson ids before they can share a
   broken.lessons[1].id = broken.lessons[0].id;
   assert.equal(courseModule.safeParse(broken).success, false, "lesson ids must be unique even when their step and exit-slip ids differ");
 });
+
+// The fixture (and every module uploaded before `part` existed) has no `part` field on its
+// steps - the schema must keep accepting that unchanged, since this field is additive.
+test("course module schema: accepts a module with no step `part` fields, unchanged (backward compatible)", () => {
+  const step = fixture.lessons[0].blocks.find((block) => block.type === "step");
+  assert.equal("part" in step, false, "fixture should not already have a part field, or this test proves nothing");
+  assert.equal(courseModule.safeParse(fixture).success, true);
+});
+
+test("course module schema: accepts a step with a `part` title, including one shared across two lessons", () => {
+  const withParts = structuredClone(fixture);
+  withParts.lessons[0].blocks.find((block) => block.type === "step").part = "Reading files";
+  withParts.lessons[1].blocks.find((block) => block.type === "step").part = "Reading files";
+  const parsed = courseModule.safeParse(withParts);
+  assert.equal(parsed.success, true);
+});
+
+test("course module schema: rejects an empty `part` title", () => {
+  const broken = structuredClone(fixture);
+  broken.lessons[0].blocks.find((block) => block.type === "step").part = "";
+  assert.equal(courseModule.safeParse(broken).success, false);
+});

@@ -43,7 +43,7 @@ One file per teaching week, named `<Course>_Week_NN.codeshare.json` (for example
 | `"analogy"` | `markdown` |
 | `"note"` | `markdown` (used for "Check yourself" and tips) |
 | `"table"` | `columns` (string[]), `rows` (string[][]) |
-| `"step"` | `id` (e.g. `"java-2-w15-d1-s1"`), `number`, `instruction` (markdown), `language` (`"java"` \| `"html"` \| `"css"` \| `"javascript"` \| `"csharp"`), `files` (File[] — the files the student puts in or replaces), `run` (optional: the file to run, e.g. `"Main.java"` or `"index.html"`), `expectedOutput` (the **real** output, exactly as produced), `checkYourself` (optional markdown) |
+| `"step"` | `id` (e.g. `"java-2-w15-d1-s1"`), `number`, `instruction` (markdown), `language` (`"java"` \| `"html"` \| `"css"` \| `"javascript"` \| `"csharp"`), `files` (File[] — the files the student puts in or replaces), `run` (optional: the file to run, e.g. `"Main.java"` or `"index.html"`), `expectedOutput` (the **real** output, exactly as produced), `checkYourself` (optional markdown), `part` (optional string — see "Parts" below) |
 | `"error"` | `language`, `markdown` (what causes it), `message` (the **real** error text) |
 | `"errorGuide"` | `rows`: `[{ "see": "...", "means": "...", "fix": "..." }]` |
 
@@ -58,6 +58,10 @@ One file per teaching week, named `<Course>_Week_NN.codeshare.json` (for example
 ### PerformanceTask
 
 `{ "id": "java-2-w15-pt", "title": "...", "markdown": "...", "checklist": ["..."], "exampleFiles": File[], "starterFiles": File[], "presentationOutline": ["..."], "questionsToPrepare": ["..."], "rubric": [ { "criterion": "...", "points": 10 } ], "totalPoints": 50 }`
+
+### Parts
+
+The module viewer groups a module's steps into named, gated parts a student unlocks one at a time (e.g. "Introduction", "File basics", "Reading files" — matching how the discussion actually flows, not necessarily one part per day; a part can cover steps from more than one lesson). Give a step a `part` title to put it in that part; any text/definition/analogy/table/note blocks between it and the previous step join the same part. A step with no `part` falls back to its own lesson as the part — so a module written before this field existed still groups sensibly, one part per lesson, with no changes needed.
 
 ### Rules
 
