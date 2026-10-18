@@ -4,7 +4,7 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-16 (PR c1 built and tested)
+Last updated: 2026-10-18 (Cloudflare preview testing complete; PR stack ready to merge in order)
 
 ## The job
 
@@ -39,6 +39,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 8. **Order swapped** (2026-10-16), so no temporary bridge code is needed:
    - **c1 (Realtime):** live features move to Supabase Realtime inside today's Express server, Socket.IO is removed, and hosting stays Vercel and Render.
    - **c2 (Cloudflare):** the `/api` routes move into Next.js, Next.js is upgraded to 16.4.2, the OpenNext adapter is added, sign-out on restart is dropped, and `docs/cloudflare-setup.md` is written.
+
+9. **Online is the everyday mode; Java online will use CheerpJ** (2026-10-17, for a later stage, nothing built yet). CodeShare runs online day to day, in class too. Offline mode is only the backup when there's no internet, and it keeps running Java on the laptop's `javac`. Online, Java will run in each student's browser with CheerpJ (it never uses a JDK on the student's own computer). CheerpJ granted a free Community Licence (non-commercial education, no ads, no paid content), on condition that the CheerpJ logo shows on pages where Java runs. The free version loads from CheerpJ's site, so the teacher agreed an exception to rule 5, written into `AGENTS.md`. Hosting CheerpJ ourselves would cost money (offered at a discount); not chosen. The plug-in point is the comment at the top of `app/webPreview.ts` and `runCode()` in `app/page.tsx`.
 
 ## Facts found while reading the code (affect PR c)
 
@@ -160,6 +162,43 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - Group members' typing isn't checked per keystroke, but saving is.
 - **For c2:** every open page asks the server for live-share state every 2 seconds (existing code). On Cloudflare's free plan (100,000 requests a day) that is too many for a class of 40, so it needs changing in c2.
 
+### PR (c2) CodeShare on Cloudflare: DONE, preview testing passed, ready to merge (pending the PR stack below it)
+
+- **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/5
+- **Branch:** `cloudflare-c2` (built on top of `realtime-c1`).
+- **What it changes:**
+  - Next.js upgraded to **16.4.2**. Added `@opennextjs/cloudflare` 1.20.12, `wrangler`, `wrangler.jsonc` (Worker `codeshare`, `nodejs_compat`, `keep_vars`), `open-next.config.ts`, and the scripts `cf:build`, `cf:preview`, `cf:deploy`.
+  - **All `/api` routes are shared:** `backend/src/routes.ts` (the old `server.ts`) runs on a tiny Express-style router (`backend/src/router.ts`) over web Request/Response.
+    - Next.js serves them through `app/api/[...path]/route.ts`, offline and on Cloudflare.
+    - `backend/src/server.ts` is now a thin Express wrapper, so **Render keeps working** for Vercel's pages.
+    - The Java runner moved to `java-runner.ts` and is loaded only when allowed (`CODESHARE_LAPTOP=true` from the launcher).
+  - **Sign-in:** `jose` replaces `jsonwebtoken`, and there's no more sign-out on restart. The cookie is Secure only over https, or for Vercel to Render (`SameSite=None`). Old cookies stay valid.
+  - **Launcher:** offline runs one program (`next start`) on port 3000; port 4000 is no longer used. `npm run dev` is one Next.js dev server.
+  - **Live-share safety net:** no 2-second timer. The page checks on open, on returning to the tab, and when the class channel (re)connects. Teacher decision, 2026-10-16.
+  - **Smaller items:** `next.config.ts` rewrites removed; `.env.example` cleared (`NEXT_PUBLIC_API_URL` only for Vercel); `cookie-parser` and `jsonwebtoken` removed; backend imports use `.ts`, rewritten to `.js` by `tsc`.
+  - **New guide:** `docs/cloudflare-setup.md`, step by step for the teacher.
+- **Tested on 2026-10-16:**
+  - `npm test` passes 17 of 17. New `tests/api-router.test.mjs` has 3 router checks, plus 1 route check through `handleApi` against local Supabase: register, cookie, me, pass, forged cookie refused, logout.
+  - The route check was **shown failing** when the cookie was forced to always be Secure, and passing once restored.
+  - `build:all` passes, and lint shows 0 errors.
+  - **Cloudflare runtime locally** (`opennextjs-cloudflare preview`, workerd, port 8787, local Supabase):
+    - health, login (cookie `HttpOnly; SameSite=Lax`, no Secure on http), me, bootstrap, live pass, file save, image upload, a student refused on a teacher route, bad JSON gives 400, unknown routes give 404, Java gives demo mode;
+    - in the browser: sign-in, "Live classroom connected", and the web project Run console (`script.js:1/3/4`);
+    - the teacher on the offline server saw that student Online.
+  - **Bundle:** 1,200 KiB compressed (free limit 3 MB), from a `wrangler deploy --dry-run`; nothing was deployed.
+  - **Offline (`classroom:offline`):** one program on 3000, nothing on 4000.
+    - Teacher and student were still signed in from before the change.
+    - Java ran on the laptop.
+    - Live share start and stop reached the student within 2 seconds.
+    - The student page made no live-share requests while idle.
+  - **Render path** (`node backend/dist/server.js`, `NODE_ENV=production`): health, login (`Secure; SameSite=None`, CORS for the pages' origin), the cookie works, the teacher route is refused for a student, and Java gives demo mode.
+- **Not tested:**
+  - A real Cloudflare deployment. I have no access to the teacher's account; that's what the setup guide's preview step is for.
+  - Vercel's build of the new code.
+  - Windows.
+  - A real device on the Wi-Fi.
+- **Teacher must do:** follow `docs/cloudflare-setup.md`: apply both migrations, connect GitHub, add 5 secrets, test the `cloudflare-c2` preview, and only then merge.
+
 ### Knowledge base: DONE, waiting for teacher review
 
 - **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/3
@@ -177,17 +216,26 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 ## Next steps
 
-1. The teacher reviews PRs #1, #2, #3, and the c1 PR.
-2. Build **c2 (Cloudflare)** on a new branch stacked on `realtime-c1`:
-   - move the `/api` routes into Next.js;
-   - upgrade Next.js to 16.4.2 and add OpenNext;
-   - drop sign-out on restart;
-   - replace the 2-second live-share check;
-   - write `docs/cloudflare-setup.md`.
+1. The teacher reviews PRs #1–#4 and the c2 PR, then follows `docs/cloudflare-setup.md` to test a Cloudflare preview.
+   - **Done 2026-10-17:** the teacher applied both new migrations (`20261016000100_project_language.sql`, `20261016000200_realtime_private_channels.sql`) to the hosted Supabase project in the SQL Editor. Both reported "Success. No rows returned". Applied by hand, so the hosted migration history doesn't list them; never run `supabase db push`.
+   - **Done 2026-10-17, Part 1:** Cloudflare Worker `codeshare` connected to `SirNeo-Coder/JavaShare`. Cloudflare's form now shows a "Preview command" box (set to `npx opennextjs-cloudflare upload`) with "Enable Preview builds" on, instead of a separate non-production deploy command. Its first build, of `main`, failed as expected ("could not determine executable to run"), because `main` doesn't have the Cloudflare tools yet.
+   - **Done 2026-10-17, Part 2:** the teacher added the 5 secrets, using the legacy anon and service_role keys to match Render. The first attempt put them in the **Build** section's variables, which the running app can't see (health said the keys were missing). They were redone under **Runtime variables and secrets**, as Secret, for **both Production and Previews**. Preview addresses also had to be switched on (Settings > Domains & Routes > Preview), because before that every address gave "error code: 1042". `docs/cloudflare-setup.md` was updated for all three points. Production's `workers.dev` address is still off, as it should be until merging.
+   - **Preview:** `https://cloudflare-c2-codeshare.ireneojrseraspe.workers.dev`. `/api/health` answered `connected: true` (checked with curl, 2026-10-17).
+   - **Part 3 results so far (2026-10-17, the teacher on two devices):** pass: sign-in with the real class, Live classroom connected, teacher autosave survives reload and sign-out, student typing and cursor seen live by the teacher, student shown Online. **Fail: classroom chat arrived only after a refresh.** CKB-006: Cloudflare dropped the server's unawaited `broadcast()`. **Fixed 2026-10-17** (teacher approved, adjustment): every `broadcast()` is awaited, with a 3-second limit. 18/18 tests pass; the new regression test was shown failing first; checked on the local Cloudflare runtime and offline. CKB-005 (a misleading Java label) was also recorded.
+   - **Chat re-test on the preview passed** (2026-10-17): it arrives live, about 2 seconds after sending. Typing is faster because it doesn't go through the server.
+   - **Remaining Part 3 items, all passed on the preview (2026-10-18, teacher's own testing):**
+     - **Save and reload:** edited `src/Main.java` in the Teacher Demo Workspace, pressed **Save lesson**, reloaded the page — the edit survived. (Same save/reload mechanism a student's "Save work" uses; tested from the teacher's own workspace rather than a student's.)
+     - **New web project + Run code:** created a web project as a student (signed in with the class join code), pressed **Run** — the page and its console appeared.
+     - **Live typing, chat, and live share, both directions:** the student's typing was already confirmed live for the teacher; the teacher confirmed a chat message and live-shared code both reached the student's screen too.
+   - **All of Part 3 (`docs/cloudflare-setup.md`) is now checked off on the real preview.** Only CKB-005 (the misleading "Java execution enabled" label while Java is in demo mode) remains open — pre-existing, cosmetic, not a functional blocker, waiting on the teacher's decision on when to fix it.
+2. Cloudflare preview testing is done. **Next real step: merge the PR stack in order** — #1 (`rename-to-codeshare`) → #2 (`web-workspace`) → #3 (`codeshare-knowledge-base`) → #4 (`realtime-c1`) → #5 (`cloudflare-c2`) — since each is stacked on the one before it; none are merged yet. After that:
+   - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
+   - Stage two (course modules) is already built on top of this stack (PR #6, PR #7) and is itself ready — see `docs/handoffs/stage-two.md`.
 
 ## Running offline mode on this laptop
 
-- Run `sg docker -c "npm run classroom:offline"`. Use plain `npm run classroom:offline` once the teacher has logged out and back in.
+- Run `sg docker -c "npm run classroom:offline"` (one program on port 3000 since c2).
+- Cloudflare runtime locally: `npm run cf:preview` (port 8787; needs a git-ignored `.dev.vars` with the local Supabase values). Use plain `npm run classroom:offline` once the teacher has logged out and back in.
 - Test accounts live only in the local database: `test.teacher@example.test` and `test.student@example.test`. Their password is not stored in this repo.
 
 ## Where the work is
@@ -199,3 +247,4 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - `web-workspace`: PR (b), stacked on (a)
   - `codeshare-knowledge-base`: knowledge base, stacked on (b)
   - `realtime-c1`: PR (c1), stacked on the knowledge base
+  - `cloudflare-c2`: PR (c2), stacked on c1

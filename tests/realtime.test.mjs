@@ -3,9 +3,9 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { createRequire } from "node:module";
 import { test } from "node:test";
 import { createClient } from "@supabase/supabase-js";
+import { SignJWT } from "jose";
 import { browserReachableUrl, throttle } from "../app/realtime.ts";
 
 test("offline: classroom devices reach local Supabase through the laptop's address", () => {
@@ -34,9 +34,9 @@ function localSupabase() {
 }
 
 const local = localSupabase();
+const pass = (sub) => new SignJWT({ role: "authenticated" }).setProtectedHeader({ alg: "HS256", typ: "JWT" })
+  .setSubject(sub).setAudience("authenticated").setExpirationTime("10m").sign(new TextEncoder().encode(local.JWT_SECRET));
 test("channel rules: members join, outsiders are refused, only the teacher broadcasts to the class", { skip: !local && "local Supabase is not running" }, async () => {
-  const require = createRequire(import.meta.url);
-  const jwt = require("jsonwebtoken");
   const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { persistSession: false } });
   const password = randomUUID();
   const made = [];
@@ -53,10 +53,10 @@ test("channel rules: members join, outsiders are refused, only the teacher broad
   const { data: team } = await admin.from("teams").insert({ classroom_id: classroom.id, owner_id: student, slug: `student-${student}`, name: "Policy team" }).select("id").single();
   await admin.from("team_members").insert({ team_id: team.id, user_id: student });
   const clients = [];
-  const join = (sub, topic) => new Promise((resolve) => {
+  const join = (sub, topic) => new Promise(async (resolve) => {
     const client = createClient(local.API_URL, local.ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
     clients.push(client);
-    client.realtime.setAuth(jwt.sign({ sub, role: "authenticated", aud: "authenticated" }, local.JWT_SECRET, { expiresIn: 600 }));
+    client.realtime.setAuth(await pass(sub));
     const channel = client.channel(topic, { config: { private: true, broadcast: { self: false } } });
     const received = [];
     channel.on("broadcast", { event: "*" }, (message) => received.push(message.event));
@@ -88,9 +88,7 @@ test("channel rules: members join, outsiders are refused, only the teacher broad
 });
 
 test("browser pass cannot read tables directly", { skip: !local && "local Supabase is not running" }, async () => {
-  const require = createRequire(import.meta.url);
-  const jwt = require("jsonwebtoken");
-  const token = jwt.sign({ sub: randomUUID(), role: "authenticated", aud: "authenticated" }, local.JWT_SECRET, { expiresIn: 600 });
+  const token = await pass(randomUUID());
   const response = await fetch(`${local.API_URL}/rest/v1/profiles?select=id&limit=1`, { headers: { apikey: local.ANON_KEY, Authorization: `Bearer ${token}` } });
   const body = await response.json();
   assert.equal(response.status, 403, "expected permission denied for direct table access");

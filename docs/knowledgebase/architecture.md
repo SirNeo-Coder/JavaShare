@@ -8,8 +8,8 @@ A classroom web app (formerly JavaShare) where a teacher and senior high school 
 
 | Part | Folder | Hosted on (online) | Job |
 | --- | --- | --- | --- |
-| Pages | `app/` (Next.js 16.2.6, React 19) | Vercel (`vercel.json`) | Everything students and teachers see |
-| Server | `backend/` (Express 5) | Render (`render.yaml`) | Sign-in and sessions, all database access, running Java, sending "this changed" live signals through Supabase |
+| Pages and server routes | `app/` (Next.js 16.4.2, React 19); every `/api` request goes to `app/api/[...path]/route.ts`, which runs the shared routes in `backend/src/routes.ts` | **Cloudflare** (`wrangler.jsonc`, `open-next.config.ts`; since PR c2). Until the teacher confirms Cloudflare: pages on Vercel (`vercel.json`) | Everything students and teachers see; sign-in and sessions, all database access, running Java (laptop only), sending "this changed" live signals through Supabase |
+| Old standalone server | `backend/src/server.ts` (Express wrapper around the same routes) | Render (`render.yaml`), kept until Cloudflare is confirmed | Serves Vercel's pages through `NEXT_PUBLIC_API_URL` |
 | Database and live channels | `supabase/` (migrations, `config.toml`) | Hosted Supabase | Users, classes, teams, projects, files, versions, chat, saved work, submissions, photos (Storage bucket `student-photos`); **Supabase Realtime** carries live typing, cursors, live share, and who's online (since PR c1) |
 
 The server is the only part that uses the secret Supabase service-role key. The browser talks to Supabase only for live channels, using a one-hour pass from the server (`GET /api/realtime/pass`); it cannot read tables.
@@ -23,11 +23,11 @@ The server is the only part that uses the secret Supabase service-role key. The 
 | Java | Judge0 if `JUDGE0_URL` is set; it is empty today, so "demo mode" | `javac`/`java` on the laptop (`LOCAL_JAVA_EXECUTION=true`; never in production) |
 | Web projects | Run in the student's browser | Same |
 
-Both launch through `scripts/classroom-mode.mjs`, which then runs `scripts/classroom.mjs`: it builds, starts the server on port 4000 and the pages on port 3000, health-checks every 10 seconds, and logs to `logs/classroom.log`. Next.js forwards `/api` to port 4000 (`next.config.ts`) when `NEXT_PUBLIC_API_URL` is unset. Live channels connect straight to Supabase; offline, `browserReachableUrl` in `app/realtime.ts` swaps `127.0.0.1` for the laptop address the page was loaded from.
+Both launch through `scripts/classroom-mode.mjs`, which then runs `scripts/classroom.mjs`: it builds, starts one program (`next start`, pages plus `/api` routes) on port 3000 with `CODESHARE_LAPTOP=true` (allows the Java runner), checks `/api/health` every 10 seconds, and logs to `logs/classroom.log`. Live channels connect straight to Supabase; offline, `browserReachableUrl` in `app/realtime.ts` swaps `127.0.0.1` for the laptop address the page was loaded from.
 
 ## Running code
 
-- **Java:** `POST /api/execute` in `backend/src/server.ts`: local `javac` runner (blocked APIs, time, memory and output limits), else Judge0 (single file), else demo message.
+- **Java:** `POST /api/execute` in `backend/src/routes.ts` (runner in `java-runner.ts`): local `javac` runner (blocked APIs, time, memory and output limits), else Judge0 (single file), else demo message.
 - **Web (HTML/CSS/JS):** `app/webPreview.ts` builds a sandboxed page in the browser. See security-and-scoping.md.
 - **Future:** in-browser Java (CheerpJ) and C# (.NET WebAssembly) plug in next to `app/webPreview.ts` and are chosen in `runCode()` in `app/page.tsx`. Not built yet.
 
@@ -35,6 +35,8 @@ Both launch through `scripts/classroom-mode.mjs`, which then runs `scripts/class
 
 See backend.md, "Live events", and security-and-scoping.md, "Live channels". Approved update caps: typing 3 a second, cursors 4 a second (only when moved), live share 2 a second (`LIVE_CAPS` in `app/realtime.ts`).
 
-## Planned (PR c2)
+## Hosting (PR c2)
 
-Move the `/api` routes into Next.js and host on Cloudflare (OpenNext needs Next.js 16.4.1 or newer). Vercel and Render are kept until Cloudflare is confirmed; offline mode is unchanged. See `docs/handoffs/stage-one.md`.
+- **Cloudflare:** OpenNext adapter (`@opennextjs/cloudflare`) builds the app into a Worker (about 1.2 MB compressed; the free limit is 3 MB). Settings are secrets in the Cloudflare dashboard (`docs/cloudflare-setup.md`). The laptop Java runner never runs there (demo mode).
+- **Shared routes:** `backend/src/router.ts` is a small Express-style router on standard web `Request`/`Response`, so one set of routes runs in Next.js on Node (offline), Next.js on Cloudflare, and the Express wrapper on Render.
+- **Live-share safety net:** no timer. The page checks when it opens, on returning to the tab, and when the class live channel (re)connects (decided 2026-10-16, to stay within 100,000 Cloudflare requests a day).

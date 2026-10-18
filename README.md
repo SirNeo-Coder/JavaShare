@@ -1,15 +1,15 @@
 # CodeShare
 
-CodeShare (formerly JavaShare) is a collaborative coding classroom with a Next.js frontend, a Node/Express backend, Supabase Auth/Postgres storage, Supabase Realtime collaboration, and optional Judge0 execution.
+CodeShare (formerly JavaShare) is a collaborative coding classroom: a Next.js app (pages plus its own `/api` server routes), Supabase Auth/Postgres storage, Supabase Realtime collaboration, and optional Judge0 execution.
 
 ## Architecture
 
-- `app/` — Next.js classroom UI for local LAN use and Vercel
-- `backend/` — Express API, sessions, live signals to Supabase Realtime, Supabase repository, and Java execution gateway
+- `app/` — Next.js pages; `app/api/[...path]/route.ts` serves every `/api` request
+- `backend/src/` — the server code those routes run: sessions, Supabase repository, live signals to Supabase Realtime, and the laptop Java runner. `backend/src/server.ts` is a thin Express wrapper kept only so the existing Render deployment keeps working.
 - `supabase/` — Postgres schema, Row Level Security, grants, and local Docker configuration
 - Supabase — users, classes, teams, projects, files, versions, chat, saved work, and submissions
 
-Students connect only to the CodeShare frontend and backend. The backend is the only component that uses the secret Supabase service-role key; never expose that key in a browser or a `NEXT_PUBLIC_` variable.
+Students connect to the CodeShare app (and, for live features, Supabase Realtime). Only the server routes use the secret Supabase service-role key; never expose that key in a browser or a `NEXT_PUBLIC_` variable.
 
 ## Install and verify
 
@@ -29,7 +29,7 @@ npm run classroom
 
 `npm run classroom` is an alias for `npm run classroom:online`. Docker is not required for online mode.
 
-The launcher builds and starts the frontend on port `3000` and backend on port `4000`. Students open the LAN frontend address printed in the terminal. Next.js forwards API requests to the backend. Live features (typing, cursors, chat updates, live share) connect to Supabase Realtime: online to the hosted project, offline to port `54321` on the teacher computer. Keep the teacher computer awake and allow Node.js and ports `3000`, `4000`, and `54321` through Windows Firewall on private networks.
+The launcher builds and starts CodeShare (pages and server routes together) on port `3000`. Students open the LAN address printed in the terminal. Live features (typing, cursors, chat updates, live share) connect to Supabase Realtime: online to the hosted project, offline to port `54321` on the teacher computer. Keep the teacher computer awake and allow Node.js and ports `3000` and `54321` through Windows Firewall on private networks.
 
 ## Local Supabase classroom (offline)
 
@@ -88,13 +88,15 @@ JUDGE0_API_KEY
 
 ## Internet deployment
 
-For the frontend, set:
+**Cloudflare (new):** follow [docs/cloudflare-setup.md](docs/cloudflare-setup.md). The pages and server routes run together on Cloudflare; `wrangler.jsonc` and `open-next.config.ts` hold the settings, and `npm run cf:preview` runs the Cloudflare build locally (put local settings in a git-ignored `.dev.vars`).
+
+**Vercel + Render (current, kept until Cloudflare is confirmed).** For the frontend on Vercel, set:
 
 ```text
 NEXT_PUBLIC_API_URL=https://your-backend.example.com
 ```
 
-For the backend, configure:
+For the backend on Render, configure:
 
 ```text
 DATABASE_MODE=supabase-online

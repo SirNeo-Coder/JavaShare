@@ -52,7 +52,7 @@ Lookup order: problem index -> matched case -> feature index -> relevant page ->
 2. **The secret Supabase service-role key stays on the server only.** Never put it in browser code or in a `NEXT_PUBLIC_` variable. On Cloudflare it is a Cloudflare secret.
 3. **New migrations only.** Never edit or delete an existing file in `supabase/migrations/`.
 4. **Never touch live services.** Never run `supabase db push`. Never change settings in the hosted Supabase project, Cloudflare, Vercel, or Render. Prepare the files and give the teacher step-by-step instructions.
-5. **Nothing loaded from the internet** (no CDN links) in the app or in the student web preview.
+5. **Nothing loaded from the internet** (no CDN links) in the app or in the student web preview. One agreed exception (2026-10-17): online only, the in-browser Java runner CheerpJ may be loaded from CheerpJ's own site when Java is run, with the CheerpJ logo shown where Java runs (their free Community Licence requires it). Offline mode never loads it; it uses the laptop's `javac`.
 6. **Don't rename existing data.** Tables, columns, the `javashare_session` cookie, `javashare-*` browser settings, and the Supabase `project_id` keep their old names (see README, "Names kept from JavaShare").
 7. **Never claim something works unless it was run.** Say plainly what could not be tested.
 8. Before each pull request, run `npm run build:all`, `npm run lint`, and `npm test`, and test the feature yourself.
