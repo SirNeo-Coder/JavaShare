@@ -1,6 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: schema/backend PR #13 open; classroom Figma UI implemented and verified on `codex/classroom-figma-ui`, PR #14 open for review.** Last updated: 2026-10-19.
+**Status: classroom Figma UI delivered through PR #14; teacher explicitly requested its complete tested version be merged into `main` on 2026-10-19.** Last updated: 2026-10-19.
 
 ## What the teacher asked for
 
@@ -117,8 +117,7 @@ Teacher clarified the reference in the current chat: retain CodeShare's existing
 module browser on the left, and use the Figma right-hand chat appearance for the messaging system
 already implemented. Explicitly classified **workflow change**. No second chat or AI assistant.
 
-**Branch:** `codex/classroom-figma-ui`, based on `feat/module-redesign-schema` (PR #13). The UI PR
-targets that branch so it does not duplicate PR #13's schema/backend diff.
+**Branch:** `codex/classroom-figma-ui`, based on `feat/module-redesign-schema` (PR #13). The UI PR was originally stacked on that branch. For the teacher's explicit main-merge request, PR #14 targets `main` and includes its existing CodeShare prerequisites.
 
 **Pull request:** https://github.com/SirNeo-Coder/JavaShare/pull/14
 **Implementation commit:** `12945c9`. Local test accounts and the isolated class were removed
@@ -144,7 +143,12 @@ passed against local Docker Supabase; the real local classroom ran Java and two-
 
 Open / next:
 
-- Review this UI PR and PR #13. Do not merge or deploy automatically.
+- Teacher explicitly authorized merging PR #14 into `main` in the current chat (2026-10-19).
+  `main` was 49 commits behind the tested UI branch, with no divergent commits. The requested
+  merge therefore brings the existing CodeShare stack and migration files into main together.
+  This is permission for this merge, not a standing change to AGENTS.md.
+- Next: check the normal main-branch build and then try the classroom on the hosted app. No
+  hosted database migration or service-setting change was performed by the assistant.
 - The original stage-four shared central module project and author-defined `part` grouping are
   still separate work. This UI reuses existing per-step editors, availability and progress rather
   than changing those learning rules. The teacher student-card view is also still open.
