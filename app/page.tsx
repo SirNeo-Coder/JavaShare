@@ -2,10 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { io, type Socket } from "socket.io-client";
-import CodeEditor from "./CodeEditor";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import CodeEditor, { languageLabel } from "./CodeEditor";
+import Landing from "./Landing";
+import ModuleViewer from "./ModuleViewer";
+import WorkspaceDrawer from "./WorkspaceDrawer";
+import { retainLiveDismissals } from "./liveClasses";
+import { api, getApiUrl } from "./apiClient";
+import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
+import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, releaseRealtimeChannels, throttle } from "./realtime";
 
-const DEPLOYED_API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 const FRESH_LESSON_CODE = `public class Main {
     public static void main(String[] args) {
         // Start today's lesson here
@@ -25,18 +31,6 @@ function getSavedFontScale() {
   if (typeof window === "undefined") return 1.15;
   const saved = Number(localStorage.getItem("javashare-font-scale"));
   return saved >= 1 && saved <= 1.45 ? saved : 1.15;
-}
-
-function getApiUrl() {
-  return DEPLOYED_API_URL;
-}
-
-function getSocketUrl() {
-  if (DEPLOYED_API_URL) return DEPLOYED_API_URL;
-  if (typeof window === "undefined") return "";
-  // Next.js rewrites handle REST reliably but do not consistently forward
-  // long-lived Socket.IO traffic. Connect directly to the teacher backend.
-  return `${window.location.protocol}//${window.location.hostname}:4000`;
 }
 
 type User = {
@@ -79,6 +73,7 @@ type TeamData = {
     id: string;
     title: string;
     description: string;
+    language?: string;
     activityId?: string;
   } | null;
   files: FileData[];
@@ -96,6 +91,9 @@ type Bootstrap = {
     name: string;
     subject: string;
     joinCode?: string;
+    hasActivity?: boolean;
+    hasLiveShare?: boolean;
+    liveSessionId?: string | null;
   }[];
   teams: TeamData[];
   groupCount?: number;
@@ -211,21 +209,16 @@ function applyOperation(source: string, operation: FileOperation) {
   return source.slice(0, start) + operation.text + source.slice(end);
 }
 
-async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${getApiUrl()}${path}`, {
-    ...options,
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...options.headers },
-  });
-  const body = response.status === 204 ? null : await response.json();
-  if (!response.ok) throw new Error(body?.error || "Request failed");
-  return body as T;
-}
-
 export default function Home() {
   const [theme, setTheme] = useState<"light" | "dark">(getSavedTheme);
   const [fontScale, setFontScale] = useState(getSavedFontScale);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [modulesOpen, setModulesOpen] = useState(false);
+  const [projectsOpen, setProjectsOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [dismissedLiveSessions, setDismissedLiveSessions] = useState<Record<string, string>>({});
+  const [homeClassroomId, setHomeClassroomId] = useState<string | null>(null);
+  const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<Bootstrap | null>(null);
   const [loading, setLoading] = useState(true);
@@ -234,7 +227,7 @@ export default function Home() {
   const [code, setCode] = useState("");
   const [syncStatus, setSyncStatus] = useState("Connecting…");
   const [panel, setPanel] = useState<
-    "console" | "chat" | "saved" | "submissions"
+    "console" | "saved" | "submissions"
   >("console");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [chatText, setChatText] = useState("");
@@ -283,8 +276,19 @@ export default function Home() {
   const [newFileOpen, setNewFileOpen] = useState(false);
   const [newFilePath, setNewFilePath] = useState("src/Helper.java");
   const [creatingFile, setCreatingFile] = useState(false);
+  const [newWebProjectOpen, setNewWebProjectOpen] = useState(false);
+  const [newWebProjectTitle, setNewWebProjectTitle] = useState("");
+  const [creatingWebProject, setCreatingWebProject] = useState(false);
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const [previewRun, setPreviewRun] = useState(0);
+  const [previewLogs, setPreviewLogs] = useState<
+    { kind: ConsoleMessage["kind"]; text: string; where: string }[]
+  >([]);
+  const previewFrameRef = useRef<HTMLIFrameElement | null>(null);
   const lastSaved = useRef("");
-  const socketRef = useRef<Socket | null>(null);
+  const teamChannelRef = useRef<RealtimeChannel | null>(null);
+  const classChannelRef = useRef<RealtimeChannel | null>(null);
+  const refreshLiveShareRef = useRef<(() => void) | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const liveDraftSequenceRef = useRef(0);
   const receivedDraftSequenceRef = useRef(0);
@@ -292,16 +296,37 @@ export default function Home() {
   const receivedGroupDraftsRef = useRef(new Map<string, number>());
   const memberPhotoUrlsRef = useRef(new Map<string, string | null>());
   const remoteGroupDraftRef = useRef<string | null>(null);
-  const classRealtimeReadyRef = useRef(false);
-  const teamRealtimeReadyRef = useRef(false);
-  const pendingLiveDraftRef = useRef<{
-    classroomId: string;
-    projectId: string;
-    fileId: string;
-    content: string;
-    sequence: number;
-  } | null>(null);
-  const pendingGroupDraftRef = useRef<FileOperation | null>(null);
+  // Latest render values for live handlers and throttled senders, which outlive a single render.
+  const liveRef = useRef<{ code: string; activeFile: FileData | null; team?: TeamData; userId: string; userName: string }>({ code: "", activeFile: null, userId: "", userName: "" });
+  // Text of the file before the first local edit that teammates have not been sent yet.
+  const unsentBaseRef = useRef<{ fileId: string; content: string } | null>(null);
+  // Approved caps: typing 3 a second, cursors 4 a second, live share 2 a second (app/realtime.ts).
+  const [sendTyping] = useState(() =>
+    throttle((sendTeamId: string, fileId: string, content: string) => {
+      const channel = teamChannelRef.current;
+      const base = unsentBaseRef.current;
+      if (!base || base.fileId !== fileId) return;
+      if (!channel) return; // kept in unsentBaseRef; sent once the channel is ready
+      groupDraftSequenceRef.current += 1;
+      const operation = createOperation(base.content, content, sendTeamId, fileId, groupDraftSequenceRef.current);
+      unsentBaseRef.current = null;
+      void channel.send({
+        type: "broadcast",
+        event: "team:file-operation",
+        payload: { ...operation, updatedById: liveRef.current.userId, updatedBy: liveRef.current.userName },
+      });
+    }, LIVE_CAPS.typingMs),
+  );
+  const [sendCursor] = useState(() =>
+    throttle((cursor: TextPoint & { teamId: string; fileId: string; userId: string; name: string }) => {
+      void teamChannelRef.current?.send({ type: "broadcast", event: "team:cursor", payload: cursor });
+    }, LIVE_CAPS.cursorMs),
+  );
+  const [sendLiveShareDraft] = useState(() =>
+    throttle((draft: { projectId: string; fileId: string; content: string; sequence: number }) => {
+      void classChannelRef.current?.send({ type: "broadcast", event: "class:live-share-draft", payload: draft });
+    }, LIVE_CAPS.liveShareMs),
+  );
   const consoleInputRef = useRef<HTMLTextAreaElement | null>(null);
   const studentPhotoInputRef = useRef<HTMLInputElement | null>(null);
   const teacherPhotoInputRef = useRef<HTMLInputElement | null>(null);
@@ -320,6 +345,7 @@ export default function Home() {
       : teamId
     : data?.classroomChatTeamId;
   const activeProjectId = team?.project?.id;
+  const isWebProject = team?.project?.language === "web";
   const currentSavedCopy =
     activeSavedWork?.projectId === activeProjectId ? activeSavedWork : null;
   const workspaceTitle =
@@ -458,14 +484,14 @@ export default function Home() {
   }, [theme, fontScale]);
 
   useEffect(() => {
-    if (panel !== "chat") return;
+    if (!chatOpen) return;
     const frame = requestAnimationFrame(() => {
       const chatMessages =
         document.querySelector<HTMLElement>(".chat-messages");
       if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
     });
     return () => cancelAnimationFrame(frame);
-  }, [messages, panel, chatTeamId]);
+  }, [messages, chatOpen, chatTeamId]);
 
   useEffect(() => {
     api<{ user: User }>("/api/auth/me")
@@ -479,10 +505,13 @@ export default function Home() {
       if (!user) return;
       try {
         const view = viewOverride || teacherWorkspaceView;
-        const next = await api<Bootstrap>(
-          `/api/bootstrap${user.role === "teacher" ? `?view=${view}` : ""}`,
-        );
+        const params = new URLSearchParams();
+        if (user.role === "teacher") params.set("view", view);
+        if (enteredClassroomId) params.set("classroomId", enteredClassroomId);
+        const query = params.toString();
+        const next = await api<Bootstrap>(`/api/bootstrap${query ? `?${query}` : ""}`);
         setData(next);
+        if (!enteredClassroomId) setDismissedLiveSessions((current) => retainLiveDismissals(next.classrooms, current));
         setUser(next.user);
         setWorkspaceError("");
         const currentActivity = next.currentActivity;
@@ -528,29 +557,45 @@ export default function Home() {
         const message =
           error instanceof Error ? error.message : "Backend unavailable";
         if (message === "Sign in required" || message === "Session expired") {
+          forgetRealtimeClient();
           setUser(null);
           setData(null);
+          setEnteredClassroomId(null);
+          setProjectsOpen(false);
+          setChatOpen(false);
+          setHomeClassroomId(null);
+          setDismissedLiveSessions({});
+          setModulesOpen(false);
           return;
+        }
+        // A failed scoped load must not leave a live-class invitation dismissed for a class the
+        // student never actually entered; a no-op if this class wasn't a dismissed invitation.
+        if (enteredClassroomId) {
+          setDismissedLiveSessions((current) =>
+            enteredClassroomId in current
+              ? Object.fromEntries(Object.entries(current).filter(([id]) => id !== enteredClassroomId))
+              : current,
+          );
         }
         setSyncStatus(message);
         setWorkspaceError(message);
       }
     },
-    [user, activeTeam, teacherWorkspaceView],
+    [user, activeTeam, teacherWorkspaceView, enteredClassroomId],
   );
   useEffect(() => {
     if (!user) {
       loadedWorkspaceKeyRef.current = "";
       return;
     }
-    const workspaceKey = `${user.id}:${user.role === "teacher" ? teacherWorkspaceView : "student"}`;
+    const workspaceKey = `${user.id}:${user.role === "teacher" ? teacherWorkspaceView : "student"}:${enteredClassroomId || "list"}`;
     if (loadedWorkspaceKeyRef.current === workspaceKey) return;
     loadedWorkspaceKeyRef.current = workspaceKey;
     const timer = setTimeout(() => void loadWorkspace(), 0);
     return () => clearTimeout(timer);
-  }, [user, loadWorkspace, teacherWorkspaceView]);
+  }, [user, loadWorkspace, teacherWorkspaceView, enteredClassroomId]);
   useEffect(() => {
-    if (!classroomId) return;
+    if (!enteredClassroomId || enteredClassroomId !== classroomId) return;
     let cancelled = false;
     const refreshLiveShare = async () => {
       try {
@@ -565,7 +610,7 @@ export default function Home() {
             next.projectId !== current.projectId
           )
             return next;
-          // Socket drafts are newer than the saved REST snapshot but have the same
+          // Live drafts are newer than the saved REST snapshot but have the same
           // version. Only accept files whose persisted version has moved forward.
           const files = next.files?.map((file) => {
             const existing = current.files?.find((item) => item.id === file.id);
@@ -585,17 +630,17 @@ export default function Home() {
     };
     window.addEventListener("focus", refreshWhenVisible);
     document.addEventListener("visibilitychange", refreshWhenVisible);
-    // Keep a lightweight REST safety net even when Socket.IO reports connected.
-    // Some proxies establish the transport but intermittently miss room events;
-    // this guarantees share start/stop is reflected without requiring F5.
-    const interval = window.setInterval(() => void refreshLiveShare(), 2000);
+    // Safety net for a missed live message (decided 2026-10-16: no timer, to stay within
+    // Cloudflare's free request limit): check when the page opens, when the student returns
+    // to the tab, and whenever the class live channel (re)connects.
+    refreshLiveShareRef.current = () => void refreshLiveShare();
     return () => {
       cancelled = true;
-      window.clearInterval(interval);
+      refreshLiveShareRef.current = null;
       window.removeEventListener("focus", refreshWhenVisible);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
-  }, [classroomId]);
+  }, [classroomId, enteredClassroomId]);
   useEffect(() => {
     if (!chatTeamId) {
       queueMicrotask(() => setMessages([]));
@@ -606,6 +651,31 @@ export default function Home() {
       .catch(() => setMessages([]));
   }, [chatTeamId]);
 
+  useEffect(() => {
+    if (!preview) return;
+    function receive(event: MessageEvent) {
+      // Only trust messages from the preview frame we created for this run.
+      if (!preview || event.source !== previewFrameRef.current?.contentWindow) return;
+      const message = event.data as ConsoleMessage;
+      if (message?.codeshare !== "console") return;
+      const origin = originOf(preview, message.line);
+      setPreviewLogs((logs) =>
+        logs.length >= 500
+          ? logs
+          : [
+              ...logs,
+              {
+                kind: message.kind,
+                text: String(message.text),
+                where: origin ? `${origin.file}:${origin.line}` : "",
+              },
+            ],
+      );
+    }
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [preview]);
+
   function chooseTeam(index: number) {
     const selected = data?.teams[index]?.files[0] ?? null;
     setActiveTeam(index);
@@ -615,80 +685,60 @@ export default function Home() {
     setSubmitted(Boolean(data?.teams[index]?.completed));
     setRemoteCursors([]);
     setActiveSavedWork(null);
+    setPreview(null);
+    setPreviewLogs([]);
   }
 
   useEffect(() => {
-    if (!teamId || !userId || !classroomId) return;
-    // Polling works reliably through the same-origin Next.js classroom proxy.
-    const socket = io(getSocketUrl(), {
-      withCredentials: true,
-      transports: ["websocket", "polling"],
-    });
-    socketRef.current = socket;
-    socket.on("connect", () => {
-      classRealtimeReadyRef.current = false;
-      teamRealtimeReadyRef.current = false;
-      setSyncStatus("Joining live classroom…");
-      socket.emit("team:join", teamId, (joined: boolean) => {
-        teamRealtimeReadyRef.current = joined;
-        if (!joined) return setSyncStatus("Could not join the live group");
-        if (user?.role === "student" && activeFile)
-          socket.emit("team:active-file", {
-            teamId,
-            fileId: activeFile.id,
-            path: activeFile.path,
-            language: activeFile.language,
-            content: code,
-            version: activeFile.version,
-          });
-        setSyncStatus("Live classroom connected");
-        if (pendingGroupDraftRef.current) {
-          socket.emit("team:file-operation", pendingGroupDraftRef.current);
-          pendingGroupDraftRef.current = null;
-        }
+    liveRef.current = { code, activeFile, team, userId: user?.id || "", userName: user?.name || "" };
+  });
+  useEffect(() => {
+    if (!enteredClassroomId || enteredClassroomId !== classroomId || !teamId || !userId) return;
+    let cancelled = false;
+    const channels: RealtimeChannel[] = [];
+    let releaseChannels = () => Promise.resolve();
+    // Live events arrive as Supabase Realtime broadcasts: "class:*" and "groups:*" events on the
+    // class channel, everything else on the team channel(s). See app/realtime.ts.
+    const handlers: { event: string; handler: (payload: never) => void }[] = [];
+    const on = <T,>(event: string, handler: (payload: T) => void) =>
+      handlers.push({ event, handler: handler as (payload: never) => void });
+    const isClassEvent = (event: string) =>
+      event.startsWith("class:") || event.startsWith("groups:");
+    const answerSyncRequest = () => {
+      const { code: current, activeFile: file, userName } = liveRef.current;
+      if (user?.role !== "student" || !file) return;
+      const channel = teamChannelRef.current;
+      void channel?.send({
+        type: "broadcast",
+        event: "team:active-file",
+        payload: { teamId, fileId: file.id, path: file.path, language: file.language, content: current, version: file.version, updatedById: userId, updatedBy: userName },
       });
-      if (chatTeamId && chatTeamId !== teamId)
-        socket.emit("team:join", chatTeamId);
-      socket.emit("class:join", classroomId, (share: LiveShare) => {
-        classRealtimeReadyRef.current = true;
-        setLiveShare(share);
-        if (pendingLiveDraftRef.current) {
-          socket.emit("class:live-share-draft", pendingLiveDraftRef.current);
-          pendingLiveDraftRef.current = null;
-        }
-      });
-    });
-    socket.on("disconnect", () => {
-      classRealtimeReadyRef.current = false;
-      teamRealtimeReadyRef.current = false;
-      setSyncStatus("Reconnecting…");
-    });
-    socket.on("connect_error", () =>
-      setSyncStatus("Live connection unavailable; retrying…"),
-    );
-    socket.on("class:live-share", (share: LiveShare) => {
+      if (current !== lastSaved.current)
+        void channel?.send({
+          type: "broadcast",
+          event: "team:live-snapshots",
+          payload: [{ fileId: file.id, content: current, updatedById: userId, updatedBy: userName }],
+        });
+    };
+    void api<{ lateAssignment: { teamName: string } | null }>(
+      `/api/classes/${classroomId}/arrive`,
+      { method: "POST" },
+    )
+      .then(({ lateAssignment }) => {
+        if (lateAssignment && !cancelled)
+          notify(`You reconnected and joined ${lateAssignment.teamName}`);
+      })
+      .catch(() => undefined);
+    on("class:live-share", (share: LiveShare) => {
       receivedDraftSequenceRef.current = 0;
       setLiveShare(share);
     });
-    socket.on("class:presence-snapshot", (ids: string[]) =>
-      setOnlineUserIds(ids),
-    );
-    socket.on("class:chat-muted", ({ muted }: { muted: boolean }) =>
+    on("class:chat-muted", ({ muted }: { muted: boolean }) =>
       setData((current) =>
         current ? { ...current, classroomChatMuted: muted } : current,
       ),
     );
-    socket.on(
-      "class:presence",
-      ({ userId, online }: { userId: string; online: boolean }) => {
-        setOnlineUserIds((ids) =>
-          online
-            ? [...new Set([...ids, userId])]
-            : ids.filter((id) => id !== userId),
-        );
-      },
-    );
-    socket.on(
+    on(
       "groups:updated",
       (assignment?: { studentName?: string; teamName?: string }) => {
         void loadWorkspace();
@@ -702,15 +752,12 @@ export default function Home() {
           );
       },
     );
-    socket.on("group:late-assigned", (assignment: { teamName: string }) =>
-      notify(`You reconnected and joined ${assignment.teamName}`),
-    );
-    socket.on("class:activity-deployed", (activity: { title: string }) => {
+    on("class:activity-deployed", (activity: { title: string }) => {
       setLiveShare({ active: false });
       void loadWorkspace();
       notify(`New activity: ${activity.title}`);
     });
-    socket.on(
+    on(
       "class:activity-ended",
       (activity: { title: string; mode: "individual" | "group" }) => {
         setLiveShare({ active: false });
@@ -728,14 +775,14 @@ export default function Home() {
         notify(`${activity.title} has ended`);
       },
     );
-    socket.on("chat:message", (message: ChatMessage) =>
+    on("chat:message", (message: ChatMessage) =>
       setMessages((items) =>
         items.some((item) => item.id === message.id)
           ? items
           : [...items, message],
       ),
     );
-    socket.on(
+    on(
       "team:submitted",
       (submission: {
         projectId: string;
@@ -765,7 +812,7 @@ export default function Home() {
         }
       },
     );
-    socket.on(
+    on(
       "class:live-share-update",
       (update: {
         projectId: string;
@@ -791,7 +838,7 @@ export default function Home() {
         );
       },
     );
-    socket.on(
+    on(
       "class:live-share-draft",
       (update: {
         projectId: string;
@@ -815,7 +862,7 @@ export default function Home() {
         );
       },
     );
-    socket.on(
+    on(
       "team:file-draft",
       (update: {
         fileId: string;
@@ -837,9 +884,15 @@ export default function Home() {
         });
       },
     );
-    socket.on(
+    on(
       "team:file-operation",
       (update: FileOperation & { updatedById: string; updatedBy: string }) => {
+        // The channel only checks team membership; ignore typing from a member the leader locked.
+        const liveTeam = liveRef.current.team;
+        const sender = liveTeam?.members.find((member) => member.id === update.updatedById);
+        if (liveTeam?.isGroup && sender?.editingLocked && liveTeam.leaderId !== sender.id) return;
+        if (unsentBaseRef.current?.fileId === update.fileId)
+          unsentBaseRef.current = { fileId: update.fileId, content: applyOperation(unsentBaseRef.current.content, update) };
         const previousSequence =
           receivedGroupDraftsRef.current.get(update.updatedById) || 0;
         if (update.sequence <= previousSequence) return;
@@ -856,7 +909,7 @@ export default function Home() {
         });
       },
     );
-    socket.on(
+    on(
       "team:live-snapshots",
       (
         snapshots: {
@@ -876,7 +929,7 @@ export default function Home() {
         setRemoteCursors([]);
       },
     );
-    socket.on(
+    on(
       "team:cursor",
       (cursor: {
         fileId: string;
@@ -896,7 +949,7 @@ export default function Home() {
         ]);
       },
     );
-    socket.on(
+    on(
       "team:active-file",
       (selection: {
         teamId: string;
@@ -930,7 +983,7 @@ export default function Home() {
         setSyncStatus(`Following ${selection.updatedBy}`);
       },
     );
-    socket.on(
+    on(
       "file:updated",
       (update: {
         fileId: string;
@@ -954,11 +1007,68 @@ export default function Home() {
         });
       },
     );
+    realtimeClient(getApiUrl())
+      .then(async (client) => {
+        if (cancelled) return;
+        releaseChannels = () => releaseRealtimeChannels(client, channels);
+        setSyncStatus("Joining live classroom…");
+        const join = async (topic: string, presenceKey?: string) => {
+          const channel = await privateChannel(client, topic, presenceKey);
+          for (const { event, handler } of handlers)
+            if (isClassEvent(event) === topic.startsWith("class:"))
+              channel.on("broadcast", { event }, ({ payload }) => handler(payload as never));
+          channels.push(channel);
+          return channel;
+        };
+        const classChannel = await join(`class:${classroomId}`, userId);
+        if (cancelled) return;
+        classChannel.on("presence", { event: "sync" }, () =>
+          setOnlineUserIds(Object.keys(classChannel.presenceState())),
+        );
+        classChannel.subscribe((status) => {
+          if (status !== "SUBSCRIBED") {
+            classChannelRef.current = null;
+            return;
+          }
+          classChannelRef.current = classChannel;
+          void classChannel.track({ online: true });
+          refreshLiveShareRef.current?.();
+        });
+        const teamChannel = await join(`team:${teamId}`);
+        if (cancelled) return;
+        teamChannel.on("broadcast", { event: "team:sync-request" }, answerSyncRequest);
+        teamChannel.subscribe((status) => {
+          if (status !== "SUBSCRIBED") {
+            teamChannelRef.current = null;
+            setSyncStatus(status === "CLOSED" ? "Reconnecting…" : "Live connection unavailable; retrying…");
+            return;
+          }
+          teamChannelRef.current = teamChannel;
+          setSyncStatus("Live classroom connected");
+          // Ask teammates for their unsaved typing and current file, and share ours.
+          void teamChannel.send({ type: "broadcast", event: "team:sync-request", payload: {} });
+          answerSyncRequest();
+          const unsent = unsentBaseRef.current;
+          const { code: current, activeFile: file } = liveRef.current;
+          if (unsent && file?.id === unsent.fileId) sendTyping(teamId, unsent.fileId, current);
+        });
+        if (chatTeamId && chatTeamId !== teamId) {
+          const chatChannel = await join(`team:${chatTeamId}`);
+          if (cancelled) return;
+          chatChannel.subscribe();
+        }
+      })
+      .catch((error) =>
+        setSyncStatus(error instanceof Error ? error.message : "Live connection unavailable"),
+      );
     return () => {
-      socket.disconnect();
-      socketRef.current = null;
+      cancelled = true;
+      teamChannelRef.current = null;
+      classChannelRef.current = null;
+      void releaseChannels();
     };
   }, [
+    enteredClassroomId,
     teamId,
     chatTeamId,
     userId,
@@ -1048,7 +1158,7 @@ export default function Home() {
       setActivityStarter("");
       setActiveTeam(0);
       await loadWorkspace("groups");
-      setPanel("chat");
+      setChatOpen(true);
       notify(
         `Deployed ${activity.title} to ${result.students} students in ${result.groups} group${result.groups === 1 ? "" : "s"}`,
       );
@@ -1223,38 +1333,21 @@ export default function Home() {
     ) {
       liveDraftSequenceRef.current += 1;
       const draft = {
-        classroomId,
         projectId: presentationProjectId,
         fileId: activeFile.id,
         content: nextCode,
         sequence: liveDraftSequenceRef.current,
       };
-      if (classRealtimeReadyRef.current)
-        socketRef.current?.emit("class:live-share-draft", draft);
-      else pendingLiveDraftRef.current = draft;
+      sendLiveShareDraft(draft);
     }
     if (user?.role === "student" && teamId && activeFile) {
-      groupDraftSequenceRef.current += 1;
-      const operation = createOperation(
-        code,
-        nextCode,
-        teamId,
-        activeFile.id,
-        groupDraftSequenceRef.current,
-      );
-      if (teamRealtimeReadyRef.current)
-        socketRef.current?.emit("team:file-operation", operation);
-      else pendingGroupDraftRef.current = operation;
+      unsentBaseRef.current ??= { fileId: activeFile.id, content: code };
+      sendTyping(teamId, activeFile.id, nextCode);
     }
   }
   function updateCursor(offset: number) {
     if (user?.role !== "student" || !teamId || !activeFile) return;
-    const position = pointAt(code, offset);
-    socketRef.current?.emit("team:cursor", {
-      teamId,
-      fileId: activeFile.id,
-      ...position,
-    });
+    sendCursor({ teamId, fileId: activeFile.id, ...pointAt(code, offset), userId: user.id, name: user.name });
   }
   async function persistCurrentCode() {
     if (!activeFile || code === lastSaved.current) return;
@@ -1313,21 +1406,21 @@ export default function Home() {
       setSyncStatus("Your work is saved");
       setRemoteCursors([]);
       if (user?.role === "student" && teamId)
-        socketRef.current?.emit("team:active-file", {
+        void teamChannelRef.current?.send({ type: "broadcast", event: "team:active-file", payload: {
           teamId,
           fileId: file.id,
           path: file.path,
           language: file.language,
           content: file.content,
           version: file.version,
-        });
+        }, });
     } catch (error) {
       notify(error instanceof Error ? error.message : "Could not switch files");
     }
   }
   function openCreateFile() {
     if (!team?.project) return;
-    setNewFilePath("src/Helper.java");
+    setNewFilePath(isWebProject ? "about.html" : "src/Helper.java");
     setNewFileOpen(true);
   }
   async function createFile(event: React.FormEvent) {
@@ -1340,6 +1433,11 @@ export default function Home() {
         .split("/")
         .pop()
         ?.replace(/\.java$/i, "") || "Helper";
+    const content = !isWebProject
+      ? `public class ${className} {\n    \n}\n`
+      : path.endsWith(".html")
+        ? `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>${className.replace(/\.html$/, "")}</title>\n</head>\n<body>\n  \n</body>\n</html>\n`
+        : "";
     setCreatingFile(true);
     try {
       await persistCurrentCode();
@@ -1347,10 +1445,7 @@ export default function Home() {
         `/api/projects/${team.project.id}/files`,
         {
           method: "POST",
-          body: JSON.stringify({
-            path,
-            content: `public class ${className} {\n    \n}\n`,
-          }),
+          body: JSON.stringify({ path, content }),
         },
       );
       updateTeamFile(created);
@@ -1365,8 +1460,50 @@ export default function Home() {
       setCreatingFile(false);
     }
   }
+  async function createWebProject(event: React.FormEvent) {
+    event.preventDefault();
+    const title = newWebProjectTitle.trim();
+    if (!classroomId || !title || creatingWebProject) return;
+    if (code !== lastSaved.current) {
+      notify("Save your changes before opening another project");
+      return;
+    }
+    setCreatingWebProject(true);
+    try {
+      const created = await api<{ project: NonNullable<TeamData["project"]>; files: FileData[] }>(
+        `/api/classes/${classroomId}/web-projects`,
+        { method: "POST", body: JSON.stringify({ title }) },
+      );
+      // The new project lives in the student's personal workspace, next to "My Practice Code".
+      const personal = data?.teams.find(
+        (item) => !item.isGroup && item.project && !item.project.activityId,
+      );
+      if (!data || !personal) {
+        await loadWorkspace();
+      } else {
+        const entry: TeamData = { ...personal, name: created.project.title, completed: false, project: created.project, files: created.files };
+        setData({ ...data, teams: [...data.teams, entry] });
+        setActiveTeam(data.teams.length);
+        const first = created.files[0] ?? null;
+        setActiveFile(first);
+        setCode(first?.content ?? "");
+        lastSaved.current = first?.content ?? "";
+        setSubmitted(false);
+        setRemoteCursors([]);
+        setActiveSavedWork(null);
+        setPreview(null);
+        setPreviewLogs([]);
+      }
+      setNewWebProjectOpen(false);
+      notify(`Created ${created.project.title}. Press Run to see your page.`);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : "Could not create web project");
+    } finally {
+      setCreatingWebProject(false);
+    }
+  }
   async function renameFile(file: FileData) {
-    const entered = window.prompt("Rename Java file:", file.path);
+    const entered = window.prompt("Rename file:", file.path);
     if (!entered?.trim() || entered.trim() === file.path) return;
     try {
       if (file.id === activeFile?.id) await persistCurrentCode();
@@ -1517,6 +1654,25 @@ export default function Home() {
   async function runCode() {
     if (!team) return;
     setPanel("console");
+    // Web projects run in this browser (see app/webPreview.ts). In-browser Java (CheerpJ) and
+    // C# (.NET WebAssembly) runners will be chosen here by project language in a later stage.
+    if (isWebProject) {
+      try {
+        await persistCurrentCode();
+      } catch (error) {
+        notify(error instanceof Error ? error.message : "Could not save before running");
+      }
+      const next = buildPreview(
+        team.files.map((file) => ({
+          path: file.path,
+          content: file.id === activeFile?.id ? code : file.content,
+        })),
+      );
+      setPreview(next);
+      setPreviewLogs(next.warnings.map((text) => ({ kind: "warn", text, where: "" })));
+      setPreviewRun((run) => run + 1);
+      return;
+    }
     setRunning(true);
     setOutput("Sending Main.java to the classroom Java runner…");
     try {
@@ -1593,16 +1749,41 @@ export default function Home() {
       }
     }
     await api("/api/auth/logout", { method: "POST" });
+    forgetRealtimeClient(); // the live pass belongs to the signed-out user
     setUser(null);
     setData(null);
+    setEnteredClassroomId(null);
+    setProjectsOpen(false);
+    setChatOpen(false);
+    setHomeClassroomId(null);
+    setDismissedLiveSessions({});
+    setModulesOpen(false);
   }
 
-  if (loading) return <CenteredCard title="Starting JavaShare…" />;
+  if (loading) return <CenteredCard title="Starting CodeShare…" />;
   if (!user) return <AuthScreen onAuthenticated={setUser} />;
   if (user.passwordResetRequired)
     return <ResetPasswordScreen user={user} onChanged={setUser} />;
   if (data?.needsJoin)
     return <JoinClass user={user} onJoined={loadWorkspace} onLogout={logout} />;
+  if (!enteredClassroomId && data)
+    return (
+      <Landing
+        role={user.role}
+        name={user.name}
+        classrooms={data.classrooms}
+        initialClassroomId={homeClassroomId}
+        onLiveStatusChange={(classes) => setDismissedLiveSessions((current) => retainLiveDismissals(classes, current))}
+        dismissedLiveSessions={dismissedLiveSessions}
+        onDismissLiveClasses={(classes) => setDismissedLiveSessions((current) => ({ ...current, ...Object.fromEntries(classes.filter((item) => item.liveSessionId).map((item) => [item.id, item.liveSessionId!])) }))}
+        onEnter={(classroomId) => {
+          setHomeClassroomId(classroomId);
+          setEnteredClassroomId(classroomId);
+        }}
+        onLogout={logout}
+        onRefresh={async () => { await loadWorkspace(); }}
+      />
+    );
   if (!data || !team)
     return (
       <CenteredCard
@@ -1635,12 +1816,12 @@ export default function Home() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark">J</span>
-          <span>JavaShare</span>
+          <span className="brand-mark">C</span>
+          <span>CodeShare</span>
           <span className="teacher-pill">{user.role.toUpperCase()}</span>
         </div>
         <div className="class-context">
-          <b>{classroom?.name || "JavaShare Classroom"}</b>
+          <b>{classroom?.name || "CodeShare Classroom"}</b>
           <span>
             {classroom?.subject || "Collaborative Java programming"}
             {classroom?.joinCode ? ` · Join code: ${classroom.joinCode}` : ""}
@@ -1657,6 +1838,26 @@ export default function Home() {
           </span>
         </div>
         <div className="header-actions">
+          <button
+            className="settings-button"
+            type="button"
+            onClick={() => { setModulesOpen(false); setProjectsOpen(false); setChatOpen(false); setEnteredClassroomId(null); }}
+            title="Back to class home"
+          >
+            Class home
+          </button>
+          {classroomId && user.role === "student" && (
+            <button
+              className="settings-button modules-button"
+              type="button"
+              aria-expanded={modulesOpen}
+              aria-controls="classroom-modules"
+              onClick={() => { setProjectsOpen(false); setModulesOpen((open) => !open); }}
+              title="This week's module"
+            >
+              Modules
+            </button>
+          )}
           <div className="display-settings">
             <button
               className="settings-button"
@@ -1763,8 +1964,16 @@ export default function Home() {
           </button>
         </div>
       </header>
-      <section className="workspace">
-        <aside className="sidebar">
+      <section className="workspace classroom-workspace">
+        <nav className="workspace-rail rail-left" aria-label="Learning panels">
+          <button type="button" aria-expanded={modulesOpen} aria-controls="classroom-modules" onClick={() => { setProjectsOpen(false); setModulesOpen(!modulesOpen); }}><span aria-hidden="true">▤</span> Module <span aria-hidden="true">{modulesOpen ? "‹" : "›"}</span></button>
+          <button type="button" aria-expanded={projectsOpen} aria-controls="classroom-projects" onClick={() => { setModulesOpen(false); setProjectsOpen(!projectsOpen); }}><span aria-hidden="true">⌘</span> {user.role === "teacher" ? "Students / projects" : "Projects"}</button>
+        </nav>
+        <nav className="workspace-rail rail-right" aria-label="Chat panel">
+          <button type="button" aria-expanded={chatOpen} aria-controls="classroom-chat" onClick={() => setChatOpen(!chatOpen)}><span aria-hidden="true">☏</span> Chat <span aria-hidden="true">{chatOpen ? "›" : "‹"}</span></button>
+        </nav>
+        <aside id="classroom-projects" aria-label={user.role === "teacher" ? "Students and projects" : "Projects"} hidden={!projectsOpen} className="sidebar classroom-projects" onKeyDown={(event) => { if (event.key === "Escape") setProjectsOpen(false); }}>
+          <div className="projects-heading"><b>{user.role === "teacher" ? "Students and projects" : "My projects"}</b><button type="button" aria-label="Close projects" onClick={() => setProjectsOpen(false)}>×</button></div>
           <div className="side-title">
             <span>
               {teacherGroupView
@@ -1775,6 +1984,18 @@ export default function Home() {
                     ? "MY GROUP ACTIVITIES"
                     : "MY ACTIVITIES"}
             </span>
+            {user.role === "student" && (
+              <div className="teacher-tools">
+                <button
+                  onClick={() => {
+                    setNewWebProjectTitle("");
+                    setNewWebProjectOpen(true);
+                  }}
+                >
+                  New web project
+                </button>
+              </div>
+            )}
             {user.role === "teacher" && (
               <div className="teacher-tools">
                 {data.currentActivity && (
@@ -2014,7 +2235,7 @@ export default function Home() {
               <span>◷</span>
               <span>
                 <small>Repository</small>
-                <b>{team.files.length} Java file(s)</b>
+                <b>{team.files.length} {isWebProject ? "web" : "Java"} file(s)</b>
               </span>
             </div>
             <button className="brief-button">
@@ -2155,6 +2376,7 @@ export default function Home() {
           </div>
           <div className="content-grid">
             <section className="editor-card">
+              <div className="workspace-card-heading"><b><span aria-hidden="true">⌘</span> Code editor</b><span>{languageLabel(activeFile?.language || "java")}</span></div>
               <div className="file-tabs">
                 {team.files.map((file) => (
                   <button
@@ -2174,7 +2396,9 @@ export default function Home() {
                         : "Double-click to rename"
                     }
                   >
-                    <span className="java-icon">J</span>
+                    <span className="java-icon">
+                      {{ html: "H", css: "C", javascript: "JS" }[file.language] ?? "J"}
+                    </span>
                     {file.path}
                     <i
                       className={
@@ -2188,13 +2412,15 @@ export default function Home() {
                 <button
                   className="add-file"
                   onClick={openCreateFile}
-                  aria-label="Create Java file"
+                  aria-label={isWebProject ? "Create web file" : "Create Java file"}
                   title={
                     team.isGroup &&
                     myGroupMembership?.editingLocked &&
                     team.leaderId !== user.id
                       ? "Group leader locked editing"
-                      : "Create Java file"
+                      : isWebProject
+                        ? "Create web file"
+                        : "Create Java file"
                   }
                   disabled={
                     team.isGroup &&
@@ -2225,6 +2451,7 @@ export default function Home() {
                 onChange={updateCode}
                 onCursorChange={updateCursor}
                 remoteCursors={remoteCursors}
+                language={activeFile?.language || "java"}
                 readOnly={
                   (user.role === "teacher" && !team.isTeacherWorkspace) ||
                   (team.isGroup &&
@@ -2245,7 +2472,7 @@ export default function Home() {
                 >
                   {activeFile?.path}
                 </button>
-                <span>Java</span>
+                <span>{languageLabel(activeFile?.language || "java")}</span>
                 <span>Version {activeFile?.version || 1}</span>
                 <span className="saved">
                   {code !== lastSaved.current ? "●" : "✓"} {syncStatus}
@@ -2253,6 +2480,7 @@ export default function Home() {
               </div>
             </section>
             <aside className="right-panel">
+              <div className="workspace-card-heading"><b><span aria-hidden="true">›_</span> Console</b><span className="terminal-status">● Terminal</span></div>
               <div className="panel-tabs">
                 <button
                   className={panel === "console" ? "active" : ""}
@@ -2261,8 +2489,10 @@ export default function Home() {
                   Console
                 </button>
                 <button
-                  className={panel === "chat" ? "active" : ""}
-                  onClick={() => setPanel("chat")}
+                  aria-expanded={chatOpen}
+                  aria-controls="classroom-chat"
+                  className={chatOpen ? "active" : ""}
+                  onClick={() => setChatOpen((open) => !open)}
                 >
                   {!data.currentActivity
                     ? "Classroom chat"
@@ -2285,7 +2515,39 @@ export default function Home() {
                   ↗
                 </button>
               </div>
-              {panel === "console" ? (
+              {panel === "console" && isWebProject ? (
+                <div className="web-preview">
+                  {preview?.html ? (
+                    <iframe
+                      key={previewRun}
+                      ref={previewFrameRef}
+                      title="Web page preview"
+                      sandbox="allow-scripts"
+                      srcDoc={preview.html}
+                    />
+                  ) : (
+                    <p className="web-preview-empty">
+                      <span>
+                        Press <b>Run</b> to see your page here.
+                      </span>
+                    </p>
+                  )}
+                  <ol className="preview-console" aria-label="Page console">
+                    {previewLogs.length ? (
+                      previewLogs.map((log, index) => (
+                        <li className={`log-${log.kind}`} key={index}>
+                          <span>{log.text}</span>
+                          {log.where && <small>{log.where}</small>}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="log-empty">
+                        console.log output and errors appear here
+                      </li>
+                    )}
+                  </ol>
+                </div>
+              ) : panel === "console" ? (
                 <div
                   className="console"
                   onClick={() => consoleInputRef.current?.focus()}
@@ -2310,84 +2572,6 @@ export default function Home() {
                     />
                   </label>
                   <small>Ctrl+Enter runs with this input</small>
-                </div>
-              ) : panel === "chat" ? (
-                <div className="chat">
-                  <div className="chat-toolbar">
-                    <b>
-                      {activityChatUnavailable
-                        ? data.currentActivity?.mode === "individual"
-                          ? "Select a student to start a private chat"
-                          : "Select a group to open its chat"
-                        : !data.currentActivity
-                          ? "Everyone in the classroom"
-                          : data.currentActivity.mode === "individual"
-                            ? `Teacher and ${team.members[0]?.name || "student"}`
-                            : team.name}
-                    </b>
-                    {!data.currentActivity && user.role === "teacher" && (
-                      <button type="button" onClick={toggleClassroomChatMute}>
-                        {data.classroomChatMuted
-                          ? "Unmute students"
-                          : "Mute students"}
-                      </button>
-                    )}
-                    {!data.currentActivity &&
-                      user.role === "student" &&
-                      data.classroomChatMuted && (
-                        <span>Teacher muted chat</span>
-                      )}
-                  </div>
-                  <div className="chat-messages">
-                    {messages.length ? (
-                      messages.map((message) => (
-                        <div className="chat-message" key={message.id}>
-                          {message.author.photoUrl ? (
-                            <img src={message.author.photoUrl} alt="" />
-                          ) : (
-                            <i>
-                              {message.author.name
-                                .split(" ")
-                                .map((part) => part[0])
-                                .join("")
-                                .slice(0, 2)
-                                .toUpperCase()}
-                            </i>
-                          )}
-                          <div>
-                            <b>{message.author.name}</b>
-                            <p>{message.text}</p>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="chat-empty">
-                        No messages yet. Say hello to your group.
-                      </p>
-                    )}
-                  </div>
-                  <form onSubmit={sendMessage}>
-                    <input
-                      value={chatText}
-                      onChange={(event) => setChatText(event.target.value)}
-                      placeholder={
-                        !data.currentActivity
-                          ? "Message the classroom…"
-                          : data.currentActivity.mode === "individual"
-                            ? "Message your teacher…"
-                            : "Message your group…"
-                      }
-                      maxLength={1000}
-                      aria-label="Chat message"
-                      disabled={
-                        activityChatUnavailable ||
-                        (team.isGroup && Boolean(myGroupMembership?.chatMuted) && team.leaderId !== user.id) ||
-                        (!data.currentActivity &&
-                          user.role === "student" &&
-                          data.classroomChatMuted)
-                      }
-                    />
-                  </form>
                 </div>
               ) : panel === "saved" ? (
                 <div className="record-list">
@@ -2468,8 +2652,8 @@ export default function Home() {
                 <div>
                   <span>✓</span>
                   <p>
-                    <b>Java execution enabled</b>
-                    <small>Teacher computer</small>
+                    <b>{isWebProject ? "Runs in your browser" : "Java execution enabled"}</b>
+                    <small>{isWebProject ? "Sandboxed preview" : "Teacher computer"}</small>
                   </p>
                 </div>
               </div>
@@ -2544,6 +2728,89 @@ export default function Home() {
             </div>
           </footer>
         </section>
+        <WorkspaceDrawer id="classroom-modules" title="Course modules" side="left" open={modulesOpen} onClose={() => setModulesOpen(false)}>
+          {classroomId && <ModuleViewer key={classroomId} role={user.role} classroomId={classroomId} embedded drawer active={modulesOpen} />}
+        </WorkspaceDrawer>
+        <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} onClose={() => setChatOpen(false)}>
+          <div className="chat">
+                  <div className="chat-toolbar">
+                    <b>
+                      {activityChatUnavailable
+                        ? data.currentActivity?.mode === "individual"
+                          ? "Select a student to start a private chat"
+                          : "Select a group to open its chat"
+                        : !data.currentActivity
+                          ? "Everyone in the classroom"
+                          : data.currentActivity.mode === "individual"
+                            ? `Teacher and ${team.members[0]?.name || "student"}`
+                            : team.name}
+                    </b>
+                    {!data.currentActivity && user.role === "teacher" && (
+                      <button type="button" onClick={toggleClassroomChatMute}>
+                        {data.classroomChatMuted
+                          ? "Unmute students"
+                          : "Mute students"}
+                      </button>
+                    )}
+                    {!data.currentActivity &&
+                      user.role === "student" &&
+                      data.classroomChatMuted && (
+                        <span>Teacher muted chat</span>
+                      )}
+                  </div>
+                  <div className="chat-messages">
+                    {messages.length ? (
+                      messages.map((message) => (
+                        <div className={`chat-message ${message.author.id === user.id ? "chat-own" : ""}`} key={message.id}>
+                          {message.author.photoUrl ? (
+                            <img src={message.author.photoUrl} alt="" />
+                          ) : (
+                            <i>
+                              {message.author.name
+                                .split(" ")
+                                .map((part) => part[0])
+                                .join("")
+                                .slice(0, 2)
+                                .toUpperCase()}
+                            </i>
+                          )}
+                          <div>
+                            <b>{message.author.name}</b>
+                            <p>{message.text}</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="chat-empty">
+                        No messages yet. Start a conversation here.
+                      </p>
+                    )}
+                  </div>
+                  <form onSubmit={sendMessage}>
+                    <input
+                      value={chatText}
+                      onChange={(event) => setChatText(event.target.value)}
+                      placeholder={
+                        !data.currentActivity
+                          ? "Message the classroom…"
+                          : data.currentActivity.mode === "individual"
+                            ? "Message your teacher…"
+                            : "Message your group…"
+                      }
+                      maxLength={1000}
+                      aria-label="Chat message"
+                      disabled={
+                        activityChatUnavailable ||
+                        (team.isGroup && Boolean(myGroupMembership?.chatMuted) && team.leaderId !== user.id) ||
+                        (!data.currentActivity &&
+                          user.role === "student" &&
+                          data.classroomChatMuted)
+                      }
+                    />
+                    <button type="submit" aria-label="Send message" disabled={!chatText.trim() || activityChatUnavailable || (team.isGroup && Boolean(myGroupMembership?.chatMuted) && team.leaderId !== user.id) || (!data.currentActivity && user.role === "student" && data.classroomChatMuted)}>➤</button>
+                  </form>
+                </div>
+        </WorkspaceDrawer>
       </section>
       {newFileOpen && (
         <div
@@ -2562,11 +2829,17 @@ export default function Home() {
             }}
           >
             <header>
-              <span className="java-icon">J</span>
+              <span className="java-icon">{isWebProject ? "W" : "J"}</span>
               <div>
-                <span className="eyebrow">JAVA SOURCE FILE</span>
+                <span className="eyebrow">
+                  {isWebProject ? "WEB PAGE FILE" : "JAVA SOURCE FILE"}
+                </span>
                 <h2>Create a new file</h2>
-                <p>Add another class to this repository.</p>
+                <p>
+                  {isWebProject
+                    ? "Add another page, stylesheet, or script."
+                    : "Add another class to this repository."}
+                </p>
               </div>
               <button
                 type="button"
@@ -2582,17 +2855,34 @@ export default function Home() {
               <input
                 value={newFilePath}
                 onChange={(event) => setNewFilePath(event.target.value)}
-                placeholder="src/Helper.java"
-                pattern="(?:[A-Za-z_$][A-Za-z0-9_$]*/)*[A-Za-z_$][A-Za-z0-9_$]*\.java"
-                title="Use a Java path such as src/Helper.java"
+                placeholder={isWebProject ? "about.html" : "src/Helper.java"}
+                pattern={
+                  isWebProject
+                    ? "(?:[A-Za-z0-9_\\-]+/)*[A-Za-z0-9_\\-]+(?:\\.[A-Za-z0-9_\\-]+)*\\.(?:html|css|js)"
+                    : "(?:[A-Za-z_$][A-Za-z0-9_$]*/)*[A-Za-z_$][A-Za-z0-9_$]*\\.java"
+                }
+                title={
+                  isWebProject
+                    ? "Use a name ending in .html, .css, or .js"
+                    : "Use a Java path such as src/Helper.java"
+                }
                 autoFocus
                 required
                 spellCheck={false}
               />
             </label>
             <small>
-              Use a unique Java filename, for example <b>src/Calculator.java</b>
-              .
+              {isWebProject ? (
+                <>
+                  Use a unique name ending in .html, .css, or .js, for example{" "}
+                  <b>about.html</b>.
+                </>
+              ) : (
+                <>
+                  Use a unique Java filename, for example{" "}
+                  <b>src/Calculator.java</b>.
+                </>
+              )}
             </small>
             <footer>
               <button
@@ -2608,6 +2898,69 @@ export default function Home() {
                 disabled={creatingFile || !newFilePath.trim()}
               >
                 {creatingFile ? "Creating…" : "Create file"}
+              </button>
+            </footer>
+          </form>
+        </div>
+      )}
+      {newWebProjectOpen && (
+        <div
+          className="activity-overlay file-dialog-overlay"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !creatingWebProject)
+              setNewWebProjectOpen(false);
+          }}
+        >
+          <form
+            className="file-dialog"
+            onSubmit={createWebProject}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && !creatingWebProject)
+                setNewWebProjectOpen(false);
+            }}
+          >
+            <header>
+              <span className="java-icon">W</span>
+              <div>
+                <span className="eyebrow">HTML · CSS · JAVASCRIPT</span>
+                <h2>New web project</h2>
+                <p>Starts with index.html, style.css, and script.js.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNewWebProjectOpen(false)}
+                aria-label="Close"
+                disabled={creatingWebProject}
+              >
+                ×
+              </button>
+            </header>
+            <label>
+              Project name
+              <input
+                value={newWebProjectTitle}
+                onChange={(event) => setNewWebProjectTitle(event.target.value)}
+                placeholder="My Web Page"
+                maxLength={60}
+                autoFocus
+                required
+              />
+            </label>
+            <small>Press Run to see your page. It runs only in your browser.</small>
+            <footer>
+              <button
+                type="button"
+                onClick={() => setNewWebProjectOpen(false)}
+                disabled={creatingWebProject}
+              >
+                Cancel
+              </button>
+              <button
+                className="create-file-button"
+                type="submit"
+                disabled={creatingWebProject || !newWebProjectTitle.trim()}
+              >
+                {creatingWebProject ? "Creating…" : "Create project"}
               </button>
             </footer>
           </form>
@@ -3086,10 +3439,10 @@ function AuthScreen({
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-mark">J</span>
+          <span className="brand-mark">C</span>
           <div>
-            <b>JavaShare</b>
-            <small>Collaborative Java classroom</small>
+            <b>CodeShare</b>
+            <small>Collaborative coding classroom</small>
           </div>
         </div>
         <h1>
@@ -3172,7 +3525,7 @@ function AuthScreen({
           onClick={() => switchMode(mode === "signin" ? "signup" : "signin")}
         >
           {mode === "signin"
-            ? "New to JavaShare? Create an account"
+            ? "New to CodeShare? Create an account"
             : mode === "signup"
               ? "Already have an account? Sign in"
               : "Back to sign in"}
@@ -3217,9 +3570,9 @@ function ResetPasswordScreen({
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-mark">J</span>
+          <span className="brand-mark">C</span>
           <div>
-            <b>JavaShare</b>
+            <b>CodeShare</b>
             <small>Signed in as {user.name}</small>
           </div>
         </div>
@@ -3299,9 +3652,9 @@ function JoinClass({
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="brand-mark">J</span>
+          <span className="brand-mark">C</span>
           <div>
-            <b>JavaShare</b>
+            <b>CodeShare</b>
             <small>Signed in as {user.name}</small>
           </div>
         </div>
@@ -3336,7 +3689,7 @@ function CenteredCard({ title, message }: { title: string; message?: string }) {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <span className="brand-mark">J</span>
+        <span className="brand-mark">C</span>
         <h1>{title}</h1>
         {message && <p>{message}</p>}
       </div>

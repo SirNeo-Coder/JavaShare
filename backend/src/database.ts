@@ -24,7 +24,8 @@ function readDatabaseMode(): DatabaseMode {
 class SupabaseDatabaseProvider implements DatabaseProvider {
   private client: SupabaseClient | null = null;
 
-  constructor(readonly mode: "supabase-local" | "supabase-online") {}
+  readonly mode: "supabase-local" | "supabase-online";
+  constructor(mode: "supabase-local" | "supabase-online") { this.mode = mode; }
 
   private getClient() {
     if (this.client) return this.client;

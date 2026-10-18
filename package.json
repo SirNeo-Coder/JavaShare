@@ -1,5 +1,5 @@
 {
-  "name": "javashare",
+  "name": "codeshare",
   "version": "0.2.0",
   "private": true,
   "workspaces": [
@@ -18,22 +18,30 @@
     "build": "next build",
     "build:all": "npm run build && npm --workspace backend run build",
     "start": "next start",
-    "lint": "eslint . --ignore-pattern .next --ignore-pattern backend/dist"
+    "lint": "eslint . --ignore-pattern .next --ignore-pattern backend/dist",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "kb:search": "node scripts/problem-kb-search.mjs",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.7",
-    "next": "16.2.6",
+    "jose": "^6.2.12",
+    "next": "^16.4.2",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "socket.io-client": "^4.8.1"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.12",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "^16.4.2",
     "supabase": "^2.109.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wrangler": "^4.151.1"
   }
 }
