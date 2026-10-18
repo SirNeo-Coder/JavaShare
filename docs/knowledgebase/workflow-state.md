@@ -8,6 +8,13 @@ What teachers and students can do today. Compare any proposed change with this p
 - Students join a class with its code; each gets a personal workspace with "My Practice Code" (Java).
 - Teachers manage student accounts at `/teacher/accounts` (edit, photo, approve password reset, delete) and see an activity summary at `/teacher`.
 
+## Classes (landing page)
+
+- On login, everyone sees a class list before entering any classroom: a teacher sees every class they teach as a card (name, subject, join code, a "Live now" badge if an activity or live share is running), a student sees one card per class they've joined, each with that class's own module list and progress.
+- A teacher can **Create a class** (name + subject) from this screen - it gets its own join code and its own "Teacher Demo Workspace", independent of their other classes. A student can **Join another class** from the same screen the same way they joined their first one.
+- Clicking a class's **Enter classroom** opens today's live workspace (editor, live share, activities, chat) scoped to just that one class; a **Dashboard** button in the workspace header returns to the class list. Each classroom's teams, activities, and live-share state are isolated from every other classroom the same user belongs to.
+- A teacher's roster/module-progress drill-down (click "View students" on a class, then a student, for their module summary) lives on this same class list screen.
+
 ## Students
 
 - Edit Java files, press **Run code** (laptop `javac` offline; demo mode online today), and type program input in the Console.

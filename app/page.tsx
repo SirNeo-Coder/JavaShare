@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import CodeEditor, { languageLabel } from "./CodeEditor";
+import Landing from "./Landing";
 import ModuleViewer from "./ModuleViewer";
 import { api, getApiUrl } from "./apiClient";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
@@ -88,6 +89,8 @@ type Bootstrap = {
     name: string;
     subject: string;
     joinCode?: string;
+    hasActivity?: boolean;
+    hasLiveShare?: boolean;
   }[];
   teams: TeamData[];
   groupCount?: number;
@@ -208,6 +211,8 @@ export default function Home() {
   const [fontScale, setFontScale] = useState(getSavedFontScale);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
+  const [pendingModuleId, setPendingModuleId] = useState<string | undefined>(undefined);
+  const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<Bootstrap | null>(null);
   const [loading, setLoading] = useState(true);
@@ -494,9 +499,11 @@ export default function Home() {
       if (!user) return;
       try {
         const view = viewOverride || teacherWorkspaceView;
-        const next = await api<Bootstrap>(
-          `/api/bootstrap${user.role === "teacher" ? `?view=${view}` : ""}`,
-        );
+        const params = new URLSearchParams();
+        if (user.role === "teacher") params.set("view", view);
+        if (enteredClassroomId) params.set("classroomId", enteredClassroomId);
+        const query = params.toString();
+        const next = await api<Bootstrap>(`/api/bootstrap${query ? `?${query}` : ""}`);
         setData(next);
         setUser(next.user);
         setWorkspaceError("");
@@ -552,19 +559,19 @@ export default function Home() {
         setWorkspaceError(message);
       }
     },
-    [user, activeTeam, teacherWorkspaceView],
+    [user, activeTeam, teacherWorkspaceView, enteredClassroomId],
   );
   useEffect(() => {
     if (!user) {
       loadedWorkspaceKeyRef.current = "";
       return;
     }
-    const workspaceKey = `${user.id}:${user.role === "teacher" ? teacherWorkspaceView : "student"}`;
+    const workspaceKey = `${user.id}:${user.role === "teacher" ? teacherWorkspaceView : "student"}:${enteredClassroomId || "list"}`;
     if (loadedWorkspaceKeyRef.current === workspaceKey) return;
     loadedWorkspaceKeyRef.current = workspaceKey;
     const timer = setTimeout(() => void loadWorkspace(), 0);
     return () => clearTimeout(timer);
-  }, [user, loadWorkspace, teacherWorkspaceView]);
+  }, [user, loadWorkspace, teacherWorkspaceView, enteredClassroomId]);
   useEffect(() => {
     if (!classroomId) return;
     let cancelled = false;
@@ -1724,6 +1731,23 @@ export default function Home() {
     return <ResetPasswordScreen user={user} onChanged={setUser} />;
   if (data?.needsJoin)
     return <JoinClass user={user} onJoined={loadWorkspace} onLogout={logout} />;
+  if (!enteredClassroomId && data)
+    return (
+      <Landing
+        role={user.role}
+        name={user.name}
+        classrooms={data.classrooms}
+        onEnter={(classroomId, moduleId) => {
+          setEnteredClassroomId(classroomId);
+          if (moduleId) {
+            setPendingModuleId(moduleId);
+            setModulesOpen(true);
+          }
+        }}
+        onLogout={logout}
+        onRefresh={() => void loadWorkspace()}
+      />
+    );
   if (!data || !team)
     return (
       <CenteredCard
@@ -1778,6 +1802,14 @@ export default function Home() {
           </span>
         </div>
         <div className="header-actions">
+          <button
+            className="settings-button"
+            type="button"
+            onClick={() => setEnteredClassroomId(null)}
+            title="Back to the dashboard"
+          >
+            Dashboard
+          </button>
           {classroomId && (
             <button
               className="settings-button modules-button"
@@ -3304,7 +3336,15 @@ export default function Home() {
         </div>
       )}
       {modulesOpen && classroomId && (
-        <ModuleViewer role={user.role} classroomId={classroomId} onClose={() => setModulesOpen(false)} />
+        <ModuleViewer
+          role={user.role}
+          classroomId={classroomId}
+          initialModuleId={pendingModuleId}
+          onClose={() => {
+            setModulesOpen(false);
+            setPendingModuleId(undefined);
+          }}
+        />
       )}
       {toast && <div className="toast">{toast}</div>}
     </main>

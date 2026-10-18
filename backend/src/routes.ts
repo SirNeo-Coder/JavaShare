@@ -14,6 +14,7 @@ import {
   canAccessSupabaseClass,
   changeSupabaseResetPassword,
   createSupabaseActivity,
+  createSupabaseClassroom,
   createSupabaseFile,
   createSupabaseWebProject,
   createSupabaseSavedWork,
@@ -24,7 +25,9 @@ import {
   getSupabaseModule,
   getSupabaseModuleProgress,
   joinSupabaseClass,
+  listSupabaseClassroomStudents,
   listSupabaseModules,
+  listSupabaseModuleProgressSummary,
   listSupabaseMessages,
   listSupabaseSavedWork,
   listSupabaseStudents,
@@ -211,6 +214,20 @@ app.delete("/api/teacher/students/:studentId", requireAuth, requireTeacher, asyn
   } catch (error) { next(error); }
 });
 
+// Teacher landing page: one classroom's roster, and (lazily, on clicking a student) that
+// student's module-progress summary - see listSupabaseModuleProgressSummary below.
+app.get("/api/classes/:classroomId/students", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await listSupabaseClassroomStudents(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.get("/api/classes/:classroomId/students/:studentId/modules-summary", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const studentId = z.string().uuid().parse(req.params.studentId);
+    return res.json(await listSupabaseModuleProgressSummary(req.user!, String(req.params.classroomId), studentId));
+  } catch (error) { next(error); }
+});
+
 app.post("/api/classes/join", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const { joinCode } = z.object({ joinCode: z.string().min(4).max(20) }).parse(req.body);
@@ -221,7 +238,17 @@ app.post("/api/classes/join", requireAuth, async (req: AuthedRequest, res, next)
 app.get("/api/bootstrap", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const teacherView = req.query.view === "groups" ? "groups" : "students";
-    return res.json(await bootstrapFromSupabase(req.user!, teacherView));
+    const classroomId = req.query.classroomId ? String(req.query.classroomId) : undefined;
+    return res.json(await bootstrapFromSupabase(req.user!, teacherView, classroomId));
+  } catch (error) { next(error); }
+});
+
+// Teacher creates an additional class beyond the one auto-created at signup (Google-Classroom-
+// style class list). Reuses the same classroom-workspace setup as that starter class.
+app.post("/api/classes", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const input = z.object({ name: z.string().trim().min(2).max(80), subject: z.string().trim().min(2).max(80).optional() }).parse(req.body);
+    return res.status(201).json(await createSupabaseClassroom(req.user!.id, input));
   } catch (error) { next(error); }
 });
 
@@ -460,6 +487,14 @@ app.post("/api/classrooms/:classroomId/modules", requireAuth, async (req: Authed
 
 app.get("/api/classrooms/:classroomId/modules", requireAuth, async (req: AuthedRequest, res, next) => {
   try { return res.json(await listSupabaseModules(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+// Student landing page: the signed-in student's own module list with percent/status. Must be
+// registered before the :moduleId route below, or "summary" would be matched as a moduleId
+// (first-match routing in router.ts).
+app.get("/api/classrooms/:classroomId/modules/summary", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await listSupabaseModuleProgressSummary(req.user!, String(req.params.classroomId))); }
   catch (error) { next(error); }
 });
 

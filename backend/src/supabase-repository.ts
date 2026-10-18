@@ -42,22 +42,18 @@ const starterCode = `public class Main {
     }
 }`;
 
-async function createStarterClass(teacherId: string) {
+async function createClassroomWorkspace(classroomId: string, teacherId: string) {
   const db = getSupabaseAdmin();
-  const { data: classroom, error: classroomError } = await db.from("classrooms").insert({
-    name: "CS 101 · Period 3", join_code: "JAVA101", teacher_id: teacherId,
-  }).select("id").single();
-  fail(classroomError, "Could not create starter classroom");
-  const { error: memberError } = await db.from("classroom_members").insert({ classroom_id: classroom.id, user_id: teacherId });
-  fail(memberError, "Could not add teacher to starter classroom");
+  const { error: memberError } = await db.from("classroom_members").insert({ classroom_id: classroomId, user_id: teacherId });
+  fail(memberError, "Could not add teacher to classroom");
   const { data: team, error: teamError } = await db.from("teams").insert({
-    classroom_id: classroom.id, owner_id: teacherId, slug: "teacher-demo", name: "Teacher Demo Workspace",
+    classroom_id: classroomId, owner_id: teacherId, slug: "teacher-demo", name: "Teacher Demo Workspace",
   }).select("id").single();
   fail(teamError, "Could not create teacher workspace");
   const { error: teamMemberError } = await db.from("team_members").insert({ team_id: team.id, user_id: teacherId });
   fail(teamMemberError, "Could not add teacher to workspace");
   const { data: project, error: projectError } = await db.from("projects").insert({
-    classroom_id: classroom.id,
+    classroom_id: classroomId,
     team_id: team.id,
     title: "Live Lesson Code",
     description: "The teacher's persistent workspace for live coding demonstrations.",
@@ -67,6 +63,36 @@ async function createStarterClass(teacherId: string) {
     project_id: project.id, path: "src/Main.java", content: starterCode, updated_by: teacherId,
   });
   fail(fileError, "Could not create starter file");
+}
+
+async function createStarterClass(teacherId: string) {
+  const db = getSupabaseAdmin();
+  const { data: classroom, error: classroomError } = await db.from("classrooms").insert({
+    name: "CS 101 · Period 3", join_code: "JAVA101", teacher_id: teacherId,
+  }).select("id").single();
+  fail(classroomError, "Could not create starter classroom");
+  await createClassroomWorkspace(classroom.id, teacherId);
+}
+
+function generateJoinCode() {
+  return randomBytes(5).toString("hex").toUpperCase().slice(0, 6);
+}
+
+export async function createSupabaseClassroom(teacherId: string, input: { name: string; subject?: string }) {
+  const db = getSupabaseAdmin();
+  const row: Record<string, unknown> = { name: input.name, teacher_id: teacherId };
+  if (input.subject) row.subject = input.subject;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data: classroom, error } = await db.from("classrooms")
+      .insert({ ...row, join_code: generateJoinCode() })
+      .select("id,name,subject,join_code").single();
+    if (!error) {
+      await createClassroomWorkspace(classroom.id, teacherId);
+      return { id: classroom.id, name: classroom.name, subject: classroom.subject, joinCode: classroom.join_code };
+    }
+    if (!error.message.includes("join_code")) throw new Error(`Could not create classroom: ${error.message}`);
+  }
+  throw new Error("Could not generate a unique join code");
 }
 
 export async function registerWithSupabase(input: { name: string; email: string; password: string }) {
@@ -225,6 +251,19 @@ export async function canAccessSupabaseClass(user: SupabaseSessionUser, classroo
   return (await supabaseClassIds(user)).includes(classroomId);
 }
 
+function classSummary(user: SupabaseSessionUser, classroom: ClassroomRow) {
+  return {
+    id: classroom.id, name: classroom.name, subject: classroom.subject,
+    hasActivity: Boolean(classroom.current_activity_id), hasLiveShare: Boolean(classroom.live_share_project_id),
+    ...(user.role === "teacher" ? { joinCode: classroom.join_code } : {}),
+  };
+}
+
+// The class list screen: every class the user belongs to, with no workspace data loaded.
+export async function listSupabaseClassSummaries(user: SupabaseSessionUser) {
+  return (await loadClasses(user)).map((classroom) => classSummary(user, classroom));
+}
+
 async function canAccessSupabaseTeam(user: SupabaseSessionUser, teamId: string) {
   const db = getSupabaseAdmin();
   const { data: requestedTeam, error: requestedTeamError } = await db.from("teams").select("classroom_id,slug").eq("id", teamId).maybeSingle();
@@ -240,12 +279,21 @@ async function canAccessSupabaseTeam(user: SupabaseSessionUser, teamId: string) 
   return Boolean(team && await canAccessSupabaseClass(user, team.classroom_id));
 }
 
-export async function bootstrapFromSupabase(user: SupabaseSessionUser, teacherView: "students" | "groups") {
+export async function bootstrapFromSupabase(user: SupabaseSessionUser, teacherView: "students" | "groups", classroomId?: string) {
   const db = getSupabaseAdmin();
-  const classes = await loadClasses(user);
+  // No classroomId: this is the class list screen - every class, no workspace data (teams,
+  // activities, ...) loaded for any of them, so one class's activity/team state can never mix
+  // with another's (see CKB-010 for the same class of bug in module progress).
+  if (!classroomId) {
+    const classrooms = await listSupabaseClassSummaries(user);
+    return { user, classrooms, teams: [], groupCount: 0, classroomChatTeamId: null, classroomChatMuted: false, currentActivity: null, needsJoin: user.role === "student" && classrooms.length === 0 };
+  }
+  if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Classroom access denied");
+  const { data: classroomRow, error: classroomRowError } = await db.from("classrooms").select("*").eq("id", classroomId).single();
+  fail(classroomRowError, "Could not load classroom");
+  const classes = [classroomRow as ClassroomRow];
   if (user.role === "student") await Promise.all(classes.map((classroom) => ensurePersonalWorkspace(classroom, user)));
   const classIds = classes.map((item) => item.id);
-  if (!classIds.length) return { user, classrooms: [], teams: [], groupCount: 0, currentActivity: null, needsJoin: user.role === "student" };
 
   const { data: activityData, error: activityError } = await db.from("activities").select("*").in("classroom_id", classIds).order("created_at", { ascending: false });
   fail(activityError, "Could not load activities");
@@ -364,10 +412,10 @@ export async function bootstrapFromSupabase(user: SupabaseSessionUser, teacherVi
     : payload;
   return {
     user: { ...user, photoUrl: profiles.find((profile) => profile.id === user.id)?.photoUrl || null },
-    classrooms: classes.map((item) => ({ id: item.id, name: item.name, subject: item.subject, ...(user.role === "teacher" ? { joinCode: item.join_code } : {}) })),
+    classrooms: classes.map((item) => classSummary(user, item)),
     teams: visiblePayload, groupCount, classroomChatTeamId, classroomChatMuted: Boolean(firstClass?.chat_muted),
     currentActivity: currentActivity ? { id: currentActivity.id, title: currentActivity.title, mode: currentActivity.mode } : null,
-    needsJoin: user.role === "student" && classes.length === 0,
+    needsJoin: false,
   };
 }
 
@@ -1261,6 +1309,71 @@ export async function setSupabaseModulePerformanceTask(
     "Could not save performance task submission",
   );
   return moduleProgressView(data);
+}
+
+// A single classroom's student roster, for the teacher landing page's class-card drill-down.
+// listSupabaseStudents merges every class the teacher has; this is scoped to just one.
+export async function listSupabaseClassroomStudents(user: SupabaseSessionUser, classroomId: string) {
+  await teacherClassroom(user, classroomId);
+  const db = getSupabaseAdmin();
+  const { data: memberships, error: membershipError } = await db.from("classroom_members").select("user_id,joined_at").eq("classroom_id", classroomId);
+  fail(membershipError, "Could not load classroom students");
+  const studentMemberships = memberships.filter((item) => item.user_id !== user.id);
+  if (!studentMemberships.length) return { students: [] };
+  const ids = studentMemberships.map((item) => item.user_id);
+  const { data: students, error } = await db.from("profiles").select("id,name,email").in("id", ids).eq("role", "student").order("name");
+  fail(error, "Could not load student accounts");
+  const joinedAt = new Map(studentMemberships.map((item) => [item.user_id, item.joined_at]));
+  return { students: students.map((student) => ({ id: student.id, name: student.name, email: student.email, joinedAt: joinedAt.get(student.id) })) };
+}
+
+// Mirrors app/ModuleViewer.tsx's meterPercent - duplicated rather than shared because that one
+// runs in the browser off a module the student is actively viewing, and this runs server-side,
+// scoped to whichever student a landing page is asking about, without sending the full module
+// content (lessons, step files, instructions) down just to show a percentage.
+function moduleCompletionPercent(module: CourseModule, progress: Pick<ModuleProgressRow, "step_states" | "performance_task">) {
+  const steps = module.lessons.flatMap((lesson) => lesson.blocks.filter((block) => block.type === "step"));
+  const total = steps.length + module.lessons.length + (module.performanceTask ? 2 : 0);
+  if (total === 0) return 0;
+  const stepsDone = steps.filter((step) => progress.step_states[step.id] === "pass").length;
+  const slipsDone = module.lessons.filter((lesson) => progress.step_states[lesson.exitSlip.id] === "pass").length;
+  const taskDone = module.performanceTask ? (progress.performance_task.sample ? 1 : 0) + (progress.performance_task.own ? 1 : 0) : 0;
+  return Math.round(((stepsDone + slipsDone + taskDone) / total) * 100);
+}
+
+// Landing-page module list for one classroom: each module's title/week plus one student's
+// percent and a status bucket. targetStudentId lets a teacher view a specific student (must be
+// in that classroom); omitted, it's the signed-in student's own progress.
+export async function listSupabaseModuleProgressSummary(user: SupabaseSessionUser, classroomId: string, targetStudentId?: string) {
+  const db = getSupabaseAdmin();
+  let studentId: string;
+  if (targetStudentId) {
+    await teacherClassroom(user, classroomId);
+    const { data: membership, error } = await db.from("classroom_members").select("user_id").eq("classroom_id", classroomId).eq("user_id", targetStudentId).maybeSingle();
+    fail(error, "Could not verify classroom student");
+    if (!membership) throw new SupabaseRepositoryError(404, "Student is not in this classroom");
+    studentId = targetStudentId;
+  } else {
+    if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
+    await requireClassroomMember(user, classroomId);
+    studentId = user.id;
+  }
+  const { data: modules, error: moduleError } = await db.from("course_modules").select("module_id,content,created_at").eq("classroom_id", classroomId).order("created_at", { ascending: false });
+  fail(moduleError, "Could not list modules");
+  if (!modules.length) return [];
+  const { data: progressRows, error: progressError } = await db.from("module_progress").select("module_id,step_states,performance_task").eq("classroom_id", classroomId).eq("student_id", studentId);
+  fail(progressError, "Could not load module progress");
+  const progressByModule = new Map(progressRows.map((row) => [row.module_id, row]));
+  const latestModuleId = (modules as { module_id: string }[])[0]?.module_id;
+  return (modules as { module_id: string; content: CourseModule }[]).map((row) => {
+    const progress = progressByModule.get(row.module_id) || { step_states: {}, performance_task: {} };
+    const percent = moduleCompletionPercent(row.content, progress);
+    return {
+      moduleId: row.module_id, title: row.content.title, week: row.content.week, percent,
+      status: percent === 100 ? "done" as const : percent > 0 ? "in-progress" as const : "not-started" as const,
+      isLatest: row.module_id === latestModuleId,
+    };
+  });
 }
 
 // Course modules (docs/course-format.md): the teacher uploads a validated .codeshare.json file

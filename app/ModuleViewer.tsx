@@ -76,7 +76,7 @@ type Progress = {
   performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>>;
 };
 
-type Props = { role: "teacher" | "student"; classroomId: string; onClose: () => void };
+type Props = { role: "teacher" | "student"; classroomId: string; initialModuleId?: string; onClose: () => void };
 
 function isStepBlock(block: Block): block is StepBlock {
   return block.type === "step";
@@ -348,20 +348,12 @@ function ModuleContent({ module, classroomId, role }: { module: CourseModule; cl
   );
 }
 
-export default function ModuleViewer({ role, classroomId, onClose }: Props) {
+export default function ModuleViewer({ role, classroomId, initialModuleId, onClose }: Props) {
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [selected, setSelected] = useState<CourseModule | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
-
-  const refreshList = () => {
-    api<ModuleSummary[]>(`/api/classrooms/${classroomId}/modules`)
-      .then(setModules)
-      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Could not load modules"));
-  };
-
-  useEffect(refreshList, [classroomId]);
 
   const openModule = (moduleId: string) => {
     setError(null);
@@ -369,6 +361,19 @@ export default function ModuleViewer({ role, classroomId, onClose }: Props) {
       .then(setSelected)
       .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Could not load module"));
   };
+
+  const refreshList = () => {
+    api<ModuleSummary[]>(`/api/classrooms/${classroomId}/modules`)
+      .then((list) => {
+        setModules(list);
+        // Jumping in from the landing page's module cards (app/Landing.tsx): open straight to
+        // that module instead of showing the list first.
+        if (initialModuleId) openModule(initialModuleId);
+      })
+      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Could not load modules"));
+  };
+
+  useEffect(refreshList, [classroomId]);
 
   const upload = async (file: File) => {
     setUploading(true);
