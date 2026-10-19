@@ -1,6 +1,7 @@
 # Teacher progress dashboard handoff
 
 Last updated: 2026-10-20. Branch: `codex/teacher-progress-dashboard`.
+Implementation: `91a4976`. Draft review: [PR #17](https://github.com/SirNeo-Coder/JavaShare/pull/17).
 Base: `codex/printed-module-worksheet`; keep the dashboard review separate from that worksheet PR.
 
 ## Approved decision
@@ -49,12 +50,14 @@ file, commands, isolated-vs-real-app distinctions, mutation proof and screenshot
 
 ## In progress / next
 
-Implementation and verification complete. Commit, push and prepare a draft review PR against
-`codex/printed-module-worksheet`, then record the PR link here. The teacher reviews and merges.
-No deployment or hosted changes are authorized. No dashboard feature work remains in this scope.
+Implementation `91a4976` is committed and pushed. [Draft PR #17](https://github.com/SirNeo-Coder/JavaShare/pull/17)
+targets `codex/printed-module-worksheet`, keeping its review focused on the dashboard. The teacher
+reviews and merges. No deployment or hosted changes are authorized. No feature work remains in
+this scope; hosted and real-device checks remain explicit verification limits.
 
 ## Local working state
 
 Existing unrelated changes were left alone: `logs/classroom.log`, `supabase/.temp/cli-latest`,
 `.claude/`, and `supabase/snippets/`. Do not include them in the dashboard commits.
-Disposable browser fixtures and the temporary port-3100 server are cleaned up after verification.
+Disposable browser fixtures were deleted and the temporary port-3100 server was stopped after
+verification. The existing port-3000 classroom was left running.
