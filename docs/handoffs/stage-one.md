@@ -4,14 +4,12 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-19. Current classroom UI work is on `codex/classroom-figma-ui`;
-see [stage-four.md](stage-four.md) and [classroom UI verification](../verification/classroom-figma-ui.md).
-The teacher approved this as a workflow change: retain the top bar, left module browser, right
-existing messaging system. Built and tested; the teacher explicitly requested merging [PR #14](https://github.com/SirNeo-Coder/JavaShare/pull/14)
-into `main` on 2026-10-19. It includes the existing CodeShare prerequisite stack, originally based
-on schema/backend PR #13. Next: check the normal main-branch build and hosted classroom; no hosted
-migrations or service settings were changed.
-
+Last updated: 2026-10-19. Classroom UI PR #14 is merged. The current follow-up is the approved
+**drawer-animation adjustment** on `codex/drawer-slide-animation`: left panels and right chat
+slide in/out in 250 ms while keeping their existing content and controls. Built/tested and served
+on localhost:3000; [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15) is open for review (implementation `d072aa1`). See [stage-four.md](stage-four.md) and
+[drawer animation verification](../verification/drawer-slide-animation.md). No hosted service or
+database settings were changed.
 
 ## The job
 

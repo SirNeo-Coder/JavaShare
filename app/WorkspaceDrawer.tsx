@@ -11,12 +11,12 @@ export default function WorkspaceDrawer({ id, title, side, open, onClose, childr
   useEffect(() => {
     if (!open) return;
     const previousFocus = document.activeElement as HTMLElement | null;
-    closeRef.current?.focus();
-    return () => { if (previousFocus?.isConnected) previousFocus.focus(); };
+    closeRef.current?.focus({ preventScroll: true });
+    return () => { if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true }); };
   }, [open]);
 
   return (
-    <aside id={id} aria-label={title} hidden={!open}
+    <aside id={id} aria-label={title} data-open={open} aria-hidden={!open} inert={!open}
       className={`workspace-drawer drawer-${side}${pinned ? " drawer-pinned" : ""}`}
       onKeyDown={(event) => {
         if (event.key === "Escape") { event.stopPropagation(); onClose(); }

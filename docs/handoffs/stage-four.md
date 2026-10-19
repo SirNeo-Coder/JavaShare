@@ -1,6 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: classroom Figma UI delivered through PR #14; teacher explicitly requested its complete tested version be merged into `main` on 2026-10-19.** Last updated: 2026-10-19.
+**Status: classroom Figma UI merged through PR #14; approved drawer-animation adjustment implemented and verified on `codex/drawer-slide-animation`, [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15) open for review.** Last updated: 2026-10-19.
 
 ## What the teacher asked for
 
@@ -156,3 +156,38 @@ Open / next:
 - The in-app browser does not support `prompt()`, so the Save work naming dialog could not be
   exercised; existing file-save routes still pass integration checks. Wide pin interaction could
   not be completed through the browser's iframe controls; see the verification note.
+
+## Drawer animation follow-up — 2026-10-19
+
+Teacher reported that the panels appeared instantly instead of sliding. The targeted proposal was
+approved as an **adjustment**: Modules / Projects slide from the left, Chat from the right,
+250 ms opening and closing, existing drafts/messages/keyboard controls retained, reduced-motion
+preferences respected. No new teaching step, route, dependency or migration.
+
+**Branch:** `codex/drawer-slide-animation`, based on merged `main` (`667186c`, PR #14).
+
+Done:
+
+- `app/WorkspaceDrawer.tsx` and the Projects aside in `app/page.tsx` use `data-open`, `inert`, and
+  `aria-hidden` rather than `hidden`. CSS can animate closing without exposing closed controls.
+- `app/globals.css` slides from the proper edge, clips off-screen content, delays `visibility`
+  until closing finishes, and disables transitions for `prefers-reduced-motion: reduce`.
+- Wide pin selectors now check the explicit open marker. Browser checks proved left/right
+  reserved space clears on close and returns on reopening. Focus restoration prevents scrolling.
+- CKB-031 records the omission and fix. Regression test shown failing after restoring the old
+  hidden behavior, then passing with the fix restored.
+
+Verification: `docs/verification/drawer-slide-animation.md`. Build passed through
+`npm run classroom:offline -- --build-only` (runs `npm run build:all`). Lint: 0 errors, 8 existing
+warnings. Full suite: 64 passed, 0 failures/skips. Focused React checks: 5/5. Real browser measured
+intermediate positions for all panels, six chat reversals, retained chat/lesson drafts, Escape
+focus, no horizontal overflow and wide pin spacing. Reduced-motion CSS rule was inspected in the
+browser; the tool cannot toggle the operating-system preference, so that mode was not forced.
+
+Local preview: the existing port-3000 offline supervisor restarted its Next.js worker with the
+new build, keeping database/sign-in settings. `/api/health` confirmed local Supabase connected.
+Implementation committed as `d072aa1` and pushed. [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15)
+is open against `main`. Generated browser-test sessions were signed out; the isolated test class
+and all three generated test accounts were removed. The normal localhost:3000 server remains running.
+Another assistant can continue from this branch and this verification document. Next: teacher review
+of PR #15; merging this follow-up awaits a specific request. No hosted-service changes were made.

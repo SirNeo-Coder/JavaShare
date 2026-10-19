@@ -1972,7 +1972,7 @@ export default function Home() {
         <nav className="workspace-rail rail-right" aria-label="Chat panel">
           <button type="button" aria-expanded={chatOpen} aria-controls="classroom-chat" onClick={() => setChatOpen(!chatOpen)}><span aria-hidden="true">☏</span> Chat <span aria-hidden="true">{chatOpen ? "›" : "‹"}</span></button>
         </nav>
-        <aside id="classroom-projects" aria-label={user.role === "teacher" ? "Students and projects" : "Projects"} hidden={!projectsOpen} className="sidebar classroom-projects" onKeyDown={(event) => { if (event.key === "Escape") setProjectsOpen(false); }}>
+        <aside id="classroom-projects" aria-label={user.role === "teacher" ? "Students and projects" : "Projects"} data-open={projectsOpen} aria-hidden={!projectsOpen} inert={!projectsOpen} className="sidebar classroom-projects" onKeyDown={(event) => { if (event.key === "Escape") setProjectsOpen(false); }}>
           <div className="projects-heading"><b>{user.role === "teacher" ? "Students and projects" : "My projects"}</b><button type="button" aria-label="Close projects" onClick={() => setProjectsOpen(false)}>×</button></div>
           <div className="side-title">
             <span>
