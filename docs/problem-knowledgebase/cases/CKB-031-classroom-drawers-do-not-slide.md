@@ -43,7 +43,7 @@ No timer, second chat system, new module storage, dependency, route or migration
 - Reduced-motion rule inspected in the delivered stylesheet; operating-system preference could
   not be toggled through the available browser controls. See verification for this limit.
 - Full evidence: `docs/verification/drawer-slide-animation.md`.
-- Commit: drawer-animation fix on `codex/drawer-slide-animation`.
+- Commit: `d072aa1` on `codex/drawer-slide-animation`; [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15).
 
 ## Recurrence triage
 

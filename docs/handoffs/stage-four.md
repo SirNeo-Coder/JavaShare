@@ -1,6 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: classroom Figma UI merged through PR #14; approved drawer-animation adjustment implemented and verified on `codex/drawer-slide-animation`, preparing its PR.** Last updated: 2026-10-19.
+**Status: classroom Figma UI merged through PR #14; approved drawer-animation adjustment implemented and verified on `codex/drawer-slide-animation`, [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15) open for review.** Last updated: 2026-10-19.
 
 ## What the teacher asked for
 
@@ -186,5 +186,8 @@ browser; the tool cannot toggle the operating-system preference, so that mode wa
 
 Local preview: the existing port-3000 offline supervisor restarted its Next.js worker with the
 new build, keeping database/sign-in settings. `/api/health` confirmed local Supabase connected.
-Another assistant can continue from this branch and this verification document. Next: review
-this small PR; no automatic merge or hosted-service changes are authorized by this adjustment.
+Implementation committed as `d072aa1` and pushed. [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15)
+is open against `main`. Generated browser-test sessions were signed out; the isolated test class
+and all three generated test accounts were removed. The normal localhost:3000 server remains running.
+Another assistant can continue from this branch and this verification document. Next: teacher review
+of PR #15; merging this follow-up awaits a specific request. No hosted-service changes were made.

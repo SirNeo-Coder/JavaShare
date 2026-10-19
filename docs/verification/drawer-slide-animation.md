@@ -1,5 +1,6 @@
 # Drawer slide animation — verification, 2026-10-19
 
+Implementation: `d072aa1`, [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15).
 Branch: `codex/drawer-slide-animation`, based on merged main (`667186c`). The teacher approved the
 proposal as an **adjustment**: Modules / Projects slide from the left, Chat from the right,
 250 ms opening and closing, existing content and controls preserved.
@@ -241,6 +242,11 @@ local Supabase. The real-browser checks above cover combined app behavior.
 ✔ file names must fit the project language (4.248088ms)
 ```
 
+
+## Cleanup
+
+Generated test sessions signed out; the isolated test class and all three generated accounts were
+removed from local Supabase. The ordinary localhost:3000 server remains running with this build.
 
 ## Screenshot
 

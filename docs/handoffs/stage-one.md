@@ -7,7 +7,7 @@ The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowled
 Last updated: 2026-10-19. Classroom UI PR #14 is merged. The current follow-up is the approved
 **drawer-animation adjustment** on `codex/drawer-slide-animation`: left panels and right chat
 slide in/out in 250 ms while keeping their existing content and controls. Built/tested and served
-on localhost:3000; preparing its review PR. See [stage-four.md](stage-four.md) and
+on localhost:3000; [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15) is open for review (implementation `d072aa1`). See [stage-four.md](stage-four.md) and
 [drawer animation verification](../verification/drawer-slide-animation.md). No hosted service or
 database settings were changed.
 
