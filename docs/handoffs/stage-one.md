@@ -4,14 +4,18 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-20. Current work: teacher-approved **printed module worksheet workflow
-change** on `codex/printed-module-worksheet`, based on the tested drawer animation branch
-(PR #15, `3990646`). The classroom keeps its module browser and opens a separate wide worksheet
-with named parts, Overview/step pages, printed content and a hover/click/keyboard Module ear.
-Existing runner, progress, availability and chat stay connected. [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16) is open (implementation `9b538d5`), stacked on PR #15. UI build/lint and 69 tests pass; exact supplied JSON is verified in the reader. The existing
-Step 1 starter-file execution issue (CKB-038) awaits approval of a separate compatibility fix;
-see [stage-four.md](stage-four.md) and [worksheet verification](../verification/printed-module-worksheet.md).
-No hosted services or database settings changed.
+Last updated: 2026-10-20. Classroom UI, sliding drawers and the printed worksheet reader are
+on **main**, delivered through PR #14, [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15)
+and [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16). The teacher explicitly requested
+these merges in the current chat; this is permission for this delivery, not a standing change
+to the branch/PR rules. PR #15 merged as `8464d73`; the worksheet implementation is `9b538d5`.
+
+The exact Week 14 JSON renders five lesson sections, eleven steps and 17 digital pages. Full
+build/offline build and lint passed (eight existing warnings); 69 tests passed. See
+[stage-four.md](stage-four.md) and [worksheet verification](../verification/printed-module-worksheet.md).
+The existing Step 1 starter-file execution issue **CKB-038 still awaits separate approval**.
+The merge request does not authorize that additional backend change. Uncommitted teacher-dashboard
+work in the local checkout was left untouched. No hosted setting or database migration was applied.
 
 ## The job
 
