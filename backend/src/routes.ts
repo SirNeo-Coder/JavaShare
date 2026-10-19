@@ -27,6 +27,7 @@ import {
   getSupabaseStudentWebProject,
   joinSupabaseClass,
   listSupabaseClassroomStudents,
+  getSupabaseTeacherClassProgress,
   listSupabaseModules,
   listSupabaseModuleProgressSummary,
   listSupabaseMessages,
@@ -223,6 +224,11 @@ app.delete("/api/teacher/students/:studentId", requireAuth, requireTeacher, asyn
 // student's module-progress summary - see listSupabaseModuleProgressSummary below.
 app.get("/api/classes/:classroomId/students", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
   try { return res.json(await listSupabaseClassroomStudents(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.get("/api/classes/:classroomId/module-progress", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseTeacherClassProgress(req.user!, z.string().uuid().parse(req.params.classroomId))); }
   catch (error) { next(error); }
 });
 

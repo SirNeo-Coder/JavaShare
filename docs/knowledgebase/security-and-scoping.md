@@ -24,6 +24,13 @@ Checked in `supabase-repository.ts` (row-level security exists but the server by
 - **Open issue CKB-021:** the older `PUT /api/files/:fileId` allows the class teacher to overwrite a student file via a direct request. The new viewer has read-only fields and GET routes, but does not repair this existing server write-permission gap. Reproduced only with disposable local data; separate approval needed for permission changes.
 - File names: `backend/src/file-paths.ts` rejects names that don't fit the project language, plus `..` and hidden files.
 
+## Teacher class progress dashboard
+
+`GET /api/classes/:classroomId/module-progress` requires a signed-in teacher and verifies class
+ownership before reading the roster, modules, or progress. Every progress page filters by class.
+Only current students and existing uploaded modules contribute to figures. Replies contain counts
+and percentages, without student source files or raw progress maps. Reads do not create progress.
+
 ## Live channels (PR c1)
 
 - The browser gets a one-hour pass (`GET /api/realtime/pass`): a JWT with `sub` = user id and `role` = `authenticated`, signed with `SUPABASE_JWT_SECRET`. It is renewed 5 minutes before expiry, and forgotten on sign-out.

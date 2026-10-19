@@ -1423,6 +1423,70 @@ function moduleCompletionPercent(module: CourseModule, progress: Pick<ModuleProg
   return Math.round(((stepsDone + slipsDone + taskDone) / total) * 100);
 }
 
+// Load a class together, rather than making one request and repeating module queries per student.
+export async function getSupabaseTeacherClassProgress(user: SupabaseSessionUser, classroomId: string) {
+  const { students: roster } = await listSupabaseClassroomStudents(user, classroomId);
+  const db = getSupabaseAdmin();
+  const loadProgress = async () => {
+    const rows: Pick<ModuleProgressRow, "student_id" | "module_id" | "step_states" | "performance_task">[] = [];
+    // Supabase caps each reply; a full year's class can have more than 1,000 progress rows.
+    for (let offset = 0; ; offset += 500) {
+      const { data, error } = await db.from("module_progress").select("student_id,module_id,step_states,performance_task")
+        .eq("classroom_id", classroomId).order("student_id").order("module_id").range(offset, offset + 499);
+      fail(error, "Could not load class progress");
+      rows.push(...data);
+      if (data.length < 500) return rows;
+    }
+  };
+  const [moduleResult, progressRows] = await Promise.all([
+    db.from("course_modules").select("module_id,content").eq("classroom_id", classroomId),
+    loadProgress(),
+  ]);
+  fail(moduleResult.error, "Could not load class modules");
+  const courseRows = (moduleResult.data as { module_id: string; content: CourseModule }[])
+    .sort((a, b) => a.content.week - b.content.week || a.content.title.localeCompare(b.content.title));
+  const progressByStudent = new Map<string, Map<string, Pick<ModuleProgressRow, "step_states" | "performance_task">>>();
+  for (const row of progressRows) {
+    if (!progressByStudent.has(row.student_id)) progressByStudent.set(row.student_id, new Map());
+    progressByStudent.get(row.student_id)!.set(row.module_id, row);
+  }
+  const average = (values: number[]) => values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : 0;
+  const completionStatus = (values: number[]) => values.length && values.every((value) => value === 100) ? "finished" as const : values.some((value) => value > 0) ? "in-progress" as const : "not-started" as const;
+  const students = roster.map((student) => {
+    const modules = courseRows.map(({ module_id, content }) => {
+      const progress = progressByStudent.get(student.id)?.get(module_id) ?? { step_states: {}, performance_task: {} };
+      return {
+        moduleId: module_id,
+        percent: moduleCompletionPercent(content, progress),
+        submissions: content.performanceTask ? Number(Boolean(progress.performance_task.sample)) + Number(Boolean(progress.performance_task.own)) : 0,
+      };
+    });
+    return { ...student, modules, averagePercent: average(modules.map((module) => module.percent)), status: completionStatus(modules.map((module) => module.percent)), completedModules: modules.filter((module) => module.percent === 100).length };
+  });
+  const modules = courseRows.map(({ module_id, content }) => {
+    const progress = students.flatMap((student) => student.modules.filter((module) => module.moduleId === module_id));
+    return {
+      moduleId: module_id, title: content.title, week: content.week, course: content.course,
+      lessons: content.lessons.length,
+      steps: content.lessons.reduce((total, lesson) => total + lesson.blocks.filter((block) => block.type === "step").length, 0),
+      completedStudents: progress.filter((module) => module.percent === 100).length,
+      averagePercent: average(progress.map((module) => module.percent)),
+      status: completionStatus(progress.map((module) => module.percent)),
+      submissions: progress.reduce((total, module) => total + module.submissions, 0),
+    };
+  });
+  return {
+    students, modules,
+    totals: {
+      students: students.length, modules: modules.length,
+      averagePercent: average(students.flatMap((student) => student.modules.map((module) => module.percent))),
+      completedModules: students.reduce((total, student) => total + student.completedModules, 0),
+      notStartedStudents: students.filter((student) => student.modules.every((module) => module.percent === 0)).length,
+      submissions: modules.reduce((total, module) => total + module.submissions, 0),
+    },
+  };
+}
+
 // Landing-page module list for one classroom: each module's title/week plus one student's
 // percent and a status bucket. targetStudentId lets a teacher view a specific student (must be
 // in that classroom); omitted, it's the signed-in student's own progress.

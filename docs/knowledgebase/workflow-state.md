@@ -12,7 +12,7 @@ What teachers and students can do today. Compare any proposed change with this p
 
 - On login, everyone sees a class list. Each card shows the class name, subject, and a "Live now" badge if an activity or live share is running; teachers also see its join code. **Open class** opens that class's home, without entering the live workspace.
 - A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and "Teacher Demo Workspace". A student can **Join another class** from that same list.
-- A teacher's class home contains **Modules** (the **Upload module** file picker, module preview, and **Delete**) and **Students**. **View module progress** on a student shows that student's module summaries for this class. **Back to modules** leaves a teacher preview.
+- A teacher's class home uses **Overview**, **Students**, and **Curriculum** (the module-management page). See "Teacher class dashboard" below for the approved 2026-10-20 workflow.
 - A student's class home shows **Your modules**, with each module's progress. Opening a module stays on class home; **Close** returns to the module cards and refreshes their progress.
 - **Enter classroom** opens the existing live workspace for that one class. **Class home** in its header returns to the same class home; **Classes** goes back to the class list. Students also retain the workspace's **Modules** shortcut. Teacher module upload and deletion now live on class home, rather than in the workspace header.
 - On **Classes** or class home, students see **Your class is live** for a running activity or teacher live share, with **Join live class** and **Not now**. Several live classes appear as a choice. The invitation waits until an open module is closed, and never moves a student automatically. Teachers do not receive this popup.
@@ -106,3 +106,31 @@ What teachers and students can do today. Compare any proposed change with this p
   page or draft; closing Projects restores that visit. The classroom top bar and existing chat
   system are retained. Class-home upload, availability, progress and submission
   routes retain their existing storage and permissions. No new route, dependency or migration.
+
+## Teacher class dashboard (approved workflow change, 2026-10-20)
+
+- **Open class** in the teacher account opens a dashboard for that class, with a dark sidebar and
+  **Overview**, **Students**, and **Curriculum**. **All classes**, **Enter classroom**, **Activity
+  summary**, **Student accounts**, and **Sign out** remain available, including on narrow screens.
+- **Overview** shows student count, average saved completion, completed student–module pairs, and
+  students with no completed items. A student's overall percentage is the arithmetic mean of
+  their percentages across all uploaded modules. The class mean includes every student–module
+  pair, including untouched modules and closed lessons. These are completion figures, not grades.
+- Displayed averages are rounded. Finished/In progress/Not started labels and filters use the
+  underlying completion records, so rounding to 0% or 100% cannot change status.
+- **Students** shows searchable cards with completion filters. **View module progress** opens a
+  student's summary and module cards. **View web projects** retains the existing saved-file review.
+- **Curriculum** is the teacher's module-management page. Cards show week, course, lesson and step
+  counts, average completion, students finished, and saved performance-task submission count.
+  **Add module** uses the existing JSON upload; **View module details** opens the existing teacher
+  preview and **Open to students** controls. **Back to modules** returns to Curriculum. **Delete
+  module** asks for confirmation; cancelling restores focus to its original button.
+- **Refresh** fetches saved progress again. Navigation within a class uses that visit's loaded
+  figures; returning from module preview, uploading, and deleting refreshes them. This is not a
+  live dashboard. Search and filters affect cards, not the class-wide summary totals.
+- Only the class teacher can fetch the class-wide progress request. Current student membership is
+  required for inclusion; former members and deleted modules do not affect totals. Progress pages
+  are read in batches so a year's records are not truncated by Supabase's response limit.
+- No new tables, migrations, progress-writing rules, grading, time tracking, streaks, or weekly
+  history. All dashboard assets are local. Student module use and classroom live features retain
+  their existing behavior.

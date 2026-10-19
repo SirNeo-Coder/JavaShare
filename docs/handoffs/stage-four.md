@@ -1,5 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
+> Teacher-side follow-up approved 2026-10-20: the new [teacher progress dashboard](teacher-progress-dashboard.md) supplies Overview, student cards/details, and Curriculum module management. Its handoff records implementation and review status; earlier teacher-side mock questions below are superseded for this scope.
 **Status: classroom Figma UI is on main; drawer-animation PR #15 is open. The approved printed-worksheet workflow change is implemented on `codex/printed-module-worksheet` (based on PR #15), reader verified with the exact supplied JSON; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16) open for review (implementation `9b538d5`). Starter-file execution fix awaits separate approval (CKB-038).** Last updated: 2026-10-20.
 
 ## What the teacher asked for

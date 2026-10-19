@@ -532,7 +532,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             {drawer && !selected && <p>Continue a lesson or revisit what you’ve learned.</p>}
           </div>
           {embedded ? (
-            selected && <button type="button" onClick={() => worksheet ? onClose?.() : setSelected(null)}>{worksheet ? "← All modules" : "Back to modules"}</button>
+            selected && <button type="button" onClick={() => worksheet || (initialModuleId && onClose) ? onClose?.() : setSelected(null)}>{worksheet ? "← All modules" : "Back to modules"}</button>
           ) : (
             <button type="button" onClick={() => selected && !initialModuleId ? setSelected(null) : onClose?.()} aria-label={selected && !initialModuleId ? "Back to modules" : "Close"}>×</button>
           )}

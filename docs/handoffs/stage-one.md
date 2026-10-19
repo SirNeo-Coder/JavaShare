@@ -1,5 +1,6 @@
 # CodeShare — Stage One Progress
 
+> Current teacher dashboard work (2026-10-20): see [teacher progress dashboard](teacher-progress-dashboard.md) for the approved Overview / Students / Curriculum workflow, branch, verification and review status.
 Keep this file current. After every finished step: update it, commit, and push the branch.
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.

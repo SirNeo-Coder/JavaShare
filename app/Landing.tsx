@@ -6,10 +6,9 @@ import { api, getApiUrl } from "./apiClient";
 import { realtimeClient } from "./realtime";
 import { listenForLiveClasses, pendingLiveClasses, type LiveClassroom } from "./liveClasses";
 import ModuleViewer from "./ModuleViewer";
-import TeacherWebProjects from "./TeacherWebProjects";
+import TeacherClassDashboard from "./TeacherClassDashboard";
 
 type LandingClassroom = LiveClassroom;
-type RosterStudent = { id: string; name: string; email: string; joinedAt?: string };
 type ModuleStatus = "done" | "in-progress" | "not-started";
 type ModuleSummary = { moduleId: string; title: string; week: number; percent: number; status: ModuleStatus; isLatest: boolean };
 
@@ -44,35 +43,6 @@ function ProgressBar({ percent }: { percent: number }) {
 function LiveBadge({ classroom }: { classroom: LandingClassroom }) {
   if (!classroom.hasActivity && !classroom.hasLiveShare) return null;
   return <span className="activity-state active">Live now</span>;
-}
-
-function StudentModulePanel({ classroomId, studentId }: { classroomId: string; studentId: string }) {
-  const [modules, setModules] = useState<ModuleSummary[] | null>(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    api<ModuleSummary[]>(`/api/classes/${classroomId}/students/${studentId}/modules-summary`)
-      .then((result) => { if (active) setModules(result); })
-      .catch((loadError) => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load this student's progress"); });
-    return () => { active = false; };
-  }, [classroomId, studentId]);
-
-  if (error) return <p className="dashboard-error"><span>{error}</span></p>;
-  if (modules === null) return <p className="dashboard-loading">Loading progress…</p>;
-  if (!modules?.length) return <p className="empty-activities">No modules uploaded for this class yet.</p>;
-  return (
-    <div className="activity-summary-list">
-      {modules.map((module) => (
-        <div className="activity-summary-card" key={module.moduleId}>
-          <div className="activity-summary-head">
-            <div><span className={`activity-state ${module.status === "done" ? "active" : ""}`}>{statusLabel(module)}</span><h3>Week {module.week} — {module.title}</h3></div>
-          </div>
-          <ProgressBar percent={module.percent} />
-        </div>
-      ))}
-    </div>
-  );
 }
 
 function CreateClass({ onCreated }: { onCreated: () => void }) {
@@ -145,46 +115,6 @@ function JoinAnotherClass({ onJoined }: { onJoined: () => void }) {
       <button className="auth-submit">Join classroom</button>
       <button type="button" onClick={() => setOpen(false)}>Cancel</button>
     </form>
-  );
-}
-
-function ClassRoster({ classroomId }: { classroomId: string }) {
-  const [roster, setRoster] = useState<RosterStudent[] | null>(null);
-  const [error, setError] = useState("");
-  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
-  const [webStudent, setWebStudent] = useState<RosterStudent | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    api<{ students: RosterStudent[] }>(`/api/classes/${classroomId}/students`)
-      .then((result) => { if (active) setRoster(result.students); })
-      .catch((loadError) => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load students"); });
-    return () => { active = false; };
-  }, [classroomId]);
-
-  return (
-    <section className="class-summary" aria-label="Students">
-      <h2>Students</h2>
-      {error ? <p className="dashboard-error" role="alert">{error}</p> :
-        roster === null ? <p className="dashboard-loading">Loading students…</p> :
-        !roster.length ? <div className="empty-activities">No students have joined this class yet.</div> :
-        <div className="activity-summary-list">
-          {roster.map((student) => (
-            <div className="activity-summary-card" key={student.id}>
-              <div className="activity-summary-head">
-                <div><h3>{student.name}</h3><p>{student.email}</p></div>
-                <button onClick={() => setExpandedStudent(expandedStudent === student.id ? null : student.id)} aria-expanded={expandedStudent === student.id}>
-                  {expandedStudent === student.id ? "Hide progress" : "View module progress"}
-                </button>
-                <button type="button" onClick={() => setWebStudent(student)}>View web projects</button>
-              </div>
-              {expandedStudent === student.id && <StudentModulePanel classroomId={classroomId} studentId={student.id} />}
-            </div>
-          ))}
-        </div>
-      }
-      {webStudent && <TeacherWebProjects key={webStudent.id} classroomId={classroomId} student={webStudent} onClose={() => setWebStudent(null)} />}
-    </section>
   );
 }
 
@@ -336,6 +266,8 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
     };
   }, [role, classroomIds, connectionAttempt]);
 
+  if (role === "teacher" && classroom) return <TeacherClassDashboard key={classroom.id} classroom={classroom} name={name} onClasses={() => openClassroom(null)} onEnter={() => enterClassroom(classroom)} onLogout={onLogout} />;
+
   return (
     <main className="teacher-dashboard">
       <header className="dashboard-topbar">
@@ -365,14 +297,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
                 <button onClick={() => enterClassroom(classroom)}>Enter classroom</button>
               </div>
             </div>
-            {role === "teacher" ? (
-              <>
-                <section className="class-summary" aria-label="Modules">
-                  <ModuleViewer role="teacher" classroomId={classroom.id} embedded />
-                </section>
-                <ClassRoster classroomId={classroom.id} />
-              </>
-            ) : <StudentModules classroomId={classroom.id} selectedModuleId={selectedModuleId} onSelectModule={setSelectedModuleId} />}
+            <StudentModules classroomId={classroom.id} selectedModuleId={selectedModuleId} onSelectModule={setSelectedModuleId} />
           </div>
         ) : (
           <>
