@@ -5,8 +5,8 @@ import Link from "next/link";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import CodeEditor, { languageLabel } from "./CodeEditor";
 import Landing from "./Landing";
-import ModuleViewer from "./ModuleViewer";
 import WorkspaceDrawer from "./WorkspaceDrawer";
+import ModuleWorkspace from "./ModuleWorkspace";
 import { retainLiveDismissals } from "./liveClasses";
 import { api, getApiUrl } from "./apiClient";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
@@ -2728,9 +2728,7 @@ export default function Home() {
             </div>
           </footer>
         </section>
-        <WorkspaceDrawer id="classroom-modules" title="Course modules" side="left" open={modulesOpen} onClose={() => setModulesOpen(false)}>
-          {classroomId && <ModuleViewer key={classroomId} role={user.role} classroomId={classroomId} embedded drawer active={modulesOpen} />}
-        </WorkspaceDrawer>
+        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} />}
         <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} onClose={() => setChatOpen(false)}>
           <div className="chat">
                   <div className="chat-toolbar">

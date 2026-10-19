@@ -4,12 +4,18 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-19. Classroom UI PR #14 is merged. The current follow-up is the approved
-**drawer-animation adjustment** on `codex/drawer-slide-animation`: left panels and right chat
-slide in/out in 250 ms while keeping their existing content and controls. Built/tested and served
-on localhost:3000; [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15) is open for review (implementation `d072aa1`). See [stage-four.md](stage-four.md) and
-[drawer animation verification](../verification/drawer-slide-animation.md). No hosted service or
-database settings were changed.
+Last updated: 2026-10-20. Classroom UI, sliding drawers and the printed worksheet reader are
+on **main**, delivered through PR #14, [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15)
+and [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16). The teacher explicitly requested
+these merges in the current chat; this is permission for this delivery, not a standing change
+to the branch/PR rules. PR #15 merged as `8464d73`; the worksheet implementation is `9b538d5`.
+
+The exact Week 14 JSON renders five lesson sections, eleven steps and 17 digital pages. Full
+build/offline build and lint passed (eight existing warnings); 69 tests passed. See
+[stage-four.md](stage-four.md) and [worksheet verification](../verification/printed-module-worksheet.md).
+The existing Step 1 starter-file execution issue **CKB-038 still awaits separate approval**.
+The merge request does not authorize that additional backend change. Uncommitted teacher-dashboard
+work in the local checkout was left untouched. No hosted setting or database migration was applied.
 
 ## The job
 

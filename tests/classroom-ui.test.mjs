@@ -66,3 +66,101 @@ test("module pages: inactive lessons and task editors stay mounted so navigation
   assert.match(html, /Your own version/);
   assert.equal((html.match(/class="module-lesson" hidden=""/g) ?? []).length, 2, "later lesson and performance task are hidden, not unmounted");
 });
+
+const { groupModuleParts } = tsxRequire("../app/moduleParts.ts", import.meta.url);
+const { ModulePaperBlock } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
+const worksheetFixture = () => {
+  const course = JSON.parse(readFileSync(new URL("./fixtures/sample-module.codeshare.json", import.meta.url), "utf8"));
+  course.availability = { openLessonIds: course.lessons.map((lesson) => lesson.id), performanceTaskOpen: true };
+  return course;
+};
+
+test("module parts: author grouping spans days and assigns discussion and exit slips exactly once", () => {
+  const course = worksheetFixture();
+  const [monday, tuesday] = course.lessons;
+  monday.blocks[0].part = "Reading files";
+  tuesday.blocks[0].part = "Reading files";
+  monday.blocks.unshift({ type: "definition", term: "File", markdown: "A named store." });
+  monday.blocks.push({ type: "note", markdown: "Keep this trailing note." });
+  const finalStep = { ...tuesday.blocks[0], id: "second-part-step", part: "Writing files", number: 2 };
+  tuesday.blocks.push({ type: "analogy", markdown: "A notebook." }, finalStep);
+  const parts = groupModuleParts(course);
+  assert.deepEqual(parts.map((part) => part.title), ["Reading files", "Writing files"]);
+  assert.equal(parts[0].lessons.length, 2);
+  assert.deepEqual(parts[0].blocks.map((block) => block.type), ["definition", "step", "note", "step"]);
+  assert.deepEqual(parts[1].blocks.map((block) => block.type), ["analogy", "step"]);
+  assert.deepEqual(parts.map((part) => part.exitLessons.map((lesson) => lesson.id)), [[monday.id], [tuesday.id]]);
+  assert.equal(parts.flatMap((part) => part.blocks).length, monday.blocks.length + tuesday.blocks.length);
+});
+
+test("module parts: older lessons and redacted closed lessons retain their own safe pages", () => {
+  const course = worksheetFixture();
+  course.lessons[1] = { ...course.lessons[1], closed: true, blocks: [], exitSlip: { id: "closed-slip", questions: [] } };
+  const parts = groupModuleParts(course);
+  assert.deepEqual(parts.map((part) => part.id), course.lessons.map((lesson) => lesson.id));
+  assert.equal(parts[0].closed, false);
+  assert.equal(parts[1].closed, true);
+  assert.deepEqual(parts[1].blocks, []);
+});
+
+test("module paper: tables, analogies, notes and error guides display their actual supplied content safely", () => {
+  const render = (block) => renderToStaticMarkup(createElement(ModulePaperBlock, { block }));
+  const table = render({ type: "table", columns: ["Collection", "Rule"], rows: [["**List**", "<script>alert(1)</script>"]] });
+  assert.match(table, /<th>Collection<\/th>/);
+  assert.match(table, /<td><b>List<\/b><\/td>/);
+  assert.match(table, /&lt;script&gt;/);
+  assert.doesNotMatch(table, /<script>/);
+  assert.match(render({ type: "analogy", markdown: "The dispatcher's logbook." }), /Analogy.*logbook/s);
+  assert.match(render({ type: "note", markdown: "Check the key." }), /Check yourself.*Check the key/s);
+  assert.match(render({ type: "errorGuide", rows: [{ see: "Missing key", means: "No match", fix: "Check spelling" }] }), /<th>If you see<\/th>.*Missing key.*No match.*Check spelling/s);
+  assert.match(render({ type: "error", markdown: "The index is outside the list.", message: "IndexOutOfBoundsException" }), /IndexOutOfBoundsException/);
+});
+
+test("module worksheet: named parts, real code/output, page controls and hidden practice editors coexist", () => {
+  const course = worksheetFixture();
+  course.lessons[0].blocks[0].part = "PART A — Lists";
+  course.lessons[1].blocks[0].part = "PART B — Sets";
+  const html = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true, onAvailabilityChanged() {} }));
+  assert.match(html, /aria-label="Module parts"/);
+  assert.match(html, /PART A — Lists/);
+  assert.match(html, /PART B — Sets/);
+  assert.match(html, /MONDAY · Step 1/);
+  assert.match(html, /Page 1 of 5/);
+  assert.match(html, /Next page/);
+  assert.match(html, /Output \(expected\):/);
+  assert.match(html, /1\n2\n3/);
+  assert.match(html, /Practise this step/);
+  assert.equal((html.match(/hidden="" class="module-practice"/g) ?? []).length, 2);
+  assert.equal((html.match(/class="worksheet-paper" hidden=""/g) ?? []).length, 4);
+  assert.match(html, /Sample code/);
+  assert.match(html, /Your own version/);
+  assert.match(html, /Presentation/);
+  assert.match(html, /Correct output/);
+  assert.doesNotMatch(html, /\d+ of \d+ parts completed/, "teacher preview must not invent student progress");
+});
+
+const { modulePartPages } = tsxRequire("../app/moduleParts.ts", import.meta.url);
+test("module worksheet: inter-step tables and notes retain the uploaded reading order", () => {
+  const course = worksheetFixture();
+  const lesson = course.lessons[0];
+  const first = lesson.blocks[0];
+  lesson.blocks = [
+    { type: "definition", term: "List", markdown: "Introduction before step one." },
+    first,
+    { type: "table", columns: ["Method"], rows: [["add(item)"]] },
+    { type: "note", markdown: "After the first output." },
+    { ...first, id: "second-step", number: 2 },
+    { type: "note", markdown: "After the second output." },
+  ];
+  const pages = modulePartPages(groupModuleParts(course)[0]);
+  assert.deepEqual(pages.map((page) => [page.step?.id ?? null, page.blocks.map((block) => block.type)]), [
+    [null, ["definition"]], [first.id, ["table", "note"]], ["second-step", ["note"]],
+  ]);
+  const html = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true, onAvailabilityChanged() {} }));
+  const articles = html.match(/<article\b[\s\S]*?<\/article>/g);
+  assert.match(articles[0], /Introduction before step one/);
+  assert.doesNotMatch(articles[0], /add\(item\)|After the first output/);
+  assert.match(articles[1], /Output \(expected\):[\s\S]*add\(item\)[\s\S]*After the first output/);
+  assert.doesNotMatch(articles[1], /LIPLET/);
+  assert.match(articles[2], /After the second output[\s\S]*LIPLET/);
+});
