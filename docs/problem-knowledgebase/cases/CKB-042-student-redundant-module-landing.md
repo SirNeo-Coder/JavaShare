@@ -25,7 +25,7 @@ The previous class-list workflow deliberately initialized every session without 
 - `tests/student-classroom-entry.test.mjs`, eight exact test names in [verification](../../verification/student-classroom-entry.md): single/multiple/absent memberships, account separation, denied storage, reset/teacher/chooser guards, removed landing screen and retained teacher chooser.
 - `node --test tests/student-classroom-entry.test.mjs`: 8 pass. Restoring the previous `Landing.tsx` made **student chooser: a former class-home selection cannot resurrect the removed module landing page** fail (7 pass, 1 fail); restoring the fix returned 8 pass.
 - `npm test`: 88 pass, 0 fail, 0 skipped. Offline build and browser checks include actual sign-in, refresh, class switching, first join, removed membership, failure recovery and teacher return path.
-- Commit: see the student-entry feature handoff / PR; the record ships with the implementation.
+- Commit: `60f89b4`; [PR #18](https://github.com/SirNeo-Coder/JavaShare/pull/18).
 
 ## Recurrence triage
 

@@ -1,6 +1,6 @@
 # Student classroom entry
 
-Updated 2026-10-20. Branch: `codex/student-classroom-entry`, based on teacher dashboard commit `33a3822`. Review is stacked on `codex/teacher-progress-dashboard` (PR #17); this feature does not merge that separate work. PR: being prepared.
+Updated 2026-10-20. Branch: `codex/student-classroom-entry`, based on teacher dashboard commit `33a3822`. Review is stacked on `codex/teacher-progress-dashboard` (PR #17); this feature does not merge that separate work. Implementation: `60f89b4`, committed and pushed. Review: [PR #18](https://github.com/SirNeo-Coder/JavaShare/pull/18).
 
 ## Approved decision
 
@@ -18,6 +18,6 @@ The teacher approved this as a workflow change and requested removal of code orp
 
 ## In progress / next
 
-Commit and push this feature, then open the stacked review PR. No migration, hosted service setting or new dependency is needed. Teacher dashboard review/merge is a separate dependency. CKB-038 module starter-file compatibility and the earlier main-rail hover report are separate work and were not changed here.
+Implementation `60f89b4` is committed and pushed. [PR #18](https://github.com/SirNeo-Coder/JavaShare/pull/18) is open against `codex/teacher-progress-dashboard`; the teacher reviews and merges. No implementation work remains in this scope. No migration, hosted service setting or new dependency is needed. Teacher dashboard review/merge is a separate dependency. CKB-038 module starter-file compatibility and the earlier main-rail hover report are separate work and were not changed here.
 
 Unrelated existing `logs/classroom.log`, `supabase/.temp/cli-latest`, `.claude/` and `supabase/snippets/` are not part of this change.
