@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import CodeEditor, { languageLabel } from "./CodeEditor";
 import Landing from "./Landing";
+import { studentEntryClassroom, rememberedStudentClassroom, rememberStudentClassroom } from "./studentClassroomEntry";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import ModuleWorkspace from "./ModuleWorkspace";
 import { retainLiveDismissals } from "./liveClasses";
@@ -219,6 +220,7 @@ export default function Home() {
   const [dismissedLiveSessions, setDismissedLiveSessions] = useState<Record<string, string>>({});
   const [homeClassroomId, setHomeClassroomId] = useState<string | null>(null);
   const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
+  const [choosingStudentClass, setChoosingStudentClass] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<Bootstrap | null>(null);
   const [loading, setLoading] = useState(true);
@@ -502,7 +504,7 @@ export default function Home() {
 
   const loadWorkspace = useCallback(
     async (viewOverride?: "students" | "groups") => {
-      if (!user) return;
+      if (!user || user.passwordResetRequired) return;
       try {
         const view = viewOverride || teacherWorkspaceView;
         const params = new URLSearchParams();
@@ -510,6 +512,17 @@ export default function Home() {
         if (enteredClassroomId) params.set("classroomId", enteredClassroomId);
         const query = params.toString();
         const next = await api<Bootstrap>(`/api/bootstrap${query ? `?${query}` : ""}`);
+        if (!enteredClassroomId && !next.needsJoin) {
+          const destination = studentEntryClassroom(next.user, next.classrooms, rememberedStudentClassroom(next.user.id), choosingStudentClass);
+          if (destination) {
+            setData(null);
+            setActiveTeam(0);
+            setHomeClassroomId(destination);
+            setEnteredClassroomId(destination);
+            return;
+          }
+        }
+        if (enteredClassroomId && next.user.role === "student") rememberStudentClassroom(next.user.id, enteredClassroomId);
         setData(next);
         if (!enteredClassroomId) setDismissedLiveSessions((current) => retainLiveDismissals(next.classrooms, current));
         setUser(next.user);
@@ -561,6 +574,8 @@ export default function Home() {
           setUser(null);
           setData(null);
           setEnteredClassroomId(null);
+          setChoosingStudentClass(false);
+          setActiveTeam(0);
           setProjectsOpen(false);
           setChatOpen(false);
           setHomeClassroomId(null);
@@ -581,14 +596,14 @@ export default function Home() {
         setWorkspaceError(message);
       }
     },
-    [user, activeTeam, teacherWorkspaceView, enteredClassroomId],
+    [user, activeTeam, teacherWorkspaceView, enteredClassroomId, choosingStudentClass],
   );
   useEffect(() => {
     if (!user) {
       loadedWorkspaceKeyRef.current = "";
       return;
     }
-    const workspaceKey = `${user.id}:${user.role === "teacher" ? teacherWorkspaceView : "student"}:${enteredClassroomId || "list"}`;
+    const workspaceKey = `${user.id}:${user.role === "teacher" ? teacherWorkspaceView : "student"}:${enteredClassroomId || "list"}:${user.passwordResetRequired ? "reset" : "ready"}`;
     if (loadedWorkspaceKeyRef.current === workspaceKey) return;
     loadedWorkspaceKeyRef.current = workspaceKey;
     const timer = setTimeout(() => void loadWorkspace(), 0);
@@ -1753,12 +1768,26 @@ export default function Home() {
     setUser(null);
     setData(null);
     setEnteredClassroomId(null);
+    setChoosingStudentClass(false);
+    setActiveTeam(0);
     setProjectsOpen(false);
     setChatOpen(false);
     setHomeClassroomId(null);
     setDismissedLiveSessions({});
     setModulesOpen(false);
   }
+
+  const showClasses = () => {
+    setChoosingStudentClass(user?.role === "student");
+    setModulesOpen(false);
+    setProjectsOpen(false);
+    setChatOpen(false);
+    setSettingsOpen(false);
+    setWorkspaceError("");
+    setActiveTeam(0);
+    setData(null);
+    setEnteredClassroomId(null);
+  };
 
   if (loading) return <CenteredCard title="Starting CodeShare…" />;
   if (!user) return <AuthScreen onAuthenticated={setUser} />;
@@ -1772,11 +1801,14 @@ export default function Home() {
         role={user.role}
         name={user.name}
         classrooms={data.classrooms}
-        initialClassroomId={homeClassroomId}
+        initialClassroomId={user.role === "teacher" ? homeClassroomId : null}
         onLiveStatusChange={(classes) => setDismissedLiveSessions((current) => retainLiveDismissals(classes, current))}
         dismissedLiveSessions={dismissedLiveSessions}
         onDismissLiveClasses={(classes) => setDismissedLiveSessions((current) => ({ ...current, ...Object.fromEntries(classes.filter((item) => item.liveSessionId).map((item) => [item.id, item.liveSessionId!])) }))}
         onEnter={(classroomId) => {
+          setData(null);
+          setActiveTeam(0);
+          setWorkspaceError("");
           setHomeClassroomId(classroomId);
           setEnteredClassroomId(classroomId);
         }}
@@ -1791,7 +1823,9 @@ export default function Home() {
         message={
           workspaceError || "Loading your team repository from Supabase…"
         }
-      />
+      >
+        {workspaceError && user.role === "student" && <div className="dashboard-actions"><button type="button" onClick={() => void loadWorkspace()}>Retry</button><button type="button" onClick={showClasses}>Classes</button></div>}
+      </CenteredCard>
     );
 
   const initials = user.name
@@ -1841,10 +1875,10 @@ export default function Home() {
           <button
             className="settings-button"
             type="button"
-            onClick={() => { setModulesOpen(false); setProjectsOpen(false); setChatOpen(false); setEnteredClassroomId(null); }}
-            title="Back to class home"
+            onClick={showClasses}
+            title={user.role === "student" ? "Switch or join a class" : "Back to class home"}
           >
-            Class home
+            {user.role === "student" ? "Classes" : "Class home"}
           </button>
           {classroomId && user.role === "student" && (
             <button
@@ -3683,13 +3717,14 @@ function JoinClass({
   );
 }
 
-function CenteredCard({ title, message }: { title: string; message?: string }) {
+function CenteredCard({ title, message, children }: { title: string; message?: string; children?: React.ReactNode }) {
   return (
     <div className="auth-page">
       <div className="auth-card">
         <span className="brand-mark">C</span>
         <h1>{title}</h1>
         {message && <p>{message}</p>}
+        {children}
       </div>
     </div>
   );

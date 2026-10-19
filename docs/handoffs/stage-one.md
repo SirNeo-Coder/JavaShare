@@ -1,18 +1,14 @@
 # CodeShare — Stage One Progress
 
-> Current teacher dashboard work (2026-10-20): see [teacher progress dashboard](teacher-progress-dashboard.md) for the approved Overview / Students / Curriculum workflow, branch, verification and review status.
+> Current student entry work (2026-10-20): see [student classroom entry](student-classroom-entry.md) for the approved direct-entry workflow, orphan cleanup, branch and verification. Teacher dashboard work remains in [its own handoff](teacher-progress-dashboard.md).
+
 Keep this file current. After every finished step: update it, commit, and push the branch.
-Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
+Anyone continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-20. Current work: teacher-approved **printed module worksheet workflow
-change** on `codex/printed-module-worksheet`, based on the tested drawer animation branch
-(PR #15, `3990646`). The classroom keeps its module browser and opens a separate wide worksheet
-with named parts, Overview/step pages, printed content and a hover/click/keyboard Module ear.
-Existing runner, progress, availability and chat stay connected. [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16) is open (implementation `9b538d5`), stacked on PR #15. UI build/lint and 69 tests pass; exact supplied JSON is verified in the reader. The existing
-Step 1 starter-file execution issue (CKB-038) awaits approval of a separate compatibility fix;
-see [stage-four.md](stage-four.md) and [worksheet verification](../verification/printed-module-worksheet.md).
-No hosted services or database settings changed.
+Last updated: 2026-10-20. Current work: approved **student classroom entry workflow change** on `codex/student-classroom-entry`, based on teacher dashboard commit `33a3822` (PR #17). One class opens automatically, multiple classes reopen a valid last-used class or use the chooser, and no class keeps the join screen. Student modules stay in the classroom. The obsolete student module landing screen and its orphan helpers/state/styles were removed. Offline build passes, lint has 0 errors / 8 existing warnings, and all 88 tests pass; real local browser entry, switching, joining and failed-entry recovery verified. Review PR preparation is in progress; see the feature handoff and [verification](../verification/student-classroom-entry.md).
+
+Earlier classroom layout, slide animation and printed worksheet work (PRs #14–16) is on `main`. CKB-038 starter-file compatibility and the earlier hover report remain separate, unchanged work. No hosted services or database settings changed.
 
 ## The job
 

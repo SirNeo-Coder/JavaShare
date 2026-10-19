@@ -1,4 +1,4 @@
-# Workflow state (updated 2026-10-19, branch `codex/classroom-figma-ui`)
+# Workflow state (updated 2026-10-20, branch `codex/student-classroom-entry`)
 
 What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
 
@@ -10,12 +10,13 @@ What teachers and students can do today. Compare any proposed change with this p
 
 ## Classes and class home
 
-- On login, everyone sees a class list. Each card shows the class name, subject, and a "Live now" badge if an activity or live share is running; teachers also see its join code. **Open class** opens that class's home, without entering the live workspace.
-- A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and "Teacher Demo Workspace". A student can **Join another class** from that same list.
-- A teacher's class home uses **Overview**, **Students**, and **Curriculum** (the module-management page). See "Teacher class dashboard" below for the approved 2026-10-20 workflow.
-- A student's class home shows **Your modules**, with each module's progress. Opening a module stays on class home; **Close** returns to the module cards and refreshes their progress.
-- **Enter classroom** opens the existing live workspace for that one class. **Class home** in its header returns to the same class home; **Classes** goes back to the class list. Students also retain the workspace's **Modules** shortcut. Teacher module upload and deletion now live on class home, rather than in the workspace header.
-- On **Classes** or class home, students see **Your class is live** for a running activity or teacher live share, with **Join live class** and **Not now**. Several live classes appear as a choice. The invitation waits until an open module is closed, and never moves a student automatically. Teachers do not receive this popup.
+- Students sign in or reopen CodeShare directly in their classroom when they belong to one class. With several classes, the last successfully entered class reopens if they still belong to it; otherwise **Classes** offers their current memberships. The preference belongs to this account in this browser. If browser storage is unavailable, one class still opens automatically and several classes require a choice.
+- Students without a class see **Join your class** and enter the classroom after successfully joining. A required password reset takes priority over classroom entry.
+- The student classroom header has **Classes** to switch or **Join another class**. This deliberately opens the chooser even with one class. **Open class** enters directly; there is no separate student module home. Modules and saved progress remain in the existing left-hand classroom module browser and worksheet.
+- Teachers still start with the class list. Each card shows the class name, subject, join code and a **Live now** badge when appropriate. **Open class** shows the teacher dashboard with **Overview**, **Students**, and **Curriculum**. **Enter classroom** opens the live workspace and **Class home** returns to that dashboard.
+- A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and "Teacher Demo Workspace". A student can **Join another class** from the chooser.
+- Student entry failures show the server's error, **Retry**, and **Classes** so a removed membership or connection failure need not trap the student. Server membership checks and per-class workspace loading remain authoritative.
+- While students are on **Classes**, **Your class is live** offers **Join live class** or **Not now**; several live classes appear as a choice. Teachers do not receive this popup. The initial classroom entry rule is independent of whether a live session is running.
 - **Not now** (or Escape) dismisses the displayed sessions while this page remains open, including trips into the workspace and back. Joining dismisses that chosen session. A new activity, or a session stopped and restarted while the page can observe the stop, can invite again. Reloading the page or signing out resets dismissal.
 - Live status refreshes on announcements, connection/reconnection, and returning to the tab, without a repeating status timer. If live passes or the live connection fail, students see an error with **Reconnect** and can still enter a class manually. Listening outside a workspace does not mark students Online in every class.
 - Session identity reuses the current activity or presentation project id, without a new database column. If the same activity/presentation stops and restarts entirely while disconnected, a previously dismissed invitation may remain dismissed; a persisted session-start marker would be needed to distinguish that case.
@@ -57,7 +58,7 @@ What teachers and students can do today. Compare any proposed change with this p
 
 ## Classroom layout (approved workflow change, 2026-10-19)
 
-- The teacher retained CodeShare's existing top bar: brand, role, class, **Class home**, student
+- The teacher retained CodeShare's existing top bar: brand, role, class, teacher **Class home** / student **Classes**, student
   **Modules**, display settings, notifications and account. On phones those same visible controls
   wrap into two rows so they fit the screen; desktop appearance stays the same.
 - The classroom uses the Figma reference's dark editor and Console with a yellow **Run code**
