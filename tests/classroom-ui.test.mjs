@@ -36,11 +36,18 @@ test("module catalog: teacher browsing never invents student progress", () => {
   assert.doesNotMatch(teacher, /% complete|Continue lesson|Review lesson/);
 });
 
-test("workspace drawers: closed panels hide their controls and the two panels have separate accessible identities", () => {
+test("workspace drawers: closed panels stay mounted but inaccessible so closing can animate", () => {
   const renderDrawer = (open, side, title) => renderToStaticMarkup(createElement(WorkspaceDrawer, { id: side, title, side, open, onClose() {} }, "Existing feature content"));
-  assert.match(renderDrawer(false, "left", "Course modules"), /<aside[^>]*hidden=""/);
+  const closed = renderDrawer(false, "left", "Course modules");
+  assert.match(closed, /aria-hidden="true"/);
+  assert.match(closed, /inert=""/);
+  assert.match(closed, /data-open="false"/);
+  assert.doesNotMatch(closed, /<aside[^>]* hidden=/);
+  assert.match(closed, /Existing feature content/);
   const open = renderDrawer(true, "right", "Classroom chat");
-  assert.doesNotMatch(open, /<aside[^>]* hidden=/);
+  assert.doesNotMatch(open, /<aside[^>]* hidden=|inert=/);
+  assert.match(open, /aria-hidden="false"/);
+  assert.match(open, /data-open="true"/);
   assert.match(open, /aria-label="Classroom chat"/);
   assert.match(open, /aria-label="Close classroom chat"/);
   assert.match(open, /Existing feature content/);

@@ -304,7 +304,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .teacher-web-preview { min-height:320px; grid-template-rows:240px minmax(80px,150px); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
 
 /* Classroom workspace: keep the existing top bar; drawers reuse modules and messaging. */
-.classroom-workspace { --drawer-left-width:390px; --drawer-right-width:330px; position:relative; display:block; background:#d8dfe9; padding:0 24px; }
+.classroom-workspace { --drawer-left-width:390px; --drawer-right-width:330px; position:relative; display:block; overflow:hidden; background:#d8dfe9; padding:0 24px; }
 .classroom-workspace .main-area { height:100%; min-height:0; grid-template-rows:auto 66px minmax(0,1fr) 60px; background:#d8dfe9; }
 .classroom-workspace .content-grid { min-width:0; padding:8px 0 10px; grid-template-columns:minmax(0,1.5fr) minmax(240px,1fr); gap:10px; }
 .classroom-workspace .workspace-mode { margin:0 -24px; padding-left:24px; padding-right:24px; }
@@ -346,8 +346,13 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .workspace-rail button[aria-expanded="true"] { background:#254374; }
 .workspace-rail button:focus-visible,.classroom-workspace button:focus-visible { outline:2px solid #e6a937; outline-offset:3px; }
 .workspace-drawer { --ink:#23324b; --muted:#71839d; --panel:#eef2f8; --surface:#fff; --line:#dae3ef; position:absolute; z-index:11; top:8px; bottom:10px; display:grid; grid-template-rows:64px minmax(0,1fr); overflow:hidden; border:1px solid #9eabc0; border-radius:8px; background:#f5f7fb; color:#23324b; box-shadow:0 10px 32px #0b17264a; }
-.workspace-drawer[hidden],.classroom-workspace .classroom-projects[hidden] { display:none; }
-.drawer-left { width:min(var(--drawer-left-width),calc(100% - 48px)); left:24px; }.drawer-right { width:min(var(--drawer-right-width),calc(100% - 48px)); right:24px; }
+/* Keep closed panels rendered so both directions animate; inert blocks their controls. */
+.workspace-drawer,.classroom-workspace .classroom-projects { --drawer-offset:calc(-100% - 32px); transform:translateX(var(--drawer-offset)); opacity:0; visibility:hidden; pointer-events:none; transition:transform .25s cubic-bezier(.22,.61,.36,1),opacity .25s ease,visibility 0s linear .25s; }
+.workspace-drawer[data-open="true"],.classroom-workspace .classroom-projects[data-open="true"] { transform:translateX(0); opacity:1; visibility:visible; pointer-events:auto; transition-delay:0s; }
+@media (prefers-reduced-motion:reduce) {
+  .workspace-drawer,.classroom-workspace .classroom-projects { transition:none; }
+}
+.drawer-left { width:min(var(--drawer-left-width),calc(100% - 48px)); left:24px; }.drawer-right { --drawer-offset:calc(100% + 32px); width:min(var(--drawer-right-width),calc(100% - 48px)); right:24px; }
 .drawer-heading { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid #dce2ed; background:#f8faff; }
 .drawer-heading>div { display:grid; gap:5px; flex:1; min-width:0; }.drawer-heading b { font-size:12px; }.drawer-heading small { color:#7a879a; font-size:8px; }
 .drawer-symbol { font-size:21px; color:#667a98; }
@@ -394,11 +399,11 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .drawer-module-viewer .module-content { gap:14px; }.drawer-module-viewer .module-lesson { padding-top:0; border-top:0; }
 .drawer-module-viewer .module-step,.drawer-module-viewer .module-exit-slip { border-color:#d8e1ed; background:#fff; }.drawer-module-viewer .module-goal-meter { color:#61738e; }.drawer-module-viewer .module-goal-meter i { background:#dfe6f0; }.drawer-module-viewer .module-goal-meter i>span { background:#14a681; }
 @media (min-width:1400px) {
-  .classroom-workspace:has(.drawer-left.drawer-pinned:not([hidden])) .main-area { margin-left:calc(var(--drawer-left-width) + 12px); }
-  .classroom-workspace:has(.drawer-right.drawer-pinned:not([hidden])) .main-area { margin-right:calc(var(--drawer-right-width) + 12px); }
-  .classroom-workspace:has(.drawer-pinned:not([hidden])) .content-grid { grid-template-columns:minmax(0,1fr); overflow:auto; }
-  .classroom-workspace:has(.drawer-pinned:not([hidden])) .editor-card { min-height:420px; }
-  .classroom-workspace:has(.drawer-pinned:not([hidden])) .right-panel { min-height:280px; }
+  .classroom-workspace:has(.drawer-left.drawer-pinned[data-open="true"]) .main-area { margin-left:calc(var(--drawer-left-width) + 12px); }
+  .classroom-workspace:has(.drawer-right.drawer-pinned[data-open="true"]) .main-area { margin-right:calc(var(--drawer-right-width) + 12px); }
+  .classroom-workspace:has(.drawer-pinned[data-open="true"]) .content-grid { grid-template-columns:minmax(0,1fr); overflow:auto; }
+  .classroom-workspace:has(.drawer-pinned[data-open="true"]) .editor-card { min-height:420px; }
+  .classroom-workspace:has(.drawer-pinned[data-open="true"]) .right-panel { min-height:280px; }
 }
 @media (max-width:1399px) { .drawer-pin { display:none; } }
 @media (max-width:900px) {
