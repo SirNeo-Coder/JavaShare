@@ -31,7 +31,7 @@ scroll area remains available. Existing focus changes still use preventScroll.
   positions. See `docs/verification/printed-module-worksheet.md` for actual results.
 - This layout/focus check runs in the real browser; React server-render tests cannot measure
   browser focus scrolling or responsive layout. No assertion about CSS text alone substitutes for it.
-- Commit: implementation on `codex/printed-module-worksheet`.
+- Commit: `9b538d5` on `codex/printed-module-worksheet`; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16).
 
 ## Recurrence triage
 

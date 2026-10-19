@@ -31,7 +31,7 @@ panel. Click and keyboard opening retain the existing drawer focus behavior.
   button labelled `Module worksheet`.
 - This is a browser regression check, not a new automated DOM interaction test. Existing React
   rendering tests cannot exercise effects or native focus. See `docs/verification/printed-module-worksheet.md`.
-- Commit: implementation on `codex/printed-module-worksheet`.
+- Commit: `9b538d5` on `codex/printed-module-worksheet`; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16).
 
 ## Recurrence triage
 

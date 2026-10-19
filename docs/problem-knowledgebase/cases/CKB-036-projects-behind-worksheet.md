@@ -30,7 +30,7 @@ Closing Projects restores that worksheet visit. No second copy of Projects or it
   restores the worksheet. See `docs/verification/printed-module-worksheet.md`.
 - Full 68-test suite passes. Native browser interaction is the applicable verification for this
   integration; server-render tests cannot drive its stateful toggles.
-- Commit: implementation on `codex/printed-module-worksheet`.
+- Commit: `9b538d5` on `codex/printed-module-worksheet`; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16).
 
 ## Recurrence triage
 

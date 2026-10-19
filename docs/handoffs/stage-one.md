@@ -8,7 +8,7 @@ Last updated: 2026-10-20. Current work: teacher-approved **printed module worksh
 change** on `codex/printed-module-worksheet`, based on the tested drawer animation branch
 (PR #15, `3990646`). The classroom keeps its module browser and opens a separate wide worksheet
 with named parts, Overview/step pages, printed content and a hover/click/keyboard Module ear.
-Existing runner, progress, availability and chat stay connected. UI build/lint and 69 tests pass; exact supplied JSON is verified in the reader. The existing
+Existing runner, progress, availability and chat stay connected. [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16) is open (implementation `9b538d5`), stacked on PR #15. UI build/lint and 69 tests pass; exact supplied JSON is verified in the reader. The existing
 Step 1 starter-file execution issue (CKB-038) awaits approval of a separate compatibility fix;
 see [stage-four.md](stage-four.md) and [worksheet verification](../verification/printed-module-worksheet.md).
 No hosted services or database settings changed.

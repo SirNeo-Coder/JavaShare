@@ -1,6 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: classroom Figma UI is on main; drawer-animation PR #15 is open. The approved printed-worksheet workflow change is implemented on `codex/printed-module-worksheet` (based on PR #15), reader verified with the exact supplied JSON; preparing its review PR. Starter-file execution fix awaits separate approval (CKB-038).** Last updated: 2026-10-20.
+**Status: classroom Figma UI is on main; drawer-animation PR #15 is open. The approved printed-worksheet workflow change is implemented on `codex/printed-module-worksheet` (based on PR #15), reader verified with the exact supplied JSON; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16) open for review (implementation `9b538d5`). Starter-file execution fix awaits separate approval (CKB-038).** Last updated: 2026-10-20.
 
 ## What the teacher asked for
 
@@ -261,3 +261,8 @@ JSON samples run. Full evidence and exact test names: `docs/verification/printed
 October 20 cleanup completed: signed out the exact-JSON browser session, removed only its known
 isolated class and two generated accounts, deleted temporary local credentials. Server remains
 running. App implementation is ready for review; CKB-038 is still awaiting approval.
+
+Reader implementation committed as `9b538d5` and pushed. [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16)
+is open against `codex/drawer-slide-animation` (PR #15 is still open). Review/merge #15 first,
+then retarget #16 to main. No automatic merge. Only the separate CKB-038 starter-file fix awaits
+the teacher's scope approval; the approved reader is complete and available locally.

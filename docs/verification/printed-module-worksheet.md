@@ -1,5 +1,7 @@
 # Printed module worksheet — verification, 2026-10-20
 
+Implementation: `9b538d5`, [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16), stacked on PR #15.
+
 Branch: `codex/printed-module-worksheet`, based on drawer-animation PR #15 (`3990646`).
 Teacher explicitly approved this proposal as a **workflow change** after supplying worksheet
 screenshots and a local Collections Framework PDF as a visual reference.

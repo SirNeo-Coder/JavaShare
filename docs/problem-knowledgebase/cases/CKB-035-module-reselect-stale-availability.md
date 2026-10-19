@@ -32,7 +32,7 @@ not covered by the in-memory draft promise (same boundary as CKB-028).
   All modules → same card; it fetches again and shows Not open yet with no exposed code.
 - Browser route/UI regression, not an automated React-effects test. The complete 68-test suite
   and rendering checks also pass. Full evidence: `docs/verification/printed-module-worksheet.md`.
-- Commit: implementation on `codex/printed-module-worksheet`.
+- Commit: `9b538d5` on `codex/printed-module-worksheet`; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16).
 
 ## Recurrence triage
 

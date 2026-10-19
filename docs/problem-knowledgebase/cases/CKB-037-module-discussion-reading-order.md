@@ -32,7 +32,7 @@ fallback are retained; source JSON and all ids stay unchanged.
   lesson groups and 17 digital pages. Every supplied step file and expected output was found
   unchanged in the rendered result. Real browser showed the ArrayList table after its output and
   the LinkedList comparison table on Step 2, followed by the Monday liplet.
-- Commit: implementation on `codex/printed-module-worksheet`.
+- Commit: `9b538d5` on `codex/printed-module-worksheet`; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16).
 
 ## Recurrence triage
 

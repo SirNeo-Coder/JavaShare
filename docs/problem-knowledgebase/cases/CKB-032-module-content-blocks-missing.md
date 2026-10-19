@@ -33,7 +33,7 @@ blocks on a white paper surface. No PDF upload, external asset or schema change.
   path, not a claim that the entire old viewer was restored.
 - Real offline browser displayed a supplied table, analogy, note and error guide in an isolated
   local test module. Full results: `docs/verification/printed-module-worksheet.md`.
-- Commit: implementation on `codex/printed-module-worksheet`.
+- Commit: `9b538d5` on `codex/printed-module-worksheet`; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16).
 
 ## Recurrence triage
 
