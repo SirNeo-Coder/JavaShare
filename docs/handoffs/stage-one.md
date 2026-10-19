@@ -4,12 +4,14 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-19. Classroom UI PR #14 is merged. The current follow-up is the approved
-**drawer-animation adjustment** on `codex/drawer-slide-animation`: left panels and right chat
-slide in/out in 250 ms while keeping their existing content and controls. Built/tested and served
-on localhost:3000; [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15) is open for review (implementation `d072aa1`). See [stage-four.md](stage-four.md) and
-[drawer animation verification](../verification/drawer-slide-animation.md). No hosted service or
-database settings were changed.
+Last updated: 2026-10-20. Current work: teacher-approved **printed module worksheet workflow
+change** on `codex/printed-module-worksheet`, based on the tested drawer animation branch
+(PR #15, `3990646`). The classroom keeps its module browser and opens a separate wide worksheet
+with named parts, Overview/step pages, printed content and a hover/click/keyboard Module ear.
+Existing runner, progress, availability and chat stay connected. UI build/lint and 69 tests pass; exact supplied JSON is verified in the reader. The existing
+Step 1 starter-file execution issue (CKB-038) awaits approval of a separate compatibility fix;
+see [stage-four.md](stage-four.md) and [worksheet verification](../verification/printed-module-worksheet.md).
+No hosted services or database settings changed.
 
 ## The job
 

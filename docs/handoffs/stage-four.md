@@ -1,6 +1,6 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: classroom Figma UI merged through PR #14; approved drawer-animation adjustment implemented and verified on `codex/drawer-slide-animation`, [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15) open for review.** Last updated: 2026-10-19.
+**Status: classroom Figma UI is on main; drawer-animation PR #15 is open. The approved printed-worksheet workflow change is implemented on `codex/printed-module-worksheet` (based on PR #15), reader verified with the exact supplied JSON; preparing its review PR. Starter-file execution fix awaits separate approval (CKB-038).** Last updated: 2026-10-20.
 
 ## What the teacher asked for
 
@@ -191,3 +191,73 @@ is open against `main`. Generated browser-test sessions were signed out; the iso
 and all three generated test accounts were removed. The normal localhost:3000 server remains running.
 Another assistant can continue from this branch and this verification document. Next: teacher review
 of PR #15; merging this follow-up awaits a specific request. No hosted-service changes were made.
+
+## Printed worksheet follow-up — 2026-10-19
+
+Teacher supplied screenshots of a printed-looking File Handling reader and a local Collections
+Framework PDF. Approved the proposal as a **workflow change**: retain the module browser, open a
+separate wide worksheet with author-defined parts and Overview/step pages, and add a Module ear
+that previews on mouse hover while retaining click, keyboard, Pin and Escape controls.
+
+**Branch:** `codex/printed-module-worksheet`, based on `3990646` from drawer-animation PR #15.
+The branch deliberately includes that unmerged animation dependency. The new PR will target #15's
+branch; once #15 lands, retarget this follow-up to main. Do not merge automatically.
+
+Implemented:
+
+- `app/ModuleWorkspace.tsx`: coordinates the existing catalog and separate worksheet, retains
+  its selected module when closed, supports hover preview/leave, Pin and explicit close focus.
+- `app/moduleParts.ts`: author labels group steps/discussion across days; older files fall back
+  to lesson grouping. Discussion and exit slips are assigned once, and closed lessons remain safe.
+- `app/ModuleViewer.tsx`: worksheet mode with a real part-progress row, Overview and step tabs,
+  previous/next digital pages, supplied code/output, practice editors, existing Run & check and
+  submission handlers. Editors stay mounted across navigation/closing. Tables, error guides,
+  analogies, notes, task presentation/questions/rubric render their existing structured content.
+- `app/globals.css`: printed paper, navy headings, dotted desk, responsive reader, sliding ear.
+  Reduced motion uses the existing preference rule. `overflow:clip` prevents focus from panning
+  a narrowed classroom; the paper remains vertically scrollable.
+- CKB-032 records missing structured content; CKB-033 records hover-Escape focus fallback;
+  CKB-034 records focus-related horizontal panning caught in responsive checks.
+
+Scope boundaries: the PDF is a visual reference, not an import feature or a converted module.
+Class-home upload/preview remains available in its existing form. No new runner, chat, route,
+module ids, storage, dependency or migration. The shared central per-module project and teacher
+student cards from the original stage-four request remain separate unfinished work.
+
+Checks and exact test names: `docs/verification/printed-module-worksheet.md`. Full build, lint,
+68-test suite and nine focused React checks passed. Browser already proved native pointer hover,
+inside/leave behavior, Pin, draft retention, real javac output and saved 17% progress. Completing
+final narrow-width checks after correcting focus scrolling. Next: finish verification, remove
+only generated local fixtures, commit/push and open the review PR. Localhost:3000 stays running.
+
+### Exact JSON continuation — 2026-10-20
+
+Teacher clarified that the module displayed is generated from
+`/home/ireneo/Documents/Java 2026/Java2_Week_14.codeshare.json` and asked to continue. It has no
+explicit part labels: use its five existing lesson groups, eleven steps, and separate task
+(17 digital pages). All supplied files/output were checked unchanged in the actual renderer.
+No copy of the full private source file was added to the repository.
+
+CKB-037 fixed discussion order: Overview keeps only the introduction; each step retains its
+following tables/notes, and the liplet follows the final step. Mutation proof: 9 pass/1 fail with
+old pagination, 10/10 after restoration. Current build/offline build and lint pass (eight existing
+warnings); full suite **69/69**. Exact LinkedList Step 2 ran in the real offline browser and saved
+6%. Projects suspends/restores the worksheet correctly, completing CKB-036's browser check.
+
+**Open compatibility issue / scope approval pending:** actual Step 1 fails with six missing-class
+javac errors. The existing student module response omits module starterFiles; StepView only sends
+step.files. CKB-038 contains the proposal: expose the existing starter files safely in the same
+module response, merge by path with step files winning, keep availability and execute limits.
+An async question was sent requesting this extension of the UI plan into the server response.
+Do not assume elapsed time means approval. No backend change has been made yet.
+
+The ordinary offline launcher was stopped when work resumed; started `npm run classroom:offline`
+and served the built UI on localhost:3000 again. Exact JSON only went into an isolated local test
+class with generated teacher/student accounts. No real classroom or hosted setting was changed.
+Next: commit/push the completed reader and open its review PR, with CKB-038 prominently disclosed.
+If the teacher approves that separate fix, continue it with a regression before claiming all
+JSON samples run. Full evidence and exact test names: `docs/verification/printed-module-worksheet.md`.
+
+October 20 cleanup completed: signed out the exact-JSON browser session, removed only its known
+isolated class and two generated accounts, deleted temporary local credentials. Server remains
+running. App implementation is ready for review; CKB-038 is still awaiting approval.

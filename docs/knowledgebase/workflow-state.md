@@ -65,7 +65,7 @@ What teachers and students can do today. Compare any proposed change with this p
   existing handlers and permissions.
 - **Module** on the left edge or **Modules** in the top bar opens the module browser. The weekly
   pick appears first when one exists; cards show the student's saved percentage and server's live
-  lock. Selecting a lesson shows one lesson at a time; **Performance task** has its own page.
+  lock. Selecting a module opens a separate wide worksheet drawer; **Performance task** has its own page.
   Closed lessons still show **Not open yet**. Navigation keeps editors mounted, so switching
   lessons preserves unsaved drafts. This does not add persistence across reloading or leaving a module.
 - **Projects** on the left edge exposes the existing student projects/activity list and **New web
@@ -82,3 +82,27 @@ What teachers and students can do today. Compare any proposed change with this p
   matching the Figma reference, with a navy heading.
 - Class-home module upload, deletion, full teacher preview and availability controls stay where
   they were. No new chat service, AI assistant, route, migration, dependency or internet asset.
+
+## Printed module worksheet (approved workflow change, 2026-10-19)
+
+- The classroom's left **Module** browser stays available. Choosing a module opens a wider
+  worksheet with a white paper surface, navy section headings, tables, code/output, analogy and
+  note boxes, and a dotted desk background. The teacher's PDF is a visual reference; module
+  content still comes from the existing uploaded JSON, not a new PDF-import feature.
+- The progress row uses saved student progress. Named parts follow the author's step `part`
+  labels, even across days. Older modules fall back to one part per lesson. Closed lessons show
+  **Not open yet** without exposing content; the existing teacher availability rules still apply.
+- Each part has **Overview** for its opening discussion and step pages retaining their following
+  tables/notes in reading order, with the liplet at the end. **Previous page / Next page** walk through the
+  digital pages; their page count is separate from physical printed PDF pages. **Practise this
+  step** exposes the existing editor and **Run & check**. Page switches and drawer closing keep
+  drafts mounted. Reloading, changing module or leaving the classroom still does not save a draft.
+- After selecting a module, its additional **Module** ear previews the worksheet on mouse hover.
+  Moving into the worksheet keeps the preview open; leaving closes it unless pinned. Clicking or
+  keyboard-activating the ear keeps it open. **Pin** keeps it visible; at wide desktop widths it
+  also reserves space. **× / Escape** closes it, with keyboard focus returned to its ear.
+- **All modules** returns to the existing browser. Selecting a card again reloads its current
+  content and teacher availability; merely closing/reopening the ear preserves the current visit. Projects temporarily covers the worksheet and hides its ear without dropping the selected
+  page or draft; closing Projects restores that visit. The classroom top bar and existing chat
+  system are retained. Class-home upload, availability, progress and submission
+  routes retain their existing storage and permissions. No new route, dependency or migration.
