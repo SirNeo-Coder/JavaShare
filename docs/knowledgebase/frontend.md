@@ -29,3 +29,10 @@ StudentModuleActivity (module and personal), and ModuleViewer previews. Module r
 save first, run in browser when configured, then report success/output with saved
 version. Personal/practice runs do not write module completion. JavaRunnerBrand uses
 a locally served CheerpJ logo and is shown only after online execution is requested.
+
+`StudentModuleActivity.tsx` shows `JavaRunProgress` immediately above **Actual output** for
+module and personal runs: saving, Java startup/running, then module output checking. The strip
+uses its own run message rather than the general busy flag, so Save work or submission alone
+does not claim Java is running. Interactive personal runs show **Waiting for your input**; success,
+compiler errors, failed requests and Stop remove the strip. Screen readers receive the status,
+and the spinner stops animating under reduced motion. No runner protocol or completion rule changes.

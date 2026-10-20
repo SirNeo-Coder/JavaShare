@@ -2,6 +2,18 @@
 
 What teachers and students can do today. Keep this page current when their use of CodeShare changes; no change-level classification is required.
 
+## Java run status (2026-10-21)
+
+- In the module and personal Java editor, a prominent strip directly above **Actual output**
+  shows **Saving your code…**, **Java is loading or running… Please wait.**, and **Checking your output…**.
+  Offline module execution shows **Running Java and checking output… Please wait.**.
+- During online personal input waits, it says **Waiting for your input** and points to **Program input**.
+  Enter sends the answer; Stop cancels. Once output, a compiler error, or a request failure arrives,
+  the strip clears. Previous output remains readable during the run.
+- Save work and Submit this version alone do not display a Java-running indicator. This display
+  does not change sample completion, personal submission or offline input-before-Run behavior.
+- The text is announced for accessibility. Reduced motion keeps the indicator visible without spinning.
+
 ## Accounts
 
 - The first account ever registered becomes the teacher and gets a starter class (code `JAVA101`) plus the "Teacher Demo Workspace" with "Live Lesson Code". Every later account is a student.
