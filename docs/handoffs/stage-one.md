@@ -1,4 +1,6 @@
-> Current approved Java loading repair (2026-10-21): branch `codex/java-runner-startup`,
+> Delivered Java loading repair (2026-10-21): [PR #30](https://github.com/SirNeo-Coder/JavaShare/pull/30)
+> merged into main as `f3daa64` under the teacher's explicit "merge and push to main"
+> request. Implementation branch: `codex/java-runner-startup`,
 > based on main `8fb41ff`, integrated main `7089377` in `87041d9`; isolated checkout `/tmp/codeshare-java-runner-startup`.
 > Teacher approved complete compiler downloads, stage feedback, tests and branch/PR
 > delivery. Done: both JARs load as binary memory files without HTTP Range; editable
@@ -16,12 +18,12 @@
 > hostname allowed normal execution again. No execution change is approved or included.
 > Implementation `90937ce` is complete; final integrated checks passed (148 tests).
 > Final evidence `df1619a` and implementation are committed and pushed. [PR #30](https://github.com/SirNeo-Coder/JavaShare/pull/30)
-> targets main and is attached to this chat. No approved work remains in progress.
-> Next: teacher review, normal automatic builds of both Workers after acceptance,
-> then affected-browser retest using the named Last stage.
+> is merged and attached to this chat. No approved work remains in progress.
+> Next: verify the normal automatic builds of both Workers, then affected-browser
+> retest using the named Last stage. Hosted rollout remains unverified.
 > Temporary local servers and disposable fixtures were cleaned up; existing servers
-> and the other checkout's work were preserved. No PR merge,
-> deploy, hosted settings, SQL or database push. No remaining approved implementation work.
+> and the other checkout's work were preserved. No manual deploy, hosted settings,
+> SQL or database push. This explicit merge request does not authorize merging other PRs.
 
 > Current approved UI delivery (2026-10-21): branch `codex/java-console-progress`, directly
 > based on main at `8fb41ff`. Teacher approved a Console loading/running indicator and explicitly
