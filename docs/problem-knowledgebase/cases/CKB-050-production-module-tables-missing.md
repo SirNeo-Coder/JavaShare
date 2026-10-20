@@ -1,6 +1,6 @@
 # CKB-050 — Production Students and Curriculum fail with missing module tables
 
-- Status: investigating (cause identified; hosted repair pending)
+- Status: investigating (teacher reports hosted SQL success; production checks pending)
 - First recorded: 2026-10-20
 - Last verified: 2026-10-20
 - Area: production database setup, teacher dashboard
@@ -66,4 +66,6 @@ does not identify the cause of a current running dashboard failure.
 
 - 2026-10-20 — Teacher reported production failure, provided logs and the NULL
   table check, and approved the existing migration repair as an adjustment.
-  Instructions prepared; hosted application and verification remain pending.
+  Teacher subsequently supplied a SQL success screenshot. Readiness-query and
+  production browser recovery remain unverified. The teacher explicitly requested
+  merging the repair documentation into main.

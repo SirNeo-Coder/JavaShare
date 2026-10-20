@@ -1,6 +1,6 @@
 > Current session work (2026-10-20), branch `codex/session-inactivity`,
-> [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), implementation `b24c89c`, based on the
-> documentation-only production-repair branch (PR #23): implemented the teacher's two-hour
+> [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), implementation `b24c89c`, now targeting
+> `main` after documentation-only PR #23 merged: implemented the teacher's two-hour
 > and student's fifteen-minute inactivity sign-out. Server checks, trusted browser interaction,
 > one-minute warning, restored-tab refusal, shared-tab logout and live-pass deadlines are complete.
 > The teacher also removed the VMAS workflow/adjustment classification question; removal
@@ -11,8 +11,11 @@
 > [session verification](../verification/session-inactivity.md) for every test and limits,
 > and CKB-051 for diagnosis. Unsaved edits can be lost after the warning; old cookies need a
 > fresh sign-in on rollout. No migration or hosted change. Implementation and rule removal
-> committed and pushed; PR attached. Nothing is in progress. Next: teacher review/deployment,
-> followed by the hosted Brave re-test. No merge or deployment was performed.
+> committed and pushed; PR attached. The teacher explicitly requested merging and pushing to
+> `origin/main`. Retargeted the PR and preserved main's newer SQL-repair status while resolving
+> the two overlapping problem-index/prompt-map rows. Application code is unchanged from the
+> verified implementation. In progress: requested merge; next: confirm main delivery and the
+> hosted Brave re-test. No hosted setting or manual deployment was changed.
 
 > Current approved work (2026-10-20): [interactive online Java](online-java-interactive-input.md),
 > branch codex/online-java-interactive-input, implementation 7930d79, [PR #22](https://github.com/SirNeo-Coder/JavaShare/pull/22).
@@ -302,16 +305,20 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   database was removed. Build passed, lint had 0 errors/8 existing warnings, full
   suite passed 125/125 with no skips, and CKB-050 is the first matching search result.
   [Named tests, commands and limits](../verification/production-module-setup.md).
+  The SQL-success/merge handoff update also passed both named tests in
+  `node --test tests/kb-search.test.mjs` and `git diff --check`.
 - Preparation is complete, committed and pushed as `edf4a6b` / `4f3a154`; final
-  checks were repeated on current main. [Draft PR #23](https://github.com/SirNeo-Coder/JavaShare/pull/23)
-  targets main. The teacher reviews it; no merge or hosted deployment was performed.
-- Next: teacher runs the prepared SQL in the correct hosted project's SQL Editor,
-  verifies all readiness fields are true, refreshes Students/Curriculum, uploads
-  the intended module, and checks student save/reload and refreshed progress.
-  Stop on any SQL error rather than rerunning table creation after partial success.
-- Hosted SQL and production browser repair checks remain pending. No assistant
-  hosted changes, database reset, `supabase db push`, deploy or merge. Creating
-  storage does not transfer local modules/progress online.
+  checks were repeated on current main. [PR #23](https://github.com/SirNeo-Coder/JavaShare/pull/23)
+  targets main. The teacher explicitly requested merging it into main on 2026-10-20;
+  its GitHub merge status records delivery.
+- Teacher supplied a **Success. No rows returned** screenshot after the prepared
+  SQL instructions. Hosted SQL success is teacher-reported; the assistant did not
+  execute it or independently query the hosted database.
+- Next: verify all readiness fields are true, refresh Students/Curriculum, upload
+  the intended module, and check student save/reload and refreshed progress.
+  Production browser recovery and readiness-query results remain unconfirmed.
+- No assistant hosted SQL, database reset, `supabase db push` or deploy command.
+  Creating storage does not transfer local modules/progress online.
 
 ## Running offline mode on this laptop
 
