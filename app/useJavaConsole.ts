@@ -32,6 +32,7 @@ export function useJavaConsole(onOutput: (output: string) => void, projectId?: s
         result = await runJava(files, initial, config, {
           signal: current.signal,
           onOutput: (text) => { if (controller.current === current) onOutput(text); },
+          onStatus: (stage) => { if (controller.current === current) onOutput(`${stage}…`); },
           onInput: (send) => {
             if (controller.current !== current) return;
             pending.current = send; setWaiting(!!send);

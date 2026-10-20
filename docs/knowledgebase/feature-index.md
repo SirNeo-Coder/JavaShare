@@ -33,3 +33,9 @@
 | online multi-file Java, Java packages, CheerpJ, browser practice result | GET `/api/java-runner`, POST `.../progress/browser-result`, `recordSupabaseModuleActivityResult` | `javaExecution.ts`, `JavaRunnerBrand`, three existing Java callers; `java-runtime/`, `vendor/java/` | no migration; `tests/browser-java-*.test.mjs`; CKB-046/047/048; `docs/handoffs/online-multifile-java.md` |
 
 | interactive online Java, Scanner waits, answer after Run, live Console output, Stop | existing Java mode and module-result routes unchanged | useJavaConsole.ts, javaExecution.ts, page.tsx, StudentModuleActivity.tsx; runner.js and vendor/java/CodeShareJava.java | tests/browser-java-client.test.mjs and browser-java-runtime.test.mjs; CKB-049; docs/handoffs/online-java-interactive-input.md |
+
+Online Java loading timeout / whole-file compiler downloads: `runner.js` loads the
+binary compiler/helper into `/str/`; `javaExecution.ts` authenticates stage messages
+and names the last stage on timeout; `useJavaConsole.ts` shows loading feedback.
+CKB-056; `tests/browser-java-client.test.mjs`, `tests/browser-java-runtime.test.mjs`;
+verification and rollout: `docs/verification/java-runner-startup.md`.

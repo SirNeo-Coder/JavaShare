@@ -1,3 +1,28 @@
+> Current approved Java loading repair (2026-10-21): branch `codex/java-runner-startup`,
+> based on main `8fb41ff`, integrated main `7089377` in `87041d9`; isolated checkout `/tmp/codeshare-java-runner-startup`.
+> Teacher approved complete compiler downloads, stage feedback, tests and branch/PR
+> delivery. Done: both JARs load as binary memory files without HTTP Range; editable
+> Consoles show loading stages and startup errors name the last stage. No dependency,
+> migration, Java helper, security policy or hosted configuration change.
+> Build passed; lint zero errors/eight existing warnings; full suite 148/148 with no
+> skips; 21 focused checks pass after two deliberate regressions failed and were restored.
+> Actual CheerpJ with no-Range host: Hello CodeShare, two-file Unicode/blank input,
+> Stop and fixed-input module pass; offline laptop Java passed with no Java frame/logo.
+> Static Worker dry-run and offline launcher readiness passed. [Every test name and limits](../verification/java-runner-startup.md).
+> CKB-056 is a local mitigation: the original affected-browser timeout was not
+> reproduced, so hosted recovery is unconfirmed. CKB-057 separately records an
+> unresponsive same-site tight-loop trial and later startup failure on its hostname;
+> a different-site parent displayed its five-second timeout, and a fresh runner
+> hostname allowed normal execution again. No execution change is approved or included.
+> Implementation `90937ce` is complete; final integrated checks passed (148 tests).
+> Final evidence `df1619a` and implementation are committed and pushed. [PR #30](https://github.com/SirNeo-Coder/JavaShare/pull/30)
+> targets main and is attached to this chat. No approved work remains in progress.
+> Next: teacher review, normal automatic builds of both Workers after acceptance,
+> then affected-browser retest using the named Last stage.
+> Temporary local servers and disposable fixtures were cleaned up; existing servers
+> and the other checkout's work were preserved. No PR merge,
+> deploy, hosted settings, SQL or database push. No remaining approved implementation work.
+
 > Current approved UI delivery (2026-10-21): branch `codex/java-console-progress`, directly
 > based on main at `8fb41ff`. Teacher approved a Console loading/running indicator and explicitly
 > requested merge/push. Implemented a prominent accessible strip above Actual output for module
