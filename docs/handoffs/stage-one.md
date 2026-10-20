@@ -1,4 +1,31 @@
-> Current approved correction (2026-10-21): `codex/classroom-java-progress`, implementation
+> Current approved drawer repair (2026-10-21): branch `codex/classroom-drawer-controls`, directly
+> based on main `9257ea7` (merged PR #31). Teacher approved one Module/Projects rail, reopening
+> the selected worksheet, hover opening and animated outside closing for Module, Projects and
+> Chat. The earlier CKB-053 repair was only on open PR #26 targeting the unmerged rolling-tasks
+> branch; it was never in main. This branch brings only the relevant repair onto current main.
+> Done: one fixed Module tab beside Projects (Students / projects for teachers), no moving
+> worksheet duplicate; hover does not steal focus or close on leaving; outside presses close
+> even pinned panels. Both slide directions, keyboard/Escape, touch taps, worksheet page and
+> unsaved editor/chat text are retained. Projects explicitly remains visible on phones. Opening
+> Projects closes the worksheet; Module reopens its retained visit. All modules/top-bar Modules
+> opens the catalog. Java execution/status/startup code is preserved. No server, schema, route,
+> dependency, hosted settings or migration changes.
+> Verification: final full suite 149/149; final actual offline production browser 17/17, both
+> roles, phone/desktop/enlarged UI, measured opening/closing motion and real laptop Java. Build,
+> offline launcher build and diff check pass; lint 0 errors/8 existing warnings. Deliberately
+> removing outside closing and restoring the duplicate Module tab caused 15 expected failures
+> (2 pass); restored build passes all 17. [All named tests, commands and limits](../verification/classroom-drawer-controls.md).
+> CKB-053, frontend/workflow pages and the prompt map are updated. Implementation `ed16d50`
+> is committed and pushed; [PR #32](https://github.com/SirNeo-Coder/JavaShare/pull/32) is open
+> against main and attached to this chat. No implementation work remains. Do not merge unrelated
+> PR #25/#26 or curriculum work. The current approval authorizes this repair and the
+> project's normal branch/PR delivery, not a merge. Next: teacher review and hosted rollout test.
+> Hosted rollout, physical devices and disconnected Wi-Fi remain unverified. Clicks inside the
+> separate web-preview frame do not reach the document outside-dismiss handler. Disposable local
+> fixtures are cleaned; only our temporary server is stopped. Existing servers and unrelated
+> logs, Supabase CLI cache, .claude and snippets are preserved.
+
+> Delivered regular Console correction (2026-10-21): `codex/classroom-java-progress`, implementation
 > `8ae4f1a`, integrated latest main `b3c74e0` (startup repair PR #30) in `398aa8c`. Teacher reported no animation in the regular Code editor; earlier coverage
 > only entered module/personal editors. Teacher approved reusing the existing status strip in
 > the regular teacher/student Console. Its Java-only running flag keeps the strip visible when

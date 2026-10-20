@@ -339,7 +339,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .classroom-workspace .actionbar { padding:0 12px; border-color:#bfc9d9; background:transparent; }
 .classroom-workspace .actionbar .run-button:first-child { border-color:#eab04b; background:#ffc45d; color:#17233b; box-shadow:0 2px 5px #13244c19; }
 .classroom-workspace .actionbar .run-button:first-child kbd { color:#71521a; }
-.workspace-rail { position:absolute; z-index:12; top:31%; display:grid; gap:12px; }
+.workspace-rail { position:absolute; z-index:15; top:31%; display:grid; gap:12px; }
 .rail-left { left:0; }.rail-right { right:0; }
 .workspace-rail button { display:flex; align-items:center; gap:10px; writing-mode:vertical-rl; padding:12px 7px; border:1px solid #405584; border-radius:0 6px 6px 0; background:#15294f; color:#ffce7b; font-size:9px; font-weight:700; box-shadow:0 3px 9px #0b162c3d; }
 .rail-right button { border-radius:6px 0 0 6px; color:#cbdcfa; }
@@ -375,7 +375,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .classroom-workspace #classroom-chat .chat input { min-width:0; padding:12px 10px; border-color:#d2dcea; border-radius:10px; background:#fff; color:#23324b; font-size:10px; }
 .classroom-workspace #classroom-chat .chat form>button { padding:10px 12px; border:0; border-radius:8px; background:#183761; color:#ffce7b; }
 .classroom-workspace #classroom-chat .chat form>button:disabled { opacity:.4; cursor:not-allowed; }
-.classroom-workspace .classroom-projects { position:absolute; z-index:13; left:24px; top:8px; bottom:10px; width:min(310px,calc(100% - 48px)); border:1px solid var(--line); border-radius:8px; box-shadow:0 10px 32px #0b17264a; }
+.classroom-workspace .classroom-projects { display:flex; position:absolute; z-index:13; left:24px; top:8px; bottom:10px; width:min(310px,calc(100% - 48px)); border:1px solid var(--line); border-radius:8px; box-shadow:0 10px 32px #0b17264a; }
 .projects-heading { display:flex; align-items:center; justify-content:space-between; padding:0 8px 16px; font-size:12px; }.projects-heading button { border:0; background:transparent; color:var(--muted); font-size:22px; }
 .drawer-module-viewer.activity-modal { padding:20px 16px; gap:16px; border:0; border-radius:0; background:#f5f7fb; color:#23324b; }
 .drawer-module-viewer.activity-modal header { gap:12px; align-items:center; }.drawer-module-viewer.activity-modal header h2 { margin:9px 0; font-size:21px; font-weight:500; }.drawer-module-viewer.activity-modal header p { color:#7a879a; line-height:1.6; font-size:10px; }
@@ -433,8 +433,6 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .worksheet-drawer .drawer-heading { padding:6px 12px; }.worksheet-drawer .drawer-heading small { display:none; }
 .worksheet-drawer .drawer-pin { display:block; }
 .worksheet-drawer .drawer-body { overflow:hidden; }
-.worksheet-ear { pointer-events:auto; position:absolute; z-index:12; left:0; top:46%; display:flex; gap:8px; align-items:center; writing-mode:vertical-rl; padding:13px 7px; border:1px solid #405584; border-radius:0 5px 5px 0; background:#15294f; color:#ffce7b; font-size:10px; transition:left .25s cubic-bezier(.22,.61,.36,1); }
-.worksheet-ear[data-open="true"] { left:min(764px,calc(100% - 28px)); }
 .printed-module-viewer.activity-modal { --ink:#253754; --muted:#64748b; --surface:#fff; --line:#d5dfed; height:100%; min-height:0; display:flex; flex-direction:column; gap:0; padding:0; border:0; border-radius:0; background:#f7f9fd; color:#253754; }
 .printed-module-viewer.activity-modal>header { flex:none; min-height:40px; padding:8px 14px; border-bottom:1px solid #d5dfed; align-items:center; }
 .printed-module-viewer.activity-modal>header>div { min-width:0; }.printed-module-viewer.activity-modal>header h2 { margin:0; font-size:12px; }
@@ -462,10 +460,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .worksheet-pagination { flex:none; display:flex; gap:8px; justify-content:space-between; align-items:center; padding:10px; background:#f7f9fd; border-top:1px solid #d5dfed; font-size:10px; }.worksheet-pagination button { border:0; background:transparent; color:#173e71; font-size:11px; }.worksheet-pagination button:disabled { color:#9ca8b9; }
 @media (min-width:1400px) { .classroom-workspace:has(.worksheet-drawer.drawer-pinned[data-open="true"]) .main-area { margin-left:752px; } }
 @media (max-width:600px) { .worksheet-paper { padding:14px; font-size:13px; }.worksheet-paper .paper-title h2 { font-size:18px; }.worksheet-pagination { padding:10px 4px; font-size:9px; }.worksheet-pagination button { font-size:10px; } }
-@media (prefers-reduced-motion:reduce) { .worksheet-ear { transition:none; } }
-.worksheet-ear[hidden] { display:none; }.worksheet-weekly { color:#a56809; font-size:8px; letter-spacing:.8px; }
-/* The opening ear moves to the paper edge; keep its original hit area under the pointer. */
-.worksheet-hover-bridge { position:absolute; left:0; top:46%; width:26px; height:120px; pointer-events:auto; }
+.worksheet-weekly { color:#a56809; font-size:8px; letter-spacing:.8px; }
 
 /* Teacher class home: local assets and saved module progress, online and offline. */
 .teacher-class-dashboard { --teacher-ink:#17292b; --teacher-muted:#708284; --teacher-line:#e0e8e8; --teacher-purple:#8200ed; display:grid; grid-template-columns:224px minmax(0,1fr); min-height:calc(100dvh / var(--ui-scale)); background:#f4f7f7; color:var(--teacher-ink); font-size:13px; }

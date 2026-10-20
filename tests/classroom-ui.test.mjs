@@ -54,6 +54,20 @@ test("workspace drawers: closed panels stay mounted but inaccessible so closing 
   assert.match(renderDrawer(true, "left", "Course modules"), /aria-label="Course modules"/);
 });
 
+const { default: ModuleWorkspace } = tsxRequire("../app/ModuleWorkspace.tsx", import.meta.url);
+test("workspace rails: one Module control and the role's Projects control share the fixed left rail", () => {
+  for (const role of ["teacher", "student"]) {
+    const html = renderToStaticMarkup(createElement(ModuleWorkspace, {
+      classroomId: "local-class", role, browserOpen: false, projectsOpen: false,
+      onBrowserChange() {}, onProjectsChange() {}, async onStartActivity() {},
+    }));
+    assert.equal((html.match(/aria-label="Module"/g) || []).length, 1);
+    assert.match(html, /aria-controls="classroom-projects"/);
+    assert.match(html, role === "teacher" ? /Students \/ projects/ : /> Projects</);
+    assert.doesNotMatch(html, /worksheet-ear|worksheet-hover-bridge/);
+  }
+});
+
 const { ModuleContent } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
 test("module pages: inactive lessons and task editors stay mounted so navigation cannot discard drafts", () => {
   const course = JSON.parse(readFileSync(new URL("./fixtures/sample-module.codeshare.json", import.meta.url), "utf8"));
