@@ -1,3 +1,39 @@
+> Current approved Java loading repair (2026-10-21): branch `codex/java-runner-startup`,
+> based on main `8fb41ff`, isolated checkout `/tmp/codeshare-java-runner-startup`.
+> Teacher approved complete compiler downloads, stage feedback, tests and branch/PR
+> delivery. Done: both JARs load as binary memory files without HTTP Range; editable
+> Consoles show loading stages and startup errors name the last stage. No dependency,
+> migration, Java helper, security policy or hosted configuration change.
+> Build passed; lint zero errors/eight existing warnings; full suite 145/145 with no
+> skips; 21 focused checks pass after two deliberate regressions failed and were restored.
+> Actual CheerpJ with no-Range host: Hello CodeShare, two-file Unicode/blank input,
+> Stop and fixed-input module pass; offline laptop Java passed with no Java frame/logo.
+> Static Worker dry-run and offline launcher readiness passed. [Every test name and limits](../verification/java-runner-startup.md).
+> CKB-056 is a local mitigation: the original affected-browser timeout was not
+> reproduced, so hosted recovery is unconfirmed. CKB-057 separately records an
+> unresponsive same-site tight-loop trial and later startup failure on its hostname;
+> a different-site parent displayed its five-second timeout, and a fresh runner
+> hostname allowed normal execution again. No execution change is approved or included.
+> In progress: final commit/push/PR delivery. Next: teacher review, normal automatic
+> builds of both Workers, then affected-browser retest using the named Last stage.
+> The other checkout's Console work and all existing servers were preserved. No merge,
+> deploy, hosted settings, SQL or database push. No remaining approved implementation work.
+
+> Current approved UI delivery (2026-10-21): branch `codex/java-console-progress`, directly
+> based on main at `8fb41ff`. Teacher approved a Console loading/running indicator and explicitly
+> requested merge/push. Implemented a prominent accessible strip above Actual output for module
+> and personal runs: saving, Java startup/running, checking, or waiting for input. It clears after
+> success/error/Stop; Save work alone does not claim execution. Reduced motion disables spinning.
+> Build and actual offline launcher build pass; lint zero errors/eight existing warnings; full
+> suite 143/143; real online CheerpJ/offline javac production browser checks 12/12. Hiding the strip
+> deliberately failed two render regressions; restored implementation passes. Initial browser
+> throttle issue was resolved in the harness. [All named tests, commands and limits](../verification/java-console-progress.md); CKB-055.
+> Implementation `8198348` is committed and pushed. Main delivery is tracked by
+> [PR #29](https://github.com/SirNeo-Coder/JavaShare/pull/29), under the teacher's explicit merge/push
+> instruction. No code work remains. Next: verify the automatic main deployment and re-test
+> the hosted Console; the PR records merge status. No other open PRs are part of this delivery.
+> No schema, dependency or hosted setting change. Hosted rollout/physical devices remain unverified.
+
 > Delivered session work (2026-10-20), now on `main`:
 > [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), merge `34b83bb`, implementation
 > `b24c89c`: implemented the teacher's two-hour
@@ -41,27 +77,6 @@
 > Module progression uses printed sample output; a separate personal performance project rolls
 > forward independently. Online multi-file Java is the next step. See the feature handoff for
 > exact verification and remaining decisions. No hosted changes or deployment authorized.
-
-> Current approved Java loading repair (2026-10-21): branch `codex/java-runner-startup`,
-> based on main `8fb41ff`, isolated checkout `/tmp/codeshare-java-runner-startup`.
-> Teacher approved complete compiler downloads, stage feedback, tests and branch/PR
-> delivery. Done: both JARs load as binary memory files without HTTP Range; editable
-> Consoles show loading stages and startup errors name the last stage. No dependency,
-> migration, Java helper, security policy or hosted configuration change.
-> Build passed; lint zero errors/eight existing warnings; full suite 145/145 with no
-> skips; 21 focused checks pass after two deliberate regressions failed and were restored.
-> Actual CheerpJ with no-Range host: Hello CodeShare, two-file Unicode/blank input,
-> Stop and fixed-input module pass; offline laptop Java passed with no Java frame/logo.
-> Static Worker dry-run and offline launcher readiness passed. [Every test name and limits](../verification/java-runner-startup.md).
-> CKB-056 is a local mitigation: the original affected-browser timeout was not
-> reproduced, so hosted recovery is unconfirmed. CKB-057 separately records an
-> unresponsive same-site tight-loop trial and later startup failure on its hostname;
-> a different-site parent displayed its five-second timeout, and a fresh runner
-> hostname allowed normal execution again. No execution change is approved or included.
-> In progress: final commit/push/PR delivery. Next: teacher review, normal automatic
-> builds of both Workers, then affected-browser retest using the named Last stage.
-> The other checkout's Console work and all existing servers were preserved. No merge,
-> deploy, hosted settings, SQL or database push. No remaining approved implementation work.
 
 # CodeShare — Stage One Progress
 

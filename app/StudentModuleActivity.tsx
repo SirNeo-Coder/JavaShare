@@ -17,6 +17,14 @@ export type StudentActivity = {
 };
 export type ModuleEditorHandle = { save: () => Promise<void> };
 
+export function JavaRunProgress({ message, waiting = false }: { message: string | null; waiting?: boolean }) {
+  if (!message) return null;
+  return <div className="java-run-progress" role="status" aria-live="polite">
+    <span className="java-run-spinner" aria-hidden="true" />
+    <strong>{waiting ? "Waiting for your input — type your answer in Program input and press Enter." : message}</strong>
+  </div>;
+}
+
 export default function StudentModuleActivity({ activity, ref, onChecked, onClose }: {
   activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void;
 }) {
@@ -27,6 +35,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [newPath, setNewPath] = useState("");
   const [addingFile, setAddingFile] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [runMessage, setRunMessage] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [output, setOutput] = useState("Ready — edit your project, then press Run code.");
   const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
@@ -52,15 +61,18 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const run = async () => {
     if (busyRef.current) return;
     busyRef.current = true; setBusy(true); setError("");
+    setRunMessage("Saving your code…");
     try {
       // Save first so failures or an unavailable runner never discard the student's edits.
       progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
       setSavedFiles(JSON.stringify(files));
+      setRunMessage("Java is loading or running… Please wait.");
       if (personal) {
         await javaConsole.run(files, stdin, () => setStdin(""));
       } else {
         const runner = await getJavaRunner();
         const browserResult = runner.mode === "browser" ? await runJava(files, activity.stdin, runner) : null;
+        setRunMessage(browserResult ? "Checking your output…" : "Running Java and checking output… Please wait.");
         const result = await api<{ output: string; passed: boolean; progress: Progress }>(`${base}/${browserResult ? "browser-result" : "run"}`, {
           method: "POST", body: JSON.stringify({ stepId: activity.stepId, updatedAt: progress.current.updatedAt, ...(browserResult ? { success: browserResult.success, output: browserResult.output } : { files }) }),
         });
@@ -71,7 +83,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       }
     } catch (runError) {
       setError(runError instanceof Error ? runError.message : "Could not run this activity");
-    } finally { busyRef.current = false; setBusy(false); }
+    } finally { busyRef.current = false; setBusy(false); setRunMessage(null); }
   };
 
   const submit = async () => {
@@ -126,7 +138,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
-        <JavaRunnerBrand /><div className="console"><pre aria-label="Program output">{output}</pre>
+        <JavaRunnerBrand />
+        <JavaRunProgress message={runMessage} waiting={javaConsole.waiting} />
+        <div className="console" aria-busy={Boolean(runMessage) && !javaConsole.waiting}><b>Actual output</b><pre aria-label="Program output">{output}</pre>
           {javaConsole.waiting && <small role="status">Waiting for input — press Enter to send</small>}
           {javaConsole.active && <button type="button" className="run-button" onClick={javaConsole.stop}>Stop</button>}
         </div>
