@@ -147,7 +147,7 @@ for (const mode of ["offline", "online"]) {
         const finished = () => regularIndicator.waitFor({ state: "hidden" });
         const cooldown = async () => { if (mode === "offline") await delay(1600); };
 
-        await t.test(`regular ${role} Console: spinner rotates while output is blank, then clears after real Java`, async () => {
+        await t.test(`regular ${role} Console: spinner rotates through startup, then clears after real Java`, async () => {
           await cooldown(); await page.emulateMedia({ reducedMotion: "no-preference" });
           await editor.fill(`public class Main { public static void main(String[] args) { System.out.println("Regular ${role} output"); } }`);
           const startup = await hold(mode === "online" ? "http://localhost:3031/" : "**/api/execute");
@@ -155,7 +155,7 @@ for (const mode of ["offline", "online"]) {
             await runButton().click(); await startup.seen;
             assert.ok(await regularIndicator.isVisible(), "the regular Code editor must render the status strip");
             assert.match(await regularIndicator.textContent(), /Java is loading or running/);
-            if (mode === "online") assert.equal(await regularOutput.textContent(), "", "the indicator must survive the interactive runner clearing output");
+            if (mode === "online") assert.match(await regularOutput.textContent(), /Opening Java runner/, "keep the newer startup-stage feedback alongside the indicator");
             const spinner = regularIndicator.locator(".java-run-spinner");
             const firstTransform = await spinner.evaluate((el) => getComputedStyle(el).transform);
             await page.waitForFunction((first) => getComputedStyle(document.querySelector(".console .java-run-spinner")).transform !== first, firstTransform, { timeout: 3000 });

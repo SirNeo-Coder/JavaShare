@@ -36,8 +36,10 @@ for public Java execution; it must not host other private applications.
 
 Open its address. It should say “CodeShare Java 8 runner. Open a project in CodeShare
 and choose Run code.” Check `/javac.jar`, `/codeshare-runner.jar`,
-`/javac-sources.zip` and `/OPENJDK-LICENSE` are available. The compiler needs normal
-HTTP range requests; Cloudflare static assets supply these. Do not replace the
+`/javac-sources.zip` and `/OPENJDK-LICENSE` are available. The runner downloads both
+JAR files completely and places their binary contents in CheerpJ's memory filesystem.
+It does not depend on the host supporting partial downloads (HTTP Range requests).
+Do not replace the
 provided `_headers`: its policy permits CheerpJ's own runtime frame while keeping
 other network destinations blocked.
 
@@ -75,7 +77,9 @@ runs `javac` locally. Do not put hosted database keys in the offline profile.
 5. Test **Stop** while Java waits for input, then run again. An endless loop stops
    after five seconds of execution in total. Time waiting for input is excluded;
    an unanswered question stops after two minutes. Loading/compilation has its separate
-   120-second limit; output stays capped at 64 KB. Run a correct program afterward.
+   120-second limit; its failure message names the last loading stage. Editable online
+   Consoles show those stages while Java starts; program output replaces them when it
+   arrives. Output stays capped at 64 KB. Run a correct program afterward.
 6. Run `npm run classroom:offline` and repeat a Java run over classroom Wi-Fi with
    internet disconnected. The laptop must run Java with no CheerpJ request or logo.
 
@@ -89,7 +93,9 @@ output. Paper assessment and performance-task assessment remain separate.
 “Online Java is not set up yet” means the CodeShare server lacks `JAVA_RUNNER_URL`.
 A separate-origin/HTTPS error means that setting is invalid. A startup timeout can
 mean no internet, a blocked CheerpJ site, missing compiler files, or replaced runtime
-headers. Saves happen before execution, so reopen the saved project before retrying.
+headers. Report the **Last stage** shown in the Console. A failed compiler download
+names `javac.jar` or `codeshare-runner.jar` and its HTTP error when available.
+Saves happen before execution, so reopen the saved project before retrying.
 The runner is public static files; never solve a startup problem by adding a Supabase
 key there or by moving it onto CodeShare's signed-in origin.
 

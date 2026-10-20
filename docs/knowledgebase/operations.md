@@ -67,3 +67,8 @@ example uses LOCAL_JAVA_EXECUTION=false; offline stays true and ignores that URL
 Compiler, source ZIP and notices are committed. Rebuild CodeShare's bridge only when
 its Java source changes: `node scripts/build-java-bridge.mjs`. Normal builds need no
 JDK. Never deploy or change hosted settings automatically.
+
+CKB-056: `runner.js` fetches both JARs as complete binary downloads into `/str/`
+before starting the compiler; it no longer relies on HTTP Range support from the
+asset host. Startup messages identify the last loading stage without extending
+the existing 120-second deadline. No hosted setting or migration is needed.

@@ -23,6 +23,7 @@ export function runnerAddress(address: string, parentOrigin: string) {
 export type JavaInteraction = {
   signal: AbortSignal;
   onOutput: (output: string) => void;
+  onStatus?: (stage: string) => void;
   onInput: (send: ((line: string) => void) | null) => void;
 };
 
@@ -47,6 +48,8 @@ export async function runJava(files: ModuleFile[], stdin: string, runner?: JavaR
     let sent = false, running = false, finished = false, waiting = false;
     let remaining = 5000, resumedAt = 0, inputId = 0, inputUsed = stdin.length;
     let streamed = "";
+    let stage = "Opening Java runner";
+    interaction?.onStatus?.(stage);
     const finish = (success: boolean, output: string) => {
       if (finished) return;
       finished = true;
@@ -61,15 +64,19 @@ export async function runJava(files: ModuleFile[], stdin: string, runner?: JavaR
       waiting = false; resumedAt = Date.now();
       timer = setTimeout(() => failure("Execution stopped after 5 seconds."), Math.max(0, remaining));
     };
-    let timer = setTimeout(() => failure("Java loading or compilation stopped after 120 seconds. Check your internet connection and try again."), 120000);
+    let timer = setTimeout(() => failure(`Java startup stopped after 120 seconds. Last stage: ${stage}. Try again; if this continues, tell your teacher this stage.`), 120000);
     const receive = (event: MessageEvent) => {
       if (finished || event.source !== frame.contentWindow || event.origin !== url.origin) return;
       const data = event.data;
       if (data?.type === "codeshare-java-ready" && !sent) {
         if (interaction && data.interactive !== true) { failure("The Java runner is updating. Refresh CodeShare and try again."); return; }
         sent = true;
+        stage = "Loading or compiling Java";
         frame.contentWindow!.postMessage({ type: "codeshare-java-run", id, files: files.map((file, index) => ({ ...file, path: paths[index] })), stdin, mainClass: packageName ? `${packageName}.Main` : "Main", ...(interaction ? { interactive: true } : {}) }, url.origin);
+      } else if (data?.id === id && data.type === "codeshare-java-status" && !running && typeof data.stage === "string" && data.stage.length > 0 && data.stage.length <= 80) {
+        stage = data.stage; interaction?.onStatus?.(stage);
       } else if (data?.id === id && data.type === "codeshare-java-running" && !running) {
+        interaction?.onStatus?.("Running Java");
         running = true; clearTimeout(timer); resume();
       } else if (data?.id === id && data.type === "codeshare-java-output" && interaction && running && typeof data.output === "string") {
         if (data.output.length > 70000) failure("Execution stopped: output exceeded 64 KB.");
