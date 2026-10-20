@@ -1,4 +1,5 @@
-> Current session work (2026-10-20), branch `codex/session-inactivity`, based on the
+> Current session work (2026-10-20), branch `codex/session-inactivity`,
+> [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), implementation `b24c89c`, based on the
 > documentation-only production-repair branch (PR #23): implemented the teacher's two-hour
 > and student's fifteen-minute inactivity sign-out. Server checks, trusted browser interaction,
 > one-minute warning, restored-tab refusal, shared-tab logout and live-pass deadlines are complete.
@@ -9,8 +10,9 @@
 > another tab, expired restored-session refusal and offline javac. See
 > [session verification](../verification/session-inactivity.md) for every test and limits,
 > and CKB-051 for diagnosis. Unsaved edits can be lost after the warning; old cookies need a
-> fresh sign-in on rollout. No migration or hosted change. Implementation ready for review;
-> next: commit/push the finished step, attach its PR, then teacher review/deployment.
+> fresh sign-in on rollout. No migration or hosted change. Implementation and rule removal
+> committed and pushed; PR attached. Nothing is in progress. Next: teacher review/deployment,
+> followed by the hosted Brave re-test. No merge or deployment was performed.
 
 > Current approved work (2026-10-20): [interactive online Java](online-java-interactive-input.md),
 > branch codex/online-java-interactive-input, implementation 7930d79, [PR #22](https://github.com/SirNeo-Coder/JavaShare/pull/22).

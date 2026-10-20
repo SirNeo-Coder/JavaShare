@@ -42,6 +42,7 @@ the new account out. No student work or credentials are stored in this metadata.
 - Removing the server idle check made the expiry regression fail. Restoring it passed all five server tests.
 - Skipping browser expiry made its assertions fail. Restoring it passed all browser-controller tests, including the later warning/continue and delayed-timer regressions.
 - Commands and full named results: [session verification](../../verification/session-inactivity.md).
+- Implementation commit: `b24c89c`, [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24).
 - Isolated rule/controller tests use a controlled clock; real-app evidence and untested areas are recorded separately there.
 
 ## Recurrence triage
