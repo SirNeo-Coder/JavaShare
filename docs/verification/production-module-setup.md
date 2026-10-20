@@ -7,7 +7,7 @@ SQL file only; application code and existing migrations were not changed.
 
 - `npm run build:all`: passed (Next.js pages and backend TypeScript).
 - `npm run lint`: 0 errors, 8 existing warnings.
-- `sg docker -c 'npm test'`: **98 passed, 0 failed, 0 skipped**.
+- `sg docker -c 'npm test'`: **125 passed, 0 failed, 0 skipped**.
 - `git diff --check`: passed.
 - `npm run kb:search -- 'production students missing module tables'`: CKB-050 first.
 - Initial `node --test tests/kb-search.test.mjs` in the restricted environment
@@ -49,6 +49,11 @@ session was repeated because the change contains only documentation and uses the
 existing migrations unchanged. The required teacher-run production checks are in
 [the repair guide](../production-module-setup.md).
 
+The first run on the starting branch passed 98/98. The documentation was then
+rebased onto current main to preserve newer work and assign the next unused case
+number, CKB-050. The final build, lint and 125-test suite were rerun on that base.
+All six migration source files are identical across those bases.
+
 ## Named tests, grouped by file
 
 Command for every group: `sg docker -c 'npm test'`.
@@ -61,6 +66,41 @@ Command for every group: `sg docker -c 'npm test'`.
 - ✔ router: the larger JSON body cap is scoped to the module-upload route, not every route
 - ✔ routes: register, stay signed in with the cookie, get a live pass, sign out
 - ✔ routes: a chat message's live signal finishes sending before the reply (CKB-006)
+
+### `tests/browser-java-bridge.test.mjs`
+
+- ✔ browser bridge: committed JAR matches its Java source
+- ✔ browser bridge: packages, inheritance, input and Unicode run together
+- ✔ browser bridge: compile error, stderr and crash after expected output all fail
+- ✔ browser bridge: combined stdout/stderr stops at 64 KB and missing classes cannot survive another run
+- ✔ browser bridge: flat browser strings become distinct source folders, including duplicate class names
+
+### `tests/browser-java-client.test.mjs`
+
+- ✔ browser Java: refuses same origin, insecure, credentialed and path-based runner addresses
+- ✔ browser Java: authenticates frame messages, sends every source/input/package, and tears down after result or timeout
+- ✔ browser Java: offline uses only the existing authenticated laptop endpoint
+- ✔ interactive Java: streams prompts, waits for blank and Unicode answers, and rejects stale or foreign input requests (CKB-049)
+- ✔ interactive Java: the five-second execution budget is cumulative across input waits
+- ✔ interactive Java: Stop preserves printed output and removes a waiting run
+- ✔ interactive Java: abandoned input stops after two minutes
+- ✔ interactive Java: total submitted input and streamed output stay bounded
+- ✔ interactive Java: streamed output stays bounded
+- ✔ interactive Java: an older runner fails clearly during independent deployments
+- ✔ interactive Java: a run cancelled before startup never appends its frame
+
+### `tests/browser-java-progress.test.mjs`
+
+- ✔ online Java progress: browser evidence obeys membership, exact output, successful exit, saved version and part access
+- ✔ online Java mode: missing address fails clearly; unsafe addresses are refused; legacy server mode remains available
+
+### `tests/browser-java-runtime.test.mjs`
+
+- ✔ browser runtime: only the parent starts Java; flat strings preserve duplicate filenames for the bridge
+- ✔ browser runtime: invalid sources and download failure report failure instead of progress
+- ✔ browser runtime: public asset policy permits CheerpJ's required nested runtime frame only (CKB-047)
+- ✔ browser runtime: live input waits for authenticated matching answers and streams output before completion (CKB-049)
+- ✔ browser runtime: live input cannot exceed the existing total input limit
 
 ### `tests/classroom-ui.test.mjs`
 
@@ -114,7 +154,7 @@ Command for every group: `sg docker -c 'npm test'`.
 
 ### `tests/module-activities.test.mjs`
 
-- ✔ module activities: JSON keeps the printed sample separate from the student's challenge
+- ✔ module activities: legacy challenge JSON remains readable while progress follows the sample
 - ✔ module activities: parts spanning lessons require every task and never require a paper liplet
 - ✔ module activities: matching text cannot pass a failed process; internal whitespace still matters
 - ✔ module activities: supporting classes survive and src aliases cannot duplicate Main.java (CKB-038)
@@ -122,6 +162,8 @@ Command for every group: `sg docker -c 'npm test'`.
 - ✔ module activities: compile errors and a crash after the right output cannot pass
 - ✔ module activities: prior project is copied only for its owner/class and later saves never replace it
 - ✔ module activities: JSON supplies fixed program input and demo execution cannot award a pass
+- ✔ weekly Java projects: personal drafts roll forward separately, preserve submissions and never advance module progress
+- ✔ module activities: offline ignores online runner address and refuses browser progress
 
 ### `tests/module-availability.test.mjs`
 
@@ -167,7 +209,7 @@ Command for every group: `sg docker -c 'npm test'`.
 ### `tests/student-module-activity-ui.test.mjs`
 
 - ✔ module activity screen: signing in starts safely before a class or project exists (CKB-044)
-- ✔ module activity screen: main Java editor has project tabs, challenge target, Console, Run code and Save work
+- ✔ module activity screen: main Java editor has project tabs, sample output, Console, Run code and Save work
 
 ### `tests/teacher-dashboard-ui.test.mjs`
 
@@ -204,4 +246,9 @@ Command for every group: `sg docker -c 'npm test'`.
 - ✔ a </script> inside JavaScript cannot break out of the inlined script
 - ✔ no index.html gives a friendly message
 - ✔ file names must fit the project language
+
+### `tests/weekly-java-project-ui.test.mjs`
+
+- ✔ weekly Java editor: module shows sample output and only module source
+- ✔ weekly Java editor: personal shows its own source, input and explicit submission
 

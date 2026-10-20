@@ -284,9 +284,10 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   before and seven true values after; existing test teacher/class rows survived,
   both new tables were empty and protected by row-level security. The temporary
   database was removed. Build passed, lint had 0 errors/8 existing warnings, full
-  suite passed 98/98 with no skips, and CKB-050 is the first matching search result.
+  suite passed 125/125 with no skips, and CKB-050 is the first matching search result.
   [Named tests, commands and limits](../verification/production-module-setup.md).
-- In progress: commit/push the repair documentation and open its review PR.
+- Preparation is complete and committed; final checks were repeated on current
+  main. In progress: push the repair documentation and open its review PR.
 - Next: teacher runs the prepared SQL in the correct hosted project's SQL Editor,
   verifies all readiness fields are true, refreshes Students/Curriculum, uploads
   the intended module, and checks student save/reload and refreshed progress.
