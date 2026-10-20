@@ -195,6 +195,14 @@ Command: `sg docker -c 'npm test -- --test-reporter=spec'`.
 
 ### tests/teacher-dashboard.test.mjs
 
+- ✔ refuses signed-out users, students, foreign teachers, and invalid class IDs
+- ✔ counts saved completion and both submissions, including closed lessons, without exposing source
+- ✔ keeps the same student's progress separate between classes and excludes former members
+- ✔ returns finite zero totals for empty classes and modules with no students
+- ✔ rounded 100% averages do not label unfinished students or modules Finished (CKB-041)
+- ✔ rounded 0% averages retain In progress when a student has completed an item (CKB-041)
+- ✔ reads every progress page instead of silently truncating a full year
+- ✔ a new read reflects saved results without changing student progress
 - ✔ teacher dashboard
 
 ### tests/teacher-web-projects.test.mjs
