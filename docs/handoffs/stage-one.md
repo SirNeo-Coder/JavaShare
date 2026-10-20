@@ -15,9 +15,10 @@
 > a different-site parent displayed its five-second timeout, and a fresh runner
 > hostname allowed normal execution again. No execution change is approved or included.
 > Implementation `90937ce` is complete; final integrated checks passed (148 tests).
-> No implementation remains in progress. Review-branch publication is the final step.
-> Next: teacher review, normal automatic
-> builds of both Workers, then affected-browser retest using the named Last stage.
+> Final evidence `df1619a` and implementation are committed and pushed. [PR #30](https://github.com/SirNeo-Coder/JavaShare/pull/30)
+> targets main and is attached to this chat. No approved work remains in progress.
+> Next: teacher review, normal automatic builds of both Workers after acceptance,
+> then affected-browser retest using the named Last stage.
 > Temporary local servers and disposable fixtures were cleaned up; existing servers
 > and the other checkout's work were preserved. No PR merge,
 > deploy, hosted settings, SQL or database push. No remaining approved implementation work.
