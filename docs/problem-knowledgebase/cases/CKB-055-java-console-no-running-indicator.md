@@ -1,6 +1,6 @@
 # CKB-055 — Console stays Ready while Java is loading or running
 
-- Status: regular Console correction verified; 143/143 suite and 20/20 real browser checks pass; original delivery PR #29
+- Status: regular Console correction verified; 148/148 integrated suite and 20/20 real browser checks pass; original delivery PR #29
 - First recorded: 2026-10-21
 - Last verified: 2026-10-21
 - Area: regular student/teacher Code editor Console (`app/page.tsx`), module/personal Console (`app/StudentModuleActivity.tsx`), `app/globals.css`
@@ -76,3 +76,5 @@ loading failures or change its execution limits.
   input waiting; explicitly authorized push/merge. Independent branch `codex/java-console-progress`.
 
 - 2026-10-21 — Teacher reported “I don’t see the animation” in the regular Code editor. Read-only investigation confirmed the missed caller; teacher approved the targeted correction. Branch `codex/classroom-java-progress`; latest regression proof and results are in the same verification report.
+
+Main startup repair PR #30 arrived during validation. Merge `398aa8c` preserves it; the final regular Console test requires its Opening Java runner text alongside the rotating indicator. Final integrated suite: 148/148; actual browser: 20/20.
