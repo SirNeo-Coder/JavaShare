@@ -97,9 +97,14 @@ Keep the rolling handoff for the current stage current: `docs/handoffs/stage-one
 
 ## Student module activities (agreed 2026-10-20)
 
-- JSON keeps worked examples separate from student activities and their required output.
-- Students edit and run activities in the main code editor, using one saved project per module
-  per student per class, including all supporting Java classes. Preserve previous and current work.
+- Each student has two separate Java projects per module per class: the module project and the
+  personal performance-task project. Each rolls forward from its own preceding week's work;
+  never mix the tracks or overwrite earlier weeks, current edits, or submitted snapshots.
+- The module project uses the module's sample code, all supporting Java classes, and exact expected
+  output. Successful runs complete its steps and unlock the next part. Legacy separate challenge
+  JSON remains readable but does not determine module progression.
+- Both projects use the main code editor. Saving or running the personal project is not submission
+  or grading, and never completes a module step. Submit the personal version explicitly.
 - Successful code execution with the required output completes a task; all tasks in a part unlock
   the next part automatically for that student. Teacher availability switches do not gate progress.
 - Handwritten liplets are submitted to the teacher and assessed separately; they do not block

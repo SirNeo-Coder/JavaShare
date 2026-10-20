@@ -7,7 +7,7 @@ import { api } from "./apiClient";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 
 export default function ModuleWorkspace({ classroomId, role, browserOpen, projectsOpen, onBrowserChange, onStartActivity, progressRevision = 0 }: {
-  onStartActivity: (module: CourseModule, step: StepBlock) => Promise<void>; progressRevision?: number;
+  onStartActivity: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
   classroomId: string; role: "teacher" | "student"; browserOpen: boolean; projectsOpen: boolean; onBrowserChange: (open: boolean) => void;
 }) {
   const [error, setError] = useState("");

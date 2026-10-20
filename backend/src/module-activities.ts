@@ -3,8 +3,8 @@ import type { CourseModule } from "./course-module-schema.ts";
 export type ModuleFile = { path: string; content: string };
 export type ActivityStep = Extract<CourseModule["lessons"][number]["blocks"][number], { type: "step" }>;
 
-// Adding a distinct challenge must not inherit a pass earned by running the old sample.
-export function activityStateId(step: { id: string; activity?: unknown }) { return step.activity ? `${step.id}:activity` : step.id; }
+// Progress follows the printed sample. Legacy challenge results stay stored separately.
+export function activityStateId(step: { id: string }) { return step.id; }
 
 // Same author-defined parts as the worksheet, including parts spanning several lessons.
 export function activityParts(module: CourseModule) {
@@ -47,5 +47,7 @@ export function mergeProjectFiles(...groups: ModuleFile[][]) {
 }
 
 export function matchesActivityOutput(result: { success: boolean; output: string }, expected: string) {
-  return result.success && result.output.replace(/\r\n/g, "\n").trim() === expected.replace(/\r\n/g, "\n").trim();
+  // Ignore platform line endings and one final println terminator, never spaces or blank lines.
+  const text = (value: string) => value.replace(/\r\n/g, "\n").replace(/\n$/, "");
+  return result.success && text(result.output) === text(expected);
 }

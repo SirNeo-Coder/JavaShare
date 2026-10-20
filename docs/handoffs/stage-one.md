@@ -1,3 +1,11 @@
+> Current approved work (2026-10-20): [two weekly Java projects](weekly-java-projects.md),
+> branch `codex/weekly-java-projects`, [PR #20](https://github.com/SirNeo-Coder/JavaShare/pull/20),
+> isolated from the other checkout's unfinished merge. Build and 101/101 tests passed; lint has
+> 0 errors/8 existing warnings. Main-editor module/personal projects were checked locally.
+> Module progression uses printed sample output; a separate personal performance project rolls
+> forward independently. Online multi-file Java is the next step. See the feature handoff for
+> exact verification and remaining decisions. No hosted changes or deployment authorized.
+
 # CodeShare — Stage One Progress
 
 > Delivered to main: [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19), merge `b81b5db`, 2026-10-20, under the teacher’s explicit push-to-main request. Includes the tested dashboard/student-entry prerequisites; 98 tests passed.

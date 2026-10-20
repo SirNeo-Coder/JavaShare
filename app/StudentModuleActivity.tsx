@@ -3,11 +3,12 @@
 import { useImperativeHandle, useRef, useState, type Ref } from "react";
 import CodeEditor from "./CodeEditor";
 import { api } from "./apiClient";
-import type { ModuleFile, Progress } from "./ModuleViewer";
+import type { CourseModule, ModuleFile, Progress } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
 import { sourcePath } from "../backend/src/module-activities";
 
 export type StudentActivity = {
+  kind: "module" | "performance"; module: CourseModule;
   classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
 };
@@ -16,18 +17,21 @@ export type ModuleEditorHandle = { save: () => Promise<void> };
 export default function StudentModuleActivity({ activity, ref, onChecked, onClose }: {
   activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void;
 }) {
-  const [files, setFiles] = useState<ModuleFile[]>(activity.progress.projectFiles);
+  const personal = activity.kind === "performance";
+  const [files, setFiles] = useState<ModuleFile[]>(personal ? activity.progress.performanceProjectFiles : activity.progress.projectFiles);
+  const [stdin, setStdin] = useState("");
   const [path, setPath] = useState(files.find((file) => /(?:^|\/)Main\.java$/.test(file.path))?.path ?? files[0]?.path ?? "");
   const [newPath, setNewPath] = useState("");
   const [addingFile, setAddingFile] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [output, setOutput] = useState("Ready — edit your project, then press Run code.");
-  const [status, setStatus] = useState(activity.progress.stepStates[activity.stateId] === "pass" ? "Passed" : "Not checked yet");
+  const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Passed" : "Not checked yet");
   const progress = useRef(activity.progress);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
   const busyRef = useRef(false);
   const base = `/api/classrooms/${activity.classroomId}/modules/${activity.moduleId}/progress`;
+  const projectPath = `${base}/${personal ? "performance-project" : "project"}`;
   const dirty = JSON.stringify(files) !== savedFiles;
 
   const save = async () => {
@@ -35,7 +39,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     if (!dirty) return;
     busyRef.current = true; setBusy(true); setError("");
     try {
-      progress.current = await api<Progress>(`${base}/project`, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
       setSavedFiles(JSON.stringify(files));
     } finally { busyRef.current = false; setBusy(false); }
   };
@@ -46,18 +50,37 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     busyRef.current = true; setBusy(true); setError("");
     try {
       // Save first so failures or an unavailable runner never discard the student's edits.
-      progress.current = await api<Progress>(`${base}/project`, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
       setSavedFiles(JSON.stringify(files));
-      const result = await api<{ output: string; passed: boolean; progress: Progress }>(`${base}/run`, {
-        method: "POST", body: JSON.stringify({ stepId: activity.stepId, files, updatedAt: progress.current.updatedAt }),
-      });
-      progress.current = result.progress;
-      setOutput(result.output);
-      setStatus(result.passed ? "Passed" : "Try again — this run did not match the required outcome");
-      onChecked();
+      if (personal) {
+        const result = await api<{ output: string }>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin }) });
+        setOutput(result.output);
+      } else {
+        const result = await api<{ output: string; passed: boolean; progress: Progress }>(`${base}/run`, {
+          method: "POST", body: JSON.stringify({ stepId: activity.stepId, files, updatedAt: progress.current.updatedAt }),
+        });
+        progress.current = result.progress;
+        setOutput(result.output);
+        setStatus(result.passed ? "Passed" : "Try again — this run did not match the expected output");
+        onChecked();
+      }
     } catch (runError) {
       setError(runError instanceof Error ? runError.message : "Could not run this activity");
     } finally { busyRef.current = false; setBusy(false); }
+  };
+
+  const submit = async () => {
+    if (busyRef.current) return;
+    try {
+      await save();
+      if (busyRef.current) return;
+      busyRef.current = true; setBusy(true); setError("");
+      progress.current = await api<Progress>(`${base}/performance-task`, {
+        method: "PUT", body: JSON.stringify({ variant: "own", files, status: "pass", updatedAt: progress.current.updatedAt }),
+      });
+      setStatus("Submitted"); onChecked();
+    } catch (submitError) { setError(submitError instanceof Error ? submitError.message : "Could not submit your project"); }
+    finally { busyRef.current = false; setBusy(false); }
   };
 
   const addFile = (event: React.FormEvent) => {
@@ -77,19 +100,19 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       if (event.ctrlKey && event.key === "Enter") { event.preventDefault(); void run(); }
     }}>
       <section className="editor-card">
-        <div className="workspace-card-heading"><b>Code editor · {activity.moduleTitle}</b><span>Java</span></div>
-        <div className="file-tabs" aria-label="Module project files">
+        <div className="workspace-card-heading"><b>{personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>Java</span></div>
+        <div className="file-tabs" aria-label={personal ? "Personal project files" : "Module project files"}>
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
-          <button type="button" className="add-file" aria-label="Add module Java file" disabled={busy} onClick={() => setAddingFile(!addingFile)}>＋</button>
+          <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy} onClick={() => setAddingFile(!addingFile)}>＋</button>
         </div>
         <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={busy} onChange={(content) => setFiles((current) => current.map((file) => file.path === path ? { ...file, content } : file))} />
-        <div className="editor-status"><span>{path}</span><span>{dirty ? "Unsaved changes — click Save work" : "Your module project is saved"}</span></div>
+        <div className="editor-status"><span>{path}</span><span>{dirty ? "Unsaved changes — click Save work" : "Your project is saved"}</span></div>
       </section>
       <aside className="right-panel module-activity-console">
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
-          <b>Your activity</b><p>{activity.instruction}</p>
-          <b>Required output</b><pre>{activity.expectedOutput}</pre>
+          <b>{personal ? "Your performance task" : "Module sample"}</b><p>{activity.instruction}</p>
+          {personal ? <label>Program input<textarea value={stdin} onChange={(event) => setStdin(event.target.value)} /></label> : <><b>Expected output</b><pre>{activity.expectedOutput}</pre></>}
           {activity.stdin && <><b>Program input for this check</b><pre>{activity.stdin}</pre></>}
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
@@ -99,7 +122,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div><button type="button" className="run-button" disabled={busy} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button><button type="button" className="run-button" disabled={busy} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button></div>
+      <div>{personal && <button type="button" className="run-button" disabled={busy} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button><button type="button" className="run-button" disabled={busy} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button></div>
     </footer>
   </>;
 }

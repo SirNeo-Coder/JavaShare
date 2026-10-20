@@ -1227,7 +1227,7 @@ type ModulePerformanceEntry = { files: Array<{ path: string; content: string }>;
 type ModuleProgressRow = {
   student_id: string; classroom_id: string; module_id: string;
   step_states: Record<string, ModuleStepStatus>;
-  performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>>;
+  performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>> & { project?: { files: ModuleFile[] } };
   project_files: Array<{ path: string; content: string }>;
   updated_at: string;
 };
@@ -1296,6 +1296,7 @@ async function updateModuleProgressWithMerge(
 function moduleProgressView(row: ModuleProgressRow, module: CourseModule) {
   return {
     moduleId: row.module_id, stepStates: row.step_states, performanceTask: row.performance_task,
+    performanceProjectFiles: row.performance_task.project?.files ?? [],
     projectFiles: row.project_files, percent: moduleCompletionPercent(module, row), updatedAt: row.updated_at,
   };
 }
@@ -1329,7 +1330,7 @@ export async function setSupabaseModuleStepState(user: SupabaseSessionUser, clas
 
 export async function setSupabaseModulePerformanceTask(
   user: SupabaseSessionUser, classroomId: string, moduleId: string, variant: ModulePerformanceVariant,
-  files: Array<{ path: string; content: string }>, status: ModuleStepStatus,
+  files: Array<{ path: string; content: string }>, status: ModuleStepStatus, updatedAt?: string,
 ) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
@@ -1340,10 +1341,53 @@ export async function setSupabaseModulePerformanceTask(
   if (!activityAccess(courseRow.content, progress.step_states).performanceTaskOpen) throw new SupabaseRepositoryError(403, "Complete the module activities before the performance task");
   const data = await updateModuleProgressWithMerge(
     user, classroomId, moduleId,
-    (row) => ({ performance_task: { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } } }),
+    (row) => {
+      if (updatedAt && row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "This project changed in another tab. Reopen it before submitting");
+      return { performance_task: { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } } };
+    },
     "Could not save performance task submission",
   );
   return moduleProgressView(data, courseRow.content);
+}
+
+// A working project is not a submission. Keep it beside the existing sample/own snapshots
+// in performance_task JSON, so saving and running cannot silently mark the task submitted.
+async function requirePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have performance projects");
+  await requireClassroomMember(user, classroomId);
+  await enforceModuleLiveLock(user, classroomId, moduleId);
+  const courseRow = await loadCourseModuleRow(classroomId, moduleId);
+  if (!courseRow.content.performanceTask) throw new SupabaseRepositoryError(404, "Performance task not found in this module");
+  const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
+  if (!activityAccess(courseRow.content, progress.step_states).performanceTaskOpen) throw new SupabaseRepositoryError(403, "Complete the module activities before the performance task");
+  return { content: courseRow.content, progress };
+}
+
+export async function prepareSupabasePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  const { content, progress } = await requirePerformanceProject(user, classroomId, moduleId);
+  let previous: ModuleFile[] = [];
+  if (content.previousModuleId && !progress.performance_task.project && !progress.performance_task.own) {
+    const { data, error } = await getSupabaseAdmin().from("module_progress").select("performance_task")
+      .eq("student_id", user.id).eq("classroom_id", classroomId).eq("module_id", content.previousModuleId).maybeSingle();
+    fail(error, "Could not load the previous personal project");
+    previous = data?.performance_task?.project?.files ?? data?.performance_task?.own?.files ?? [];
+  }
+  const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
+    const files = mergeProjectFiles(content.starterFiles, content.performanceTask!.starterFiles, previous,
+      row.performance_task.project?.files ?? row.performance_task.own?.files ?? []);
+    if (files.length > 50 || files.some((file) => file.path.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(file.path))) throw new SupabaseRepositoryError(400, "This performance task needs at most 50 valid Java files");
+    return { performance_task: { ...row.performance_task, project: { files } } };
+  }, "Could not open your personal project");
+  return moduleProgressView(saved, content);
+}
+
+export async function saveSupabasePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string, files: ModuleFile[], updatedAt: string) {
+  const { content } = await requirePerformanceProject(user, classroomId, moduleId);
+  const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
+    if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "This personal project changed in another tab. Reopen it before saving");
+    return { performance_task: { ...row.performance_task, project: { files } } };
+  }, "Could not save your personal project");
+  return moduleProgressView(saved, content);
 }
 
 async function requireModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string) {
@@ -1368,7 +1412,7 @@ export async function prepareSupabaseModuleActivity(user: SupabaseSessionUser, c
     fail(error, "Could not load the previous module project");
     previous = data?.project_files ?? [];
   }
-  const files = mergeProjectFiles(content.starterFiles, step.activity?.files ?? step.files, previous);
+  const files = mergeProjectFiles(content.starterFiles, step.files, previous);
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId,
     (row) => {
       const project = mergeProjectFiles(files, row.project_files);
@@ -1390,9 +1434,9 @@ export async function runSupabaseModuleActivity(
   const saved = JSON.stringify(files) === JSON.stringify(beforeRun.project_files)
     ? moduleProgressView(beforeRun, content)
     : await setSupabaseModuleProjectFiles(user, classroomId, moduleId, files, updatedAt);
-  const result = await execute(files, step.activity?.stdin ?? "");
+  const result = await execute(files, step.stdin ?? "");
   if (result.mode === "demo") throw new SupabaseRepositoryError(503, "Java execution is unavailable here. Run this activity in offline classroom mode");
-  const passed = matchesActivityOutput(result, step.activity?.expectedOutput ?? step.expectedOutput);
+  const passed = matchesActivityOutput(result, step.expectedOutput);
   const progress = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     // A changed project must not receive a result from an earlier run.
     if (row.updated_at !== saved.updatedAt) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");

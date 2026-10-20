@@ -1,7 +1,6 @@
 // Validates a module upload against docs/course-format.md so a malformed file is rejected with
 // a plain-English error instead of corrupting a class. Keep this in sync with that doc.
 import { z } from "zod";
-import { activityStateId } from "./module-activities.ts";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "./file-paths.ts";
 
 const file = z.object({ path: z.string().trim().min(1).max(200), content: z.string().max(200000) });
@@ -23,8 +22,9 @@ const block = z.discriminatedUnion("type", [
     files: z.array(file).min(1).max(50),
     run: z.string().trim().min(1).max(200).optional(),
     expectedOutput: z.string().max(100000),
+    stdin: z.string().max(10000).optional(),
     checkYourself: z.string().max(5000).optional(),
-    // Sample files/output remain the printed example; activity describes the student's challenge.
+    // Legacy separate challenge data remains readable; sample files/output control progress.
     activity: z.object({
       instruction: z.string().trim().min(1).max(5000),
       files: z.array(file).max(50).default([]),
@@ -101,7 +101,7 @@ export const courseModule = z.object({
   // Lesson ids also identify availability switches, so they must not collide (CKB-019).
   const progressIds = module.lessons.flatMap((lesson) => [
     lesson.id, lesson.exitSlip.id,
-    ...lesson.blocks.filter((block) => block.type === "step").flatMap((block) => block.activity ? [block.id, activityStateId(block)] : [block.id]),
+    ...lesson.blocks.filter((block) => block.type === "step").flatMap((block) => block.activity ? [block.id, `${block.id}:activity`] : [block.id]),
   ]);
   return module.previousModuleId !== module.id && progressIds.length === new Set(progressIds).size;
 }, { message: "Two lessons, steps or exit slips in this module share the same id - their ids must be unique across the whole module" })

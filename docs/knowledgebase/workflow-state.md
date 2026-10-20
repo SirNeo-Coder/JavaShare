@@ -22,35 +22,37 @@ What teachers and students can do today. Compare any proposed change with this p
 - Session identity reuses the current activity or presentation project id, without a new database column. If the same activity/presentation stops and restarts entirely while disconnected, a previously dismissed invitation may remain dismissed; a persisted session-start marker would be needed to distinguish that case.
 - Each class's roster, modules, progress, teams, activities, and live-share state stay separate. Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
 
-## Weekly modules: student activities (approved workflow change, 2026-10-20)
+## Weekly Java projects (approved workflow change, 2026-10-20)
 
-- Selecting a module loads the student's saved module project into the main code editor and opens
-  its worksheet. **Work in code editor** closes the worksheet so the student can edit the project.
-  The module shows the unchanged worked sample and, when authored in JSON, a distinct activity
-  and required output. Old JSON steps still use their original sample as the activity.
-- Each student has separate files for every module in each class. Module starter files supply
-  supporting classes such as Vehicle and Jeepney. Optional `previousModuleId` copies this
-  student's previous module project once, without modifying it. Opening later activities adds
-  missing files and keeps all edits. **Save work** saves this module's working files; **Run code**
-  saves and compiles them together. Switching activities/projects/classes or signing out saves
-  the active module first; a failed save blocks that transition. Reloading before saving can
-  still lose unsaved edits, as with the existing classroom editor.
-- The first part opens automatically. Passing every required activity in a part opens the next
-  for that student immediately. The server withholds locked content and rejects premature runs
-  and direct pass flags. Output must match after successful compilation/execution. Failed later
-  practice runs keep an earlier pass. Teacher preview still shows every part.
-- Handwritten liplets are submitted to the teacher and assessed separately; no student checkbox
-  or teacher marking is needed to unlock the next part. Completion percentages now count passed
-  steps and performance-task submissions, excluding liplets. Existing paper flags remain saved.
-- **Performance task** opens after the lesson activities pass. Its existing two submission slots
-  and assessment workflow are retained; this change implements the lesson activities first.
-- Teacher **Open to students** switches are removed from the module viewer. Stored choices and
-  the old API remain compatible, but no longer gate students. Existing module ids, sources,
-  progress and submissions are kept. Reuploading added requirements can reduce the percentage.
-- Automatic activity checking currently supports Java through the existing runner. Offline mode
-  compiles all project files on the laptop. Hosted Java remains demo/single-file according to
-  existing configuration; unavailable execution cannot pass an activity. No new internet asset,
-  hosted setting change, dependency or database migration.
+- Each student has a **Module project** and a **Personal performance-task project** for every
+  module in each class. Both use the main Java editor, supporting class tabs, Add file,
+  **Save work** and **Run code**. The Projects drawer offers both for the selected module;
+  the worksheet's **Work in code editor** and **Work on performance task** open the same projects.
+- Module progress checks the printed sample's `files`, `expectedOutput` and optional `stdin`.
+  Legacy `activity` JSON and challenge results stay stored, but no longer determine progression.
+  The sample step id is the completion key; old `:activity` passes do not unlock sample steps.
+  Compilation and execution must succeed. Match spaces/blank lines exactly; normalize CRLF
+  and allow one final newline (Java println). Failed exploratory runs retain earlier passes.
+- The first part opens automatically. Every required sample step in a part must pass to unlock
+  the next part for that student. Locked content and premature requests are refused server-side.
+  Handwritten liplets are assessed separately and do not gate progress. Teacher availability
+  switches do not gate progress. The existing weekly live-class lock remains enforced.
+- `previousModuleId` links the preceding week. Module files copy only the previous module project;
+  personal files copy only the previous personal working project (or its submitted own version
+  for older records). Supporting starter classes are added; existing student files win. Each
+  copy is saved independently and never changes the preceding week. The teacher must supply
+  the stable link in weekly JSON; a missing link starts with the supplied starter files.
+- The personal task opens after the module steps pass, as before. **Run code** accepts personal
+  program input and does not check a module target. **Submit this version** saves a separate
+  own-version snapshot. Later draft edits do not change that submission. Existing sample and
+  own submission records, completion totals and assessment are preserved; output is not a grade.
+- Opening another project/module/class or signing out saves the active project first; save
+  failures stop the transition. New saves/submissions reject stale tabs. Reload before saving
+  can still lose unsaved edits. The personal draft is `performance_task.project.files`, separate
+  from `performance_task.sample` and `.own`; drafts never count as submissions. No migration.
+- Offline Java compiles all project files on the laptop, including Java packages with Main.java.
+  Online multi-file execution is the next step; current hosted demo/single-file limitations remain.
+
 
 ## Students
 

@@ -220,6 +220,7 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
   const [moduleActivity, setModuleActivity] = useState<StudentActivity | null>(null);
+  const [weeklySelection, setWeeklySelection] = useState<{ studentId: string; classroomId: string; module: CourseModule } | null>(null);
   const [moduleProgressRevision, setModuleProgressRevision] = useState(0);
   const moduleEditorRef = useRef<ModuleEditorHandle>(null);
   const [projectsOpen, setProjectsOpen] = useState(false);
@@ -359,17 +360,18 @@ export default function Home() {
     activeSavedWork?.projectId === activeProjectId ? activeSavedWork : null;
   const currentModuleProject = moduleProjectForClass(moduleActivity, data?.classrooms[0]?.id, user?.role);
   const workspaceTitle = currentModuleProject
-    ? currentModuleProject.moduleTitle :
+    ? `${currentModuleProject.kind === "performance" ? "Personal project" : "Module project"} · ${currentModuleProject.moduleTitle}` :
     user?.role === "student" && currentSavedCopy
       ? currentSavedCopy.label
       : team?.name || "Workspace";
   const workspaceSubtitle = currentModuleProject
-    ? "Your saved module project" :
+    ? currentModuleProject.kind === "performance" ? "Your saved personal performance-task project" : "Your saved module project" :
     user?.role === "student" && currentSavedCopy
       ? `Saved copy · ${activeFile?.path || "Java project"}`
       : `${team?.project?.title || "Java project"} · ${activeFile?.path || ""}`;
   const userId = user?.id;
   const classroomId = data?.classrooms[0]?.id;
+  const weeklyModule = weeklySelection && user?.role === "student" && weeklySelection.studentId === user.id && weeklySelection.classroomId === classroomId ? weeklySelection.module : null;
   memberPhotoUrlsRef.current = new Map(
     data?.teams.flatMap((entry) =>
       entry.members.map(
@@ -1677,16 +1679,20 @@ export default function Home() {
       );
     }
   }
-  async function startModuleActivity(module: CourseModule, step: StepBlock) {
+  async function startModuleActivity(module: CourseModule, step?: StepBlock) {
     if (!classroomId || user?.role !== "student") return;
     await moduleEditorRef.current?.save();
     await persistCurrentCode();
-    const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/activity`, {
-      method: "POST", body: JSON.stringify({ stepId: step.id }),
+    const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/${step ? "activity" : "performance-project"}`, {
+      method: "POST", body: JSON.stringify(step ? { stepId: step.id } : {}),
     });
-    setModuleActivity({ classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step.id, stateId: activityStateId(step),
-      instruction: step.activity?.instruction ?? step.instruction,
-      expectedOutput: step.activity?.expectedOutput ?? step.expectedOutput, stdin: step.activity?.stdin ?? "", progress });
+    // The worksheet may have been opened before the final module step unlocked the task.
+    const currentModule = step ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
+    setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
+    setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
+      classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "",
+      instruction: step?.instruction ?? currentModule.performanceTask?.markdown ?? "",
+      expectedOutput: step?.expectedOutput ?? "", stdin: step?.stdin ?? "", progress });
     setProjectsOpen(false);
   }
 
@@ -2144,6 +2150,18 @@ export default function Home() {
             accept="image/jpeg,image/png,image/webp"
             onChange={uploadStudentPhoto}
           />
+          {weeklyModule && <div className="team-list" aria-label="Weekly Java projects">
+            <b>{weeklyModule.title}</b>
+            <div className={`team-card ${currentModuleProject?.kind === "module" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Module project" onClick={async () => {
+              const step = weeklyModule.lessons.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
+              try { if (step) await startModuleActivity(weeklyModule, step); }
+              catch (error) { notify(error instanceof Error ? error.message : "Could not open module project"); }
+            }}><span className="team-icon">J</span><span className="team-copy"><b>Module project</b></span></button></div>
+            <div className={`team-card ${currentModuleProject?.kind === "performance" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Personal performance-task project" onClick={async () => {
+              try { await startModuleActivity(weeklyModule); }
+              catch (error) { notify(error instanceof Error ? error.message : "Could not open personal project"); }
+            }}><span className="team-icon">J</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>
+          </div>}
           <div className="team-list">
             {data.teams.map((item, index) => {
               const online = item.members.some((member) =>
@@ -2156,7 +2174,7 @@ export default function Home() {
                 item.isGroup && activeTeam === index && (teacherGroupView || (user.role === "student" && item.leaderId === user.id));
               return (
                 <div
-                  className={`team-card ${activeTeam === index ? "active" : ""} ${user.role === "teacher" && !online && !item.isTeacherWorkspace ? "offline" : ""} ${item.isTeacherWorkspace ? "teacher-workspace" : ""} ${item.isGroup ? "group-card" : ""}`}
+                  className={`team-card ${activeTeam === index && !currentModuleProject ? "active" : ""} ${user.role === "teacher" && !online && !item.isTeacherWorkspace ? "offline" : ""} ${item.isTeacherWorkspace ? "teacher-workspace" : ""} ${item.isGroup ? "group-card" : ""}`}
                   key={`${item.id}:${item.project?.id || index}`}
                 >
                   <button
@@ -2294,7 +2312,12 @@ export default function Home() {
               );
             })}
           </div>
-          <div className="assignment-block">
+          {currentModuleProject ? <div className="assignment-block">
+            <span className="eyebrow">{currentModuleProject.kind === "performance" ? "PERSONAL PERFORMANCE TASK" : "MODULE PROJECT"}</span>
+            <h3>{currentModuleProject.moduleTitle}</h3>
+            <p>{currentModuleProject.kind === "performance" ? "Your own Java project, continued from the previous week. Saving and running do not submit it." : "Use the module sample code and match its expected output to progress."}</p>
+            <p>Java files are in the editor tabs.</p>
+          </div> : <div className="assignment-block">
             <span className="eyebrow">CURRENT ASSIGNMENT</span>
             <h3>{team.project?.title}</h3>
             <p>{team.project?.description}</p>
@@ -2308,7 +2331,7 @@ export default function Home() {
             <button className="brief-button">
               View assignment brief <span>↗</span>
             </button>
-          </div>
+          </div>}
           <button className="all-teams">
             ⌘ Classroom repository <span>{data.teams.length}</span>
           </button>
@@ -2319,7 +2342,7 @@ export default function Home() {
           >
             <span>
               {user.role === "student"
-                ? moduleActivity ? "MODULE PROJECT" : currentSavedCopy
+                ? moduleActivity ? moduleActivity.kind === "performance" ? "PERSONAL PERFORMANCE TASK" : "MODULE PROJECT" : currentSavedCopy
                   ? "EDITING SAVED COPY"
                   : "MY PRACTICE CODE"
                 : team.isTeacherWorkspace
@@ -2328,7 +2351,7 @@ export default function Home() {
             </span>
             <b>
               {user.role === "student"
-                ? moduleActivity ? "Your module project" : currentSavedCopy
+                ? moduleActivity ? moduleActivity.kind === "performance" ? "Your personal project" : "Your module project" : currentSavedCopy
                   ? currentSavedCopy.label
                   : "Current practice workspace"
                 : team.isTeacherWorkspace
@@ -2337,7 +2360,7 @@ export default function Home() {
             </b>
             {user.role === "student" && (
               <small>
-                {moduleActivity ? "Save work keeps this module’s files" : currentSavedCopy
+                {moduleActivity ? "Save work keeps this project’s files" : currentSavedCopy
                   ? "Save work updates this named copy"
                   : "Save work creates a new named copy"}
               </small>
@@ -2442,7 +2465,7 @@ export default function Home() {
             </div>
           </div>
           {currentModuleProject ? <StudentModuleActivity
-            key={`${currentModuleProject.moduleId}:${currentModuleProject.stepId}:${currentModuleProject.progress.updatedAt}`}
+            key={`${currentModuleProject.kind}:${currentModuleProject.moduleId}:${currentModuleProject.stepId}:${currentModuleProject.progress.updatedAt}`}
             activity={currentModuleProject} ref={moduleEditorRef}
             onChecked={() => setModuleProgressRevision((revision) => revision + 1)}
             onClose={() => setModuleActivity(null)}
