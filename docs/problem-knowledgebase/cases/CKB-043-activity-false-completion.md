@@ -47,3 +47,11 @@ pass before reusing it for newly added work.
 ## History
 
 - 2026-10-20 — Found and fixed while implementing the teacher-approved student activity workflow.
+
+## Current workflow clarification (2026-10-20)
+
+The original implementation used `<step id>:activity`. CKB-045 later established sample-only
+progression and preserved those legacy records. CKB-052 now opts into alterations only with
+an explicit stable `activity.id`, stored under `task:<id>`. Unnamed legacy activities still
+follow their sample. The process-success regression remains required in both modes. The
+current explicit-id tests prove old sample/challenge passes cannot complete a new task.

@@ -43,3 +43,5 @@ existing Java-only `running` flag. The strip stays visible when interactive star
 output text. Input waiting replaces its loading/running wording; success, failure and Stop clear
 it. Only the output pre is marked busy, leaving the status outside that accessibility boundary.
 Web previews, saved-work lists and plain Save work do not show Java progress.
+
+Module samples and alterations: `StudentModuleActivity.tsx` restores per-step drafts and shows `ModuleRunFeedback` alongside the existing Java-running indicator. The worksheet and project buttons use `moduleResumeStep` in `moduleParts.ts` to continue unfinished work.

@@ -613,3 +613,12 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
   color: #451a03;
   box-shadow: 0 2px 10px #0003;
 }
+
+.module-run-feedback { flex:none; padding:14px 16px; border-top:1px solid #53627b; border-bottom:1px solid #53627b; background:#24344b; color:#e8efff; font-size:14px; line-height:1.5; }
+.module-run-feedback strong { display:block; font-size:16px; }
+.module-run-feedback p { margin:5px 0 0; }
+.module-run-feedback.passed { border-color:#387d65; background:#153e32; color:#d7ffeb; }
+.module-run-feedback.retry { border-color:#ad7930; background:#463313; color:#ffe9b8; }
+.module-before-sample { margin-top:12px; font-size:12px; }
+.module-before-sample summary { cursor:pointer; }
+.module-activity-console .console>b { display:block; margin-bottom:10px; font:700 13px/1.5 var(--font-geist),sans-serif; }

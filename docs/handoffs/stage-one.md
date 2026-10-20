@@ -422,3 +422,32 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - `codeshare-knowledge-base`: knowledge base, stacked on (b)
   - `realtime-c1`: PR (c1), stacked on the knowledge base
   - `cloudflare-c2`: PR (c2), stacked on c1
+
+## Module resume and meaningful exercises — 2026-10-21
+
+- Approved by the teacher: reopen the next unfinished step, auto-load each complete sample,
+  restore previous step edits, keep personal work separate, and make Week 12/13 alterations
+  exercise lesson logic through changed output, using Week 14 as the reference.
+- Branch: `codex/module-resume-and-logic-tasks`, based on `codex/classroom-drawer-controls`.
+  Work is isolated in `/tmp/codeshare-module-resume`; primary checkout is preserved.
+- Done: prepared task/sample-first/Week 12–13 changes integrated with current Console/drawer
+  fixes; shared saved-progress resume; seven improved exercise requirements with new ids.
+  CKB-052/054 updated and CKB-058 added. Required history migration is the unchanged prepared
+  additive file. Hosted actions remain teacher-only.
+- Verified: production build, offline launcher and whitespace checks passed; lint zero errors/eight
+  existing warnings; full suite 221/221, actual offline/online resume browser 11/11, revised exercises
+  on browser Java 8 8/8. Both deliberate-break regressions failed and passed after restoration.
+  Final named checks and limits: `docs/verification/module-resume-and-logic-tasks.md`.
+- Delivered: implementation `ad7efe6`, pushed on `codex/module-resume-and-logic-tasks`;
+  [PR #33](https://github.com/SirNeo-Coder/JavaShare/pull/33) now targets main after PR #32 merged.
+  No code work remains in progress. Next: teacher review and documented migration/app/JSON rollout.
+  Do not merge or change hosted services. Temporary verification servers were stopped; the original
+  classroom and primary checkout remain intact. Continue from `docs/handoffs/rolling-module-tasks.md`.
+
+- History migration update (2026-10-21): teacher screenshots show **Success. No rows returned**
+  and the verification row `activity_projects | jsonb | NO` in the selected Supabase project.
+  No assistant hosted SQL was run; project identity was not independently verified.
+- Prerequisite update: teacher merged PR #32 as `e421fe0`; confirmed through GitHub metadata.
+  Retargeted PR #33 from the drawer branch to main; verified open/unmerged/mergeable.
+  Next: teacher reviews/merges #33 into main, completes app rollout, and uploads revised
+  Week 12/13/14 JSON. Hosted feature verification remains pending. No assistant merge/deploy.

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./apiClient";
 import { runJava } from "./javaExecution";
 import JavaRunnerBrand from "./JavaRunnerBrand";
-import { groupModuleParts, modulePartPages } from "./moduleParts";
+import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
 import { activityStateId } from "../backend/src/module-activities";
 import ModuleCatalogCard from "./ModuleCatalogCard";
 
@@ -39,7 +39,7 @@ async function runFiles(files: ModuleFile[], stdin = "") {
 export type ModuleFile = { path: string; content: string };
 export type StepBlock = {
   locked?: boolean;
-  activity?: { instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string };
+  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string };
   part?: string;
   type: "step";
   id: string;
@@ -48,6 +48,7 @@ export type StepBlock = {
   language: string;
   files: ModuleFile[];
   expectedOutput: string;
+  expectedError?: string;
   stdin?: string;
   checkYourself?: string;
 };
@@ -75,7 +76,7 @@ type PerformanceTask = {
   totalPoints: number;
 };
 type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
-export type CourseModule = { continues?: string; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
+export type CourseModule = { continues?: string; sampleFirst?: boolean; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
 type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean };
 type StepStatus = "pass" | "fail";
 export type Progress = {
@@ -84,6 +85,7 @@ export type Progress = {
   performanceProjectFiles: ModuleFile[];
   percent: number;
   updatedAt: string;
+  activityProjects?: import("../backend/src/module-activities").ActivityProjects;
   // Covers both step blocks and a lesson's exitSlip, keyed by whichever's own "id" - one flag
   // per module couldn't tell lessons apart (CKB-007).
   stepStates: Record<string, StepStatus>;
@@ -143,8 +145,8 @@ export function ModulePaperBlock({ block }: { block: OtherBlock }) {
   </div>;
 }
 
-function StepView({ step, status, role, printed = false, onStart }: {
-  step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; onStart?: () => Promise<void>;
+function StepView({ step, status, role, printed = false, sampleFirst = false, onStart }: {
+  step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; sampleFirst?: boolean; onStart?: () => Promise<void>;
 }) {
   const [files, setFiles] = useState(step.files);
   const [output, setOutput] = useState<string | null>(null);
@@ -155,17 +157,20 @@ function StepView({ step, status, role, printed = false, onStart }: {
     catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
     finally { setBusy(false); }
   };
-  if (step.locked) return <p className="module-preview-note">Complete the previous part to unlock this activity.</p>;
+  const task = step.activity?.id ? step.activity : null;
+  if (step.locked) return <p className="module-preview-note">Complete the previous activity to unlock this step.</p>;
   return <div className="module-step">
-    <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Passed" : "Try again"}</span>}</div>
+    <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Completed" : "Try again"}</span>}</div>
     <Markdown markdown={step.instruction} />
+    {task && <b>Sample code</b>}
     <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>
-    <b>Output (expected):</b><pre className="printed-output">{step.expectedOutput}</pre>
+    <b>{task ? "Sample output" : "Output (expected):"}</b><pre className="printed-output">{step.expectedOutput}</pre>
+    {task && <div className="paper-instructions"><b>Your task</b><Markdown markdown={task.instruction} /><b>Expected task output</b><pre className="printed-output">{task.expectedOutput}</pre></div>}
     {role === "student" && <div className="paper-instructions">
-      <p>Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step.</p>
+      <p>{task && sampleFirst ? "Work in code editor loads this step's sample on first opening. Run the sample unchanged to verify it, then make the changes in Your task and Run code again. A matching task run completes this step and unlocks the next activity. Reopening a started step restores your saved edits." : task ? "Continue in your saved module project. Make the changes in Your task, then Run code. Successful execution matching Expected task output completes this task and unlocks the next step." : "Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step."}</p>
       {step.language === "java" ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java only.</p>}
     </div>}
-    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
+    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;
@@ -251,14 +256,14 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   const [progress, setProgress] = useState<Progress | null>(role === "teacher" ? emptyProgress(module.id) : null);
   const [error, setError] = useState<string | null>(null);
   const [lessonPage, setLessonPage] = useState(0);
-  const [paperPage, setPaperPage] = useState(0);
+  const [paperPage, setPaperPage] = useState<number | null>(null);
   const applyProgress = (updated: Progress) => setProgress((current) => !current || updated.updatedAt >= current.updatedAt ? updated : current);
 
   useEffect(() => {
     if (role !== "student") return;
     let active = true;
     api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress`)
-      .then((loaded) => { if (active) setProgress(loaded); })
+      .then((loaded) => { if (active) { setProgress(loaded); setPaperPage(null); } })
       .catch((loadError) => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load progress"); });
     return () => { active = false; };
   }, [classroomId, module.id, role, progressRevision]);
@@ -274,7 +279,9 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
     })));
     const hasTask = Boolean(module.performanceTask || module.closedPerformanceTask);
     const totalPages = pages.length + Number(hasTask);
-    const currentPage = Math.min(paperPage, totalPages - 1);
+    const resumeStep = moduleResumeStep(module, progress.stepStates);
+    const resumePage = resumeStep ? pages.findIndex((page) => page.step?.id === resumeStep.id) : totalPages - 1;
+    const currentPage = Math.max(0, Math.min(paperPage ?? (role === "student" ? resumePage : 0), totalPages - 1));
     const current = pages[currentPage];
     const partDone = (part: typeof parts[number]) => !part.closed && part.blocks.filter(isStepBlock).every((step) => progress.stepStates[activityStateId(step)] === "pass");
     const taskDone = progress.performanceTask.sample?.status === "pass" && progress.performanceTask.own?.status === "pass";
@@ -301,7 +308,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
               {!page.part.blocks.some(isStepBlock) && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}
             </>}
           </>}
-          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={() => onStartActivity?.(module, page.step!) ?? Promise.resolve()} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
+          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed sampleFirst={module.sampleFirst} step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={() => onStartActivity?.(module, page.step!) ?? Promise.resolve()} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
         </article>)}
         {hasTask && <article className="worksheet-paper" hidden={currentPage !== pages.length} aria-label="Performance task">
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
@@ -342,6 +349,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
           {lesson.blocks.map((block, index) =>
             isStepBlock(block) ? (
               <StepView
+                sampleFirst={module.sampleFirst}
                 key={block.id}
                 step={block}
                 status={progress.stepStates[activityStateId(block)]}

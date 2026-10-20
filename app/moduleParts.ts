@@ -1,3 +1,4 @@
+import { activityStateId } from "../backend/src/module-activities";
 import type { CourseModule, Lesson, Block, StepBlock } from "./ModuleViewer";
 
 export type ModulePart = { id: string; title: string; blocks: Block[]; lessons: Lesson[]; exitLessons: Lesson[]; closed: boolean };
@@ -18,7 +19,6 @@ export function groupModuleParts(module: CourseModule): ModulePart[] {
       if (block.type !== "step") { pending.push(block); continue; }
       const step = block as StepBlock;
       const part = findPart(step.part ? `part:${step.part}` : lesson.id, step.part || lesson.title, lesson);
-      part.closed ||= Boolean(step.locked);
       part.blocks.push(...pending, step);
       pending = [];
       lastPart = part;
@@ -27,7 +27,10 @@ export function groupModuleParts(module: CourseModule): ModulePart[] {
     lastPart.blocks.push(...pending);
     lastPart.exitLessons.push(lesson);
   }
-  return parts;
+  return parts.map((part) => {
+    const steps = part.blocks.filter((block): block is StepBlock => block.type === "step");
+    return { ...part, closed: steps.length ? steps.every((step) => step.locked) : part.closed };
+  });
 }
 
 // Break before each step without moving the following discussion out of reading order.
@@ -38,4 +41,10 @@ export function modulePartPages(part: ModulePart): { step: StepBlock | null; blo
     else pages[pages.length - 1].blocks.push(block);
   }
   return pages;
+}
+
+// Use saved completion, so reopening on another browser resumes the same unfinished work.
+export function moduleResumeStep(module: CourseModule, states: Record<string, string>) {
+  return module.lessons.filter((lesson) => !lesson.closed).flatMap((lesson) => lesson.blocks)
+    .find((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && states[activityStateId(block as StepBlock)] !== "pass");
 }

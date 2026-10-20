@@ -39,3 +39,25 @@ binary compiler/helper into `/str/`; `javaExecution.ts` authenticates stage mess
 and names the last stage on timeout; `useJavaConsole.ts` shows loading feedback.
 CKB-056; `tests/browser-java-client.test.mjs`, `tests/browser-java-runtime.test.mjs`;
 verification and rollout: `docs/verification/java-runner-startup.md`.
+
+Explicit alteration tasks: `activityTask` / `activityStateId` / `activityAccess.openStepIds` in
+`backend/src/module-activities.ts`; existing repository activity and result routes;
+`ModuleViewer`, `StudentModuleActivity`, `moduleParts`, `page.tsx`. Tests in module-activities,
+browser-java-progress, classroom-ui, weekly-java-project-ui and rolling-module-tasks.
+First example: `docs/modules/week14/`; CKB-052.
+
+Sample-first loading and visible run feedback: `samplePending`, `sampleStateId`, `matchesSample`
+and `unchangedSample` in `module-activities.ts`; activity preparation, project saves and result
+recording in `supabase-repository.ts`; existing project route adds optional `stepId`.
+`StudentModuleActivity`, `ModuleRunFeedback` and `ModuleViewer` handle the screen.
+Migration `20261021000100_module_activity_projects.sql`; CKB-054; regressions in module-activities,
+browser-java-progress, module-run-feedback, module-activity-migration and rolling-module-tasks;
+actual production browser script `tests/module-sample-first.browser.mjs`.
+
+Week 12/13 curriculum JSON: `docs/modules/week12/` and `docs/modules/week13/`, chaining
+`java-2-w12` → `java-2-w13` → `java-2-w14`. Complete per-step samples, no Vehicle personal starters,
+and an approved in-memory substitute for Week 13 disk examples. No app or migration change.
+Real Java and compatibility checks: `tests/week12-week13-modules.test.mjs`; actual production
+editor and browser Java 8 checks: `tests/week12-week13.browser.mjs`.
+
+Module resume: `moduleResumeStep` in `app/moduleParts.ts`, consumed by worksheet, catalog and weekly Module project. Saved step completion supplies the position; no navigation storage. CKB-058; `tests/module-resume.test.mjs` and `tests/module-resume.browser.mjs`.
