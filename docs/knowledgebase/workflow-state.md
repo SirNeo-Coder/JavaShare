@@ -222,3 +222,20 @@ What teachers and students can do today. Keep this page current when their use o
   save a new-flow project without its step identity are refused, rather than overwriting another step.
 - Apply the new migration before deploying this app and re-uploading the revised Week 14 JSON.
   See `docs/module-sample-first-setup.md`. No assistant hosted migration or deployment is performed.
+
+## Weeks 12 and 13 JSON (approved 2026-10-21)
+
+- New Week 12 OOP and Week 13 exception-handling JSON use sample verification followed by small
+  alterations with separate expected outputs. Upload Week 12, then 13, then 14 in the same class;
+  stable predecessor ids connect their module projects. Week 13 finishes with the exact supporting
+  classes Week 14 expects. No app or migration change is needed beyond the sample-first setup.
+- Week 12 preserves the printed three-session catch-up order, grouped by the four pillars plus
+  synthesis. Week 13 follows its five-day plan. Complete per-step sources run in the main editor;
+  deliberately uncompilable/crashing demonstrations remain reading examples. Liplets stay separate.
+- Week 13's disk example is reading material. Its runnable checked-exception practice uses an
+  approved in-memory driver list and `Exception`, since the runner blocks `java.io` imports.
+  This does not enable disk access or verify file-handling skills.
+- The personal performance project retains the student's own theme and track. Neither new module
+  inserts Vehicle starter classes into it. Original PDF/DOCX documents and the generation prompt
+  remain unchanged. Source mapping and evidence: `docs/modules/week12/README.md`,
+  `docs/modules/week13/README.md`, `docs/verification/week12-week13-modules.md`.

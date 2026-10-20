@@ -1,4 +1,17 @@
-> Current approved continuation (2026-10-21): [sample-first module work](rolling-module-tasks.md),
+> Current approved continuation (2026-10-21): [Week 12/13 curriculum JSON](rolling-module-tasks.md),
+> branch `codex/week12-week13-modules`, based on `codex/module-sample-first` at `b027634` (PR #27).
+> Nine OOP and thirteen exception activities are complete. Both use sample-first verification,
+> small alterations and the Vehicle predecessor chain into Week 14; personal projects stay separate.
+> Approved disk-example substitute uses an in-memory checked exception; original printed files
+> and the generation prompt are unchanged. No app or migration change. Build passed; lint zero
+> errors/eight existing warnings; full suite 208/208. All 44 sample/task runs pass laptop Java and
+> actual browser Java 8. Both modules pass the real offline editor completion/restoration checks.
+> Missing-class mutation fails as expected, then restored suite passes. [All test names and limits](../verification/week12-week13-modules.md).
+> Delivery in progress: commit/push and stacked PR. Next: teacher review, then upload Weeks 12, 13,
+> 14 in order with the reviewed sample-first app and its existing history migration. No hosted action.
+> The rolling handoff contains the complete continuation state; earlier entries below are historical.
+
+> Prior delivered continuation (2026-10-21): [sample-first module work](rolling-module-tasks.md),
 > branch `codex/module-sample-first`, based on PR #26 (stacked on PR #25). Automatic sample loading,
 > unchanged baseline checks, saved drafts per step and visible latest-run banners are complete.
 > Build and offline launcher build pass; lint 0 errors/8 existing warnings; full suite 181/181.

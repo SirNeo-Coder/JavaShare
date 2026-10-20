@@ -47,3 +47,9 @@ recording in `supabase-repository.ts`; existing project route adds optional `ste
 Migration `20261021000100_module_activity_projects.sql`; CKB-054; regressions in module-activities,
 browser-java-progress, module-run-feedback, module-activity-migration and rolling-module-tasks;
 actual production browser script `tests/module-sample-first.browser.mjs`.
+
+Week 12/13 curriculum JSON: `docs/modules/week12/` and `docs/modules/week13/`, chaining
+`java-2-w12` → `java-2-w13` → `java-2-w14`. Complete per-step samples, no Vehicle personal starters,
+and an approved in-memory substitute for Week 13 disk examples. No app or migration change.
+Real Java and compatibility checks: `tests/week12-week13-modules.test.mjs`; actual production
+editor and browser Java 8 checks: `tests/week12-week13.browser.mjs`.

@@ -22,7 +22,8 @@ Successful execution matching **Expected task output** saves **Completed** immed
 the next activity. A prominent banner also identifies unchanged sample output and mismatches.
 A failed later run retains the earlier completion while reporting the current mismatch.
 
-The preceding module id is `java-2-w13`; its JSON is not part of this stage. Available preceding
+The preceding module id is `java-2-w13`; its JSON is now in [Week 13](../week13/README.md), following
+[Week 12](../week12/README.md). Upload the three weeks in order in the same class. Available preceding
 work rolls forward with supporting Vehicle classes. Each new step overlays its supplied sample
 files; earlier step drafts stay saved independently. Reopening a started step restores its edits.
 Pre-update work without recorded step identity remains readable in **Work saved before sample

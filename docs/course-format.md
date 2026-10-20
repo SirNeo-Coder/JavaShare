@@ -156,8 +156,10 @@ back to starter files. Once this week's project exists, opening it again never r
 it. Module and personal projects roll forward separately; previous weeks and submitted snapshots
 are unchanged. No new table, column or migration.
 
-The first revised example is [Week 14](modules/week14/README.md). Its link is `java-2-w13`;
-Week 13 JSON is still to be authored. Deploy the app change before uploading a task-enabled file.
+The first revised example is [Week 14](modules/week14/README.md). New
+[Week 12](modules/week12/README.md) and [Week 13](modules/week13/README.md) JSON now supply the
+preceding chain `java-2-w12` → `java-2-w13` → `java-2-w14`. Upload them in order in the same class.
+Deploy the app change before uploading a task-enabled file.
 The old playbook checker validates sample runs only; updating the generation prompt/playbook and
 its checker is a later stage.
 

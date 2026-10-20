@@ -1,8 +1,8 @@
 # CKB-052 — Module practice checks the sample instead of the student alteration
 
-- Status: resolved for the approved task-flow and Week 14 stage; broader curriculum work pending
+- Status: resolved for the approved task-flow and Weeks 12–14; later curriculum work pending
 - First recorded: 2026-10-20
-- Last verified: 2026-10-20
+- Last verified: 2026-10-21
 - Area: module worksheet, main editor, module validation, saved projects, completion and unlocking
 - Search terms: sample output vs task output, simple alteration, rolling code, next step locked, Completed, existing sample pass
 
@@ -58,5 +58,10 @@ provided files were reviewed but not changed.
 ## History
 
 - 2026-10-20 — Teacher approved the core alteration workflow and Week 14 pilot.
+- 2026-10-21 — Teacher approved new Week 12 OOP and Week 13 exceptions JSON. Both use
+  sample-first verification, small alterations, complete supporting classes and stable predecessor
+  links into Week 14. Week 13 disk examples remain reading material; runnable checked-exception
+  practice uses the approved in-memory substitute. No new app defect or app change. Evidence:
+  `docs/verification/week12-week13-modules.md`.
 
 Implementation: `f07bb71`; review: [PR #25](https://github.com/SirNeo-Coder/JavaShare/pull/25).

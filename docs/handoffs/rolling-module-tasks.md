@@ -1,8 +1,46 @@
 # Rolling module tasks handoff
 
-Updated 2026-10-21. Current branch: `codex/module-sample-first`.
+Updated 2026-10-21. Current branch: `codex/week12-week13-modules`.
 
-## Current approved continuation
+## Current approved continuation: Weeks 12 and 13 JSON
+
+The teacher approved authoring the missing Week 12 OOP and Week 13 exception-handling JSON
+from the supplied original PDF modules and ILAW lesson plans. This includes complete runnable
+samples, small alterations with separate outputs, and an approved in-memory substitute for the
+Week 13 disk example. No application, schema or configuration change was proposed or made.
+
+Finished: `docs/modules/week12/Java2_Week_12.codeshare.json` (nine activities) and
+`docs/modules/week13/Java2_Week_13.codeshare.json` (thirteen). Both opt into sample-first checks.
+The chain is `java-2-w12` → `java-2-w13` → existing `java-2-w14`. Week 13's final supporting classes
+match Week 14 exactly. Personal starters contain Main.java guidance only and receive no Vehicle
+family. Complete per-step sources, original teaching material, separate paper liplets, performance
+instructions/rubrics and stable alteration identities are included. The READMEs map printed steps
+and explain the catch-up schedule, added review checks and disk substitution. Original PDF/DOCX
+files and the generation prompt remain unchanged.
+
+Evidence: `npm run build:all` passed; lint zero errors/eight existing warnings; full suite
+208/208 without skips. Focused module checks 27/27. All 22 samples and 22 alterations actually
+run on laptop Java and browser CheerpJ Java 8. Both personal starters/reference examples compile
+and run. The rolling project also runs Week 14's first ArrayList example without replacing its
+supporting classes. Actual offline production browser checks both uploads, sample/task distinction,
+unchanged-output feedback, immediate saved completion, next-step gating and draft restoration.
+Removing one final supporting class failed the compatibility regression; restoration passed.
+Full named checks, commands and limits: `docs/verification/week12-week13-modules.md`.
+No new app defect was found; CKB-052 history and the prompt map record this curriculum continuation.
+
+In progress: commit/push and PR delivery, based on `b027634` / `codex/module-sample-first` (PR #27).
+Next: teacher reviews the stacked PR, uses the sample-first app/history migration already prepared
+in PR #27, then uploads Week 12, Week 13 and Week 14 in that order in the intended class. No new
+migration is needed. The teacher's real class and hosted data have not been changed. File APIs
+remain blocked; the checked-exception list is memory only. Later weeks, printed revisions and
+the generation prompt/playbook remain separate work. Hosted, Windows, physical disconnected
+classroom devices and every alteration clicked through the full editor remain unverified; every
+alteration did run in real laptop and browser Java. Local browser fixtures clean up their own
+disposable class/accounts. Existing classroom server 3012 and unrelated local files are preserved.
+
+## Prior delivered sample-first stage
+
+Branch: `codex/module-sample-first`.
 
 The teacher approved the expanded proposal on 2026-10-21: first opening loads a step's sample,
 Run code verifies the unchanged sample before alteration editing, and a large banner distinguishes
