@@ -438,6 +438,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   existing warnings; full suite 221/221, actual offline/online resume browser 11/11, revised exercises
   on browser Java 8 8/8. Both deliberate-break regressions failed and passed after restoration.
   Final named checks and limits: `docs/verification/module-resume-and-logic-tasks.md`.
-- No code work remains in progress. Next: commit, push and deliver a PR against the drawer
-  branch; teacher review and migration/app/JSON rollout follow. Do not merge or change hosted services.
-  Continue from `docs/handoffs/rolling-module-tasks.md`.
+- Delivered: implementation `ad7efe6`, pushed on `codex/module-resume-and-logic-tasks`;
+  [PR #33](https://github.com/SirNeo-Coder/JavaShare/pull/33) targets the drawer branch (PR #32).
+  No code work remains in progress. Next: teacher review and documented migration/app/JSON rollout.
+  Do not merge or change hosted services. Temporary verification servers were stopped; the original
+  classroom and primary checkout remain intact. Continue from `docs/handoffs/rolling-module-tasks.md`.

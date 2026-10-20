@@ -443,3 +443,7 @@ Command: `sg docker -c 'CODESHARE_PLAYWRIGHT_MODULE=/absolute/path/to/playwright
 ℹ duration_ms 115767.969923
 
 The existing historical sample-first and Week 12/13 standalone browser scripts were adapted to the current single Module tab. Their historical counts are preserved in their source-branch reports; they were not rerun for this delivery. The new browser scripts above provide the current production-app and revised-Java evidence.
+
+## Delivery
+
+Implementation `ad7efe6` is committed and pushed. [PR #33](https://github.com/SirNeo-Coder/JavaShare/pull/33) targets `codex/classroom-drawer-controls` (PR #32). GitHub connector creation returned 403; authenticated CLI creation succeeded. No merge or hosted action. Verification servers were stopped and disposable test users/classes cleaned up. The primary checkout remains unchanged.

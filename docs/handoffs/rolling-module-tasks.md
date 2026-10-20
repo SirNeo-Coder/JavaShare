@@ -34,11 +34,19 @@ saved completion failed the Monday-to-Tuesday resume regression; leaving the arr
 failed Week 12 Step 7. Both fixes restored. Final evidence, every named check, initial resolved test errors and limits are in
 `docs/verification/module-resume-and-logic-tasks.md`.
 
-Implementation is complete; no code work remains in progress. Next: commit and push this branch;
-open a review PR against
-`codex/classroom-drawer-controls` so its already delivered drawer changes are not duplicated.
-Never merge or deploy. Other teacher work and local untracked files in the primary checkout
-are untouched; this isolated checkout is `/tmp/codeshare-module-resume`.
+Implementation `ad7efe6` is committed and pushed. [PR #33](https://github.com/SirNeo-Coder/JavaShare/pull/33)
+is open against `codex/classroom-drawer-controls` (PR #32), and attached to the chat. No code work
+remains in progress. Next: teacher review of PR #32/#33, then the teacher performs the documented
+history migration, reviewed app rollout and revised JSON uploads. Do not merge or deploy.
+The GitHub connector returned 403 for PR creation; the authenticated CLI created PR #33. There
+is no remaining permission block. Final delivery notes are committed separately after implementation.
+
+Temporary production verification servers 3020/3022 and public-assets server 3021 were stopped
+after testing; original classroom processes were preserved. Test fixtures removed their own
+local users/classes. Hosted rollout, Windows, physical disconnected Wi-Fi student devices and
+non-Chromium browsers remain unverified. Full names, limits and initial resolved test failures:
+`docs/verification/module-resume-and-logic-tasks.md`. The isolated checkout remains
+`/tmp/codeshare-module-resume`; unrelated work in the primary checkout is untouched.
 
 ## Historical prepared work
 
