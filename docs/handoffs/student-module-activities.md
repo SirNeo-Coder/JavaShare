@@ -4,6 +4,11 @@ Updated: 2026-10-20. Branch: `codex/student-module-activities`, based on
 `codex/student-classroom-entry` (PR #18, still open). This is the teacher-approved workflow change
 from this chat: implement student activities first. No permission to merge or deploy.
 
+Implementation committed and pushed as `13e68a0`. [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19)
+is open against `codex/student-classroom-entry` (PR #18). Final full suite: 98/98, build passed,
+lint 0 errors/8 existing warnings. Disposable local fixtures and the isolated port-3001 test
+server have been removed/stopped; the pre-existing port-3000 classroom was left running.
+
 ## Done
 
 - JSON supports a separate `activity` on a step (instruction, optional starter files, required
@@ -49,8 +54,8 @@ CKB-044 records the startup null-state bug caught in the browser and fixed befor
 
 ## Next / limits
 
-- Open the review PR against `codex/student-classroom-entry` while #18 is open; review that stack
-  first. Teacher reviews and merges. No automatic merge or live deployment.
+- Review PR #18 before PR #19. PR #19 currently targets `codex/student-classroom-entry`; retarget
+  after its prerequisite is merged. Teacher reviews and merges. No automatic merge or live deployment.
 - Existing course JSON needs authored activities for genuinely different practice outcomes. A
   complete example is `tests/fixtures/student-activity.codeshare.json`; format is documented in
   `docs/course-format.md`. No private course source was rewritten or committed.

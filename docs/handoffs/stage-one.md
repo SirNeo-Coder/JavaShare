@@ -1,6 +1,6 @@
 # CodeShare — Stage One Progress
 
-> Current student activity work (2026-10-20): approved and implemented on `codex/student-module-activities`. See [student-module-activities.md](student-module-activities.md) for main-editor projects, automatic progression, CKB-038 resolution and verification. Earlier pending starter-file proposals below are superseded for the student activity path.
+> Current student activity work (2026-10-20): approved, committed as `13e68a0` and pushed on `codex/student-module-activities`; [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19) is open against PR #18. See [student-module-activities.md](student-module-activities.md) for main-editor projects, automatic progression, CKB-038 resolution and verification. Earlier pending starter-file proposals below are superseded for the student activity path.
 
 > Current student entry work (2026-10-20): see [student classroom entry](student-classroom-entry.md) for the approved direct-entry workflow, orphan cleanup, branch and verification. Teacher dashboard work remains in [its own handoff](teacher-progress-dashboard.md).
 
