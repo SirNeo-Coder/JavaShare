@@ -1,7 +1,7 @@
 # Two weekly Java projects
 
 Updated 2026-10-20. Approved workflow change in this chat. Branch `codex/weekly-java-projects`
-starts from `codex/student-module-activities` at `2430478`. Isolated worktree:
+was rebased onto `main` at `74ed3e3` after PR #19 merged. Isolated worktree:
 `/home/ireneo/.codex/worktrees/weekly-java-projects/JavaShare`. The original checkout had an
 unfinished merge; do not abort or change it for this feature. No merge/deploy or hosted changes.
 
@@ -34,8 +34,9 @@ runner names and browser results are recorded in `docs/verification/weekly-java-
 
 ## Next
 
-Implementation and verification are complete in this commit. Push this branch and open the review
-PR against main (PR #19 was merged during this work). The original checkout's merge is untouched.
+Implementation `033c17b` and complete test report `f3d40dc` are committed and pushed.
+[PR #20](https://github.com/SirNeo-Coder/JavaShare/pull/20) targets main for teacher review.
+The original checkout and its unfinished merge remain untouched.
 
 Next: implement online multi-file Java in a separate branch/change. The teacher explicitly approved
 using CheerpJ browser-reported results for practice progress on 2026-10-20, acknowledging these can
