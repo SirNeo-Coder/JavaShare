@@ -2,8 +2,9 @@
 > branch `codex/online-multifile-java`, stacked on weekly-projects PR #20. Browser
 > results and a separate public Java runner address were explicitly approved for
 > practice progress. Implementation and real browser/isolated offline checks passed; build and 115/115
-> tests passed, lint 0 errors/8 existing warnings. PR delivery is next. Teacher
-> deployment/setup is separate. No hosted changes.
+> tests passed, lint 0 errors/8 existing warnings. Commit `8af5b90` is pushed;
+> [PR #21](https://github.com/SirNeo-Coder/JavaShare/pull/21) targets PR #20's branch.
+> Teacher deployment/setup is separate. No merge or hosted changes.
 
 > Current approved work (2026-10-20): [two weekly Java projects](weekly-java-projects.md),
 > branch `codex/weekly-java-projects`, [PR #20](https://github.com/SirNeo-Coder/JavaShare/pull/20),

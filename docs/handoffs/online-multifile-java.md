@@ -49,7 +49,8 @@ teacher's existing server on port 3000 was left running; exact full launcher on 
 port and disconnected-internet/multiple Wi-Fi devices were not tested.
 All test names/commands/levels: docs/verification/online-multifile-java.md.
 
-Implementation is ready to commit/push and open a PR against codex/weekly-java-projects
-(PR #20 remains open). Teacher reviews #20 before the stacked online change, then
+Implementation `8af5b90` is committed and pushed. [PR #21](https://github.com/SirNeo-Coder/JavaShare/pull/21)
+targets codex/weekly-java-projects (PR #20 remains open). Teacher reviews #20 before
+the stacked online change, then
 follows docs/online-java-setup.md. Hosted deployment/setup, preview end-to-end and
 real classroom Wi-Fi devices remain teacher checks. No hosted settings were changed.
