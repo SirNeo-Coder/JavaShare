@@ -43,6 +43,7 @@ selection/pages and chat drafts across closing. No server, route, dependency or 
 
 - Existing regression: `tests/classroom-ui.test.mjs`, `workspace drawers: closed panels stay mounted but inaccessible so closing can animate`; baseline 12/12 file checks passed.
 - Real-app regression: `tests/workspace-drawers.browser.mjs`, teacher/student hover, inside/trigger/outside clicks, both animation directions, keyboard/Escape, worksheet pages/focus, reduced motion, pinned closing, chat drafts, and offline Run code.
+- Implementation `83cb931`, [PR #26](https://github.com/SirNeo-Coder/JavaShare/pull/26).
 - Final commands, results, deliberate mutation and limitations: [verification](../../verification/earlet-hover-dismiss.md).
 
 ## Recurrence triage

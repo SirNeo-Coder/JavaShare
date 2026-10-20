@@ -2,6 +2,8 @@
 
 Branch: `codex/earlet-hover-dismiss`, based on `codex/rolling-module-tasks` at `1c581ee`
 (open PR #25). The teacher approved the proposal in a later message before editing.
+Implementation `83cb931` is pushed; [PR #26](https://github.com/SirNeo-Coder/JavaShare/pull/26)
+is open against PR #25’s branch. No merge or deployment was performed.
 No hosted settings, services, migrations, dependencies or student data were changed.
 
 ## Final results

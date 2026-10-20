@@ -7,8 +7,9 @@
 > warnings, full suite 160/160, actual Chromium 13/13 including teacher/student offline Run code.
 > Deliberately restoring pointer-enter behavior failed both worksheet tests; restored fix passes.
 > CKB-053; [full test names, regression evidence and limits](../verification/earlet-hover-dismiss.md).
-> Nothing remains to implement. Next: commit/push this branch and open a review PR against
-> `codex/rolling-module-tasks`, then teacher review and rollout. No merge/deploy or hosted changes.
+> Implementation `83cb931` is committed and pushed; [PR #26](https://github.com/SirNeo-Coder/JavaShare/pull/26)
+> is open against `codex/rolling-module-tasks` (PR #25). Nothing remains in progress. Next:
+> teacher review and rollout of the reviewed branches. No merge/deploy or hosted changes.
 > Existing classroom servers and unrelated local files were preserved; physical touch/other
 > browsers and hosted behavior are unverified. Use this section and linked verification to continue.
 
