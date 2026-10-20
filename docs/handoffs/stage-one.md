@@ -286,8 +286,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   database was removed. Build passed, lint had 0 errors/8 existing warnings, full
   suite passed 125/125 with no skips, and CKB-050 is the first matching search result.
   [Named tests, commands and limits](../verification/production-module-setup.md).
-- Preparation is complete and committed; final checks were repeated on current
-  main. In progress: push the repair documentation and open its review PR.
+- Preparation is complete, committed and pushed as `edf4a6b` / `4f3a154`; final
+  checks were repeated on current main. [Draft PR #23](https://github.com/SirNeo-Coder/JavaShare/pull/23)
+  targets main. The teacher reviews it; no merge or hosted deployment was performed.
 - Next: teacher runs the prepared SQL in the correct hosted project's SQL Editor,
   verifies all readiness fields are true, refreshes Students/Curriculum, uploads
   the intended module, and checks student save/reload and refreshed progress.
