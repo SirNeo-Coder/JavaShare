@@ -50,8 +50,9 @@ Never commit filled-in env files or keys.
   module tables are absent. The six `20261018` migrations must be applied in order
   to the hosted project used by the Worker. [Repair steps and read-only readiness
   check](../production-module-setup.md). The teacher approved this repair on
-  2026-10-20; hosted application and post-repair checks remain pending. Local
-  migrations and passing builds do not establish hosted readiness.
+  2026-10-20 and then supplied a SQL success screenshot. Hosted readiness-query
+  results and post-repair browser checks remain unconfirmed. Local migrations
+  and passing builds do not establish hosted readiness.
 
 ## Known repository clutter (not yet cleaned up)
 

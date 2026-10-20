@@ -286,16 +286,20 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   database was removed. Build passed, lint had 0 errors/8 existing warnings, full
   suite passed 125/125 with no skips, and CKB-050 is the first matching search result.
   [Named tests, commands and limits](../verification/production-module-setup.md).
+  The SQL-success/merge handoff update also passed both named tests in
+  `node --test tests/kb-search.test.mjs` and `git diff --check`.
 - Preparation is complete, committed and pushed as `edf4a6b` / `4f3a154`; final
-  checks were repeated on current main. [Draft PR #23](https://github.com/SirNeo-Coder/JavaShare/pull/23)
-  targets main. The teacher reviews it; no merge or hosted deployment was performed.
-- Next: teacher runs the prepared SQL in the correct hosted project's SQL Editor,
-  verifies all readiness fields are true, refreshes Students/Curriculum, uploads
-  the intended module, and checks student save/reload and refreshed progress.
-  Stop on any SQL error rather than rerunning table creation after partial success.
-- Hosted SQL and production browser repair checks remain pending. No assistant
-  hosted changes, database reset, `supabase db push`, deploy or merge. Creating
-  storage does not transfer local modules/progress online.
+  checks were repeated on current main. [PR #23](https://github.com/SirNeo-Coder/JavaShare/pull/23)
+  targets main. The teacher explicitly requested merging it into main on 2026-10-20;
+  its GitHub merge status records delivery.
+- Teacher supplied a **Success. No rows returned** screenshot after the prepared
+  SQL instructions. Hosted SQL success is teacher-reported; the assistant did not
+  execute it or independently query the hosted database.
+- Next: verify all readiness fields are true, refresh Students/Curriculum, upload
+  the intended module, and check student save/reload and refreshed progress.
+  Production browser recovery and readiness-query results remain unconfirmed.
+- No assistant hosted SQL, database reset, `supabase db push` or deploy command.
+  Creating storage does not transfer local modules/progress online.
 
 ## Running offline mode on this laptop
 
