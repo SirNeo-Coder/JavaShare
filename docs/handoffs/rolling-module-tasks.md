@@ -35,12 +35,15 @@ failed Week 12 Step 7. Both fixes restored. Final evidence, every named check, i
 `docs/verification/module-resume-and-logic-tasks.md`.
 
 Implementation `ad7efe6` is committed and pushed. [PR #33](https://github.com/SirNeo-Coder/JavaShare/pull/33)
-is open against `codex/classroom-drawer-controls` (PR #32), and attached to the chat. No code work
+is open against `main` after PR #32 merged, and attached to the chat. No code work
 remains in progress. The teacher supplied migration success and verification screenshots on
 2026-10-21: activity_projects / jsonb / NO in the selected Supabase project. This is teacher-provided
 evidence; the assistant did not execute hosted SQL or independently verify the project's identity.
-Next: teacher review of PR #32 then #33, reviewed app rollout, and revised JSON uploads in order.
-Both PRs were still open/unmerged when checked after the screenshots. Do not merge or deploy.
+PR #32 is now merged into main as `e421fe0` (teacher screenshot and GitHub metadata).
+PR #33 initially still targeted the drawer branch; retargeted it to main and verified it is open,
+unmerged and mergeable. Only PR metadata changed; no code merge or hosted action was performed.
+Next: teacher reviews/merges PR #33 into main, waits for the app rollout, then uploads revised
+Week 12/13/14 JSON in order. Do not merge or deploy as an assistant.
 The GitHub connector returned 403 for PR creation; the authenticated CLI created PR #33. There
 is no remaining permission block. Final delivery notes are committed separately after implementation.
 

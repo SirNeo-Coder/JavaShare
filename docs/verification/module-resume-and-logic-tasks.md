@@ -460,3 +460,12 @@ Reran in the same normal runtime used for the successful full suite:
 
 Two passed, zero failed/skipped. These are repeat checks already included in the 221 full-suite
 total, not additional distinct coverage. Final whitespace and clean-branch checks passed.
+
+## Prerequisite review merged
+
+The teacher merged PR #32 into main as `e421fe0` (screenshot and GitHub metadata confirmed).
+Retargeted PR #33 from `codex/classroom-drawer-controls` to `main`; GitHub reports it open,
+unmerged and mergeable. Only metadata and rollout handoff text changed. The connector lacked
+edit permission and the installed CLI's ordinary edit hit a deprecated Projects query; the
+same authenticated CLI's direct API update succeeded. No code merge, hosted SQL or deployment.
+Documentation whitespace check passed; application tests were not repeated for metadata/text-only work.
