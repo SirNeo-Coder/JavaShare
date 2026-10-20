@@ -1,6 +1,7 @@
 # Classroom drawer controls — verification, 2026-10-21
 
 Branch `codex/classroom-drawer-controls`, based directly on main `9257ea7` (merged PR #31).
+Implementation `ed16d50`, committed and pushed for [PR #32](https://github.com/SirNeo-Coder/JavaShare/pull/32).
 Teacher approved one fixed Module/Projects rail, hover opening and animated outside closing.
 Only the relevant earlier CKB-053 repair was reused; open PR #26 and its rolling-module-tasks
 base were not merged. The existing Java status/startup fixes remain in place.

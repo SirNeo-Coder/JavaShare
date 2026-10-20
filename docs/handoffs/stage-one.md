@@ -15,9 +15,10 @@
 > offline launcher build and diff check pass; lint 0 errors/8 existing warnings. Deliberately
 > removing outside closing and restoring the duplicate Module tab caused 15 expected failures
 > (2 pass); restored build passes all 17. [All named tests, commands and limits](../verification/classroom-drawer-controls.md).
-> CKB-053, frontend/workflow pages and the prompt map are updated. Implementation complete;
-> delivery in progress: commit/push this branch and create a review PR against main. Do not merge
-> unrelated PR #25/#26 or curriculum work. The current approval authorizes this repair and the
+> CKB-053, frontend/workflow pages and the prompt map are updated. Implementation `ed16d50`
+> is committed and pushed; [PR #32](https://github.com/SirNeo-Coder/JavaShare/pull/32) is open
+> against main and attached to this chat. No implementation work remains. Do not merge unrelated
+> PR #25/#26 or curriculum work. The current approval authorizes this repair and the
 > project's normal branch/PR delivery, not a merge. Next: teacher review and hosted rollout test.
 > Hosted rollout, physical devices and disconnected Wi-Fi remain unverified. Clicks inside the
 > separate web-preview frame do not reach the document outside-dismiss handler. Disposable local

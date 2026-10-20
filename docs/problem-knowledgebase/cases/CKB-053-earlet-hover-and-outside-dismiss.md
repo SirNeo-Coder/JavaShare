@@ -42,6 +42,7 @@ No route, data, dependency, migration or hosted configuration change.
   focus, pointer leave, inside/outside/trigger clicks, Escape, retained page, single rail geometry,
   phone/desktop/enlarged UI, reduced motion, pinned draft, touch taps and actual laptop Java.
 - Named results, commands, deliberate regression proof and limits: [verification](../../verification/classroom-drawer-controls.md).
+- Implementation ed16d50; [PR #32](https://github.com/SirNeo-Coder/JavaShare/pull/32).
 - Branch: codex/classroom-drawer-controls, directly based on main 9257ea7.
 
 ## Recurrence triage
