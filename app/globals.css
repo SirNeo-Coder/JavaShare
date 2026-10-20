@@ -592,6 +592,11 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .module-activity-details p { white-space:pre-wrap; }
 .module-activity-details pre { white-space:pre-wrap; overflow-wrap:anywhere; }
 .module-activity-console .console { flex:1; min-height:120px; overflow:auto; }
+.module-activity-console .console>b { display:block; margin-bottom:10px; font:700 13px/1.5 var(--font-geist),sans-serif; }
+.java-run-progress { display:flex; flex:none; align-items:center; gap:12px; padding:14px 16px; border-block:1px solid #62789d; background:#203b60; color:#f0f6ff; font-size:14px; line-height:1.5; }
+.java-run-spinner { width:18px; height:18px; flex:none; border:3px solid #8da4c6; border-top-color:#ffce7b; border-radius:50%; animation:java-run-spin 1s linear infinite; }
+@keyframes java-run-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce) { .java-run-spinner { animation:none; } }
 .module-activity-details form { display:flex; gap:8px; flex-wrap:wrap; }
 .student-module-project .workspace-card-heading b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 

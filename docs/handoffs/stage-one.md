@@ -1,3 +1,18 @@
+> Current approved UI delivery (2026-10-21): branch `codex/java-console-progress`, directly
+> based on main at `8fb41ff`. Teacher approved a Console loading/running indicator and explicitly
+> requested merge/push. Implemented a prominent accessible strip above Actual output for module
+> and personal runs: saving, Java startup/running, checking, or waiting for input. It clears after
+> success/error/Stop; Save work alone does not claim execution. Reduced motion disables spinning.
+> Build and actual offline launcher build pass; lint zero errors/eight existing warnings; full
+> suite 143/143; real online CheerpJ/offline javac production browser checks 12/12. Hiding the strip
+> deliberately failed two render regressions; restored implementation passes. Initial browser
+> throttle issue was resolved in the harness. [All named tests, commands and limits](../verification/java-console-progress.md); CKB-055.
+> Implementation `8198348` is committed and pushed. Main delivery is tracked by
+> [PR #29](https://github.com/SirNeo-Coder/JavaShare/pull/29), under the teacher's explicit merge/push
+> instruction. No code work remains. Next: verify the automatic main deployment and re-test
+> the hosted Console; the PR records merge status. No other open PRs are part of this delivery.
+> No schema, dependency or hosted setting change. Hosted rollout/physical devices remain unverified.
+
 > Delivered session work (2026-10-20), now on `main`:
 > [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), merge `34b83bb`, implementation
 > `b24c89c`: implemented the teacher's two-hour
