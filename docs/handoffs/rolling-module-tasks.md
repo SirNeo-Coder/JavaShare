@@ -28,8 +28,11 @@ Removing one final supporting class failed the compatibility regression; restora
 Full named checks, commands and limits: `docs/verification/week12-week13-modules.md`.
 No new app defect was found; CKB-052 history and the prompt map record this curriculum continuation.
 
-In progress: commit/push and PR delivery, based on `b027634` / `codex/module-sample-first` (PR #27).
-Next: teacher reviews the stacked PR, uses the sample-first app/history migration already prepared
+Implementation `eccd62a` is committed and pushed. [PR #28](https://github.com/SirNeo-Coder/JavaShare/pull/28)
+is open against `codex/module-sample-first`, based on `b027634` (PR #27), and attached to this chat.
+Nothing remains in progress for the approved JSON work. Temporary verification servers 3020–3022
+are stopped; the pre-existing classroom server is preserved. Next: teacher reviews PR #28 and
+the preceding stacked app PRs, uses the sample-first app/history migration already prepared
 in PR #27, then uploads Week 12, Week 13 and Week 14 in that order in the intended class. No new
 migration is needed. The teacher's real class and hosted data have not been changed. File APIs
 remain blocked; the checked-exception list is memory only. Later weeks, printed revisions and

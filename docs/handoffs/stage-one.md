@@ -7,8 +7,10 @@
 > errors/eight existing warnings; full suite 208/208. All 44 sample/task runs pass laptop Java and
 > actual browser Java 8. Both modules pass the real offline editor completion/restoration checks.
 > Missing-class mutation fails as expected, then restored suite passes. [All test names and limits](../verification/week12-week13-modules.md).
-> Delivery in progress: commit/push and stacked PR. Next: teacher review, then upload Weeks 12, 13,
-> 14 in order with the reviewed sample-first app and its existing history migration. No hosted action.
+> Implementation `eccd62a` committed/pushed; [PR #28](https://github.com/SirNeo-Coder/JavaShare/pull/28)
+> open against PR #27's branch and attached to this chat. No work remains in progress. Next:
+> teacher review, then upload Weeks 12, 13, 14 in order with the reviewed sample-first app and its
+> existing history migration. Temporary test servers stopped; existing 3012 preserved. No hosted action.
 > The rolling handoff contains the complete continuation state; earlier entries below are historical.
 
 > Prior delivered continuation (2026-10-21): [sample-first module work](rolling-module-tasks.md),

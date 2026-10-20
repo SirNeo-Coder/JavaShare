@@ -4,6 +4,9 @@ Verified 2026-10-21 on branch `codex/week12-week13-modules`, based on `b027634`
 (`codex/module-sample-first`, PR #27). Content and tests only; no application, migration,
 configuration, hosted SQL, deployment, merge or settings change.
 
+Implementation `eccd62a`; review [PR #28](https://github.com/SirNeo-Coder/JavaShare/pull/28),
+stacked on PR #27. Both implementation and final handoff are saved on the pushed feature branch.
+
 ## Required checks
 
 - PASS — `npm run build:all`: production app and backend.
