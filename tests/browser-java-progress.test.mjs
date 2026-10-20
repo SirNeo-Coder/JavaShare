@@ -128,3 +128,33 @@ test("online Java mode: missing address fails clearly; unsafe addresses are refu
     assert.equal((await config()).status, 200);
   });
 });
+
+test("online sample first: server-owned stages reject edited samples and save verification separately from task completion", needsLocal, async () => {
+  await withClass(async ({ upload, prepare, request, call, cookies, classroomId }) => {
+    const content = structuredClone(fixture); content.sampleFirst = true;
+    content.lessons[0].blocks[0].activity.id = "browser-sample-first";
+    await upload(content);
+    let p = await prepare();
+    const report = (output, success = true) => request("/progress/browser-result", { stepId: first.id, updatedAt: p.updatedAt, output, success, expectedOutput: output, stage: "task" });
+    let r = await (await report(first.activity.expectedOutput)).json();
+    assert.equal(r.check, "sample"); assert.equal(r.passed, false, "client cannot select task before verification"); p = r.progress;
+    const original = p.projectFiles;
+    const edited = original.map((f) => f.path === "Main.java" ? { ...f, content: f.content + " // altered before check" } : f);
+    const save = async (files) => {
+      const response = await call(`/api/classrooms/${classroomId}/modules/${fixture.id}/progress/project`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ files, updatedAt: p.updatedAt, stepId: first.id }) });
+      assert.equal(response.status, 200); p = await response.json();
+    };
+    await save(edited);
+    r = await (await report(first.expectedOutput)).json(); assert.equal(r.passed, false, "matching output cannot verify edited sample source"); p = r.progress;
+    await save(original);
+    r = await (await report(first.expectedOutput)).json(); assert.equal(r.passed, true); assert.equal(r.check, "sample"); p = r.progress;
+    assert.equal(p.stepStates["sample:browser-sample-first"], "pass"); assert.equal(p.stepStates["task:browser-sample-first"], undefined);
+    assert.equal((await request("/progress/activity", { stepId: second.id })).status, 403);
+    r = await (await report(first.expectedOutput)).json(); assert.equal(r.passed, false); assert.equal(r.sampleMatched, true); p = r.progress;
+    r = await (await report(first.activity.expectedOutput)).json(); assert.equal(r.passed, true); assert.equal(r.check, "task"); p = r.progress;
+    assert.equal(p.stepStates["task:browser-sample-first"], "pass");
+    r = await (await report("later failed exploration", false)).json();
+    assert.equal(r.passed, false); assert.equal(r.progress.stepStates["task:browser-sample-first"], "pass");
+    assert.equal((await (await request()).json()).lessons[1].closed, false);
+  });
+});

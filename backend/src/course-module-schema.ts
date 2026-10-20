@@ -22,6 +22,7 @@ const block = z.discriminatedUnion("type", [
     files: z.array(file).min(1).max(50),
     run: z.string().trim().min(1).max(200).optional(),
     expectedOutput: z.string().max(100000),
+    expectedError: z.string().regex(/^(?:[A-Za-z_$][\w$]*\.)+[A-Za-z_$][\w$]*$/).max(200).optional(),
     stdin: z.string().max(10000).optional(),
     checkYourself: z.string().max(5000).optional(),
     // A stable task id opts into alteration checks; legacy challenge data stays readable.
@@ -91,6 +92,7 @@ export const courseModule = z.object({
   title: z.string().max(200),
   continues: z.string().max(200).optional(),
   previousModuleId: z.string().trim().min(1).max(100).optional(),
+  sampleFirst: z.boolean().optional(),
   starterFiles: z.array(file).max(50).default([]),
   lessons: z.array(lesson).min(1).max(10),
   performanceTask: performanceTask.optional(),
@@ -104,7 +106,7 @@ export const courseModule = z.object({
     lesson.id, lesson.exitSlip.id,
     ...lesson.blocks.filter((block) => block.type === "step").flatMap((block) => [block.id,
       ...(block.activity ? [`${block.id}:activity`] : []),
-      ...(block.activity?.id ? [block.activity.id, `task:${block.activity.id}`] : []),
+      ...(block.activity?.id ? [block.activity.id, `task:${block.activity.id}`, `sample:${block.activity.id}`] : []),
     ]),
   ]);
   return module.previousModuleId !== module.id && progressIds.length === new Set(progressIds).size;

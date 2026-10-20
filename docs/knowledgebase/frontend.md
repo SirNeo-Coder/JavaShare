@@ -29,3 +29,9 @@ StudentModuleActivity (module and personal), and ModuleViewer previews. Module r
 save first, run in browser when configured, then report success/output with saved
 version. Personal/practice runs do not write module completion. JavaRunnerBrand uses
 a locally served CheerpJ logo and is shown only after online execution is requested.
+
+`StudentModuleActivity.tsx` now shows sample-first verification for opted-in modules, keeps the
+sample read-only until verified, then presents the alteration target in the same editor.
+`ModuleRunFeedback` renders a persistent, accessible banner above Actual output for verification,
+old sample output, mismatch and completion. Latest results and saved completion are separate;
+`ModuleViewer` explains loading/resuming, while preparation/history remain server-owned.

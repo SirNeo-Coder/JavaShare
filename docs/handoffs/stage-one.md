@@ -1,3 +1,13 @@
+> Current approved continuation (2026-10-21): [sample-first module work](rolling-module-tasks.md),
+> branch `codex/module-sample-first`, based on PR #26 (stacked on PR #25). Automatic sample loading,
+> unchanged baseline checks, saved drafts per step and visible latest-run banners are complete.
+> Build and offline launcher build pass; lint 0 errors/8 existing warnings; full suite 181/181.
+> Actual production browser: 5/5 offline and 5/5 online; all eleven baselines also verify on
+> actual Java 8. Mutation proof and every test name: [verification](../verification/module-sample-first.md).
+> New additive history migration applied locally only. Teacher hosted rollout/re-upload instructions:
+> [setup](../module-sample-first-setup.md). No merge, hosted SQL, deploy or settings change.
+> Next: feature PR review and teacher rollout. Earlier stages below are historical.
+
 > Current approved UI fix (2026-10-20): branch `codex/earlet-hover-dismiss`, based on
 > `codex/rolling-module-tasks` at `1c581ee` (open PR #25). Teacher approved hover opening
 > and outside-click animated closing for Module, Projects / Students / projects, Chat and worksheet.

@@ -39,3 +39,11 @@ Explicit alteration tasks: `activityTask` / `activityStateId` / `activityAccess.
 `ModuleViewer`, `StudentModuleActivity`, `moduleParts`, `page.tsx`. Tests in module-activities,
 browser-java-progress, classroom-ui, weekly-java-project-ui and rolling-module-tasks.
 First example: `docs/modules/week14/`; CKB-052.
+
+Sample-first loading and visible run feedback: `samplePending`, `sampleStateId`, `matchesSample`
+and `unchangedSample` in `module-activities.ts`; activity preparation, project saves and result
+recording in `supabase-repository.ts`; existing project route adds optional `stepId`.
+`StudentModuleActivity`, `ModuleRunFeedback` and `ModuleViewer` handle the screen.
+Migration `20261021000100_module_activity_projects.sql`; CKB-054; regressions in module-activities,
+browser-java-progress, module-run-feedback, module-activity-migration and rolling-module-tasks;
+actual production browser script `tests/module-sample-first.browser.mjs`.

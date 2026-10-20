@@ -7,7 +7,7 @@
     },
     {
       "path": "Main.java",
-      "from": "\"No vehicle there: \" + e.getMessage()",
+      "from": "\"No vehicle there: index 5 is unavailable.\"",
       "to": "\"No vehicle at index 5.\""
     }
   ],

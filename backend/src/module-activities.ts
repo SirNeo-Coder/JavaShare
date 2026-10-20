@@ -8,6 +8,14 @@ export function activityStateId(step: { id: string; activity?: { id?: string } }
   return step.activity?.id ? `task:${step.activity.id}` : step.id;
 }
 
+export function sampleStateId(step: { activity?: { id?: string } }) { return `sample:${step.activity?.id}`; }
+
+export function samplePending(module: { sampleFirst?: boolean }, step: { id: string; activity?: { id?: string } }, states: Record<string, string>) {
+  return Boolean(module.sampleFirst && step.activity?.id && states[activityStateId(step)] !== "pass" && states[sampleStateId(step)] !== "pass");
+}
+
+export type ActivityProjects = { activeKey?: string; drafts?: Record<string, ModuleFile[]>; beforeSampleFiles?: ModuleFile[] };
+
 export function activityTask(step: { instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string;
   activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string } }) {
   return step.activity?.id ? step.activity : step;
@@ -69,4 +77,15 @@ export function matchesActivityOutput(result: { success: boolean; output: string
   // Ignore platform line endings and one final println terminator, never spaces or blank lines.
   const text = (value: string) => value.replace(/\r\n/g, "\n").replace(/\n$/, "");
   return result.success && text(result.output) === text(expected);
+}
+
+export function matchesSample(result: { success: boolean; output: string }, step: { expectedOutput: string; expectedError?: string }) {
+  if (!step.expectedError) return matchesActivityOutput(result, step.expectedOutput);
+  // Match the declared exception, never JVM-specific stack frames or an unrelated failed run.
+  const firstLine = result.output.split(/\r?\n/, 1)[0].replace(/^Exception in thread "[^"]+" /, "");
+  return !result.success && (firstLine === step.expectedError || firstLine.startsWith(`${step.expectedError}: `));
+}
+
+export function unchangedSample(files: ModuleFile[], sample: ModuleFile[]) {
+  return sample.every((file) => files.some((saved) => sourcePath(saved.path) === sourcePath(file.path) && saved.content === file.content));
 }

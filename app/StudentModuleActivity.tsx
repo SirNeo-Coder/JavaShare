@@ -6,9 +6,9 @@ import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
-import type { CourseModule, ModuleFile, Progress } from "./ModuleViewer";
+import type { CourseModule, ModuleFile, Progress, StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
-import { sourcePath } from "../backend/src/module-activities";
+import { sourcePath, samplePending } from "../backend/src/module-activities";
 
 export type StudentActivity = {
   kind: "module" | "performance"; module: CourseModule;
@@ -16,6 +16,26 @@ export type StudentActivity = {
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
 };
 export type ModuleEditorHandle = { save: () => Promise<void> };
+
+type RunCheck = { check: "sample" | "task"; passed: boolean; sampleMatched: boolean; success: boolean };
+
+export function ModuleRunFeedback({ result, completed, pendingSample, expectedError }: {
+  result: RunCheck | null; completed: boolean; pendingSample: boolean; expectedError?: string;
+}) {
+  const good = result?.passed ?? completed;
+  const title = result?.check === "sample" ? result.passed
+    ? expectedError ? "Expected error observed — now complete Your task." : "Sample verified — now complete Your task."
+    : "Sample not verified — run the supplied sample unchanged."
+    : result ? result.passed ? "Completed — next activity unlocked."
+      : result.sampleMatched ? "Still showing sample output. Apply the task changes and run again."
+        : "Not completed — this run differs from the required output."
+      : completed ? "Completed — your progress is saved." : pendingSample ? "First, run the sample unchanged." : "Not checked yet — complete Your task, then Run code.";
+  return <div className={`module-run-feedback ${good ? "passed" : result ? "retry" : "ready"}`} role="status" aria-live="polite">
+    <strong>{title}</strong>
+    {result?.check === "sample" && result.passed && <p>Sample verification is saved. This step stays open until your alteration matches Expected task output.</p>}
+    {result && !result.passed && <p>{completed ? "This task was completed earlier. Your saved completion remains." : "Progress has not advanced. Compare Actual output with the expected output above."}</p>}
+  </div>;
+}
 
 export default function StudentModuleActivity({ activity, ref, onChecked, onClose }: {
   activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void;
@@ -33,6 +53,12 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
   const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
   const progress = useRef(activity.progress);
+  const [stepStates, setStepStates] = useState(activity.progress.stepStates);
+  const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
+  const step = activity.module?.lessons?.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === activity.stepId);
+  const pendingSample = !personal && Boolean(step && samplePending(activity.module, step, stepStates));
+  const completed = !personal && stepStates[activity.stateId] === "pass";
+  const checkInput = pendingSample ? step?.stdin ?? "" : activity.stdin;
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
   const busyRef = useRef(false);
   const base = `/api/classrooms/${activity.classroomId}/modules/${activity.moduleId}/progress`;
@@ -44,7 +70,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     if (!dirty) return;
     busyRef.current = true; setBusy(true); setError("");
     try {
-      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt, ...(!personal ? { stepId: activity.stepId } : {}) }) });
       setSavedFiles(JSON.stringify(files));
     } finally { busyRef.current = false; setBusy(false); }
   };
@@ -53,21 +79,24 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const run = async () => {
     if (busyRef.current) return;
     busyRef.current = true; setBusy(true); setError("");
+    setLastCheck(null);
     try {
       // Save first so failures or an unavailable runner never discard the student's edits.
-      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt, ...(!personal ? { stepId: activity.stepId } : {}) }) });
       setSavedFiles(JSON.stringify(files));
       if (personal) {
         await javaConsole.run(files, stdin, () => setStdin(""));
       } else {
         const runner = await getJavaRunner();
-        const browserResult = runner.mode === "browser" ? await runJava(files, activity.stdin, runner) : null;
-        const result = await api<{ output: string; passed: boolean; progress: Progress }>(`${base}/${browserResult ? "browser-result" : "run"}`, {
+        const browserResult = runner.mode === "browser" ? await runJava(files, checkInput, runner) : null;
+        const result = await api<RunCheck & { output: string; progress: Progress }>(`${base}/${browserResult ? "browser-result" : "run"}`, {
           method: "POST", body: JSON.stringify({ stepId: activity.stepId, updatedAt: progress.current.updatedAt, ...(browserResult ? { success: browserResult.success, output: browserResult.output } : { files }) }),
         });
         progress.current = result.progress;
+        setStepStates(result.progress.stepStates);
         setOutput(result.output);
-        setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Try again — this run did not match the expected output");
+        setLastCheck(result);
+        setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : result.check === "sample" && result.passed ? "Sample verified" : "Try again");
         onChecked();
       }
     } catch (runError) {
@@ -109,25 +138,27 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="workspace-card-heading"><b>{personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>Java</span></div>
         <div className="file-tabs" aria-label={personal ? "Personal project files" : "Module project files"}>
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
-          <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy} onClick={() => setAddingFile(!addingFile)}>＋</button>
+          <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>
         </div>
-        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={busy} onChange={(content) => setFiles((current) => current.map((file) => file.path === path ? { ...file, content } : file))} />
+        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={busy || pendingSample} onChange={(content) => setFiles((current) => current.map((file) => file.path === path ? { ...file, content } : file))} />
         <div className="editor-status"><span>{path}</span><span>{dirty ? "Unsaved changes — click Save work" : "Your project is saved"}</span></div>
       </section>
       <aside className="right-panel module-activity-console">
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
-          <b>{personal ? "Your performance task" : task ? "Your task" : "Module sample"}</b><p>{activity.instruction}</p>
+          <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
           {personal ? <label>Program input<textarea value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");
             }
-          }} /></label> : <><b>{task ? "Expected task output" : "Expected output"}</b><pre>{activity.expectedOutput}</pre></>}
-          {activity.stdin && <><b>Program input for this check</b><pre>{activity.stdin}</pre></>}
+          }} /></label> : <><b>{pendingSample ? step?.expectedError ? "Expected error" : "Expected sample output" : task ? "Expected task output" : "Expected output"}</b><pre>{pendingSample ? step?.expectedError ?? step?.expectedOutput : activity.expectedOutput}</pre></>}
+          {checkInput && <><b>Program input for this check</b><pre>{checkInput}</pre></>}
+          {!personal && activity.progress.activityProjects?.beforeSampleFiles && <details className="module-before-sample"><summary>Work saved before sample loading</summary>{activity.progress.activityProjects.beforeSampleFiles.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</details>}
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
-        <JavaRunnerBrand /><div className="console"><pre aria-label="Program output">{output}</pre>
+        {!personal && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} expectedError={step?.expectedError} />}
+        <JavaRunnerBrand /><div className="console"><b>Actual output</b><pre aria-label="Program output">{output}</pre>
           {javaConsole.waiting && <small role="status">Waiting for input — press Enter to send</small>}
           {javaConsole.active && <button type="button" className="run-button" onClick={javaConsole.stop}>Stop</button>}
         </div>

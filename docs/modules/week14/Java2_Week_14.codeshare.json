@@ -104,14 +104,14 @@
           "files": [
             {
               "path": "Main.java",
-              "content": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Vehicle> fleet = new ArrayList<>();     // starts empty, grows as needed\n        fleet.add(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"));\n        fleet.add(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"));\n        fleet.add(new Bus(\"BUS 789\", \"Aling Rosa\", 50));\n        fleet.add(new Jeepney(\"NYB 321\", \"Mang Tonyo\", \"Sangandaan-Recto\"));   // a 4th!\n\n        System.out.println(\"Vehicles in fleet: \" + fleet.size());\n        System.out.println(\"First vehicle: \" + fleet.get(0).getPlateNumber());\n\n        fleet.remove(1);                             // the tricycle leaves for repair\n        System.out.println(\"After removal: \" + fleet.size());\n\n        for (Vehicle v : fleet) {\n            v.showInfo();\n        }\n\n        try {\n            fleet.get(5).showInfo();                 // there is no index 5\n        } catch (IndexOutOfBoundsException e) {\n            System.out.println(\"No vehicle there: \" + e.getMessage());\n        }\n    }\n}\n"
+              "content": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Vehicle> fleet = new ArrayList<>();     // starts empty, grows as needed\n        fleet.add(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"));\n        fleet.add(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"));\n        fleet.add(new Bus(\"BUS 789\", \"Aling Rosa\", 50));\n        fleet.add(new Jeepney(\"NYB 321\", \"Mang Tonyo\", \"Sangandaan-Recto\"));   // a 4th!\n\n        System.out.println(\"Vehicles in fleet: \" + fleet.size());\n        System.out.println(\"First vehicle: \" + fleet.get(0).getPlateNumber());\n\n        fleet.remove(1);                             // the tricycle leaves for repair\n        System.out.println(\"After removal: \" + fleet.size());\n\n        for (Vehicle v : fleet) {\n            v.showInfo();\n        }\n\n        try {\n            fleet.get(5).showInfo();                 // there is no index 5\n        } catch (IndexOutOfBoundsException e) {\n            System.out.println(\"No vehicle there: index 5 is unavailable.\");\n        }\n    }\n}\n"
             }
           ],
-          "expectedOutput": "Vehicles in fleet: 4\nFirst vehicle: NXA 123\nAfter removal: 3\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nNYB 321 | Driver: Mang Tonyo | Passengers: 0/20\nNo vehicle there: Index 5 out of bounds for length 3",
+          "expectedOutput": "Vehicles in fleet: 4\nFirst vehicle: NXA 123\nAfter removal: 3\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nNYB 321 | Driver: Mang Tonyo | Passengers: 0/20\nNo vehicle there: index 5 is unavailable.",
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d1-s1-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nIn the sample, change fleet.remove(1) to fleet.remove(3). Remove the fourth vehicle instead of the tricycle. In the catch block, replace the printed exception message with exactly: No vehicle at index 5. Keep the list and the other output lines.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nIn the sample, change fleet.remove(1) to fleet.remove(3). Remove the fourth vehicle instead of the tricycle. In the catch block, replace the printed exception message with exactly: No vehicle at index 5. Keep the list and the other output lines.",
             "files": [],
             "expectedOutput": "Vehicles in fleet: 4\nFirst vehicle: NXA 123\nAfter removal: 3\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nTRC 456 | Driver: Kuya Ben | Passengers: 0/4\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nNo vehicle at index 5."
           }
@@ -170,7 +170,7 @@
           "checkYourself": "Add `line.addLast(\"Lola Maria\");` right after `addFirst`. Is she placed in the priority lane? (No — `addLast` puts her at the back. To give her priority, use `addFirst` instead.)",
           "activity": {
             "id": "java-2-w14-d1-s2-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nChange the priority passenger from Lolo Pedro to Lola Nena. Keep addFirst, removeFirst, and the other three passengers unchanged.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nChange the priority passenger from Lolo Pedro to Lola Nena. Keep addFirst, removeFirst, and the other three passengers unchanged.",
             "files": [],
             "expectedOutput": "Waiting: [Lola Nena, Ana, Ben, Carla]\nNext to board: Lola Nena\nNow boarding: Lola Nena\nStill waiting: [Ana, Ben, Carla] (3 people)"
           }
@@ -273,7 +273,7 @@
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d2-s3-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nChange only the third registered.add call: add BUS 789 instead of repeating NXA 123. Keep the BUS lookup and the removal of TRC 456.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nChange only the third registered.add call: add BUS 789 instead of repeating NXA 123. Keep the BUS lookup and the removal of TRC 456.",
             "files": [],
             "expectedOutput": "true\ntrue\ntrue\nRegistered plates: 3\nIs BUS 789 registered? true\nAfter removing TRC 456: 2"
           }
@@ -299,7 +299,7 @@
           "checkYourself": "Add `\"Divisoria\"` to the `passedBy` array one more time and run again. \"Stops passed\" becomes 8, but \"Different stops\" stays 5. Can you explain why? (The TreeSet refuses a stop it already has, so only the array grows.)",
           "activity": {
             "id": "java-2-w14-d2-s4-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nKeep hashStops as a HashSet. In the last println, display new TreeSet<String>(hashStops) instead of hashStops. This sorts only the displayed copy, giving everyone the same output. The sample HashSet order may differ between computers.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nKeep hashStops as a HashSet. In the last println, display new TreeSet<String>(hashStops) instead of hashStops. This sorts only the displayed copy, giving everyone the same output. The sample HashSet order may differ between computers.",
             "files": [],
             "expectedOutput": "Stops passed: 7\nDifferent stops: 5\nTreeSet, sorted: [5th Avenue, Blumentritt, Divisoria, Monumento, Recto]\nFirst alphabetically: 5th Avenue\nLast alphabetically: Recto\nHashSet: [5th Avenue, Blumentritt, Divisoria, Monumento, Recto]"
           }
@@ -446,7 +446,7 @@
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d3-s5-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nIn the try block, change the first findVehicle lookup from TRC 456 to NXA 123. Keep the later ZZZ 000 lookup so the custom exception is still handled.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nIn the try block, change the first findVehicle lookup from TRC 456 to NXA 123. Keep the later ZZZ 000 lookup so the custom exception is still handled.",
             "files": [],
             "expectedOutput": "Vehicles on record: 3\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nHas ZZZ 000? false\nget(\"ZZZ 000\") gives: null\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nLookup failed: No vehicle with plate ZZZ 000"
           }
@@ -475,7 +475,7 @@
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d3-s6-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nIncrease Kuya Ben's extra trips by 2 instead of 1. Change the + 1 in the update for Kuya Ben only. Keep the initial values and Mang Tonyo's update.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nIncrease Kuya Ben's extra trips by 2 instead of 1. Change the + 1 in the update for Kuya Ben only. Keep the initial values and Mang Tonyo's update.",
             "files": [],
             "expectedOutput": "Drivers: 4\nAling Rosa: 3 trip(s)\nKuya Ben: 10 trip(s)\nMang Ramon: 5 trip(s)\nMang Tonyo: 1 trip(s)"
           }
@@ -619,7 +619,7 @@
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d4-s7-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nCalculate the total fare for 6 km instead of 5 km. Change quoteFare(5) to quoteFare(6) and change the output label to 6 km. Keep the three Vehicle objects and their fare methods.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nCalculate the total fare for 6 km instead of 5 km. Change quoteFare(5) to quoteFare(6) and change the output label to 6 km. Keep the three Vehicle objects and their fare methods.",
             "files": [],
             "expectedOutput": "1. NXA 123\n2. TRC 456\n3. BUS 789\nTotal fare for 6 km on every vehicle: P127.0"
           }
@@ -647,10 +647,11 @@
           "expectedOutput": "Exception in thread \"main\" java.util.ConcurrentModificationException\n\tat java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1095)\n\tat java.base/java.util.ArrayList$Itr.next(ArrayList.java:1049)\n\tat Main.main(Main.java:13)",
           "activity": {
             "id": "java-2-w14-d4-s8-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nThe sample deliberately crashes when it removes from the list during for-each. For this task, list the empty vehicles without removing them. Replace fleet.remove(v); with System.out.println(\"Empty vehicle: \" + v.getPlateNumber());. Keep the final fleet-size line. The next step teaches safe removal.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nThe sample deliberately crashes when it removes from the list during for-each. For this task, list the empty vehicles without removing them. Replace fleet.remove(v); with System.out.println(\"Empty vehicle: \" + v.getPlateNumber());. Keep the final fleet-size line. The next step teaches safe removal.",
             "files": [],
             "expectedOutput": "Empty vehicle: NXA 123\nEmpty vehicle: BUS 789\nVehicles still on duty: 3"
-          }
+          },
+          "expectedError": "java.util.ConcurrentModificationException"
         },
         {
           "type": "note",
@@ -677,7 +678,7 @@
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d4-s9-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nUse the Iterator sample. Change its condition from passengers == 0 to passengers > 0, so only the occupied tricycle goes off duty. Keep it.remove() and both output messages.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nUse the Iterator sample. Change its condition from passengers == 0 to passengers > 0, so only the occupied tricycle goes off duty. Keep it.remove() and both output messages.",
             "files": [],
             "expectedOutput": "Off duty: TRC 456\nVehicles still on duty: 2"
           }
@@ -702,7 +703,7 @@
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d4-s10-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nChange Mang Ramon's trip count from 5 to 7. Keep the sorted stop list and all three map loops. Check both the total and Mang Ramon's final entry.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nChange Mang Ramon's trip count from 5 to 7. Keep the sorted stop list and all three map loops. Check both the total and Mang Ramon's final entry.",
             "files": [],
             "expectedOutput": "Stop: Divisoria\nStop: Monumento\nStop: Recto\nAling Rosa Kuya Ben Mang Ramon \nTotal trips: 19\nAling Rosa -> 3\nKuya Ben -> 9\nMang Ramon -> 7"
           }
@@ -815,7 +816,7 @@
           "run": "Main.java",
           "activity": {
             "id": "java-2-w14-d5-s11-alter-v1",
-            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nThis is module practice using the worked store example, separate from your own performance-task project. Change Bread stock from 10 to 12. Keep the sales log, customers, sold-out removal, and both product lookups.",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Your supporting classes roll forward. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nThis is module practice using the worked store example, separate from your own performance-task project. Change Bread stock from 10 to 12. Keep the sales log, customers, sold-out removal, and both product lookups.",
             "files": [],
             "expectedOutput": "Ana added? true\nBen added? true\nAna added again? false\n1. Ana bought 2 Bread\n2. Ben bought 1 Softdrink\n3. Ana bought 1 Softdrink\nPieces in stock: 86\nDifferent customers: [Ana, Ben]\nSold out, removed: Candy\nBread -> 12\nRice (kg) -> 50\nSoftdrink -> 24\nBread in stock: 12\nSearch finished.\nSorry: No product named Eggs\nSearch finished."
           }
@@ -928,5 +929,6 @@
     ],
     "totalPoints": 50
   },
-  "previousModuleId": "java-2-w13"
+  "previousModuleId": "java-2-w13",
+  "sampleFirst": true
 }

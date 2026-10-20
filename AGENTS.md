@@ -147,3 +147,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Module practice checks keep their JSON-supplied input and existing server-owned sample/task output
   and saved-version checks. Personal runs do not submit or complete module steps.
 - Offline keeps laptop javac and its existing input-before-Run behavior for this slice.
+
+## Sample verification before alterations (agreed 2026-10-21)
+
+- Modules opting into `sampleFirst` load the selected step's sample on first opening in the main
+  editor, including its supplied Java files and rolling supporting classes. Save each step's
+  working files separately before switching; reopening a started step restores its saved edits.
+  Preserve a readable backup of work that existed before sample loading and all existing completions.
+- Run the unchanged sample before editing its alteration. Save sample verification separately;
+  it never completes the task or opens the next step. Declared intentional runtime errors show
+  Expected error observed and verify only the demonstration. A failed alteration never completes.
+- Show a prominent result banner above Actual output: sample verified, unchanged sample output,
+  mismatch, or Completed. Keep the latest run result separate from an earlier saved completion.
+- Existing JSON without `sampleFirst` retains its prior progression. Module/personal tracks,
+  submitted snapshots, class/student scope, stale-write checks and offline laptop Java stay intact.

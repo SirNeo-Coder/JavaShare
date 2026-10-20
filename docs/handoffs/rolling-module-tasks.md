@@ -1,6 +1,43 @@
 # Rolling module tasks handoff
 
-Updated 2026-10-20. Branch: `codex/rolling-module-tasks`.
+Updated 2026-10-21. Current branch: `codex/module-sample-first`.
+
+## Current approved continuation
+
+The teacher approved the expanded proposal on 2026-10-21: first opening loads a step's sample,
+Run code verifies the unchanged sample before alteration editing, and a large banner distinguishes
+verification, expected-error demonstration, old sample output, mismatch and task completion.
+Successful alterations save completion immediately and unlock the next activity. Completed tasks
+remain completed. New steps preserve earlier drafts and revisits restore each step's edits.
+
+Finished: server-owned sample/task stages, unchanged source checks, separate sample evidence,
+per-step module drafts and a readable pre-update source backup, step/version conflict guards,
+accessible banner, revised Week 14 JSON/PDF/DOCX, migration and teacher rollout guide. No personal
+track/submission mixing, old progress reset, runtime change, hosted SQL, deploy, merge or settings.
+Opt-in is `sampleFirst: true`; existing JSON remains on its earlier workflow. New column is
+`module_progress.activity_projects`; local migration applied additively without a reset.
+
+Evidence: required production build passed; lint 0 errors/8 existing warnings; full suite 181/181,
+no skips. Offline launcher build passed. Real production Chromium passed 5/5 offline with laptop
+javac and 5/5 online with CheerpJ Java 8. All eleven baselines also ran on actual browser Java 8;
+all eleven samples and alterations ran on laptop Java. Declared-error sample verification does
+not complete a task. Source/history, old completion and personal snapshots survive. A deliberate
+sample-gate bypass failed its regression; restoration passed. Original eight PDF page streams
+are unchanged; original eight plan-page renders remain pixel-identical, with revised appendices.
+Full names, commands, initial resolved failures and limits: `docs/verification/module-sample-first.md`.
+CKB-054 records the diagnosis. Implementation and this handoff are committed together.
+
+Nothing remains in progress for the approved implementation. Next: push/review the feature PR
+against `codex/earlet-hover-dismiss` (PR #26, itself stacked on PR #25). The teacher applies
+`20261021000100_module_activity_projects.sql` before deploying the reviewed app and re-uploading
+the revised Week 14 JSON. Follow `docs/module-sample-first-setup.md`; existing app processes need
+restart after a rebuild. Existing local classroom server 3012 was left running; isolated test
+origins were 3020/3022 and a separate static runner 3021. Browser tests remove disposable local
+classes/accounts; only their temporary servers need stopping after the final check. Other weeks,
+file persistence, threads, Swing, and generation prompt/playbook remain separate proposals.
+Hosted, Windows, physical disconnected Wi-Fi devices and all browser task alterations are unverified.
+
+## Prior delivered task-flow stage
 
 ## Approved scope
 

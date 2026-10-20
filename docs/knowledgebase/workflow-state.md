@@ -197,3 +197,28 @@ What teachers and students can do today. Keep this page current when their use o
   original eight pages and appends three practice pages; the lesson plan adds a task appendix.
 - File handling/persistent runtime data, thread timing and Swing window verification require
   later proposals. This stage does not enable them. No migration or hosted settings change.
+
+## Sample verification before alterations (approved 2026-10-21)
+
+- Revised Week 14 opts into `sampleFirst: true`. **Work in code editor** loads the current step's
+  sample on first opening. Supporting classes roll forward; each step's saved working files are
+  kept independently. Reopening resumes those edits. Work present before the update remains
+  readable under **Work saved before sample loading**. The previous week and personal drafts and
+  submissions are never changed by module sample loading.
+- The sample editor stays read-only until the student presses **Run code** and verifies the
+  unchanged supplied sources and sample result. **Sample verified — now complete Your task.**
+  saves verification without completing the task, advancing its percentage, or opening the next step.
+  A sample with an explicit `expectedError` verifies the declared exception and shows
+  **Expected error observed**; it cannot earn task completion.
+- The same editor then opens for the small alteration and shows **Expected task output**.
+  A matching successful task run saves **Completed** immediately and unlocks the next activity.
+  The prominent banner sits above **Actual output**, outside the scrolling instructions.
+  Other banners distinguish unchanged sample output and a mismatch. A failed later run reports
+  its failure while explicitly retaining earlier saved completion. Reopening shows saved completion.
+- An additive `module_progress.activity_projects` column stores module-only working drafts;
+  sample evidence uses separate `sample:<activity.id>` keys. Existing completion keys stay intact
+  and already completed tasks are not forced to repeat a sample or given invented sample passes.
+  Older JSON without `sampleFirst` keeps its existing checks. Old cached clients attempting to
+  save a new-flow project without its step identity are refused, rather than overwriting another step.
+- Apply the new migration before deploying this app and re-uploading the revised Week 14 JSON.
+  See `docs/module-sample-first-setup.md`. No assistant hosted migration or deployment is performed.

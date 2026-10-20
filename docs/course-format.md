@@ -160,3 +160,24 @@ The first revised example is [Week 14](modules/week14/README.md). Its link is `j
 Week 13 JSON is still to be authored. Deploy the app change before uploading a task-enabled file.
 The old playbook checker validates sample runs only; updating the generation prompt/playbook and
 its checker is a later stage.
+
+## Optional sample-first workflow
+
+Set module-level `"sampleFirst": true` to require sample verification before each explicitly
+identified alteration (`activity.id`). Existing files omitting this field keep their prior behavior.
+The main editor loads each step's `files` on first opening and adds supporting starter/rolling
+classes. Reopening a started step resumes its saved draft; existing completions stay completed.
+The unchanged supplied sample must run with its own `stdin` and `expectedOutput` before alteration
+editing opens. This saves `sample:<activity.id>` evidence only. The alteration then checks its own
+input/output and completes only after successful execution. Sample evidence never opens the next
+step or counts toward task completion. Samples are not silently reloaded over saved edits.
+
+For an intentional Java runtime-error demonstration, add a step-level `expectedError` containing
+the fully qualified exception type, for example `"java.util.ConcurrentModificationException"`.
+The check requires an unsuccessful run with that exception as the first error line, allowing JVM
+stack-frame differences and the browser's absent thread prefix. It is a verified demonstration,
+never a completed alteration. All ordinary samples and alterations require successful execution.
+Use deterministic sample output; platform-specific exception messages should be printed explicitly
+and unordered collection iteration must be checked on each supported runner before publishing.
+Do not change a task's requirement without a new stable activity id; sample-key collisions are
+rejected at upload, alongside existing step/task/lesson/exit-slip collisions.
