@@ -179,3 +179,20 @@ What teachers and students can do today. Keep this page current when their use o
   expected-output checks. Personal Run is separate from Submit this version.
 - Offline still runs laptop javac with input supplied before Run. No new route, migration,
   dependency, hosted secret or hosted setting is needed.
+
+## Small alteration tasks (approved 2026-10-20)
+
+- Revised modules can opt in with a separate stable `activity.id` for each alteration. Students
+  see **Sample code**, **Sample output**, **Your task**, and **Expected task output**.
+- **Work in code editor** opens their rolling module project. Current edits and supporting
+  classes survive task changes. Successful **Run code** matching the task target earns
+  **Completed** and unlocks the next step, including within one part. The server withholds
+  later task content and rejects premature runs.
+- New task records cannot inherit old sample or legacy challenge passes. Previously completed
+  tasks stay completed after later failed exploratory runs. Unchanged older modules keep their
+  sample checks and part unlocking. Paper liplets and personal project rules are unchanged.
+- Week 14 is the first revised example under `docs/modules/week14/`. Its JSON retains
+  `java-2-w14`, links to planned `java-2-w13`, and supplies eleven small tasks. The PDF keeps its
+  original eight pages and appends three practice pages; the lesson plan adds a task appendix.
+- File handling/persistent runtime data, thread timing and Swing window verification require
+  later proposals. This stage does not enable them. No migration or hosted settings change.

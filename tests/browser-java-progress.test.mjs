@@ -55,6 +55,25 @@ async function withClass(action) {
   }
 }
 
+test("online module tasks: browser results check the task target and cannot reuse a sample pass", needsLocal, async () => {
+  await withClass(async ({ upload, prepare, request }) => {
+    const content = structuredClone(fixture);
+    content.lessons[0].blocks[0].activity.id = "browser-alteration";
+    await upload(content);
+    let progress = await prepare();
+    const report = (output, success = true) => request("/progress/browser-result", { stepId: first.id, updatedAt: progress.updatedAt, output, success, expectedOutput: output });
+    let result = await (await report(first.expectedOutput)).json();
+    assert.equal(result.passed, false); progress = result.progress;
+    result = await (await report(first.activity.expectedOutput, false)).json();
+    assert.equal(result.passed, false); progress = result.progress;
+    result = await (await report(first.activity.expectedOutput)).json();
+    assert.equal(result.passed, true);
+    assert.equal(result.progress.stepStates["task:browser-alteration"], "pass");
+    assert.equal(result.progress.stepStates[first.id], undefined);
+    assert.equal((await (await request()).json()).lessons[1].closed, false);
+  });
+});
+
 test("online Java progress: browser evidence obeys membership, exact output, successful exit, saved version and part access", needsLocal, async () => {
   await withClass(async ({ call, request, prepare, cookies, classroomId, admin, users }) => {
     assert.equal((await call("/api/java-runner")).status, 401);

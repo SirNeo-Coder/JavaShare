@@ -39,7 +39,7 @@ async function runFiles(files: ModuleFile[], stdin = "") {
 export type ModuleFile = { path: string; content: string };
 export type StepBlock = {
   locked?: boolean;
-  activity?: { instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string };
+  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string };
   part?: string;
   type: "step";
   id: string;
@@ -155,17 +155,20 @@ function StepView({ step, status, role, printed = false, onStart }: {
     catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
     finally { setBusy(false); }
   };
-  if (step.locked) return <p className="module-preview-note">Complete the previous part to unlock this activity.</p>;
+  const task = step.activity?.id ? step.activity : null;
+  if (step.locked) return <p className="module-preview-note">Complete the previous activity to unlock this step.</p>;
   return <div className="module-step">
-    <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Passed" : "Try again"}</span>}</div>
+    <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Completed" : "Try again"}</span>}</div>
     <Markdown markdown={step.instruction} />
+    {task && <b>Sample code</b>}
     <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>
-    <b>Output (expected):</b><pre className="printed-output">{step.expectedOutput}</pre>
+    <b>{task ? "Sample output" : "Output (expected):"}</b><pre className="printed-output">{step.expectedOutput}</pre>
+    {task && <div className="paper-instructions"><b>Your task</b><Markdown markdown={task.instruction} /><b>Expected task output</b><pre className="printed-output">{task.expectedOutput}</pre></div>}
     {role === "student" && <div className="paper-instructions">
-      <p>Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step.</p>
+      <p>{task ? "Continue in your saved module project. Make the changes in Your task, then Run code. Successful execution matching Expected task output completes this task and unlocks the next step." : "Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step."}</p>
       {step.language === "java" ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java only.</p>}
     </div>}
-    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
+    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;

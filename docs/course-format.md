@@ -117,3 +117,46 @@ Existing sample/own records and assessment remain compatible. Personal input is 
 Teacher availability switches do not gate students; their old API/data remain compatible. The
 weekly live-class restriction still applies. Online multi-file Java uses Java 8 in the browser after [runner setup](online-java-setup.md);
 offline mode continues compiling all classes together with laptop javac.
+
+### Small alteration tasks and rolling projects (approved 2026-10-20)
+
+Keep the printed sample in the step's `files`, `instruction`, `expectedOutput`, and optional
+`stdin`. Add a separately identified `activity` for the student alteration:
+
+```json
+"activity": {
+  "id": "java-2-w14-d1-s1-alter-v1",
+  "instruction": "Change the removal from index 1 to index 3. Keep the other output lines.",
+  "files": [],
+  "expectedOutput": "the complete, verified output after the alteration",
+  "stdin": ""
+}
+```
+
+A nonempty stable `activity.id` opts into task checking and one-step-at-a-time unlocking.
+It must be unique across the module's lesson, sample, slip and task ids, including generated
+progress keys. Completion is stored under `task:<activity.id>`; old sample and legacy
+`<step id>:activity` records remain stored but cannot complete this new task. Change the task id
+when changing what a task requires. Keep published module, lesson and sample step ids.
+
+The worksheet shows Sample code, Sample output, Your task and Expected task output. The main
+editor checks the task's output/input, not the sample's. Only successful execution with matching
+output completes it. Compiler-error and crash examples remain demonstrations; give students a
+successful alteration to check. Make required outputs predictable: do not require HashSet order,
+a particular stack trace or elapsed thread timing. Older JSON without explicit task ids keeps
+its existing sample checks and part access.
+
+Opening a task combines supporting classes, sample files and any task starter files, then keeps
+previous-week and current saved files in preference to templates. Students make the stated code
+changes themselves; opening a later task never replaces an existing Main.java. Task `files` can
+add missing supporting classes, but must not contain the solved alteration.
+
+Use `previousModuleId` for the preceding module in this class. A missing previous project falls
+back to starter files. Once this week's project exists, opening it again never recopy-overwrites
+it. Module and personal projects roll forward separately; previous weeks and submitted snapshots
+are unchanged. No new table, column or migration.
+
+The first revised example is [Week 14](modules/week14/README.md). Its link is `java-2-w13`;
+Week 13 JSON is still to be authored. Deploy the app change before uploading a task-enabled file.
+The old playbook checker validates sample runs only; updating the generation prompt/playbook and
+its checker is a later stage.

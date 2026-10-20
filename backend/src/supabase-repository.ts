@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { activityStateId, activityAccess, findActivity, matchesActivityOutput, mergeProjectFiles, type ModuleFile } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, findActivity, matchesActivityOutput, mergeProjectFiles, type ModuleFile } from "./module-activities.ts";
 import { type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, projectPathError } from "./file-paths.ts";
@@ -1398,7 +1398,7 @@ async function requireModuleActivity(user: SupabaseSessionUser, classroomId: str
   const step = findActivity(content, stepId);
   if (!step) throw new SupabaseRepositoryError(404, "Activity not found in this module");
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
-  if (!activityAccess(content, progress.step_states).parts.some((part) => part.open && part.stepIds.includes(activityStateId(step)))) throw new SupabaseRepositoryError(403, "Complete the previous part first");
+  if (!activityAccess(content, progress.step_states).openStepIds.includes(activityStateId(step))) throw new SupabaseRepositoryError(403, "Complete the previous activity first");
   return { content, step, progress };
 }
 
@@ -1412,7 +1412,7 @@ export async function prepareSupabaseModuleActivity(user: SupabaseSessionUser, c
     fail(error, "Could not load the previous module project");
     previous = data?.project_files ?? [];
   }
-  const files = mergeProjectFiles(content.starterFiles, step.files, previous);
+  const files = mergeProjectFiles(content.starterFiles, step.files, activityTask(step).files, previous);
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId,
     (row) => {
       const project = mergeProjectFiles(files, row.project_files);
@@ -1434,7 +1434,7 @@ export async function runSupabaseModuleActivity(
   const saved = JSON.stringify(files) === JSON.stringify(beforeRun.project_files)
     ? moduleProgressView(beforeRun, content)
     : await setSupabaseModuleProjectFiles(user, classroomId, moduleId, files, updatedAt);
-  const result = await execute(files, step.stdin ?? "");
+  const result = await execute(files, activityTask(step).stdin ?? "");
   if (result.mode === "demo") throw new SupabaseRepositoryError(503, "Java execution is unavailable here. Run this activity in offline classroom mode");
   return recordSupabaseModuleActivityResult(user, classroomId, moduleId, stepId, saved.updatedAt, result);
 }
@@ -1447,7 +1447,7 @@ export async function recordSupabaseModuleActivityResult(
 ) {
   const { content, step } = await requireModuleActivity(user, classroomId, moduleId, stepId);
   if (step.language !== "java") throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java only");
-  const passed = matchesActivityOutput(result, step.expectedOutput);
+  const passed = matchesActivityOutput(result, activityTask(step).expectedOutput);
   const progress = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     // A changed project must not receive a result from an earlier run.
     if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
@@ -1723,14 +1723,16 @@ export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: 
   if (user.role === "teacher") return { ...row.content, availability: moduleAvailability(row) };
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
   const access = activityAccess(row.content, progress.step_states);
-  const openSteps = new Set(access.parts.filter((part) => part.open).flatMap((part) => part.stepIds));
+  const openSteps = new Set(access.openStepIds);
   const lessons = row.content.lessons.map((lesson) => {
     const steps = lesson.blocks.filter((block) => block.type === "step");
     const blocks = lesson.blocks.map((block, index) => {
       const owner = lesson.blocks.slice(index).find((item) => item.type === "step") ?? steps.at(-1);
       if (!owner || owner.type !== "step" || openSteps.has(activityStateId(owner))) return block;
       if (block.type !== "step") return { type: "text", markdown: "" };
-      return { type: "step", id: block.id, number: block.number, part: block.part, language: block.language, locked: true, instruction: "Complete the previous part to unlock this activity.", files: [], expectedOutput: "" };
+      return { type: "step", id: block.id, number: block.number, part: block.part, language: block.language, locked: true,
+        ...(block.activity?.id ? { activity: { id: block.activity.id, instruction: "", files: [], expectedOutput: "" } } : {}),
+        instruction: "Complete the previous activity to unlock this step.", files: [], expectedOutput: "" };
     });
     const open = !steps.length || steps.some((step) => openSteps.has(activityStateId(step)));
     return { ...lesson, closed: !open, blocks, exitSlip: steps.length && !openSteps.has(activityStateId(steps.at(-1)!)) ? { ...lesson.exitSlip, questions: [] } : lesson.exitSlip };

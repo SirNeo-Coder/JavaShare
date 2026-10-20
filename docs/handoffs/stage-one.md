@@ -1,3 +1,11 @@
+> Current approved first stage (2026-10-20): [rolling module tasks](rolling-module-tasks.md),
+> branch `codex/rolling-module-tasks`. Core task workflow and revised Week 14 example complete;
+> build passed, lint zero errors/eight existing warnings, full suite 160/160 without skips.
+> Actual browser Java and offline javac task completion/unlocking/saved-work checks passed.
+> No migration or hosted change. Next: commit/push, teacher pull-request review, then separate
+> proposals for other weeks, file persistence, Swing and generation prompt/playbook.
+> Full continuation instructions and limitations are in the linked handoff.
+
 > Delivered session work (2026-10-20), now on `main`:
 > [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), merge `34b83bb`, implementation
 > `b24c89c`: implemented the teacher's two-hour

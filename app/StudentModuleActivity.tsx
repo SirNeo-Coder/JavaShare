@@ -21,6 +21,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void;
 }) {
   const personal = activity.kind === "performance";
+  const task = !personal && activity.stateId.startsWith("task:");
   const [files, setFiles] = useState<ModuleFile[]>(personal ? activity.progress.performanceProjectFiles : activity.progress.projectFiles);
   const [stdin, setStdin] = useState("");
   const [path, setPath] = useState(files.find((file) => /(?:^|\/)Main\.java$/.test(file.path))?.path ?? files[0]?.path ?? "");
@@ -30,7 +31,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [error, setError] = useState("");
   const [output, setOutput] = useState("Ready — edit your project, then press Run code.");
   const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
-  const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Passed" : "Not checked yet");
+  const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
   const progress = useRef(activity.progress);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
   const busyRef = useRef(false);
@@ -66,7 +67,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         });
         progress.current = result.progress;
         setOutput(result.output);
-        setStatus(result.passed ? "Passed" : "Try again — this run did not match the expected output");
+        setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Try again — this run did not match the expected output");
         onChecked();
       }
     } catch (runError) {
@@ -116,12 +117,12 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       <aside className="right-panel module-activity-console">
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
-          <b>{personal ? "Your performance task" : "Module sample"}</b><p>{activity.instruction}</p>
+          <b>{personal ? "Your performance task" : task ? "Your task" : "Module sample"}</b><p>{activity.instruction}</p>
           {personal ? <label>Program input<textarea value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");
             }
-          }} /></label> : <><b>Expected output</b><pre>{activity.expectedOutput}</pre></>}
+          }} /></label> : <><b>{task ? "Expected task output" : "Expected output"}</b><pre>{activity.expectedOutput}</pre></>}
           {activity.stdin && <><b>Program input for this check</b><pre>{activity.stdin}</pre></>}
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}

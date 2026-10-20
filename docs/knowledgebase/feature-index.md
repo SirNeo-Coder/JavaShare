@@ -33,3 +33,9 @@
 | online multi-file Java, Java packages, CheerpJ, browser practice result | GET `/api/java-runner`, POST `.../progress/browser-result`, `recordSupabaseModuleActivityResult` | `javaExecution.ts`, `JavaRunnerBrand`, three existing Java callers; `java-runtime/`, `vendor/java/` | no migration; `tests/browser-java-*.test.mjs`; CKB-046/047/048; `docs/handoffs/online-multifile-java.md` |
 
 | interactive online Java, Scanner waits, answer after Run, live Console output, Stop | existing Java mode and module-result routes unchanged | useJavaConsole.ts, javaExecution.ts, page.tsx, StudentModuleActivity.tsx; runner.js and vendor/java/CodeShareJava.java | tests/browser-java-client.test.mjs and browser-java-runtime.test.mjs; CKB-049; docs/handoffs/online-java-interactive-input.md |
+
+Explicit alteration tasks: `activityTask` / `activityStateId` / `activityAccess.openStepIds` in
+`backend/src/module-activities.ts`; existing repository activity and result routes;
+`ModuleViewer`, `StudentModuleActivity`, `moduleParts`, `page.tsx`. Tests in module-activities,
+browser-java-progress, classroom-ui, weekly-java-project-ui and rolling-module-tasks.
+First example: `docs/modules/week14/`; CKB-052.

@@ -9,7 +9,7 @@ import { studentEntryClassroom, rememberedStudentClassroom, rememberStudentClass
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import ModuleWorkspace from "./ModuleWorkspace";
 import { moduleProjectForClass } from "./moduleActivityState";
-import { activityStateId } from "../backend/src/module-activities";
+import { activityStateId, activityTask } from "../backend/src/module-activities";
 import StudentModuleActivity, { type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
@@ -1694,8 +1694,8 @@ export default function Home() {
     setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
     setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
       classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "",
-      instruction: step?.instruction ?? currentModule.performanceTask?.markdown ?? "",
-      expectedOutput: step?.expectedOutput ?? "", stdin: step?.stdin ?? "", progress });
+      instruction: step ? activityTask(step).instruction : currentModule.performanceTask?.markdown ?? "",
+      expectedOutput: step ? activityTask(step).expectedOutput : "", stdin: step ? activityTask(step).stdin ?? "" : "", progress });
     setProjectsOpen(false);
   }
 

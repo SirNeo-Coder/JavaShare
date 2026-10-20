@@ -1,0 +1,932 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 14,
+  "id": "java-2-w14",
+  "title": "Self-Paced Module: The Java Collections Framework",
+  "continues": "Week 13 — Exception Handling",
+  "starterFiles": [
+    {
+      "path": "Bus.java",
+      "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+    },
+    {
+      "path": "InvalidDistanceException.java",
+      "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Jeepney.java",
+      "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+    },
+    {
+      "path": "Main.java",
+      "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle[] fleet = new Vehicle[3];          // an array: the size is fixed at 3\n        fleet[0] = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        fleet[1] = new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\");\n        fleet[2] = new Bus(\"BUS 789\", \"Aling Rosa\", 50);\n\n        for (Vehicle v : fleet) {\n            v.showInfo();\n        }\n        try {\n            fleet[3] = new Jeepney(\"NYB 321\", \"Mang Tonyo\", \"Sangandaan-Recto\");   // no room!\n        } catch (ArrayIndexOutOfBoundsException e) {\n            System.out.println(\"Fleet is full: \" + e.getMessage());\n        }\n    }\n}\n"
+    },
+    {
+      "path": "OverloadException.java",
+      "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Tricycle.java",
+      "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+    },
+    {
+      "path": "Vehicle.java",
+      "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "java-2-w14-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Beyond Arrays: The Java Collections Framework and the List Interface",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the Java Collections Framework and the List interface, and distinguish an ArrayList from a LinkedList by how each stores and accesses its elements.",
+        "affective": "Appreciate fairness in shared systems, such as a priority lane in a waiting line, and value organising information so that everyone is served in proper order.",
+        "psychomotor": "Write and run a program that stores Vehicle objects in an ArrayList and manages a waiting line with a LinkedList."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Where we left off:** your folder should already have `Vehicle.java` (with `getCapacity()`, `board()`, and `quoteFare()`), `Jeepney.java`, `Tricycle.java`, `Bus.java`, `OverloadException.java`, and `InvalidDistanceException.java`. You will replace `Main.java` many times this week, so save a copy first as `Main_week13.txt`.\n\n**No internet needed.** Keep every class in its own file, all in one folder. Compile with `javac *.java`, run with `java Main`.\n\n**Why this week exists:** last week our fleet was an array of 3 (`Vehicle[] fleet = new Vehicle[3];`). An array's size is fixed when you create it, so a 4th jeepney simply does not fit. A collection grows and shrinks by itself, and comes with methods for adding, removing, searching, and sorting."
+        },
+        {
+          "type": "definition",
+          "term": "Collection and Java Collections Framework",
+          "markdown": "A **collection** is an object that holds a group of other objects. The **Java Collections Framework** is the set of ready-made interfaces (what a collection can do) and classes (working versions you can create with `new`) that Java gives you for storing, finding, and looping through groups of data. It lives in the `java.util` package."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A terminal manages its data in three different ways. The dispatcher's **logbook** lists trips in order, and the same jeepney can appear many times: that is a **List**. The LTO registration list names each plate number only once, with no repeats allowed: that is a **Set**. The **key cabinet** has a hook labelled with each plate number, so you find a key instantly by its label: that is a **Map**."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Interface",
+            "Rule",
+            "Classes you will use",
+            "In our program"
+          ],
+          "rows": [
+            [
+              "List",
+              "Keeps order; allows duplicates; each item has an index 0, 1, 2…",
+              "ArrayList, LinkedList",
+              "the fleet; the line of waiting passengers"
+            ],
+            [
+              "Set",
+              "No duplicates; no index",
+              "HashSet, TreeSet (sorted)",
+              "registered plates; stops on a route"
+            ],
+            [
+              "Map",
+              "Stores key → value pairs; each key appears once",
+              "HashMap, TreeMap (sorted keys)",
+              "plate → vehicle; driver → trips"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Reading the angle brackets:** a `List` of `Vehicle` is written with the type inside angle brackets after the word `List`. The type inside the brackets must be a class, so for numbers you write `Integer`, not `int`, and `Double`, not `double`. Java converts between them for you automatically."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d1-s1",
+          "number": 1,
+          "instruction": "Replace `Main.java` with this. Notice the 4th vehicle — an array of 3 could never hold it.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Vehicle> fleet = new ArrayList<>();     // starts empty, grows as needed\n        fleet.add(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"));\n        fleet.add(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"));\n        fleet.add(new Bus(\"BUS 789\", \"Aling Rosa\", 50));\n        fleet.add(new Jeepney(\"NYB 321\", \"Mang Tonyo\", \"Sangandaan-Recto\"));   // a 4th!\n\n        System.out.println(\"Vehicles in fleet: \" + fleet.size());\n        System.out.println(\"First vehicle: \" + fleet.get(0).getPlateNumber());\n\n        fleet.remove(1);                             // the tricycle leaves for repair\n        System.out.println(\"After removal: \" + fleet.size());\n\n        for (Vehicle v : fleet) {\n            v.showInfo();\n        }\n\n        try {\n            fleet.get(5).showInfo();                 // there is no index 5\n        } catch (IndexOutOfBoundsException e) {\n            System.out.println(\"No vehicle there: \" + e.getMessage());\n        }\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Vehicles in fleet: 4\nFirst vehicle: NXA 123\nAfter removal: 3\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nNYB 321 | Driver: Mang Tonyo | Passengers: 0/20\nNo vehicle there: Index 5 out of bounds for length 3",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d1-s1-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nIn the sample, change fleet.remove(1) to fleet.remove(3). Remove the fourth vehicle instead of the tricycle. In the catch block, replace the printed exception message with exactly: No vehicle at index 5. Keep the list and the other output lines.",
+            "files": [],
+            "expectedOutput": "Vehicles in fleet: 4\nFirst vehicle: NXA 123\nAfter removal: 3\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nTRC 456 | Driver: Kuya Ben | Passengers: 0/4\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nNo vehicle at index 5."
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "ArrayList method",
+            "What it does"
+          ],
+          "rows": [
+            [
+              "add(item)",
+              "puts the item at the end; the list grows by one"
+            ],
+            [
+              "get(index)",
+              "gives the item at that position (the first is index 0)"
+            ],
+            [
+              "remove(index)",
+              "takes out the item at that position; everything after it moves up one place"
+            ],
+            [
+              "size()",
+              "how many items are in the list right now"
+            ],
+            [
+              "contains(item)",
+              "true if the item is in the list"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Look closely:** after `remove(1)`, the bus moved from index 2 to index 1. And `get(5)` threw an `IndexOutOfBoundsException` — the same kind of error you learned to catch last week."
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 2 — LinkedList: the line at the terminal.** A `LinkedList` is also a List, but each item is linked to the one before and after it, like passengers holding hands in a line. Adding or removing at the front or back is very fast, which makes it perfect for a waiting line."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d1-s2",
+          "number": 2,
+          "instruction": "Replace `Main.java`. Senior citizens go to the front of the line (priority lane).",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.LinkedList;\n\npublic class Main {\n    public static void main(String[] args) {\n        LinkedList<String> line = new LinkedList<>();            // passengers waiting at the terminal\n        line.addLast(\"Ana\");\n        line.addLast(\"Ben\");\n        line.addLast(\"Carla\");\n        line.addFirst(\"Lolo Pedro\");                             // senior citizen: priority lane\n\n        System.out.println(\"Waiting: \" + line);\n        System.out.println(\"Next to board: \" + line.getFirst());\n\n        String boarding = line.removeFirst();\n        System.out.println(\"Now boarding: \" + boarding);\n        System.out.println(\"Still waiting: \" + line + \" (\" + line.size() + \" people)\");\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Waiting: [Lolo Pedro, Ana, Ben, Carla]\nNext to board: Lolo Pedro\nNow boarding: Lolo Pedro\nStill waiting: [Ana, Ben, Carla] (3 people)",
+          "run": "Main.java",
+          "checkYourself": "Add `line.addLast(\"Lola Maria\");` right after `addFirst`. Is she placed in the priority lane? (No — `addLast` puts her at the back. To give her priority, use `addFirst` instead.)",
+          "activity": {
+            "id": "java-2-w14-d1-s2-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nChange the priority passenger from Lolo Pedro to Lola Nena. Keep addFirst, removeFirst, and the other three passengers unchanged.",
+            "files": [],
+            "expectedOutput": "Waiting: [Lola Nena, Ana, Ben, Carla]\nNext to board: Lola Nena\nNow boarding: Lola Nena\nStill waiting: [Ana, Ben, Carla] (3 people)"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Why `LinkedList` line and not `List` line?** Methods like `addFirst()` and `removeFirst()` belong to `LinkedList`, not to every List. If you need them, the variable's type must be `LinkedList`."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "ArrayList",
+            "LinkedList"
+          ],
+          "rows": [
+            [
+              "Picture it as",
+              "a row of numbered seats in a bus",
+              "a line of people holding hands"
+            ],
+            [
+              "Fast at",
+              "get(index): jump straight to seat number 500",
+              "adding or removing at the front or back"
+            ],
+            [
+              "Slow at",
+              "removing near the front: everyone behind must shift",
+              "get(index): must walk the line one person at a time"
+            ],
+            [
+              "Use it for",
+              "most lists: the fleet, a class list, a price list",
+              "queues and waiting lines"
+            ]
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w14-d1-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is the Java Collections Framework? Give one reason to use an ArrayList instead of an array."
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, after `fleet.remove(1)`, the bus moved from index 2 to index 1. Why?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Name one waiting line in your school or barangay. Why is a LinkedList a better fit for it than an ArrayList?"
+          }
+        ],
+        "afterStep": "java-2-w14-d1-s2"
+      }
+    },
+    {
+      "id": "java-2-w14-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "No Duplicates Allowed: The Set Interface with HashSet and TreeSet",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the Set interface's no-duplicate rule and distinguish a HashSet (no promised order) from a TreeSet (sorted order).",
+        "affective": "Value accuracy and integrity in records, recognising that duplicate entries in real registries can cause unfairness and confusion.",
+        "psychomotor": "Write and run programs that use a HashSet to refuse duplicate plate numbers and a TreeSet to list route stops in sorted order."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Set",
+          "markdown": "A **Set** is a collection that never holds the same item twice. If you try to add something already there, the set simply refuses and `add()` returns `false`. A Set has no index, so there is no `get(0)`."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The LTO will never register two vehicles with the same plate number. If someone tries to register NXA 123 again, the clerk says \"already registered\" and nothing changes. A Set behaves exactly like that clerk."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d2-s3",
+          "number": 3,
+          "instruction": "Replace `Main.java`. Watch what `add()` prints the second time we try NXA 123.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.HashSet;\nimport java.util.Set;\n\npublic class Main {\n    public static void main(String[] args) {\n        Set<String> registered = new HashSet<>();              // plate numbers: no duplicates allowed\n\n        System.out.println(registered.add(\"NXA 123\"));            // true: added\n        System.out.println(registered.add(\"TRC 456\"));            // true: added\n        System.out.println(registered.add(\"NXA 123\"));            // false: already there!\n\n        System.out.println(\"Registered plates: \" + registered.size());\n        System.out.println(\"Is BUS 789 registered? \" + registered.contains(\"BUS 789\"));\n\n        registered.remove(\"TRC 456\");\n        System.out.println(\"After removing TRC 456: \" + registered.size());\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "true\ntrue\nfalse\nRegistered plates: 2\nIs BUS 789 registered? false\nAfter removing TRC 456: 1",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d2-s3-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nChange only the third registered.add call: add BUS 789 instead of repeating NXA 123. Keep the BUS lookup and the removal of TRC 456.",
+            "files": [],
+            "expectedOutput": "true\ntrue\ntrue\nRegistered plates: 3\nIs BUS 789 registered? true\nAfter removing TRC 456: 2"
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 4 — TreeSet: no duplicates, and SORTED.** A jeepney passes the same stops more than once in a day. We want the list of different stops, in alphabetical order."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d2-s4",
+          "number": 4,
+          "instruction": "Replace `Main.java`. The same seven stops go into a HashSet and a TreeSet so you can compare them.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.HashSet;\nimport java.util.Set;\nimport java.util.TreeSet;\n\npublic class Main {\n    public static void main(String[] args) {\n        String[] passedBy = { \"Monumento\", \"Recto\", \"5th Avenue\", \"Blumentritt\",\n                              \"Divisoria\", \"Recto\", \"Monumento\" };\n\n        Set<String> hashStops = new HashSet<>();\n        TreeSet<String> treeStops = new TreeSet<>();              // TreeSet keeps them SORTED\n        for (String stop : passedBy) {\n            hashStops.add(stop);\n            treeStops.add(stop);\n        }\n\n        System.out.println(\"Stops passed: \" + passedBy.length);\n        System.out.println(\"Different stops: \" + treeStops.size());\n        System.out.println(\"TreeSet, sorted: \" + treeStops);\n        System.out.println(\"First alphabetically: \" + treeStops.first());\n        System.out.println(\"Last alphabetically: \" + treeStops.last());\n        System.out.println(\"HashSet: \" + hashStops);\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Stops passed: 7\nDifferent stops: 5\nTreeSet, sorted: [5th Avenue, Blumentritt, Divisoria, Monumento, Recto]\nFirst alphabetically: 5th Avenue\nLast alphabetically: Recto\nHashSet: [Monumento, 5th Avenue, Recto, Blumentritt, Divisoria]",
+          "run": "Main.java",
+          "checkYourself": "Add `\"Divisoria\"` to the `passedBy` array one more time and run again. \"Stops passed\" becomes 8, but \"Different stops\" stays 5. Can you explain why? (The TreeSet refuses a stop it already has, so only the array grows.)",
+          "activity": {
+            "id": "java-2-w14-d2-s4-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nKeep hashStops as a HashSet. In the last println, display new TreeSet<String>(hashStops) instead of hashStops. This sorts only the displayed copy, giving everyone the same output. The sample HashSet order may differ between computers.",
+            "files": [],
+            "expectedOutput": "Stops passed: 7\nDifferent stops: 5\nTreeSet, sorted: [5th Avenue, Blumentritt, Divisoria, Monumento, Recto]\nFirst alphabetically: 5th Avenue\nLast alphabetically: Recto\nHashSet: [5th Avenue, Blumentritt, Divisoria, Monumento, Recto]"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Your HashSet line may be in a different order — that is correct.** A HashSet makes no promise about order. Notice also that `5th Avenue` comes first in the TreeSet: text is sorted character by character, and digits come before letters."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "HashSet",
+            "TreeSet"
+          ],
+          "rows": [
+            [
+              "Duplicates?",
+              "never",
+              "never"
+            ],
+            [
+              "Order",
+              "no promised order",
+              "always sorted (A to Z, smallest to largest)"
+            ],
+            [
+              "Speed",
+              "fastest for add, remove, contains",
+              "a little slower, because it keeps everything sorted"
+            ],
+            [
+              "Extra methods",
+              "—",
+              "first(), last()"
+            ],
+            [
+              "Use it for",
+              "checking \"is this already here?\": registered plates",
+              "a unique list that must be shown in order: stops, names"
+            ]
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w14-d2-slip",
+        "points": 20,
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a Set? In Step 3, what did `add(\"NXA 123\")` return the second time, and why?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 4, seven stops were passed but there were only five \"different stops.\" Why? And why was the TreeSet's order different from the HashSet's?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Choose",
+            "points": 5,
+            "prompt": "Write the best class (ArrayList, LinkedList, HashSet, or TreeSet) for each. a) all LRNs in school, no repeats, any order; b) learners' names in a section, A to Z; c) order of homework submitted, repeats OK; d) the line at the school canteen."
+          },
+          {
+            "id": "2.4",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Name one real record that must never contain duplicates. Would you use a HashSet or a TreeSet for it? Why?"
+          }
+        ],
+        "afterStep": "java-2-w14-d2-s4"
+      }
+    },
+    {
+      "id": "java-2-w14-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Find It by Its Key: The Map Interface with HashMap and TreeMap",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the Map interface as key–value pairs with unique keys, and distinguish a HashMap from a TreeMap.",
+        "affective": "Appreciate efficient organisation that saves other people's time, like a labelled key cabinet, and value orderly, findable records.",
+        "psychomotor": "Write and run programs that look up vehicles in a HashMap, throwing a custom VehicleNotFoundException for a missing key, and that count trips in a TreeMap."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Map",
+          "markdown": "A **Map** stores pairs: a **key** and its **value**. You give the map a key, and it hands you the value instantly, without searching item by item. Each key can appear only once; putting a value under an existing key **replaces** the old value. A Map is part of the Collections Framework but is not a List or Set: it stores pairs, not single items."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The terminal's **key cabinet**: each hook has a label (the key: a plate number) and holds a jeepney key (the value). The dispatcher never searches every hook; she reads the label and takes the key. Two hooks can never have the same label."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Map method",
+            "What it does"
+          ],
+          "rows": [
+            [
+              "put(key, value)",
+              "stores the pair; if the key already exists, its value is replaced"
+            ],
+            [
+              "get(key)",
+              "gives the value for that key, or null if the key is not there"
+            ],
+            [
+              "containsKey(key)",
+              "true if the key is in the map"
+            ],
+            [
+              "getOrDefault(key, backup)",
+              "the value, or the backup value if the key is missing"
+            ],
+            [
+              "remove(key), size()",
+              "removes a pair; counts the pairs"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d3-s5",
+          "number": 5,
+          "instruction": "A missing plate deserves a clear error, so we add one more custom exception from last week's lesson. Create `VehicleNotFoundException.java`, then replace `Main.java`. The map's key is the plate; its value is the whole Vehicle object.",
+          "language": "java",
+          "files": [
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {             // CHECKED\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.util.HashMap;\nimport java.util.Map;\n\npublic class Main {\n    // look up a vehicle by plate; throws our custom exception if it is not there\n    static Vehicle findVehicle(Map<String, Vehicle> byPlate, String plate)\n            throws VehicleNotFoundException {\n        if (!byPlate.containsKey(plate)) {\n            throw new VehicleNotFoundException(\"No vehicle with plate \" + plate);\n        }\n        return byPlate.get(plate);\n    }\n\n    public static void main(String[] args) {\n        Map<String, Vehicle> byPlate = new HashMap<>();     // key: plate, value: the vehicle\n        byPlate.put(\"NXA 123\", new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"));\n        byPlate.put(\"TRC 456\", new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"));\n        byPlate.put(\"BUS 789\", new Bus(\"BUS 789\", \"Aling Rosa\", 50));\n\n        System.out.println(\"Vehicles on record: \" + byPlate.size());\n        byPlate.get(\"BUS 789\").showInfo();                  // instant lookup by key\n        System.out.println(\"Has ZZZ 000? \" + byPlate.containsKey(\"ZZZ 000\"));\n        System.out.println(\"get(\\\"ZZZ 000\\\") gives: \" + byPlate.get(\"ZZZ 000\"));\n\n        try {\n            findVehicle(byPlate, \"TRC 456\").showInfo();\n            findVehicle(byPlate, \"ZZZ 000\").showInfo();     // not found\n        } catch (VehicleNotFoundException e) {\n            System.out.println(\"Lookup failed: \" + e.getMessage());\n        }\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Vehicles on record: 3\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nHas ZZZ 000? false\nget(\"ZZZ 000\") gives: null\nTRC 456 | Driver: Kuya Ben | Passengers: 0/4\nLookup failed: No vehicle with plate ZZZ 000",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d3-s5-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nIn the try block, change the first findVehicle lookup from TRC 456 to NXA 123. Keep the later ZZZ 000 lookup so the custom exception is still handled.",
+            "files": [],
+            "expectedOutput": "Vehicles on record: 3\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nHas ZZZ 000? false\nget(\"ZZZ 000\") gives: null\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nLookup failed: No vehicle with plate ZZZ 000"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Why a custom exception?** `get()` on a missing key quietly returns `null`. If you then call `.showInfo()` on that `null`, the program crashes with a `NullPointerException`. `findVehicle()` checks with `containsKey()` first and throws a clear, checked exception instead, so whoever calls it is forced to plan for a missing plate. This is Week 13's lesson working inside this week's collections."
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 6 — TreeMap: counting trips, sorted by driver.** The dispatcher counts how many trips each driver made today. A `TreeMap` keeps its keys sorted, so the report comes out in alphabetical order by name."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d3-s6",
+          "number": 6,
+          "instruction": "Replace `Main.java`. The values are counts, so the type is `Integer`, not `int`.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.Map;\nimport java.util.TreeMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Map<String, Integer> trips = new TreeMap<>();          // key: driver, value: trips today\n        trips.put(\"Mang Ramon\", 5);\n        trips.put(\"Kuya Ben\", 8);\n        trips.put(\"Aling Rosa\", 3);\n\n        trips.put(\"Kuya Ben\", trips.get(\"Kuya Ben\") + 1); // same key: the value is REPLACED\n        trips.put(\"Mang Tonyo\", trips.getOrDefault(\"Mang Tonyo\", 0) + 1);\n\n        System.out.println(\"Drivers: \" + trips.size());\n        for (Map.Entry<String, Integer> entry : trips.entrySet()) {\n            System.out.println(entry.getKey() + \": \" + entry.getValue() + \" trip(s)\");\n        }\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Drivers: 4\nAling Rosa: 3 trip(s)\nKuya Ben: 9 trip(s)\nMang Ramon: 5 trip(s)\nMang Tonyo: 1 trip(s)",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d3-s6-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nIncrease Kuya Ben's extra trips by 2 instead of 1. Change the + 1 in the update for Kuya Ben only. Keep the initial values and Mang Tonyo's update.",
+            "files": [],
+            "expectedOutput": "Drivers: 4\nAling Rosa: 3 trip(s)\nKuya Ben: 10 trip(s)\nMang Ramon: 5 trip(s)\nMang Tonyo: 1 trip(s)"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Read it carefully:** Kuya Ben now has 9, not 8 — putting under the same key replaced his old count. Mang Tonyo was not in the map yet, so `getOrDefault` used the backup value 0, then added 1. Each `Map.Entry` is one key–value pair; Thursday explains this loop fully."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "HashMap",
+            "TreeMap"
+          ],
+          "rows": [
+            [
+              "Keys repeat?",
+              "never; a repeated key replaces its value",
+              "never; a repeated key replaces its value"
+            ],
+            [
+              "Order of keys",
+              "no promised order",
+              "always sorted by key"
+            ],
+            [
+              "Use it for",
+              "fast lookup: plate → vehicle",
+              "reports that must be in order: driver → trips"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Choosing the right collection — ask these questions in order",
+            "If YES, use…"
+          ],
+          "rows": [
+            [
+              "1. Do I need to find things by a label (a key)?",
+              "Map: HashMap, or TreeMap if keys must be sorted"
+            ],
+            [
+              "2. Must every item be unique?",
+              "Set: HashSet, or TreeSet if it must be sorted"
+            ],
+            [
+              "3. Does order matter, or can items repeat?",
+              "List: ArrayList, or LinkedList for a waiting line"
+            ]
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w14-d3-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a Map? Explain key and value using the plate-number map from Step 5."
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 6, Kuya Ben ended with 9 trips, not two separate entries of 8 and 1. Why?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Why does `findVehicle()` throw a `VehicleNotFoundException` instead of just returning what `get()` gives? Use the word NullPointerException."
+          }
+        ],
+        "afterStep": "java-2-w14-d3-s6"
+      }
+    },
+    {
+      "id": "java-2-w14-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "One at a Time: Mastering for Loops and the Iterator",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Compare the index for loop, the for-each loop, and the Iterator, and explain why removing inside a for-each loop throws a ConcurrentModificationException.",
+        "affective": "Show patience and care in working through every item one at a time, and value doing tasks the safe way even when a shortcut looks simpler.",
+        "psychomotor": "Write and run loops over a List, a Set, and a Map using all three loop styles, and safely remove items with an Iterator."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Iteration",
+          "markdown": "**Iteration** means visiting every item in a collection, one at a time. Java gives you three ways. Each one is right for a different job."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Loop",
+            "Shape",
+            "Works on",
+            "Choose it when…"
+          ],
+          "rows": [
+            [
+              "1. Index for",
+              "for (int i = 0; i < list.size(); i++)",
+              "Lists only (needs an index)",
+              "you need the position number"
+            ],
+            [
+              "2. For-each",
+              "for (Vehicle v : fleet)",
+              "any List, Set, or Map view",
+              "you only read each item; the shortest"
+            ],
+            [
+              "3. Iterator",
+              "Iterator it = fleet.iterator();",
+              "any List or Set",
+              "you must remove items while looping"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d4-s7",
+          "number": 7,
+          "instruction": "Loops 1 and 2. Replace `Main.java`.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Vehicle> fleet = new ArrayList<>();\n        fleet.add(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"));\n        fleet.add(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"));\n        fleet.add(new Bus(\"BUS 789\", \"Aling Rosa\", 50));\n        fleet.get(1).setPassengers(3);\n\n        // LOOP 1: index for loop (lists only) - you get the position number\n        for (int i = 0; i < fleet.size(); i++) {\n            System.out.println((i + 1) + \". \" + fleet.get(i).getPlateNumber());\n        }\n\n        // LOOP 2: for-each loop (any collection) - shortest, read-only\n        double total = 0;\n        for (Vehicle v : fleet) {\n            total = total + v.quoteFare(5);\n        }\n        System.out.println(\"Total fare for 5 km on every vehicle: P\" + total);\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "1. NXA 123\n2. TRC 456\n3. BUS 789\nTotal fare for 5 km on every vehicle: P112.5",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d4-s7-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nCalculate the total fare for 6 km instead of 5 km. Change quoteFare(5) to quoteFare(6) and change the output label to 6 km. Keep the three Vehicle objects and their fare methods.",
+            "files": [],
+            "expectedOutput": "1. NXA 123\n2. TRC 456\n3. BUS 789\nTotal fare for 6 km on every vehicle: P127.0"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Read it carefully:** the total is P15.00 + P70.00 + P27.50. Each vehicle used its own `computeFare()` — polymorphism from the Four Pillars. Fares are practice values, not real LTFRB rates."
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 8 — Removing inside a for-each loop: the wrong way.** End of shift: every empty vehicle goes off duty. The obvious idea is to remove it inside a for-each loop."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d4-s8",
+          "number": 8,
+          "instruction": "Keep the first five lines of `main` from Step 7 (the fleet and `setPassengers(3)`). Replace the two loops with this, and run it.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Vehicle> fleet = new ArrayList<>();\n        fleet.add(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"));\n        fleet.add(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"));\n        fleet.add(new Bus(\"BUS 789\", \"Aling Rosa\", 50));\n        fleet.get(1).setPassengers(3);\n\n        // remove every EMPTY vehicle (end of shift) - the WRONG way\n        for (Vehicle v : fleet) {\n            if (v.getPassengers() == 0) {\n                fleet.remove(v);\n            }\n        }\n        System.out.println(\"Vehicles still on duty: \" + fleet.size());\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Exception in thread \"main\" java.util.ConcurrentModificationException\n\tat java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1095)\n\tat java.base/java.util.ArrayList$Itr.next(ArrayList.java:1049)\n\tat Main.main(Main.java:13)",
+          "activity": {
+            "id": "java-2-w14-d4-s8-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nThe sample deliberately crashes when it removes from the list during for-each. For this task, list the empty vehicles without removing them. Replace fleet.remove(v); with System.out.println(\"Empty vehicle: \" + v.getPlateNumber());. Keep the final fleet-size line. The next step teaches safe removal.",
+            "files": [],
+            "expectedOutput": "Empty vehicle: NXA 123\nEmpty vehicle: BUS 789\nVehicles still on duty: 3"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**What happened:** a for-each loop secretly uses an iterator to walk the list. When you changed the list behind its back with `fleet.remove(v)`, the iterator noticed the list had been modified while it was looping and stopped the program. Your line numbers may differ."
+        },
+        {
+          "type": "definition",
+          "term": "Iterator",
+          "markdown": "An **Iterator** is an object that walks through a collection one step at a time. `hasNext()` asks \"is there another item?\", `next()` moves to it, and `remove()` deletes the item you just visited. Because the iterator itself does the removing, it never loses its place."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d4-s9",
+          "number": 9,
+          "instruction": "Replace the wrong loop from Step 8 with the Iterator loop. Add `import java.util.Iterator;` at the top. This is the whole file:",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Vehicle> fleet = new ArrayList<>();\n        fleet.add(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"));\n        fleet.add(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"));\n        fleet.add(new Bus(\"BUS 789\", \"Aling Rosa\", 50));\n        fleet.get(1).setPassengers(3);\n\n        // LOOP 3: Iterator - the SAFE way to remove while looping\n        Iterator<Vehicle> it = fleet.iterator();\n        while (it.hasNext()) {\n            Vehicle v = it.next();\n            if (v.getPassengers() == 0) {\n                it.remove();                      // remove through the iterator\n                System.out.println(\"Off duty: \" + v.getPlateNumber());\n            }\n        }\n        System.out.println(\"Vehicles still on duty: \" + fleet.size());\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Off duty: NXA 123\nOff duty: BUS 789\nVehicles still on duty: 1",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d4-s9-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nUse the Iterator sample. Change its condition from passengers == 0 to passengers > 0, so only the occupied tricycle goes off duty. Keep it.remove() and both output messages.",
+            "files": [],
+            "expectedOutput": "Off duty: TRC 456\nVehicles still on duty: 2"
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 10 — Looping through a Set and a Map.** A Set has no index, so use for-each. A Map is not looped directly; you loop over one of its three views: `keySet()` (keys only), `values()` (values only), or `entrySet()` (key and value together)."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d4-s10",
+          "number": 10,
+          "instruction": "Replace `Main.java`.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.Map;\nimport java.util.Set;\nimport java.util.TreeMap;\nimport java.util.TreeSet;\n\npublic class Main {\n    public static void main(String[] args) {\n        Set<String> stops = new TreeSet<>();\n        stops.add(\"Recto\");\n        stops.add(\"Monumento\");\n        stops.add(\"Divisoria\");\n        for (String stop : stops) {\n            System.out.println(\"Stop: \" + stop);\n        }\n\n        Map<String, Integer> trips = new TreeMap<>();\n        trips.put(\"Mang Ramon\", 5);\n        trips.put(\"Kuya Ben\", 9);\n        trips.put(\"Aling Rosa\", 3);\n\n        for (String driver : trips.keySet()) {\n            System.out.print(driver + \" \");          // keys\n        }\n        System.out.println();\n        int total = 0;\n        for (int count : trips.values()) {           // values\n            total = total + count;\n        }\n        System.out.println(\"Total trips: \" + total);\n        for (Map.Entry<String, Integer> e\n                : trips.entrySet()) {                // both\n            System.out.println(e.getKey() + \" -> \"\n                + e.getValue());\n        }\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Stop: Divisoria\nStop: Monumento\nStop: Recto\nAling Rosa Kuya Ben Mang Ramon \nTotal trips: 17\nAling Rosa -> 3\nKuya Ben -> 9\nMang Ramon -> 5",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d4-s10-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nChange Mang Ramon's trip count from 5 to 7. Keep the sorted stop list and all three map loops. Check both the total and Mang Ramon's final entry.",
+            "files": [],
+            "expectedOutput": "Stop: Divisoria\nStop: Monumento\nStop: Recto\nAling Rosa Kuya Ben Mang Ramon \nTotal trips: 19\nAling Rosa -> 3\nKuya Ben -> 9\nMang Ramon -> 7"
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "cannot find symbol ... symbol: class ArrayList",
+              "means": "A missing import.",
+              "fix": "Add the import, e.g. import java.util.ArrayList; or use import java.util.*;"
+            },
+            {
+              "see": "unexpected type ... required: reference found: int",
+              "means": "You wrote a primitive inside the angle brackets.",
+              "fix": "Use the class name: Integer, Double, Boolean."
+            },
+            {
+              "see": "incompatible types: String cannot be converted to Vehicle",
+              "means": "You added the wrong type to a List of Vehicle.",
+              "fix": "Add a Vehicle object, e.g. new Jeepney(...)."
+            },
+            {
+              "see": "cannot find symbol ... symbol: method get(int) ... type Set<String>",
+              "means": "Sets have no index.",
+              "fix": "Loop with for-each, or use a List if you need positions."
+            },
+            {
+              "see": "cannot find symbol ... symbol: method first() ... type Set<String>",
+              "means": "first() belongs to TreeSet, not every Set.",
+              "fix": "Declare the variable as TreeSet<String>."
+            },
+            {
+              "see": "IndexOutOfBoundsException: Index 5 out of bounds for length 3",
+              "means": "No item at that index (runs, then crashes).",
+              "fix": "Keep the index below size(), or catch the exception."
+            },
+            {
+              "see": "ConcurrentModificationException",
+              "means": "The collection changed while a for-each loop was going through it.",
+              "fix": "Remove with an Iterator: it.remove() (Step 9)."
+            },
+            {
+              "see": "NullPointerException ... the return value of \"java.util.Map.get(Object)\" is null",
+              "means": "You used get() with a key that is not in the map.",
+              "fix": "Check with containsKey() first, or use getOrDefault()."
+            }
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w14-d4-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "Name the three ways to loop through a collection, and one job each one is best for."
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Step 8 crashed with a `ConcurrentModificationException`, but Step 9 removed the same vehicles safely. What was different?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Why can you not use an index for loop on a TreeSet or loop over a Map directly? What do you use instead for each?"
+          }
+        ],
+        "afterStep": "java-2-w14-d4-s10"
+      }
+    },
+    {
+      "id": "java-2-w14-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "Data That Works: Collections Performance Task and Presentation",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Justify, using their own program as evidence, the choice of each collection and each loop for the job it performs.",
+        "affective": "Take pride in building a program that manages real data responsibly, and show confidence in explaining design choices to an audience.",
+        "psychomotor": "Add a List, a Set, and a Map to their own program, demonstrate each collection's rule live, and answer questions about the design."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "Today you finish and present the **Performance Task**: add a List, a Set, and a Map to your own program. Run it four ways before you present, then answer the Friday exit slip. The task is described below the lessons."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w14-d5-s11",
+          "number": 11,
+          "instruction": "Before building your own, run the worked sari-sari store example from the Performance Task below so you can see a finished List + Set + Map program in action. Create `ProductNotFoundException.java` and `Main.java` with this content.",
+          "language": "java",
+          "files": [
+            {
+              "path": "ProductNotFoundException.java",
+              "content": "public class ProductNotFoundException extends Exception {      // CHECKED\n    public ProductNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Set;\nimport java.util.TreeMap;\nimport java.util.TreeSet;\n\npublic class Main {\n    // FIND: look up a product by name; throws our own checked exception\n    static int findStock(Map<String, Integer> stock, String name) throws ProductNotFoundException {\n        if (!stock.containsKey(name)) {\n            throw new ProductNotFoundException(\"No product named \" + name);\n        }\n        return stock.get(name);\n    }\n\n    public static void main(String[] args) {\n        // MAP: product name -> pieces in stock (TreeMap: report comes out A to Z)\n        Map<String, Integer> stock = new TreeMap<>();\n        stock.put(\"Softdrink\", 24);\n        stock.put(\"Bread\", 10);\n        stock.put(\"Rice (kg)\", 50);\n        stock.put(\"Candy\", 0);\n\n        // LIST: every sale, in order, repeats allowed\n        List<String> salesLog = new ArrayList<>();\n        salesLog.add(\"Ana bought 2 Bread\");\n        salesLog.add(\"Ben bought 1 Softdrink\");\n        salesLog.add(\"Ana bought 1 Softdrink\");\n\n        // SET: each customer counted once (TreeSet: names A to Z)\n        Set<String> customers = new TreeSet<>();\n        System.out.println(\"Ana added? \" + customers.add(\"Ana\"));\n        System.out.println(\"Ben added? \" + customers.add(\"Ben\"));\n        System.out.println(\"Ana added again? \" + customers.add(\"Ana\"));   // false: refused\n\n        // LOOP 1: index for loop numbers the sales\n        for (int i = 0; i < salesLog.size(); i++) {\n            System.out.println((i + 1) + \". \" + salesLog.get(i));\n        }\n\n        // LOOP 2: for-each adds up the stock\n        int pieces = 0;\n        for (int count : stock.values()) {\n            pieces = pieces + count;\n        }\n        System.out.println(\"Pieces in stock: \" + pieces);\n        System.out.println(\"Different customers: \" + customers);\n\n        // LOOP 3: Iterator removes the sold-out items safely\n        Iterator<Map.Entry<String, Integer>> it = stock.entrySet().iterator();\n        while (it.hasNext()) {\n            Map.Entry<String, Integer> e = it.next();\n            if (e.getValue() == 0) {\n                System.out.println(\"Sold out, removed: \" + e.getKey());\n                it.remove();\n            }\n        }\n\n        // MAP LOOP with entrySet()\n        for (Map.Entry<String, Integer> e : stock.entrySet()) {\n            System.out.println(e.getKey() + \" -> \" + e.getValue());\n        }\n\n        // LOOKUP: a missing key shows a friendly message, never a crash\n        String[] wanted = { \"Bread\", \"Eggs\" };\n        for (String key : wanted) {\n            try {\n                System.out.println(key + \" in stock: \" + findStock(stock, key));\n            } catch (ProductNotFoundException e) {\n                System.out.println(\"Sorry: \" + e.getMessage());\n            } finally {\n                System.out.println(\"Search finished.\");\n            }\n        }\n    }\n}\n"
+            }
+          ],
+          "expectedOutput": "Ana added? true\nBen added? true\nAna added again? false\n1. Ana bought 2 Bread\n2. Ben bought 1 Softdrink\n3. Ana bought 1 Softdrink\nPieces in stock: 84\nDifferent customers: [Ana, Ben]\nSold out, removed: Candy\nBread -> 10\nRice (kg) -> 50\nSoftdrink -> 24\nBread in stock: 10\nSearch finished.\nSorry: No product named Eggs\nSearch finished.",
+          "run": "Main.java",
+          "activity": {
+            "id": "java-2-w14-d5-s11-alter-v1",
+            "instruction": "Continue in your saved module project. Keep your supporting classes and completed work. Use this step's sample in the module worksheet to make the stated Main.java changes; opening this task never replaces your saved Main.java.\n\nThis is module practice using the worked store example, separate from your own performance-task project. Change Bread stock from 10 to 12. Keep the sales log, customers, sold-out removal, and both product lookups.",
+            "files": [],
+            "expectedOutput": "Ana added? true\nBen added? true\nAna added again? false\n1. Ana bought 2 Bread\n2. Ben bought 1 Softdrink\n3. Ana bought 1 Softdrink\nPieces in stock: 86\nDifferent customers: [Ana, Ben]\nSold out, removed: Candy\nBread -> 12\nRice (kg) -> 50\nSoftdrink -> 24\nBread in stock: 12\nSearch finished.\nSorry: No product named Eggs\nSearch finished."
+          }
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w14-d5-slip",
+        "points": 20,
+        "afterStep": "java-2-w14-d5-s11",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Name your List, Set, and Map: the class you used for each, and what it holds."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Pick one of your three. Why that collection and not the other two? Would choosing Hash instead of Tree, or Tree instead of Hash, make it better or worse?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "A school library app needs: (a) books found by call number, (b) learners waiting in line for one popular book, (c) the LRNs of everyone who borrowed this month, counted once each. Name the best collection class for each, and why."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your program last week, with arrays, and this week, with collections. What can it do now that it could not do before?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w14-pt",
+    "title": "Performance Task: Manage Your Data with Collections",
+    "markdown": "Open your own program from last week's Performance Task (your sari-sari store, pets, gadgets, school personnel, or shapes theme). Replace its arrays with collections, and add a List, a Set, and a Map that each do a real job. Start on Thursday after the Thursday exit slip; finish and present on Friday.\n\n**Example (sari-sari store).** Do yours your own way:\n\n- A Map of product to pieces in stock (a TreeMap, so the report is A to Z)\n- A List of sales, in order, with repeats allowed\n- A Set of customers, each counted once: adding Ana a second time is refused\n- Sales today: 3 / Different customers: Ana, Ben\n\n**Testing tip:** before you present, run your program at least four times: once normally, once adding a duplicate to your Set, once typing a key that exists, and once typing a key that does not exist. Every run must end with a friendly message, never an `Exception in thread \"main\"` report.\n\n**Plan before you type** (show your teacher): for your List, Set, and Map write the class you will use, what it holds, and why this one and not the others. For your Iterator, write which items it will remove, and why.\n\n**Schedule:** Thursday — Steps 7 to 10, the Thursday strip, then the plan and your List and Set. Friday — build the Map, the find method, and the loops; a classmate tries to break it; presentations and Q&A.",
+    "checklist": [
+      "A List of your objects with at least 4, from at least 2 subclasses",
+      "A Set that refuses a duplicate — show add() returning false",
+      "A Map for looking up an object by a key (an ID, name, or code)",
+      "A find method that throws your own checked NotFound exception",
+      "Loop 1: an index for loop that numbers the items",
+      "Loop 2: a for-each loop that adds up or counts something",
+      "Loop 3: an Iterator that safely removes some items",
+      "A Map loop using entrySet()",
+      "The user types a key; a missing key shows a friendly message, never a crash",
+      "A comment on each part, e.g. // SET: no duplicate IDs"
+    ],
+    "exampleFiles": [
+      {
+        "path": "ProductNotFoundException.java",
+        "content": "public class ProductNotFoundException extends Exception {      // CHECKED\n    public ProductNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+      },
+      {
+        "path": "Main.java",
+        "content": "import java.util.ArrayList;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Set;\nimport java.util.TreeMap;\nimport java.util.TreeSet;\n\npublic class Main {\n    // FIND: look up a product by name; throws our own checked exception\n    static int findStock(Map<String, Integer> stock, String name) throws ProductNotFoundException {\n        if (!stock.containsKey(name)) {\n            throw new ProductNotFoundException(\"No product named \" + name);\n        }\n        return stock.get(name);\n    }\n\n    public static void main(String[] args) {\n        // MAP: product name -> pieces in stock (TreeMap: report comes out A to Z)\n        Map<String, Integer> stock = new TreeMap<>();\n        stock.put(\"Softdrink\", 24);\n        stock.put(\"Bread\", 10);\n        stock.put(\"Rice (kg)\", 50);\n        stock.put(\"Candy\", 0);\n\n        // LIST: every sale, in order, repeats allowed\n        List<String> salesLog = new ArrayList<>();\n        salesLog.add(\"Ana bought 2 Bread\");\n        salesLog.add(\"Ben bought 1 Softdrink\");\n        salesLog.add(\"Ana bought 1 Softdrink\");\n\n        // SET: each customer counted once (TreeSet: names A to Z)\n        Set<String> customers = new TreeSet<>();\n        System.out.println(\"Ana added? \" + customers.add(\"Ana\"));\n        System.out.println(\"Ben added? \" + customers.add(\"Ben\"));\n        System.out.println(\"Ana added again? \" + customers.add(\"Ana\"));   // false: refused\n\n        // LOOP 1: index for loop numbers the sales\n        for (int i = 0; i < salesLog.size(); i++) {\n            System.out.println((i + 1) + \". \" + salesLog.get(i));\n        }\n\n        // LOOP 2: for-each adds up the stock\n        int pieces = 0;\n        for (int count : stock.values()) {\n            pieces = pieces + count;\n        }\n        System.out.println(\"Pieces in stock: \" + pieces);\n        System.out.println(\"Different customers: \" + customers);\n\n        // LOOP 3: Iterator removes the sold-out items safely\n        Iterator<Map.Entry<String, Integer>> it = stock.entrySet().iterator();\n        while (it.hasNext()) {\n            Map.Entry<String, Integer> e = it.next();\n            if (e.getValue() == 0) {\n                System.out.println(\"Sold out, removed: \" + e.getKey());\n                it.remove();\n            }\n        }\n\n        // MAP LOOP with entrySet()\n        for (Map.Entry<String, Integer> e : stock.entrySet()) {\n            System.out.println(e.getKey() + \" -> \" + e.getValue());\n        }\n\n        // LOOKUP: a missing key shows a friendly message, never a crash\n        String[] wanted = { \"Bread\", \"Eggs\" };\n        for (String key : wanted) {\n            try {\n                System.out.println(key + \" in stock: \" + findStock(stock, key));\n            } catch (ProductNotFoundException e) {\n                System.out.println(\"Sorry: \" + e.getMessage());\n            } finally {\n                System.out.println(\"Search finished.\");\n            }\n        }\n    }\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "LookupTemplate.txt",
+        "content": "Scanner sc = new Scanner(System.in);\nSystem.out.print(\"Enter ________ to find: \");\nString key = sc.nextLine();\ntry {\n    ________ found = find________(map, key);\n    found.showInfo();\n} catch (________NotFoundException e) {\n    System.out.println(\"Sorry: \" + e.getMessage());\n} finally {\n    System.out.println(\"Search finished.\");\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce your theme and your List, Set, and Map. (30 sec)",
+      "Run it: show the numbered list and the totals. (1 min)",
+      "Prove the rules live: add a duplicate to your Set; look up a key that exists and one that does not; remove items with your Iterator. (2 min)",
+      "Point to the code for each of the three loops and say why you chose it. (1 min)",
+      "Answer questions. (30 sec)"
+    ],
+    "questionsToPrepare": [
+      "Why is your Set a Set and not a List?",
+      "What would change if your HashMap became a TreeMap?",
+      "What happens if you remove inside your for-each loop?",
+      "Why does your Map use Integer and not int?",
+      "Which loop could not work on your Set, and why?"
+    ],
+    "rubric": [
+      {
+        "criterion": "List: holds at least 4 objects from at least 2 subclasses; uses add, get, size, and remove correctly",
+        "points": 7
+      },
+      {
+        "criterion": "Set: fits a real must-be-unique rule; a duplicate is shown being refused",
+        "points": 7
+      },
+      {
+        "criterion": "Map + exception: lookup by key works; a missing key throws the custom checked exception and is caught",
+        "points": 8
+      },
+      {
+        "criterion": "Iteration: index for, for-each, and Iterator with remove each used for the right job; a Map loop with entrySet",
+        "points": 10
+      },
+      {
+        "criterion": "Program quality: compiles and runs; no crash on bad input; parts labelled in comments",
+        "points": 8
+      },
+      {
+        "criterion": "Presentation and Q&A: proves each rule live; explains every choice of collection and loop with own code",
+        "points": 10
+      }
+    ],
+    "totalPoints": 50
+  },
+  "previousModuleId": "java-2-w13"
+}

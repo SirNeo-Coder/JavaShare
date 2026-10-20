@@ -105,13 +105,15 @@ Keep the rolling handoff for the current stage current: `docs/handoffs/stage-one
 - Each student has two separate Java projects per module per class: the module project and the
   personal performance-task project. Each rolls forward from its own preceding week's work;
   never mix the tracks or overwrite earlier weeks, current edits, or submitted snapshots.
-- The module project uses the module's sample code, all supporting Java classes, and exact expected
-  output. Successful runs complete its steps and unlock the next part. Legacy separate challenge
-  JSON remains readable but does not determine module progression.
+- Modules with explicit `activity.id` show sample code/output separately from a small alteration
+  task and its expected output. Successful task runs earn Completed and unlock the next step.
+  Modules without explicit task ids retain sample-output checks and part unlocking. Legacy
+  separate challenge JSON remains readable. Never reuse old sample/challenge passes for new tasks.
 - Both projects use the main code editor. Saving or running the personal project is not submission
   or grading, and never completes a module step. Submit the personal version explicitly.
-- Successful code execution with the required output completes a task; all tasks in a part unlock
-  the next part automatically for that student. Teacher availability switches do not gate progress.
+- Successful code execution with the required output completes a task. Explicit alteration tasks
+  unlock one step at a time; older sample modules unlock by part. Teacher availability switches
+  do not gate progress.
 - Handwritten liplets are submitted to the teacher and assessed separately; they do not block
   student progression. Output completion is not a grade or proof of conceptual understanding.
 
@@ -142,6 +144,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   output while running and wait for answers in Program input. Enter sends an answer;
   Stop cancels the run. Keep the five-second execution budget separate from the
   two-minute input wait. A stopped or timed-out run is unsuccessful.
-- Module sample checks keep their JSON-supplied input and existing server-owned output
+- Module practice checks keep their JSON-supplied input and existing server-owned sample/task output
   and saved-version checks. Personal runs do not submit or complete module steps.
 - Offline keeps laptop javac and its existing input-before-Run behavior for this slice.

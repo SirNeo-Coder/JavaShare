@@ -23,3 +23,9 @@ test("weekly Java editor: personal shows its own source, input and explicit subm
   assert.match(html, /Program input/); assert.match(html, /Submit this version/);
   assert.match(html, /Personal project/); assert.match(html, /Save work/);
 });
+
+test("weekly Java editor: alteration shows its own target and remembers completed tasks", () => {
+  const html = render({ ...activity, stateId: "task:alteration", progress: { ...activity.progress, stepStates: { "task:alteration": "pass" } } });
+  assert.match(html, /Your task/); assert.match(html, /Expected task output/);
+  assert.match(html, /Completed/); assert.doesNotMatch(html, /Module sample|Submit this version/);
+});

@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
-import { activityAccess, activityStateId, matchesActivityOutput, mergeProjectFiles } from "../backend/src/module-activities.ts";
+import { activityAccess, activityStateId, activityTask, matchesActivityOutput, mergeProjectFiles } from "../backend/src/module-activities.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
@@ -65,6 +65,35 @@ test("module activities: supporting classes survive and src aliases cannot dupli
   assert.ok(files.some((file) => file.path === "Vehicle.java"));
 });
 
+test("module tasks: explicit ids isolate completion and unlock one step at a time inside a part", () => {
+  const content = structuredClone(fixture);
+  const steps = content.lessons.map((lesson) => lesson.blocks[0]);
+  steps.forEach((step, index) => { step.activity.id = `alteration-${index}`; step.part = "Shared part"; });
+  const [one, two] = steps.map(activityStateId);
+  const old = { [steps[0].id]: "pass", [`${steps[0].id}:activity`]: "pass" };
+  assert.deepEqual(activityAccess(content, old).openStepIds, [one]);
+  assert.equal(activityAccess(content, old).parts[0].done, false);
+  assert.deepEqual(activityAccess(content, { ...old, [one]: "pass" }).openStepIds, [one, two]);
+  assert.equal(activityAccess(content, { [one]: "pass", [two]: "pass" }).performanceTaskOpen, true);
+  assert.equal(activityTask(steps[0]).expectedOutput, "Capacity: 25");
+  steps[0].stdin = "999\n"; steps[0].activity.stdin = "7\n";
+  assert.equal(activityTask(steps[0]).stdin, "7\n");
+  steps[0].activity.id = "revised-alteration";
+  assert.deepEqual(activityAccess(content, { [one]: "pass", [two]: "pass" }).openStepIds, [activityStateId(steps[0]), two]);
+  assert.equal(activityAccess(content, { [one]: "pass", [two]: "pass" }).performanceTaskOpen, false);
+});
+
+test("module tasks: upload rejects duplicate task ids and collisions with stored progress keys", () => {
+  const content = structuredClone(fixture);
+  content.lessons[0].blocks[0].activity.id = "alteration";
+  assert.equal(courseModule.safeParse(content).success, true);
+  for (const id of ["alteration", first.id, `task:alteration`]) {
+    const broken = structuredClone(content);
+    broken.lessons[1].blocks[0].activity.id = id;
+    assert.equal(courseModule.safeParse(broken).success, false);
+  }
+});
+
 async function withClass(action) {
   Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", LOCAL_JAVA_EXECUTION: "true", JWT_SECRET: "module-activities-test" });
   const { handleApi } = await import("../backend/src/routes.ts");
@@ -110,6 +139,40 @@ async function withClass(action) {
     for (const user of users) await admin.auth.admin.deleteUser(user.id);
   }
 }
+
+test("module tasks: real Java checks the alteration, redacts the next step and preserves rolling work", needsLocal, async () => {
+  await withClass(async ({ upload, request, prepare, run, admin, users, classroomId, cookies }) => {
+    const content = structuredClone(fixture);
+    content.lessons.forEach((lesson, index) => { lesson.blocks[0].activity.id = `task-${index}`; lesson.blocks[0].part = "Vehicle"; });
+    content.lessons[0].blocks[0].activity.files.push({ path: "TaskHint.java", content: "public class TaskHint {}" });
+    await upload(content);
+    let prepared = await prepare();
+    assert.ok(prepared.projectFiles.some((file) => file.path === "TaskHint.java"), "task supporting files are added without replacing current work");
+    await admin.from("module_progress").update({ step_states: { [first.id]: "pass", [`${first.id}:activity`]: "pass" } })
+      .eq("classroom_id", classroomId).eq("student_id", users[1].id).eq("module_id", fixture.id);
+    let view = await (await request()).json();
+    assert.equal(view.lessons[0].closed, false);
+    assert.equal(view.lessons[1].blocks[0].locked, true, "a shared part cannot bypass the next task");
+    assert.ok(!JSON.stringify(view).includes(second.activity.instruction));
+    assert.equal((await request("/progress/activity", { stepId: second.id })).status, 403);
+    let result = await (await run(prepared.projectFiles)).json();
+    assert.equal(result.passed, false, "unchanged sample output cannot pass the task");
+    const solution = prepared.projectFiles.map((file) => file.path === "Jeepney.java" ? { ...file, content: file.content.replace("return 20", "return 25") } : file);
+    result = await (await run(solution)).json();
+    assert.equal(result.passed, true);
+    assert.equal(result.progress.stepStates["task:task-0"], "pass");
+    assert.equal(result.progress.stepStates[first.id], "pass", "the sample record remains stored");
+    view = await (await request()).json();
+    assert.equal(view.lessons[1].blocks[0].locked, undefined);
+    assert.equal((await (await request("", undefined, cookies[2])).json()).lessons[1].blocks[0].locked, true);
+    prepared = await prepare(second.id);
+    assert.deepEqual(prepared.projectFiles, solution, "next task keeps the student's altered class");
+    const final = solution.map((file) => file.path === "Main.java" ? { ...file, content: 'public class Main { public static void main(String[] args) { Jeepney j = new Jeepney("NXA 123"); System.out.println(j.getPlate() + ": " + j.getCapacity()); } }' } : file);
+    result = await (await run(final, second.id)).json();
+    assert.equal(result.passed, true);
+    assert.ok((await (await request()).json()).performanceTask);
+  });
+});
 
 test("module activities: real multi-file Java result unlocks only that student, without teacher switches or liplets (CKB-038)", needsLocal, async () => {
   await withClass(async ({ request, prepare, run, cookies, call, classroomId }) => {

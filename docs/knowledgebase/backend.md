@@ -84,3 +84,13 @@ identity/class/Java step/part/live week and saved version, compares its own expe
 output and retains earlier passes. It uses `recordSupabaseModuleActivityResult`,
 also used by the laptop path. The teacher accepts browser result falsification for
 practice; this is not grading. No browser-supplied expected output/pass flag is used.
+
+## Explicit alteration tasks (2026-10-20)
+
+The existing activity/run/browser-result/project routes also serve tasks with `activity.id`.
+`activityTask` chooses server-owned task input/output; `activityStateId` uses `task:<id>` so
+sample and legacy challenge passes cannot count. `activityAccess.openStepIds` enforces
+individual prerequisites in opted-in modules; legacy modules retain part access. Student module
+responses redact future task instructions/files/output while keeping their identity for status.
+Current and previous project files still win over starter/sample/task templates. No migration,
+runner change, new route, settings or live event.

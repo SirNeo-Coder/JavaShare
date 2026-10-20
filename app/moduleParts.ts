@@ -18,7 +18,6 @@ export function groupModuleParts(module: CourseModule): ModulePart[] {
       if (block.type !== "step") { pending.push(block); continue; }
       const step = block as StepBlock;
       const part = findPart(step.part ? `part:${step.part}` : lesson.id, step.part || lesson.title, lesson);
-      part.closed ||= Boolean(step.locked);
       part.blocks.push(...pending, step);
       pending = [];
       lastPart = part;
@@ -27,7 +26,10 @@ export function groupModuleParts(module: CourseModule): ModulePart[] {
     lastPart.blocks.push(...pending);
     lastPart.exitLessons.push(lesson);
   }
-  return parts;
+  return parts.map((part) => {
+    const steps = part.blocks.filter((block): block is StepBlock => block.type === "step");
+    return { ...part, closed: steps.length ? steps.every((step) => step.locked) : part.closed };
+  });
 }
 
 // Break before each step without moving the following discussion out of reading order.

@@ -3,8 +3,15 @@ import type { CourseModule } from "./course-module-schema.ts";
 export type ModuleFile = { path: string; content: string };
 export type ActivityStep = Extract<CourseModule["lessons"][number]["blocks"][number], { type: "step" }>;
 
-// Progress follows the printed sample. Legacy challenge results stay stored separately.
-export function activityStateId(step: { id: string }) { return step.id; }
+// Explicit task ids opt in; legacy samples/challenges keep their existing completion records.
+export function activityStateId(step: { id: string; activity?: { id?: string } }) {
+  return step.activity?.id ? `task:${step.activity.id}` : step.id;
+}
+
+export function activityTask(step: { instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string;
+  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string } }) {
+  return step.activity?.id ? step.activity : step;
+}
 
 // Same author-defined parts as the worksheet, including parts spanning several lessons.
 export function activityParts(module: CourseModule) {
@@ -30,7 +37,19 @@ export function activityAccess(module: CourseModule, states: Record<string, stri
     previousDone = previousDone && done;
     return { ...part, done, open };
   });
-  return { parts, performanceTaskOpen: parts.every((part) => part.done) };
+  const steps = module.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
+  let openStepIds = parts.filter((part) => part.open).flatMap((part) => part.stepIds);
+  if (steps.some((step) => step.activity?.id)) {
+    let precedingDone = true;
+    openStepIds = steps.flatMap((step) => {
+      const id = activityStateId(step), done = states[id] === "pass";
+      const open = precedingDone || done;
+      precedingDone &&= done;
+      return open ? [id] : [];
+    });
+    for (const part of parts) part.open = part.stepIds.some((id) => openStepIds.includes(id)) || !part.stepIds.length;
+  }
+  return { parts, openStepIds, performanceTaskOpen: parts.every((part) => part.done) };
 }
 
 export function findActivity(module: CourseModule, stepId: string) {
