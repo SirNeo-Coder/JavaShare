@@ -7,9 +7,11 @@
 > suite 143/143; real online CheerpJ/offline javac production browser checks 12/12. Hiding the strip
 > deliberately failed two render regressions; restored implementation passes. Initial browser
 > throttle issue was resolved in the harness. [All named tests, commands and limits](../verification/java-console-progress.md); CKB-055.
-> Implementation complete. Next: commit/push, open an independent main-based PR and merge under
-> the teacher's explicit instruction. No other open PRs are part of this merge; no schema,
-> dependency or hosted setting change. Hosted rollout/physical devices remain unverified.
+> Implementation `8198348` is committed and pushed. Main delivery is tracked by
+> [PR #29](https://github.com/SirNeo-Coder/JavaShare/pull/29), under the teacher's explicit merge/push
+> instruction. No code work remains. Next: verify the automatic main deployment and re-test
+> the hosted Console; the PR records merge status. No other open PRs are part of this delivery.
+> No schema, dependency or hosted setting change. Hosted rollout/physical devices remain unverified.
 
 > Delivered session work (2026-10-20), now on `main`:
 > [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), merge `34b83bb`, implementation

@@ -1,6 +1,6 @@
 # CKB-055 — Console stays Ready while Java is loading or running
 
-- Status: resolved locally; 143/143 suite and 12/12 real browser checks pass; delivery in progress
+- Status: fixed; 143/143 suite and 12/12 real browser checks pass; main delivery tracked by PR #29
 - First recorded: 2026-10-21
 - Last verified: 2026-10-21
 - Area: student module/personal Console, `app/StudentModuleActivity.tsx`, `app/globals.css`
@@ -44,6 +44,7 @@ No server, runner protocol, dependency, migration or hosted setting change is re
 - `tests/java-run-progress.browser.mjs`: actual production apps, local Supabase, laptop javac and
   actual online CheerpJ verify delayed saves/startup/results, reduced motion, completion, request
   errors/recovery, compiler errors, Save work without Java status, input/Enter and Stop.
+- Implementation `8198348`, [delivery PR #29](https://github.com/SirNeo-Coder/JavaShare/pull/29); teacher explicitly requested merge/push.
 - Full test names, commands, failures and limits: [verification](../../verification/java-console-progress.md).
 
 ## Recurrence triage

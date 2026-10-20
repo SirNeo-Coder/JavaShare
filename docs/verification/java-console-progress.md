@@ -3,6 +3,8 @@
 Branch: `codex/java-console-progress`, directly based on main (`8fb41ff`). Teacher approved the
 proposal, then explicitly requested merge and push. This is independent of open PRs #25–28;
 no rolling-task, sample-first, or curriculum changes are being merged with it.
+Implementation `8198348` is committed/pushed; [PR #29](https://github.com/SirNeo-Coder/JavaShare/pull/29)
+tracks the teacher-authorized main delivery and its merge state.
 
 ## Final gates
 
