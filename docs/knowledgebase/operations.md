@@ -46,6 +46,13 @@ Never commit filled-in env files or keys.
 
 - Lesson-open controls add `20261018000500_module_availability.sql`. Apply it after earlier module migrations and before the new app: existing modules open, new uploads closed, settings separate from source JSON. [Teacher setup and rollback steps](../lesson-availability-setup.md). Only local application was performed by the assistant.
 
+- Production module readiness: CKB-050 records Students/Curriculum failing when both
+  module tables are absent. The six `20261018` migrations must be applied in order
+  to the hosted project used by the Worker. [Repair steps and read-only readiness
+  check](../production-module-setup.md). The teacher approved this repair on
+  2026-10-20; hosted application and post-repair checks remain pending. Local
+  migrations and passing builds do not establish hosted readiness.
+
 ## Known repository clutter (not yet cleaned up)
 
 `logs/classroom.log`, `test.txt` and `supabase/.temp/` are committed. `logs/classroom.log` changes whenever the classroom runs; don't commit those changes.

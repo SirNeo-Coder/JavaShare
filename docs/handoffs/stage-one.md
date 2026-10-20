@@ -268,6 +268,33 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
    - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
    - Stage two (course modules) can start.
 
+## Production module repair — 2026-10-20
+
+- Branch: `codex/production-module-setup`. Teacher approved an **adjustment** to
+  apply the six existing `20261018` migrations to the hosted project.
+- Done: identified CKB-050. Teacher SQL screenshot returned NULL for both
+  `public.module_progress` and `public.course_modules`; production dashboard GETs
+  fail. Confirm the selected Supabase project matches the Worker's SUPABASE_URL.
+- Prepared [teacher repair steps](../production-module-setup.md), updated the
+  operations page, problem index and prompt map. Existing migrations and app
+  behavior are unchanged. A convenience SQL file in `/tmp` contains unchanged
+  copies of the six originals in order; the originals are the durable source.
+- Verified: the exact six-file SQL bundle passed in a new disposable local
+  PostgreSQL database. The guide's readiness query showed seven false values
+  before and seven true values after; existing test teacher/class rows survived,
+  both new tables were empty and protected by row-level security. The temporary
+  database was removed. Build passed, lint had 0 errors/8 existing warnings, full
+  suite passed 98/98 with no skips, and CKB-050 is the first matching search result.
+  [Named tests, commands and limits](../verification/production-module-setup.md).
+- In progress: commit/push the repair documentation and open its review PR.
+- Next: teacher runs the prepared SQL in the correct hosted project's SQL Editor,
+  verifies all readiness fields are true, refreshes Students/Curriculum, uploads
+  the intended module, and checks student save/reload and refreshed progress.
+  Stop on any SQL error rather than rerunning table creation after partial success.
+- Hosted SQL and production browser repair checks remain pending. No assistant
+  hosted changes, database reset, `supabase db push`, deploy or merge. Creating
+  storage does not transfer local modules/progress online.
+
 ## Running offline mode on this laptop
 
 - Run `sg docker -c "npm run classroom:offline"` (one program on port 3000 since c2).
