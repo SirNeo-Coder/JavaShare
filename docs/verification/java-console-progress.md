@@ -3,6 +3,7 @@
 Current correction: `codex/classroom-java-progress`, implementation `8ae4f1a`. Initially based on
 main `7089377` (PR #29); latest main `b3c74e0` including startup repair PR #30 was preserved in
 merge `398aa8c` before the final integrated checks.
+Correction delivery: [PR #31](https://github.com/SirNeo-Coder/JavaShare/pull/31), with the teacher's existing explicit merge/push authorization.
 The teacher reported no animation in the regular Code editor and approved the targeted correction.
 Earlier merge/push authorization continues for this correction. No other open feature/curriculum
 PR is included; no hosted settings, server code, dependencies or migrations change.

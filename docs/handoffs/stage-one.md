@@ -8,8 +8,9 @@
 > rotation in the reported regular Console for both roles, preserving the new startup-stage text. Hiding only the regular strip caused
 > the new checks to fail in both modes/roles (10 pass/10 fail counting parents); restored fix passes.
 > [All named tests, proof and limits](../verification/java-console-progress.md); CKB-055 updated.
-> Implementation and integrated checks are complete and pushed. Next: publish/merge the correction
-> under the existing explicit merge/push request, then verify the automatic main deployment and hosted re-test.
+> Implementation and integrated checks are complete and pushed. Main delivery is tracked by
+> [PR #31](https://github.com/SirNeo-Coder/JavaShare/pull/31) under the existing explicit merge/push
+> request; the PR records its merge state. Next: verify the automatic main deployment and hosted re-test.
 > No other feature PRs, server/protocol/dependency/migration/hosted setting changes. Physical devices
 > and hosted rollout remain unverified. Existing classroom processes and unrelated files preserved.
 

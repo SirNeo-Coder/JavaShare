@@ -78,3 +78,5 @@ loading failures or change its execution limits.
 - 2026-10-21 — Teacher reported “I don’t see the animation” in the regular Code editor. Read-only investigation confirmed the missed caller; teacher approved the targeted correction. Branch `codex/classroom-java-progress`; latest regression proof and results are in the same verification report.
 
 Main startup repair PR #30 arrived during validation. Merge `398aa8c` preserves it; the final regular Console test requires its Opening Java runner text alongside the rotating indicator. Final integrated suite: 148/148; actual browser: 20/20.
+
+Regular Console correction implementation `8ae4f1a`; integrated evidence `a51be32`; [delivery PR #31](https://github.com/SirNeo-Coder/JavaShare/pull/31).
