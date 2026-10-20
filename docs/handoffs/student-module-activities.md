@@ -7,8 +7,9 @@ requested pushing this completed work to main, authorizing this merge and its ex
 teacher-dashboard/student-entry prerequisites. No hosted settings or database changes.
 
 Implementation committed and pushed as `13e68a0`. [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19)
-was originally opened against `codex/student-classroom-entry` (PR #18); it is now being
-retargeted to main for the teacher-authorized delivery. Final full suite: 98/98, build passed,
+was retargeted from `codex/student-classroom-entry` to main and **merged** under the
+teacher’s explicit request. Main merge commit: `b81b5db` (2026-10-20). Its teacher-dashboard
+and student-entry prerequisite commits are included. Final full suite: 98/98, build passed,
 lint 0 errors/8 existing warnings. Disposable local fixtures and the isolated port-3001 test
 server have been removed/stopped; the pre-existing port-3000 classroom was left running.
 
@@ -57,7 +58,7 @@ CKB-044 records the startup null-state bug caught in the browser and fixed befor
 
 ## Next / limits
 
-- Teacher-authorized main delivery: PR #19 includes the existing tested prerequisite commits
+- Completed teacher-authorized main delivery: PR #19 merged as `b81b5db` and includes the existing tested prerequisite commits
   from PRs #17/#18. Current main history was merged into this branch; only handoff notes needed
   resolution. Application/configuration/test files are identical to tested commit `2430478`, so
   its 98-test, build and browser evidence remains current. No product changes or migrations were added.

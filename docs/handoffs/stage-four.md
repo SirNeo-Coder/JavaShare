@@ -1,5 +1,7 @@
 # Stage four handoff (module viewer redesign)
 
+> Delivered to main: [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19), merge `b81b5db`, 2026-10-20, under the teacher’s explicit push-to-main request. Includes the tested dashboard/student-entry prerequisites; 98 tests passed.
+
 **Status: classroom UI, drawer animation and printed worksheet are on main (PRs #14–16).
 The teacher approved the student activity workflow and explicitly requested its main delivery
 on 2026-10-20. PR #19 includes the teacher dashboard and student-entry prerequisites, saved
