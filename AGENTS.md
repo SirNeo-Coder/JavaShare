@@ -130,3 +130,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Interactive online Java (agreed 2026-10-20)
+
+- Online teacher/classroom practice and personal performance-task Java projects display
+  output while running and wait for answers in Program input. Enter sends an answer;
+  Stop cancels the run. Keep the five-second execution budget separate from the
+  two-minute input wait. A stopped or timed-out run is unsuccessful.
+- Module sample checks keep their JSON-supplied input and existing server-owned output
+  and saved-version checks. Personal runs do not submit or complete module steps.
+- Offline keeps laptop javac and its existing input-before-Run behavior for this slice.

@@ -14,7 +14,38 @@ import javax.tools.ToolProvider;
 public final class CodeShareJava {
     private static native void running();
     private static final class OutputLimit extends RuntimeException {}
-    private static final class Budget { int used; }
+    private static native String readInput();
+    private static native void output(String text);
+    private static final class LiveInput extends InputStream {
+        byte[] bytes;
+        int position;
+        LiveInput(String initial) { bytes = initial.getBytes(StandardCharsets.UTF_8); }
+        public int read() {
+            if (position == bytes.length) {
+                String line = readInput();
+                if (line == null) return -1;
+                bytes = line.getBytes(StandardCharsets.UTF_8); position = 0;
+                if (bytes.length == 0) return -1;
+            }
+            return bytes[position++] & 255;
+        }
+        // Return the available line without asking for more bytes: Scanner buffers its reads.
+        public int read(byte[] target, int offset, int length) {
+            if (length == 0) return 0;
+            int first = read();
+            if (first < 0) return -1;
+            target[offset] = (byte)first;
+            int count = Math.min(length - 1, bytes.length - position);
+            System.arraycopy(bytes, position, target, offset + 1, count); position += count;
+            return count + 1;
+        }
+    }
+    private static final class Budget {
+        int used;
+        boolean live;
+        Capture stdout, stderr;
+        void publish() { if (live) output(stdout.text() + stderr.text()); }
+    }
     private static final class Capture extends OutputStream {
         final Budget budget;
         Capture(Budget budget) { this.budget = budget; }
@@ -23,6 +54,7 @@ public final class CodeShareJava {
             if (budget.used >= 65536) throw new OutputLimit();
             budget.used++; bytes.write(value);
         }
+        public void flush() { budget.publish(); }
         String text() { return new String(bytes.toByteArray(), StandardCharsets.UTF_8); }
     }
     private static String json(boolean success, String output) {
@@ -43,10 +75,14 @@ public final class CodeShareJava {
         file.delete();
     }
     public static String run(String sourcePaths, String mainClass, String input, String directory) {
+        return run(sourcePaths, mainClass, input, directory, false);
+    }
+    private static String run(String sourcePaths, String mainClass, String input, String directory, boolean interactive) {
         InputStream previousIn = System.in;
         PrintStream previousOut = System.out, previousErr = System.err;
         Budget budget = new Budget();
         Capture output = new Capture(budget), errors = new Capture(budget);
+        budget.stdout = output; budget.stderr = errors;
         boolean success = false;
         try {
             Files.createDirectories(Paths.get(directory));
@@ -57,7 +93,8 @@ public final class CodeShareJava {
             int compiled = compiler.run(null, output, errors, args.toArray(new String[0]));
             if (compiled != 0) return json(false, output.text() + errors.text());
             output.bytes.reset(); errors.bytes.reset(); budget.used = 0;
-            System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+            budget.live = interactive && "true".equals(System.getProperty("codeshare.browser"));
+            System.setIn(budget.live ? new LiveInput(input) : new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
             System.setOut(new PrintStream(output, true, "UTF-8"));
             System.setErr(new PrintStream(errors, true, "UTF-8"));
             if ("true".equals(System.getProperty("codeshare.browser"))) running();
@@ -79,6 +116,12 @@ public final class CodeShareJava {
     // /str is flat in CheerpJ. Copy strings into real source folders before compiling,
     // preserving filenames even when two packages both contain a class named Helper.
     public static String runSources(String paths, String mainClass, String input, String directory, String strings) {
+        return runSources(paths, mainClass, input, directory, strings, false);
+    }
+    public static String runInteractiveSources(String paths, String mainClass, String input, String directory, String strings) {
+        return runSources(paths, mainClass, input, directory, strings, true);
+    }
+    private static String runSources(String paths, String mainClass, String input, String directory, String strings, boolean interactive) {
         try {
             // /files persists in CheerpJ. A timed-out frame cannot run finally, so
             // clear abandoned runs before any new student class can execute.
@@ -96,7 +139,7 @@ public final class CodeShareJava {
                 Files.write(target, Files.readAllBytes(Paths.get(strings, "codeshare-" + index)));
                 sources.add(target.toString());
             }
-            return run(String.join("\n", sources), mainClass, input, directory);
+            return run(String.join("\n", sources), mainClass, input, directory, interactive);
         } catch (Throwable error) { return json(false, "Could not prepare Java sources: " + error); }
         finally { remove(new File(directory)); }
     }

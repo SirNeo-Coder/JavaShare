@@ -4,6 +4,7 @@ import { useImperativeHandle, useRef, useState, type Ref } from "react";
 import CodeEditor from "./CodeEditor";
 import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
+import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import type { CourseModule, ModuleFile, Progress } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
@@ -28,6 +29,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [output, setOutput] = useState("Ready — edit your project, then press Run code.");
+  const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
   const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Passed" : "Not checked yet");
   const progress = useRef(activity.progress);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
@@ -55,8 +57,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
       setSavedFiles(JSON.stringify(files));
       if (personal) {
-        const result = await runJava(files, stdin);
-        setOutput(result.output);
+        await javaConsole.run(files, stdin, () => setStdin(""));
       } else {
         const runner = await getJavaRunner();
         const browserResult = runner.mode === "browser" ? await runJava(files, activity.stdin, runner) : null;
@@ -101,7 +102,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
 
   return <>
     <div className="content-grid student-module-project" onKeyDown={(event) => {
-      if (event.ctrlKey && event.key === "Enter") { event.preventDefault(); void run(); }
+      if (event.ctrlKey && event.key === "Enter" && !javaConsole.waiting) { event.preventDefault(); void run(); }
     }}>
       <section className="editor-card">
         <div className="workspace-card-heading"><b>{personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>Java</span></div>
@@ -116,12 +117,19 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : "Module sample"}</b><p>{activity.instruction}</p>
-          {personal ? <label>Program input<textarea value={stdin} onChange={(event) => setStdin(event.target.value)} /></label> : <><b>Expected output</b><pre>{activity.expectedOutput}</pre></>}
+          {personal ? <label>Program input<textarea value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
+            if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+              event.preventDefault(); javaConsole.send(stdin); setStdin("");
+            }
+          }} /></label> : <><b>Expected output</b><pre>{activity.expectedOutput}</pre></>}
           {activity.stdin && <><b>Program input for this check</b><pre>{activity.stdin}</pre></>}
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
-        <JavaRunnerBrand /><div className="console"><pre aria-label="Program output">{output}</pre></div>
+        <JavaRunnerBrand /><div className="console"><pre aria-label="Program output">{output}</pre>
+          {javaConsole.waiting && <small role="status">Waiting for input — press Enter to send</small>}
+          {javaConsole.active && <button type="button" className="run-button" onClick={javaConsole.stop}>Stop</button>}
+        </div>
       </aside>
     </div>
     <footer className="actionbar">

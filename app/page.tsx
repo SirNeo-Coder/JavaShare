@@ -14,7 +14,7 @@ import StudentModuleActivity, { type StudentActivity, type ModuleEditorHandle } 
 import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
 import { api, getApiUrl } from "./apiClient";
-import { runJava } from "./javaExecution";
+import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
 import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, releaseRealtimeChannels, throttle } from "./realtime";
@@ -346,6 +346,7 @@ export default function Home() {
   const loadedWorkspaceKeyRef = useRef("");
   const promptedGroupActivityRef = useRef("");
   const team = data?.teams[activeTeam];
+  const javaConsole = useJavaConsole(setOutput, team?.project?.id);
   const myGroupMembership = team?.members.find((member) => member.id === user?.id);
   const teamId = team?.id;
   const activityChatUnavailable = Boolean(
@@ -1699,7 +1700,7 @@ export default function Home() {
   }
 
   async function runCode() {
-    if (!team) return;
+    if (!team || running) return;
     setPanel("console");
     // Web projects run in this browser (see app/webPreview.ts). In-browser Java (CheerpJ) and
     // C# (.NET WebAssembly) runners will be chosen here by project language in a later stage.
@@ -1728,8 +1729,7 @@ export default function Home() {
         path: file.path,
         content: file.id === activeFile?.id ? code : file.content,
       }));
-      const result = await runJava(files, consoleInput);
-      setOutput(result.output);
+      await javaConsole.run(files, consoleInput, () => setConsoleInput(""));
     } catch (error) {
       setOutput(
         `Execution failed: ${error instanceof Error ? error.message : "Runner unavailable"}`,
@@ -2654,18 +2654,21 @@ export default function Home() {
                       value={consoleInput}
                       onChange={(event) => setConsoleInput(event.target.value)}
                       onKeyDown={(event) => {
-                        if (event.ctrlKey && event.key === "Enter") {
+                        if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                          event.preventDefault(); javaConsole.send(consoleInput); setConsoleInput("");
+                        } else if (event.ctrlKey && event.key === "Enter") {
                           event.preventDefault();
                           void runCode();
                         }
                       }}
-                      placeholder="Type program input here…"
+                      placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Type program input here…"}
                       aria-label="Program input"
                       maxLength={10000}
-                      disabled={running}
+                      disabled={running && !javaConsole.waiting}
                     />
                   </label>
-                  <small>Ctrl+Enter runs with this input</small>
+                  <small aria-live="polite">{javaConsole.waiting ? "Waiting for input — press Enter to send" : "Ctrl+Enter runs with this input"}</small>
+                  {javaConsole.active && <button type="button" className="run-button" onClick={javaConsole.stop}>Stop</button>}
                 </div>
               ) : panel === "saved" ? (
                 <div className="record-list">

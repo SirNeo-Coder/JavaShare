@@ -66,11 +66,16 @@ runs `javac` locally. Do not put hosted database keys in the offline profile.
 3. Introduce a compile error or print the wrong output. It must show failure and
    must not unlock a new part. Previously completed steps stay completed.
 4. After the required samples, open **Projects → Personal performance-task project**.
-   Edit/run multiple files and Program input. Running must not submit or complete a
-   module step. **Submit this version** is still the separate submission action.
-5. Test an endless loop: it stops after five seconds of program execution. Loading
-   and compilation have a separate 120-second limit; output is capped at 64 KB.
-   Run a correct program afterward to check recovery.
+   Run a multi-file Scanner program with no input entered beforehand. Its prompt must
+   appear immediately; Program input becomes available when Java waits. Type an answer
+   and press Enter, then answer another question in the same run. Try a blank answer
+   and Unicode. Teacher demos and ordinary classroom Java use this flow too. Module
+   samples keep supplied input for repeatable checks. Personal runs must not submit
+   or complete a module step; **Submit this version** stays separate.
+5. Test **Stop** while Java waits for input, then run again. An endless loop stops
+   after five seconds of execution in total. Time waiting for input is excluded;
+   an unanswered question stops after two minutes. Loading/compilation has its separate
+   120-second limit; output stays capped at 64 KB. Run a correct program afterward.
 6. Run `npm run classroom:offline` and repeat a Java run over classroom Wi-Fi with
    internet disconnected. The laptop must run Java with no CheerpJ request or logo.
 

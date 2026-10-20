@@ -54,3 +54,105 @@ test("browser Java: offline uses only the existing authenticated laptop endpoint
   assert.equal(calls[0].url, "/api/execute"); assert.equal(calls[0].options.credentials, "include");
   assert.deepEqual(JSON.parse(calls[0].options.body), { files, stdin: "input" });
 });
+
+function liveConsole(t, { oldRunner = false, aborted = false } = {}) {
+  const originalWindow = globalThis.window, originalDocument = globalThis.document;
+  const listeners = new Set(), posts = [], outputs = [];
+  let frame, send;
+  globalThis.window = { location: { origin: "https://class.example.test" }, addEventListener: (_, fn) => listeners.add(fn), removeEventListener: (_, fn) => listeners.delete(fn) };
+  const dispatch = (data, source = frame.contentWindow, origin = "https://java.example.test") => {
+    for (const listener of [...listeners]) listener({ data, source, origin });
+  };
+  globalThis.document = { createElement: () => {
+    frame = { sandbox: { add() {} }, contentWindow: { postMessage(data, origin) { posts.push({ data, origin }); } }, remove() { this.removed = true; } };
+    return frame;
+  }, body: { append() { dispatch({ type: "codeshare-java-ready", interactive: !oldRunner }); } } };
+  t.mock.timers.enable({ apis: ["setTimeout", "Date"] });
+  t.after(() => { globalThis.window = originalWindow; globalThis.document = originalDocument; });
+  const controller = new AbortController();
+  if (aborted) controller.abort();
+  const promise = runJava(files, "", browser, { signal: controller.signal, onOutput: (text) => outputs.push(text), onInput: (callback) => { send = callback; } });
+  const id = posts[0]?.data.id;
+  return { promise, controller, frame, posts, outputs, dispatch, listeners, get send() { return send; }, event: (type, extra = {}) => dispatch({ type: "codeshare-java-" + type, id, ...extra }) };
+}
+
+test("interactive Java: streams prompts, waits for blank and Unicode answers, and rejects stale or foreign input requests (CKB-049)", async (t) => {
+  const live = liveConsole(t);
+  assert.equal(live.posts[0].data.interactive, true);
+  live.event("running");
+  live.event("output", { output: "Name? " });
+  assert.deepEqual(live.outputs, ["Name? "]);
+  live.dispatch({ type: "codeshare-java-input", id: live.posts[0].data.id, inputId: 1 }, {});
+  live.dispatch({ type: "codeshare-java-input", id: "old-run", inputId: 1 });
+  live.dispatch({ type: "codeshare-java-input", id: live.posts[0].data.id, inputId: 1 }, live.frame.contentWindow, "https://evil.example.test");
+  assert.equal(live.send, undefined);
+  live.event("input", { inputId: 1 });
+  const first = live.send;
+  t.mock.timers.tick(60000);
+  assert.equal(live.frame.removed, undefined, "typing time does not consume the execution limit");
+  live.send("Zoë 🐕");
+  assert.equal(live.posts[1].data.line, "Zoë 🐕\n");
+  assert.equal(live.posts[1].origin, "https://java.example.test");
+  live.event("output", { output: "Name? Hello, Zoë 🐕\nAgain? " });
+  live.event("input", { inputId: 2 });
+  first("stale");
+  assert.equal(live.posts.length, 2, "an earlier answer cannot satisfy the next read");
+  live.send("");
+  assert.equal(live.posts[2].data.line, "\n");
+  assert.equal(live.posts[2].data.inputId, 2);
+  live.event("result", { success: true, output: "Name? Hello, Zoë 🐕\nAgain? Done\n" });
+  assert.equal((await live.promise).success, true);
+  assert.equal(live.send, null); assert.equal(live.frame.removed, true); assert.equal(live.listeners.size, 0);
+});
+
+test("interactive Java: the five-second execution budget is cumulative across input waits", async (t) => {
+  const live = liveConsole(t);
+  live.event("running"); t.mock.timers.tick(3000);
+  live.event("input", { inputId: 1 }); t.mock.timers.tick(60000); live.send("one");
+  t.mock.timers.tick(1000); live.event("input", { inputId: 2 }); t.mock.timers.tick(60000); live.send("two");
+  t.mock.timers.tick(1001);
+  assert.match((await live.promise).output, /5 seconds/);
+  assert.equal(live.frame.removed, true);
+});
+
+test("interactive Java: Stop preserves printed output and removes a waiting run", async (t) => {
+  const live = liveConsole(t);
+  live.event("running"); live.event("output", { output: "Name? " }); live.event("input", { inputId: 1 });
+  const send = live.send;
+  live.controller.abort(); send("late answer");
+  assert.deepEqual(await live.promise, { mode: "browser", success: false, output: "Name? \nExecution stopped." });
+  assert.equal(live.posts.length, 1); assert.equal(live.send, null); assert.equal(live.listeners.size, 0);
+});
+
+test("interactive Java: abandoned input stops after two minutes", async (t) => {
+  const live = liveConsole(t);
+  live.event("running"); live.event("input", { inputId: 1 }); t.mock.timers.tick(120001);
+  assert.match((await live.promise).output, /waiting 2 minutes/);
+  assert.equal(live.frame.removed, true); assert.equal(live.send, null);
+});
+
+test("interactive Java: total submitted input and streamed output stay bounded", async (t) => {
+  const live = liveConsole(t);
+  live.event("running"); live.event("input", { inputId: 1 }); live.send("x".repeat(6000));
+  live.event("input", { inputId: 2 }); live.send("y".repeat(4000));
+  assert.match((await live.promise).output, /10,000 characters/);
+  assert.equal(live.posts.length, 2);
+});
+
+test("interactive Java: streamed output stays bounded", async (t) => {
+  const live = liveConsole(t);
+  live.event("running"); live.event("output", { output: "x".repeat(70001) });
+  assert.match((await live.promise).output, /64 KB/);
+});
+
+test("interactive Java: an older runner fails clearly during independent deployments", async (t) => {
+  const live = liveConsole(t, { oldRunner: true });
+  assert.match((await live.promise).output, /runner is updating/);
+  assert.equal(live.posts.length, 0); assert.equal(live.frame.removed, true); assert.equal(live.listeners.size, 0);
+});
+
+test("interactive Java: a run cancelled before startup never appends its frame", async (t) => {
+  const live = liveConsole(t, { aborted: true });
+  assert.match((await live.promise).output, /Execution stopped/);
+  assert.equal(live.posts.length, 0); assert.equal(live.frame.removed, true); assert.equal(live.listeners.size, 0);
+});
