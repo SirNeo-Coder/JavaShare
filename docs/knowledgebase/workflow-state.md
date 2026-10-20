@@ -4,6 +4,11 @@ What teachers and students can do today. Keep this page current when their use o
 
 ## Java run status (2026-10-21)
 
+- The regular **Code editor → Console** used by teachers and students also shows the same
+  rotating status strip while Java loads or runs. It remains visible even when output is blank
+  during online startup, points to **Program input** when Java waits, and clears on output,
+  errors or Stop. Reduced motion disables rotation. This applies to Java, not web previews.
+
 - In the module and personal Java editor, a prominent strip directly above **Actual output**
   shows **Saving your code…**, **Java is loading or running… Please wait.**, and **Checking your output…**.
   Offline module execution shows **Running Java and checking output… Please wait.**.

@@ -10,7 +10,7 @@ import WorkspaceDrawer from "./WorkspaceDrawer";
 import ModuleWorkspace from "./ModuleWorkspace";
 import { moduleProjectForClass } from "./moduleActivityState";
 import { activityStateId } from "../backend/src/module-activities";
-import StudentModuleActivity, { type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
+import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
 import { api, getApiUrl } from "./apiClient";
@@ -2646,7 +2646,8 @@ export default function Home() {
                   className="console"
                   onClick={() => consoleInputRef.current?.focus()}
                 >
-                  <pre>{output}</pre>
+                  <JavaRunProgress message={running ? "Java is loading or running… Please wait." : null} waiting={javaConsole.waiting} />
+                  <pre aria-busy={running && !javaConsole.waiting}>{output}</pre>
                   <label className="console-prompt">
                     <span>&gt;</span>
                     <textarea

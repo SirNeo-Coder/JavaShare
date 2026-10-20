@@ -1,3 +1,19 @@
+> Current approved correction (2026-10-21): `codex/classroom-java-progress`, implementation
+> `8ae4f1a`, integrated latest main `b3c74e0` (startup repair PR #30) in `398aa8c`. Teacher reported no animation in the regular Code editor; earlier coverage
+> only entered module/personal editors. Teacher approved reusing the existing status strip in
+> the regular teacher/student Console. Its Java-only running flag keeps the strip visible when
+> online startup clears output; input waiting changes its text, output/error/Stop clears it.
+> Implemented and verified: final integrated full suite 148/148, actual online/offline production browser 20/20,
+> build and offline launcher build pass; lint 0 errors/8 existing warnings. Browser checks measure
+> rotation in the reported regular Console for both roles, preserving the new startup-stage text. Hiding only the regular strip caused
+> the new checks to fail in both modes/roles (10 pass/10 fail counting parents); restored fix passes.
+> [All named tests, proof and limits](../verification/java-console-progress.md); CKB-055 updated.
+> Implementation and integrated checks are complete and pushed. Main delivery is tracked by
+> [PR #31](https://github.com/SirNeo-Coder/JavaShare/pull/31) under the existing explicit merge/push
+> request; the PR records its merge state. Next: verify the automatic main deployment and hosted re-test.
+> No other feature PRs, server/protocol/dependency/migration/hosted setting changes. Physical devices
+> and hosted rollout remain unverified. Existing classroom processes and unrelated files preserved.
+
 > Delivered Java loading repair (2026-10-21): [PR #30](https://github.com/SirNeo-Coder/JavaShare/pull/30)
 > merged into main as `f3daa64` under the teacher's explicit "merge and push to main"
 > request. Implementation branch: `codex/java-runner-startup`,

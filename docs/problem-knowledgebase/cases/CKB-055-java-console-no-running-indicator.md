@@ -1,10 +1,10 @@
 # CKB-055 — Console stays Ready while Java is loading or running
 
-- Status: fixed; 143/143 suite and 12/12 real browser checks pass; main delivery tracked by PR #29
+- Status: regular Console correction verified; 148/148 integrated suite and 20/20 real browser checks pass; original delivery PR #29
 - First recorded: 2026-10-21
 - Last verified: 2026-10-21
-- Area: student module/personal Console, `app/StudentModuleActivity.tsx`, `app/globals.css`
-- Search terms: Java loading, working out output, Working button, Console Ready, no spinner, startup feedback
+- Area: regular student/teacher Code editor Console (`app/page.tsx`), module/personal Console (`app/StudentModuleActivity.tsx`), `app/globals.css`
+- Search terms: Java loading, working out output, Working button, Console Ready, no spinner, startup feedback, I do not see the animation, regular Code editor
 
 ## Symptom
 
@@ -12,6 +12,21 @@ The teacher's screenshot showed **Working…** on Run code while Console still d
 **Ready — edit your project, then press Run code.** The teacher requested a visible indication
 beside the output that Java was still loading or working, then approved the proposal and
 explicitly requested push and merge.
+
+## Follow-up: regular Code editor omitted
+
+The teacher's next screenshot showed the regular Code editor Console, with Stop visible and no
+status strip. The first fix only rendered it in StudentModuleActivity. The regular `runCode`
+path in page.tsx has a separate `running` flag and still lacked the component. `useJavaConsole`
+also clears output when online interactive execution begins, erasing the prior Starting Java
+text. The original three render tests and module/personal browser checks passed because they
+did not enter this screen; this was incomplete caller coverage, not proof of a deployment issue.
+
+The teacher approved extending the fix to the regular Console. It now reuses the existing strip
+with the Java-only running flag and input-wait state. The expanded browser tests enter the actual
+regular student AND teacher workspace, hold Java startup with blank output, measure changing
+spinner transforms, verify reduced motion, and execute real Java/input/Stop/compiler-error flows
+online and offline. Previous module/personal checks stay in the same browser script.
 
 ## Root cause
 
@@ -45,6 +60,7 @@ No server, runner protocol, dependency, migration or hosted setting change is re
   actual online CheerpJ verify delayed saves/startup/results, reduced motion, completion, request
   errors/recovery, compiler errors, Save work without Java status, input/Enter and Stop.
 - Implementation `8198348`, [delivery PR #29](https://github.com/SirNeo-Coder/JavaShare/pull/29); teacher explicitly requested merge/push.
+- Follow-up mutation: hid only the regular strip; both roles failed in both modes (10 pass/10 fail including parents). Restored/rebuilt: all 20 browser checks pass.
 - Full test names, commands, failures and limits: [verification](../../verification/java-console-progress.md).
 
 ## Recurrence triage
@@ -58,3 +74,9 @@ loading failures or change its execution limits.
 
 - 2026-10-21 — Teacher approved the Console status proposal, including animated indicator and
   input waiting; explicitly authorized push/merge. Independent branch `codex/java-console-progress`.
+
+- 2026-10-21 — Teacher reported “I don’t see the animation” in the regular Code editor. Read-only investigation confirmed the missed caller; teacher approved the targeted correction. Branch `codex/classroom-java-progress`; latest regression proof and results are in the same verification report.
+
+Main startup repair PR #30 arrived during validation. Merge `398aa8c` preserves it; the final regular Console test requires its Opening Java runner text alongside the rotating indicator. Final integrated suite: 148/148; actual browser: 20/20.
+
+Regular Console correction implementation `8ae4f1a`; integrated evidence `a51be32`; [delivery PR #31](https://github.com/SirNeo-Coder/JavaShare/pull/31).

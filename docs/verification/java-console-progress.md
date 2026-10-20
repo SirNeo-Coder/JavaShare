@@ -1,60 +1,67 @@
-# Java Console loading and running status — verification, 2026-10-21
+# Java Console progress — verification, 2026-10-21
 
-Branch: `codex/java-console-progress`, directly based on main (`8fb41ff`). Teacher approved the
-proposal, then explicitly requested merge and push. This is independent of open PRs #25–28;
-no rolling-task, sample-first, or curriculum changes are being merged with it.
-Implementation `8198348` is committed/pushed; [PR #29](https://github.com/SirNeo-Coder/JavaShare/pull/29)
-tracks the teacher-authorized main delivery and its merge state.
+Current correction: `codex/classroom-java-progress`, implementation `8ae4f1a`. Initially based on
+main `7089377` (PR #29); latest main `b3c74e0` including startup repair PR #30 was preserved in
+merge `398aa8c` before the final integrated checks.
+Correction delivery: [PR #31](https://github.com/SirNeo-Coder/JavaShare/pull/31), with the teacher's existing explicit merge/push authorization.
+The teacher reported no animation in the regular Code editor and approved the targeted correction.
+Earlier merge/push authorization continues for this correction. No other open feature/curriculum
+PR is included; no hosted settings, server code, dependencies or migrations change.
 
-## Final gates
+## Results
 
-- PASS — `npm run build:all`: production frontend and backend TypeScript build.
-- PASS — `npm run classroom:offline -- --build-only`: actual local Docker setup/configuration and complete production build.
+- PASS — `npm run build:all`: production frontend and backend TypeScript.
+- PASS — `npm run classroom:offline -- --build-only`: actual local Docker setup/configuration and restored final production build.
 - PASS WITH EXISTING WARNINGS — `npm run lint`: 0 errors, 8 existing image/live-effect warnings.
-- PASS — `npm test`: 143 passed, 0 failed/skipped (main's 140 checks plus three progress render checks).
-- PASS — final grouped run: `node --test --test-reporter=/tmp/earlet-test-reporter.mjs 'tests/*.test.mjs'`, 143 passed, 0 failed/skipped. This temporary reporting module only formats test events by file; exact names and marks are below.
-- PASS — real online and offline production browser runs: 12 passed including their two parent suites, 0 failures/skips. Actual online CheerpJ compiled/executed Java, and offline used laptop javac. Online CheerpJ branding stayed visible; offline did not load/display it.
-- PASS — deliberately made JavaRunProgress return null: two named status-render checks failed (1 pass, 2 failures). Restored the code and reran: 3/3 passed. The final suite and actual app tests also pass.
-- PASS — `git diff --check` and source review. Only StudentModuleActivity and its CSS change application behavior; no helper/runner protocol, server, dependency, schema or configuration change.
+- PASS — final integrated `npm test`: 148 passed, 0 failed/skipped. The original correction baseline also passed 143/143. Exact final runner names and marks are grouped by file below.
+- PASS — final actual production Chromium/Java checks: 20 passed, 0 failed/skipped (18 subtests plus two parent suites). Includes the regular student AND teacher Console online and offline, as well as all previous module/personal checks.
+- REGRESSION PROVED — on the initial 7089377 baseline, temporarily forced only the regular Console's JavaRunProgress message to null, rebuilt and served it. Both roles' regular Console tests failed in both modes; totals 10 passed / 10 failed counting parents. The direct visibility assertion failed with `the regular Code editor must render the status strip`. Restored source, rebuilt through the offline launcher and reran: all 20 passed.
+- PASS — spinner rotation measured through changing computed transforms, rather than only checking its CSS animation name. Before integration, actual blank online output was asserted while the status remained visible. Main now supplies startup-stage output; final checks require Opening Java runner text alongside the indicator. Screenshots of regular student/teacher Consoles and the strip were captured and inspected.
+- PASS — `git diff --check` and focused source review. The application change reuses the existing component from page.tsx; there is no new application helper, timer, state, stylesheet or dependency.
 
-## Failures and limits
+## Missed coverage, intentional failures and limits
 
-The first browser run had one failed offline personal check and its failed parent (8 passes,
-2 failures). Its rapid runs did not respect the existing 1.5-second laptop execution limit.
-The harness now respects that limit and asserts actual HTTP success before accepting previous
-output as evidence. The final offline/online run passes all 12 checks. No application rate-limit
-change was made. The two deliberately failing render checks are regression proof, not remaining failures.
+PR #29 fixed module and personal-project Consoles but omitted the regular Code editor. Its three
+render tests and original 12 browser checks passed because none entered that screen. The teacher's
+new screenshot correctly exposed that gap. The regular run path set Starting Java text, but the
+interactive runner cleared output at startup and this screen never rendered JavaRunProgress.
+The corrected integration uses its existing Java-only running flag; output clearing no longer
+removes the independent status strip. Only the output pre is marked busy, keeping the accessible
+status outside the busy region. Web previews and plain Save work retain their existing behavior.
 
-NOT VERIFIED — hosted automatic deployment, physical mobile/touch devices, Windows, Firefox/Brave,
-or a physical classroom LAN with internet disconnected. A full two-minute startup timeout was
-not forced in the UI; existing execution-client timeout tests remain in the passing full suite.
-No manual deployment or hosted settings/database action was performed. Existing classroom
-processes were preserved; isolated temporary verification origins were used.
+The deliberate mutation's failures are expected regression evidence, not remaining failures:
+regular startup/rotation visibility fails and the dependent input/status checks also fail.
+The restored final integrated 20-check run and full 148-test suite have no failures or skips.
+The original PR #29 harness initially ignored the laptop's 1.5-second run limit; that prior
+harness issue remains fixed without changing the app's limit.
 
-## What the checks exercise
+NOT VERIFIED — hosted automatic deployment/current browser build, physical mobile/touch devices,
+Windows, Firefox/Brave specifically, or a physical disconnected classroom Wi-Fi device. A full
+120-second startup timeout was not forced in this UI check; existing execution-client timeout
+checks are in the passing suite. No manual deployment or hosted configuration/database action
+was performed. Existing classroom processes were preserved; isolated local test servers were used.
 
-The three `java-run-progress.test.mjs` checks render the strip in isolation: absence when idle,
-visible status/spinner semantics, and the input-wait text. The mutation proves the checks reject
-a missing strip. They do not exercise React events or network timing.
+## Coverage levels
 
-`java-run-progress.browser.mjs` exercises the real production student module/personal editor,
-local Supabase APIs and actual Java. It holds individual save/config/result requests only to
-make transitional states observable; it does not replace Java output. It verifies saving before
-execution, loading before output, checking until the real response, reduced-motion behavior,
-clearing after success/compiler error/request error/Stop, error recovery and Save work alone.
-Online personal Java actually waits for Scanner input, receives Ada on Enter and prints Hello Ada;
-offline uses the existing input-before-Run behavior. Temporary accounts/classes are removed.
-The banner was visually inspected from the captured online loading screenshot.
+`java-run-progress.test.mjs` tests the shared strip's rendering in isolation (three existing
+checks, unchanged). No isolated Home-render test is added: it cannot exercise the authenticated
+regular classroom run path. The real-app browser tests now provide that regression coverage.
 
-No migration, server-permission or hosted integration check applies to this UI-only change.
+`java-run-progress.browser.mjs` uses actual production apps, local Supabase and actual Java.
+Individual save/config/result/startup requests are held to make transitional states observable;
+Java output is not replaced. Existing module/personal checks cover save/startup/checking, failed
+requests/recovery, compiler errors, Save work alone and real online input/Stop versus offline
+input-before-Run. New regular student/teacher checks enter My Practice Code / Teacher Demo Workspace,
+hold browser startup, preserve main's new Opening Java runner output, assert the visible rotating indicator, check reduced
+motion, then finish real Java. They also run Scanner input, Enter, Stop online, and compiler errors.
+CheerpJ branding stays visible online; offline stays on laptop javac. Temporary accounts/classes
+are removed in finally. No schema, server-permission or hosted integration check applies.
 
-## Reproduce and check on screen
+## Re-run
 
-Use isolated rebuilt production apps with local Supabase on ports 3030 (online Java) and 3032
-(offline, CODESHARE_LAPTOP=true and LOCAL_JAVA_EXECUTION=true). Online JAVA_RUNNER_URL points to a
-separate local static origin on 3031 serving java-runtime/public with its existing CSP/Range support.
-The browser script rejects remote database addresses, uses only those fixed local app URLs,
-and creates/removes disposable verification accounts/classes.
+Use rebuilt local production apps on 3030 (online Java) and 3032 (offline, LOCAL_JAVA_EXECUTION=true,
+CODESHARE_LAPTOP=true), with local Supabase. Online JAVA_RUNNER_URL points to a separate static
+origin on 3031 serving java-runtime/public with its existing CSP and HTTP Range support.
 
 ```sh
 CODESHARE_PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs \
@@ -62,37 +69,79 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/absolute/path/to/chrome \
 node --test tests/java-run-progress.browser.mjs
 ```
 
-The existing workspace Playwright and installed Chromium were used; no dependency or browser
-was downloaded. The executable override can be omitted if Playwright's matching browser is installed.
+The installed workspace Playwright and Chromium were reused; no download or dependency was added.
+The executable override is optional when Playwright's matching browser is installed.
 
-1. As a student, open a module in the main editor and press Run code. Watch the strip above Actual output: saving, Java starting/running, then output checking. It clears once the output arrives.
-2. Introduce a compiler error and run again. The strip clears and the error remains in Actual output. Fix the code and rerun.
-3. Use Save work without Run code: no Java-running strip appears.
-4. In the personal project, run Java that asks a question. Online, the strip points to Program input; Enter sends the answer and Stop clears a waiting run. Offline, enter input before Run as before.
-5. Enable reduced motion. The message stays visible while the spinner stops rotating.
+## Manual check of the teacher's reported screen
 
-## Real production browser — command above
+1. Enter a class in the regular Code editor (My Practice Code for a student; teacher demo for the teacher).
+2. Press Run code. Above the output, the rotating strip says Java is loading or running… Please wait.
+3. While online Java starts, Stop and loading-stage text may be visible; the strip must remain visible.
+4. Run code asking for an answer. Online, the strip points to Program input; Enter resumes the run, and Stop cancels. Offline, input stays before Run.
+5. Run invalid Java: output shows the compiler error and the strip clears. Enable reduced motion: text remains while rotation stops.
+
+## History
+
+- Original module/personal delivery: implementation `8198348`, PR #29 merged at `7089377`.
+- Follow-up: regular caller was omitted; teacher approved adding the same strip there. Correction `8ae4f1a` passed its tests, then latest main startup repair PR #30 was integrated and rechecked (148 suite / 20 browser). Existing repair notes and stage output were preserved.
+
+## Actual production browser — command above
 
 File: `tests/java-run-progress.browser.mjs`
 
 ```text
-  ✔ shows saving and startup immediately, checking until the actual result, and honors reduced motion (1031.402235ms)
-  ✔ a failed run clears the indicator and the next run recovers (2664.130208ms)
-  ✔ compiler errors clear progress and remain visible in Actual output (2152.19468ms)
-  ✔ Save work alone does not claim Java is running (101.877495ms)
-  ✔ offline personal Java retains input-before-Run and clears progress after real javac (2297.825482ms)
-✔ Java progress offline: real student Console statuses and completion (10726.53836ms)
-  ✔ shows saving and startup immediately, checking until the actual result, and honors reduced motion (7254.439772ms)
-  ✔ a failed run clears the indicator and the next run recovers (5903.938445ms)
-  ✔ compiler errors clear progress and remain visible in Actual output (4010.909136ms)
-  ✔ Save work alone does not claim Java is running (69.140448ms)
-  ✔ personal Java shows input waiting, resumes on Enter, and clears after Stop (8825.222317ms)
-✔ Java progress online: real student Console statuses and completion (28323.577738ms)
+  ✔ shows saving and startup immediately, checking until the actual result, and honors reduced motion (859.8642ms)
+  ✔ a failed run clears the indicator and the next run recovers (2398.765311ms)
+  ✔ compiler errors clear progress and remain visible in Actual output (1955.41244ms)
+  ✔ Save work alone does not claim Java is running (70.072831ms)
+  ✔ offline personal Java retains input-before-Run and clears progress after real javac (2131.169854ms)
+  ✔ regular student Console: spinner rotates through startup, then clears after real Java (2695.857203ms)
+  ✔ regular student Console: input and compiler errors clear progress; online Stop works (4420.254089ms)
+  ✔ regular teacher Console: spinner rotates through startup, then clears after real Java (2679.831661ms)
+  ✔ regular teacher Console: input and compiler errors clear progress; online Stop works (4405.083038ms)
+✔ Java progress offline: real module, personal and classroom Console statuses (24956.360998ms)
+  ✔ shows saving and startup immediately, checking until the actual result, and honors reduced motion (10538.729063ms)
+  ✔ a failed run clears the indicator and the next run recovers (8574.964074ms)
+  ✔ compiler errors clear progress and remain visible in Actual output (6662.40771ms)
+  ✔ Save work alone does not claim Java is running (71.119801ms)
+  ✔ personal Java shows input waiting, resumes on Enter, and clears after Stop (14977.335195ms)
+  ✔ regular student Console: spinner rotates through startup, then clears after real Java (7273.591415ms)
+  ✔ regular student Console: input and compiler errors clear progress; online Stop works (21881.677694ms)
+  ✔ regular teacher Console: spinner rotates through startup, then clears after real Java (7736.873861ms)
+  ✔ regular teacher Console: input and compiler errors clear progress; online Stop works (19906.472522ms)
+✔ Java progress online: real module, personal and classroom Console statuses (100405.204972ms)
 ```
 
-## Complete suite — names and marks grouped by file
+## Deliberate missing-regular-indicator mutation
 
-Commands: `npm test` and the final grouped command above.
+Same browser command, with only the regular strip hidden.
+
+```text
+  ✔ shows saving and startup immediately, checking until the actual result, and honors reduced motion (1025.014255ms)
+  ✔ a failed run clears the indicator and the next run recovers (2405.283343ms)
+  ✔ compiler errors clear progress and remain visible in Actual output (1967.854743ms)
+  ✔ Save work alone does not claim Java is running (69.288681ms)
+  ✔ offline personal Java retains input-before-Run and clears progress after real javac (2098.518508ms)
+  ✖ regular student Console: spinner rotates while output is blank, then clears after real Java (1712.154094ms)
+  ✖ regular student Console: input and compiler errors clear progress; online Stop works (1676.876818ms)
+  ✖ regular teacher Console: spinner rotates while output is blank, then clears after real Java (1715.69069ms)
+  ✖ regular teacher Console: input and compiler errors clear progress; online Stop works (1655.514565ms)
+✖ Java progress offline: real module, personal and classroom Console statuses (17602.006723ms)
+  ✔ shows saving and startup immediately, checking until the actual result, and honors reduced motion (7042.516237ms)
+  ✔ a failed run clears the indicator and the next run recovers (5305.553547ms)
+  ✔ compiler errors clear progress and remain visible in Actual output (4421.242339ms)
+  ✔ Save work alone does not claim Java is running (71.593784ms)
+  ✔ personal Java shows input waiting, resumes on Enter, and clears after Stop (10408.172494ms)
+  ✖ regular student Console: spinner rotates while output is blank, then clears after real Java (97.337121ms)
+  ✖ regular student Console: input and compiler errors clear progress; online Stop works (30063.010322ms)
+  ✖ regular teacher Console: spinner rotates while output is blank, then clears after real Java (178.737574ms)
+  ✖ regular teacher Console: input and compiler errors clear progress; online Stop works (30055.161697ms)
+✖ Java progress online: real module, personal and classroom Console statuses (90549.698879ms)
+```
+
+## Complete suite — exact runner names and marks grouped by file
+
+Command: `npm test`, final integrated source.
 
 ### tests/api-router.test.mjs
 
@@ -116,6 +165,8 @@ Commands: `npm test` and the final grouped command above.
 - ✔ browser Java: refuses same origin, insecure, credentialed and path-based runner addresses
 - ✔ browser Java: authenticates frame messages, sends every source/input/package, and tears down after result or timeout
 - ✔ browser Java: offline uses only the existing authenticated laptop endpoint
+- ✔ browser Java: startup stages authenticate messages and identify the stalled stage without extending the deadline (CKB-056)
+- ✔ browser Java: startup feedback never contaminates Java output or accepts stages after execution starts (CKB-056)
 - ✔ interactive Java: streams prompts, waits for blank and Unicode answers, and rejects stale or foreign input requests (CKB-049)
 - ✔ interactive Java: the five-second execution budget is cumulative across input waits
 - ✔ interactive Java: Stop preserves printed output and removes a waiting run
@@ -133,6 +184,9 @@ Commands: `npm test` and the final grouped command above.
 ### tests/browser-java-runtime.test.mjs
 
 - ✔ browser runtime: only the parent starts Java; flat strings preserve duplicate filenames for the bridge
+- ✔ browser runtime: whole-file downloads preserve binary compiler JARs without Range support (CKB-056)
+- ✔ browser runtime: missing compiler assets report the filename and stage without starting Java (CKB-056)
+- ✔ browser runtime: failed compiler downloads report their stage and do not compile (CKB-056)
 - ✔ browser runtime: invalid sources and download failure report failure instead of progress
 - ✔ browser runtime: public asset policy permits CheerpJ's required nested runtime frame only (CKB-047)
 - ✔ browser runtime: live input waits for authenticated matching answers and streams output before completion (CKB-049)
