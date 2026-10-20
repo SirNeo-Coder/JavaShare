@@ -8,6 +8,10 @@ import Landing from "./Landing";
 import { studentEntryClassroom, rememberedStudentClassroom, rememberStudentClassroom } from "./studentClassroomEntry";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import ModuleWorkspace from "./ModuleWorkspace";
+import { moduleProjectForClass } from "./moduleActivityState";
+import { activityStateId } from "../backend/src/module-activities";
+import StudentModuleActivity, { type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
+import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
 import { api, getApiUrl } from "./apiClient";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
@@ -215,6 +219,9 @@ export default function Home() {
   const [fontScale, setFontScale] = useState(getSavedFontScale);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
+  const [moduleActivity, setModuleActivity] = useState<StudentActivity | null>(null);
+  const [moduleProgressRevision, setModuleProgressRevision] = useState(0);
+  const moduleEditorRef = useRef<ModuleEditorHandle>(null);
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [dismissedLiveSessions, setDismissedLiveSessions] = useState<Record<string, string>>({});
@@ -350,11 +357,14 @@ export default function Home() {
   const isWebProject = team?.project?.language === "web";
   const currentSavedCopy =
     activeSavedWork?.projectId === activeProjectId ? activeSavedWork : null;
-  const workspaceTitle =
+  const currentModuleProject = moduleProjectForClass(moduleActivity, data?.classrooms[0]?.id, user?.role);
+  const workspaceTitle = currentModuleProject
+    ? currentModuleProject.moduleTitle :
     user?.role === "student" && currentSavedCopy
       ? currentSavedCopy.label
       : team?.name || "Workspace";
-  const workspaceSubtitle =
+  const workspaceSubtitle = currentModuleProject
+    ? "Your saved module project" :
     user?.role === "student" && currentSavedCopy
       ? `Saved copy · ${activeFile?.path || "Java project"}`
       : `${team?.project?.title || "Java project"} · ${activeFile?.path || ""}`;
@@ -572,6 +582,7 @@ export default function Home() {
         if (message === "Sign in required" || message === "Session expired") {
           forgetRealtimeClient();
           setUser(null);
+          setModuleActivity(null);
           setData(null);
           setEnteredClassroomId(null);
           setChoosingStudentClass(false);
@@ -1666,6 +1677,19 @@ export default function Home() {
       );
     }
   }
+  async function startModuleActivity(module: CourseModule, step: StepBlock) {
+    if (!classroomId || user?.role !== "student") return;
+    await moduleEditorRef.current?.save();
+    await persistCurrentCode();
+    const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/activity`, {
+      method: "POST", body: JSON.stringify({ stepId: step.id }),
+    });
+    setModuleActivity({ classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step.id, stateId: activityStateId(step),
+      instruction: step.activity?.instruction ?? step.instruction,
+      expectedOutput: step.activity?.expectedOutput ?? step.expectedOutput, stdin: step.activity?.stdin ?? "", progress });
+    setProjectsOpen(false);
+  }
+
   async function runCode() {
     if (!team) return;
     setPanel("console");
@@ -1743,6 +1767,8 @@ export default function Home() {
     }
   }
   async function logout() {
+    try { await moduleEditorRef.current?.save(); }
+    catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); return; }
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     if (
       user?.role === "student" &&
@@ -1766,6 +1792,7 @@ export default function Home() {
     await api("/api/auth/logout", { method: "POST" });
     forgetRealtimeClient(); // the live pass belongs to the signed-out user
     setUser(null);
+    setModuleActivity(null);
     setData(null);
     setEnteredClassroomId(null);
     setChoosingStudentClass(false);
@@ -1777,7 +1804,10 @@ export default function Home() {
     setModulesOpen(false);
   }
 
-  const showClasses = () => {
+  const showClasses = async () => {
+    try { await moduleEditorRef.current?.save(); }
+    catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); return; }
+    setModuleActivity(null);
     setChoosingStudentClass(user?.role === "student");
     setModulesOpen(false);
     setProjectsOpen(false);
@@ -2131,7 +2161,10 @@ export default function Home() {
                 >
                   <button
                     className="team-select"
-                    onClick={() => chooseTeam(index)}
+                    onClick={moduleActivity ? async () => {
+                      try { await moduleEditorRef.current?.save(); setModuleActivity(null); chooseTeam(index); }
+                      catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); }
+                    } : () => chooseTeam(index)}
                     aria-expanded={item.isGroup ? groupExpanded : undefined}
                   >
                     <span
@@ -2286,7 +2319,7 @@ export default function Home() {
           >
             <span>
               {user.role === "student"
-                ? currentSavedCopy
+                ? moduleActivity ? "MODULE PROJECT" : currentSavedCopy
                   ? "EDITING SAVED COPY"
                   : "MY PRACTICE CODE"
                 : team.isTeacherWorkspace
@@ -2295,7 +2328,7 @@ export default function Home() {
             </span>
             <b>
               {user.role === "student"
-                ? currentSavedCopy
+                ? moduleActivity ? "Your module project" : currentSavedCopy
                   ? currentSavedCopy.label
                   : "Current practice workspace"
                 : team.isTeacherWorkspace
@@ -2304,7 +2337,7 @@ export default function Home() {
             </b>
             {user.role === "student" && (
               <small>
-                {currentSavedCopy
+                {moduleActivity ? "Save work keeps this module’s files" : currentSavedCopy
                   ? "Save work updates this named copy"
                   : "Save work creates a new named copy"}
               </small>
@@ -2369,7 +2402,7 @@ export default function Home() {
                 </span>
               </div>
             )}
-            <div className="team-buttons">
+            <div className="team-buttons" hidden={Boolean(moduleActivity)}>
               {user.role === "teacher" &&
                 team.isTeacherWorkspace &&
                 team.project && (
@@ -2408,7 +2441,12 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div className="content-grid">
+          {currentModuleProject ? <StudentModuleActivity
+            key={`${currentModuleProject.moduleId}:${currentModuleProject.stepId}:${currentModuleProject.progress.updatedAt}`}
+            activity={currentModuleProject} ref={moduleEditorRef}
+            onChecked={() => setModuleProgressRevision((revision) => revision + 1)}
+            onClose={() => setModuleActivity(null)}
+          /> : <><div className="content-grid">
             <section className="editor-card">
               <div className="workspace-card-heading"><b><span aria-hidden="true">⌘</span> Code editor</b><span>{languageLabel(activeFile?.language || "java")}</span></div>
               <div className="file-tabs">
@@ -2760,9 +2798,9 @@ export default function Home() {
                 </button>
               )}
             </div>
-          </footer>
+          </footer></>}
         </section>
-        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} />}
+        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
         <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} onClose={() => setChatOpen(false)}>
           <div className="chat">
                   <div className="chat-toolbar">

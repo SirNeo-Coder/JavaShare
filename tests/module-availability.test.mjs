@@ -92,69 +92,47 @@ test("module availability migration: preserves existing content and work, opens 
   } finally { psql(`drop schema if exists ${schema} cascade;`); }
 });
 
-test("module availability: new modules withhold closed content and reject direct progress writes; only the class teacher can open them", needsLocal, async () => {
+test("module availability: first part opens automatically, future content is withheld, and teacher switches cannot bypass student progress", needsLocal, async () => {
   await withClass(async ({ classrooms: [id], request, upload, teacherCookie, studentCookie, outsiderCookie }) => {
     assert.equal((await upload(id)).status, 201);
     const preview = await (await request(id, "", { cookie: teacherCookie })).json();
-    assert.deepEqual(preview.availability, { openLessonIds: [], performanceTaskOpen: false });
-    assert.deepEqual(preview.lessons, fixture.lessons, "teacher preview must keep all content");
-    const closed = await (await request(id)).json();
-    assert.equal(closed.lessons.length, fixture.lessons.length);
-    assert.ok(closed.lessons.every((lesson) => lesson.closed && lesson.blocks.length === 0 && lesson.exitSlip.questions.length === 0));
-    assert.equal(closed.performanceTask, undefined);
-    assert.equal(closed.starterFiles, undefined);
-    assert.deepEqual(closed.closedPerformanceTask, { title: fixture.performanceTask.title });
-    const closedJson = JSON.stringify(closed);
-    assert.ok(!closedJson.includes(fixture.lessons[0].blocks[0].instruction));
-    assert.ok(!closedJson.includes(fixture.lessons[0].blocks[0].files[0].content));
-    assert.ok(!closedJson.includes(fixture.performanceTask.markdown));
-    for (const stepId of [fixture.lessons[0].blocks[0].id, fixture.lessons[0].exitSlip.id]) {
-      assert.equal((await request(id, "/progress/step", { method: "PUT", body: { stepId, status: "pass" } })).status, 403);
-    }
-    assert.equal((await request(id, "/progress/performance-task", { method: "PUT", body: { variant: "sample", files: fixture.performanceTask.exampleFiles, status: "pass" } })).status, 403);
-    const change = { target: "lesson", lessonId: fixture.lessons[0].id, open: true };
+    assert.deepEqual(preview.lessons, fixture.lessons);
+    let view = await (await request(id)).json();
+    assert.equal(view.lessons[0].closed, false);
+    assert.equal(view.lessons[1].closed, true);
+    assert.equal(view.lessons[1].blocks[0].locked, true);
+    assert.equal(view.lessons[1].blocks[0].files.length, 0);
+    assert.equal(view.lessons[1].exitSlip.questions.length, 0);
+    assert.equal(view.performanceTask, undefined);
+    const change = { target: "lesson", lessonId: fixture.lessons[1].id, open: true };
     for (const cookie of [studentCookie, outsiderCookie]) assert.equal((await request(id, "/availability", { cookie, method: "PATCH", body: change })).status, 403);
-    assert.equal((await request(id, "/availability", { cookie: teacherCookie, method: "PATCH", body: { ...change, lessonId: "invented" } })).status, 400);
-    assert.equal((await request(id, "/availability", { cookie: teacherCookie, method: "PATCH", body: { ...change, open: "yes" } })).status, 400);
     assert.equal((await request(id, "/availability", { cookie: teacherCookie, method: "PATCH", body: change })).status, 200);
-    const opened = await (await request(id)).json();
-    assert.deepEqual(opened.lessons[0], fixture.lessons[0]);
-    assert.equal(opened.lessons[1].closed, true);
+    view = await (await request(id)).json();
+    assert.equal(view.lessons[1].closed, true, "legacy teacher switches cannot bypass automatic progression");
+    assert.equal((await request(id, "/progress/activity", { method: "POST", body: { stepId: fixture.lessons[1].blocks[0].id } })).status, 403);
   });
 });
 
-test("module availability: closing and reopening preserves work and the full-module meter; reupload preserves settings and new lessons start closed", needsLocal, async () => {
-  await withClass(async ({ classrooms: [id], request, upload, teacherCookie }) => {
+test("module availability: reupload preserves work and new parts require their preceding activities", needsLocal, async () => {
+  await withClass(async ({ admin, users, classrooms: [id], request, upload }) => {
     await upload(id);
-    const change = (body) => request(id, "/availability", { cookie: teacherCookie, method: "PATCH", body });
-    assert.equal((await change({ target: "lesson", lessonId: fixture.lessons[0].id, open: true })).status, 200);
-    const stepResponse = await request(id, "/progress/step", { method: "PUT", body: { stepId: fixture.lessons[0].blocks[0].id, status: "pass" } });
-    assert.equal(stepResponse.status, 200);
-    assert.equal((await stepResponse.json()).percent, 17, "one of six requirements, including closed content");
-    await change({ target: "lesson", lessonId: fixture.lessons[0].id, open: false });
-    const closedProgress = await (await request(id, "/progress")).json();
-    assert.equal(closedProgress.percent, 17);
-    assert.equal(closedProgress.stepStates[fixture.lessons[0].blocks[0].id], "pass");
-    assert.equal((await request(id, "/progress/step", { method: "PUT", body: { stepId: fixture.lessons[0].blocks[0].id, status: "fail" } })).status, 403, "a previously loaded lesson cannot save after closing");
-    await change({ target: "lesson", lessonId: fixture.lessons[0].id, open: true });
-    await change({ target: "performance-task", open: true });
+    const states = Object.fromEntries(fixture.lessons.map((lesson) => [lesson.blocks[0].id, "pass"]));
+    await request(id, "/progress");
+    await admin.from("module_progress").update({ step_states: states }).eq("classroom_id", id).eq("student_id", users[1].id);
     const taskResponse = await request(id, "/progress/performance-task", { method: "PUT", body: { variant: "sample", files: fixture.performanceTask.exampleFiles, status: "pass" } });
-    assert.equal(taskResponse.status, 200); assert.equal((await taskResponse.json()).percent, 33);
-    await change({ target: "performance-task", open: false });
-    assert.equal((await request(id, "/progress/performance-task", { method: "PUT", body: { variant: "own", files: fixture.performanceTask.starterFiles, status: "pass" } })).status, 403);
+    assert.equal(taskResponse.status, 200); assert.equal((await taskResponse.json()).percent, 75);
     const correction = structuredClone(fixture); correction.title = "Corrected module";
     const newLesson = structuredClone(fixture.lessons[1]); newLesson.id = "new-lesson"; newLesson.exitSlip.id = "new-slip"; newLesson.blocks[0].id = "new-step"; newLesson.exitSlip.afterStep = "new-step";
-    correction.lessons.push(newLesson);
+    const lastLesson = structuredClone(newLesson); lastLesson.id = "last-lesson"; lastLesson.exitSlip.id = "last-slip"; lastLesson.blocks[0].id = "last-step";
+    correction.lessons.push(newLesson, lastLesson);
     assert.equal((await upload(id, correction)).status, 201);
-    const reuploaded = await (await request(id, "", { cookie: teacherCookie })).json();
-    assert.deepEqual(reuploaded.availability, { openLessonIds: [fixture.lessons[0].id], performanceTaskOpen: false });
-    const studentView = await (await request(id)).json();
-    assert.equal(studentView.lessons[2].closed, true);
-    const afterCorrection = await (await request(id, "/progress")).json();
-    assert.equal(afterCorrection.stepStates[fixture.lessons[0].blocks[0].id], "pass");
-    assert.equal(afterCorrection.performanceTask.sample.status, "pass");
-    // Two completed items out of eight after the teacher adds another lesson, not a loss of work.
-    assert.equal(afterCorrection.percent, 25);
+    const view = await (await request(id)).json();
+    assert.equal(view.lessons[2].closed, false);
+    assert.equal(view.lessons[3].closed, true);
+    const saved = await (await request(id, "/progress")).json();
+    assert.equal(saved.stepStates[fixture.lessons[0].blocks[0].id], "pass");
+    assert.equal(saved.performanceTask.sample.status, "pass");
+    assert.equal(saved.percent, 50, "three saved items out of six; no paper marks in the denominator");
   });
 });
 
@@ -167,7 +145,8 @@ test("module availability: the same module in two classes has independent switch
     const inA = await (await request(a, "", { cookie: teacherCookie })).json();
     assert.deepEqual([...inA.availability.openLessonIds].sort(), fixture.lessons.map((lesson) => lesson.id).sort());
     assert.deepEqual((await (await request(b, "", { cookie: teacherCookie })).json()).availability.openLessonIds, []);
-    assert.ok((await (await request(b)).json()).lessons.every((lesson) => lesson.closed));
+    assert.equal((await (await request(b)).json()).lessons[0].closed, false);
+    assert.equal((await (await request(b)).json()).lessons[1].closed, true);
   });
 });
 

@@ -63,9 +63,10 @@ test("course modules: teacher uploads, class members read, only the teacher may 
     // The student (a class member) can list and read it.
     const list = await (await call(`/api/classrooms/${classroomId}/modules`, { headers: { cookie: studentCookie } })).json();
     assert.deepEqual(list.map((module) => module.moduleId), [fixture.id]);
-    // New uploads start closed; the teacher still previews the unchanged file.
+    // New uploads open their first part automatically; teacher preview keeps the uploaded file.
     const closed = await (await call(`/api/classrooms/${classroomId}/modules/${fixture.id}`, { headers: { cookie: studentCookie } })).json();
-    assert.ok(closed.lessons.every((lesson) => lesson.closed && lesson.blocks.length === 0));
+    assert.equal(closed.lessons[0].closed, false);
+    assert.equal(closed.lessons[1].closed, true);
     const preview = await (await call(`/api/classrooms/${classroomId}/modules/${fixture.id}`, { headers: { cookie: teacherCookie } })).json();
     const { availability, ...source } = preview;
     assert.deepEqual(source, fixture);

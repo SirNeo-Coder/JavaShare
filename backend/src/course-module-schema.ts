@@ -1,6 +1,7 @@
 // Validates a module upload against docs/course-format.md so a malformed file is rejected with
 // a plain-English error instead of corrupting a class. Keep this in sync with that doc.
 import { z } from "zod";
+import { activityStateId } from "./module-activities.ts";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "./file-paths.ts";
 
 const file = z.object({ path: z.string().trim().min(1).max(200), content: z.string().max(200000) });
@@ -23,6 +24,13 @@ const block = z.discriminatedUnion("type", [
     run: z.string().trim().min(1).max(200).optional(),
     expectedOutput: z.string().max(100000),
     checkYourself: z.string().max(5000).optional(),
+    // Sample files/output remain the printed example; activity describes the student's challenge.
+    activity: z.object({
+      instruction: z.string().trim().min(1).max(5000),
+      files: z.array(file).max(50).default([]),
+      expectedOutput: z.string().max(100000),
+      stdin: z.string().max(10000).default(""),
+    }).optional(),
     // Groups this step (and any text/definition/analogy/table/note blocks leading into it) under
     // one named, gated part of the module viewer - a part can span several lessons (e.g. a
     // "Reading files" part covering both a Tuesday and a Wednesday lesson) because grouping
@@ -81,6 +89,7 @@ export const courseModule = z.object({
   id: z.string().trim().min(1).max(100),
   title: z.string().max(200),
   continues: z.string().max(200).optional(),
+  previousModuleId: z.string().trim().min(1).max(100).optional(),
   starterFiles: z.array(file).max(50).default([]),
   lessons: z.array(lesson).min(1).max(10),
   performanceTask: performanceTask.optional(),
@@ -92,9 +101,9 @@ export const courseModule = z.object({
   // Lesson ids also identify availability switches, so they must not collide (CKB-019).
   const progressIds = module.lessons.flatMap((lesson) => [
     lesson.id, lesson.exitSlip.id,
-    ...lesson.blocks.filter((block) => block.type === "step").map((block) => block.id),
+    ...lesson.blocks.filter((block) => block.type === "step").flatMap((block) => block.activity ? [block.id, activityStateId(block)] : [block.id]),
   ]);
-  return progressIds.length === new Set(progressIds).size;
+  return module.previousModuleId !== module.id && progressIds.length === new Set(progressIds).size;
 }, { message: "Two lessons, steps or exit slips in this module share the same id - their ids must be unique across the whole module" })
   .refine((module) => {
     // /api/execute only runs java files whose path matches a strict identifier-style regex, at
@@ -102,7 +111,8 @@ export const courseModule = z.object({
     // performance-task file (both always sent to /api/execute - app/ModuleViewer.tsx), must pass
     // that same rule or the step becomes permanently unrunnable with no warning at upload time.
     const javaFiles = [
-      ...module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? block.files : []))),
+      ...module.starterFiles.filter((file) => file.path.endsWith(".java")),
+      ...module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? [])] : []))),
       ...(module.performanceTask ? [...module.performanceTask.exampleFiles, ...module.performanceTask.starterFiles].filter((file) => file.path.endsWith(".java")) : []),
     ];
     return javaFiles.every((file) => file.path.length <= JAVA_PATH_MAX_LENGTH && JAVA_PATH.test(file.path));

@@ -33,8 +33,26 @@ Private channels `team:<teamId>` and `class:<classroomId>` (policies in `supabas
 
 Nothing live is kept in server memory any more. File saves emit `file:updated`. Live-share and invitation safety checks run on opening the screen, returning to the tab, and channel (re)connection; there is no 2-second polling timer.
 
-## Module availability
+## Module activities and saved projects
 
-`getSupabaseModule` returns full content to the class teacher. Students receive open lessons, closed lesson title stubs, and either the open performance task or its title stub. Closed instructions, questions, expected output and supplied code are withheld server-side, including top-level starter files. Original JSON stays intact.
-
-Progress reads/writes require an uploaded module; step writes also require a real step/exit-slip id in an open lesson, and task writes require an existing open task (CKB-018). Progress replies include `percent` from the whole module and `updatedAt`; the viewer ignores older save replies. Closing content preserves progress and submissions. Availability updates retry against `updated_at` so concurrent teacher tabs retain separate switch changes. No new live event: students close and reopen the module to refresh availability.
+- `POST /api/classrooms/:id/modules/:moduleId/progress/activity` prepares the selected unlocked
+  step's project. It combines supporting starter files, optional activity files and the student's
+  optional preceding module project, keeping the current project's existing files.
+- `POST .../progress/run` validates Java source paths, membership, the existing weekly live lock,
+  the activity's existence and its part's prerequisites. It saves the project, runs it through
+  the existing rate/concurrency-limited Java runner, and writes pass/fail from the actual result.
+  Demo mode never passes. A previous pass survives later failed practice runs.
+- `PUT .../progress/project` accepts optional `updatedAt`; new editor clients must supply it so
+  a stale tab cannot overwrite a newer project. A project changed while compiling cannot receive
+  a result for the earlier source. Existing clients remain compatible.
+- `GET .../modules/:moduleId` returns all content to the teacher. Students receive unlocked
+  parts plus locked step placeholders, without future instructions, code, output or questions.
+  Base supporting starter files are available to initialize the shared project. Completed parts
+  stay accessible. Successful checks refresh the worksheet immediately without polling.
+- Direct `PUT .../progress/step` code pass flags are refused. Old paper liplet writes remain
+  compatible, but do not affect percentages or unlocking. A new `activity` uses a separate saved
+  state key (`<step id>:activity`), so an old sample pass cannot satisfy a new challenge.
+- Completion counts passed activities plus the two existing performance-task submissions.
+  Liplets are assessed on paper. The task opens after all lesson activities pass; its submission
+  workflow is unchanged. Teacher availability writes remain teacher-only for older clients,
+  but the old switches no longer control student access. No new database migration or live event.

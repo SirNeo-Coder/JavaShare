@@ -18,6 +18,7 @@ export function groupModuleParts(module: CourseModule): ModulePart[] {
       if (block.type !== "step") { pending.push(block); continue; }
       const step = block as StepBlock;
       const part = findPart(step.part ? `part:${step.part}` : lesson.id, step.part || lesson.title, lesson);
+      part.closed ||= Boolean(step.locked);
       part.blocks.push(...pending, step);
       pending = [];
       lastPart = part;

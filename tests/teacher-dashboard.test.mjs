@@ -87,13 +87,13 @@ test("teacher dashboard", { skip: !local && "local Supabase is not running" }, a
     });
     await t.test("counts saved completion and both submissions, including closed lessons, without exposing source", async () => {
       const data = await read();
-      assert.deepEqual(data.totals, { students: 3, modules: 2, averagePercent: 20, completedModules: 1, notStartedStudents: 1, submissions: 2 });
+      assert.deepEqual(data.totals, { students: 3, modules: 2, averagePercent: 21, completedModules: 1, notStartedStudents: 1, submissions: 2 });
       assert.deepEqual(data.modules.map((module) => module.moduleId), [second.id, fixture.id], "module cards follow week order");
       const courseSummary = data.modules.find((module) => module.moduleId === fixture.id);
-      assert.deepEqual({ lessons: courseSummary.lessons, steps: courseSummary.steps, completed: courseSummary.completedStudents, average: courseSummary.averagePercent, submissions: courseSummary.submissions }, { lessons: 2, steps: 2, completed: 1, average: 39, submissions: 2 });
+      assert.deepEqual({ lessons: courseSummary.lessons, steps: courseSummary.steps, completed: courseSummary.completedStudents, average: courseSummary.averagePercent, submissions: courseSummary.submissions }, { lessons: 2, steps: 2, completed: 1, average: 42, submissions: 2 });
       assert.equal(data.modules.find((module) => module.moduleId === second.id).submissions, 0, "removed task slots cannot count as submissions");
       assert.equal(data.students.find((student) => student.id === full.id).averagePercent, 50);
-      assert.equal(data.students.find((student) => student.id === partial.id).averagePercent, 9);
+      assert.equal(data.students.find((student) => student.id === partial.id).averagePercent, 13);
       assert.equal(data.students.find((student) => student.id === untouched.id).averagePercent, 0);
       assert.doesNotMatch(JSON.stringify(data), /DO_NOT_EXPOSE_STUDENT_SOURCE|step_states|performance_task|project_files/);
       const own = await (await call(`/api/classrooms/${classA}/modules/summary`, { headers: { cookie: studentCookie } })).json();
@@ -104,7 +104,7 @@ test("teacher dashboard", { skip: !local && "local Supabase is not running" }, a
       assert.ok(!data.students.some((student) => student.id === former.id));
       assert.ok(!data.students.some((student) => student.id === teacher.id));
       const studentA = data.students.find((student) => student.id === partial.id);
-      assert.equal(studentA.modules.find((module) => module.moduleId === fixture.id).percent, 17);
+      assert.equal(studentA.modules.find((module) => module.moduleId === fixture.id).percent, 25);
       const otherClass = await read(classB);
       assert.equal(otherClass.students[0].modules[0].percent, 100);
       assert.equal(otherClass.totals.students, 1);
@@ -171,7 +171,7 @@ test("teacher dashboard", { skip: !local && "local Supabase is not running" }, a
       const before = await read();
       await admin.from("module_progress").update({ step_states: {} }).eq("classroom_id", classA).eq("student_id", partial.id);
       const after = await read();
-      assert.equal(before.totals.averagePercent, 20);
+      assert.equal(before.totals.averagePercent, 21);
       assert.equal(after.totals.averagePercent, 17);
       assert.equal(after.totals.notStartedStudents, 2);
       const { data: rows } = await admin.from("module_progress").select("student_id").eq("classroom_id", classA).eq("student_id", untouched.id);

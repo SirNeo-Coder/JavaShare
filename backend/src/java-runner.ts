@@ -37,6 +37,11 @@ function runLimitedProcess(command: string, args: string[], cwd: string, stdin: 
 type ExecutableJavaFile = { path: string; content: string };
 
 export async function executeLocally(files: ExecutableJavaFile[], stdin: string) {
+  return (await executeLocallyResult(files, stdin)).output;
+}
+
+export async function executeLocallyResult(files: ExecutableJavaFile[], stdin: string) {
+  const failed = (output: string) => ({ success: false, output });
   const code = files.map((file) => file.content).join("\n");
   const blocked = [
     /\b(?:java\.io|java\.nio\.file|java\.net)\b/,
@@ -53,17 +58,17 @@ export async function executeLocally(files: ExecutableJavaFile[], stdin: string)
     }
     const sourcePaths = files.map((file) => file.path.replace(/\\/g, "/").replace(/^src\//, ""));
     const compiled = await runLimitedProcess("javac", ["-encoding", "UTF-8", "-d", directory, ...sourcePaths], directory, "", 10000);
-    if (compiled.outputLimited) return "Compilation stopped: output exceeded 64 KB.";
-    if (compiled.timedOut) return "Compilation stopped after 10 seconds.";
-    if (compiled.exitCode !== 0) return compiled.stderr || compiled.stdout || "Compilation failed.";
+    if (compiled.outputLimited) return failed("Compilation stopped: output exceeded 64 KB.");
+    if (compiled.timedOut) return failed("Compilation stopped after 10 seconds.");
+    if (compiled.exitCode !== 0) return failed(compiled.stderr || compiled.stdout || "Compilation failed.");
     const mainFile = files.find((file) => /(?:^|\/)Main\.java$/.test(file.path));
-    if (!mainFile) return "Run failed: this project needs a Main.java file containing public static void main(String[] args).";
+    if (!mainFile) return failed("Run failed: this project needs a Main.java file containing public static void main(String[] args).");
     const packageName = mainFile.content.match(/^\s*package\s+([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*;/m)?.[1];
     const mainClass = packageName ? `${packageName}.Main` : "Main";
     const executed = await runLimitedProcess("java", ["-Xmx128m", "-Xss1m", "-cp", directory, mainClass], directory, stdin, 5000);
-    if (executed.outputLimited) return `${executed.stdout}${executed.stderr}\n\nExecution stopped: output exceeded 64 KB.`;
-    if (executed.timedOut) return `${executed.stdout}${executed.stderr}\n\nExecution stopped after 5 seconds.`;
-    return executed.stdout || executed.stderr || `Process finished with exit code ${executed.exitCode}.`;
+    if (executed.outputLimited) return failed(`${executed.stdout}${executed.stderr}\n\nExecution stopped: output exceeded 64 KB.`);
+    if (executed.timedOut) return failed(`${executed.stdout}${executed.stderr}\n\nExecution stopped after 5 seconds.`);
+    return { success: executed.exitCode === 0 && !executed.stderr, output: executed.stdout + executed.stderr };
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

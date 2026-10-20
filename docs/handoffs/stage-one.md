@@ -1,5 +1,7 @@
 # CodeShare — Stage One Progress
 
+> Current student activity work (2026-10-20): approved and implemented on `codex/student-module-activities`. See [student-module-activities.md](student-module-activities.md) for main-editor projects, automatic progression, CKB-038 resolution and verification. Earlier pending starter-file proposals below are superseded for the student activity path.
+
 > Current student entry work (2026-10-20): see [student classroom entry](student-classroom-entry.md) for the approved direct-entry workflow, orphan cleanup, branch and verification. Teacher dashboard work remains in [its own handoff](teacher-progress-dashboard.md).
 
 Keep this file current. After every finished step: update it, commit, and push the branch.

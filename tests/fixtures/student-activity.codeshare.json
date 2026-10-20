@@ -1,0 +1,157 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 14,
+  "id": "java-2-activity-example",
+  "title": "Vehicle project activities",
+  "starterFiles": [
+    {
+      "path": "Vehicle.java",
+      "content": "public abstract class Vehicle { private final String plate; protected Vehicle(String plate) { this.plate = plate; } public String getPlate() { return plate; } public abstract int getCapacity(); }"
+    },
+    {
+      "path": "Jeepney.java",
+      "content": "public class Jeepney extends Vehicle { public Jeepney(String plate) { super(plate); } public int getCapacity() { return 20; } }"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "java-2-w99-test-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Counting with a for loop",
+      "hours": 1,
+      "objectives": {
+        "cognitive": "Write a for loop",
+        "affective": "Stay patient debugging",
+        "psychomotor": "Type Java in the editor"
+      },
+      "blocks": [
+        {
+          "type": "step",
+          "id": "java-2-w99-test-d1-s1",
+          "number": 1,
+          "instruction": "Worked example: show the capacity of one jeepney.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "public class Main { public static void main(String[] args) { Vehicle v = new Jeepney(\"NXA 123\"); System.out.println(\"Capacity: \" + v.getCapacity()); } }"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Capacity: 20",
+          "activity": {
+            "instruction": "Keep Vehicle as the parent class. Change the Jeepney capacity to 25, then print its capacity from Main.java.",
+            "files": [
+              {
+                "path": "Main.java",
+                "content": "public class Main { public static void main(String[] args) { Vehicle v = new Jeepney(\"NXA 123\"); System.out.println(\"Capacity: \" + v.getCapacity()); } }"
+              }
+            ],
+            "expectedOutput": "Capacity: 25",
+            "stdin": ""
+          }
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w99-test-d1-slip",
+        "points": 5,
+        "afterStep": "java-2-w99-test-d1-s1",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does a for loop do?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w99-test-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Counting down with a while loop",
+      "hours": 1,
+      "objectives": {
+        "cognitive": "Write a while loop",
+        "affective": "Stay patient debugging",
+        "psychomotor": "Type Java in the editor"
+      },
+      "blocks": [
+        {
+          "type": "step",
+          "id": "java-2-w99-test-d2-s1",
+          "number": 1,
+          "instruction": "Print the numbers 3 down to 1.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "public class Main { public static void main(String[] args) { int i = 3; while (i >= 1) { System.out.println(i); i--; } } }"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "3\n2\n1\n",
+          "activity": {
+            "instruction": "Use the same project to print the plate number and capacity.",
+            "files": [],
+            "expectedOutput": "NXA 123: 25",
+            "stdin": ""
+          }
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w99-test-d2-slip",
+        "points": 5,
+        "afterStep": "java-2-w99-test-d2-s1",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does a while loop do?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w99-test-pt",
+    "title": "Print a multiplication table",
+    "markdown": "Print the 5 times table from 1 to 5.",
+    "checklist": [
+      "Compiles",
+      "Prints 5 lines",
+      "Matches expected output"
+    ],
+    "exampleFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main { public static void main(String[] args) { for (int i = 1; i <= 5; i++) System.out.println(5 * i); } }"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main { public static void main(String[] args) { } }"
+      }
+    ],
+    "presentationOutline": [
+      "Show the loop",
+      "Show the output"
+    ],
+    "questionsToPrepare": [
+      "Why a for loop and not a while loop?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Correct output",
+        "points": 10
+      }
+    ],
+    "totalPoints": 10
+  }
+}
