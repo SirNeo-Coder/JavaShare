@@ -268,6 +268,39 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
    - a later step removes Render and Vercel (`backend/src/server.ts`, `render.yaml`, `vercel.json`) — only when the teacher asks;
    - Stage two (course modules) can start.
 
+## Production module repair — 2026-10-20
+
+- Branch: `codex/production-module-setup`. Teacher approved an **adjustment** to
+  apply the six existing `20261018` migrations to the hosted project.
+- Done: identified CKB-050. Teacher SQL screenshot returned NULL for both
+  `public.module_progress` and `public.course_modules`; production dashboard GETs
+  fail. Confirm the selected Supabase project matches the Worker's SUPABASE_URL.
+- Prepared [teacher repair steps](../production-module-setup.md), updated the
+  operations page, problem index and prompt map. Existing migrations and app
+  behavior are unchanged. A convenience SQL file in `/tmp` contains unchanged
+  copies of the six originals in order; the originals are the durable source.
+- Verified: the exact six-file SQL bundle passed in a new disposable local
+  PostgreSQL database. The guide's readiness query showed seven false values
+  before and seven true values after; existing test teacher/class rows survived,
+  both new tables were empty and protected by row-level security. The temporary
+  database was removed. Build passed, lint had 0 errors/8 existing warnings, full
+  suite passed 125/125 with no skips, and CKB-050 is the first matching search result.
+  [Named tests, commands and limits](../verification/production-module-setup.md).
+  The SQL-success/merge handoff update also passed both named tests in
+  `node --test tests/kb-search.test.mjs` and `git diff --check`.
+- Preparation is complete, committed and pushed as `edf4a6b` / `4f3a154`; final
+  checks were repeated on current main. [PR #23](https://github.com/SirNeo-Coder/JavaShare/pull/23)
+  targets main. The teacher explicitly requested merging it into main on 2026-10-20;
+  its GitHub merge status records delivery.
+- Teacher supplied a **Success. No rows returned** screenshot after the prepared
+  SQL instructions. Hosted SQL success is teacher-reported; the assistant did not
+  execute it or independently query the hosted database.
+- Next: verify all readiness fields are true, refresh Students/Curriculum, upload
+  the intended module, and check student save/reload and refreshed progress.
+  Production browser recovery and readiness-query results remain unconfirmed.
+- No assistant hosted SQL, database reset, `supabase db push` or deploy command.
+  Creating storage does not transfer local modules/progress online.
+
 ## Running offline mode on this laptop
 
 - Run `sg docker -c "npm run classroom:offline"` (one program on port 3000 since c2).
