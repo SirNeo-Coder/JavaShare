@@ -1,6 +1,6 @@
 # Sample-first module verification
 
-Verified 2026-10-21 on branch `codex/module-sample-first`, based on `codex/earlet-hover-dismiss` (PR #26, stacked on PR #25). No hosted SQL, deployment, merge, or settings changes.
+Verified 2026-10-21 on branch `codex/module-sample-first`, based on `codex/earlet-hover-dismiss` (PR #26, stacked on PR #25). Implementation `799519d`; [PR #27](https://github.com/SirNeo-Coder/JavaShare/pull/27) is open. No hosted SQL, deployment, merge, or settings changes.
 
 ## Final gate
 
@@ -338,3 +338,18 @@ Command: `node --test --test-reporter=spec tests/week14-java8.browser.mjs`
 - ✔ Java 8 sample 10: java-2-w14-d4-s10 (4333.223974ms)
 - ✔ Java 8 sample 11: java-2-w14-d5-s11 (4599.353313ms)
 - ✔ Week 14 online samples: every published baseline verifies in actual CheerpJ Java 8 (59855.154464ms)
+
+## Delivery and cleanup
+
+Implementation committed and pushed as `799519d`; PR #27 is open against the parent review branch. Disposable verification accounts/classes and temporary servers were removed. Existing classroom server 3012 and unrelated logs/cache/untracked files were preserved. GitHub connector PR creation returned 403; the authenticated CLI fallback created the attached PR. Teacher hosted migration and deployment remain pending.
+
+## Final handoff lookup checks
+
+Command: `node --test --test-reporter=spec tests/kb-search.test.mjs`
+
+The restricted sandbox first blocked the checks’ Node subprocess with EPERM; rerunning with subprocess access passed both checks. No application change was needed.
+
+### tests/kb-search.test.mjs
+
+- ✔ kb:search finds the matching bug record first (35.742761ms)
+- ✔ kb:search says so when nothing matches (25.607085ms)

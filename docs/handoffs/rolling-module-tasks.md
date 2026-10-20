@@ -25,17 +25,19 @@ not complete a task. Source/history, old completion and personal snapshots survi
 sample-gate bypass failed its regression; restoration passed. Original eight PDF page streams
 are unchanged; original eight plan-page renders remain pixel-identical, with revised appendices.
 Full names, commands, initial resolved failures and limits: `docs/verification/module-sample-first.md`.
-CKB-054 records the diagnosis. Implementation and this handoff are committed together.
+CKB-054 records the diagnosis. Implementation committed as `799519d` and pushed; [PR #27](https://github.com/SirNeo-Coder/JavaShare/pull/27) is open against `codex/earlet-hover-dismiss`.
 
-Nothing remains in progress for the approved implementation. Next: push/review the feature PR
-against `codex/earlet-hover-dismiss` (PR #26, itself stacked on PR #25). The teacher applies
+Nothing remains in progress for the approved implementation. Next: teacher review of PR #27,
+stacked on PR #26, itself stacked on PR #25. The teacher applies
 `20261021000100_module_activity_projects.sql` before deploying the reviewed app and re-uploading
 the revised Week 14 JSON. Follow `docs/module-sample-first-setup.md`; existing app processes need
 restart after a rebuild. Existing local classroom server 3012 was left running; isolated test
 origins were 3020/3022 and a separate static runner 3021. Browser tests remove disposable local
-classes/accounts; only their temporary servers need stopping after the final check. Other weeks,
+classes/accounts; temporary verification servers have been stopped. Other weeks,
 file persistence, threads, Swing, and generation prompt/playbook remain separate proposals.
 Hosted, Windows, physical disconnected Wi-Fi devices and all browser task alterations are unverified.
+The GitHub connector returned 403 for PR creation; the authenticated CLI created PR #27, which
+was attached to this chat. There is no remaining permission block.
 
 ## Prior delivered task-flow stage
 

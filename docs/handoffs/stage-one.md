@@ -6,7 +6,9 @@
 > actual Java 8. Mutation proof and every test name: [verification](../verification/module-sample-first.md).
 > New additive history migration applied locally only. Teacher hosted rollout/re-upload instructions:
 > [setup](../module-sample-first-setup.md). No merge, hosted SQL, deploy or settings change.
-> Next: feature PR review and teacher rollout. Earlier stages below are historical.
+> Implementation `799519d` committed/pushed; [PR #27](https://github.com/SirNeo-Coder/JavaShare/pull/27) open against PR #26’s branch.
+> Next: teacher PR review and rollout. Temporary verification servers stopped; existing 3012 left running.
+> Earlier stages below are historical.
 
 > Current approved UI fix (2026-10-20): branch `codex/earlet-hover-dismiss`, based on
 > `codex/rolling-module-tasks` at `1c581ee` (open PR #25). Teacher approved hover opening
