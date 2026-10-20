@@ -44,7 +44,7 @@ it to returned Java output. Execution and input budgets remain separate.
 - `tests/browser-java-client.test.mjs`: **browser Java: startup stages authenticate messages and identify the stalled stage without extending the deadline (CKB-056)**; result separation also covered.
 - Command: `node --test --test-isolation=none --test-reporter=spec tests/browser-java-client.test.mjs tests/browser-java-runtime.test.mjs` — 21 passed.
 - Restored `/app/` classpath: regression failed. Removed saved-stage update: regression failed. Restored fixes: 21 passed.
-- Full suite: 145 passed, no failures/skips. Build passed; lint zero errors/eight existing warnings.
+- Full suite: 148 passed, no failures/skips. Build passed; lint zero errors/eight existing warnings.
 - Actual production app/local Supabase/actual CheerpJ on a local server with no
   Range support: Hello CodeShare, repeated multi-file interactive input, blank and
   Unicode answers, Stop and offline laptop Java passed. Complete evidence and

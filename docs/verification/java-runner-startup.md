@@ -1,13 +1,13 @@
 # Java runner startup verification — 2026-10-21
 
-Branch: `codex/java-runner-startup`, based on main `8fb41ff`.
+Branch: `codex/java-runner-startup`, based on main `8fb41ff`; integrated current main `7089377` (Console indicator) in `87041d9`.
 Isolated checkout: `/tmp/codeshare-java-runner-startup`.
 
 ## Results and limitations
 
 - ✔ `npm run build:all`: production Next.js and backend TypeScript passed.
 - ✔ `npm run lint`: zero errors, eight existing warnings; no new warning.
-- ✔ `sg docker -c 'npm test -- --test-reporter=spec'`: 145 passed, zero failed,
+- ✔ `sg docker -c 'npm test -- --test-reporter=spec'`: 148 passed, zero failed,
   cancelled or skipped. Full named results grouped by file below.
 - ✔ `node --test --test-isolation=none --test-reporter=spec tests/browser-java-client.test.mjs tests/browser-java-runtime.test.mjs`:
   21 passed, zero failures/skips after both deliberate regressions were restored.
@@ -66,6 +66,13 @@ runtime policy, compiler JAR, Java helper or production configuration was change
 Screenshot of actual module result: `/tmp/codeshare-java-startup-result.jpg`
 (local verification evidence; disposable names only, no credentials).
 
+After integrating main's Console indicator, the final production build again
+printed `Hello, CodeShare!` without browser errors. The final module run showed
+`Java is loading or running… Please wait.` above Actual output while using the
+same complete-download runner. Its supplied input and expected-output result
+were checked again. Earlier offline and multi-file evidence used identical
+runner/client/hook code; main added only the independent Console indicator.
+
 ## Tight-loop check: separate unresolved finding
 
 **Do not report this as an unconditional browser-timeout pass.** With the app on
@@ -110,7 +117,7 @@ root through a node_modules symlink. A private local dependency copy fixed that.
 A sandboxed build then could not parse TypeScript subprocess output; the standard
 build passed outside that restriction. The first sandboxed test-runner invocation
 reported only file-level results; focused isolation-none checks printed all 21
-names, and the full Docker-capable run printed all 145 names below.
+names, and the full Docker-capable run printed all 148 final names below.
 The in-app browser does not support the existing Save work naming prompt; a helper
 file was persisted before that prompt failed, then verified by the multi-file run.
 No change to Save work is part of this fix. No package, configuration or dependency
@@ -129,13 +136,19 @@ was changed to address these local testing limitations.
    explanation of the initial report. Review CKB-057 before trying tight loops in
    any working classroom browser.
 
+All local test servers were stopped and both sets of disposable accounts/classes
+were removed after verification. Existing servers were preserved. The initial
+unresponsive test tab resisted explicit close/navigation; remaining temporary
+browser tabs are left to the browser tool's end-of-turn cleanup.
+
 No hosted deployment, SQL, settings change or `supabase db push` was performed.
 Rollback is a normal code revert; no data migration or saved-work conversion exists.
 
 ## Full named test results
 
 Command: `sg docker -c 'npm test -- --test-reporter=spec'`.
-Marks and names below are copied from the successful runner output, grouped by file.
+Final run after integrating main: 148 passed, no failures/skips.
+Marks and names below are copied from the runner output, grouped by file.
 
 ### api-router.test.mjs
 
@@ -218,6 +231,12 @@ Marks and names below are copied from the successful runner output, grouped by f
 ### course-modules.test.mjs
 
 - ✔ course modules: teacher uploads, class members read, only the teacher may upload or delete
+
+### java-run-progress.test.mjs
+
+- ✔ Java progress: idle, finished and failed runs leave no loading indicator
+- ✔ Java progress: saving, starting and checking are visible accessible status messages
+- ✔ Java progress: waiting for an answer replaces the working message
 
 ### kb-search.test.mjs
 
