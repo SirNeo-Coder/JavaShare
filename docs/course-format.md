@@ -70,10 +70,10 @@ The module viewer groups a module's steps into named, gated parts a student unlo
 2. If content is corrected later, keep the same ids; CodeShare replaces the content and keeps progress.
 3. Code and outputs in this file must be **identical** to the printed module.
 
-### Student activities (approved workflow, 2026-10-20)
+### Two weekly Java projects (approved workflow, 2026-10-20)
 
-A step's `files`, `instruction`, and `expectedOutput` remain its printed worked example. Add an
-`activity` to give the student a different challenge without altering the printed sample:
+A step's `files`, `instruction`, and `expectedOutput` are the printed sample used for progression.
+Older modules may contain a separate `activity`, for example:
 
 ```json
 "activity": {
@@ -84,35 +84,36 @@ A step's `files`, `instruction`, and `expectedOutput` remain its printed worked 
 }
 ```
 
-`instruction` and `expectedOutput` are required. `files` defaults to an empty array (continue the
-existing project); `stdin` defaults to an empty string and supplies fixed input for the check.
-A new activity has its own saved completion key, so a pass earned on the old sample does not
-complete a newly added challenge. Older steps without `activity` use their original sample files, instructions and expected output.
-CodeShare does not invent a new exercise for an old JSON file. Automatic checking currently
-supports Java only; other languages remain readable but cannot automatically pass an activity.
+Legacy `activity` fields remain accepted for compatibility and teacher reference. Module progress
+now uses the step's printed sample: `files`, `instruction`, `expectedOutput`, and optional `stdin`
+(default empty). It never checks a different `activity.expectedOutput`. Stored challenge results
+remain saved, but the sample's step id controls completion.
 
-Students use the main classroom code editor, **Run code**, and **Save work**. Each student has one
-saved project per module per class. Start with module `starterFiles`, then activity files (or old
-step files), then this student's preceding project when `previousModuleId` is supplied. Later
-sources win by filename; `src/Main.java` and `Main.java` identify the same source. Existing files
-in the current project always win, so opening another activity never replaces student edits.
-Missing supporting files may be added. At most 50 valid Java files can compile together.
+Each student has two saved Java projects per module per class, both edited in the main editor:
 
-The first part opens automatically. All steps in a part must pass before the next part opens;
-named parts can span lessons. A pass requires successful compilation, successful execution, and
-matching expected output (CRLF line endings normalized; whitespace trimmed only at the ends).
-The server runs and checks the saved sources; a browser-supplied `pass` cannot complete a step.
-Earlier passes remain available for review even if a later exploratory run fails.
+- **Module project** starts from module supporting `starterFiles` and sample step files. If
+  `previousModuleId` is present, copy this student's preceding module project in the same class.
+- **Personal performance-task project** starts from module supporting files and performance-task
+  `starterFiles`. Copy only the preceding personal draft, falling back to that week's submitted
+  own version for legacy records. Never copy from the module project into the personal project.
 
-Liplets are handwritten and submitted to the teacher; they do not block progress or enter the
-completion percentage. The percentage counts passed steps and the two performance-task
-submissions, equally. The performance task opens after all lesson activities pass; its existing
-submission and assessment workflow is retained. This change implements lesson activities first.
+Current saved files always win and missing supporting files are added. `src/Main.java` and
+`Main.java` identify the same source. At most 50 valid Java files compile together. Supply
+`previousModuleId` to continue the correct preceding week; without it a new project starts from
+its supplied starter files. Preceding weeks and submitted snapshots are never overwritten.
 
-Teacher **Open to students** switches are removed from the viewer. Their old stored values and
-API remain for compatibility, but do not control student progression. Existing progress ids,
-saved files and submissions are preserved. The existing live-class weekly module restriction
-still applies. Online Java support is unchanged: the current hosted fallback cannot compile
-multiple files; offline classroom mode uses the teacher laptop's JDK.
+The first part opens automatically. Every sample step in a part must pass before the next part
+opens; named parts may span lessons. Compile and run successfully with exact expected output:
+normalize CRLF and ignore one final println newline, but never trim spaces or extra blank lines.
+The server verifies results; browser-supplied pass flags are refused. Earlier passes survive
+later failed practice runs. Automatic checking supports Java only.
 
-Complete example: [student-activity.codeshare.json](../tests/fixtures/student-activity.codeshare.json).
+Liplets are handwritten, assessed by the teacher, and never gate progress. The existing completion
+percentage counts passed sample steps plus the two performance-task submission records, equally.
+The performance task opens after the module steps pass. Personal **Save work** and **Run code**
+do not submit or grade it; **Submit this version** records the student's own version explicitly.
+Existing sample/own records and assessment remain compatible. Personal input is entered in Console.
+
+Teacher availability switches do not gate students; their old API/data remain compatible. The
+weekly live-class restriction still applies. Online multi-file Java is the next planned step;
+offline mode continues compiling all classes together with laptop javac.

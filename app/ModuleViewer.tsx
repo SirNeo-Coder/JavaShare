@@ -46,6 +46,7 @@ export type StepBlock = {
   language: string;
   files: ModuleFile[];
   expectedOutput: string;
+  stdin?: string;
   checkYourself?: string;
 };
 type OtherBlock = { type: string; markdown?: string; term?: string; columns?: string[]; rows?: string[][] | { see: string; means: string; fix: string }[]; message?: string };
@@ -78,6 +79,7 @@ type StepStatus = "pass" | "fail";
 export type Progress = {
   moduleId: string;
   projectFiles: ModuleFile[];
+  performanceProjectFiles: ModuleFile[];
   percent: number;
   updatedAt: string;
   // Covers both step blocks and a lesson's exitSlip, keyed by whichever's own "id" - one flag
@@ -86,7 +88,7 @@ export type Progress = {
   performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>>;
 };
 
-type Props = { onStartActivity?: (module: CourseModule, step: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
+type Props = { onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
 
 function isStepBlock(block: Block): block is StepBlock {
   return block.type === "step";
@@ -158,9 +160,7 @@ function StepView({ step, status, role, printed = false, onStart }: {
     <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>
     <b>Output (expected):</b><pre className="printed-output">{step.expectedOutput}</pre>
     {role === "student" && <div className="paper-instructions">
-      <b>Your activity</b><Markdown markdown={step.activity?.instruction ?? step.instruction} />
-      {!step.activity && <p>This module uses the original step as its activity. A separate challenge has not been added yet.</p>}
-      <b>Required output:</b><pre className="printed-output">{step.activity?.expectedOutput ?? step.expectedOutput}</pre>
+      <p>Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step.</p>
       {step.language === "java" ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java only.</p>}
     </div>}
     {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
@@ -170,10 +170,10 @@ function StepView({ step, status, role, printed = false, onStart }: {
 }
 
 function PerformanceTaskSlot({
-  label, files: initialFiles, classroomId, moduleId, variant, submitted, onSubmitted, role,
+  label, files: initialFiles, classroomId, moduleId, variant, submitted, onSubmitted, role, onStart,
 }: {
   label: string; files: ModuleFile[]; classroomId: string; moduleId: string; variant: "sample" | "own";
-  submitted?: StepStatus; onSubmitted: (progress: Progress) => void; role: "teacher" | "student";
+  submitted?: StepStatus; onSubmitted: (progress: Progress) => void; role: "teacher" | "student"; onStart?: () => Promise<void>;
 }) {
   const [files, setFiles] = useState(initialFiles);
   const [output, setOutput] = useState<string | null>(null);
@@ -203,6 +203,19 @@ function PerformanceTaskSlot({
     }
   };
 
+  if (role === "student" && variant === "own") return <div className="module-step">
+    <b>Personal performance-task project</b>
+    <p>Continue your own project from the previous week. Your module project stays separate.</p>
+    {submitted && <span className="status-chip done">Submitted</span>}
+    <button type="button" disabled={busy || !onStart} onClick={async () => {
+      setBusy(true);
+      try { await onStart?.(); }
+      catch (error) { setOutput(error instanceof Error ? error.message : "Could not open your personal project"); }
+      finally { setBusy(false); }
+    }}>{busy ? "Opening…" : "Work on performance task"}</button>
+    {output && <p role="alert">{output}</p>}
+  </div>;
+
   return (
     <div className="module-step">
       <div className="module-step-head">
@@ -227,11 +240,11 @@ function PerformanceTaskSlot({
 // fetches it for them - an empty stub keeps the rendering below (stepStates/performanceTask
 // lookups) uniform, and role flags below hide anything progress-dependent (goal meter, checkboxes,
 // submit buttons, status chips) for that role.
-const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {}, projectFiles: [], percent: 0, updatedAt: "" });
+const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {}, projectFiles: [], performanceProjectFiles: [], percent: 0, updatedAt: "" });
 
 export function ModuleContent({ module, classroomId, role, paged = false, worksheet = false, onStartActivity, progressRevision = 0 }: {
   worksheet?: boolean; paged?: boolean; module: CourseModule; classroomId: string; role: "teacher" | "student";
-  onStartActivity?: (module: CourseModule, step: StepBlock) => Promise<void>; progressRevision?: number;
+  onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
 }) {
   const [progress, setProgress] = useState<Progress | null>(role === "teacher" ? emptyProgress(module.id) : null);
   const [error, setError] = useState<string | null>(null);
@@ -293,7 +306,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
           {module.closedPerformanceTask && <p className="module-preview-note">Complete the previous part first</p>}
           {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
             <PerformanceTaskSlot label="Sample code" files={module.performanceTask.exampleFiles} classroomId={classroomId} moduleId={module.id} variant="sample" role={role} submitted={progress.performanceTask.sample?.status} onSubmitted={applyProgress} />
-            <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role} submitted={progress.performanceTask.own?.status} onSubmitted={applyProgress} />
+            <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role} onStart={() => onStartActivity?.(module) ?? Promise.resolve()} submitted={progress.performanceTask.own?.status} onSubmitted={applyProgress} />
             {module.performanceTask.presentationOutline?.length ? <><h3 className="paper-heading">Presentation</h3><ol>{module.performanceTask.presentationOutline.map((item, index) => <li key={index}>{item}</li>)}</ol></> : null}
             {module.performanceTask.questionsToPrepare?.length ? <><h3 className="paper-heading">Prepare for these questions</h3><ul>{module.performanceTask.questionsToPrepare.map((item, index) => <li key={index}>{item}</li>)}</ul></> : null}
             {module.performanceTask.rubric?.length ? <ModulePaperBlock block={{ type: "table", columns: ["Criterion", "Points"], rows: module.performanceTask.rubric.map((row) => [row.criterion, String(row.points)]) }} /> : null}
@@ -356,7 +369,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
             onSubmitted={applyProgress}
           />
           <PerformanceTaskSlot
-            label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role}
+            label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role} onStart={() => onStartActivity?.(module) ?? Promise.resolve()}
             submitted={progress.performanceTask.own?.status}
             onSubmitted={applyProgress}
           />

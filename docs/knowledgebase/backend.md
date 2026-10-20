@@ -56,3 +56,17 @@ Nothing live is kept in server memory any more. File saves emit `file:updated`. 
   Liplets are assessed on paper. The task opens after all lesson activities pass; its submission
   workflow is unchanged. Teacher availability writes remain teacher-only for older clients,
   but the old switches no longer control student access. No new database migration or live event.
+
+## Two weekly Java projects (2026-10-20)
+
+- The existing module activity endpoints now prepare/check the printed sample and sample step id,
+  including optional sample stdin. Legacy challenge fields/results are retained.
+- POST `.../progress/performance-project` initializes/reopens the personal working project from
+  its own preceding week's draft (legacy own submission fallback), preserving current edits.
+  PUT on that path saves valid, unique Java files with required `updatedAt`. Both require the
+  current student/class membership, live-week access and completed module samples.
+- Personal drafts use `performance_task.project.files`; sample/own submission snapshots are
+  untouched by draft saves/runs. Existing own submission accepts optional `updatedAt` for the
+  main editor's stale-tab protection. Old clients keep working. No new table or migration.
+- Both tracks are scoped by student, class and module. Previous-week copies never modify the
+  source week. The existing Java runner compiles all files together offline; hosted support is next.

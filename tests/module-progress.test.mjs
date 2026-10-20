@@ -51,7 +51,7 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     await admin.from("course_modules").insert({ classroom_id: classroomId, module_id: moduleId, content: fixture, created_by: teacher.id, open_lesson_ids: fixture.lessons.map((lesson) => lesson.id), performance_task_open: true });
 
     const empty = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
-    assert.deepEqual(empty, { moduleId, stepStates: {}, performanceTask: {}, projectFiles: [], percent: 0, updatedAt: empty.updatedAt });
+    assert.deepEqual(empty, { moduleId, stepStates: {}, performanceTask: {}, projectFiles: [], performanceProjectFiles: [], percent: 0, updatedAt: empty.updatedAt });
     assert.equal(typeof empty.updatedAt, "string");
 
     // Code results must come from the runner, never a client-supplied pass/fail flag.

@@ -15,7 +15,7 @@ test("module activity screen: signing in starts safely before a class or project
   assert.match(renderToStaticMarkup(createElement(Home)), /Starting CodeShare/);
 });
 
-test("module activity screen: main Java editor has project tabs, challenge target, Console, Run code and Save work", () => {
+test("module activity screen: main Java editor has project tabs, sample output, Console, Run code and Save work", () => {
   const html = renderToStaticMarkup(createElement(StudentModuleActivity, {
     activity: { classroomId: "class", moduleId: "module", moduleTitle: "Vehicle project", stepId: "step", stateId: "step:activity", instruction: "Change the capacity", expectedOutput: "Capacity: 25", stdin: "", progress: { projectFiles: [{ path: "Main.java", content: "class Main {}" }, { path: "Vehicle.java", content: "abstract class Vehicle {}" }], stepStates: {}, updatedAt: "", percent: 0 } },
     ref: { current: null }, onChecked() {}, onClose() {},
@@ -23,7 +23,7 @@ test("module activity screen: main Java editor has project tabs, challenge targe
   assert.match(html, /Java source code editor/);
   assert.match(html, /Module project files/);
   assert.match(html, /Vehicle\.java/);
-  assert.match(html, /Required output/);
+  assert.match(html, /Expected output/);
   assert.match(html, /Capacity: 25/);
   assert.match(html, /Program output/);
   assert.match(html, /Run code/);

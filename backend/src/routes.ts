@@ -26,6 +26,8 @@ import {
   getSupabaseModule,
   getSupabaseModuleProgress,
   prepareSupabaseModuleActivity,
+  prepareSupabasePerformanceProject,
+  saveSupabasePerformanceProject,
   runSupabaseModuleActivity,
   getSupabaseStudentWebProject,
   joinSupabaseClass,
@@ -494,12 +496,13 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/step", requireA
 
 app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-task", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const { variant, files, status } = z.object({
+    const { variant, files, status, updatedAt } = z.object({
       variant: z.enum(["sample", "own"]),
       files: z.array(z.object({ path: z.string().trim().min(1).max(160), content: z.string().max(200000) })).min(1).max(50),
       status: z.enum(["pass", "fail"]),
+      updatedAt: z.string().datetime({ offset: true }).optional(),
     }).parse(req.body);
-    return res.json(await setSupabaseModulePerformanceTask(req.user!, String(req.params.classroomId), String(req.params.moduleId), variant, files, status));
+    return res.json(await setSupabaseModulePerformanceTask(req.user!, String(req.params.classroomId), String(req.params.moduleId), variant, files, status, updatedAt));
   } catch (error) { next(error); }
 });
 
@@ -601,6 +604,18 @@ app.post("/api/execute", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const { files, stdin = "" } = z.object({ files: javaFiles, stdin: z.string().max(10000).optional() }).parse(req.body);
     return res.json(await executeJava(req.user!.id, files, stdin));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-project", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await prepareSupabasePerformanceProject(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-project", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { files, updatedAt } = z.object({ files: javaFiles, updatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
+    return res.json(await saveSupabasePerformanceProject(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt));
   } catch (error) { next(error); }
 });
 
