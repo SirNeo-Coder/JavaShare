@@ -36,3 +36,9 @@ uses its own run message rather than the general busy flag, so Save work or subm
 does not claim Java is running. Interactive personal runs show **Waiting for your input**; success,
 compiler errors, failed requests and Stop remove the strip. Screen readers receive the status,
 and the spinner stops animating under reduced motion. No runner protocol or completion rule changes.
+
+The regular **Code editor** Console in `app/page.tsx` also reuses `JavaRunProgress`, using its
+existing Java-only `running` flag. The strip stays visible when interactive startup clears the
+output text. Input waiting replaces its loading/running wording; success, failure and Stop clear
+it. Only the output pre is marked busy, leaving the status outside that accessibility boundary.
+Web previews, saved-work lists and plain Save work do not show Java progress.

@@ -19,7 +19,7 @@ fixture.lessons[0].blocks[0].expectedOutput = "Java status check";
 fixture.performanceTask.starterFiles = [{ path: "Main.java", content: 'import java.util.Scanner; public class Main { public static void main(String[] args) { System.out.println("Name?"); System.out.println("Hello " + new Scanner(System.in).nextLine()); } }' }];
 
 for (const mode of ["offline", "online"]) {
-  test(`Java progress ${mode}: real student Console statuses and completion`, { timeout: 300000 }, async (t) => {
+  test(`Java progress ${mode}: real module, personal and classroom Console statuses`, { timeout: 300000 }, async (t) => {
     const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
     const users = [], gates = [];
     let classroomId;
@@ -129,6 +129,66 @@ for (const mode of ["offline", "online"]) {
           const executed = page.waitForResponse((response) => response.url().endsWith("/api/execute"));
           await runButton().click(); assert.equal((await executed).status(), 200); await idle();
           assert.match(await consoleOutput.textContent(), /Hello Ada/);
+        });
+      }
+
+      await page.getByRole("button", { name: "Return to class project", exact: true }).click();
+      for (const role of ["student", "teacher"]) {
+        if (role === "teacher") {
+          assert.equal((await context.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
+          await page.goto("/");
+          await page.getByRole("button", { name: "Open class", exact: true }).click();
+          await page.getByRole("button", { name: "Enter classroom" }).click();
+        }
+        const regular = page.locator(".right-panel:not(.module-activity-console) .console");
+        const regularOutput = regular.locator(":scope > pre");
+        const regularIndicator = regular.locator(".java-run-progress");
+        const editor = page.getByRole("textbox", { name: "Java source code editor", exact: true });
+        const finished = () => regularIndicator.waitFor({ state: "hidden" });
+        const cooldown = async () => { if (mode === "offline") await delay(1600); };
+
+        await t.test(`regular ${role} Console: spinner rotates while output is blank, then clears after real Java`, async () => {
+          await cooldown(); await page.emulateMedia({ reducedMotion: "no-preference" });
+          await editor.fill(`public class Main { public static void main(String[] args) { System.out.println("Regular ${role} output"); } }`);
+          const startup = await hold(mode === "online" ? "http://localhost:3031/" : "**/api/execute");
+          try {
+            await runButton().click(); await startup.seen;
+            assert.ok(await regularIndicator.isVisible(), "the regular Code editor must render the status strip");
+            assert.match(await regularIndicator.textContent(), /Java is loading or running/);
+            if (mode === "online") assert.equal(await regularOutput.textContent(), "", "the indicator must survive the interactive runner clearing output");
+            const spinner = regularIndicator.locator(".java-run-spinner");
+            const firstTransform = await spinner.evaluate((el) => getComputedStyle(el).transform);
+            await page.waitForFunction((first) => getComputedStyle(document.querySelector(".console .java-run-spinner")).transform !== first, firstTransform, { timeout: 3000 });
+            assert.equal(await regularOutput.getAttribute("aria-busy"), "true");
+            await page.screenshot({ path: `/tmp/classroom-java-progress-${mode}-${role}.png`, fullPage: true });
+            await regularIndicator.screenshot({ path: `/tmp/classroom-java-progress-${mode}-${role}-strip.png` });
+            await page.emulateMedia({ reducedMotion: "reduce" });
+            assert.equal(await spinner.evaluate((el) => getComputedStyle(el).animationName), "none");
+            startup.release(); await finished();
+            assert.match(await regularOutput.textContent(), new RegExp(`Regular ${role} output`));
+          } finally { startup.release(); }
+        });
+
+        await t.test(`regular ${role} Console: input and compiler errors clear progress; online Stop works`, async () => {
+          await cooldown();
+          await editor.fill(fixture.performanceTask.starterFiles[0].content);
+          const input = page.getByRole("textbox", { name: "Program input", exact: true });
+          if (mode === "offline") await input.fill("Ada");
+          await runButton().click();
+          if (mode === "online") {
+            await regularIndicator.filter({ hasText: "Waiting for your input" }).waitFor({ timeout: 30000 });
+            await input.fill("Ada"); await input.press("Enter");
+          }
+          await finished(); assert.match(await regularOutput.textContent(), /Hello Ada/);
+          if (mode === "online") {
+            await runButton().click(); await regularIndicator.filter({ hasText: "Waiting for your input" }).waitFor({ timeout: 30000 });
+            await page.getByRole("button", { name: "Stop", exact: true }).click(); await finished();
+            assert.match(await regularOutput.textContent(), /Execution stopped/);
+          }
+          await cooldown(); await editor.fill("public class Main { invalid java }");
+          await runButton().click(); await finished();
+          assert.match(await regularOutput.textContent(), /error/i);
+          assert.equal(await regularIndicator.count(), 0);
         });
       }
       await context.close();

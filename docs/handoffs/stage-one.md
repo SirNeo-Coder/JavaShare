@@ -1,3 +1,18 @@
+> Current approved correction (2026-10-21): `codex/classroom-java-progress`, based on main at
+> `7089377` (PR #29). Teacher reported no animation in the regular Code editor; earlier coverage
+> only entered module/personal editors. Teacher approved reusing the existing status strip in
+> the regular teacher/student Console. Its Java-only running flag keeps the strip visible when
+> online startup clears output; input waiting changes its text, output/error/Stop clears it.
+> Implemented and verified: full suite 143/143, actual online/offline production browser 20/20,
+> build and offline launcher build pass; lint 0 errors/8 existing warnings. Browser checks measure
+> rotation in the exact blank-output screen for both roles. Hiding only the regular strip caused
+> the new checks to fail in both modes/roles (10 pass/10 fail counting parents); restored fix passes.
+> [All named tests, proof and limits](../verification/java-console-progress.md); CKB-055 updated.
+> No code work remains. Next: commit/push and merge this correction under the existing explicit
+> merge/push request, then verify the automatic main deployment and teacher's hosted re-test.
+> No other feature PRs, server/protocol/dependency/migration/hosted setting changes. Physical devices
+> and hosted rollout remain unverified. Existing classroom processes and unrelated files preserved.
+
 > Current approved UI delivery (2026-10-21): branch `codex/java-console-progress`, directly
 > based on main at `8fb41ff`. Teacher approved a Console loading/running indicator and explicitly
 > requested merge/push. Implemented a prominent accessible strip above Actual output for module
