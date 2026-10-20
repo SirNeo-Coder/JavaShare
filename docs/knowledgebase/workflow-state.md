@@ -1,6 +1,6 @@
 # Workflow state (updated 2026-10-20, branch `codex/student-classroom-entry`)
 
-What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
+What teachers and students can do today. Keep this page current when their use of CodeShare changes; no change-level classification is required.
 
 ## Accounts
 

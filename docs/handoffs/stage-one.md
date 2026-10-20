@@ -1,3 +1,11 @@
+> Current session work (2026-10-20), branch `codex/session-inactivity`: the teacher removed
+> the requirement to classify CodeShare changes as "workflow change" or "adjustment".
+> Removed that approval question from AGENTS.md and the problem-knowledge-base proposal,
+> and retained the requirement to keep the workflow description current. Documentation-only
+> checks: reviewed the diff and searched the rule/proposal pages for the removed requirement.
+> Inactivity limits requested: teachers two hours, students fifteen minutes. Session code
+> is unchanged; investigation/implementation and its tests are next.
+
 > Current approved work (2026-10-20): [interactive online Java](online-java-interactive-input.md),
 > branch codex/online-java-interactive-input, implementation 7930d79, [PR #22](https://github.com/SirNeo-Coder/JavaShare/pull/22).
 > Teacher approved live online answers and explicitly requested push/merge. Feature complete:
