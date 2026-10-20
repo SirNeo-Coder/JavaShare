@@ -443,3 +443,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   No code work remains in progress. Next: teacher review and documented migration/app/JSON rollout.
   Do not merge or change hosted services. Temporary verification servers were stopped; the original
   classroom and primary checkout remain intact. Continue from `docs/handoffs/rolling-module-tasks.md`.
+
+- History migration update (2026-10-21): teacher screenshots show **Success. No rows returned**
+  and the verification row `activity_projects | jsonb | NO` in the selected Supabase project.
+  No assistant hosted SQL was run; project identity was not independently verified. PR #32 and
+  #33 remain open/unmerged. Next: teacher reviews/merges #32 first, then #33, completes app rollout,
+  and uploads revised Week 12/13/14 JSON. Hosted feature verification remains pending.
