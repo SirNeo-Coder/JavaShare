@@ -20,7 +20,13 @@ export function runnerAddress(address: string, parentOrigin: string) {
   return url;
 }
 
-export async function runJava(files: ModuleFile[], stdin: string, runner?: JavaRunner): Promise<JavaResult> {
+export type JavaInteraction = {
+  signal: AbortSignal;
+  onOutput: (output: string) => void;
+  onInput: (send: ((line: string) => void) | null) => void;
+};
+
+export async function runJava(files: ModuleFile[], stdin: string, runner?: JavaRunner, interaction?: JavaInteraction): Promise<JavaResult> {
   const config = runner ?? await getJavaRunner();
   if (config.mode !== "browser") return api<JavaResult>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin }) });
   const url = runnerAddress(config.url ?? "", window.location.origin);
@@ -38,27 +44,56 @@ export async function runJava(files: ModuleFile[], stdin: string, runner?: JavaR
     frame.sandbox.add("allow-scripts", "allow-same-origin");
     frame.referrerPolicy = "no-referrer";
     frame.src = url.href;
-    let sent = false, running = false;
+    let sent = false, running = false, finished = false, waiting = false;
+    let remaining = 5000, resumedAt = 0, inputId = 0, inputUsed = stdin.length;
+    let streamed = "";
     const finish = (success: boolean, output: string) => {
+      if (finished) return;
+      finished = true;
       clearTimeout(timer); window.removeEventListener("message", receive); frame.remove();
+      interaction?.signal.removeEventListener("abort", stop);
+      interaction?.onInput(null);
       resolve({ mode: "browser", success, output });
     };
-    let timer = setTimeout(() => finish(false, "Java loading or compilation stopped after 120 seconds. Check your internet connection and try again."), 120000);
+    const failure = (message: string) => finish(false, `${streamed}${streamed && !streamed.endsWith("\n") ? "\n" : ""}${message}`);
+    const stop = () => failure("Execution stopped.");
+    const resume = () => {
+      waiting = false; resumedAt = Date.now();
+      timer = setTimeout(() => failure("Execution stopped after 5 seconds."), Math.max(0, remaining));
+    };
+    let timer = setTimeout(() => failure("Java loading or compilation stopped after 120 seconds. Check your internet connection and try again."), 120000);
     const receive = (event: MessageEvent) => {
-      if (event.source !== frame.contentWindow || event.origin !== url.origin) return;
+      if (finished || event.source !== frame.contentWindow || event.origin !== url.origin) return;
       const data = event.data;
       if (data?.type === "codeshare-java-ready" && !sent) {
+        if (interaction && data.interactive !== true) { failure("The Java runner is updating. Refresh CodeShare and try again."); return; }
         sent = true;
-        frame.contentWindow!.postMessage({ type: "codeshare-java-run", id, files: files.map((file, index) => ({ ...file, path: paths[index] })), stdin, mainClass: packageName ? `${packageName}.Main` : "Main" }, url.origin);
+        frame.contentWindow!.postMessage({ type: "codeshare-java-run", id, files: files.map((file, index) => ({ ...file, path: paths[index] })), stdin, mainClass: packageName ? `${packageName}.Main` : "Main", ...(interaction ? { interactive: true } : {}) }, url.origin);
       } else if (data?.id === id && data.type === "codeshare-java-running" && !running) {
-        running = true; clearTimeout(timer);
-        timer = setTimeout(() => finish(false, "Execution stopped after 5 seconds."), 5000);
+        running = true; clearTimeout(timer); resume();
+      } else if (data?.id === id && data.type === "codeshare-java-output" && interaction && running && typeof data.output === "string") {
+        if (data.output.length > 70000) failure("Execution stopped: output exceeded 64 KB.");
+        else { streamed = data.output; interaction.onOutput(streamed); }
+      } else if (data?.id === id && data.type === "codeshare-java-input" && interaction && running && !waiting && data.inputId === inputId + 1) {
+        inputId = data.inputId; waiting = true;
+        remaining -= Date.now() - resumedAt; clearTimeout(timer);
+        if (remaining <= 0) { failure("Execution stopped after 5 seconds."); return; }
+        timer = setTimeout(() => failure("Execution stopped after waiting 2 minutes for input."), 120000);
+        const requested = inputId;
+        interaction.onInput((line) => {
+          if (finished || !waiting || requested !== inputId) return;
+          if (typeof line !== "string" || (inputUsed += line.length + 1) > 10000) { failure("Execution stopped: input exceeded 10,000 characters."); return; }
+          clearTimeout(timer); interaction.onInput(null); resume();
+          frame.contentWindow!.postMessage({ type: "codeshare-java-input", id, inputId, line: `${line}\n` }, url.origin);
+        });
       } else if (data?.id === id && data.type === "codeshare-java-result" && typeof data.success === "boolean" && typeof data.output === "string") {
-        if (data.output.length > 70000) finish(false, "Execution stopped: output exceeded 64 KB.");
+        if (data.output.length > 70000) failure("Execution stopped: output exceeded 64 KB.");
         else finish(data.success, data.output);
       }
     };
     window.addEventListener("message", receive);
-    document.body.append(frame);
+    interaction?.signal.addEventListener("abort", stop, { once: true });
+    if (interaction?.signal.aborted) stop();
+    else document.body.append(frame);
   });
 }

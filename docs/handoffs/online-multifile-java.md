@@ -49,8 +49,11 @@ teacher's existing server on port 3000 was left running; exact full launcher on 
 port and disconnected-internet/multiple Wi-Fi devices were not tested.
 All test names/commands/levels: docs/verification/online-multifile-java.md.
 
-Implementation `8af5b90` is committed and pushed. [PR #21](https://github.com/SirNeo-Coder/JavaShare/pull/21)
-targets codex/weekly-java-projects (PR #20 remains open). Teacher reviews #20 before
-the stacked online change, then
-follows docs/online-java-setup.md. Hosted deployment/setup, preview end-to-end and
-real classroom Wi-Fi devices remain teacher checks. No hosted settings were changed.
+PR #20 and PR #21 were merged into main on 2026-10-20 under the teacher's explicit
+request (merge commits c16bba3 and ec90c56). The teacher deployed the public runner at
+https://codeshare-java.ireneojrseraspe.workers.dev/ and added JAVA_RUNNER_URL to CodeShare.
+Screenshots confirmed both production branches are main. The public page and required
+compiler files were reachable. Hosted screenshots showed CheerpJ executing Java, but
+revealed input had to be supplied before Run. The teacher approved the follow-up
+[interactive online Java](online-java-interactive-input.md) workflow and requested push/merge.
+Assistants have not changed hosted settings.

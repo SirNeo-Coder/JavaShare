@@ -157,3 +157,18 @@ What teachers and students can do today. Compare any proposed change with this p
 - No new tables, migrations, progress-writing rules, grading, time tracking, streaks, or weekly
   history. All dashboard assets are local. Student module use and classroom live features retain
   their existing behavior.
+
+## Interactive online Java (approved workflow change, 2026-10-20)
+
+- In the teacher demo, ordinary practice/class projects and personal performance-task
+  projects, Run code starts online Java with live Console output. When Scanner reads
+  more input, the Console says Waiting for input; type an answer in Program input and
+  press Enter. Blank lines and successive questions are supported. Shift+Enter keeps
+  a line break for entering several lines. Optional input entered before Run remains usable.
+- Stop cancels loading, execution or input waiting. Java gets five seconds of execution
+  time in total, excluding input waits; each unanswered request stops after two minutes.
+  Output and input limits remain 64 KB and 10,000 characters. A new run starts fresh.
+- Module sample checks and teacher sample previews retain supplied JSON input and fixed
+  expected-output checks. Personal Run is separate from Submit this version.
+- Offline still runs laptop javac with input supplied before Run. No new route, migration,
+  dependency, hosted secret or hosted setting is needed.
