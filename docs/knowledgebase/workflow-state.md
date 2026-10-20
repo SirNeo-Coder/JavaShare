@@ -45,18 +45,19 @@ What teachers and students can do today. Keep this page current when their use o
   module in each class. Both use the main Java editor, supporting class tabs, Add file,
   **Save work** and **Run code**. The Projects drawer offers both for the selected module;
   the worksheet's **Work in code editor** and **Work on performance task** open the same projects.
-- Module progress checks the printed sample's `files`, `expectedOutput` and optional `stdin`.
-  Legacy `activity` JSON and challenge results stay stored, but no longer determine progression.
-  The sample step id is the completion key; old `:activity` passes do not unlock sample steps.
+- Legacy modules check the printed sample. Modules with explicit `activity.id` instead verify
+  the separate alteration target and store `task:<activity.id>` completion. Old sample passes
+  cannot complete new tasks. `sampleFirst` additionally verifies the unchanged sample before editing.
   Compilation and execution must succeed. Match spaces/blank lines exactly; normalize CRLF
   and allow one final newline (Java println). Failed exploratory runs retain earlier passes.
-- The first part opens automatically. Every required sample step in a part must pass to unlock
-  the next part for that student. Locked content and premature requests are refused server-side.
+- Explicit alteration tasks open one step at a time; legacy samples open one part at a time.
+  Locked content and premature requests are refused server-side. Reopening resumes unfinished work.
   Handwritten liplets are assessed separately and do not gate progress. Teacher availability
   switches do not gate progress. The existing weekly live-class lock remains enforced.
 - `previousModuleId` links the preceding week. Module files copy only the previous module project;
   personal files copy only the previous personal working project (or its submitted own version
-  for older records). Supporting starter classes are added; existing student files win. Each
+  for older records). Supporting starter classes are added. Sample-first steps load their own supplied sources on
+  first opening and restore their draft on revisits; legacy projects retain existing-file precedence. Each
   copy is saved independently and never changes the preceding week. The teacher must supply
   the stable link in weekly JSON; a missing link starts with the supplied starter files.
 - The personal task opens after the module steps pass, as before. **Run code** accepts personal
@@ -66,7 +67,7 @@ What teachers and students can do today. Keep this page current when their use o
 - Opening another project/module/class or signing out saves the active project first; save
   failures stop the transition. New saves/submissions reject stale tabs. Reload before saving
   can still lose unsaved edits. The personal draft is `performance_task.project.files`, separate
-  from `performance_task.sample` and `.own`; drafts never count as submissions. No migration.
+  from `performance_task.sample` and `.own`; drafts never count as submissions. Sample-first history uses the additive migration described below.
 - Offline Java compiles all project files on the laptop, including Java packages with Main.java.
   Online execution uses Java 8/CheerpJ on a separate public runner origin after the teacher's setup. Students keep Run code; first run needs internet and displays CheerpJ attribution. Browser-reported results are practice evidence, not grades. Server access, exact expected output and saved-version checks remain authoritative. No new migration.
 
@@ -201,3 +202,58 @@ What teachers and students can do today. Keep this page current when their use o
   expected-output checks. Personal Run is separate from Submit this version.
 - Offline still runs laptop javac with input supplied before Run. No new route, migration,
   dependency, hosted secret or hosted setting is needed.
+
+## Sample verification before alterations (approved 2026-10-21)
+
+- Revised Week 14 opts into `sampleFirst: true`. **Work in code editor** loads the current step's
+  sample on first opening. Supporting classes roll forward; each step's saved working files are
+  kept independently. Reopening resumes those edits. Work present before the update remains
+  readable under **Work saved before sample loading**. The previous week and personal drafts and
+  submissions are never changed by module sample loading.
+- The sample editor stays read-only until the student presses **Run code** and verifies the
+  unchanged supplied sources and sample result. **Sample verified — now complete Your task.**
+  saves verification without completing the task, advancing its percentage, or opening the next step.
+  A sample with an explicit `expectedError` verifies the declared exception and shows
+  **Expected error observed**; it cannot earn task completion.
+- The same editor then opens for the small alteration and shows **Expected task output**.
+  A matching successful task run saves **Completed** immediately and unlocks the next activity.
+  The prominent banner sits above **Actual output**, outside the scrolling instructions.
+  Other banners distinguish unchanged sample output and a mismatch. A failed later run reports
+  its failure while explicitly retaining earlier saved completion. Reopening shows saved completion.
+- An additive `module_progress.activity_projects` column stores module-only working drafts;
+  sample evidence uses separate `sample:<activity.id>` keys. Existing completion keys stay intact
+  and already completed tasks are not forced to repeat a sample or given invented sample passes.
+  Older JSON without `sampleFirst` keeps its existing checks. Old cached clients attempting to
+  save a new-flow project without its step identity are refused, rather than overwriting another step.
+- Apply the new migration before deploying this app and re-uploading the revised Week 14 JSON.
+  See `docs/module-sample-first-setup.md`. No assistant hosted migration or deployment is performed.
+
+## Weeks 12 and 13 JSON (approved 2026-10-21)
+
+- New Week 12 OOP and Week 13 exception-handling JSON use sample verification followed by small
+  alterations with separate expected outputs. Upload Week 12, then 13, then 14 in the same class;
+  stable predecessor ids connect their module projects. Week 13 finishes with the exact supporting
+  classes Week 14 expects. No app or migration change is needed beyond the sample-first setup.
+- Week 12 preserves the printed three-session catch-up order, grouped by the four pillars plus
+  synthesis. Week 13 follows its five-day plan. Complete per-step sources run in the main editor;
+  deliberately uncompilable/crashing demonstrations remain reading examples. Liplets stay separate.
+- Week 13's disk example is reading material. Its runnable checked-exception practice uses an
+  approved in-memory driver list and `Exception`, since the runner blocks `java.io` imports.
+  This does not enable disk access or verify file-handling skills.
+- The personal performance project retains the student's own theme and track. Neither new module
+  inserts Vehicle starter classes into it. Original PDF/DOCX documents and the generation prompt
+  remain unchanged. Source mapping and evidence: `docs/modules/week12/README.md`,
+  `docs/modules/week13/README.md`, `docs/verification/week12-week13-modules.md`.
+
+## Resuming and lesson logic (2026-10-21)
+
+- Student module worksheets and the Module project button use saved completion to reopen the next
+  unfinished step. Sample verification or a failed run keeps that step unfinished. Reload and
+  another browser use the same server progress. Once all steps pass, the worksheet opens the
+  performance task; completed modules without one open their final page. Teachers start at Overview.
+- Weeks 12 and 13 include object state, inherited behavior, reversed object reports, polymorphic
+  array swaps and exception-path tasks, each with complete changed output. Renaming output alone
+  is insufficient. Revised requirements have `-v2` ids; old records stay saved and cannot skip them.
+- First opening loads that step's complete sample; revisiting restores its saved draft. Module
+  sources, personal sources, earlier weeks and submissions remain separate. The sample history
+  migration and revised JSON must accompany the app rollout; hosted steps remain teacher actions.

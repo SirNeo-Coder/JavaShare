@@ -422,3 +422,22 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - `codeshare-knowledge-base`: knowledge base, stacked on (b)
   - `realtime-c1`: PR (c1), stacked on the knowledge base
   - `cloudflare-c2`: PR (c2), stacked on c1
+
+## Module resume and meaningful exercises — 2026-10-21
+
+- Approved by the teacher: reopen the next unfinished step, auto-load each complete sample,
+  restore previous step edits, keep personal work separate, and make Week 12/13 alterations
+  exercise lesson logic through changed output, using Week 14 as the reference.
+- Branch: `codex/module-resume-and-logic-tasks`, based on `codex/classroom-drawer-controls`.
+  Work is isolated in `/tmp/codeshare-module-resume`; primary checkout is preserved.
+- Done: prepared task/sample-first/Week 12–13 changes integrated with current Console/drawer
+  fixes; shared saved-progress resume; seven improved exercise requirements with new ids.
+  CKB-052/054 updated and CKB-058 added. Required history migration is the unchanged prepared
+  additive file. Hosted actions remain teacher-only.
+- Verified: production build, offline launcher and whitespace checks passed; lint zero errors/eight
+  existing warnings; full suite 221/221, actual offline/online resume browser 11/11, revised exercises
+  on browser Java 8 8/8. Both deliberate-break regressions failed and passed after restoration.
+  Final named checks and limits: `docs/verification/module-resume-and-logic-tasks.md`.
+- No code work remains in progress. Next: commit, push and deliver a PR against the drawer
+  branch; teacher review and migration/app/JSON rollout follow. Do not merge or change hosted services.
+  Continue from `docs/handoffs/rolling-module-tasks.md`.

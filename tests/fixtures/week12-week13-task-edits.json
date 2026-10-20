@@ -1,0 +1,166 @@
+{
+  "java-2-w12-s1": [
+    {
+      "path": "Main.java",
+      "from": "v.showInfo();",
+      "to": "Vehicle other = new Vehicle(\"TRC 456\", \"Kuya Ben\");\n        other.showInfo();\n        v.showInfo();"
+    }
+  ],
+  "java-2-w12-s2": [
+    {
+      "path": "Main.java",
+      "from": "v.setPassengers(-3);",
+      "to": "v.setPassengers(6);"
+    }
+  ],
+  "java-2-w12-s3": [
+    {
+      "path": "Main.java",
+      "from": "System.out.println(\"Tricycle TODA: \" + trike.getToda());",
+      "to": "System.out.println(\"Tricycle TODA: \" + trike.getToda());\n        jeep.setPassengers(3);\n        jeep.showInfo();"
+    }
+  ],
+  "java-2-w12-s4": [
+    {
+      "path": "Main.java",
+      "from": "jeep.setPassengers(12);",
+      "to": "jeep.setPassengers(12);\n        jeep.setPassengers(-3);"
+    }
+  ],
+  "java-2-w12-s5": [
+    {
+      "path": "Main.java",
+      "from": "6 km",
+      "to": "5 km"
+    },
+    {
+      "path": "Main.java",
+      "from": "computeFare(6)",
+      "to": "computeFare(5)"
+    }
+  ],
+  "java-2-w12-s6": [
+    {
+      "path": "Main.java",
+      "from": "fleet[1].setPassengers(-3);",
+      "to": "fleet[1].setPassengers(3);"
+    }
+  ],
+  "java-2-w12-s7": [
+    {
+      "path": "Main.java",
+      "from": "for (Vehicle v : fleet) {",
+      "to": "Vehicle first = fleet[0];\n        fleet[0] = fleet[2];\n        fleet[2] = first;\n        for (Vehicle v : fleet) {"
+    }
+  ],
+  "java-2-w12-s8": [
+    {
+      "path": "Main.java",
+      "from": "6 km",
+      "to": "4 km"
+    },
+    {
+      "path": "Main.java",
+      "from": "computeFare(6)",
+      "to": "computeFare(4)"
+    }
+  ],
+  "java-2-w12-s9": [
+    {
+      "path": "Main.java",
+      "from": "new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\")",
+      "to": "new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\")"
+    }
+  ],
+  "java-2-w13-s1": [
+    {
+      "path": "Main.java",
+      "from": "    new Bus(\"BUS 789\", \"Aling Rosa\", 50)\n",
+      "to": ""
+    }
+  ],
+  "java-2-w13-s2": [
+    {
+      "path": "Main.java",
+      "from": "i <= fleet.length",
+      "to": "i < fleet.length"
+    }
+  ],
+  "java-2-w13-s3": [
+    {
+      "path": "Main.java",
+      "from": "int riders = trike.getPassengers();",
+      "to": "trike.setPassengers(4);\n        int riders = trike.getPassengers();"
+    }
+  ],
+  "java-2-w13-s4": [
+    {
+      "path": "Main.java",
+      "from": "String typed = \"twelve\";",
+      "to": "String typed = \"12\";"
+    }
+  ],
+  "java-2-w13-s5": [
+    {
+      "path": "Main.java",
+      "from": "printDrivers(\"missing.txt\");",
+      "to": "printDrivers(\"drivers.txt\");"
+    }
+  ],
+  "java-2-w13-s6": [
+    {
+      "path": "Main.java",
+      "from": "int riders = Integer.parseInt(sc.nextLine());",
+      "to": "int riders = Integer.parseInt(sc.nextLine());\n            riders = 0;"
+    }
+  ],
+  "java-2-w13-s7": [
+    {
+      "path": "Main.java",
+      "from": "jeep.setPassengers(-3);",
+      "to": "jeep.setPassengers(4);"
+    }
+  ],
+  "java-2-w13-s8": [
+    {
+      "path": "Main.java",
+      "from": "jeep.setPassengers(-3);",
+      "to": "jeep.setPassengers(8);"
+    }
+  ],
+  "java-2-w13-s9": [
+    {
+      "path": "Main.java",
+      "from": "System.out.println(full.getMessage());\n        System.out.println(distance.getMessage());",
+      "to": "System.out.println(distance.getMessage());\n        System.out.println(full.getMessage());"
+    }
+  ],
+  "java-2-w13-s10": [
+    {
+      "path": "Main.java",
+      "from": "\"Aling Rosa\", 50",
+      "to": "\"Aling Rosa\", 40"
+    }
+  ],
+  "java-2-w13-s11": [
+    {
+      "path": "Main.java",
+      "from": "jeep.board(2);",
+      "to": "jeep.board(21);"
+    }
+  ],
+  "java-2-w13-s12": [
+    {
+      "path": "Main.java",
+      "from": "jeep.board(10);",
+      "to": "jeep.board(3);"
+    }
+  ],
+  "java-2-w13-s13": [
+    {
+      "path": "Main.java",
+      "from": "vehicle.quoteFare(2)",
+      "to": "vehicle.quoteFare(0)"
+    }
+  ]
+}

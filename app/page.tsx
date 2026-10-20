@@ -9,8 +9,9 @@ import { studentEntryClassroom, rememberedStudentClassroom, rememberStudentClass
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import useOutsideDismiss from "./useOutsideDismiss";
 import ModuleWorkspace from "./ModuleWorkspace";
+import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
-import { activityStateId } from "../backend/src/module-activities";
+import { activityStateId, activityTask } from "../backend/src/module-activities";
 import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
@@ -1698,8 +1699,8 @@ export default function Home() {
     setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
     setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
       classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "",
-      instruction: step?.instruction ?? currentModule.performanceTask?.markdown ?? "",
-      expectedOutput: step?.expectedOutput ?? "", stdin: step?.stdin ?? "", progress });
+      instruction: step ? activityTask(step).instruction : currentModule.performanceTask?.markdown ?? "",
+      expectedOutput: step ? activityTask(step).expectedOutput : "", stdin: step ? activityTask(step).stdin ?? "" : "", progress });
     setProjectsOpen(false);
   }
 
@@ -2154,8 +2155,14 @@ export default function Home() {
           {weeklyModule && <div className="team-list" aria-label="Weekly Java projects">
             <b>{weeklyModule.title}</b>
             <div className={`team-card ${currentModuleProject?.kind === "module" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Module project" onClick={async () => {
-              const step = weeklyModule.lessons.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
-              try { if (step) await startModuleActivity(weeklyModule, step); }
+              try {
+                const [module, progress] = await Promise.all([
+                  api<CourseModule>(`/api/classrooms/${classroomId}/modules/${weeklyModule.id}`),
+                  api<Progress>(`/api/classrooms/${classroomId}/modules/${weeklyModule.id}/progress`),
+                ]);
+                const step = moduleResumeStep(module, progress.stepStates) ?? module.lessons.flatMap((lesson) => lesson.blocks).findLast((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
+                if (step?.language === "java") await startModuleActivity(module, step);
+              }
               catch (error) { notify(error instanceof Error ? error.message : "Could not open module project"); }
             }}><span className="team-icon">J</span><span className="team-copy"><b>Module project</b></span></button></div>
             <div className={`team-card ${currentModuleProject?.kind === "performance" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Personal performance-task project" onClick={async () => {

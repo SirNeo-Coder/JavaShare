@@ -525,11 +525,12 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-tas
 // separate from the two performance-task submissions above.
 app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/project", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const { files, updatedAt } = z.object({
+    const { files, updatedAt, stepId } = z.object({
       files: z.array(z.object({ path: z.string().trim().min(1).max(160), content: z.string().max(200000) })).min(1).max(50),
       updatedAt: z.string().datetime({ offset: true }).optional(),
+      stepId: z.string().trim().min(1).max(100).optional(),
     }).parse(req.body);
-    return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt));
+    return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt, stepId));
   } catch (error) { next(error); }
 });
 

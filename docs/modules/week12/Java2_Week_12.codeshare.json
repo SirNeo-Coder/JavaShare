@@ -1,0 +1,735 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 12,
+  "id": "java-2-w12",
+  "title": "Self-Paced Module: The Four Pillars of OOP in Java",
+  "sampleFirst": true,
+  "starterFiles": [],
+  "lessons": [
+    {
+      "id": "java-2-w12-encapsulation",
+      "order": 1,
+      "dayLabel": "DAY 1",
+      "title": "Encapsulation: protect the data",
+      "hours": 1,
+      "objectives": {
+        "cognitive": "Explain private fields, getters and a validating setter.",
+        "affective": "Respect rules that protect another object's data.",
+        "psychomotor": "Run a complete Vehicle class and change a setter argument."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "This JSON follows the printed three-session catch-up sequence. Day 2 contains three successive pillars; the five-day lesson plan supplies the teaching objectives. Work through each part in order. Each sample is followed by a small alteration with its own expected output. Paper liplets are submitted to the teacher and never block online progress."
+        },
+        {
+          "type": "definition",
+          "term": "Four pillars",
+          "markdown": "Encapsulation protects data; inheritance reuses a parent; polymorphism lets one call take different forms; abstraction shows a contract while leaving details to children."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Pillar",
+            "Remember",
+            "In our Vehicle program"
+          ],
+          "rows": [
+            [
+              "Encapsulation",
+              "PROTECT",
+              "private fields; getters and setters"
+            ],
+            [
+              "Inheritance",
+              "REUSE",
+              "extends and super(...)"
+            ],
+            [
+              "Polymorphism",
+              "MANY FORMS",
+              "overridden computeFare(...)"
+            ],
+            [
+              "Abstraction",
+              "HIDE DETAIL",
+              "abstract Vehicle and abstract computeFare(...)"
+            ]
+          ]
+        },
+        {
+          "type": "definition",
+          "term": "Encapsulation",
+          "markdown": "Bundle data and methods in one class. Make fields private and use public methods to read or change them. A setter can reject an invalid value."
+        },
+        {
+          "type": "analogy",
+          "markdown": "An ATM protects its money. You ask through its controls instead of touching the cash. A validating setter is that controlled door."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s1",
+          "number": 1,
+          "instruction": "Printed Step 1 introduces Vehicle. This complete Main.java creates one object so you can run the class immediately. Read its fields, constructor, getters, validating setter and methods.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public double computeFare(double km) { return 13.00; }\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle v = new Vehicle(\"NXA 123\", \"Mang Ramon\");\n        v.showInfo();\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 0",
+          "activity": {
+            "id": "java-2-w12-s1-alter-v2",
+            "instruction": "Create a second Vehicle named other with plate TRC 456 and driver Kuya Ben. Display other first, then display the original v. Keep both objects and their default passenger counts; use showInfo() rather than printing the reports as literal text.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "TRC 456 | Driver: Kuya Ben | Passengers: 0\nNXA 123 | Driver: Mang Ramon | Passengers: 0",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Class order: private fields, constructor, getters/setters, then other methods. this refers to the current object."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s2",
+          "number": 2,
+          "instruction": "Based on printed Step 2: the setter rejects -3 and leaves passengers at zero. The final showInfo line makes the unchanged value visible. The private-field compiler experiment remains a reading example below.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public double computeFare(double km) { return 13.00; }\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle v = new Vehicle(\"NXA 123\", \"Mang Ramon\");\n        v.setPassengers(-3);\n        v.showInfo();\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Invalid passenger count.\nNXA 123 | Driver: Mang Ramon | Passengers: 0",
+          "activity": {
+            "id": "java-2-w12-s2-alter-v1",
+            "instruction": "Change v.setPassengers(-3) to v.setPassengers(6). The valid count should be accepted, so the refusal message disappears.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 6",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "error",
+          "language": "java",
+          "markdown": "Reading experiment from printed Step 2: `v.passengers = -3;` does not compile because passengers is private. Use setPassengers instead. Keep the private-access experiment out of the required runnable files.",
+          "message": "passengers has private access in Vehicle"
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w12-encapsulation-liplet",
+        "points": 15,
+        "afterStep": "java-2-w12-s2",
+        "questions": [
+          {
+            "id": "1",
+            "kind": "Define",
+            "prompt": "Define encapsulation in your own words.",
+            "points": 5
+          },
+          {
+            "id": "2",
+            "kind": "Explain",
+            "prompt": "Why does v.passengers = -3 fail while v.setPassengers(-3) compiles but refuses the value?",
+            "points": 5
+          },
+          {
+            "id": "3",
+            "kind": "Connect",
+            "prompt": "Name a school, barangay or bank record that should be private. What should its setter check?",
+            "points": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w12-inheritance",
+      "order": 2,
+      "dayLabel": "DAY 2",
+      "title": "Inheritance: reuse the parent",
+      "hours": 1,
+      "objectives": {
+        "cognitive": "Explain the is-a relationship, extends and super(...).",
+        "affective": "Reuse working parent behavior responsibly.",
+        "psychomotor": "Run two child classes and call inherited methods."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Inheritance",
+          "markdown": "A subclass extends a superclass and reuses its accessible methods. Private parent fields remain protected; super(...) lets the parent initialize its own data."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A jeepney is a vehicle. It has a plate, driver and passengers, and adds its own route. A tricycle adds its TODA."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s3",
+          "number": 3,
+          "instruction": "Based on printed Step 3: Jeepney and Tricycle extend Vehicle, call super(...), and add one private field each. The runnable Main prints the two new getters.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public double computeFare(double km) { return 13.00; }\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Jeepney jeep = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        Tricycle trike = new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\");\n        System.out.println(\"Jeepney route: \" + jeep.getRoute());\n        System.out.println(\"Tricycle TODA: \" + trike.getToda());\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Jeepney route: Monumento-Divisoria\nTricycle TODA: Bagong Silang TODA",
+          "activity": {
+            "id": "java-2-w12-s3-alter-v2",
+            "instruction": "After the two route/TODA lines, use the Jeepney object's inherited setter to store 3 passengers, then call its inherited showInfo(). Keep Vehicle, Jeepney and Tricycle unchanged; do not copy parent fields or methods into the child.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "Jeepney route: Monumento-Divisoria\nTricycle TODA: Bagong Silang TODA\nNXA 123 | Driver: Mang Ramon | Passengers: 3",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Do not copy Vehicle fields into each child. Inherited getters and methods already work on the parent part of the child object."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s4",
+          "number": 4,
+          "instruction": "Printed Step 4: Jeepney inherits setPassengers and showInfo without retyping them. getRoute belongs to the child.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public double computeFare(double km) { return 13.00; }\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Jeepney jeep = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        jeep.setPassengers(12);\n        jeep.showInfo();\n        System.out.println(\"Route: \" + jeep.getRoute());\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 12\nRoute: Monumento-Divisoria",
+          "activity": {
+            "id": "java-2-w12-s4-alter-v2",
+            "instruction": "Keep the successful setter call that stores 12 passengers. Immediately after it, try to set -3 passengers on the same Jeepney. Keep the existing showInfo() and route report. The inherited setter must reject the second value and preserve the earlier valid count.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "Invalid passenger count.\nNXA 123 | Driver: Mang Ramon | Passengers: 12\nRoute: Monumento-Divisoria",
+            "stdin": ""
+          }
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w12-inheritance-liplet",
+        "points": 15,
+        "afterStep": "java-2-w12-s4",
+        "questions": [
+          {
+            "id": "1",
+            "kind": "Define",
+            "prompt": "Define inheritance using superclass and subclass.",
+            "points": 5
+          },
+          {
+            "id": "2",
+            "kind": "Explain",
+            "prompt": "Why does the Jeepney constructor call super(...) instead of assigning the private parent plateNumber?",
+            "points": 5
+          },
+          {
+            "id": "3",
+            "kind": "Connect",
+            "prompt": "How does encapsulation still protect Vehicle inside a child class?",
+            "points": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w12-polymorphism",
+      "order": 3,
+      "dayLabel": "DAY 2",
+      "title": "Polymorphism: one call, many forms",
+      "hours": 1,
+      "objectives": {
+        "cognitive": "Explain overriding and runtime choice through a parent reference.",
+        "affective": "Accept different implementations of one shared responsibility.",
+        "psychomotor": "Run different children in one Vehicle array."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Polymorphism",
+          "markdown": "An overridden method has the same name and parameters but a different body. Java calls the version belonging to the actual object, even when the variable has the parent type."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Ask two drivers the same fare question. A jeepney and a tricycle use different practice formulas."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s5",
+          "number": 5,
+          "instruction": "Based on printed Step 5: each child now overrides computeFare. The wrapper calls each implementation. All fares in this module are practice values.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public double computeFare(double km) { return 13.00; }\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n    @Override\n    public double computeFare(double km) { return 20.00 + (km * 10.00); }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Jeepney jeep = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        Tricycle trike = new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\");\n        System.out.println(\"Jeepney fare for 6 km: P\" + jeep.computeFare(6));\n        System.out.println(\"Tricycle fare for 6 km: P\" + trike.computeFare(6));\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Jeepney fare for 6 km: P17.0\nTricycle fare for 6 km: P80.0",
+          "activity": {
+            "id": "java-2-w12-s5-alter-v1",
+            "instruction": "Use 5 km instead of 6 km in both calls and both printed labels. Keep the fare formulas unchanged.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "Jeepney fare for 5 km: P15.0\nTricycle fare for 5 km: P70.0",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s6",
+          "number": 6,
+          "instruction": "Printed Step 6: one Vehicle array holds different children. The same v.computeFare(6) call uses the actual child implementation. The negative count is refused.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public double computeFare(double km) { return 13.00; }\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n    @Override\n    public double computeFare(double km) { return 20.00 + (km * 10.00); }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle[] fleet = {\n            new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"),\n            new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\")\n        };\n        fleet[0].setPassengers(12);\n        fleet[1].setPassengers(-3);\n        for (Vehicle v : fleet) {\n            v.showInfo();\n            System.out.println(\"Fare for 6 km: P\" + v.computeFare(6));\n        }\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Invalid passenger count.\nNXA 123 | Driver: Mang Ramon | Passengers: 12\nFare for 6 km: P17.0\nTRC 456 | Driver: Kuya Ben | Passengers: 0\nFare for 6 km: P80.0",
+          "activity": {
+            "id": "java-2-w12-s6-alter-v1",
+            "instruction": "Change only fleet[1].setPassengers(-3) to fleet[1].setPassengers(3). The tricycle should now show 3 passengers and the refusal message should disappear.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 12\nFare for 6 km: P17.0\nTRC 456 | Driver: Kuya Ben | Passengers: 3\nFare for 6 km: P80.0",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "The parent-type array lets the loop work with different child objects. Adding a Bus does not require changing the loop."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s7",
+          "number": 7,
+          "instruction": "Digital Step 7 corresponds to printed Step 6b. The supplied sample contains the completed Bus class so sample verification can run. Bus adds seats and its own fare formula; the extra seats line lets you observe its getter.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public double computeFare(double km) { return 13.00; }\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n    @Override\n    public double computeFare(double km) { return 20.00 + (km * 10.00); }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n    public int getSeats() { return seats; }\n    @Override\n    public double computeFare(double km) { return 15.00 + (km * 2.50); }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Bus bus = new Bus(\"BUS 789\", \"Aling Rosa\", 50);\n        Vehicle[] fleet = {\n            new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"),\n            new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"),\n            bus\n        };\n        for (Vehicle v : fleet) {\n            v.showInfo();\n            System.out.println(\"Fare for 6 km: P\" + v.computeFare(6));\n        }\n        System.out.println(\"Bus seats: \" + bus.getSeats());\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 0\nFare for 6 km: P17.0\nTRC 456 | Driver: Kuya Ben | Passengers: 0\nFare for 6 km: P80.0\nBUS 789 | Driver: Aling Rosa | Passengers: 0\nFare for 6 km: P30.0\nBus seats: 50",
+          "activity": {
+            "id": "java-2-w12-s7-alter-v2",
+            "instruction": "Before the existing loop, exchange the Vehicle objects at fleet indexes 0 and 2. Keep all three objects, the loop, fare methods and final bus-seat report unchanged. The same parent-type loop must now display Bus, Tricycle and Jeepney in that order with each child's own fare.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "BUS 789 | Driver: Aling Rosa | Passengers: 0\nFare for 6 km: P30.0\nTRC 456 | Driver: Kuya Ben | Passengers: 0\nFare for 6 km: P80.0\nNXA 123 | Driver: Mang Ramon | Passengers: 0\nFare for 6 km: P17.0\nBus seats: 50",
+            "stdin": ""
+          }
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w12-polymorphism-liplet",
+        "points": 15,
+        "afterStep": "java-2-w12-s7",
+        "questions": [
+          {
+            "id": "1",
+            "kind": "Define",
+            "prompt": "Define polymorphism and overriding.",
+            "points": 5
+          },
+          {
+            "id": "2",
+            "kind": "Explain",
+            "prompt": "Why does the same v.computeFare(6) call print P17.0 for a jeepney and P80.0 for a tricycle?",
+            "points": 5
+          },
+          {
+            "id": "3",
+            "kind": "Connect",
+            "prompt": "Could this example work without inheritance? Explain.",
+            "points": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w12-abstraction",
+      "order": 4,
+      "dayLabel": "DAY 2",
+      "title": "Abstraction: require each child to implement the contract",
+      "hours": 1,
+      "objectives": {
+        "cognitive": "Explain abstract classes and abstract methods.",
+        "affective": "Value clear responsibilities over hidden assumptions.",
+        "psychomotor": "Run an abstract Vehicle family with all required overrides."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Abstraction",
+          "markdown": "An abstract class describes a shared idea and cannot be instantiated directly. An abstract method has no body; each concrete child must implement it."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s8",
+          "number": 8,
+          "instruction": "Digital Step 8 combines the runnable part of printed Steps 7-8. Vehicle is now abstract and computeFare has no body. All children implement it, so the complete program runs. The two deliberate compiler failures appear below as reading examples.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public abstract double computeFare(double km);\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n    @Override\n    public double computeFare(double km) { return 20.00 + (km * 10.00); }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n    public int getSeats() { return seats; }\n    @Override\n    public double computeFare(double km) { return 15.00 + (km * 2.50); }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle[] fleet = {\n            new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"),\n            new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"),\n            new Bus(\"BUS 789\", \"Aling Rosa\", 50)\n        };\n        for (Vehicle v : fleet) {\n            v.showInfo();\n            System.out.println(\"Fare for 6 km: P\" + v.computeFare(6));\n        }\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 0\nFare for 6 km: P17.0\nTRC 456 | Driver: Kuya Ben | Passengers: 0\nFare for 6 km: P80.0\nBUS 789 | Driver: Aling Rosa | Passengers: 0\nFare for 6 km: P30.0",
+          "activity": {
+            "id": "java-2-w12-s8-alter-v1",
+            "instruction": "Change the loop to quote 4 km instead of 6 km, including the printed label. Keep the abstract parent and each child formula unchanged.\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 0\nFare for 4 km: P13.0\nTRC 456 | Driver: Kuya Ben | Passengers: 0\nFare for 4 km: P60.0\nBUS 789 | Driver: Aling Rosa | Passengers: 0\nFare for 4 km: P25.0",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "error",
+          "language": "java",
+          "markdown": "Printed Step 8, reading experiment A: `new Vehicle(\"ABC 000\", \"Nobody\")` does not compile after Vehicle becomes abstract. Create a specific child instead. This intentionally broken line is not placed in the required runnable sample.",
+          "message": "Vehicle is abstract; cannot be instantiated"
+        },
+        {
+          "type": "error",
+          "language": "java",
+          "markdown": "Reading experiment B: deleting computeFare from Tricycle leaves the abstract promise unfulfilled. Restore the override before running a correct program.",
+          "message": "Tricycle is not abstract and does not override abstract method computeFare(double) in Vehicle"
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w12-abstraction-liplet",
+        "points": 15,
+        "afterStep": "java-2-w12-s8",
+        "questions": [
+          {
+            "id": "1",
+            "kind": "Define",
+            "prompt": "What makes a class or method abstract?",
+            "points": 5
+          },
+          {
+            "id": "2",
+            "kind": "Explain",
+            "prompt": "Why do creating a plain abstract Vehicle and deleting a required override both fail to compile?",
+            "points": 5
+          },
+          {
+            "id": "3",
+            "kind": "Connect",
+            "prompt": "Why is an abstract computeFare contract safer than a default fare that every child might accidentally inherit?",
+            "points": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w12-synthesis",
+      "order": 5,
+      "dayLabel": "DAY 3",
+      "title": "The four pillars together",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Connect the four pillars using exact program lines.",
+        "affective": "Explain and defend your own design choices.",
+        "psychomotor": "Apply the model in an independent themed program and demonstrate it."
+      },
+      "blocks": [
+        {
+          "type": "table",
+          "columns": [
+            "Pillar",
+            "Code evidence",
+            "Connection"
+          ],
+          "rows": [
+            [
+              "Encapsulation",
+              "private fields and validating setter",
+              "Protects data shared through the parent"
+            ],
+            [
+              "Inheritance",
+              "extends Vehicle and super(...)",
+              "Provides the parent-child relationship"
+            ],
+            [
+              "Polymorphism",
+              "parent reference and overridden computeFare",
+              "Selects each real object's behavior"
+            ],
+            [
+              "Abstraction",
+              "abstract Vehicle and computeFare",
+              "Requires the child implementation"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w12-s9",
+          "number": 9,
+          "instruction": "Synthesis check before the separate personal performance task. An abstract parent reference holds a real child; the inherited setter protects private state and the overridden fare method supplies the result.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public abstract double computeFare(double km);\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n    @Override\n    public double computeFare(double km) { return 20.00 + (km * 10.00); }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n    public int getSeats() { return seats; }\n    @Override\n    public double computeFare(double km) { return 15.00 + (km * 2.50); }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle vehicle = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        vehicle.setPassengers(5);\n        vehicle.showInfo();\n        System.out.println(\"Fare for 4 km: P\" + vehicle.computeFare(4));\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "NXA 123 | Driver: Mang Ramon | Passengers: 5\nFare for 4 km: P13.0",
+          "activity": {
+            "id": "java-2-w12-s9-alter-v1",
+            "instruction": "Keep the variable type Vehicle, setter and fare call. Change only the object creation to new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\").\n\nRun the loaded sample unchanged first. After Sample verified, make only the stated alteration and Run code again. A matching task run saves Completed and opens the next activity. Reopening this step restores your saved edits.",
+            "files": [],
+            "expectedOutput": "TRC 456 | Driver: Kuya Ben | Passengers: 5\nFare for 4 km: P60.0",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Next, open your separate Personal performance-task project. Do not replace module work with your own theme. Saving or running personal work is not submission; use Submit this version when ready."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w12-synthesis-liplet",
+        "points": 20,
+        "afterStep": "java-2-w12-s9",
+        "questions": [
+          {
+            "id": "1",
+            "kind": "Connect",
+            "prompt": "Explain how all four pillars work together in the Vehicle model.",
+            "points": 5
+          },
+          {
+            "id": "2",
+            "kind": "Point",
+            "prompt": "Choose a pillar, define it, and identify the exact class and line in your own program.",
+            "points": 5
+          },
+          {
+            "id": "3",
+            "kind": "Explain",
+            "prompt": "If extends disappeared from every child, what else would stop working and why?",
+            "points": 5
+          },
+          {
+            "id": "4",
+            "kind": "Evaluate",
+            "prompt": "Which pillar best protects learner grades? Defend your answer.",
+            "points": 5
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w12-performance",
+    "title": "Build and present your own OOP program",
+    "markdown": "Use the Vehicle program as your model, then build a different theme: sari-sari store items, school personnel/pay, pets/care cost, gadgets/warranty, shapes/area, or a teacher-approved theme. Do not copy the Vehicle theme. Work in the separate personal project. Plan class names, fields, methods and setter validation before coding. Run and save as often as needed; submit explicitly when ready. Paper liplets and teacher assessment remain separate.",
+    "checklist": [
+      "One abstract parent with at least one abstract method",
+      "At least three private parent fields, constructor using this, and getters",
+      "At least one validating setter that refuses bad data",
+      "At least two children using extends and super(...)",
+      "Each child adds a private field and getter",
+      "Each child overrides the abstract method differently",
+      "Main uses a parent-type array and loop",
+      "Comments identify all four pillars",
+      "Use a different theme and Submit this version explicitly"
+    ],
+    "exampleFiles": [
+      {
+        "path": "Vehicle.java",
+        "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName() { return driverName; }\n    public int getPassengers() { return passengers; }\n    public void setPassengers(int passengers) {\n        if (passengers >= 0) {\n            this.passengers = passengers;\n        } else {\n            System.out.println(\"Invalid passenger count.\");\n        }\n    }\n    public abstract double computeFare(double km);\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName + \" | Passengers: \" + passengers);\n    }\n}\n"
+      },
+      {
+        "path": "Jeepney.java",
+        "content": "public class Jeepney extends Vehicle {\n    private String route;\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n    public String getRoute() { return route; }\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n}\n"
+      },
+      {
+        "path": "Tricycle.java",
+        "content": "public class Tricycle extends Vehicle {\n    private String toda;\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n    public String getToda() { return toda; }\n    @Override\n    public double computeFare(double km) { return 20.00 + (km * 10.00); }\n}\n"
+      },
+      {
+        "path": "Bus.java",
+        "content": "public class Bus extends Vehicle {\n    private int seats;\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n    public int getSeats() { return seats; }\n    @Override\n    public double computeFare(double km) { return 15.00 + (km * 2.50); }\n}\n"
+      },
+      {
+        "path": "Main.java",
+        "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle vehicle = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        vehicle.setPassengers(5);\n        vehicle.showInfo();\n        System.out.println(\"Fare for 4 km: P\" + vehicle.computeFare(4));\n    }\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main {\n    public static void main(String[] args) {\n        // Build your own theme here. Add one abstract parent and at least two child files.\n        // Use private fields, a validating setter, overrides and a parent-type array.\n        System.out.println(\"My own OOP project\");\n    }\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce theme and classes (30 seconds)",
+      "Run and explain the output (1 minute)",
+      "Point to all four pillars in your own files (2 minutes)",
+      "Pass a bad value to the setter and show refusal (30 seconds)",
+      "Answer teacher/class questions (1 minute)"
+    ],
+    "questionsToPrepare": [
+      "What changes if a private field becomes public?",
+      "Why does a child call super(...)?",
+      "Why can the same loop call have different results?",
+      "Why can you not create the abstract parent directly?",
+      "Which pillars depend on the parent-child relationship?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Encapsulation",
+        "points": 8
+      },
+      {
+        "criterion": "Inheritance",
+        "points": 8
+      },
+      {
+        "criterion": "Polymorphism",
+        "points": 8
+      },
+      {
+        "criterion": "Abstraction",
+        "points": 8
+      },
+      {
+        "criterion": "Program structure",
+        "points": 8
+      },
+      {
+        "criterion": "Presentation and questions",
+        "points": 10
+      }
+    ],
+    "totalPoints": 50
+  }
+}

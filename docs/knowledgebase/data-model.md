@@ -24,3 +24,11 @@ Notes:
 - Since migration `20261016000200`, the `anon` and `authenticated` roles have no table privileges. Only the server (service role) reads and writes tables. Functions `can_join_realtime_topic` and `can_broadcast_realtime_topic` back the live-channel policies on `realtime.messages`.
 - A student's personal team can hold several personal projects ("My Practice Code" plus web projects). Activity projects have `activity_id` set.
 - Language values are free text on purpose so `csharp` and module languages need no schema change (see `../course-format.md`).
+
+Sample-first addition (2026-10-21): `module_progress.activity_projects` is an additive JSON object
+with optional `activeKey`, `drafts` (task completion key to that step's complete working file list),
+and `beforeSampleFiles` (the pre-update working copy). `project_files` remains the active rolling
+project so existing weekly carry-forward readers keep working. Saves update the active draft and
+working copy together under the existing `updated_at` comparison. `step_states` also accepts
+`sample:<activity.id>` for sample verification; only the existing task key completes an alteration.
+The column is introduced by `20261021000100_module_activity_projects.sql`; older readers ignore it.

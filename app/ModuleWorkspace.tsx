@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import ModuleViewer, { type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
-import { activityStateId } from "../backend/src/module-activities";
+import { moduleResumeStep } from "./moduleParts";
 import { api } from "./apiClient";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 
@@ -46,8 +46,8 @@ export default function ModuleWorkspace({ classroomId, role, browserOpen, projec
               api<Progress>(`/api/classrooms/${classroomId}/modules/${id}/progress`),
             ]);
             const steps = module.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
-            const step = steps.find((item) => progress.stepStates[activityStateId(item)] !== "pass") ?? steps[0];
-            if (step) await onStartActivity(module, step);
+            const step = moduleResumeStep(module, progress.stepStates) ?? steps.at(-1);
+            if (step?.language === "java") await onStartActivity(module, step);
           }
           setSelection((current) => ({ id, visit: (current?.visit ?? 0) + 1 })); setOpen(true); setHoverPreview(false); onBrowserChange(false);
         } catch (loadError) { setError(loadError instanceof Error ? loadError.message : "Could not open the module project"); }

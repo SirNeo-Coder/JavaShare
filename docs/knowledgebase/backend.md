@@ -84,3 +84,23 @@ identity/class/Java step/part/live week and saved version, compares its own expe
 output and retains earlier passes. It uses `recordSupabaseModuleActivityResult`,
 also used by the laptop path. The teacher accepts browser result falsification for
 practice; this is not grading. No browser-supplied expected output/pass flag is used.
+
+## Explicit alteration tasks (2026-10-20)
+
+The existing activity/run/browser-result/project routes also serve tasks with `activity.id`.
+`activityTask` chooses server-owned task input/output; `activityStateId` uses `task:<id>` so
+sample and legacy challenge passes cannot count. `activityAccess.openStepIds` enforces
+individual prerequisites in opted-in modules; legacy modules retain part access. Student module
+responses redact future task instructions/files/output while keeping their identity for status.
+Current and previous project files still win over starter/sample/task templates. No migration,
+runner change, new route, settings or live event.
+
+Sample-first modules (`sampleFirst: true`, 2026-10-21) reuse the existing activity/run/browser-result
+routes. Preparation snapshots the active step, resumes a saved draft or loads the new sample,
+and preserves pre-update files. Project saves include `stepId` as well as `updatedAt`; both must
+identify the current draft. The server selects the sample or task check from saved progress,
+never a client pass flag or requested stage. Sample verification requires the unchanged supplied
+step files and its declared result. Expected runtime errors compare the exception type across
+laptop JVM / browser stack formats, separately from successful alteration execution. Result
+responses add `check`, `sampleMatched` and the latest `passed`; prior completion stays monotonic.
+History appears in progress responses only for opted-in modules, keeping old response shapes.
