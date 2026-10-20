@@ -2,7 +2,7 @@
 
 | Keywords | Server | Pages | Database / tests |
 | --- | --- | --- | --- |
-| sign in, register, password reset, session, signed out after restart | `routes.ts` (auth routes, `requireAuth`, `setSession`), `supabase-repository.ts` (`loginWithSupabase`, `registerWithSupabase`) | `AuthScreen`, `ResetPasswordScreen` in `app/page.tsx` | `profiles`, Supabase Auth |
+| sign in, register, password reset, session, idle, inactivity, restored browser | `routes.ts` (auth routes including `/auth/activity`, `requireAuth`, `setSession`), `realtime.ts` (pass deadline), `supabase-repository.ts` (`loginWithSupabase`, `registerWithSupabase`) | `AuthScreen`, `ResetPasswordScreen` in `app/page.tsx`; root `SessionActivity.tsx`, `sessionActivity.ts`, `apiClient.ts` | `profiles`, Supabase Auth; no migration; `tests/session-expiry.test.mjs`, `tests/session-activity.test.mjs`, CKB-051 |
 | join class, class code | `joinSupabaseClass`, `ensurePersonalWorkspace` | `JoinClass` in `app/page.tsx` | `classrooms`, `classroom_members` |
 | workspace load, sidebar, teams list, session expired | `bootstrapFromSupabase` | `loadWorkspace`, team list in `app/page.tsx` | `teams`, `projects`, `code_files`; CKB-023 session-expiry reset parity with `logout()` |
 | save file, versions, conflict | `saveSupabaseFile`, `PUT /api/files/:id` | `persistCurrentCode` | `code_files`, `file_versions` |

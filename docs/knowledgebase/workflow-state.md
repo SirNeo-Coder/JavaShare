@@ -1,6 +1,6 @@
 # Workflow state (updated 2026-10-20, branch `codex/student-classroom-entry`)
 
-What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
+What teachers and students can do today. Keep this page current when their use of CodeShare changes; no change-level classification is required.
 
 ## Accounts
 
@@ -73,7 +73,14 @@ What teachers and students can do today. Compare any proposed change with this p
 
 ## Sign-in (PR c2)
 
-- Sign-in lasts 7 days, online and offline. Restarting the laptop or the server no longer signs anyone out.
+- Teachers sign out after two hours without interaction; students after fifteen minutes,
+  online and offline. Background classroom updates do not count. Closing the browser or
+  shutting down the laptop does not stop the countdown; returning after expiry requires sign-in.
+- A warning appears one minute before sign-out: save work or continue using CodeShare.
+  Saved files remain safe; unsaved edits may be lost when the page returns to sign-in.
+  Activity in another tab keeps the same account active; signing out clears other open tabs.
+  Server restarts retain sessions still within these limits. Active sign-ins keep their existing
+  seven-day maximum. The first deployment requires existing users to sign in again.
 
 ## Live features (PR c1)
 

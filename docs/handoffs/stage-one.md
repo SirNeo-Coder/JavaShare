@@ -1,3 +1,22 @@
+> Current session work (2026-10-20), branch `codex/session-inactivity`,
+> [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), implementation `b24c89c`, now targeting
+> `main` after documentation-only PR #23 merged: implemented the teacher's two-hour
+> and student's fifteen-minute inactivity sign-out. Server checks, trusted browser interaction,
+> one-minute warning, restored-tab refusal, shared-tab logout and live-pass deadlines are complete.
+> The teacher also removed the VMAS workflow/adjustment classification question; removal
+> committed/pushed as `50cc01e`. Normal proposal approval and workflow documentation remain.
+> Final build passed; full suite 140/140, no failures/skips; lint 0 errors/8 existing warnings.
+> Actual local production browser checked both roles, warning/sign-out, teacher accounts in
+> another tab, expired restored-session refusal and offline javac. See
+> [session verification](../verification/session-inactivity.md) for every test and limits,
+> and CKB-051 for diagnosis. Unsaved edits can be lost after the warning; old cookies need a
+> fresh sign-in on rollout. No migration or hosted change. Implementation and rule removal
+> committed and pushed; PR attached. The teacher explicitly requested merging and pushing to
+> `origin/main`. Retargeted the PR and preserved main's newer SQL-repair status while resolving
+> the two overlapping problem-index/prompt-map rows. Application code is unchanged from the
+> verified implementation. In progress: requested merge; next: confirm main delivery and the
+> hosted Brave re-test. No hosted setting or manual deployment was changed.
+
 > Current approved work (2026-10-20): [interactive online Java](online-java-interactive-input.md),
 > branch codex/online-java-interactive-input, implementation 7930d79, [PR #22](https://github.com/SirNeo-Coder/JavaShare/pull/22).
 > Teacher approved live online answers and explicitly requested push/merge. Feature complete:

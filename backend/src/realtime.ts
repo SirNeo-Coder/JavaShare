@@ -18,15 +18,15 @@ export async function broadcast(topic: string, event: string, payload: unknown =
   }).catch((error) => console.error(`Realtime broadcast ${event} to ${topic} failed:`, error instanceof Error ? error.message : error));
 }
 
-// A one-hour pass that lets the browser join only the live channels its policies allow.
-export async function realtimePass(userId: string) {
+// Live access cannot outlast the current sign-in's inactivity deadline.
+export async function realtimePass(userId: string, sessionExpiresAt: number) {
   const secret = process.env.SUPABASE_JWT_SECRET?.trim();
   const url = process.env.SUPABASE_URL?.trim();
   const anonKey = process.env.SUPABASE_ANON_KEY?.trim();
   if (!secret || !url || !anonKey) return null;
-  const expiresIn = 3600;
+  const expiresAt = Math.floor(Math.min(Date.now() + 3600000, sessionExpiresAt) / 1000) * 1000;
   const token = await new SignJWT({ role: "authenticated" }).setProtectedHeader({ alg: "HS256", typ: "JWT" })
-    .setSubject(userId).setAudience("authenticated").setIssuedAt().setExpirationTime(`${expiresIn}s`)
+    .setSubject(userId).setAudience("authenticated").setIssuedAt().setExpirationTime(expiresAt / 1000)
     .sign(new TextEncoder().encode(secret));
-  return { token, expiresAt: Date.now() + expiresIn * 1000, url, anonKey };
+  return { token, expiresAt, url, anonKey };
 }

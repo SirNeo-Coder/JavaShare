@@ -24,7 +24,6 @@ Then do only the targeted read-only investigation needed for a credible proposal
 - Proposed steps
 - Tests and checks to run
 - Risks, migrations, compatibility effects, open choices
-- Level of change: workflow change or adjustment, asked of the teacher (see below)
 
 Stop and ask for explicit approval. Do not change application code, schemas, configuration, or tests until the teacher approves in a later message. Approval of an earlier, different plan does not cover a changed plan.
 
@@ -64,12 +63,18 @@ Lookup order: problem index -> matched case -> feature index -> relevant page ->
 - **Strict scope.** Change only what was asked. No drive-by refactors, renames, or restyling.
 - **Check before delivering.** Re-read the request point by point and check the work against it.
 
-## Level of change: workflow change or adjustment
+## Keep the workflow description current
 
-Before changing how teachers or students use CodeShare, or the data model, compare with `docs/knowledgebase/workflow-state.md` and ask the teacher which level it is. Don't decide it yourself.
+When a change affects how teachers or students use CodeShare, update
+`docs/knowledgebase/workflow-state.md` in the same change. CodeShare does not require
+the teacher to classify changes as a workflow change or an adjustment.
 
-- **Workflow change:** something a user would notice or relearn, such as a new, removed or renamed screen, button, step or permission, including a schema change that alters what someone sees. Once confirmed, update `workflow-state.md` in the same change.
-- **Adjustment:** nothing a user would do differently (a fix, refactor, or invisible schema change).
+## Inactivity sign-out (agreed 2026-10-20)
+
+- Teachers sign out after two hours without interaction; students after fifteen minutes,
+  including on public computers. Time with the browser closed or laptop off counts.
+- Background requests and live classroom updates never extend sign-in. Enforce expiry
+  on the server online and offline, and return expired/restored pages to sign-in.
 
 ## Refactor and housekeeping discipline
 
