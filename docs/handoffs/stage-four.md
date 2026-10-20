@@ -1,9 +1,14 @@
 # Stage four handoff (module viewer redesign)
 
-> Current student activity work (2026-10-20): approved, committed as `13e68a0` and pushed on `codex/student-module-activities`; [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19) is open against PR #18. See [student-module-activities.md](student-module-activities.md) for main-editor projects, automatic progression, CKB-038 resolution and verification. Earlier pending starter-file proposals below are superseded for the student activity path.
+**Status: classroom UI, drawer animation and printed worksheet are on main (PRs #14–16).
+The teacher approved the student activity workflow and explicitly requested its main delivery
+on 2026-10-20. PR #19 includes the teacher dashboard and student-entry prerequisites, saved
+multi-file module projects, and automatic progression. Final verification: 98/98 tests, build
+passed, lint 0 errors/8 existing warnings. CKB-038 is resolved for student projects.**
 
-> Teacher-side follow-up approved 2026-10-20: the new [teacher progress dashboard](teacher-progress-dashboard.md) supplies Overview, student cards/details, and Curriculum module management. Its handoff records implementation and review status; earlier teacher-side mock questions below are superseded for this scope.
-**Status: classroom Figma UI is on main; drawer-animation PR #15 is open. The approved printed-worksheet workflow change is implemented on `codex/printed-module-worksheet` (based on PR #15), reader verified with the exact supplied JSON; [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16) open for review (implementation `9b538d5`). Starter-file execution fix awaits separate approval (CKB-038).** Last updated: 2026-10-20.
+See [student-module-activities.md](student-module-activities.md) for the current handoff and
+[teacher-progress-dashboard.md](teacher-progress-dashboard.md) for the teacher dashboard.
+Earlier pending proposals below are historical and superseded by these approved changes.
 
 ## What the teacher asked for
 
@@ -269,3 +274,20 @@ Reader implementation committed as `9b538d5` and pushed. [PR #16](https://github
 is open against `codex/drawer-slide-animation` (PR #15 is still open). Review/merge #15 first,
 then retarget #16 to main. No automatic merge. Only the separate CKB-038 starter-file fix awaits
 the teacher's scope approval; the approved reader is complete and available locally.
+
+## Teacher-authorized main delivery — 2026-10-20
+
+The teacher asked whether this was pushed and on main, then explicitly said **merge to main**.
+Delivered drawer-animation PR #15 first (`8464d734c0083c3b7a96a60571d733bd6b2895d5`), retargeted
+worksheet PR #16 from the animation branch to main, and delivered that reader through PR #16.
+The validated application heads were `3990646` and `ad030ab`; only these handoff notes were added
+for the merge record. Existing build checks on both PRs were successful before the merge request.
+
+This one-time authorization overrides the normal no-merge rule for these two PRs only. No admin
+bypass, direct main push, hosted-setting change or database migration was performed. The separate
+uncommitted teacher-dashboard work on `codex/teacher-progress-dashboard` was not included, reset,
+stashed or checked out. The main checkout was not switched underneath that work.
+
+Remaining: CKB-038 starter-file compatibility proposal still needs its own explicit approval;
+merging the reader is not approval to expand it. Reduced-motion preference/device limits remain
+as recorded in the verification report. Follow current GitHub PR history for the final merge SHA.

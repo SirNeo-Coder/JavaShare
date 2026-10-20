@@ -2,10 +2,13 @@
 
 Updated: 2026-10-20. Branch: `codex/student-module-activities`, based on
 `codex/student-classroom-entry` (PR #18, still open). This is the teacher-approved workflow change
-from this chat: implement student activities first. No permission to merge or deploy.
+from this chat: implement student activities first. On 2026-10-20 the teacher explicitly
+requested pushing this completed work to main, authorizing this merge and its existing
+teacher-dashboard/student-entry prerequisites. No hosted settings or database changes.
 
 Implementation committed and pushed as `13e68a0`. [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19)
-is open against `codex/student-classroom-entry` (PR #18). Final full suite: 98/98, build passed,
+was originally opened against `codex/student-classroom-entry` (PR #18); it is now being
+retargeted to main for the teacher-authorized delivery. Final full suite: 98/98, build passed,
 lint 0 errors/8 existing warnings. Disposable local fixtures and the isolated port-3001 test
 server have been removed/stopped; the pre-existing port-3000 classroom was left running.
 
@@ -54,8 +57,10 @@ CKB-044 records the startup null-state bug caught in the browser and fixed befor
 
 ## Next / limits
 
-- Review PR #18 before PR #19. PR #19 currently targets `codex/student-classroom-entry`; retarget
-  after its prerequisite is merged. Teacher reviews and merges. No automatic merge or live deployment.
+- Teacher-authorized main delivery: PR #19 includes the existing tested prerequisite commits
+  from PRs #17/#18. Current main history was merged into this branch; only handoff notes needed
+  resolution. Application/configuration/test files are identical to tested commit `2430478`, so
+  its 98-test, build and browser evidence remains current. No product changes or migrations were added.
 - Existing course JSON needs authored activities for genuinely different practice outcomes. A
   complete example is `tests/fixtures/student-activity.codeshare.json`; format is documented in
   `docs/course-format.md`. No private course source was rewritten or committed.

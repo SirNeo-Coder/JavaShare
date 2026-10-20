@@ -8,9 +8,17 @@ Keep this file current. After every finished step: update it, commit, and push t
 Anyone continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-20. Current work: approved **student classroom entry workflow change** on `codex/student-classroom-entry`, based on teacher dashboard commit `33a3822` (PR #17). One class opens automatically, multiple classes reopen a valid last-used class or use the chooser, and no class keeps the join screen. Student modules stay in the classroom. The obsolete student module landing screen and its orphan helpers/state/styles were removed. Offline build passes, lint has 0 errors / 8 existing warnings, and all 88 tests pass; real local browser entry, switching, joining and failed-entry recovery verified. Implementation `60f89b4` is committed and pushed; [PR #18](https://github.com/SirNeo-Coder/JavaShare/pull/18) targets the pending teacher-dashboard branch for review. See the feature handoff and [verification](../verification/student-classroom-entry.md).
+Last updated: 2026-10-20. The teacher explicitly requested pushing the completed student activity
+workflow to main. PR #19 includes its tested teacher-dashboard and student-entry prerequisites
+(PRs #17/#18), plus saved multi-file module projects and automatic per-student progression.
+Implementation `13e68a0`; final verification: 98 tests passed, 0 failed/skipped, production build
+passed, lint 0 errors/8 existing warnings. See [student module activities](student-module-activities.md).
 
-Earlier classroom layout, slide animation and printed worksheet work (PRs #14–16) is on `main`. CKB-038 starter-file compatibility and the earlier hover report remain separate, unchanged work. No hosted services or database settings changed.
+The earlier classroom UI, drawer animation and printed worksheet were already delivered on main
+through PRs #14–16 (including main commits `8464d73` and `704565a`). Their history is preserved.
+CKB-038 is now resolved for the approved student activity project path. No hosted setting or
+hosted database change was made. This explicit main delivery is not standing permission to merge
+future work.
 
 ## The job
 
