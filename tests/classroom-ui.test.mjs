@@ -116,7 +116,7 @@ test("module paper: tables, analogies, notes and error guides display their actu
   assert.match(render({ type: "error", markdown: "The index is outside the list.", message: "IndexOutOfBoundsException" }), /IndexOutOfBoundsException/);
 });
 
-test("module worksheet: named parts, real code/output, page controls and hidden practice editors coexist", () => {
+test("module worksheet: named parts, unchanged samples, page controls and teacher-only sample preview coexist", () => {
   const course = worksheetFixture();
   course.lessons[0].blocks[0].part = "PART A — Lists";
   course.lessons[1].blocks[0].part = "PART B — Sets";
@@ -129,8 +129,8 @@ test("module worksheet: named parts, real code/output, page controls and hidden 
   assert.match(html, /Next page/);
   assert.match(html, /Output \(expected\):/);
   assert.match(html, /1\n2\n3/);
-  assert.match(html, /Practise this step/);
-  assert.equal((html.match(/hidden="" class="module-practice"/g) ?? []).length, 2);
+  assert.match(html, /Preview sample code/);
+  assert.doesNotMatch(html, /Open to students|Mark exit slip done|Practise this step/);
   assert.equal((html.match(/class="worksheet-paper" hidden=""/g) ?? []).length, 4);
   assert.match(html, /Sample code/);
   assert.match(html, /Your own version/);

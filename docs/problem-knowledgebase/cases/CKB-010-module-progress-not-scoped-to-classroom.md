@@ -65,3 +65,11 @@ the classroom, not the lesson.
   old queries (via the migration-first approach, which made the mismatch surface as a Postgres
   error), then `loadOrCreateModuleProgress`/`updateModuleProgressWithMerge` scoped by
   `classroom_id`, test passing.
+
+## Teacher dashboard extension (2026-10-20)
+
+The new class-wide read applies the class filter to every progress page before grouping by
+student and module. `tests/teacher-dashboard.test.mjs` checks the same student and module in two
+classes and excludes former members. Temporarily removing that filter failed four subchecks
+(class totals, class separation, pagination totals, and refreshed totals); restoring it passed.
+No new recurrence was reported; this reuses CKB-010 as a preventive regression guard.

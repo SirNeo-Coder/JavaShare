@@ -1,4 +1,4 @@
-# Workflow state (updated 2026-10-19, branch `codex/classroom-figma-ui`)
+# Workflow state (updated 2026-10-20, branch `codex/student-classroom-entry`)
 
 What teachers and students can do today. Compare any proposed change with this page to decide whether it is a workflow change or an adjustment.
 
@@ -10,24 +10,47 @@ What teachers and students can do today. Compare any proposed change with this p
 
 ## Classes and class home
 
-- On login, everyone sees a class list. Each card shows the class name, subject, and a "Live now" badge if an activity or live share is running; teachers also see its join code. **Open class** opens that class's home, without entering the live workspace.
-- A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and "Teacher Demo Workspace". A student can **Join another class** from that same list.
-- A teacher's class home contains **Modules** (the **Upload module** file picker, module preview, and **Delete**) and **Students**. **View module progress** on a student shows that student's module summaries for this class. **Back to modules** leaves a teacher preview.
-- A student's class home shows **Your modules**, with each module's progress. Opening a module stays on class home; **Close** returns to the module cards and refreshes their progress.
-- **Enter classroom** opens the existing live workspace for that one class. **Class home** in its header returns to the same class home; **Classes** goes back to the class list. Students also retain the workspace's **Modules** shortcut. Teacher module upload and deletion now live on class home, rather than in the workspace header.
-- On **Classes** or class home, students see **Your class is live** for a running activity or teacher live share, with **Join live class** and **Not now**. Several live classes appear as a choice. The invitation waits until an open module is closed, and never moves a student automatically. Teachers do not receive this popup.
+- Students sign in or reopen CodeShare directly in their classroom when they belong to one class. With several classes, the last successfully entered class reopens if they still belong to it; otherwise **Classes** offers their current memberships. The preference belongs to this account in this browser. If browser storage is unavailable, one class still opens automatically and several classes require a choice.
+- Students without a class see **Join your class** and enter the classroom after successfully joining. A required password reset takes priority over classroom entry.
+- The student classroom header has **Classes** to switch or **Join another class**. This deliberately opens the chooser even with one class. **Open class** enters directly; there is no separate student module home. Modules and saved progress remain in the existing left-hand classroom module browser and worksheet.
+- Teachers still start with the class list. Each card shows the class name, subject, join code and a **Live now** badge when appropriate. **Open class** shows the teacher dashboard with **Overview**, **Students**, and **Curriculum**. **Enter classroom** opens the live workspace and **Class home** returns to that dashboard.
+- A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and "Teacher Demo Workspace". A student can **Join another class** from the chooser.
+- Student entry failures show the server's error, **Retry**, and **Classes** so a removed membership or connection failure need not trap the student. Server membership checks and per-class workspace loading remain authoritative.
+- While students are on **Classes**, **Your class is live** offers **Join live class** or **Not now**; several live classes appear as a choice. Teachers do not receive this popup. The initial classroom entry rule is independent of whether a live session is running.
 - **Not now** (or Escape) dismisses the displayed sessions while this page remains open, including trips into the workspace and back. Joining dismisses that chosen session. A new activity, or a session stopped and restarted while the page can observe the stop, can invite again. Reloading the page or signing out resets dismissal.
 - Live status refreshes on announcements, connection/reconnection, and returning to the tab, without a repeating status timer. If live passes or the live connection fail, students see an error with **Reconnect** and can still enter a class manually. Listening outside a workspace does not mark students Online in every class.
 - Session identity reuses the current activity or presentation project id, without a new database column. If the same activity/presentation stops and restarts entirely while disconnected, a previously dismissed invitation may remain dismissed; a persisted session-start marker would be needed to distinguish that case.
 - Each class's roster, modules, progress, teams, activities, and live-share state stay separate. Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
 
-## Weekly modules: opening lessons (stage-three item 4, approved workflow change)
+## Weekly modules: student activities (approved workflow change, 2026-10-20)
 
-- In a teacher's class home, opening a module shows **Open to students** beside each lesson and, separately, the performance task. The teacher can preview and run everything regardless of the switches.
-- Existing modules remain open when the new migration is first applied. Newly uploaded modules start with all lessons and the performance task closed. Choices belong to this class and module, separately from the uploaded file.
-- Students see closed titles with **Not open yet**; their browser is not sent the assigned instructions, questions, expected outputs or supplied code for closed content. They close and reopen the module to see availability changes. Already-loaded content cannot be taken back, but further saves are refused once closed.
-- Closing and reopening keeps saved progress and submissions. The percentage always uses the whole module, including closed lessons. Reuploading corrections with the same ids preserves choices and progress; added lesson ids start closed. Adding requirements can reduce the percentage without deleting work.
-- Setup and safe rollback: [lesson-availability-setup.md](../lesson-availability-setup.md). The teacher applies the hosted migration before deploying the new app; assistants only apply it locally.
+- Selecting a module loads the student's saved module project into the main code editor and opens
+  its worksheet. **Work in code editor** closes the worksheet so the student can edit the project.
+  The module shows the unchanged worked sample and, when authored in JSON, a distinct activity
+  and required output. Old JSON steps still use their original sample as the activity.
+- Each student has separate files for every module in each class. Module starter files supply
+  supporting classes such as Vehicle and Jeepney. Optional `previousModuleId` copies this
+  student's previous module project once, without modifying it. Opening later activities adds
+  missing files and keeps all edits. **Save work** saves this module's working files; **Run code**
+  saves and compiles them together. Switching activities/projects/classes or signing out saves
+  the active module first; a failed save blocks that transition. Reloading before saving can
+  still lose unsaved edits, as with the existing classroom editor.
+- The first part opens automatically. Passing every required activity in a part opens the next
+  for that student immediately. The server withholds locked content and rejects premature runs
+  and direct pass flags. Output must match after successful compilation/execution. Failed later
+  practice runs keep an earlier pass. Teacher preview still shows every part.
+- Handwritten liplets are submitted to the teacher and assessed separately; no student checkbox
+  or teacher marking is needed to unlock the next part. Completion percentages now count passed
+  steps and performance-task submissions, excluding liplets. Existing paper flags remain saved.
+- **Performance task** opens after the lesson activities pass. Its existing two submission slots
+  and assessment workflow are retained; this change implements the lesson activities first.
+- Teacher **Open to students** switches are removed from the module viewer. Stored choices and
+  the old API remain compatible, but no longer gate students. Existing module ids, sources,
+  progress and submissions are kept. Reuploading added requirements can reduce the percentage.
+- Automatic activity checking currently supports Java through the existing runner. Offline mode
+  compiles all project files on the laptop. Hosted Java remains demo/single-file according to
+  existing configuration; unavailable execution cannot pass an activity. No new internet asset,
+  hosted setting change, dependency or database migration.
 
 ## Students
 
@@ -57,7 +80,7 @@ What teachers and students can do today. Compare any proposed change with this p
 
 ## Classroom layout (approved workflow change, 2026-10-19)
 
-- The teacher retained CodeShare's existing top bar: brand, role, class, **Class home**, student
+- The teacher retained CodeShare's existing top bar: brand, role, class, teacher **Class home** / student **Classes**, student
   **Modules**, display settings, notifications and account. On phones those same visible controls
   wrap into two rows so they fit the screen; desktop appearance stays the same.
 - The classroom uses the Figma reference's dark editor and Console with a yellow **Run code**
@@ -66,7 +89,7 @@ What teachers and students can do today. Compare any proposed change with this p
 - **Module** on the left edge or **Modules** in the top bar opens the module browser. The weekly
   pick appears first when one exists; cards show the student's saved percentage and server's live
   lock. Selecting a module opens a separate wide worksheet drawer; **Performance task** has its own page.
-  Closed lessons still show **Not open yet**. Navigation keeps editors mounted, so switching
+  Later parts remain locked until their required activities are passed. Navigation keeps editors mounted, so switching
   lessons preserves unsaved drafts. This does not add persistence across reloading or leaving a module.
 - **Projects** on the left edge exposes the existing student projects/activity list and **New web
   project**. Teachers use **Students / projects** for their existing student/group lists, activity
@@ -80,7 +103,7 @@ What teachers and students can do today. Compare any proposed change with this p
   wide desktop widths (1400 pixels and above), **Pin** reserves workspace space for a drawer;
   narrower screens use overlays. The chat conversation area stays light in both saved themes,
   matching the Figma reference, with a navy heading.
-- Class-home module upload, deletion, full teacher preview and availability controls stay where
+- Class-home module upload, deletion, full teacher preview and activity requirements stay where
   they were. No new chat service, AI assistant, route, migration, dependency or internet asset.
 
 ## Printed module worksheet (approved workflow change, 2026-10-19)
@@ -90,12 +113,10 @@ What teachers and students can do today. Compare any proposed change with this p
   note boxes, and a dotted desk background. The teacher's PDF is a visual reference; module
   content still comes from the existing uploaded JSON, not a new PDF-import feature.
 - The progress row uses saved student progress. Named parts follow the author's step `part`
-  labels, even across days. Older modules fall back to one part per lesson. Closed lessons show
-  **Not open yet** without exposing content; the existing teacher availability rules still apply.
+  labels, even across days. Older modules fall back to one part per lesson. Locked parts withhold their content until the student passes the preceding activities.
 - Each part has **Overview** for its opening discussion and step pages retaining their following
   tables/notes in reading order, with the liplet at the end. **Previous page / Next page** walk through the
-  digital pages; their page count is separate from physical printed PDF pages. **Practise this
-  step** exposes the existing editor and **Run & check**. Page switches and drawer closing keep
+  digital pages; their page count is separate from physical printed PDF pages. **Work in code editor** opens the activity in the main saved module project. Page switches and drawer closing keep
   drafts mounted. Reloading, changing module or leaving the classroom still does not save a draft.
 - After selecting a module, its additional **Module** ear previews the worksheet on mouse hover.
   Moving into the worksheet keeps the preview open; leaving closes it unless pinned. Clicking or
@@ -106,3 +127,31 @@ What teachers and students can do today. Compare any proposed change with this p
   page or draft; closing Projects restores that visit. The classroom top bar and existing chat
   system are retained. Class-home upload, availability, progress and submission
   routes retain their existing storage and permissions. No new route, dependency or migration.
+
+## Teacher class dashboard (approved workflow change, 2026-10-20)
+
+- **Open class** in the teacher account opens a dashboard for that class, with a dark sidebar and
+  **Overview**, **Students**, and **Curriculum**. **All classes**, **Enter classroom**, **Activity
+  summary**, **Student accounts**, and **Sign out** remain available, including on narrow screens.
+- **Overview** shows student count, average saved completion, completed student–module pairs, and
+  students with no completed items. A student's overall percentage is the arithmetic mean of
+  their percentages across all uploaded modules. The class mean includes every student–module
+  pair, including untouched modules and closed lessons. These are completion figures, not grades.
+- Displayed averages are rounded. Finished/In progress/Not started labels and filters use the
+  underlying completion records, so rounding to 0% or 100% cannot change status.
+- **Students** shows searchable cards with completion filters. **View module progress** opens a
+  student's summary and module cards. **View web projects** retains the existing saved-file review.
+- **Curriculum** is the teacher's module-management page. Cards show week, course, lesson and step
+  counts, average completion, students finished, and saved performance-task submission count.
+  **Add module** uses the existing JSON upload; **View module details** opens the existing teacher
+  preview and student activity requirements. **Back to modules** returns to Curriculum. **Delete
+  module** asks for confirmation; cancelling restores focus to its original button.
+- **Refresh** fetches saved progress again. Navigation within a class uses that visit's loaded
+  figures; returning from module preview, uploading, and deleting refreshes them. This is not a
+  live dashboard. Search and filters affect cards, not the class-wide summary totals.
+- Only the class teacher can fetch the class-wide progress request. Current student membership is
+  required for inclusion; former members and deleted modules do not affect totals. Progress pages
+  are read in batches so a year's records are not truncated by Supabase's response limit.
+- No new tables, migrations, progress-writing rules, grading, time tracking, streaks, or weekly
+  history. All dashboard assets are local. Student module use and classroom live features retain
+  their existing behavior.

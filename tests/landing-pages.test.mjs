@@ -91,7 +91,8 @@ test("landing pages: class roster, a student's own module summary, and a teacher
     const beforeStep = await (await call(`/api/classes/${classroomId}/students/${studentA.id}/modules-summary`, { headers: { cookie: teacherCookie } })).json();
     assert.equal(beforeStep[0].percent, 0);
 
-    await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie: studentACookie }, body: JSON.stringify({ stepId: step.id, status: "pass" }) });
+    // This read-only summary test seeds a saved result; actual code checking is covered in module-activities.test.mjs.
+    await admin.from("module_progress").upsert({ classroom_id: classroomId, student_id: studentA.id, module_id: moduleId, step_states: { [step.id]: "pass" } }, { onConflict: "student_id,classroom_id,module_id" });
 
     const afterStep = await (await call(`/api/classes/${classroomId}/students/${studentA.id}/modules-summary`, { headers: { cookie: teacherCookie } })).json();
     assert.ok(afterStep[0].percent > 0, "the teacher's view must reflect the student's step just passed");

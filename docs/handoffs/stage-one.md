@@ -1,21 +1,24 @@
 # CodeShare — Stage One Progress
 
+> Current student activity work (2026-10-20): approved, committed as `13e68a0` and pushed on `codex/student-module-activities`; [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19) is open against PR #18. See [student-module-activities.md](student-module-activities.md) for main-editor projects, automatic progression, CKB-038 resolution and verification. Earlier pending starter-file proposals below are superseded for the student activity path.
+
+> Current student entry work (2026-10-20): see [student classroom entry](student-classroom-entry.md) for the approved direct-entry workflow, orphan cleanup, branch and verification. Teacher dashboard work remains in [its own handoff](teacher-progress-dashboard.md).
+
 Keep this file current. After every finished step: update it, commit, and push the branch.
-Anyone (or any coding assistant) continuing this work should be able to start from this file alone.
+Anyone continuing this work should be able to start from this file alone.
 The working rules are in `AGENTS.md`; the knowledge base starts at `docs/knowledgebase/README.md`; past bugs are in `docs/problem-knowledgebase/`.
 
-Last updated: 2026-10-20. Classroom UI, sliding drawers and the printed worksheet reader are
-on **main**, delivered through PR #14, [PR #15](https://github.com/SirNeo-Coder/JavaShare/pull/15)
-and [PR #16](https://github.com/SirNeo-Coder/JavaShare/pull/16). The teacher explicitly requested
-these merges in the current chat; this is permission for this delivery, not a standing change
-to the branch/PR rules. PR #15 merged as `8464d73`; the worksheet implementation is `9b538d5`.
+Last updated: 2026-10-20. The teacher explicitly requested pushing the completed student activity
+workflow to main. PR #19 includes its tested teacher-dashboard and student-entry prerequisites
+(PRs #17/#18), plus saved multi-file module projects and automatic per-student progression.
+Implementation `13e68a0`; final verification: 98 tests passed, 0 failed/skipped, production build
+passed, lint 0 errors/8 existing warnings. See [student module activities](student-module-activities.md).
 
-The exact Week 14 JSON renders five lesson sections, eleven steps and 17 digital pages. Full
-build/offline build and lint passed (eight existing warnings); 69 tests passed. See
-[stage-four.md](stage-four.md) and [worksheet verification](../verification/printed-module-worksheet.md).
-The existing Step 1 starter-file execution issue **CKB-038 still awaits separate approval**.
-The merge request does not authorize that additional backend change. Uncommitted teacher-dashboard
-work in the local checkout was left untouched. No hosted setting or database migration was applied.
+The earlier classroom UI, drawer animation and printed worksheet were already delivered on main
+through PRs #14–16 (including main commits `8464d73` and `704565a`). Their history is preserved.
+CKB-038 is now resolved for the approved student activity project path. No hosted setting or
+hosted database change was made. This explicit main delivery is not standing permission to merge
+future work.
 
 ## The job
 

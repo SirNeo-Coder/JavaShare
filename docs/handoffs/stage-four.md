@@ -1,6 +1,14 @@
 # Stage four handoff (module viewer redesign)
 
-**Status: classroom Figma UI, drawer animation (PR #15) and printed worksheet (PR #16) delivered to main under the teacher's explicit 2026-10-20 merge request. Exact JSON verified; 69 tests passed. CKB-038 starter-file execution compatibility still awaits separate scope approval.** Last updated: 2026-10-20.
+**Status: classroom UI, drawer animation and printed worksheet are on main (PRs #14–16).
+The teacher approved the student activity workflow and explicitly requested its main delivery
+on 2026-10-20. PR #19 includes the teacher dashboard and student-entry prerequisites, saved
+multi-file module projects, and automatic progression. Final verification: 98/98 tests, build
+passed, lint 0 errors/8 existing warnings. CKB-038 is resolved for student projects.**
+
+See [student-module-activities.md](student-module-activities.md) for the current handoff and
+[teacher-progress-dashboard.md](teacher-progress-dashboard.md) for the teacher dashboard.
+Earlier pending proposals below are historical and superseded by these approved changes.
 
 ## What the teacher asked for
 

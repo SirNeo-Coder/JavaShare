@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./apiClient";
 import { groupModuleParts, modulePartPages } from "./moduleParts";
+import { activityStateId } from "../backend/src/module-activities";
 import ModuleCatalogCard from "./ModuleCatalogCard";
 
 // CodeEditor (the full syntax-highlighted editor) renders invisible text when there are many
@@ -33,8 +34,10 @@ async function runFiles(files: ModuleFile[]) {
   return result.output;
 }
 
-type ModuleFile = { path: string; content: string };
+export type ModuleFile = { path: string; content: string };
 export type StepBlock = {
+  locked?: boolean;
+  activity?: { instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string };
   part?: string;
   type: "step";
   id: string;
@@ -69,12 +72,12 @@ type PerformanceTask = {
   totalPoints: number;
 };
 type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
-type AvailabilityChange = { target: "lesson"; lessonId: string; open: boolean } | { target: "performance-task"; open: boolean };
 export type CourseModule = { continues?: string; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
 type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean };
 type StepStatus = "pass" | "fail";
-type Progress = {
+export type Progress = {
   moduleId: string;
+  projectFiles: ModuleFile[];
   percent: number;
   updatedAt: string;
   // Covers both step blocks and a lesson's exitSlip, keyed by whichever's own "id" - one flag
@@ -83,7 +86,7 @@ type Progress = {
   performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>>;
 };
 
-type Props = { role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
+type Props = { onStartActivity?: (module: CourseModule, step: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
 
 function isStepBlock(block: Block): block is StepBlock {
   return block.type === "step";
@@ -136,75 +139,34 @@ export function ModulePaperBlock({ block }: { block: OtherBlock }) {
   </div>;
 }
 
-function StepView({
-  step, classroomId, moduleId, status, onChecked, role, printed = false,
-}: { printed?: boolean; step: StepBlock; classroomId: string; moduleId: string; status?: StepStatus; onChecked: (progress: Progress) => void; role: "teacher" | "student" }) {
+function StepView({ step, status, role, printed = false, onStart }: {
+  step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; onStart?: () => Promise<void>;
+}) {
   const [files, setFiles] = useState(step.files);
-  const [practising, setPractising] = useState(false);
   const [output, setOutput] = useState<string | null>(null);
-  const [running, setRunning] = useState(false);
-  const canRun = step.language === "java";
-  // A teacher previewing a module has no progress of their own to save (module_progress is
-  // student-only) - they can still run a Java step to check it works, but nothing is persisted.
-  const canSaveProgress = role === "student";
-
-  // Saving the step's result is a separate try/catch from running it: a save failure must not
-  // overwrite the real program output that already printed above it.
-  const saveStepResult = async (status: StepStatus) => {
-    try {
-      const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: step.id, status }) });
-      onChecked(updated);
-    } catch (saveError) {
-      setOutput((current) => `${current ?? ""}\n\n(Could not save this result: ${saveError instanceof Error ? saveError.message : "try again"})`);
-    }
-  };
-
+  const [busy, setBusy] = useState(false);
   const run = async () => {
-    setRunning(true);
-    try {
-      if (canRun) {
-        const result = await runFiles(files);
-        setOutput(result);
-        if (canSaveProgress) await saveStepResult(result.trim() === step.expectedOutput.trim() ? "pass" : "fail");
-      } else if (canSaveProgress) {
-        await saveStepResult("pass");
-      }
-    } catch (error) {
-      setOutput(error instanceof Error ? error.message : "Could not run this step");
-    } finally {
-      setRunning(false);
-    }
+    setBusy(true);
+    try { if (role === "student") await onStart?.(); else setOutput(await runFiles(files)); }
+    catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
+    finally { setBusy(false); }
   };
-
-  const showActions = canRun || canSaveProgress;
-
-  return (
-    <div className="module-step">
-      <div className="module-step-head">
-        <b>Step {step.number}</b>
-        {status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Passed" : "Try again"}</span>}
-      </div>
-      <Markdown markdown={step.instruction} />
-      {printed && <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>}
-      {printed && <><b>Output (expected):</b><pre className="printed-output">{step.expectedOutput}</pre><button type="button" className="worksheet-practise" aria-expanded={practising} onClick={() => setPractising(!practising)}>{practising ? "Hide practice editor" : "Practise this step"}</button></>}
-      <div hidden={printed && !practising} className="module-practice">
-      <ModuleFileEditors
-        files={files}
-        onChange={(index, value) => setFiles((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, content: value } : item)))}
-      />
-      {showActions && (
-        <div className="module-step-actions">
-          <button type="button" onClick={run} disabled={running}>
-            {running ? "Running…" : canRun ? (canSaveProgress ? "Run & check" : "Run") : "Mark done"}
-          </button>
-          {!canRun && canSaveProgress && <small>This language runs in your own project — run it there, then mark this step done.</small>}
-        </div>
-      )}
-      {output !== null && <pre className="module-step-output">{output}</pre>}
-      </div>
-      {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
-    </div>
-  );
+  if (step.locked) return <p className="module-preview-note">Complete the previous part to unlock this activity.</p>;
+  return <div className="module-step">
+    <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Passed" : "Try again"}</span>}</div>
+    <Markdown markdown={step.instruction} />
+    <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>
+    <b>Output (expected):</b><pre className="printed-output">{step.expectedOutput}</pre>
+    {role === "student" && <div className="paper-instructions">
+      <b>Your activity</b><Markdown markdown={step.activity?.instruction ?? step.instruction} />
+      {!step.activity && <p>This module uses the original step as its activity. A separate challenge has not been added yet.</p>}
+      <b>Required output:</b><pre className="printed-output">{step.activity?.expectedOutput ?? step.expectedOutput}</pre>
+      {step.language === "java" ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java only.</p>}
+    </div>}
+    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
+    {output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
+    {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
+  </div>;
 }
 
 function PerformanceTaskSlot({
@@ -265,13 +227,14 @@ function PerformanceTaskSlot({
 // fetches it for them - an empty stub keeps the rendering below (stepStates/performanceTask
 // lookups) uniform, and role flags below hide anything progress-dependent (goal meter, checkboxes,
 // submit buttons, status chips) for that role.
-const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {}, percent: 0, updatedAt: "" });
+const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {}, projectFiles: [], percent: 0, updatedAt: "" });
 
-export function ModuleContent({ module, classroomId, role, onAvailabilityChanged, paged = false, worksheet = false }: { worksheet?: boolean; paged?: boolean; module: CourseModule; classroomId: string; role: "teacher" | "student"; onAvailabilityChanged: (availability: Availability) => void }) {
+export function ModuleContent({ module, classroomId, role, paged = false, worksheet = false, onStartActivity, progressRevision = 0 }: {
+  worksheet?: boolean; paged?: boolean; module: CourseModule; classroomId: string; role: "teacher" | "student";
+  onStartActivity?: (module: CourseModule, step: StepBlock) => Promise<void>; progressRevision?: number;
+}) {
   const [progress, setProgress] = useState<Progress | null>(role === "teacher" ? emptyProgress(module.id) : null);
   const [error, setError] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [savingAvailability, setSavingAvailability] = useState(false);
   const [lessonPage, setLessonPage] = useState(0);
   const [paperPage, setPaperPage] = useState(0);
   const applyProgress = (updated: Progress) => setProgress((current) => !current || updated.updatedAt >= current.updatedAt ? updated : current);
@@ -283,30 +246,10 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
       .then((loaded) => { if (active) setProgress(loaded); })
       .catch((loadError) => { if (active) setError(loadError instanceof Error ? loadError.message : "Could not load progress"); });
     return () => { active = false; };
-  }, [classroomId, module.id, role]);
+  }, [classroomId, module.id, role, progressRevision]);
 
   if (error) return <p className="module-error">{error}</p>;
   if (!progress) return <p>Loading your progress…</p>;
-
-  const markExitSlip = async (exitSlipId: string) => {
-    try {
-      const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/step`, { method: "PUT", body: JSON.stringify({ stepId: exitSlipId, status: "pass" }) });
-      applyProgress(updated);
-    } catch (markError) {
-      setActionError(markError instanceof Error ? markError.message : "Could not mark the exit slip done");
-    }
-  };
-
-  const changeAvailability = async (change: AvailabilityChange) => {
-    setSavingAvailability(true);
-    setActionError(null);
-    try {
-      const availability = await api<Availability>(`/api/classrooms/${classroomId}/modules/${module.id}/availability`, { method: "PATCH", body: JSON.stringify(change) });
-      onAvailabilityChanged(availability);
-    } catch (saveError) {
-      setActionError(saveError instanceof Error ? saveError.message : "Could not save lesson availability");
-    } finally { setSavingAvailability(false); }
-  };
 
   if (worksheet) {
     const parts = groupModuleParts(module);
@@ -318,11 +261,10 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
     const totalPages = pages.length + Number(hasTask);
     const currentPage = Math.min(paperPage, totalPages - 1);
     const current = pages[currentPage];
-    const partDone = (part: typeof parts[number]) => !part.closed && part.blocks.filter(isStepBlock).every((step) => progress.stepStates[step.id] === "pass") && part.exitLessons.every((lesson) => progress.stepStates[lesson.exitSlip.id] === "pass");
+    const partDone = (part: typeof parts[number]) => !part.closed && part.blocks.filter(isStepBlock).every((step) => progress.stepStates[activityStateId(step)] === "pass");
     const taskDone = progress.performanceTask.sample?.status === "pass" && progress.performanceTask.own?.status === "pass";
     const completed = parts.filter(partDone).length + Number(hasTask && taskDone);
     return <div className="worksheet-content">
-      {actionError && <p className="module-error" role="alert">{actionError}</p>}
       {role === "teacher" && <p className="module-preview-note">Teacher preview — running code does not save student progress.</p>}
       <div className="worksheet-progress">
         <div><span><small>MODULE PROGRESS</small>{role === "student" ? `${completed} of ${parts.length + Number(hasTask)} parts completed` : "Teacher preview"}</span>{role === "student" && <b>{progress.percent}%</b>}</div>
@@ -338,19 +280,17 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
           {!page.step && <>
             {index === 0 && <><header className="paper-title"><h2>Self-Paced Module: {module.title.replace(/^Self-Paced Module:\s*/i, "")}</h2><p>{module.course.toUpperCase()} · Week {module.week}{module.continues ? ` · Continues ${module.continues}` : ""}</p></header><table className="paper-schedule"><thead><tr><th>Day</th><th>Topic</th></tr></thead><tbody>{module.lessons.map((lesson) => <tr key={lesson.id}><td>{lesson.dayLabel}</td><td>{lesson.title}</td></tr>)}</tbody></table></>}
             <h3 className="paper-heading">{page.part.title}</h3>
-            {role === "teacher" && page.part.lessons.map((lesson) => <label key={lesson.id} className="module-availability"><input type="checkbox" checked={module.availability.openLessonIds.includes(lesson.id)} disabled={savingAvailability} onChange={(event) => void changeAvailability({ target: "lesson", lessonId: lesson.id, open: event.target.checked })} />Open to students — {lesson.title}</label>)}
-            {page.part.closed ? <p className="module-preview-note">Not open yet</p> : <>
+            {page.part.closed ? <p className="module-preview-note">Complete the previous part first</p> : <>
               {page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}
-              {page.part.blocks.filter(isStepBlock).length > 0 && <div className="paper-instructions"><b>Work through this part</b><p>Read the discussion, then open each step above. Type and run the sample code in its practice editor.</p></div>}
-              {!page.part.blocks.some(isStepBlock) && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <label><input type="checkbox" checked={progress.stepStates[lesson.exitSlip.id] === "pass"} onChange={() => progress.stepStates[lesson.exitSlip.id] !== "pass" && markExitSlip(lesson.exitSlip.id)} />Mark exit slip done</label>}</div>)}
+              {page.part.blocks.filter(isStepBlock).length > 0 && <div className="paper-instructions"><b>Work through this part</b><p>Read the discussion, then open each step above. Choose Work in code editor to complete the activity in your saved module project.</p></div>}
+              {!page.part.blocks.some(isStepBlock) && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}
             </>}
           </>}
-          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed step={page.step} classroomId={classroomId} moduleId={module.id} status={progress.stepStates[page.step.id]} onChecked={applyProgress} role={role} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <label><input type="checkbox" checked={progress.stepStates[lesson.exitSlip.id] === "pass"} onChange={() => progress.stepStates[lesson.exitSlip.id] !== "pass" && markExitSlip(lesson.exitSlip.id)} />Mark exit slip done</label>}</div>)}</>}
+          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={() => onStartActivity?.(module, page.step!) ?? Promise.resolve()} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
         </article>)}
         {hasTask && <article className="worksheet-paper" hidden={currentPage !== pages.length} aria-label="Performance task">
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
-          {role === "teacher" && <label className="module-availability"><input type="checkbox" checked={module.availability.performanceTaskOpen} disabled={savingAvailability} onChange={(event) => void changeAvailability({ target: "performance-task", open: event.target.checked })} />Open to students</label>}
-          {module.closedPerformanceTask && <p className="module-preview-note">Not open yet</p>}
+          {module.closedPerformanceTask && <p className="module-preview-note">Complete the previous part first</p>}
           {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
             <PerformanceTaskSlot label="Sample code" files={module.performanceTask.exampleFiles} classroomId={classroomId} moduleId={module.id} variant="sample" role={role} submitted={progress.performanceTask.sample?.status} onSubmitted={applyProgress} />
             <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role} submitted={progress.performanceTask.own?.status} onSubmitted={applyProgress} />
@@ -366,8 +306,7 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
 
   return (
     <div className="module-content">
-      {actionError && <p className="module-error">{actionError}</p>}
-      {role === "teacher" && <p className="module-preview-note">Teacher preview — running code does not save student progress. Availability switches are saved for this class.</p>}
+      {role === "teacher" && <p className="module-preview-note">Teacher preview — students unlock parts by completing their activities. Running sample code does not save student progress.</p>}
       {role === "student" && (
         <div className="activity-progress module-goal-meter">
           <div><span>Module progress</span><b>{progress.percent}%</b></div>
@@ -376,7 +315,7 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
       )}
       {paged && <nav className="module-parts" aria-label="Module lessons">
         {module.lessons.map((lesson, index) => {
-          const done = !lesson.closed && progress.stepStates[lesson.exitSlip.id] === "pass" && lesson.blocks.filter(isStepBlock).every((step) => progress.stepStates[step.id] === "pass");
+          const done = !lesson.closed && lesson.blocks.filter(isStepBlock).every((step) => progress.stepStates[activityStateId(step)] === "pass");
           return <button key={lesson.id} type="button" aria-current={lessonPage === index ? "step" : undefined} onClick={() => setLessonPage(index)} className={done ? "part-done" : ""}><i aria-hidden="true">{done ? "✓" : lesson.closed ? "⊘" : index + 1}</i><span>{lesson.title}</span></button>;
         })}
         {(module.performanceTask || module.closedPerformanceTask) && <button type="button" aria-current={lessonPage === module.lessons.length ? "step" : undefined} onClick={() => setLessonPage(module.lessons.length)}><i aria-hidden="true">★</i><span>Performance task</span></button>}
@@ -384,23 +323,15 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
       {module.lessons.map((lesson, index) => (
         <section key={lesson.id} className="module-lesson" hidden={paged && index !== lessonPage}>
           <h3>{lesson.dayLabel ? `${lesson.dayLabel} — ${lesson.title}` : lesson.title}</h3>
-          {role === "teacher" && (
-            <label className="module-availability">
-              <input type="checkbox" checked={module.availability.openLessonIds.includes(lesson.id)} disabled={savingAvailability} onChange={(event) => void changeAvailability({ target: "lesson", lessonId: lesson.id, open: event.target.checked })} />
-              Open to students
-            </label>
-          )}
-          {lesson.closed ? <p className="module-preview-note">Not open yet</p> : <>
+          {lesson.closed ? <p className="module-preview-note">Complete the previous part first</p> : <>
           {lesson.blocks.map((block, index) =>
             isStepBlock(block) ? (
               <StepView
                 key={block.id}
                 step={block}
-                classroomId={classroomId}
-                moduleId={module.id}
-                status={progress.stepStates[block.id]}
-                onChecked={applyProgress}
+                status={progress.stepStates[activityStateId(block)]}
                 role={role}
+                onStart={() => onStartActivity?.(module, block) ?? Promise.resolve()}
               />
             ) : (
               <ModulePaperBlock key={index} block={block} />
@@ -409,16 +340,7 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
           <div className="module-exit-slip">
             <b>Exit slip</b>
             {lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}
-            {role === "student" && (
-              <label>
-                <input
-                  type="checkbox"
-                  checked={progress.stepStates[lesson.exitSlip.id] === "pass"}
-                  onChange={() => progress.stepStates[lesson.exitSlip.id] !== "pass" && markExitSlip(lesson.exitSlip.id)}
-                />
-                Mark exit slip done
-              </label>
-            )}
+            {role === "student" && <p>Write your liplet answers on paper and submit them to your teacher.</p>}
           </div>
           </>}
         </section>
@@ -426,12 +348,6 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
       {module.performanceTask && (
         <section className="module-lesson" hidden={paged && lessonPage !== module.lessons.length}>
           <h3>{module.performanceTask.title}</h3>
-          {role === "teacher" && (
-            <label className="module-availability">
-              <input type="checkbox" checked={module.availability.performanceTaskOpen} disabled={savingAvailability} onChange={(event) => void changeAvailability({ target: "performance-task", open: event.target.checked })} />
-              Open to students
-            </label>
-          )}
           <Markdown markdown={module.performanceTask.markdown} />
           <ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
           <PerformanceTaskSlot
@@ -447,13 +363,13 @@ export function ModuleContent({ module, classroomId, role, onAvailabilityChanged
         </section>
       )}
       {module.closedPerformanceTask && (
-        <section className="module-lesson" hidden={paged && lessonPage !== module.lessons.length}><h3>{module.closedPerformanceTask.title}</h3><p className="module-preview-note">Not open yet</p></section>
+        <section className="module-lesson" hidden={paged && lessonPage !== module.lessons.length}><h3>{module.closedPerformanceTask.title}</h3><p className="module-preview-note">Complete the previous part first</p></section>
       )}
     </div>
   );
 }
 
-export default function ModuleViewer({ role, classroomId, initialModuleId, embedded = false, drawer = false, active = true, worksheet = false, onOpenModule, onClose }: Props) {
+export default function ModuleViewer({ role, classroomId, initialModuleId, embedded = false, drawer = false, active = true, worksheet = false, onOpenModule, onClose, onStartActivity, progressRevision = 0 }: Props) {
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [selected, setSelected] = useState<CourseModule | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -480,7 +396,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
       .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Could not load modules"));
   }, [classroomId, initialModuleId, openModule]);
 
-  useEffect(() => { if (!drawer) refreshList(); }, [drawer, refreshList]);
+  useEffect(() => { if (!drawer) refreshList(); }, [drawer, refreshList, progressRevision]);
 
   useEffect(() => {
     if (!drawer || !active) return;
@@ -532,7 +448,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             {drawer && !selected && <p>Continue a lesson or revisit what you’ve learned.</p>}
           </div>
           {embedded ? (
-            selected && <button type="button" onClick={() => worksheet ? onClose?.() : setSelected(null)}>{worksheet ? "← All modules" : "Back to modules"}</button>
+            selected && <button type="button" onClick={() => worksheet || (initialModuleId && onClose) ? onClose?.() : setSelected(null)}>{worksheet ? "← All modules" : "Back to modules"}</button>
           ) : (
             <button type="button" onClick={() => selected && !initialModuleId ? setSelected(null) : onClose?.()} aria-label={selected && !initialModuleId ? "Back to modules" : "Close"}>×</button>
           )}
@@ -559,7 +475,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             ))}
           </div>
         )}
-        {selected && <ModuleContent key={selected.id} worksheet={worksheet} paged={drawer} module={selected} classroomId={classroomId} role={role} onAvailabilityChanged={(availability) => setSelected((current) => current && { ...current, availability })} />}
+        {selected && <ModuleContent key={selected.id} worksheet={worksheet} paged={drawer} module={selected} classroomId={classroomId} role={role} onStartActivity={onStartActivity} progressRevision={progressRevision} />}
     </>
   );
 

@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 import { jwtVerify, SignJWT } from "jose";
 import { z } from "zod";
 import { courseModule } from "./course-module-schema.ts";
+import { sourcePath, type ModuleFile } from "./module-activities.ts";
 import { database } from "./database.ts";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "./file-paths.ts";
 import { broadcast, realtimePass } from "./realtime.ts";
@@ -24,9 +25,12 @@ import {
   endSupabaseActivity,
   getSupabaseModule,
   getSupabaseModuleProgress,
+  prepareSupabaseModuleActivity,
+  runSupabaseModuleActivity,
   getSupabaseStudentWebProject,
   joinSupabaseClass,
   listSupabaseClassroomStudents,
+  getSupabaseTeacherClassProgress,
   listSupabaseModules,
   listSupabaseModuleProgressSummary,
   listSupabaseMessages,
@@ -223,6 +227,11 @@ app.delete("/api/teacher/students/:studentId", requireAuth, requireTeacher, asyn
 // student's module-progress summary - see listSupabaseModuleProgressSummary below.
 app.get("/api/classes/:classroomId/students", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
   try { return res.json(await listSupabaseClassroomStudents(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.get("/api/classes/:classroomId/module-progress", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseTeacherClassProgress(req.user!, z.string().uuid().parse(req.params.classroomId))); }
   catch (error) { next(error); }
 });
 
@@ -498,10 +507,11 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-tas
 // separate from the two performance-task submissions above.
 app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/project", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const { files } = z.object({
+    const { files, updatedAt } = z.object({
       files: z.array(z.object({ path: z.string().trim().min(1).max(160), content: z.string().max(200000) })).min(1).max(50),
+      updatedAt: z.string().datetime({ offset: true }).optional(),
     }).parse(req.body);
-    return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files));
+    return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt));
   } catch (error) { next(error); }
 });
 
@@ -558,31 +568,52 @@ app.delete("/api/classrooms/:classroomId/modules/:moduleId", requireAuth, async 
   catch (error) { next(error); }
 });
 
-type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; message?: string; status?: { description?: string } };
+const javaPath = z.string().trim().min(1).max(JAVA_PATH_MAX_LENGTH).transform((value) => value.replace(/\\/g, "/")).refine((value) => JAVA_PATH.test(value) && !value.includes(".."));
+const javaFiles = z.array(z.object({ path: javaPath, content: z.string().max(200000) })).min(1).max(50)
+  .refine((files) => new Set(files.map((file) => sourcePath(file.path))).size === files.length, "Each Java source file must have a different path");
+
+type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; message?: string; status?: { id?: number; description?: string } };
+
+async function executeJava(userId: string, files: ModuleFile[], stdin: string) {
+  if (!process.env.JUDGE0_URL && localJavaEnabled) {
+    const lastRun = lastExecution.get(userId) || 0;
+    if (Date.now() - lastRun < 1500) throw new SupabaseRepositoryError(429, "Please wait briefly before running again");
+    if (activeExecutions >= 2) throw new SupabaseRepositoryError(429, "The classroom runner is busy; try again shortly");
+    lastExecution.set(userId, Date.now());
+    activeExecutions += 1;
+    const { executeLocallyResult } = await import("./java-runner.ts");
+    try { return { mode: "local", ...await executeLocallyResult(files, stdin) }; }
+    finally { activeExecutions -= 1; }
+  }
+  if (!process.env.JUDGE0_URL) return { mode: "demo", success: false, output: "Java execution is not configured. Enable the guarded local runner for development or connect Judge0.\n\n[Demo execution mode]" };
+  if (files.length > 1) throw new SupabaseRepositoryError(501, "Multi-file execution requires the classroom local Java runner");
+  const response = await fetch(`${process.env.JUDGE0_URL.replace(/\/$/, "")}/submissions?base64_encoded=false&wait=true`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(process.env.JUDGE0_API_KEY ? { "X-Auth-Token": process.env.JUDGE0_API_KEY } : {}) },
+    body: JSON.stringify({ source_code: files[0].content, stdin, language_id: 62, cpu_time_limit: 3, memory_limit: 128000 }),
+  });
+  if (!response.ok) throw new SupabaseRepositoryError(502, `Judge0 returned ${response.status}`);
+  const result = await response.json() as JudgeResult;
+  return { mode: "judge0", success: result.status?.id === 3 && !result.stderr && !result.compile_output, output: result.compile_output || result.stderr || result.stdout || result.message || result.status?.description || "" };
+}
 
 app.post("/api/execute", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const javaPath = z.string().trim().min(1).max(JAVA_PATH_MAX_LENGTH).transform((value) => value.replace(/\\/g, "/")).refine((value) => JAVA_PATH.test(value) && !value.includes(".."));
-    const { files, stdin = "" } = z.object({ files: z.array(z.object({ path: javaPath, content: z.string().max(200000) })).min(1).max(50), stdin: z.string().max(10000).optional() }).parse(req.body);
-    if (!process.env.JUDGE0_URL && localJavaEnabled) {
-      const lastRun = lastExecution.get(req.user!.id) || 0;
-      if (Date.now() - lastRun < 1500) return res.status(429).json({ error: "Please wait briefly before running again" });
-      if (activeExecutions >= 2) return res.status(429).json({ error: "The classroom runner is busy; try again shortly" });
-      lastExecution.set(req.user!.id, Date.now());
-      activeExecutions += 1;
-      const { executeLocally } = await import("./java-runner.ts");
-      try { return res.json({ mode: "local", output: await executeLocally(files, stdin) }); }
-      finally { activeExecutions -= 1; }
-    }
-    if (!process.env.JUDGE0_URL) return res.json({ mode: "demo", output: "Java execution is not configured. Enable the guarded local runner for development or connect Judge0.\n\n[Demo execution mode]" });
-    if (files.length > 1) return res.status(501).json({ error: "Multi-file execution requires the classroom local Java runner" });
-    const response = await fetch(`${process.env.JUDGE0_URL.replace(/\/$/, "")}/submissions?base64_encoded=false&wait=true`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...(process.env.JUDGE0_API_KEY ? { "X-Auth-Token": process.env.JUDGE0_API_KEY } : {}) },
-      body: JSON.stringify({ source_code: files[0].content, stdin, language_id: 62, cpu_time_limit: 3, memory_limit: 128000 }),
-    });
-    if (!response.ok) return res.status(502).json({ error: `Judge0 returned ${response.status}` });
-    const result = await response.json() as JudgeResult;
-    return res.json({ mode: "judge0", output: result.compile_output || result.stderr || result.stdout || result.message || result.status?.description || "Program completed without output." });
+    const { files, stdin = "" } = z.object({ files: javaFiles, stdin: z.string().max(10000).optional() }).parse(req.body);
+    return res.json(await executeJava(req.user!.id, files, stdin));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/activity", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { stepId } = z.object({ stepId: z.string().trim().min(1).max(100) }).parse(req.body);
+    return res.json(await prepareSupabaseModuleActivity(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/run", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { stepId, files, updatedAt } = z.object({ stepId: z.string().trim().min(1).max(100), files: javaFiles, updatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
+    return res.json(await runSupabaseModuleActivity(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId, files, updatedAt, (sources, stdin) => executeJava(req.user!.id, sources, stdin)));
   } catch (error) { next(error); }
 });

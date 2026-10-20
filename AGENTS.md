@@ -94,3 +94,13 @@ Keep the rolling handoff for the current stage current: `docs/handoffs/stage-one
 - Say which checks test a rule on its own and which go through the real app, and say plainly when one kind does not exist.
 - Prove a regression test catches the bug: break the fix, show the test failing, restore it, show it passing. Say so if this was not done.
 - Report failures, skips, and untested areas as prominently as passes.
+
+## Student module activities (agreed 2026-10-20)
+
+- JSON keeps worked examples separate from student activities and their required output.
+- Students edit and run activities in the main code editor, using one saved project per module
+  per student per class, including all supporting Java classes. Preserve previous and current work.
+- Successful code execution with the required output completes a task; all tasks in a part unlock
+  the next part automatically for that student. Teacher availability switches do not gate progress.
+- Handwritten liplets are submitted to the teacher and assessed separately; they do not block
+  student progression. Output completion is not a grade or proof of conceptual understanding.

@@ -12,6 +12,7 @@ All in `backend/src/`: `routes.ts` (every route, sign-in, the Java endpoint; `ha
 | Teacher admin | `GET /api/teacher/students` (also returns `classroomIds` for the live "Online" status), `POST .../:studentId/reset-password`, `PATCH`/`DELETE /api/teacher/students/:studentId`, `PUT .../photo`, `PUT /api/teacher/profile/photo`, `GET /api/teacher/activity-summary` |
 | Classes | `POST /api/classes` (teacher-only, creates an additional class with its own join code), `POST /api/classes/join`, `GET /api/bootstrap` (no `classroomId`: the class list only, no workspace data; each summary includes `liveSessionId` derived from the current activity/presentation id for invitation dismissal; with `?classroomId=`: that one class's full workspace, scoped so no other classroom's teams/activities can appear), `POST /api/classes/:id/auto-group`, activities (`POST .../activities`, `end-activity`, `.../reopen`, `DELETE`), `PUT .../chat-mute`, `GET`/`POST .../live-share`, `POST .../web-projects` (students only) |
 | Teams | `GET`/`POST /api/teams/:id/messages`, `PUT .../group-profile`, `PUT .../group-permissions` |
+| Teacher module dashboard | `GET /api/classes/:classroomId/module-progress` (class teacher only). Current roster, uploaded module metadata, per-student percentages and class totals; reuses `moduleCompletionPercent`, reads progress in pages, returns no student source or new progress rows |
 | Teacher web-project review | `GET /api/classes/:classroomId/students/:studentId/web-projects` (list metadata), `GET .../:projectId` (one project and saved files). Teacher-only; verifies class ownership, current student membership, personal workspace ownership, class, web language and no activity |
 | Files and projects | `PUT /api/files/:id` (save; needs matching `version` for groups), `PATCH /api/files/:id` (rename), `POST /api/projects/:id/files`, `POST .../submit`, saved work (`GET`/`POST .../saved-work`, `PUT /api/saved-work/:id`, `POST .../restore`), `GET /api/submissions` |
 | Course modules | `GET`/`POST /api/classrooms/:classroomId/modules`, `GET`/`DELETE .../:moduleId`, `PATCH .../:moduleId/availability` (class teacher only; lesson id + boolean, or performance-task boolean), `GET .../summary`, `GET .../:moduleId/progress`, `PUT .../:moduleId/progress/step`, `PUT .../:moduleId/progress/performance-task` |
@@ -32,8 +33,26 @@ Private channels `team:<teamId>` and `class:<classroomId>` (policies in `supabas
 
 Nothing live is kept in server memory any more. File saves emit `file:updated`. Live-share and invitation safety checks run on opening the screen, returning to the tab, and channel (re)connection; there is no 2-second polling timer.
 
-## Module availability
+## Module activities and saved projects
 
-`getSupabaseModule` returns full content to the class teacher. Students receive open lessons, closed lesson title stubs, and either the open performance task or its title stub. Closed instructions, questions, expected output and supplied code are withheld server-side, including top-level starter files. Original JSON stays intact.
-
-Progress reads/writes require an uploaded module; step writes also require a real step/exit-slip id in an open lesson, and task writes require an existing open task (CKB-018). Progress replies include `percent` from the whole module and `updatedAt`; the viewer ignores older save replies. Closing content preserves progress and submissions. Availability updates retry against `updated_at` so concurrent teacher tabs retain separate switch changes. No new live event: students close and reopen the module to refresh availability.
+- `POST /api/classrooms/:id/modules/:moduleId/progress/activity` prepares the selected unlocked
+  step's project. It combines supporting starter files, optional activity files and the student's
+  optional preceding module project, keeping the current project's existing files.
+- `POST .../progress/run` validates Java source paths, membership, the existing weekly live lock,
+  the activity's existence and its part's prerequisites. It saves the project, runs it through
+  the existing rate/concurrency-limited Java runner, and writes pass/fail from the actual result.
+  Demo mode never passes. A previous pass survives later failed practice runs.
+- `PUT .../progress/project` accepts optional `updatedAt`; new editor clients must supply it so
+  a stale tab cannot overwrite a newer project. A project changed while compiling cannot receive
+  a result for the earlier source. Existing clients remain compatible.
+- `GET .../modules/:moduleId` returns all content to the teacher. Students receive unlocked
+  parts plus locked step placeholders, without future instructions, code, output or questions.
+  Base supporting starter files are available to initialize the shared project. Completed parts
+  stay accessible. Successful checks refresh the worksheet immediately without polling.
+- Direct `PUT .../progress/step` code pass flags are refused. Old paper liplet writes remain
+  compatible, but do not affect percentages or unlocking. A new `activity` uses a separate saved
+  state key (`<step id>:activity`), so an old sample pass cannot satisfy a new challenge.
+- Completion counts passed activities plus the two existing performance-task submissions.
+  Liplets are assessed on paper. The task opens after all lesson activities pass; its submission
+  workflow is unchanged. Teacher availability writes remain teacher-only for older clients,
+  but the old switches no longer control student access. No new database migration or live event.

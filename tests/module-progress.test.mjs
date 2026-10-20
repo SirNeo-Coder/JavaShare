@@ -54,12 +54,11 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     assert.deepEqual(empty, { moduleId, stepStates: {}, performanceTask: {}, projectFiles: [], percent: 0, updatedAt: empty.updatedAt });
     assert.equal(typeof empty.updatedAt, "string");
 
-    const afterStep = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "pass" }) })).json();
-    assert.deepEqual(afterStep.stepStates, { [step.id]: "pass" });
-
-    // A later run can flip the same step to fail (the student re-ran and broke it).
-    const afterFail = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "fail" }) })).json();
-    assert.deepEqual(afterFail.stepStates, { [step.id]: "fail" });
+    // Code results must come from the runner, never a client-supplied pass/fail flag.
+    assert.equal((await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "pass" }) })).status, 403);
+    // Seed completed activities for these paper-record/submission persistence checks.
+    const passedSteps = Object.fromEntries(fixture.lessons.flatMap((lesson) => lesson.blocks.filter((block) => block.type === "step").map((block) => [block.id, "pass"])));
+    await admin.from("module_progress").update({ step_states: passedSteps }).eq("student_id", student.id).eq("classroom_id", classroomId).eq("module_id", moduleId);
 
     // An exit slip is marked done the same way as a step - through the same route, keyed by the
     // exit slip's own id (CKB-007: one flag per module couldn't tell lessons apart).
@@ -83,7 +82,7 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     assert.equal(afterOwn.performanceTask.own.status, "fail");
 
     const final = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
-    assert.deepEqual(final.stepStates, { [step.id]: "fail", [exitSlipId]: "pass" });
+    assert.deepEqual(final.stepStates, { ...passedSteps, [exitSlipId]: "pass" });
     assert.equal(final.performanceTask.sample.status, "pass");
     assert.equal(final.performanceTask.own.status, "fail");
 
@@ -171,7 +170,7 @@ test("module progress: a module in two classrooms doesn't share one student's pr
     ]);
     const login = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: student.user.email, password }) });
     const cookie = login.headers.get("set-cookie").split(";")[0];
-    const step = fixture.lessons[0].blocks[0];
+    const step = fixture.lessons[0].exitSlip;
 
     await call(`/api/classrooms/${classroomA.id}/modules/${moduleId}/progress/step`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ stepId: step.id, status: "pass" }) });
 
@@ -215,6 +214,7 @@ test("module progress: two simultaneous performance-task submissions don't lose 
     // Force the row to already exist, so both submissions below race on the same read-merge-write
     // instead of also racing on first-touch creation (that race is covered by the test above).
     await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } });
+    await admin.from("module_progress").update({ step_states: Object.fromEntries(fixture.lessons.flatMap((lesson) => lesson.blocks.filter((block) => block.type === "step").map((block) => [block.id, "pass"]))) }).eq("student_id", student.user.id).eq("classroom_id", classroomId).eq("module_id", moduleId);
 
     // The student submits the sample-code run and their own version at nearly the same time
     // (e.g. two browser tabs, or a slow network making two "Run" clicks overlap). Both submissions
