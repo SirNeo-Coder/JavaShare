@@ -14,6 +14,8 @@ import StudentModuleActivity, { type StudentActivity, type ModuleEditorHandle } 
 import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
 import { api, getApiUrl } from "./apiClient";
+import { runJava } from "./javaExecution";
+import JavaRunnerBrand from "./JavaRunnerBrand";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
 import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, releaseRealtimeChannels, throttle } from "./realtime";
 
@@ -1719,17 +1721,14 @@ export default function Home() {
       return;
     }
     setRunning(true);
-    setOutput("Sending Main.java to the classroom Java runner…");
+    setOutput("Starting Java… The first online run may take a little longer.");
     try {
       await persistCurrentCode();
       const files = team.files.map((file) => ({
         path: file.path,
         content: file.id === activeFile?.id ? code : file.content,
       }));
-      const result = await api<{ output: string }>("/api/execute", {
-        method: "POST",
-        body: JSON.stringify({ files, stdin: consoleInput }),
-      });
+      const result = await runJava(files, consoleInput);
       setOutput(result.output);
     } catch (error) {
       setOutput(
@@ -2575,7 +2574,7 @@ export default function Home() {
               </div>
             </section>
             <aside className="right-panel">
-              <div className="workspace-card-heading"><b><span aria-hidden="true">›_</span> Console</b><span className="terminal-status">● Terminal</span></div>
+              <JavaRunnerBrand /><div className="workspace-card-heading"><b><span aria-hidden="true">›_</span> Console</b><span className="terminal-status">● Terminal</span></div>
               <div className="panel-tabs">
                 <button
                   className={panel === "console" ? "active" : ""}
@@ -2748,7 +2747,7 @@ export default function Home() {
                   <span>✓</span>
                   <p>
                     <b>{isWebProject ? "Runs in your browser" : "Java execution enabled"}</b>
-                    <small>{isWebProject ? "Sandboxed preview" : "Teacher computer"}</small>
+                    <small>{isWebProject ? "Sandboxed preview" : "Online or classroom mode"}</small>
                   </p>
                 </div>
               </div>

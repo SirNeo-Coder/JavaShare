@@ -109,3 +109,24 @@ Keep the rolling handoff for the current stage current: `docs/handoffs/stage-one
   the next part automatically for that student. Teacher availability switches do not gate progress.
 - Handwritten liplets are submitted to the teacher and assessed separately; they do not block
   student progression. Output completion is not a grade or proof of conceptual understanding.
+
+## Online Java practice (agreed 2026-10-20)
+
+- Online multi-file Java runs with CheerpJ in the student's browser on a separate
+  public runner origin. Preparing its Cloudflare files/instructions is approved;
+  assistants still never deploy or change hosted settings. No secrets or login
+  routes belong on that public origin. Keep the CheerpJ logo visible where Java runs.
+- Browser-reported success/output may complete online practice samples. The teacher
+  accepts that developer tools can falsify this evidence: it is not grading. Keep
+  server-owned expected output, identity/class/part/live-week checks and saved-version
+  checks. Direct pass flags remain refused. Offline always uses the laptop runner.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

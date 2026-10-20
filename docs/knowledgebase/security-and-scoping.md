@@ -55,3 +55,22 @@ and percentages, without student source files or raw progress maps. Reads do not
 ## Java runner
 
 Local runner only when `LOCAL_JAVA_EXECUTION=true` and either `NODE_ENV` is not production or `CODESHARE_LAPTOP=true` (set by the classroom launcher). Render (production) and Cloudflare never run it. It blocks file, network, process and system APIs by pattern, with a 10-second compile limit, 5-second run limit, 128 MB memory, 64 KB output, at most 2 runs at once, and 1.5 seconds between a student's runs. It is not a full security sandbox.
+
+## Online browser Java (approved 2026-10-20)
+
+`javaExecution.ts` rejects CodeShare's own origin, credentials and non-root runner
+URLs. HTTPS is required except localhost development. Its frame has allow-scripts
+and allow-same-origin **only on the separate public origin**. That origin hosts no
+private app, sessions or Supabase keys. Browser and runner verify message source;
+the parent also checks origin/run id, result types and output length. No source is
+placed in URLs. Every run gets a fresh frame/Java state, removed on result or timeout. CheerpJ /files
+persists locally, so the bridge removes prior interrupted run folders before compiling
+new student code and removes the current folder on normal return/error.
+
+Public runtime CSP allows only its own assets and CheerpJ's official runtime site,
+including CheerpJ's required nested runtime frame. It does not enable top navigation,
+popups or arbitrary network connections. Program execution stops after 5 seconds;
+startup/compile stops after 120 seconds. Combined stdout/stderr is capped at 64 KB.
+The teacher explicitly accepts browser evidence as falsifiable practice completion;
+the authenticated server retains class, part, live-week, version and exact-output checks.
+Offline rejects browser result reporting and never loads CheerpJ. See setup/verification.

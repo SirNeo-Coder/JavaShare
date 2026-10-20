@@ -50,3 +50,9 @@ Search symptoms, user wording, features, and test language here first.
 | [CKB-044](cases/CKB-044-module-project-startup-null.md) | moduleTitle of null, student reload startup crash | missing project/class guard during signed-in loading | resolved; guard mutation failed regression and browser reload passed | `codex/student-module-activities` |
 
 | [CKB-045](cases/CKB-045-weekly-java-project-separation.md) | weekly personal Java project missing, Java Project contains web files, sample output vs challenge | initial slice saved only module working files, performance task had snapshots/inline edits | resolved; 101/101, local browser and three mutation proofs | `codex/weekly-java-projects` |
+
+| [CKB-046](cases/CKB-046-online-java-unavailable.md) | Hosted Java could not run multiple files | All Run code callers used /api/execute; the hosted path had only demo/Judge0, while multi-file javac was laptop-only. No browser integration existed. | resolved; failing mutation, restored checks and real browser | `codex/online-multifile-java` |
+
+| [CKB-047](cases/CKB-047-cheerpj-runtime-frame-blocked.md) | Browser Java stalled during library startup | CheerpJ uses its own nested c.html frame for runtime resource loading (verified in vendor cheerpOS.js ipfCreateIFrame). The first public runtime CSP used frame-src none. | resolved; failing mutation, restored checks and real browser | `codex/online-multifile-java` |
+
+| [CKB-048](cases/CKB-048-cheerpj-flat-source-files.md) | Browser compiler could not find a saved Java source | CheerpJ string-file storage is flat. Nested string paths did not become readable directories. Preserving normal source paths there made javac unable to read them. | resolved; failing mutation, restored checks and real browser | `codex/online-multifile-java` |

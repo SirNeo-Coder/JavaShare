@@ -1436,10 +1436,21 @@ export async function runSupabaseModuleActivity(
     : await setSupabaseModuleProjectFiles(user, classroomId, moduleId, files, updatedAt);
   const result = await execute(files, step.stdin ?? "");
   if (result.mode === "demo") throw new SupabaseRepositoryError(503, "Java execution is unavailable here. Run this activity in offline classroom mode");
+  return recordSupabaseModuleActivityResult(user, classroomId, moduleId, stepId, saved.updatedAt, result);
+}
+
+// Browser results are practice evidence, explicitly approved by the teacher, not grades.
+// Identity, part access, expected output and the saved version remain server controlled.
+export async function recordSupabaseModuleActivityResult(
+  user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string, updatedAt: string,
+  result: { mode: string; success: boolean; output: string },
+) {
+  const { content, step } = await requireModuleActivity(user, classroomId, moduleId, stepId);
+  if (step.language !== "java") throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java only");
   const passed = matchesActivityOutput(result, step.expectedOutput);
   const progress = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     // A changed project must not receive a result from an earlier run.
-    if (row.updated_at !== saved.updatedAt) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
+    if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
     return { step_states: { ...row.step_states, [activityStateId(step)]: row.step_states[activityStateId(step)] === "pass" || passed ? "pass" : "fail" } };
   }, "Could not save the activity result");
   return { ...result, passed, progress: moduleProgressView(progress, content) };

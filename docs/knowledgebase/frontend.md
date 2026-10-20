@@ -23,3 +23,9 @@
 | `app/globals.css` | All styles; dark theme via `html[data-theme="dark"]` |
 
 The browser calls the server with `api()` in `app/page.tsx` (cookies included) and joins live channels through `realtimeClient()` in `app/realtime.ts`.
+
+Online Java uses shared `app/javaExecution.ts` from practice/classroom Run code,
+StudentModuleActivity (module and personal), and ModuleViewer previews. Module runs
+save first, run in browser when configured, then report success/output with saved
+version. Personal/practice runs do not write module completion. JavaRunnerBrand uses
+a locally served CheerpJ logo and is shown only after online execution is requested.

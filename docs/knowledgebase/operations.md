@@ -49,3 +49,13 @@ Never commit filled-in env files or keys.
 ## Known repository clutter (not yet cleaned up)
 
 `logs/classroom.log`, `test.txt` and `supabase/.temp/` are committed. `logs/classroom.log` changes whenever the classroom runs; don't commit those changes.
+
+## Online Java runner
+
+Teacher setup: `docs/online-java-setup.md`. Separate assets-only Worker config:
+`java-runtime/wrangler.jsonc`. Set server runtime `JAVA_RUNNER_URL` to that HTTPS
+root, not CodeShare's origin. No credentials belong on the public Worker. Online
+example uses LOCAL_JAVA_EXECUTION=false; offline stays true and ignores that URL.
+Compiler, source ZIP and notices are committed. Rebuild CodeShare's bridge only when
+its Java source changes: `node scripts/build-java-bridge.mjs`. Normal builds need no
+JDK. Never deploy or change hosted settings automatically.

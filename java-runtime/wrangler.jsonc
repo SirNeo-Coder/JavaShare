@@ -1,0 +1,6 @@
+// Public static Java runner only. No login, API routes, or secrets belong here.
+{
+  "name": "codeshare-java",
+  "compatibility_date": "2026-10-20",
+  "assets": { "directory": "./public" }
+}
