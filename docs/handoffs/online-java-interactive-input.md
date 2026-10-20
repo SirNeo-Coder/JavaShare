@@ -44,11 +44,20 @@ Real production app/local Supabase and actual CheerpJ:
   compatibility-date override (2026-10-19) because the installed binary did not support
   2026-10-20. The committed/hosted configuration was unchanged.
 
-## In progress / next
+## Delivery and remaining teacher checks
 
-Finish final verification report, commit and push feature branch, open PR and merge
-when checks pass under the teacher's explicit instruction. Record PR/merge here.
-Both Cloudflare Workers already follow main, so each should build automatically.
-Read build checks after merging; teacher then refreshes hosted CodeShare and repeats
+Implementation commit: 7930d79, committed and pushed. Pull request:
+https://github.com/SirNeo-Coder/JavaShare/pull/22 (the PR is the authoritative merge status).
+The teacher explicitly authorized merge into main. All feature work and required local
+verification are complete: build passed, 125/125 tests, zero lint errors/eight existing
+warnings, static Worker dry-run and regression failure/restoration proof.
+
+Both Workers already follow main. After the PR merge, check the codeshare and
+codeshare-java automatic production builds, then refresh hosted CodeShare and repeat
 Run -> prompt -> Enter answer. No hosted setting change is needed.
-Hosted interactive flow, disconnected internet, Windows and another Wi-Fi device remain unverified.
+If the app deploys before the runner, its temporary update message means to wait for
+the separate runner build and refresh again.
+
+Hosted interactive flow, disconnected internet, Windows and another Wi-Fi device remain
+unverified. Offline remains input-before-Run by the approved scope. Local test servers
+and disposable fixtures are cleaned up after browser verification; port 3000 is untouched.

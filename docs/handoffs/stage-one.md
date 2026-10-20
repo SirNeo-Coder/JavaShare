@@ -1,8 +1,10 @@
 > Current approved work (2026-10-20): [interactive online Java](online-java-interactive-input.md),
-> branch codex/online-java-interactive-input, based on main after merged PRs #20/#21.
-> The teacher approved live answers during online execution and explicitly requested push/merge.
-> Implementation, real CheerpJ teacher/personal flows, module checks and isolated offline Java
-> passed. Final checks and delivery are being recorded in the feature handoff. No hosted settings changed.
+> branch codex/online-java-interactive-input, implementation 7930d79, [PR #22](https://github.com/SirNeo-Coder/JavaShare/pull/22).
+> Teacher approved live online answers and explicitly requested push/merge. Feature complete:
+> production build passed, 125/125 tests, lint zero errors/eight existing warnings; actual
+> CheerpJ teacher/personal flows, fixed module checks and isolated offline Java verified.
+> Next: both automatic main deployments and the teacher's hosted interactive re-test.
+> No hosted settings changed; original checkout/port 3000 preserved.
 
 > Current approved work (2026-10-20): [online multi-file Java](online-multifile-java.md),
 > branch `codex/online-multifile-java`, stacked on weekly-projects PR #20. Browser
