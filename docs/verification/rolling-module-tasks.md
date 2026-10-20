@@ -1,6 +1,7 @@
 # Rolling module tasks verification
 
-Date: 2026-10-20. Branch: `codex/rolling-module-tasks`.
+Date: 2026-10-20. Branch: `codex/rolling-module-tasks`. Implementation: `f07bb71`.
+Review: [PR #25](https://github.com/SirNeo-Coder/JavaShare/pull/25).
 
 ## Final checks
 
@@ -308,3 +309,10 @@ Command for every file below: `sg docker -c 'npm test -- --test-reporter=spec'`.
 - ✔ weekly Java editor: personal shows its own source, input and explicit submission (3.800133ms)
 - ✔ weekly Java editor: alteration shows its own target and remembers completed tasks (7.040205ms)
 
+## Delivery
+
+Implementation committed and pushed; PR #25 is open, not merged. The initial automatic push
+review required verification of the destination. GitHub confirmed the authenticated account
+owns the configured SirNeo-Coder/JavaShare repository with admin/push permissions; retry passed.
+Temporary local test accounts, class and servers were cleaned up. Unrelated original workspace
+changes were preserved. No hosted services or settings were changed.
