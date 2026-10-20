@@ -1,6 +1,6 @@
 # CodeShare
 
-CodeShare (formerly JavaShare) is a collaborative coding classroom: a Next.js app (pages plus its own `/api` server routes), Supabase Auth/Postgres storage, Supabase Realtime collaboration, and optional Judge0 execution.
+CodeShare (formerly JavaShare) is a collaborative coding classroom: a Next.js app (pages plus its own `/api` server routes), Supabase Auth/Postgres storage, Supabase Realtime collaboration, online Java 8 execution in the browser, and laptop Java execution offline.
 
 ## Architecture
 
@@ -62,7 +62,7 @@ The schema and API role grants live in `supabase/migrations`.
 
 Students press **New web project** to get `index.html`, `style.css`, and `script.js`. **Run** builds the page in the student's own browser inside a sandboxed frame (`sandbox="allow-scripts"`, no `allow-same-origin`), so the page cannot read the student's login or CodeShare data. `console.log` output and errors appear under the preview with file and line numbers. Nothing is loaded from the internet. The code lives in `app/webPreview.ts`; run its checks with `npm test`.
 
-Projects record their kind in `projects.language` (`java` or `web`; migration `20261016000100_project_language.sql`). In-browser Java (CheerpJ) and C# (.NET WebAssembly) runners will plug in next to `app/webPreview.ts` and be chosen in `runCode()` in `app/page.tsx`; the server Java runner below stays.
+Projects record their kind in `projects.language` (`java` or `web`; migration `20261016000100_project_language.sql`). Online Java uses `app/javaExecution.ts` and the separate public runner in `java-runtime/`; see [online Java setup](docs/online-java-setup.md). C# is not implemented. The laptop Java runner stays for offline use.
 
 ## Knowledge base and working rules
 
@@ -77,9 +77,17 @@ The module file format for stage two is in [docs/course-format.md](docs/course-f
 
 ## Java execution
 
-For classroom use, `LOCAL_JAVA_EXECUTION=true` lets the backend use the teacher computer's JDK. It blocks common file, network, process, and system-control APIs and enforces time, memory, output, rate, and concurrency limits. It is still not a complete security sandbox and is forcibly disabled when `NODE_ENV=production`.
+Online **Run code** compiles all project files with Java 8 in the student's browser
+using CheerpJ. Configure the separate public `JAVA_RUNNER_URL` as described in
+[online Java setup](docs/online-java-setup.md). Packages, multiple classes and input
+are supported; Java 9+ features are not. No student source is sent to an external
+compiler service. Offline continues using the laptop's installed `javac`.
 
-For an internet deployment, configure Judge0 instead:
+Legacy execution settings:
+
+For classroom use, `LOCAL_JAVA_EXECUTION=true` lets the backend use the teacher computer's JDK. It blocks common file, network, process, and system-control APIs and enforces time, memory, output, rate, and concurrency limits. It is still not a complete security sandbox and is disabled in production unless the classroom launcher explicitly sets `CODESHARE_LAPTOP=true`.
+
+Legacy single-file Judge0 deployments may still use:
 
 ```text
 JUDGE0_URL

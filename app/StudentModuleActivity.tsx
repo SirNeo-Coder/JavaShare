@@ -3,6 +3,8 @@
 import { useImperativeHandle, useRef, useState, type Ref } from "react";
 import CodeEditor from "./CodeEditor";
 import { api } from "./apiClient";
+import { runJava, getJavaRunner } from "./javaExecution";
+import JavaRunnerBrand from "./JavaRunnerBrand";
 import type { CourseModule, ModuleFile, Progress } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
 import { sourcePath } from "../backend/src/module-activities";
@@ -53,11 +55,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
       setSavedFiles(JSON.stringify(files));
       if (personal) {
-        const result = await api<{ output: string }>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin }) });
+        const result = await runJava(files, stdin);
         setOutput(result.output);
       } else {
-        const result = await api<{ output: string; passed: boolean; progress: Progress }>(`${base}/run`, {
-          method: "POST", body: JSON.stringify({ stepId: activity.stepId, files, updatedAt: progress.current.updatedAt }),
+        const runner = await getJavaRunner();
+        const browserResult = runner.mode === "browser" ? await runJava(files, activity.stdin, runner) : null;
+        const result = await api<{ output: string; passed: boolean; progress: Progress }>(`${base}/${browserResult ? "browser-result" : "run"}`, {
+          method: "POST", body: JSON.stringify({ stepId: activity.stepId, updatedAt: progress.current.updatedAt, ...(browserResult ? { success: browserResult.success, output: browserResult.output } : { files }) }),
         });
         progress.current = result.progress;
         setOutput(result.output);
@@ -117,7 +121,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
-        <div className="console"><pre aria-label="Program output">{output}</pre></div>
+        <JavaRunnerBrand /><div className="console"><pre aria-label="Program output">{output}</pre></div>
       </aside>
     </div>
     <footer className="actionbar">

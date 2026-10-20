@@ -596,3 +596,6 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .student-module-project .workspace-card-heading b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 .classroom-workspace .team-buttons[hidden] { display:none; }
+
+.java-runner-brand { display: flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 11px; color: var(--muted); }
+.java-runner-brand img { object-fit: contain; }

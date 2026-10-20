@@ -3,6 +3,8 @@
 // Existing module routes supply the catalog, worksheet, progress and teacher availability.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "./apiClient";
+import { runJava } from "./javaExecution";
+import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages } from "./moduleParts";
 import { activityStateId } from "../backend/src/module-activities";
 import ModuleCatalogCard from "./ModuleCatalogCard";
@@ -29,8 +31,8 @@ function ModuleFileEditors({ files, onChange }: { files: ModuleFile[]; onChange:
   );
 }
 
-async function runFiles(files: ModuleFile[]) {
-  const result = await api<{ mode: string; output: string }>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin: "" }) });
+async function runFiles(files: ModuleFile[], stdin = "") {
+  const result = await runJava(files, stdin);
   return result.output;
 }
 
@@ -149,7 +151,7 @@ function StepView({ step, status, role, printed = false, onStart }: {
   const [busy, setBusy] = useState(false);
   const run = async () => {
     setBusy(true);
-    try { if (role === "student") await onStart?.(); else setOutput(await runFiles(files)); }
+    try { if (role === "student") await onStart?.(); else setOutput(await runFiles(files, step.stdin ?? "")); }
     catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
     finally { setBusy(false); }
   };
@@ -164,7 +166,7 @@ function StepView({ step, status, role, printed = false, onStart }: {
       {step.language === "java" ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java only.</p>}
     </div>}
     {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
-    {output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
+    <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;
 }
@@ -230,7 +232,7 @@ function PerformanceTaskSlot({
         {canRun && <button type="button" onClick={runIt} disabled={busy}>{busy ? "Running…" : "Run"}</button>}
         {role === "student" && <button type="button" onClick={submit} disabled={busy}>{busy ? "Submitting…" : "Submit this version"}</button>}
       </div>
-      {output !== null && <pre className="module-step-output">{output}</pre>}
+      <JavaRunnerBrand />{output !== null && <pre className="module-step-output">{output}</pre>}
     </div>
   );
 }

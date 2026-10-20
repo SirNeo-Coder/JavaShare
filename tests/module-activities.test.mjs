@@ -283,3 +283,16 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     } finally { await admin.from("classrooms").delete().eq("id", otherClass.data.id); }
   });
 });
+
+
+test("module activities: offline ignores online runner address and refuses browser progress", needsLocal, async () => {
+  await withClass(async ({ call, request, cookies, prepare }) => {
+    process.env.JAVA_RUNNER_URL = "https://java.example.test/";
+    try {
+      const response = await call("/api/java-runner", { headers: { cookie: cookies[1] } });
+      assert.deepEqual(await response.json(), { mode: "local" });
+      const progress = await prepare();
+      assert.equal((await request("/progress/browser-result", { stepId: first.id, updatedAt: progress.updatedAt, success: true, output: first.expectedOutput })).status, 403);
+    } finally { delete process.env.JAVA_RUNNER_URL; }
+  });
+});

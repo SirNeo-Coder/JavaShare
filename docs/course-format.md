@@ -105,7 +105,7 @@ its supplied starter files. Preceding weeks and submitted snapshots are never ov
 The first part opens automatically. Every sample step in a part must pass before the next part
 opens; named parts may span lessons. Compile and run successfully with exact expected output:
 normalize CRLF and ignore one final println newline, but never trim spaces or extra blank lines.
-The server verifies results; browser-supplied pass flags are refused. Earlier passes survive
+Offline execution results come from the laptop. Online browser-reported success/output is approved practice evidence, checked against server-owned expected output and the saved version; direct browser pass flags are refused. Earlier passes survive
 later failed practice runs. Automatic checking supports Java only.
 
 Liplets are handwritten, assessed by the teacher, and never gate progress. The existing completion
@@ -115,5 +115,5 @@ do not submit or grade it; **Submit this version** records the student's own ver
 Existing sample/own records and assessment remain compatible. Personal input is entered in Console.
 
 Teacher availability switches do not gate students; their old API/data remain compatible. The
-weekly live-class restriction still applies. Online multi-file Java is the next planned step;
+weekly live-class restriction still applies. Online multi-file Java uses Java 8 in the browser after [runner setup](online-java-setup.md);
 offline mode continues compiling all classes together with laptop javac.

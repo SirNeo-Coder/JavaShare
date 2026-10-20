@@ -29,6 +29,7 @@ import {
   prepareSupabasePerformanceProject,
   saveSupabasePerformanceProject,
   runSupabaseModuleActivity,
+  recordSupabaseModuleActivityResult,
   getSupabaseStudentWebProject,
   joinSupabaseClass,
   listSupabaseClassroomStudents,
@@ -578,7 +579,7 @@ const javaFiles = z.array(z.object({ path: javaPath, content: z.string().max(200
 type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; message?: string; status?: { id?: number; description?: string } };
 
 async function executeJava(userId: string, files: ModuleFile[], stdin: string) {
-  if (!process.env.JUDGE0_URL && localJavaEnabled) {
+  if (localJavaEnabled) {
     const lastRun = lastExecution.get(userId) || 0;
     if (Date.now() - lastRun < 1500) throw new SupabaseRepositoryError(429, "Please wait briefly before running again");
     if (activeExecutions >= 2) throw new SupabaseRepositoryError(429, "The classroom runner is busy; try again shortly");
@@ -599,6 +600,31 @@ async function executeJava(userId: string, files: ModuleFile[], stdin: string) {
   const result = await response.json() as JudgeResult;
   return { mode: "judge0", success: result.status?.id === 3 && !result.stderr && !result.compile_output, output: result.compile_output || result.stderr || result.stdout || result.message || result.status?.description || "" };
 }
+
+app.get("/api/java-runner", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    if (localJavaEnabled) return res.json({ mode: "local" });
+    if (process.env.JAVA_RUNNER_URL) {
+      let url: URL;
+      try { url = new URL(process.env.JAVA_RUNNER_URL); }
+      catch { throw new SupabaseRepositoryError(503, "JAVA_RUNNER_URL must be a separate HTTPS origin"); }
+      if (url.origin === req.url.origin || url.username || url.password || url.search || url.hash || url.pathname !== "/" ||
+          (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)))) throw new SupabaseRepositoryError(503, "JAVA_RUNNER_URL must be a separate HTTPS origin");
+      return res.json({ mode: "browser", url: url.href });
+    }
+    if (process.env.JUDGE0_URL) return res.json({ mode: "judge0" });
+    throw new SupabaseRepositoryError(503, "Online Java is not set up yet. Ask your teacher to configure JAVA_RUNNER_URL.");
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/browser-result", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    if (localJavaEnabled) throw new SupabaseRepositoryError(403, "Offline progress must use the classroom Java runner");
+    if (!process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(503, "Online Java is not configured");
+    const { stepId, updatedAt, success, output } = z.object({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }), success: z.boolean(), output: z.string().max(70000) }).parse(req.body);
+    return res.json(await recordSupabaseModuleActivityResult(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId, updatedAt, { mode: "browser", success, output }));
+  } catch (error) { next(error); }
+});
 
 app.post("/api/execute", requireAuth, async (req: AuthedRequest, res, next) => {
   try {

@@ -51,12 +51,12 @@ What teachers and students can do today. Compare any proposed change with this p
   can still lose unsaved edits. The personal draft is `performance_task.project.files`, separate
   from `performance_task.sample` and `.own`; drafts never count as submissions. No migration.
 - Offline Java compiles all project files on the laptop, including Java packages with Main.java.
-  Online multi-file execution is the next step; current hosted demo/single-file limitations remain.
+  Online execution uses Java 8/CheerpJ on a separate public runner origin after the teacher's setup. Students keep Run code; first run needs internet and displays CheerpJ attribution. Browser-reported results are practice evidence, not grades. Server access, exact expected output and saved-version checks remain authoritative. No new migration.
 
 
 ## Students
 
-- Edit Java files, press **Run code** (laptop `javac` offline; demo mode online today), and type program input in the Console.
+- Edit Java files, press **Run code** (laptop `javac` offline; CheerpJ Java 8 online after setup), and type program input in the Console.
 - **New web project** (from PR b): name it, and get `index.html`, `style.css`, `script.js`. **Run code** shows the page in the panel, with console output and errors (file:line) under it. Add `.html`/`.css`/`.js` files with **＋**; double-click a tab to rename.
 - **Save work** (manual save for students), **Reopen saved work**, and named saved copies.
 - Activities from the teacher appear in the sidebar; **Submit to teacher**. In group activities the leader submits, a leader vote prompt appears, and the leader can mute or lock members.

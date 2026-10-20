@@ -16,7 +16,7 @@ All in `backend/src/`: `routes.ts` (every route, sign-in, the Java endpoint; `ha
 | Teacher web-project review | `GET /api/classes/:classroomId/students/:studentId/web-projects` (list metadata), `GET .../:projectId` (one project and saved files). Teacher-only; verifies class ownership, current student membership, personal workspace ownership, class, web language and no activity |
 | Files and projects | `PUT /api/files/:id` (save; needs matching `version` for groups), `PATCH /api/files/:id` (rename), `POST /api/projects/:id/files`, `POST .../submit`, saved work (`GET`/`POST .../saved-work`, `PUT /api/saved-work/:id`, `POST .../restore`), `GET /api/submissions` |
 | Course modules | `GET`/`POST /api/classrooms/:classroomId/modules`, `GET`/`DELETE .../:moduleId`, `PATCH .../:moduleId/availability` (class teacher only; lesson id + boolean, or performance-task boolean), `GET .../summary`, `GET .../:moduleId/progress`, `PUT .../:moduleId/progress/step`, `PUT .../:moduleId/progress/performance-task` |
-| Java | `POST /api/execute` |
+| Java | `GET /api/java-runner` chooses browser/local/legacy server mode; `POST /api/execute` retains laptop/legacy runner |
 
 ## Live events (Supabase Realtime, since PR c1)
 
@@ -50,8 +50,8 @@ Nothing live is kept in server memory any more. File saves emit `file:updated`. 
   Base supporting starter files are available to initialize the shared project. Completed parts
   stay accessible. Successful checks refresh the worksheet immediately without polling.
 - Direct `PUT .../progress/step` code pass flags are refused. Old paper liplet writes remain
-  compatible, but do not affect percentages or unlocking. A new `activity` uses a separate saved
-  state key (`<step id>:activity`), so an old sample pass cannot satisfy a new challenge.
+  compatible, but do not affect percentages or unlocking. Legacy challenge state keys (`<step id>:activity`) remain stored, but sample progression uses
+  the sample step id and ignores those challenge passes.
 - Completion counts passed activities plus the two existing performance-task submissions.
   Liplets are assessed on paper. The task opens after all lesson activities pass; its submission
   workflow is unchanged. Teacher availability writes remain teacher-only for older clients,
@@ -69,4 +69,18 @@ Nothing live is kept in server memory any more. File saves emit `file:updated`. 
   untouched by draft saves/runs. Existing own submission accepts optional `updatedAt` for the
   main editor's stale-tab protection. Old clients keep working. No new table or migration.
 - Both tracks are scoped by student, class and module. Previous-week copies never modify the
-  source week. The existing Java runner compiles all files together offline; hosted support is next.
+  source week. The laptop compiles all files together offline; online uses the separate browser Java runner.
+
+## Online Java (2026-10-20)
+
+`GET /api/java-runner` requires sign-in. Local mode takes precedence over hosted
+settings; otherwise a valid separate HTTPS `JAVA_RUNNER_URL` selects browser mode.
+HTTP localhost is allowed for development. No configured runner gives a clear 503.
+Legacy Judge0 remains optional. The existing local execution endpoint is unchanged.
+
+`POST .../progress/browser-result` accepts stepId, updatedAt, success and output
+(max 70,000 characters including limit diagnostics). It refuses local mode, validates
+identity/class/Java step/part/live week and saved version, compares its own expected
+output and retains earlier passes. It uses `recordSupabaseModuleActivityResult`,
+also used by the laptop path. The teacher accepts browser result falsification for
+practice; this is not grading. No browser-supplied expected output/pass flag is used.

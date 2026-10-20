@@ -8,7 +8,7 @@ What stays the same:
 
 - **Supabase** still stores everything.
 - **Offline mode** (`npm run classroom:offline`) doesn't use Cloudflare at all.
-- **Java** runs in demo mode online, as it does today. The laptop's Java runner only works offline.
+- **Java** can run online after the separate [online Java setup](online-java-setup.md). Without its setting, Java reports that setup is missing. The laptop runner remains for offline use.
 
 ---
 

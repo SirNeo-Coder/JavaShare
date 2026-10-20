@@ -1,3 +1,10 @@
+> Current approved work (2026-10-20): [online multi-file Java](online-multifile-java.md),
+> branch `codex/online-multifile-java`, stacked on weekly-projects PR #20. Browser
+> results and a separate public Java runner address were explicitly approved for
+> practice progress. Implementation and real browser/isolated offline checks passed; build and 115/115
+> tests passed, lint 0 errors/8 existing warnings. PR delivery is next. Teacher
+> deployment/setup is separate. No hosted changes.
+
 > Current approved work (2026-10-20): [two weekly Java projects](weekly-java-projects.md),
 > branch `codex/weekly-java-projects`, [PR #20](https://github.com/SirNeo-Coder/JavaShare/pull/20),
 > isolated from the other checkout's unfinished merge. Build and 101/101 tests passed; lint has
