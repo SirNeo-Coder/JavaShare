@@ -1,3 +1,17 @@
+> Current approved UI fix (2026-10-20): branch `codex/earlet-hover-dismiss`, based on
+> `codex/rolling-module-tasks` at `1c581ee` (open PR #25). Teacher approved hover opening
+> and outside-click animated closing for Module, Projects / Students / projects, Chat and worksheet.
+> Implemented and verified: existing 250 ms slides retained, pointer leave no longer closes
+> worksheet, hover does not steal focus, click/keyboard navigation preserved, moving-ear
+> reopen/focus issues fixed. Build and offline launcher build pass, lint 0 errors/8 existing
+> warnings, full suite 160/160, actual Chromium 13/13 including teacher/student offline Run code.
+> Deliberately restoring pointer-enter behavior failed both worksheet tests; restored fix passes.
+> CKB-053; [full test names, regression evidence and limits](../verification/earlet-hover-dismiss.md).
+> Nothing remains to implement. Next: commit/push this branch and open a review PR against
+> `codex/rolling-module-tasks`, then teacher review and rollout. No merge/deploy or hosted changes.
+> Existing classroom servers and unrelated local files were preserved; physical touch/other
+> browsers and hosted behavior are unverified. Use this section and linked verification to continue.
+
 > Current approved first stage (2026-10-20): [rolling module tasks](rolling-module-tasks.md),
 > branch `codex/rolling-module-tasks`. Core task workflow and revised Week 14 example complete;
 > build passed, lint zero errors/eight existing warnings, full suite 160/160 without skips.

@@ -108,6 +108,7 @@ What teachers and students can do today. Keep this page current when their use o
   during an individual activity, group chat in a group activity. Existing messages, live delivery,
   teacher mute and group-leader permissions are reused. Both Enter and **Send message** submit
   through the same existing handler. The Console remains available independently.
+- Hovering the **Module**, **Projects / Students / projects**, or **Chat** earlet slides its panel open without moving keyboard focus. Moving away keeps it open. Clicking outside a panel slides it closed, including a pinned panel; clicking inside or its own earlet does not count as outside. Mouse click, touch and keyboard opening remain available.
 - Drawer **×** or Escape from within the drawer closes it and restores the previous focus. At
   wide desktop widths (1400 pixels and above), **Pin** reserves workspace space for a drawer;
   narrower screens use overlays. The chat conversation area stays light in both saved themes,
@@ -128,9 +129,9 @@ What teachers and students can do today. Keep this page current when their use o
   digital pages; their page count is separate from physical printed PDF pages. **Work in code editor** opens the activity in the main saved module project. Page switches and drawer closing keep
   drafts mounted. Reloading, changing module or leaving the classroom still does not save a draft.
 - After selecting a module, its additional **Module** ear previews the worksheet on mouse hover.
-  Moving into the worksheet keeps the preview open; leaving closes it unless pinned. Clicking or
-  keyboard-activating the ear keeps it open. **Pin** keeps it visible; at wide desktop widths it
-  also reserves space. **× / Escape** closes it, with keyboard focus returned to its ear.
+  Moving away keeps it open until an outside click, **×**, or Escape closes it. Clicking or
+  keyboard-activating the ear also opens it. **Pin** reserves space at wide desktop widths;
+  an outside click still closes it. **× / Escape** closes it, with keyboard focus returned to its ear.
 - **All modules** returns to the existing browser. Selecting a card again reloads its current
   content and teacher availability; merely closing/reopening the ear preserves the current visit. Projects temporarily covers the worksheet and hides its ear without dropping the selected
   page or draft; closing Projects restores that visit. The classroom top bar and existing chat

@@ -7,6 +7,7 @@ import CodeEditor, { languageLabel } from "./CodeEditor";
 import Landing from "./Landing";
 import { studentEntryClassroom, rememberedStudentClassroom, rememberStudentClassroom } from "./studentClassroomEntry";
 import WorkspaceDrawer from "./WorkspaceDrawer";
+import useOutsideDismiss from "./useOutsideDismiss";
 import ModuleWorkspace from "./ModuleWorkspace";
 import { moduleProjectForClass } from "./moduleActivityState";
 import { activityStateId, activityTask } from "../backend/src/module-activities";
@@ -227,6 +228,10 @@ export default function Home() {
   const moduleEditorRef = useRef<ModuleEditorHandle>(null);
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [modulesAutoFocus, setModulesAutoFocus] = useState(true);
+  const [chatAutoFocus, setChatAutoFocus] = useState(true);
+  const [projectsHoverPreview, setProjectsHoverPreview] = useState(false);
+  useOutsideDismiss("classroom-projects", projectsOpen, () => setProjectsOpen(false));
   const [dismissedLiveSessions, setDismissedLiveSessions] = useState<Record<string, string>>({});
   const [homeClassroomId, setHomeClassroomId] = useState<string | null>(null);
   const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
@@ -1189,6 +1194,7 @@ export default function Home() {
       setActivityStarter("");
       setActiveTeam(0);
       await loadWorkspace("groups");
+      setChatAutoFocus(true);
       setChatOpen(true);
       notify(
         `Deployed ${activity.title} to ${result.students} students in ${result.groups} group${result.groups === 1 ? "" : "s"}`,
@@ -1921,7 +1927,7 @@ export default function Home() {
               type="button"
               aria-expanded={modulesOpen}
               aria-controls="classroom-modules"
-              onClick={() => { setProjectsOpen(false); setModulesOpen((open) => !open); }}
+              onClick={() => { setModulesAutoFocus(true); setProjectsOpen(false); setModulesOpen((open) => !open); }}
               title="This week's module"
             >
               Modules
@@ -2035,11 +2041,17 @@ export default function Home() {
       </header>
       <section className="workspace classroom-workspace">
         <nav className="workspace-rail rail-left" aria-label="Learning panels">
-          <button type="button" aria-expanded={modulesOpen} aria-controls="classroom-modules" onClick={() => { setProjectsOpen(false); setModulesOpen(!modulesOpen); }}><span aria-hidden="true">▤</span> Module <span aria-hidden="true">{modulesOpen ? "‹" : "›"}</span></button>
-          <button type="button" aria-expanded={projectsOpen} aria-controls="classroom-projects" onClick={() => { setModulesOpen(false); setProjectsOpen(!projectsOpen); }}><span aria-hidden="true">⌘</span> {user.role === "teacher" ? "Students / projects" : "Projects"}</button>
+          <button type="button" aria-expanded={modulesOpen} aria-controls="classroom-modules"
+            onPointerEnter={(event) => { if (event.pointerType === "mouse" && !modulesOpen) { setModulesAutoFocus(false); setProjectsOpen(false); setModulesOpen(true); } }}
+            onClick={() => { setModulesAutoFocus(true); setProjectsOpen(false); setModulesOpen(!modulesAutoFocus || !modulesOpen); }}><span aria-hidden="true">▤</span> Module <span aria-hidden="true">{modulesOpen ? "‹" : "›"}</span></button>
+          <button type="button" aria-expanded={projectsOpen} aria-controls="classroom-projects"
+            onPointerEnter={(event) => { if (event.pointerType === "mouse" && !projectsOpen) { setProjectsHoverPreview(true); setModulesOpen(false); setProjectsOpen(true); } }}
+            onClick={() => { setModulesOpen(false); setProjectsOpen(projectsHoverPreview || !projectsOpen); setProjectsHoverPreview(false); }}><span aria-hidden="true">⌘</span> {user.role === "teacher" ? "Students / projects" : "Projects"}</button>
         </nav>
         <nav className="workspace-rail rail-right" aria-label="Chat panel">
-          <button type="button" aria-expanded={chatOpen} aria-controls="classroom-chat" onClick={() => setChatOpen(!chatOpen)}><span aria-hidden="true">☏</span> Chat <span aria-hidden="true">{chatOpen ? "›" : "‹"}</span></button>
+          <button type="button" aria-expanded={chatOpen} aria-controls="classroom-chat"
+            onPointerEnter={(event) => { if (event.pointerType === "mouse" && !chatOpen) { setChatAutoFocus(false); setChatOpen(true); } }}
+            onClick={() => { setChatAutoFocus(true); setChatOpen(!chatAutoFocus || !chatOpen); }}><span aria-hidden="true">☏</span> Chat <span aria-hidden="true">{chatOpen ? "›" : "‹"}</span></button>
         </nav>
         <aside id="classroom-projects" aria-label={user.role === "teacher" ? "Students and projects" : "Projects"} data-open={projectsOpen} aria-hidden={!projectsOpen} inert={!projectsOpen} className="sidebar classroom-projects" onKeyDown={(event) => { if (event.key === "Escape") setProjectsOpen(false); }}>
           <div className="projects-heading"><b>{user.role === "teacher" ? "Students and projects" : "My projects"}</b><button type="button" aria-label="Close projects" onClick={() => setProjectsOpen(false)}>×</button></div>
@@ -2586,7 +2598,7 @@ export default function Home() {
                   aria-expanded={chatOpen}
                   aria-controls="classroom-chat"
                   className={chatOpen ? "active" : ""}
-                  onClick={() => setChatOpen((open) => !open)}
+                  onClick={() => { setChatAutoFocus(true); setChatOpen((open) => !open); }}
                 >
                   {!data.currentActivity
                     ? "Classroom chat"
@@ -2825,8 +2837,8 @@ export default function Home() {
             </div>
           </footer></>}
         </section>
-        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
-        <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} onClose={() => setChatOpen(false)}>
+        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} role={user.role} browserOpen={modulesOpen} browserAutoFocus={modulesAutoFocus} projectsOpen={projectsOpen} onBrowserChange={(open) => { if (open) setModulesAutoFocus(true); setModulesOpen(open); }} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
+        <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} autoFocus={chatAutoFocus} onClose={() => setChatOpen(false)}>
           <div className="chat">
                   <div className="chat-toolbar">
                     <b>
