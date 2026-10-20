@@ -8,6 +8,11 @@
     if (typeof id !== "string" || !/^[a-z0-9-]{1,80}$/i.test(id)) return;
     started = true;
     const send = (type, extra = {}) => parent.postMessage({ type, id, ...extra }, event.origin);
+    let stage = "Checking Java project";
+    const status = (text) => {
+      stage = text; document.querySelector("p").textContent = `${text}…`;
+      send("codeshare-java-status", { stage });
+    };
     let pending = null, inputId = 0, inputUsed = stdin?.length ?? 0;
     const receiveInput = (reply) => {
       const data = reply.data;
@@ -20,8 +25,7 @@
     try {
       if (typeof interactive !== "boolean" || !Array.isArray(files) || !files.length || files.length > 50 || typeof stdin !== "string" || stdin.length > 10000 || typeof mainClass !== "string" ||
           files.some((file) => typeof file.path !== "string" || !/^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/.test(file.path) || typeof file.content !== "string" || file.content.length > 200000)) throw new Error("Invalid Java project");
-      const status = (text) => { document.querySelector("p").textContent = text; };
-      status("Loading Java 8…");
+      status("Loading Java 8");
       await new Promise((resolve, reject) => {
         const script = document.createElement("script");
         script.src = "https://cjrtnc.leaningtech.com/4.3/loader.js";
@@ -29,7 +33,7 @@
         document.head.append(script);
       });
       /* global cheerpjInit, cheerpjRunLibrary, cheerpOSAddStringFile */
-      status("Starting Java 8…");
+      status("Starting Java 8");
       await cheerpjInit({ version: 8, status: "none", javaProperties: ["codeshare.browser=true"], natives: {
         Java_CodeShareJava_running: () => send("codeshare-java-running"),
         Java_CodeShareJava_output: (_lib, output) => send("codeshare-java-output", { output }),
@@ -37,9 +41,16 @@
           pending = resolve; send("codeshare-java-input", { inputId: ++inputId });
         }),
       } });
-      status("Starting compiler…");
-      const library = await cheerpjRunLibrary("/app/javac.jar:/app/codeshare-runner.jar");
-      status("Compiling project…");
+      // Static hosts may ignore Range requests; load complete JARs into CheerpJ's memory filesystem.
+      for (const name of ["javac.jar", "codeshare-runner.jar"]) {
+        status(`Downloading ${name}`);
+        const response = await fetch(`/${name}`);
+        if (!response.ok) throw new Error(`Could not download ${name} (HTTP ${response.status}).`);
+        cheerpOSAddStringFile(`/str/${name}`, new Uint8Array(await response.arrayBuffer()));
+      }
+      status("Starting Java compiler");
+      const library = await cheerpjRunLibrary("/str/javac.jar:/str/codeshare-runner.jar");
+      status("Compiling project");
       const paths = files.map((file, index) => {
         const path = `/str/codeshare-${index}`;
         cheerpOSAddStringFile(path, file.content);
@@ -49,7 +60,7 @@
       const args = [paths.join("\n"), mainClass, stdin, `/files/${id}`, "/str"];
       const result = JSON.parse(await (interactive ? runner.runInteractiveSources(...args) : runner.runSources(...args)));
       send("codeshare-java-result", result);
-    } catch (error) { send("codeshare-java-result", { success: false, output: `Java execution failed: ${String(error)}`.slice(0, 70000) }); }
+    } catch (error) { send("codeshare-java-result", { success: false, output: `Java execution failed during ${stage}: ${String(error)}`.slice(0, 70000) }); }
     finally { window.removeEventListener("message", receiveInput); }
   });
   parent.postMessage({ type: "codeshare-java-ready", interactive: true }, "*");

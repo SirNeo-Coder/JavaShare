@@ -57,7 +57,7 @@ test("browser Java: offline uses only the existing authenticated laptop endpoint
 
 function liveConsole(t, { oldRunner = false, aborted = false } = {}) {
   const originalWindow = globalThis.window, originalDocument = globalThis.document;
-  const listeners = new Set(), posts = [], outputs = [];
+  const listeners = new Set(), posts = [], outputs = [], stages = [];
   let frame, send;
   globalThis.window = { location: { origin: "https://class.example.test" }, addEventListener: (_, fn) => listeners.add(fn), removeEventListener: (_, fn) => listeners.delete(fn) };
   const dispatch = (data, source = frame.contentWindow, origin = "https://java.example.test") => {
@@ -71,10 +71,38 @@ function liveConsole(t, { oldRunner = false, aborted = false } = {}) {
   t.after(() => { globalThis.window = originalWindow; globalThis.document = originalDocument; });
   const controller = new AbortController();
   if (aborted) controller.abort();
-  const promise = runJava(files, "", browser, { signal: controller.signal, onOutput: (text) => outputs.push(text), onInput: (callback) => { send = callback; } });
+  const promise = runJava(files, "", browser, { signal: controller.signal, onOutput: (text) => outputs.push(text), onStatus: (stage) => stages.push(stage), onInput: (callback) => { send = callback; } });
   const id = posts[0]?.data.id;
-  return { promise, controller, frame, posts, outputs, dispatch, listeners, get send() { return send; }, event: (type, extra = {}) => dispatch({ type: "codeshare-java-" + type, id, ...extra }) };
+  return { promise, controller, frame, posts, outputs, stages, dispatch, listeners, get send() { return send; }, event: (type, extra = {}) => dispatch({ type: "codeshare-java-" + type, id, ...extra }) };
 }
+
+test("browser Java: startup stages authenticate messages and identify the stalled stage without extending the deadline (CKB-056)", async (t) => {
+  const live = liveConsole(t);
+  const message = { type: "codeshare-java-status", id: live.posts[0].data.id, stage: "forged" };
+  live.dispatch(message, {}); live.dispatch(message, live.frame.contentWindow, "https://evil.example.test");
+  live.dispatch({ ...message, id: "old-run" });
+  for (const stage of [null, {}, "", "x".repeat(81)]) live.event("status", { stage });
+  assert.deepEqual(live.stages, ["Opening Java runner"]);
+  t.mock.timers.tick(60000); live.event("status", { stage: "Starting Java 8" });
+  t.mock.timers.tick(59000); live.event("status", { stage: "Downloading javac.jar" });
+  assert.deepEqual(live.stages, ["Opening Java runner", "Starting Java 8", "Downloading javac.jar"]);
+  t.mock.timers.tick(1001);
+  const result = await live.promise;
+  assert.equal(result.success, false); assert.match(result.output, /120 seconds.*Last stage: Downloading javac.jar/);
+  assert.doesNotMatch(result.output, /Check your internet connection/);
+  assert.deepEqual(live.outputs, []); assert.equal(live.frame.removed, true); assert.equal(live.listeners.size, 0);
+});
+
+test("browser Java: startup feedback never contaminates Java output or accepts stages after execution starts (CKB-056)", async (t) => {
+  const live = liveConsole(t);
+  live.event("status", { stage: "Compiling project" }); live.event("running");
+  live.event("status", { stage: "late stage" });
+  live.event("output", { output: "Hello, CodeShare!\n" });
+  live.event("result", { success: true, output: "Hello, CodeShare!\n" });
+  assert.deepEqual(live.stages, ["Opening Java runner", "Compiling project", "Running Java"]);
+  assert.deepEqual(live.outputs, ["Hello, CodeShare!\n"]);
+  assert.deepEqual(await live.promise, { mode: "browser", success: true, output: "Hello, CodeShare!\n" });
+});
 
 test("interactive Java: streams prompts, waits for blank and Unicode answers, and rejects stale or foreign input requests (CKB-049)", async (t) => {
   const live = liveConsole(t);

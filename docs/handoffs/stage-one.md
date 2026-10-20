@@ -42,6 +42,27 @@
 > forward independently. Online multi-file Java is the next step. See the feature handoff for
 > exact verification and remaining decisions. No hosted changes or deployment authorized.
 
+> Current approved Java loading repair (2026-10-21): branch `codex/java-runner-startup`,
+> based on main `8fb41ff`, isolated checkout `/tmp/codeshare-java-runner-startup`.
+> Teacher approved complete compiler downloads, stage feedback, tests and branch/PR
+> delivery. Done: both JARs load as binary memory files without HTTP Range; editable
+> Consoles show loading stages and startup errors name the last stage. No dependency,
+> migration, Java helper, security policy or hosted configuration change.
+> Build passed; lint zero errors/eight existing warnings; full suite 145/145 with no
+> skips; 21 focused checks pass after two deliberate regressions failed and were restored.
+> Actual CheerpJ with no-Range host: Hello CodeShare, two-file Unicode/blank input,
+> Stop and fixed-input module pass; offline laptop Java passed with no Java frame/logo.
+> Static Worker dry-run and offline launcher readiness passed. [Every test name and limits](../verification/java-runner-startup.md).
+> CKB-056 is a local mitigation: the original affected-browser timeout was not
+> reproduced, so hosted recovery is unconfirmed. CKB-057 separately records an
+> unresponsive same-site tight-loop trial and later startup failure on its hostname;
+> a different-site parent displayed its five-second timeout, and a fresh runner
+> hostname allowed normal execution again. No execution change is approved or included.
+> In progress: final commit/push/PR delivery. Next: teacher review, normal automatic
+> builds of both Workers, then affected-browser retest using the named Last stage.
+> The other checkout's Console work and all existing servers were preserved. No merge,
+> deploy, hosted settings, SQL or database push. No remaining approved implementation work.
+
 # CodeShare — Stage One Progress
 
 > Delivered to main: [PR #19](https://github.com/SirNeo-Coder/JavaShare/pull/19), merge `b81b5db`, 2026-10-20, under the teacher’s explicit push-to-main request. Includes the tested dashboard/student-entry prerequisites; 98 tests passed.

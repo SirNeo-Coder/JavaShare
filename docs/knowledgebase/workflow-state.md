@@ -57,6 +57,10 @@ What teachers and students can do today. Keep this page current when their use o
 ## Students
 
 - Edit Java files, press **Run code** (laptop `javac` offline; CheerpJ Java 8 online after setup), and type program input in the Console.
+- Editable online Java Consoles show the current loading stage, then the program's
+  output. A loading timeout names the last stage so the teacher can identify where
+  startup stopped. Loading text is separate from the Java result and cannot complete
+  module steps. The loading, execution and input-wait deadlines remain separate.
 - **New web project** (from PR b): name it, and get `index.html`, `style.css`, `script.js`. **Run code** shows the page in the panel, with console output and errors (file:line) under it. Add `.html`/`.css`/`.js` files with **＋**; double-click a tab to rename.
 - **Save work** (manual save for students), **Reopen saved work**, and named saved copies.
 - Activities from the teacher appear in the sidebar; **Submit to teacher**. In group activities the leader submits, a leader vote prompt appears, and the leader can mute or lock members.
