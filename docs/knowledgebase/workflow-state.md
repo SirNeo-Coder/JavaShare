@@ -116,7 +116,7 @@ What teachers and students can do today. Keep this page current when their use o
 - The classroom uses the Figma reference's dark editor and Console with a yellow **Run code**
   button. File editing, program input, saved work, submissions and teacher live share keep their
   existing handlers and permissions.
-- **Module** on the left edge or **Modules** in the top bar opens the module browser. The weekly
+- One fixed **Module** tab on the left edge opens the module browser before selection, then reopens the selected worksheet. **Modules** in the student top bar always opens the browser. The weekly
   pick appears first when one exists; cards show the student's saved percentage and server's live
   lock. Selecting a module opens a separate wide worksheet drawer; **Performance task** has its own page.
   Later parts remain locked until their required activities are passed. Navigation keeps editors mounted, so switching
@@ -129,7 +129,7 @@ What teachers and students can do today. Keep this page current when their use o
   during an individual activity, group chat in a group activity. Existing messages, live delivery,
   teacher mute and group-leader permissions are reused. Both Enter and **Send message** submit
   through the same existing handler. The Console remains available independently.
-- Drawer **×** or Escape from within the drawer closes it and restores the previous focus. At
+- Hovering **Module**, **Projects / Students / projects**, or **Chat** slides its panel open without taking editor focus. Leaving keeps it open. Clicking outside slides it closed, including a pinned panel. The first click on a hover-opened tab keeps it open; the next toggles it closed. Touch and keyboard activation also toggle. Drawer **×** or Escape from within the drawer closes it and restores focus. At
   wide desktop widths (1400 pixels and above), **Pin** reserves workspace space for a drawer;
   narrower screens use overlays. The chat conversation area stays light in both saved themes,
   matching the Figma reference, with a navy heading.
@@ -148,14 +148,15 @@ What teachers and students can do today. Keep this page current when their use o
   tables/notes in reading order, with the liplet at the end. **Previous page / Next page** walk through the
   digital pages; their page count is separate from physical printed PDF pages. **Work in code editor** opens the activity in the main saved module project. Page switches and drawer closing keep
   drafts mounted. Reloading, changing module or leaving the classroom still does not save a draft.
-- After selecting a module, its additional **Module** ear previews the worksheet on mouse hover.
-  Moving into the worksheet keeps the preview open; leaving closes it unless pinned. Clicking or
-  keyboard-activating the ear keeps it open. **Pin** keeps it visible; at wide desktop widths it
-  also reserves space. **× / Escape** closes it, with keyboard focus returned to its ear.
+- After selecting a module, the same fixed **Module** tab reopens its worksheet; there is no
+  additional tab that can cover **Projects**. Hover opens it, leaving keeps it open, and outside
+  click or **× / Escape** closes it. **Pin** reserves space at wide desktop widths. The tabs
+  remain reachable while a worksheet is open, including smaller screens.
 - **All modules** returns to the existing browser. Selecting a card again reloads its current
-  content and teacher availability; merely closing/reopening the ear preserves the current visit. Projects temporarily covers the worksheet and hides its ear without dropping the selected
-  page or draft; closing Projects restores that visit. The classroom top bar and existing chat
-  system are retained. Class-home upload, availability, progress and submission
+  content and teacher availability; closing/reopening the tab preserves the current visit.
+  Opening **Projects** closes the worksheet while keeping its selected page and draft; reopening
+  **Module** returns to that visit. Closing Projects does not automatically reopen the worksheet.
+  The classroom top bar and existing chat system are retained. Class-home upload, availability, progress and submission
   routes retain their existing storage and permissions. No new route, dependency or migration.
 
 ## Teacher class dashboard (approved workflow change, 2026-10-20)
