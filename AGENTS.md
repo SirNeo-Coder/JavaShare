@@ -69,6 +69,13 @@ When a change affects how teachers or students use CodeShare, update
 `docs/knowledgebase/workflow-state.md` in the same change. CodeShare does not require
 the teacher to classify changes as a workflow change or an adjustment.
 
+## Inactivity sign-out (agreed 2026-10-20)
+
+- Teachers sign out after two hours without interaction; students after fifteen minutes,
+  including on public computers. Time with the browser closed or laptop off counts.
+- Background requests and live classroom updates never extend sign-in. Enforce expiry
+  on the server online and offline, and return expired/restored pages to sign-in.
+
 ## Refactor and housekeeping discipline
 
 - **Commit every successful change** once it is built and its tests pass.

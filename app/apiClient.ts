@@ -13,6 +13,11 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     headers: { "Content-Type": "application/json", ...options.headers },
   });
   const body = response.status === 204 ? null : await response.json();
+  if (typeof window !== "undefined") {
+    if (response.ok && body?.session && path !== "/api/auth/activity") window.dispatchEvent(new CustomEvent("codeshare:session", { detail: body.session }));
+    if (response.ok && path === "/api/auth/logout") window.dispatchEvent(new CustomEvent("codeshare:session", { detail: null }));
+    if (response.status === 401 && !["/api/auth/login", "/api/auth/register"].includes(path)) window.dispatchEvent(new CustomEvent("codeshare:session-expired"));
+  }
   if (!response.ok) throw new Error(body?.error || "Request failed");
   return body as T;
 }

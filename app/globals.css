@@ -599,3 +599,17 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 
 .java-runner-brand { display: flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 11px; color: var(--muted); }
 .java-runner-brand img { object-fit: contain; }
+.session-notice {
+  position: fixed;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  width: min(90vw, 42rem);
+  padding: 0.75rem 1rem;
+  border: 1px solid #92400e;
+  border-radius: 0.5rem;
+  background: #fef3c7;
+  color: #451a03;
+  box-shadow: 0 2px 10px #0003;
+}

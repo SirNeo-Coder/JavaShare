@@ -1,10 +1,16 @@
-> Current session work (2026-10-20), branch `codex/session-inactivity`: the teacher removed
-> the requirement to classify CodeShare changes as "workflow change" or "adjustment".
-> Removed that approval question from AGENTS.md and the problem-knowledge-base proposal,
-> and retained the requirement to keep the workflow description current. Documentation-only
-> checks: reviewed the diff and searched the rule/proposal pages for the removed requirement.
-> Inactivity limits requested: teachers two hours, students fifteen minutes. Session code
-> is unchanged; investigation/implementation and its tests are next.
+> Current session work (2026-10-20), branch `codex/session-inactivity`, based on the
+> documentation-only production-repair branch (PR #23): implemented the teacher's two-hour
+> and student's fifteen-minute inactivity sign-out. Server checks, trusted browser interaction,
+> one-minute warning, restored-tab refusal, shared-tab logout and live-pass deadlines are complete.
+> The teacher also removed the VMAS workflow/adjustment classification question; removal
+> committed/pushed as `50cc01e`. Normal proposal approval and workflow documentation remain.
+> Final build passed; full suite 140/140, no failures/skips; lint 0 errors/8 existing warnings.
+> Actual local production browser checked both roles, warning/sign-out, teacher accounts in
+> another tab, expired restored-session refusal and offline javac. See
+> [session verification](../verification/session-inactivity.md) for every test and limits,
+> and CKB-051 for diagnosis. Unsaved edits can be lost after the warning; old cookies need a
+> fresh sign-in on rollout. No migration or hosted change. Implementation ready for review;
+> next: commit/push the finished step, attach its PR, then teacher review/deployment.
 
 > Current approved work (2026-10-20): [interactive online Java](online-java-interactive-input.md),
 > branch codex/online-java-interactive-input, implementation 7930d79, [PR #22](https://github.com/SirNeo-Coder/JavaShare/pull/22).

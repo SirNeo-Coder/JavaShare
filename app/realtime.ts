@@ -1,5 +1,5 @@
 // Live features (typing, cursors, chat signals, live share, who's online) over Supabase Realtime.
-// The CodeShare server signs a one-hour pass for the signed-in user (GET /api/realtime/pass);
+// The server signs a pass lasting at most one hour and no longer than the current sign-in;
 // private channels "team:<id>" and "class:<id>" are guarded by policies in
 // supabase/migrations/20261016000200_realtime_private_channels.sql.
 import { createClient, type RealtimeChannel, type SupabaseClient } from "@supabase/supabase-js";

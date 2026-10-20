@@ -81,21 +81,24 @@ const lastExecution = new Map<string, number>();
 export const apiConfig = { crossSiteCookies: false };
 
 type SessionUser = { id: string; role: "teacher" | "student"; email: string; name: string; passwordResetRequired: boolean };
-type AuthedRequest = ApiRequest & { user?: SessionUser };
+type Session = { id: string; expiresAt: number; absoluteExpiresAt: number };
+type AuthedRequest = ApiRequest & { user?: SessionUser; session?: Session };
 
-// Sign-in lasts 7 days, online and offline; a server restart no longer signs people out
-// (decided 2026-10-16: Cloudflare runs many short-lived copies of the server).
-async function setSession(req: ApiRequest, res: ApiResponse, user: SessionUser) {
+async function setSession(req: ApiRequest, res: ApiResponse, user: SessionUser, previous?: Session, elapsedMs = 0) {
   const { id, role, email, name, passwordResetRequired } = user;
-  const token = await new SignJWT({ id, role, email, name, passwordResetRequired }).setProtectedHeader({ alg: "HS256" }).setIssuedAt().setExpirationTime("7d").sign(JWT_SECRET);
+  const now = Date.now();
+  const absoluteExpiresAt = previous?.absoluteExpiresAt ?? Math.floor(now / 1000) * 1000 + 7 * 86400000;
+  const session = { id: previous?.id ?? crypto.randomUUID(), expiresAt: Math.min(absoluteExpiresAt, now - elapsedMs + (role === "teacher" ? 120 : 15) * 60000), absoluteExpiresAt };
+  const token = await new SignJWT({ id, role, email, name, passwordResetRequired, idleExpiresAt: session.expiresAt }).setJti(session.id).setProtectedHeader({ alg: "HS256" }).setIssuedAt().setExpirationTime(absoluteExpiresAt / 1000).sign(JWT_SECRET);
   const secure = apiConfig.crossSiteCookies || req.url.protocol === "https:";
   res.cookie("javashare_session", token, {
     httpOnly: true,
     secure,
     sameSite: apiConfig.crossSiteCookies ? "none" : "lax",
-    maxAge: 7 * 86400000,
+    maxAge: session.expiresAt - now,
     path: "/",
   });
+  return session;
 }
 
 async function requireAuth(req: AuthedRequest, res: ApiResponse, next: NextFn) {
@@ -103,8 +106,10 @@ async function requireAuth(req: AuthedRequest, res: ApiResponse, next: NextFn) {
   if (!token) return res.status(401).json({ error: "Sign in required" });
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET, { algorithms: ["HS256"] });
+    if (typeof payload.jti !== "string" || typeof payload.exp !== "number" || typeof payload.idleExpiresAt !== "number" || payload.idleExpiresAt <= Date.now()) throw new Error("Session expired");
     const session = payload as unknown as SessionUser;
     req.user = { id: session.id, role: session.role, email: session.email, name: session.name, passwordResetRequired: session.passwordResetRequired };
+    req.session = { id: payload.jti, expiresAt: payload.idleExpiresAt, absoluteExpiresAt: payload.exp * 1000 };
     next();
   } catch {
     return res.status(401).json({ error: "Session expired" });
@@ -136,8 +141,8 @@ app.post("/api/auth/register", async (req, res, next) => {
     const input = credentialsSchema.parse(req.body);
     if (!input.name) return res.status(400).json({ error: "Name is required" });
     const user = await registerWithSupabase({ name: input.name, email: input.email, password: input.password });
-    await setSession(req, res, user);
-    return res.status(201).json({ user });
+    const session = await setSession(req, res, user);
+    return res.status(201).json({ user, session });
   } catch (error) { next(error); }
 });
 
@@ -145,8 +150,8 @@ app.post("/api/auth/login", async (req, res, next) => {
   try {
     const input = z.object({ email: z.string().email(), password: z.string().max(128).optional().default("") }).parse(req.body);
     const user = await loginWithSupabase(input);
-    await setSession(req, res, user);
-    return res.json({ user });
+    const session = await setSession(req, res, user);
+    return res.json({ user, session });
   } catch (error) { next(error); }
 });
 
@@ -162,10 +167,19 @@ app.post("/api/auth/logout", (_req, res) => {
   res.status(204).end();
 });
 
-app.get("/api/auth/me", requireAuth, (req: AuthedRequest, res) => res.json({ user: req.user }));
+app.get("/api/auth/me", requireAuth, (req: AuthedRequest, res) => res.json({ user: req.user, session: req.session }));
+
+// Only browser interaction renews sign-in; background reads and live messages never do.
+app.post("/api/auth/activity", requireAuth, async (req, res, next) => {
+  try {
+    const { elapsedMs } = z.object({ elapsedMs: z.number().int().min(0).max(60000) }).parse(req.body);
+    const session = await setSession(req, res, req.user!, req.session, elapsedMs);
+    return res.json({ session });
+  } catch (error) { next(error); }
+});
 
 app.get("/api/realtime/pass", requireAuth, async (req: AuthedRequest, res) => {
-  const pass = await realtimePass(req.user!.id);
+  const pass = await realtimePass(req.user!.id, req.session!.expiresAt);
   if (!pass) return res.status(503).json({ error: "Live features are not configured (SUPABASE_JWT_SECRET is missing)" });
   return res.json(pass);
 });
@@ -174,8 +188,8 @@ app.post("/api/auth/change-reset-password", requireAuth, async (req: AuthedReque
   try {
     const { password } = z.object({ password: z.string().min(8).max(128) }).parse(req.body);
     const user = await changeSupabaseResetPassword(req.user!, password);
-    await setSession(req, res, user);
-    return res.json({ user });
+    const session = await setSession(req, res, user, req.session);
+    return res.json({ user, session });
   } catch (error) { next(error); }
 });
 

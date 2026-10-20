@@ -2,8 +2,9 @@
 
 ## Sign-in
 
-- Supabase Auth checks the password (`loginWithSupabase`). The server then sets its own cookie, `javashare_session`: a JWT (HS256, `jose`) signed with `JWT_SECRET`, valid for 7 days, `httpOnly`, `SameSite=Lax`, and `Secure` only over https (plain http on the classroom network must still work). Behind Render with pages on Vercel: `Secure; SameSite=None` (`apiConfig.crossSiteCookies`).
-- **A server restart no longer signs people out** (decided 2026-10-16; Cloudflare runs many short-lived copies of the server). Cookies issued before PR c2 stay valid when `JWT_SECRET` is unchanged.
+- Supabase Auth checks the password (`loginWithSupabase`). The server sets `javashare_session`, a JWT (HS256, `jose`) signed with `JWT_SECRET`. Teachers expire after two hours without interaction; students after fifteen minutes. The signed `idleExpiresAt` and short cookie lifetime enforce inactivity in the shared server routes. The original seven-day absolute maximum is retained across renewals. Cookie flags remain `httpOnly`, `SameSite=Lax`, and `Secure` only over https (plain classroom HTTP must work); Render/Vercel use `Secure; SameSite=None` (`apiConfig.crossSiteCookies`).
+- `POST /api/auth/activity` renews only a still-valid session; ordinary reads and live updates do not. Browser `sessionActivity.ts`, mounted once by `SessionActivity` in the root layout, reports trusted visible interaction at most once a minute, including the elapsed time since the last gesture. A one-minute warning tells users to save; expiry clears the cookie and reloads to sign-in, clearing editor/teacher-page state. Tabs share only a random session id and deadlines, never credentials or work. Old cookies lacking the inactivity deadline require a fresh sign-in. CKB-051 and `tests/session-{expiry,activity}.test.mjs` cover the rules.
+- **A server restart does not itself sign people out** (decided 2026-10-16; Cloudflare runs many short-lived copies of the server). Current-format sessions stay valid within their signed deadlines when `JWT_SECRET` is unchanged; old seven-day cookies without an inactivity deadline require a new sign-in.
 - Request bodies: JSON up to 300 KB, images up to 2 MB (`backend/src/router.ts`).
 - Teacher password reset: the teacher approves; the student signs in with a blank password and must set a new one.
 
@@ -33,7 +34,7 @@ and percentages, without student source files or raw progress maps. Reads do not
 
 ## Live channels (PR c1)
 
-- The browser gets a one-hour pass (`GET /api/realtime/pass`): a JWT with `sub` = user id and `role` = `authenticated`, signed with `SUPABASE_JWT_SECRET`. It is renewed 5 minutes before expiry, and forgotten on sign-out.
+- The browser gets a pass (`GET /api/realtime/pass`) lasting at most one hour and no longer than the current inactivity deadline: a JWT with `sub` = user id and `role` = `authenticated`, signed with `SUPABASE_JWT_SECRET`. Renewal is attempted 5 minutes before expiry and cannot extend sign-in; sign-out removes live connections by reloading the page.
 - Policies on `realtime.messages`, using `can_join_realtime_topic` and `can_broadcast_realtime_topic`:
   - **team channel:** team members and the class teacher join and send; for `teacher-demo` (classroom chat), every class member.
   - **class channel:** members join and announce presence; **only the class teacher broadcasts**.
