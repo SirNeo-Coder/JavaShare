@@ -3,7 +3,8 @@
 > Teacher approved live online answers and explicitly requested push/merge. Feature complete:
 > production build passed, 125/125 tests, lint zero errors/eight existing warnings; actual
 > CheerpJ teacher/personal flows, fixed module checks and isolated offline Java verified.
-> Next: both automatic main deployments and the teacher's hosted interactive re-test.
+> Merged as 95eb062; both production deployments succeeded and public runner files match.
+> Next: teacher’s hosted interactive re-test.
 > No hosted settings changed; original checkout/port 3000 preserved.
 
 > Current approved work (2026-10-20): [online multi-file Java](online-multifile-java.md),

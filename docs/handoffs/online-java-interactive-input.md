@@ -48,15 +48,17 @@ Real production app/local Supabase and actual CheerpJ:
 
 Implementation commit: 7930d79, committed and pushed. Pull request:
 https://github.com/SirNeo-Coder/JavaShare/pull/22 (the PR is the authoritative merge status).
-The teacher explicitly authorized merge into main. All feature work and required local
+Merged into main as 95eb062 on 2026-10-20 under the teacher’s explicit approval.
+Both automatic production build checks succeeded: codeshare and codeshare-java.
+Read-only public checks confirmed runner.js and codeshare-runner.jar exactly match the merged files.
+All feature work and required local
 verification are complete: build passed, 125/125 tests, zero lint errors/eight existing
 warnings, static Worker dry-run and regression failure/restoration proof.
 
-Both Workers already follow main. After the PR merge, check the codeshare and
-codeshare-java automatic production builds, then refresh hosted CodeShare and repeat
-Run -> prompt -> Enter answer. No hosted setting change is needed.
-If the app deploys before the runner, its temporary update message means to wait for
-the separate runner build and refresh again.
+Both Workers follow main and the automatic production builds completed successfully.
+Next: teacher refreshes hosted CodeShare, starts with empty Program input, presses
+Run code, then answers each prompt with Enter. No hosted setting change is needed.
+The full hosted interactive flow is the remaining teacher check.
 
 Hosted interactive flow, disconnected internet, Windows and another Wi-Fi device remain
 unverified. Offline remains input-before-Run by the approved scope. Local test servers

@@ -2,6 +2,10 @@
 
 Branch: codex/online-java-interactive-input, based on main after PR #21.
 
+PR #22 merged into main as 95eb062. Both Cloudflare production build checks passed.
+Public runner.js and codeshare-runner.jar hashes match the merged version.
+Hosted interactive execution remains a teacher check.
+
 ## Required checks
 
 - npm run build:all: passed; production Next.js build and backend TypeScript.
