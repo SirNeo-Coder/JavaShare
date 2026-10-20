@@ -55,3 +55,4 @@ the existing server deadline before allowing renewal. Check every page through t
 ## History
 
 - 2026-10-20 — Teacher reported restored Brave access and chose teacher two-hour/student fifteen-minute limits for public computers. Also removed CodeShare's workflow/adjustment classification question; normal proposal approval and workflow documentation remain.
+- 2026-10-20 — Teacher explicitly requested merge/push to main. PR #24 merged as `34b83bb`; main delivery confirmed. Only documentation conflicts needed resolution; application code matches the tested implementation. Hosted deployment and Brave re-test remain unverified.

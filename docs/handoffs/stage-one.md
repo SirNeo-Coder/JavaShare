@@ -1,6 +1,6 @@
-> Current session work (2026-10-20), branch `codex/session-inactivity`,
-> [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), implementation `b24c89c`, now targeting
-> `main` after documentation-only PR #23 merged: implemented the teacher's two-hour
+> Delivered session work (2026-10-20), now on `main`:
+> [PR #24](https://github.com/SirNeo-Coder/JavaShare/pull/24), merge `34b83bb`, implementation
+> `b24c89c`: implemented the teacher's two-hour
 > and student's fifteen-minute inactivity sign-out. Server checks, trusted browser interaction,
 > one-minute warning, restored-tab refusal, shared-tab logout and live-pass deadlines are complete.
 > The teacher also removed the VMAS workflow/adjustment classification question; removal
@@ -11,11 +11,12 @@
 > [session verification](../verification/session-inactivity.md) for every test and limits,
 > and CKB-051 for diagnosis. Unsaved edits can be lost after the warning; old cookies need a
 > fresh sign-in on rollout. No migration or hosted change. Implementation and rule removal
-> committed and pushed; PR attached. The teacher explicitly requested merging and pushing to
-> `origin/main`. Retargeted the PR and preserved main's newer SQL-repair status while resolving
-> the two overlapping problem-index/prompt-map rows. Application code is unchanged from the
-> verified implementation. In progress: requested merge; next: confirm main delivery and the
-> hosted Brave re-test. No hosted setting or manual deployment was changed.
+> committed and pushed; PR attached and merged into `origin/main` under the teacher's explicit
+> merge/push request. Preserved main's newer SQL-repair status while resolving the two overlapping
+> problem-index/prompt-map rows; application code is unchanged from the verified implementation.
+> Local `main` was fast-forwarded; unrelated local files were preserved. Nothing remains in
+> progress. Next: verify the automatic main deployment and re-test hosted CodeShare in Brave.
+> No hosted setting or manual deployment was changed; hosted behavior is not yet verified.
 
 > Current approved work (2026-10-20): [interactive online Java](online-java-interactive-input.md),
 > branch codex/online-java-interactive-input, implementation 7930d79, [PR #22](https://github.com/SirNeo-Coder/JavaShare/pull/22).

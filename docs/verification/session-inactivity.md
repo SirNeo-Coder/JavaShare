@@ -3,6 +3,10 @@
 Branch: `codex/session-inactivity`, based on `codex/production-module-setup` (PR #23,
 which contains documentation only). No hosted setting or deployment was changed.
 
+Delivery: PR #24 merged into `main` as `34b83bb` on 2026-10-20 under the teacher's
+explicit merge/push request. The merge resolved documentation only; application and
+test files remain identical to the verified implementation. Hosted behavior is unverified.
+
 ## Final required checks
 
 - `npm run build:all`: passed, production Next.js plus backend TypeScript.
