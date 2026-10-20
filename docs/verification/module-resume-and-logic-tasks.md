@@ -447,3 +447,16 @@ The existing historical sample-first and Week 12/13 standalone browser scripts w
 ## Delivery
 
 Implementation `ad7efe6` is committed and pushed. [PR #33](https://github.com/SirNeo-Coder/JavaShare/pull/33) targets `codex/classroom-drawer-controls` (PR #32). GitHub connector creation returned 403; authenticated CLI creation succeeded. No merge or hosted action. Verification servers were stopped and disposable test users/classes cleaned up. The primary checkout remains unchanged.
+
+## Final documentation check
+
+After the review-link update, a sandboxed direct run of the two knowledge-base checks could
+not spawn its child process (`EPERM`); this was an execution restriction, not an assertion failure.
+Reran in the same normal runtime used for the successful full suite:
+`sg docker -c 'node --test --test-reporter=spec tests/kb-search.test.mjs'`.
+
+- ✔ kb:search finds the matching bug record first
+- ✔ kb:search says so when nothing matches
+
+Two passed, zero failed/skipped. These are repeat checks already included in the 221 full-suite
+total, not additional distinct coverage. Final whitespace and clean-branch checks passed.

@@ -48,6 +48,10 @@ non-Chromium browsers remain unverified. Full names, limits and initial resolved
 `docs/verification/module-resume-and-logic-tasks.md`. The isolated checkout remains
 `/tmp/codeshare-module-resume`; unrelated work in the primary checkout is untouched.
 
+Final documentation-only verification also passed both named KB-search checks in the normal
+runtime; the sandboxed attempt could not spawn a child process. No application change was needed.
+Review-link handoff commit: `fd0c140`; implementation remains `ad7efe6`.
+
 ## Historical prepared work
 
 
