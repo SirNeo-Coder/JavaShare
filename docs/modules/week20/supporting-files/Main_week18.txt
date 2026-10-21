@@ -1,0 +1,43 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+public class Main {
+  static JPanel createContent() {
+    JPanel root = new JPanel(new BorderLayout(8, 8));
+    root.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+    TerminalPanel panel = new TerminalPanel();
+    JLabel status = new JLabel("Not checked");
+    JButton check = new JButton("Check ready");
+    check.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        check.setEnabled(false);
+        status.setText("Checking...");
+        new Thread(new ReadyTask(status, check),
+          "Readiness").start();
+      }
+    });
+    JPanel ready = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+    ready.add(check); ready.add(status);
+    root.add(new JLabel("Vehicle Terminal"), BorderLayout.NORTH);
+    root.add(panel, BorderLayout.CENTER);
+    root.add(ready, BorderLayout.SOUTH);
+    return root;
+  }
+  public static void main(String[] args) {
+    if (GraphicsEnvironment.isHeadless()) {
+      System.out.println("No display: GUI not opened.");
+      return;
+    }
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        JFrame frame = new JFrame("Vehicle Terminal");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setContentPane(createContent());
+        frame.setSize(720, 320);
+        frame.setMinimumSize(new Dimension(520, 300));
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+      }
+    });
+  }
+}

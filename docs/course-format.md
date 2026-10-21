@@ -195,3 +195,15 @@ reject invalid state, change a calculation or exercise a different catch path. R
 alone is insufficient. Supply the complete expected output while keeping sample code unsolved.
 Weeks 12/13 revised requirements use new `-v2` activity identities so earlier `-v1` passes remain
 stored without passing a different exercise. No original module, lesson or step identity is renamed.
+
+## Later weekly review copies 2026-10-22
+
+[Weeks 15–21](modules/week15-week21.md) add alteration metadata and matching appendices while
+preserving original sample code and outputs. Include complete per-step supporting sources so a
+previous alteration cannot corrupt the next baseline. Existing named demo launchers receive a
+small Main.java forwarding file for the current classroom runner. Text data/backups are retained
+in the package supporting-files folder, outside both step and starter project arrays; this does
+not implement runtime file access. Reading/presentation-only lessons may use their existing lesson id as the required
+exitSlip.afterStep descriptive anchor; it is not a code-completion or handwritten-liplet gate.
+Week 20 has no invented executable steps. See the linked package's file, timing and GUI limits
+before classroom rollout. The schema, application and original files are unchanged.

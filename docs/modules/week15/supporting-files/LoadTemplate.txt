@@ -1,0 +1,14 @@
+List<______> items = new ArrayList<>();
+try (BufferedReader in = new BufferedReader(new FileReader("______.txt"))) {
+    String line = in.readLine();
+    while (line != null) {
+        try {
+            items.add(to______(line));   // text -> object
+        } catch (NumberFormatException e) {
+            System.out.println("Skipped bad line: " + line);
+        }
+        line = in.readLine();
+    }
+} catch (IOException e) {
+    System.out.println("No data yet: " + e.getMessage());
+}

@@ -508,3 +508,19 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   Temporary verification servers were stopped and disposable browser classrooms removed.
 - Continue from `docs/handoffs/rolling-module-tasks.md`. Hosted services, physical disconnected
   Wi-Fi devices, Windows and other browsers remain unverified. No assistant merge or hosted action.
+
+## Week 15 to 21 additive curriculum package 2026-10-22
+
+- Approved: add only required sample-first/task material and appendices; preserve original
+  lessons, code, outputs, ids, assessment and written Week 20. No runner changes or substitutions.
+- Branch: `codex/week15-week21-step-additions`, based on main `9fba8a7`.
+- Prepared: seven JSON/PDF/Word review packages, 33 tasks, required upload fields and weekly links.
+  Original supplied files and all original document pages remain unchanged.
+- Checked: build and offline build passed; lint zero errors/eight existing warnings; full suite
+  269/269; every sample/task ran on real Java; deliberately broken upload regression failed and
+  passed after restoration. Real local browser passed 6/6, including every code week opening. Delivery is tracked in
+  [the active rolling handoff](rolling-module-tasks.md).
+- Open: classroom file persistence, original thread-sample timing and visible/browser GUI support
+  remain separate decisions. Review copies are not a blanket classroom rollout approval.
+- Next: commit/push and open a teacher-review draft PR; never merge or deploy.
+  Files and limitations: [package index](../modules/week15-week21.md).

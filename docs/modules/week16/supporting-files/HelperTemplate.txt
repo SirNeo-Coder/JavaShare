@@ -1,0 +1,19 @@
+public class ______ implements Runnable {   // or: extends Thread
+    private ______ total = 0;                // ITS OWN data only
+    private CountDownLatch done;
+
+    public void run() {
+        try {
+            for (int i = 0; i < ______; i++) {
+                // ... one piece of work ...
+                Thread.sleep(______);
+            }
+        } catch (InterruptedException e) {
+            System.out.println("______ was interrupted");
+        } finally {
+            done.countDown();                // always report in
+        }
+    }
+}
+// in main: new CountDownLatch(__), new Thread(job, "name").start(),
+//          then done.await() inside try / catch

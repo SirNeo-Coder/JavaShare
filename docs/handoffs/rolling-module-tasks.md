@@ -28,6 +28,50 @@
 
 ## Historical resume and task work
 
+Updated 2026-10-22. Current branch: `codex/week15-week21-step-additions`.
+Base: `origin/main` at `9fba8a7`; the separate Java suggestions branch is not included.
+
+## Current additive curriculum package
+
+The teacher approved Weeks 15–21 JSON, printed modules and lesson plans, with only required
+additions. Preserve the entire original lessons, sample source and outputs, stable ids,
+performance requirements, liplets and rubrics. No in-memory substitution or runner work is
+approved. Use Caveman for short chat replies and Ponytail for the smallest complete change.
+
+Prepared: seven review packages under docs/modules/week15 through week21, linked from
+`docs/modules/week15-week21.md`. There are 33 new explicit alteration tasks, sample-first
+metadata, weekly predecessor links, missing upload fields, complete baseline supporting
+sources and minimal Main forwarders for named demos. Text assets are preserved in supporting-files
+outside Java-only project arrays. Week 20 remains written work with zero code steps.
+
+Each PDF retains its eight original pages and appends practice material (13 added pages total).
+Each Word plan retains all original ZIP content and adds one activity-notes page. Exact page
+stream comparisons preserve all 56 original PDF pages; all 52 original Word renders are
+pixel-identical. Original supplied files in /home/ireneo/Documents/Java 2026 are unchanged.
+CKB-052/054 were consulted; CKB-060 records the six original upload failures and their corrections.
+
+Verified: build:all passed; lint zero errors/eight existing image warnings; full suite
+269/269 with no failures/skips; offline launcher build passed with the existing database.
+Every sample and alteration ran on real Java: disk exercises in disposable desktop folders,
+other weeks through the laptop execution function without a display. The upload regression
+was deliberately broken by removing Friday afterStep, failed, then passed after exact restoration.
+Local production browser passed 6/6, including all seven uploads, every code week opening with
+Java-only project files, actual sample/task feedback, completion, saved drafts and a real panel
+component alteration. Its disposable accounts/class were removed and test server stopped. Named results
+and initial corrected failures: docs/verification/week15-week21-step-additions.md.
+
+Rollout limits remain: classroom file APIs/persistence absent; original Week 16 sample timing
+assumptions deliberately retained; visible GUI and browser Java 8 unverified. Do not call these
+review copies classroom-ready. No application, schema, migration, hosted setting, deployment,
+merge or real student data changed. The isolated production browser server is port 3022;
+disposable local fixtures clean up their own class/accounts. That server has been stopped.
+
+Next: commit/push this verified package and open a teacher-review draft PR.
+Do not merge, deploy, change hosted settings or overwrite the supplied originals. Preserve
+unrelated logs/classroom.log, supabase/.temp/cli-latest, .claude/ and supabase/snippets/.
+
+## Earlier integrated application work
+
 Updated 2026-10-21. Current branch: `codex/module-resume-and-logic-tasks`.
 Base: `codex/classroom-drawer-controls` (`d75d054`), which already contains current main's Java fixes.
 

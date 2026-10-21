@@ -1,0 +1,993 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 21,
+  "id": "java-2-w21-module",
+  "title": "Self-Paced Module: Complete GUI Application",
+  "continues": "Week 20 — Market Analysis and a System Proposal",
+  "starterFiles": [
+    {
+      "path": "BoardingTask.java",
+      "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+    },
+    {
+      "path": "Bus.java",
+      "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+    },
+    {
+      "path": "ConvoyLeg.java",
+      "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+    },
+    {
+      "path": "DispatchThread.java",
+      "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+    },
+    {
+      "path": "FareCheck.java",
+      "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+    },
+    {
+      "path": "FareService.java",
+      "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+    },
+    {
+      "path": "InvalidDistanceException.java",
+      "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Jeepney.java",
+      "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+    },
+    {
+      "path": "LayoutDemo.java",
+      "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "LoadingBay.java",
+      "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+    },
+    {
+      "path": "Main.java",
+      "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class Main {\n  static JPanel createContent() {\n    JPanel root = new JPanel(new BorderLayout(8, 8));\n    root.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));\n    TerminalPanel panel = new TerminalPanel();\n    JLabel status = new JLabel(\"Not checked\");\n    JButton check = new JButton(\"Check ready\");\n    check.addActionListener(new ActionListener() {\n      public void actionPerformed(ActionEvent e) {\n        check.setEnabled(false);\n        status.setText(\"Checking...\");\n        new Thread(new ReadyTask(status, check),\n          \"Readiness\").start();\n      }\n    });\n    JPanel ready = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));\n    ready.add(check); ready.add(status);\n    root.add(new JLabel(\"Vehicle Terminal\"), BorderLayout.NORTH);\n    root.add(panel, BorderLayout.CENTER);\n    root.add(ready, BorderLayout.SOUTH);\n    return root;\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JFrame frame = new JFrame(\"Vehicle Terminal\");\n        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n        frame.setContentPane(createContent());\n        frame.setSize(720, 320);\n        frame.setMinimumSize(new Dimension(520, 300));\n        frame.setLocationRelativeTo(null);\n        frame.setVisible(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "OverloadException.java",
+      "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "ReadyReport.java",
+      "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+    },
+    {
+      "path": "ReadyTask.java",
+      "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "RequestDemo.java",
+      "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class RequestDemo extends JPanel\n    implements ActionListener {\n  private JCheckBox guide = new JCheckBox(\n    \"Guide\");\n  private JCheckBox sheet = new JCheckBox(\n    \"Practice sheet\");\n  private JRadioButton desk = new JRadioButton(\n    \"Desk\", true);\n  private JRadioButton room = new JRadioButton(\n    \"Classroom\");\n  private JList<String> subject = new JList<>(\n    new String[]{\"Java\", \"English\", \"Math\"});\n  private String name = \"My request\";\n  private JTextArea result = new JTextArea(4, 24);\n  public RequestDemo() {\n    setLayout(new BorderLayout(8, 8));\n    setBorder(BorderFactory.createEmptyBorder(8, 8,\n      8, 8));\n    ButtonGroup collect = new ButtonGroup();\n    collect.add(desk); collect.add(room);\n    JPanel materials = new JPanel();\n    materials.add(guide); materials.add(sheet);\n    JPanel place = new JPanel();\n    place.add(new JLabel(\"Collect at:\"));\n    place.add(desk); place.add(room);\n    JPanel options = new JPanel(new GridLayout(2,\n      1));\n    options.add(materials); options.add(place);\n    subject.setSelectionMode(\n      ListSelectionModel.SINGLE_SELECTION);\n    subject.setVisibleRowCount(3);\n    JLabel label = new JLabel(\"Subject:\");\n    label.setLabelFor(subject);\n    JPanel choices = new JPanel(new BorderLayout(4,\n      4));\n    choices.add(label, BorderLayout.NORTH);\n    choices.add(new JScrollPane(subject),\n      BorderLayout.CENTER);\n    choices.add(options, BorderLayout.SOUTH);\n    result.setEditable(false);\n    result.setLineWrap(true);\n      result.setWrapStyleWord(true);\n    result.setText(\n      \"Choose materials, then Preview.\");\n    JPanel actions = new JPanel();\n    for (String text : new String[]{\"Preview\",\n      \"Clear\", \"Info\", \"Rename\"}) {\n      JButton button = new JButton(text);\n      button.setMnemonic(text.charAt(0));\n      button.addActionListener(this);\n      actions.add(button);\n    }\n    add(choices, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  String summary() {\n    if (subject.getSelectedValue() == null) {\n      throw new IllegalArgumentException(\n        \"Choose a subject.\");\n    }\n    if (!guide.isSelected() && !sheet.isSelected(\n      )) {\n      throw new IllegalArgumentException(\n        \"Choose materials.\");\n    }\n    if (!desk.isSelected() && !room.isSelected())\n      {\n      throw new IllegalArgumentException(\n        \"Choose a place.\");\n    }\n    return subject.getSelectedValue() + \": Guide=\"\n      + guide.isSelected()\n      + \"; Sheet=\" + sheet.isSelected()\n      + \"; Place=\" + (desk.isSelected() ? \"Desk\" :\n        \"Classroom\");\n  }\n  void clearChoices() {\n    subject.clearSelection();\n    guide.setSelected(false); sheet.setSelected(\n      false);\n    desk.setSelected(true); result.setText(\n      \"Choices cleared.\");\n  }\n  void acceptName(String input) {\n    if (input == null) { return; }\n    String clean = input.trim();\n    if (clean.isEmpty() || clean.length() > 30) {\n      result.setText(\n        \"Use 1-30 characters for the name.\");\n      return;\n    }\n    name = clean; result.setText(\"Named: \" +\n      name);\n  }\n  void clearIfConfirmed(int answer) {\n    if (answer == JOptionPane.YES_OPTION) {\n      clearChoices();\n    } else if (answer == JOptionPane.NO_OPTION) {\n      result.setText(\"Kept choices (No).\");\n    } else if (answer ==\n      JOptionPane.CANCEL_OPTION) {\n      result.setText(\"Kept choices (Cancel).\");\n    } else {\n      result.setText(\"Kept choices (Closed).\");\n    }\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String command = e.getActionCommand();\n    if (\"Rename\".equals(command)) {\n      acceptName(JOptionPane.showInputDialog(this,\n        \"Request name (1-30 characters):\", name));\n      return;\n    }\n    if (\"Clear\".equals(command)) {\n      clearIfConfirmed(\n        JOptionPane.showConfirmDialog(this,\n        \"Clear subject and materials?\",\n        \"Confirm clear\",\n          JOptionPane.YES_NO_CANCEL_OPTION));\n      return;\n    }\n    try {\n      String text = name + \"\\n\" + summary();\n      if (\"Info\".equals(command)) {\n        JOptionPane.showMessageDialog(this, text,\n          \"Request information\",\n            JOptionPane.INFORMATION_MESSAGE);\n      } else {\n        result.setText(text);\n      }\n    } catch (IllegalArgumentException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(() -> {\n        JFrame f = new JFrame(\n          \"School materials request\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(new RequestDemo());\n        f.setSize(640, 420);\n        f.setMinimumSize(new Dimension(520, 380));\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n    });\n  }\n}\n"
+    },
+    {
+      "path": "TerminalPanel.java",
+      "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JComboBox<String> plate = new\n    JComboBox<>(\n    new String[]{\"NXA 123\", \"TRC 456\", \"BUS 789\",\n      \"NYB 321\"});\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result = new JLabel(\n    \"Choose plate and km\");\n  public TerminalPanel() {\n    setLayout(new BorderLayout(8, 8));\n    plate.setSelectedIndex(-1);\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate); d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.setMnemonic('Q');\n    quote.addActionListener(this);\n    JPanel form = new JPanel(new GridLayout(2, 2,\n      8, 8));\n    form.add(p); form.add(plate);\n    form.add(d); form.add(km);\n    JPanel actions = new JPanel(new FlowLayout(\n      FlowLayout.LEFT));\n    actions.add(quote);\n    add(form, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String chosen = (String) plate.getSelectedItem(\n      );\n    if (chosen == null) {\n      result.setText(\"Choose a plate first.\");\n      return;\n    }\n    try {\n      result.setText(FareService.quote(chosen,\n        km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+    },
+    {
+      "path": "ThemeLayoutCheck.java",
+      "content": "import java.awt.*;\nimport javax.swing.*;\npublic class ThemeLayoutCheck {\n  public static void main(String[] args) {\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel form = new JPanel(\n          new GridLayout(2, 2, 6, 6));\n        form.add(new JLabel(\"Item:\"));\n        form.add(new JTextField(\"Rice\", 8));\n        form.add(new JLabel(\"Quantity:\"));\n        form.add(new JTextField(\"2\", 8));\n        JPanel actions = new JPanel(\n          new FlowLayout());\n        actions.add(new JButton(\"Calculate\"));\n        JPanel root = new JPanel(\n          new BorderLayout(6, 6));\n        root.add(form, BorderLayout.CENTER);\n        root.add(actions, BorderLayout.SOUTH);\n        System.out.println(\"Form controls: \"\n          + form.getComponentCount());\n        System.out.println(\"Action controls: \"\n          + actions.getComponentCount());\n        System.out.println(\"Root groups: \"\n          + root.getComponentCount());\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "Tricycle.java",
+      "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+    },
+    {
+      "path": "Vehicle.java",
+      "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+    },
+    {
+      "path": "VehicleNotFoundException.java",
+      "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "java-2-w21-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Plan One Useful Application",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Link a limited set of requirements and a user flow to the Week 20 own-theme proposal.",
+        "affective": "Make realistic promises and distinguish existing, planned, completed and unverified work.",
+        "psychomotor": "Draw an interface plan and write needs-linked requirements and checks for one useful task."
+      },
+      "blocks": [
+        {
+          "type": "note",
+          "markdown": "Work offline in order with the printed module, JDK and existing sources. Keep each public class in its named .java file in one folder. Compile javac *.java; java Main opens Vehicle; java RequestDemo opens school-materials practice. Use your own launcher for assessed work."
+        },
+        {
+          "type": "note",
+          "markdown": "Use the complete Week 20 starting files directly: they already include all four Week 19 steps. Do not reapply old steps. Vehicle: java Main, with the Week 18 launcher/readiness group and Week 19 JComboBox TerminalPanel. School-materials practice: java RequestDemo, with Preview, Info, Rename and confirmed Clear. Keep LayoutDemo, ThemeLayoutCheck, all other optional demonstrations, every .txt backup, the Vehicle model and exceptions, FareService/FareCheck, ReadyTask and DispatchThread, BoardingTask, ReadyReport, ConvoyLeg and LoadingBay. InvalidDistanceException extends RuntimeException directly; keep its separate catch."
+        },
+        {
+          "type": "note",
+          "markdown": "Course history: Week 11 classes/objects; 12 four OOP pillars; 13 exceptions; 14 collections; 15 file handling; 16 threads; 17 Swing basics; 18 layouts/panels; 19 advanced components/user interaction; 20 market analysis/system proposal."
+        },
+        {
+          "type": "definition",
+          "term": "Complete classroom application",
+          "markdown": "A GUI (graphical user interface) uses windows and controls to work with a program. A complete classroom application finishes one useful user task, checks input and explains its limits. A requirement is a behavior you can check; a user flow is the path from starting an action to a useful result [YS]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A school desk needs a clear path from choosing materials to a readable draft. More counters do not help if nobody can finish the request."
+        },
+        {
+          "type": "text",
+          "markdown": "**Continue your proposal.** Name your own theme, users and problem. Reuse Week 20 findings and label assumptions. Existing means already in the program; planned means proposed; completed means built with stated checks; unverified means not yet checked. A completed feature may still have unverified usability."
+        },
+        {
+          "type": "text",
+          "markdown": "**Worked example and justified revision.** Keep the school-materials draft. Week 20 planned local save/load, but did not build it. Defer that feature to protect time for safe integration and menus; retain the current one-session preview task. The hypothetical scenario, costs, benefits and estimates were not field research. No new survey is required."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Need",
+            "Limited requirement / check"
+          ],
+          "rows": [
+            [
+              "Clear draft",
+              "R1: choose subject, at least one material and collection place; Preview gives a summary or a correctable error."
+            ],
+            [
+              "Recover safely",
+              "R2: Rename accepts 1–30 trimmed characters; Cancel keeps the name. Clear changes choices only after explicit Yes."
+            ],
+            [
+              "Find useful actions",
+              "R3: Request has Preview/Rename/Clear; View has Info. Each menu uses the same behavior as its button."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Worked flow:** open → select subject/materials/place → Preview → read summary. On an error, correct the choice and Preview again. Rename is optional. Clear offers Yes/No/Cancel; closing its dialog also keeps choices. Preview is a snapshot: after editing choices, Preview again."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 1 | Own-theme design.** In your notebook, name your existing capability, user/task/problem and proposal link. Write 3–5 limited requirements with a need and a concrete check each. Draw nested panels and a menu plan; mark inputs, action, model method and result. Write the normal flow, correction path and cancellation path. Justify a reduced scope using Week 20 feasibility."
+        },
+        {
+          "type": "note",
+          "markdown": "**Boundary:** the example does not submit, reserve stock, save/load or serve simultaneous users. Closing the window loses its draft. Use invented request labels, not personal data. Your own task must remain useful within its stated limits."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Own-theme planning record",
+            "What to record"
+          ],
+          "rows": [
+            [
+              "Theme / user / useful task",
+              "Name the theme, user and task."
+            ],
+            [
+              "Requirement → need → check",
+              "Write R1–R5 as needed, with a need and concrete check each."
+            ],
+            [
+              "Proposal revision / reason",
+              "Name the revision and justify it."
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Daily allocation:** 10 min recall + 20 min scope + 20 min worked design + 40 min own plan + 20 min review/slip + 10 min revision = 120 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Yale University [YD]. [Discovery](https://usability.yale.edu/ux/discovery). Excerpt: “real goals”. Identify the intended users and their task."
+        },
+        {
+          "type": "text",
+          "markdown": "2. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Excerpt: “success criteria”. Limit requirements to needs and available resources."
+        },
+        {
+          "type": "text",
+          "markdown": "3. Yale University [YT]. [User Testing](https://usability.yale.edu/ux/validate/review-the-user-experience/user-testing). Excerpt: “complete tasks”. Observe task attempts and record problems before revision."
+        },
+        {
+          "type": "text",
+          "markdown": "4. Massachusetts Institute of Technology [MIT]. [Graphical User Interfaces](https://ocw.mit.edu/ans7870/6/6.005/s16/classes/24-graphical-user-interfaces/index.html). Excerpt: “view tree”. Separate interface actions from application rules; nest views."
+        },
+        {
+          "type": "text",
+          "markdown": "5. University of Pennsylvania [PA]. [Design and Usability Testing](https://accessibility.web-resources.upenn.edu/testing-evaluating-accessibility/design-and-usability-testing). Excerpt: “visible labels”. Use visible labels, clear actions and keyboard alternatives."
+        },
+        {
+          "type": "note",
+          "markdown": "**Key validated facts:** Choose a user task and realistic boundaries [YD] [YS]; connect controls to application rules [MIT]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w21-d1-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "java-2-w21-d1-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Activity 1, distinguish existing, planned, completed and unverified capabilities using your own proposal and program."
+          },
+          {
+            "id": "java-2-w21-d1-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "For Activity 1, trace one user need through your limited requirement, interface plan and user flow to a check."
+          },
+          {
+            "id": "java-2-w21-d1-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect Activity 1 to Weeks 11–20: name an existing model method and a proposal finding that support your chosen task."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w21-d1"
+      }
+    },
+    {
+      "id": "java-2-w21-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Combine a Complete User Workflow",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain how nested panels, layouts, actions and existing model rules complete one workflow.",
+        "affective": "Respect users by preserving useful checks and making correction clear.",
+        "psychomotor": "Combine existing controls and model calls in the own-theme program and record valid and invalid trials."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Integration",
+          "markdown": "Connecting controls, layouts, existing model rules and feedback so one user can finish a task. Nested panels are panels inside other panels; a layout arranges their controls. A model holds application data or rules; a listener is code called when an action occurs [MIT] [N1]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A materials desk connects its form, checking rule and readable result. A separate attractive form with no working route to the rule leaves the task unfinished."
+        },
+        {
+          "type": "text",
+          "markdown": "**Trace the retained RequestDemo.** It already combines the controls and rules below. Today reuse that complete workflow and explain its structure; no replacement of the worked example is needed. Build or repair the equivalent connection in your own theme program."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Group / layout",
+            "Existing connection"
+          ],
+          "rows": [
+            [
+              "RequestDemo / BorderLayout",
+              "choices NORTH; result CENTER; actions SOUTH."
+            ],
+            [
+              "choices / BorderLayout",
+              "subject label NORTH; scrollable JList CENTER; options SOUTH."
+            ],
+            [
+              "options / GridLayout(2,1)",
+              "materials row and collection-place row, each using FlowLayout."
+            ],
+            [
+              "Actions and rules",
+              "Preview/Info call summary(); it checks required choices. Rename uses acceptName(); Clear uses clearIfConfirmed()."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Follow an action:** button → actionPerformed() → summary() → useful text or IllegalArgumentException caught as feedback. This retained teaching example keeps request rules in methods of the same class. In your own theme, call the existing model method; do not duplicate its calculation in a listener. Vehicle already routes TerminalPanel through FareService to Vehicle.quoteFare(). Do not merge the two programs."
+        },
+        {
+          "type": "note",
+          "markdown": "**Read existing code, not a replacement:** `result.setText(text);` displays the current summary; `summary()` throws if a required choice is missing. Keep those checks. A disabled or empty choice is not a reason to remove validation."
+        },
+        {
+          "type": "text",
+          "markdown": "**Actual direct-check results:** with no subject: IllegalArgumentException: Choose a subject. With Java but no material: IllegalArgumentException: Choose materials. Java + Guide + Desk returns: Java: Guide=true; Sheet=false; Place=Desk. These came from method checks on the event dispatch thread, not live clicks. Headless means using no display: that launcher run showed no window."
+        },
+        {
+          "type": "text",
+          "markdown": "**Safe interface work.** The event dispatch thread (EDT) handles Swing events and interface updates [KS]. Keep short checks there. Slow work runs outside listeners; return updates through SwingUtilities.invokeLater(). Retain Main’s ReadyTask and Week 16 helpers. This draft preview has no slow operation, so it needs no new worker or storage."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 2 | Own-theme workflow.** Combine existing components and useful nested panels. Trace one action to its model method and visible result. Compile locally with javac *.java; run your own launcher. Record normal input, missing/invalid input, correction and cancellation. State expected and actual results separately. Back up each working file before changing it."
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself:** can a classmate complete the task from labels alone? Does invalid input preserve editable choices? At minimum and larger window sizes, can all controls still be reached? Keep the interface’s result and your description consistent."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Input or action",
+            "Expected",
+            "Actual / status"
+          ],
+          "rows": [
+            [
+              "Normal task",
+              "Record before running.",
+              "Record what actually happened."
+            ],
+            [
+              "Invalid → correction",
+              "Record before running.",
+              "Record what actually happened."
+            ],
+            [
+              "Cancellation",
+              "Record before running.",
+              "Record what actually happened."
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "Connection record: control → listener → model method → result. Nested groups: parent/layout contains child/layout. Record any repair or remaining check."
+        },
+        {
+          "type": "text",
+          "markdown": "**Draw and check the own-theme workflow.** Sketch labelled input, nested panels, action, model method and feedback. Add the correction and cancellation routes. Keep this with your test record."
+        },
+        {
+          "type": "note",
+          "markdown": "**Daily allocation:** 10 min recall + 20 min integration trace + 20 min worked checks + 45 min own workflow + 15 min partner check + 10 min slip = 120 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Nanyang Technological University [N1]. [GUI Programming](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html). Excerpt: “arranged from left-to-right”. Layouts arrange controls; listeners handle actions."
+        },
+        {
+          "type": "text",
+          "markdown": "2. Massachusetts Institute of Technology [MIT]. [Graphical User Interfaces](https://ocw.mit.edu/ans7870/6/6.005/s16/classes/24-graphical-user-interfaces/index.html). Excerpt: “view tree”. Separate interface actions from application rules; nest views."
+        },
+        {
+          "type": "text",
+          "markdown": "3. Kansas State University [KS]. [Swing Event Dispatch Thread](https://textbooks.cs.ksu.edu/cc410/ii-gui/13-event-driven-programming/06-swing-dispatch-thread/index.html). Excerpt: “event handlers”. Keep event handlers short; start GUI work with invokeLater."
+        },
+        {
+          "type": "text",
+          "markdown": "4. University of Pennsylvania [PA]. [Design and Usability Testing](https://accessibility.web-resources.upenn.edu/testing-evaluating-accessibility/design-and-usability-testing). Excerpt: “visible labels”. Use visible labels, clear actions and keyboard alternatives."
+        },
+        {
+          "type": "text",
+          "markdown": "5. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Excerpt: “success criteria”. Limit requirements to needs and available resources."
+        },
+        {
+          "type": "note",
+          "markdown": "**Key validated facts:** Group related controls and reuse application rules [N1] [MIT]; keep handlers short [KS]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w21-d2-slip",
+        "points": 20,
+        "questions": [
+          {
+            "id": "java-2-w21-d2-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Activity 2, explain integration and the roles of a nested panel, model method and listener in your workflow."
+          },
+          {
+            "id": "java-2-w21-d2-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Trace your Activity 2 input → action → model → result; explain invalid input and how the user corrects it."
+          },
+          {
+            "id": "java-2-w21-d2-q3",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "For Activity 2, identify four parts in your own code: (a) input control ___; (b) nested panel/layout ___; (c) model call ___; (d) feedback update ___."
+          },
+          {
+            "id": "java-2-w21-d2-q4",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect Activity 2 to exceptions or threads: explain a retained validation rule or worker and why removing it would hurt your task."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w21-d2"
+      }
+    },
+    {
+      "id": "java-2-w21-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Add Purposeful Menus Safely",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain JMenuBar, JMenu and JMenuItem and trace a menu action to existing behavior.",
+        "affective": "Protect user choices when an action is cancelled or declined.",
+        "psychomotor": "Build purposeful menus with keyboard access and test validation, correction and safe confirmation."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Menu hierarchy",
+          "markdown": "JMenuBar is the menu strip, JMenu groups related choices, and JMenuItem is an action inside a menu. Its listener works like a button listener [N2]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Request and View are like labelled desk folders. Inside each folder, each instruction performs a real task rather than merely showing a decorative label."
+        },
+        {
+          "type": "text",
+          "markdown": "**Step 1 | Add menus to the worked example.** First copy the previous working RequestDemo.java to RequestDemo_week20.txt. Keep every earlier backup. Then replace RequestDemo.java with the complete listing below. Do not run half a file. No other existing file changes. Compile javac *.java; run java RequestDemo."
+        },
+        {
+          "type": "text",
+          "markdown": "**What changes:** createMenuBar() adds Request → Preview/Rename/Clear and View → Info, using the same listener as the retained buttons. The frame installs that bar. Subject/material/place keyboard mnemonics and a scrollable result improve access. Existing validation, dialogs and safe confirmation remain. A mnemonic is a letter used to navigate controls; an accelerator runs an action directly: Ctrl+P previews [N2]."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Before typing | trace the plan",
+            "Your prediction / later check"
+          ],
+          "rows": [
+            [
+              "Request → Preview → listener",
+              "Which existing method checks the choices?"
+            ],
+            [
+              "Clear No / Cancel / close",
+              "Which choices and name must remain?"
+            ],
+            [
+              "Keyboard route",
+              "Request/View letters; Preview accelerator."
+            ],
+            [
+              "Changed choices after preview",
+              "What must the user repeat for a current result?"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Model the menu tree:** Request → Preview, Rename, Clear; View → Info. A menu groups actions; the existing listener decides which rule to run. Do not add empty menus or rename an action without updating its command check."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w21-d3-s1",
+          "number": 1,
+          "instruction": "Back up the previous working RequestDemo.java as RequestDemo_week20.txt before replacing it. The backup content included here is the complete retained Week 20 launcher. Replace RequestDemo.java with this complete verified listing. Keep all other files and earlier backups. Compile javac *.java; run java RequestDemo on a school computer. Verification expectedOutput below records the actual headless run, which cannot show a window.",
+          "language": "java",
+          "files": [
+            {
+              "path": "RequestDemo.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class RequestDemo extends JPanel\n    implements ActionListener {\n  private JCheckBox guide = new JCheckBox(\n    \"Guide\");\n  private JCheckBox sheet = new JCheckBox(\n    \"Practice sheet\");\n  private JRadioButton desk = new JRadioButton(\n    \"Desk\", true);\n  private JRadioButton room = new JRadioButton(\n    \"Classroom\");\n  private JList<String> subject = new JList<>(\n    new String[]{\"Java\", \"English\", \"Math\"});\n  private String name = \"My request\";\n  private JTextArea result = new JTextArea(4, 24);\n  public RequestDemo() {\n    setLayout(new BorderLayout(8, 8));\n    setBorder(BorderFactory.createEmptyBorder(8, 8,\n      8, 8));\n    guide.setMnemonic('G'); sheet.setMnemonic('S');\n    desk.setMnemonic('D'); room.setMnemonic('L');\n    ButtonGroup collect = new ButtonGroup();\n    collect.add(desk); collect.add(room);\n    JPanel materials = new JPanel();\n    materials.add(guide); materials.add(sheet);\n    JPanel place = new JPanel();\n    place.add(new JLabel(\"Collect at:\"));\n    place.add(desk); place.add(room);\n    JPanel options = new JPanel(new GridLayout(2,\n      1));\n    options.add(materials); options.add(place);\n    subject.setSelectionMode(\n      ListSelectionModel.SINGLE_SELECTION);\n    subject.setVisibleRowCount(3);\n    JLabel label = new JLabel(\"Subject:\");\n    label.setLabelFor(subject);\n    label.setDisplayedMnemonic('U');\n    JPanel choices = new JPanel(new BorderLayout(4,\n      4));\n    choices.add(label, BorderLayout.NORTH);\n    choices.add(new JScrollPane(subject),\n      BorderLayout.CENTER);\n    choices.add(options, BorderLayout.SOUTH);\n    result.setEditable(false);\n    result.setLineWrap(true);\n    result.setWrapStyleWord(true);\n    result.setText(\n      \"Choose materials, then Preview.\");\n    JPanel actions = new JPanel();\n    for (String text : new String[]{\"Preview\",\n      \"Clear\", \"Info\", \"Rename\"}) {\n      JButton button = new JButton(text);\n      button.setMnemonic(text.charAt(0));\n      button.addActionListener(this);\n      actions.add(button);\n    }\n    add(choices, BorderLayout.NORTH);\n    add(new JScrollPane(result),\n      BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  JMenuBar createMenuBar() {\n    JMenuBar bar = new JMenuBar();\n    JMenu request = new JMenu(\"Request\");\n    request.setMnemonic('R');\n    JMenu view = new JMenu(\"View\");\n    view.setMnemonic('V');\n    for (String text : new String[]{\"Preview\",\n        \"Rename\", \"Clear\", \"Info\"}) {\n      JMenuItem item = new JMenuItem(text);\n      item.setMnemonic(text.charAt(0));\n      item.addActionListener(this);\n      if (\"Preview\".equals(text)) {\n        item.setAccelerator(KeyStroke.getKeyStroke(\n          KeyEvent.VK_P,\n          InputEvent.CTRL_DOWN_MASK));\n      }\n      if (\"Info\".equals(text)) { view.add(item); }\n      else { request.add(item); }\n    }\n    bar.add(request); bar.add(view);\n    return bar;\n  }\n  String summary() {\n    if (subject.getSelectedValue() == null) {\n      throw new IllegalArgumentException(\n        \"Choose a subject.\");\n    }\n    if (!guide.isSelected() && !sheet.isSelected(\n      )) {\n      throw new IllegalArgumentException(\n        \"Choose materials.\");\n    }\n    if (!desk.isSelected() && !room.isSelected())\n      {\n      throw new IllegalArgumentException(\n        \"Choose a place.\");\n    }\n    return subject.getSelectedValue() + \": Guide=\"\n      + guide.isSelected()\n      + \"; Sheet=\" + sheet.isSelected()\n      + \"; Place=\" + (desk.isSelected() ? \"Desk\" :\n        \"Classroom\");\n  }\n  void clearChoices() {\n    subject.clearSelection();\n    guide.setSelected(false); sheet.setSelected(\n      false);\n    desk.setSelected(true); result.setText(\n      \"Choices cleared.\");\n  }\n  void acceptName(String input) {\n    if (input == null) { return; }\n    String clean = input.trim();\n    if (clean.isEmpty() || clean.length() > 30) {\n      result.setText(\n        \"Use 1-30 characters for the name.\");\n      return;\n    }\n    name = clean; result.setText(\"Named: \" +\n      name);\n  }\n  void clearIfConfirmed(int answer) {\n    if (answer == JOptionPane.YES_OPTION) {\n      clearChoices();\n    } else if (answer == JOptionPane.NO_OPTION) {\n      result.setText(\"Kept choices (No).\");\n    } else if (answer ==\n      JOptionPane.CANCEL_OPTION) {\n      result.setText(\"Kept choices (Cancel).\");\n    } else {\n      result.setText(\"Kept choices (Closed).\");\n    }\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String command = e.getActionCommand();\n    if (\"Rename\".equals(command)) {\n      acceptName(JOptionPane.showInputDialog(this,\n        \"Request name (1-30 characters):\", name));\n      return;\n    }\n    if (\"Clear\".equals(command)) {\n      clearIfConfirmed(\n        JOptionPane.showConfirmDialog(this,\n        \"Clear subject and materials?\",\n        \"Confirm clear\",\n          JOptionPane.YES_NO_CANCEL_OPTION));\n      return;\n    }\n    try {\n      String text = name + \"\\n\" + summary();\n      if (\"Info\".equals(command)) {\n        JOptionPane.showMessageDialog(this, text,\n          \"Request information\",\n            JOptionPane.INFORMATION_MESSAGE);\n      } else {\n        result.setText(text);\n      }\n    } catch (IllegalArgumentException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(() -> {\n        JFrame f = new JFrame(\n          \"School materials request\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        RequestDemo panel = new RequestDemo();\n        f.setContentPane(panel);\n        f.setJMenuBar(panel.createMenuBar());\n        f.setSize(640, 420);\n        f.setMinimumSize(new Dimension(520, 380));\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n    });\n  }\n}\n"
+            },
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "FareCheck.java",
+              "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+            },
+            {
+              "path": "FareService.java",
+              "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "LayoutDemo.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) throws Exception {\n        RequestDemo.main(args);\n    }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+            },
+            {
+              "path": "ReadyTask.java",
+              "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "TerminalPanel.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JComboBox<String> plate = new\n    JComboBox<>(\n    new String[]{\"NXA 123\", \"TRC 456\", \"BUS 789\",\n      \"NYB 321\"});\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result = new JLabel(\n    \"Choose plate and km\");\n  public TerminalPanel() {\n    setLayout(new BorderLayout(8, 8));\n    plate.setSelectedIndex(-1);\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate); d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.setMnemonic('Q');\n    quote.addActionListener(this);\n    JPanel form = new JPanel(new GridLayout(2, 2,\n      8, 8));\n    form.add(p); form.add(plate);\n    form.add(d); form.add(km);\n    JPanel actions = new JPanel(new FlowLayout(\n      FlowLayout.LEFT));\n    actions.add(quote);\n    add(form, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String chosen = (String) plate.getSelectedItem(\n      );\n    if (chosen == null) {\n      result.setText(\"Choose a plate first.\");\n      return;\n    }\n    try {\n      result.setText(FareService.quote(chosen,\n        km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+            },
+            {
+              "path": "ThemeLayoutCheck.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class ThemeLayoutCheck {\n  public static void main(String[] args) {\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel form = new JPanel(\n          new GridLayout(2, 2, 6, 6));\n        form.add(new JLabel(\"Item:\"));\n        form.add(new JTextField(\"Rice\", 8));\n        form.add(new JLabel(\"Quantity:\"));\n        form.add(new JTextField(\"2\", 8));\n        JPanel actions = new JPanel(\n          new FlowLayout());\n        actions.add(new JButton(\"Calculate\"));\n        JPanel root = new JPanel(\n          new BorderLayout(6, 6));\n        root.add(form, BorderLayout.CENTER);\n        root.add(actions, BorderLayout.SOUTH);\n        System.out.println(\"Form controls: \"\n          + form.getComponentCount());\n        System.out.println(\"Action controls: \"\n          + actions.getComponentCount());\n        System.out.println(\"Root groups: \"\n          + root.getComponentCount());\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "RequestDemo.java",
+          "expectedOutput": "No display: GUI not opened.",
+          "checkYourself": "Check every menu and button path at school. Preview/Info must validate; Rename Cancel/close must preserve the name; Clear must preserve choices for No/Cancel/close and clear only for explicit Yes. Check keyboard access, resizing, correction and responsiveness with the school-computer checklist. No live interface test was available in preparation."
+        ,
+          "activity": {
+            "id": "java-2-w21-d3-s1-alter-v1",
+            "instruction": "Add a Reset menu item after the existing Request menu items. Set its action command to \"Clear\", register the existing listener and add it to the Request menu. Keep Clear confirmation unchanged. Print the actual menu count and the new item action command. At school, also check Yes, No, Cancel and close through Reset.\n\nBefore the existing headless check in `RequestDemo.java`, add this console check. Keep the original sample message and the window code.\n\nJMenu request = new RequestDemo().createMenuBar().getMenu(0);\n    System.out.println(\"Request items: \" + request.getItemCount());\n    System.out.println(\"Reset action: \" + request.getItem(3).getActionCommand());",
+            "files": [],
+            "expectedOutput": "Request items: 4\nReset action: Clear\nNo display: GUI not opened.",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**Output and evidence.** The forced-headless launch printed exactly: No display: GUI not opened. A school-computer launch should show the existing controls plus Request and View menus. After Java + Guide + Desk, Preview should show My request followed by Java: Guide=true; Sheet=false; Place=Desk. This result was checked directly; window appearance and physical actions remain unverified."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Action",
+            "Required outcome"
+          ],
+          "rows": [
+            [
+              "Request → Preview / Ctrl+P",
+              "Same validation and summary as Preview button."
+            ],
+            [
+              "Request → Rename",
+              "Cancel/close keeps the name; blank or >30 characters gives feedback; a valid trimmed name is used."
+            ],
+            [
+              "Request → Clear",
+              "Only YES_OPTION clears subject/materials and selects Desk. No/Cancel/close keeps choices. The name remains."
+            ],
+            [
+              "View → Info",
+              "Same validated current request in an information dialog; closing it does not change choices."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 3 | Own-theme menus.** Back up working sources. Add a menu bar with clearly named menus and only purposeful items linked to your existing actions/model. Choose distinct navigation letters. Record normal, invalid, corrected, declined and cancelled outcomes. Never treat “not No” as permission to destroy data. Use an explicit Yes test."
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself:** selecting a menu without adding a listener cannot perform the task. Reusing the same handler avoids different rules for buttons and menus. The example’s Clear keeps the request name; explain exactly what your own destructive action resets."
+        },
+        {
+          "type": "text",
+          "markdown": "**Read the safety rules in the listing:** acceptName(null) returns without changing the name; invalid text leaves the name unchanged. clearIfConfirmed() alone authorizes clearing after Yes. Closing Info changes no request fields. These direct method outcomes were tested; a real dialog still needs the school-computer checks."
+        },
+        {
+          "type": "note",
+          "markdown": "Own menu trace: item → command → model/rule → feedback."
+        },
+        {
+          "type": "note",
+          "markdown": "**Daily allocation:** 10 min recall + 20 min menu model + 35 min Step 1 + 30 min own menus + 15 min safety checks + 10 min slip = 120 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Nanyang Technological University [N2]. [GUI Programming Part 2](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI_2.html). Excerpt: “fires ActionEvent upon activation”. Menu items fire actions; confirmation returns a choice."
+        },
+        {
+          "type": "text",
+          "markdown": "2. Yale University [YC]. [Giving Users Control](https://usability.yale.edu/ux/best-practices/giving-users-control). Excerpt: “change their minds”. Explain consequences and allow safe changes of mind."
+        },
+        {
+          "type": "text",
+          "markdown": "3. Kansas State University [KS]. [Swing Event Dispatch Thread](https://textbooks.cs.ksu.edu/cc410/ii-gui/13-event-driven-programming/06-swing-dispatch-thread/index.html). Excerpt: “event handlers”. Keep event handlers short; start GUI work with invokeLater."
+        },
+        {
+          "type": "text",
+          "markdown": "4. Massachusetts Institute of Technology [MIT]. [Graphical User Interfaces](https://ocw.mit.edu/ans7870/6/6.005/s16/classes/24-graphical-user-interfaces/index.html). Excerpt: “view tree”. Separate interface actions from application rules; nest views."
+        },
+        {
+          "type": "text",
+          "markdown": "5. University of Pennsylvania [PA]. [Design and Usability Testing](https://accessibility.web-resources.upenn.edu/testing-evaluating-accessibility/design-and-usability-testing). Excerpt: “visible labels”. Use visible labels, clear actions and keyboard alternatives."
+        },
+        {
+          "type": "note",
+          "markdown": "**Key validated facts:** A menu bar contains menus and menu items fire actions [N2]; cancellation should preserve progress [YC]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w21-d3-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "java-2-w21-d3-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "After Step 1 and Activity 3, explain JMenuBar, JMenu and JMenuItem using your menu plan."
+          },
+          {
+            "id": "java-2-w21-d3-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, why do menu items use the same listener as buttons? Explain the exact Yes condition and what No/Cancel/close preserve."
+          },
+          {
+            "id": "java-2-w21-d3-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect Activity 3 to your own existing model and exception handling: trace a menu action, a model rule and useful feedback."
+          }
+        ],
+        "afterStep": "java-2-w21-d3-s1"
+      }
+    },
+    {
+      "id": "java-2-w21-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Complete and Repair Your Own Application",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Compare requirements with actual results and choose repairs that preserve a useful task.",
+        "affective": "Report failed and unverified checks honestly and respond constructively to feedback.",
+        "psychomotor": "Complete the own-theme application, repair problems and record retest results."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Requirements versus results",
+          "markdown": "A comparison between each promised behavior and what an actual trial showed. Compilation checks syntax and types; it cannot prove that a person can finish the task [YS] [YT]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Before calling a desk ready, compare each promise on its sign with what a user can actually complete."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 4 | Complete your own-theme performance task.** Use your Week 20 proposal and Monday plan. Finish one useful workflow, menus, checks, correction and safe cancellation. Use the performance-task tools below. Run the school-computer checks below, record failures, repair the responsible code once, then repeat the failed test and one surrounding successful test. Keep useful workers; do not introduce slow work into listeners."
+        },
+        {
+          "type": "text",
+          "markdown": "**Test record format:** requirement ID | input/action | expected | actual | pass/fail/unverified | repair | retest. Record what happened, including messages; never copy an expected result into the actual column without running it. Classmate role-play is classroom feedback, not field research."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "School-computer check",
+            "Record actual result; do not pre-mark Pass"
+          ],
+          "rows": [
+            [
+              "Clicks / useful task",
+              "Open your launcher; complete the normal task by buttons and every menu item. Confirm the model result."
+            ],
+            [
+              "Keyboard / access",
+              "Use Tab/Shift+Tab and arrows/Space; try menu letters (example Alt+R/Alt+V), item letters and Ctrl+P. OS shortcuts can differ."
+            ],
+            [
+              "Resize / labels",
+              "Check the example at 520×380 and larger; verify labels, controls and scrolling remain reachable. Test your own minimum size."
+            ],
+            [
+              "Dialogs / cancellation",
+              "Info opens/closes; Rename Cancel/close, blank, 31 characters, valid trim; Clear No, Cancel and close all keep choices; only Yes clears."
+            ],
+            [
+              "Recovery / consistency",
+              "Make invalid input, correct it and repeat. Edit after Preview, then preview again; compare summary with current choices."
+            ],
+            [
+              "Responsiveness / workers",
+              "While Vehicle Check ready is running, move/resize the window and use controls; repeated clicks stay disabled until completion. Check your own workers if used."
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Preparation evidence:** both starting/final Java versions compile with Java 8 compatibility. Headless launches and direct request/menu/worker checks passed. A normal launch failed with an X11 connection error. No working display or virtual display is available; live clicks, dialogs, keyboard, resizing and perceived responsiveness remain unverified. Check them at school before claiming completion."
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "MenuError.java:2: error: cannot find symbol",
+              "means": "A test class omitted Swing imports.",
+              "fix": "Keep import javax.swing.*; at the top. The full real message names MenuError.java:2; file/line may vary."
+            },
+            {
+              "see": "IllegalArgumentException: Choose a subject.",
+              "means": "Direct call to summary() had no subject.",
+              "fix": "Select one subject and Preview again. The GUI handler shows Choose a subject. as feedback."
+            },
+            {
+              "see": "IllegalArgumentException: Choose materials.",
+              "means": "Direct call had a subject but no material.",
+              "fix": "Select Guide or Practice sheet; Preview again."
+            },
+            {
+              "see": "java.awt.AWTError: Can't connect to X11 window server using ':0' as the value of the DISPLAY variable.",
+              "means": "This preparation could not reach its configured display.",
+              "fix": "Run the GUI on the school desktop with a working display. A headless message does not establish GUI success."
+            },
+            {
+              "see": "Menu opens but no task runs. (observed symptom to check)",
+              "means": "Missing listener or wrong action text.",
+              "fix": "Use the same command and handler as the working button; retest both paths."
+            },
+            {
+              "see": "No/Cancel clears choices. (fault to check)",
+              "means": "State changes occur before confirmation or branch is too broad.",
+              "fix": "Call clearChoices() only when answer == JOptionPane.YES_OPTION. Retest all outcomes."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "University web-design advice is applied only to relevant labels, actions and keyboard alternatives. The classroom scenario and Java extension are teacher-created. Curriculum guide competency 7 includes combined components/layouts, menus and windows/dialogs; existing parented dialogs cover this modest scope. The course map was inaccessible; no contents were inferred."
+        },
+        {
+          "type": "note",
+          "markdown": "**Daily allocation:** 10 min recall + 15 min requirements review + 90 min completion + 35 min test/repair + 15 min notes + 15 min slip = 180 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Excerpt: “success criteria”. Limit requirements to needs and available resources."
+        },
+        {
+          "type": "text",
+          "markdown": "2. Yale University [YT]. [User Testing](https://usability.yale.edu/ux/validate/review-the-user-experience/user-testing). Excerpt: “complete tasks”. Observe task attempts and record problems before revision."
+        },
+        {
+          "type": "text",
+          "markdown": "3. Yale University [YC]. [Giving Users Control](https://usability.yale.edu/ux/best-practices/giving-users-control). Excerpt: “change their minds”. Explain consequences and allow safe changes of mind."
+        },
+        {
+          "type": "text",
+          "markdown": "4. Kansas State University [KS]. [Swing Event Dispatch Thread](https://textbooks.cs.ksu.edu/cc410/ii-gui/13-event-driven-programming/06-swing-dispatch-thread/index.html). Excerpt: “event handlers”. Keep event handlers short; start GUI work with invokeLater."
+        },
+        {
+          "type": "text",
+          "markdown": "5. Massachusetts Institute of Technology [MIT]. [Graphical User Interfaces](https://ocw.mit.edu/ans7870/6/6.005/s16/classes/24-graphical-user-interfaces/index.html). Excerpt: “view tree”. Separate interface actions from application rules; nest views."
+        },
+        {
+          "type": "note",
+          "markdown": "**Key validated facts:** Use actual task attempts to find problems [YT]; preserve safe correction during repairs [YC]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w21-d4-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "java-2-w21-d4-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Activity 4, distinguish a requirement, an expected result, an actual result and an unverified check using your own application."
+          },
+          {
+            "id": "java-2-w21-d4-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Describe one own-theme failed check, the repair, and actual retest evidence. If none failed, name a tested risk and one remaining unverified check."
+          },
+          {
+            "id": "java-2-w21-d4-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect Activity 4 to your Week 20 proposal and earlier Java work: justify one scope revision while retaining a useful model rule or worker."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w21-d4"
+      }
+    },
+    {
+      "id": "java-2-w21-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "Verify Document and Present Your Application",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Defend application scope and design using the proposal, code and actual test record.",
+        "affective": "Explain limitations honestly and respect a partner’s feedback.",
+        "psychomotor": "Run consistency and usability checks, finish documentation and present the own-theme application."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Consistency and usability check",
+          "markdown": "Consistency means the proposal, labels, code and evidence agree. Usability asks whether someone can complete the intended task with the interface [YT] [PA]."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 5 | Verify, document and present.** Use your own application, code, proposal and test record. Ask a classmate to attempt the task without prompting; record actual steps and confusion as classroom feedback. Repair a genuine problem and retest. Submit sources/backups, plan, requirements/results checklist, test/repair record and short user notes: launcher, task, correction/cancel behavior and limits. Present for five minutes."
+        },
+        {
+          "type": "note",
+          "markdown": "**Worked-example limit:** menus improve access to the existing draft task. They do not turn Preview into submission or implement Week 20’s deferred save/load plan. Reopen after closing to observe the one-session limit; do not describe the draft as saved."
+        },
+        {
+          "type": "note",
+          "markdown": "**Daily allocation:** 10 min recall + 30 min consistency/usability + 25 min repairs + 20 min documentation + 20 min rehearsal + 60 min presentations + 15 min slip = 180 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Yale University [YT]. [User Testing](https://usability.yale.edu/ux/validate/review-the-user-experience/user-testing). Excerpt: “complete tasks”. Observe task attempts and record problems before revision."
+        },
+        {
+          "type": "text",
+          "markdown": "2. University of Pennsylvania [PA]. [Design and Usability Testing](https://accessibility.web-resources.upenn.edu/testing-evaluating-accessibility/design-and-usability-testing). Excerpt: “visible labels”. Use visible labels, clear actions and keyboard alternatives."
+        },
+        {
+          "type": "text",
+          "markdown": "3. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Excerpt: “success criteria”. Limit requirements to needs and available resources."
+        },
+        {
+          "type": "text",
+          "markdown": "4. Kansas State University [KS]. [Swing Event Dispatch Thread](https://textbooks.cs.ksu.edu/cc410/ii-gui/13-event-driven-programming/06-swing-dispatch-thread/index.html). Excerpt: “event handlers”. Keep event handlers short; start GUI work with invokeLater."
+        },
+        {
+          "type": "text",
+          "markdown": "5. Massachusetts Institute of Technology [MIT]. [Graphical User Interfaces](https://ocw.mit.edu/ans7870/6/6.005/s16/classes/24-graphical-user-interfaces/index.html). Excerpt: “view tree”. Separate interface actions from application rules; nest views."
+        },
+        {
+          "type": "note",
+          "markdown": "**Key validated facts:** Observe task completion [YT]; check labels and keyboard alternatives [PA]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w21-d5-slip",
+        "points": 20,
+        "questions": [
+          {
+            "id": "java-2-w21-d5-q1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to your own application’s menu wiring and model call. Link them to one requirement in your proposal and one actual test record."
+          },
+          {
+            "id": "java-2-w21-d5-q2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend one design or scope choice in your own application using the proposal, code and actual usability/test evidence; state a limit."
+          },
+          {
+            "id": "java-2-w21-d5-q3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "A user cancels a destructive action in your own application. Trace the safe path in your code and add a test tied to your requirement; record the actual result if run, otherwise mark it unverified."
+          },
+          {
+            "id": "java-2-w21-d5-q4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your own Week 20 proposal with the application you presented. Explain one revision or repair, its actual evidence and what remains planned or unverified."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w21-d5"
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w21-pt",
+    "title": "Own-theme Complete GUI Application",
+    "markdown": "Start Thursday; complete and present Friday. Build a modest application using your own existing theme and Week 20 proposal, with justified revisions. Complete one useful task. Submit sources/backups, design, needs-linked requirements, actual test/repair records, checklist and short user notes. No database, networking, account, paid tool, external library or new storage feature is required.\n\n**Starter with blanks**\n\nMy existing theme is ____; users ____ need to ____ because ____. My proposal planned ____; I kept/revised ____ because ____. Requirements R1–R__ and needs: ____. Interface groups/layouts: ____. Flow: start ____ → action ____ → model ____ → result ____. Error/cancel path: ____. Menus/items/keys: ____. Retained worker (if needed): ____. Tests and actual results: ____. Repair/retest: ____. Existing ____; built and checked ____; planned/deferred ____; still unverified ____.\n\n**Self-check**\n\n- One useful task matches proposal/revision? Yes / Not yet\n- Model, controls and menus agree? Yes / Not yet\n- Errors correctable; cancel safe; Yes explicit? Yes / Not yet\n- Keyboard, resize and worker checks recorded? Yes / Not yet\n- Every requirement has actual evidence or an unverified label? Yes / Not yet\n- Limits, repairs and documentation honest? Yes / Not yet\n\n**Planning record**\n\nUser/task; requirement → need → check; panel/layout; normal/error/cancel flow.\n\n**Requirements versus results**\n\nFor every requirement: ID | input/action | expected | actual | status | repair | retest. Use pass/fail/unverified honestly.\n\n**Two three-hour days**\n\nThursday: 10 min recall + 15 min requirements review + 90 min completion + 35 min test/repair + 15 min notes + 15 min slip = 180 min. Friday: 10 min recall + 30 min consistency/usability + 25 min repairs + 20 min documentation + 20 min rehearsal + 60 min presentations + 15 min slip = 180 min.\n\nLarge class: circles of at most 12 allow 12 × 5 min = 60 min. Peer listeners keep evidence notes; the teacher rotates and reviews every application and record.\n\n**Scoring**\n\nFull points: complete and evidenced; about half: partly working or weak evidence; zero: absent/unrelated. Award intermediate whole points. Do not reward extra controls or feature count. The task score includes presentation; slip scores are separate.",
+    "checklist": [
+      "Name own theme, users, problem and Week 20 proposal link; justify revisions.",
+      "Link 3–5 limited requirements to needs and actual checks.",
+      "Show a simple interface plan and normal/error/cancel user flow.",
+      "Combine useful controls and nested layouts for one complete task.",
+      "Connect actions to the existing model; keep checks, EDT updates and useful workers.",
+      "Provide purposeful working menus, clear labels and keyboard access.",
+      "Validate input, show useful feedback and allow correction.",
+      "Keep choices on cancellation; require explicit Yes for destructive changes.",
+      "Compare requirements with actual results; record repairs and retests.",
+      "Document remaining limits and present the application honestly."
+    ],
+    "presentationOutline": [
+      "30 s: own theme, user, problem and proposal/revision.",
+      "1 min: complete one useful task and show the result.",
+      "2 min: bad input, correction and safe cancellation; show actual test evidence.",
+      "1 min: point to menu wiring, model call and safe interface/worker code.",
+      "30 s: answer a question and state one remaining limit."
+    ],
+    "questionsToPrepare": [
+      "Which own requirement solves the user’s problem?",
+      "Where does your own listener call the existing model?",
+      "What happens when a user cancels or closes a dialog?",
+      "Which actual test failed, what changed, and what did the retest show?",
+      "Which capability remains planned or unverified?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Need proposal and limited design",
+        "points": 8
+      },
+      {
+        "criterion": "Useful workflow layouts and model connection",
+        "points": 12
+      },
+      {
+        "criterion": "Purposeful menus labels and keyboard access",
+        "points": 8
+      },
+      {
+        "criterion": "Validation correction cancellation and confirmation",
+        "points": 10
+      },
+      {
+        "criterion": "Actual tests repairs and honest limitations",
+        "points": 8
+      },
+      {
+        "criterion": "Documentation and clear presentation",
+        "points": 4
+      }
+    ],
+    "totalPoints": 50
+  ,
+    "starterFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main {\n    public static void main(String[] args) {\n        // Continue your own performance-task project; follow the original module requirements.\n    }\n}\n"
+      }
+    ],
+    "exampleFiles": [
+      {
+        "path": "RequestDemo.java",
+        "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class RequestDemo extends JPanel\n    implements ActionListener {\n  private JCheckBox guide = new JCheckBox(\n    \"Guide\");\n  private JCheckBox sheet = new JCheckBox(\n    \"Practice sheet\");\n  private JRadioButton desk = new JRadioButton(\n    \"Desk\", true);\n  private JRadioButton room = new JRadioButton(\n    \"Classroom\");\n  private JList<String> subject = new JList<>(\n    new String[]{\"Java\", \"English\", \"Math\"});\n  private String name = \"My request\";\n  private JTextArea result = new JTextArea(4, 24);\n  public RequestDemo() {\n    setLayout(new BorderLayout(8, 8));\n    setBorder(BorderFactory.createEmptyBorder(8, 8,\n      8, 8));\n    guide.setMnemonic('G'); sheet.setMnemonic('S');\n    desk.setMnemonic('D'); room.setMnemonic('L');\n    ButtonGroup collect = new ButtonGroup();\n    collect.add(desk); collect.add(room);\n    JPanel materials = new JPanel();\n    materials.add(guide); materials.add(sheet);\n    JPanel place = new JPanel();\n    place.add(new JLabel(\"Collect at:\"));\n    place.add(desk); place.add(room);\n    JPanel options = new JPanel(new GridLayout(2,\n      1));\n    options.add(materials); options.add(place);\n    subject.setSelectionMode(\n      ListSelectionModel.SINGLE_SELECTION);\n    subject.setVisibleRowCount(3);\n    JLabel label = new JLabel(\"Subject:\");\n    label.setLabelFor(subject);\n    label.setDisplayedMnemonic('U');\n    JPanel choices = new JPanel(new BorderLayout(4,\n      4));\n    choices.add(label, BorderLayout.NORTH);\n    choices.add(new JScrollPane(subject),\n      BorderLayout.CENTER);\n    choices.add(options, BorderLayout.SOUTH);\n    result.setEditable(false);\n    result.setLineWrap(true);\n    result.setWrapStyleWord(true);\n    result.setText(\n      \"Choose materials, then Preview.\");\n    JPanel actions = new JPanel();\n    for (String text : new String[]{\"Preview\",\n      \"Clear\", \"Info\", \"Rename\"}) {\n      JButton button = new JButton(text);\n      button.setMnemonic(text.charAt(0));\n      button.addActionListener(this);\n      actions.add(button);\n    }\n    add(choices, BorderLayout.NORTH);\n    add(new JScrollPane(result),\n      BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  JMenuBar createMenuBar() {\n    JMenuBar bar = new JMenuBar();\n    JMenu request = new JMenu(\"Request\");\n    request.setMnemonic('R');\n    JMenu view = new JMenu(\"View\");\n    view.setMnemonic('V');\n    for (String text : new String[]{\"Preview\",\n        \"Rename\", \"Clear\", \"Info\"}) {\n      JMenuItem item = new JMenuItem(text);\n      item.setMnemonic(text.charAt(0));\n      item.addActionListener(this);\n      if (\"Preview\".equals(text)) {\n        item.setAccelerator(KeyStroke.getKeyStroke(\n          KeyEvent.VK_P,\n          InputEvent.CTRL_DOWN_MASK));\n      }\n      if (\"Info\".equals(text)) { view.add(item); }\n      else { request.add(item); }\n    }\n    bar.add(request); bar.add(view);\n    return bar;\n  }\n  String summary() {\n    if (subject.getSelectedValue() == null) {\n      throw new IllegalArgumentException(\n        \"Choose a subject.\");\n    }\n    if (!guide.isSelected() && !sheet.isSelected(\n      )) {\n      throw new IllegalArgumentException(\n        \"Choose materials.\");\n    }\n    if (!desk.isSelected() && !room.isSelected())\n      {\n      throw new IllegalArgumentException(\n        \"Choose a place.\");\n    }\n    return subject.getSelectedValue() + \": Guide=\"\n      + guide.isSelected()\n      + \"; Sheet=\" + sheet.isSelected()\n      + \"; Place=\" + (desk.isSelected() ? \"Desk\" :\n        \"Classroom\");\n  }\n  void clearChoices() {\n    subject.clearSelection();\n    guide.setSelected(false); sheet.setSelected(\n      false);\n    desk.setSelected(true); result.setText(\n      \"Choices cleared.\");\n  }\n  void acceptName(String input) {\n    if (input == null) { return; }\n    String clean = input.trim();\n    if (clean.isEmpty() || clean.length() > 30) {\n      result.setText(\n        \"Use 1-30 characters for the name.\");\n      return;\n    }\n    name = clean; result.setText(\"Named: \" +\n      name);\n  }\n  void clearIfConfirmed(int answer) {\n    if (answer == JOptionPane.YES_OPTION) {\n      clearChoices();\n    } else if (answer == JOptionPane.NO_OPTION) {\n      result.setText(\"Kept choices (No).\");\n    } else if (answer ==\n      JOptionPane.CANCEL_OPTION) {\n      result.setText(\"Kept choices (Cancel).\");\n    } else {\n      result.setText(\"Kept choices (Closed).\");\n    }\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String command = e.getActionCommand();\n    if (\"Rename\".equals(command)) {\n      acceptName(JOptionPane.showInputDialog(this,\n        \"Request name (1-30 characters):\", name));\n      return;\n    }\n    if (\"Clear\".equals(command)) {\n      clearIfConfirmed(\n        JOptionPane.showConfirmDialog(this,\n        \"Clear subject and materials?\",\n        \"Confirm clear\",\n          JOptionPane.YES_NO_CANCEL_OPTION));\n      return;\n    }\n    try {\n      String text = name + \"\\n\" + summary();\n      if (\"Info\".equals(command)) {\n        JOptionPane.showMessageDialog(this, text,\n          \"Request information\",\n            JOptionPane.INFORMATION_MESSAGE);\n      } else {\n        result.setText(text);\n      }\n    } catch (IllegalArgumentException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(() -> {\n        JFrame f = new JFrame(\n          \"School materials request\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        RequestDemo panel = new RequestDemo();\n        f.setContentPane(panel);\n        f.setJMenuBar(panel.createMenuBar());\n        f.setSize(640, 420);\n        f.setMinimumSize(new Dimension(520, 380));\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n    });\n  }\n}\n"
+      }
+    ]
+  }
+,
+  "previousModuleId": "java-2-w20",
+  "sampleFirst": true
+}
