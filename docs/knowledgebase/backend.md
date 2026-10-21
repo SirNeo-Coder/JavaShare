@@ -38,7 +38,7 @@ Nothing live is kept in server memory any more. File saves emit `file:updated`. 
 - `POST /api/classrooms/:id/modules/:moduleId/progress/activity` prepares the selected unlocked
   step's project. It combines supporting starter files, optional activity files and the student's
   optional preceding module project, keeping the current project's existing files.
-- `POST .../progress/run` validates Java source paths, membership, the existing weekly live lock,
+- `POST .../progress/run` validates Java source paths, membership, cross-module prerequisites and live-week access,
   the activity's existence and its part's prerequisites. It saves the project, runs it through
   the existing rate/concurrency-limited Java runner, and writes pass/fail from the actual result.
   Demo mode never passes. A previous pass survives later failed practice runs.
@@ -104,3 +104,17 @@ step files and its declared result. Expected runtime errors compare the exceptio
 laptop JVM / browser stack formats, separately from successful alteration execution. Result
 responses add `check`, `sampleMatched` and the latest `passed`; prior completion stays monotonic.
 History appears in progress responses only for opted-in modules, keeping old response shapes.
+
+## Cross-module prerequisites (2026-10-21)
+
+`module-prerequisites.ts` walks the declared predecessor chain and reuses `activityAccess` and
+current activity ids to find the oldest unfinished module. `loadStudentModuleAccess` reads only
+this class's modules and this student's class-scoped step states; it creates no progress rows.
+`enforceStudentModuleAccess` guards every content/progress/project/submission path, including
+activity preparation and both execution-result paths. Teacher previews bypass student gates.
+Live access includes the active module's ancestors. Invalid/missing chains block safely.
+
+Existing catalog replies may include `moduleAccess` (kind, message, and prerequisite moduleId/week).
+A blocked request returns HTTP 403 with the same metadata beside `error`; `ApiError` preserves
+it for the prominent banner and Continue action. Live-only cards remain disabled; prerequisite
+cards open their explanation. Existing routes, database identities and saved work are retained.

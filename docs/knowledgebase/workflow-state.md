@@ -68,13 +68,13 @@ What teachers and students can do today. Keep this page current when their use o
 - Explicit alteration tasks open one step at a time; legacy samples open one part at a time.
   Locked content and premature requests are refused server-side. Reopening resumes unfinished work.
   Handwritten liplets are assessed separately and do not gate progress. Teacher availability
-  switches do not gate progress. The existing weekly live-class lock remains enforced.
+  switches do not gate progress. During live class, the weekly module and its prerequisite chain are available; unrelated modules remain locked.
 - `previousModuleId` links the preceding week. Module files copy only the previous module project;
   personal files copy only the previous personal working project (or its submitted own version
   for older records). Supporting starter classes are added. Sample-first steps load their own supplied sources on
   first opening and restore their draft on revisits; legacy projects retain existing-file precedence. Each
   copy is saved independently and never changes the preceding week. The teacher must supply
-  the stable link in weekly JSON; a missing link starts with the supplied starter files.
+  the stable link in weekly JSON. No declared link starts with the supplied starter files; a declared link to a missing upload blocks access with a teacher-upload message.
 - The personal task opens after the module steps pass, as before. **Run code** accepts personal
   program input and does not check a module target. **Submit this version** saves a separate
   own-version snapshot. Later draft edits do not change that submission. Existing sample and
@@ -272,3 +272,19 @@ What teachers and students can do today. Keep this page current when their use o
 - First opening loads that step's complete sample; revisiting restores its saved draft. Module
   sources, personal sources, earlier weeks and submissions remain separate. The sample history
   migration and revised JSON must accompany the app rollout; hosted steps remain teacher actions.
+
+## Rolling module prerequisites (2026-10-21)
+
+- **Modules** shows why a later week is locked. Selecting it displays **Complete Week 12 before
+  starting Week 14**, for example, and **Continue Week 12** opens that student's next unfinished
+  step using saved progress. The rule follows declared links, not week numbers or upload order.
+- All required module activities in every preceding module must pass. Current alteration ids
+  count; sample verification, failed runs and old task identities cannot bypass new tasks.
+  Personal performance-task submissions and handwritten liplets remain separate. Existing
+  progress percentages still include submissions, so prerequisite readiness does not mean 100%.
+- Week 12 completion unlocks Week 13; Week 13 completion then unlocks Week 14. Existing later
+  work stays saved but cannot be reopened until prerequisites are satisfied. Missing linked
+  modules ask for a teacher upload; circular links ask for corrected module files.
+- Live class permits earlier modules in the weekly module's prerequisite chain. Teacher previews
+  stay available. The server applies the same restriction to direct module/project requests,
+  saves, runs, browser results and submissions in online and offline modes. No migration.

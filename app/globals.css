@@ -629,3 +629,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .code-suggestions [role="listbox"] { overflow:auto; }
 .code-suggestions [role="option"] { display:block; width:100%; padding:7px 9px; border:0; border-radius:0; background:transparent; color:inherit; font:12px/1.4 var(--font-geist-mono),monospace; text-align:left; overflow-wrap:anywhere; cursor:pointer; }
 .code-suggestions [role="option"][aria-selected="true"],.code-suggestions [role="option"]:hover { background:#31508a; }
+
+.module-access-notice { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem; margin: .75rem 0; border: 2px solid #d6a13c; border-radius: .75rem; background: var(--surface); color: var(--ink); }
+.module-access-notice strong { flex: 1; min-width: 12rem; }
+.module-access-notice button { padding: .6rem .9rem; border: 1px solid currentColor; border-radius: .4rem; font-weight: 700; }

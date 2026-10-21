@@ -1,5 +1,33 @@
 # Rolling module tasks handoff
 
+## Current prerequisite slice — 2026-10-21
+
+- Approved: require every current module activity in the full predecessor chain before starting
+  a later module; personal submissions and handwritten liplets stay separate. Project naming
+  and independent project IDs are deferred. No migration or hosted operation.
+- Branch: `codex/module-prerequisites`, based on main `9fba8a7` (merged PR #33), in an attached
+  managed worktree. The primary checkout and other chats' changes remain untouched.
+- Done: shared server restriction on every module/progress/project/run/result/submission path;
+  earliest-unfinished banner and Continue resume; live-class catch-up; missing/cyclic link
+  messages; teacher previews; saved files, personal work, history and submissions preserved.
+- Verified: build and offline launcher build passed; lint zero errors/eight existing warnings;
+  full suite 238/238; real production browser checks 10/10 with laptop javac and actual browser
+  CheerpJ. Removed server enforcement, observed regression failures, restored it and passed.
+  Full names, intermediate test corrections and limits: `docs/verification/module-prerequisites.md`.
+- Delivered: implementation `20d5931` committed and pushed; [PR #35](https://github.com/SirNeo-Coder/JavaShare/pull/35)
+  targets main and is attached to the chat. No code work remains in progress. Next: teacher
+  reviews the PR, then follows the existing app rollout and ensures all linked files are uploaded.
+  The GitHub connector could not create PRs (403); the authenticated CLI created it successfully.
+  Temporary verification servers were stopped; disposable browser classrooms were removed.
+- Prior rollout update supplied by teacher: PR #33 merged into main; history migration verified
+  (`activity_projects`, `jsonb`, `NO`); Cloudflare active Ready; Week 12 uploaded. Week 13/14 live
+  uploads remain unverified. The old `/tmp/codeshare-module-resume` checkout is gone; use
+  repository-relative files and the permanent GitHub links, not historical temporary paths.
+- Still unverified: hosted deployment, Windows, physical disconnected Wi-Fi devices, other browsers.
+  No assistant merge, deploy, hosted SQL or hosted settings changes. CKB-060 records this work.
+
+## Historical resume and task work
+
 Updated 2026-10-21. Current branch: `codex/module-resume-and-logic-tasks`.
 Base: `codex/classroom-drawer-controls` (`d75d054`), which already contains current main's Java fixes.
 

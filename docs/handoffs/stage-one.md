@@ -1,3 +1,14 @@
+> PR #35 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
+> `20a26fd`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
+> notes and the independent styles are preserved. Feature code/tests and curriculum files
+> were compared with the original PR and preserved byte-for-byte except inherited main editor
+> additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
+> subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 245/245,
+> no skips. All named checks and limits: `docs/verification/module-prerequisites.md`.
+> Resolution is complete; this record is committed and pushed to the same PR with a lease
+> protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
+> teacher review; merging another PR may require another refresh of the remaining branches.
+
 > Java code suggestions (2026-10-21): branch `codex/java-code-suggestions`, based on current
 > main `9fba8a7` (merged drawer/module work retained). Teacher approved Java-first local
 > keywords, common statements and current-file names in classroom, module and personal editors.
@@ -475,3 +486,25 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   Retargeted PR #33 from the drawer branch to main; verified open/unmerged/mergeable.
   Next: teacher reviews/merges #33 into main, completes app rollout, and uploads revised
   Week 12/13/14 JSON. Hosted feature verification remains pending. No assistant merge/deploy.
+
+## Rolling module prerequisites — 2026-10-21
+
+- Teacher approved prerequisites first: every required module activity must pass across the
+  existing predecessor chain. Personal performance submissions and handwritten liplets remain
+  separate; project naming/identity changes remain deferred.
+- Branch `codex/module-prerequisites`, based on merged main `9fba8a7`. Work is isolated in the
+  attached managed worktree; original checkout and other-chat work are preserved.
+- Done: server enforcement at every module/project entry point; earliest-unfinished banner and
+  Continue action; live-class catch-up; missing/cyclic prerequisite messages; teacher previews;
+  preserved module/personal/earlier-week work, histories and submitted snapshots. No migration.
+- Evidence: production build and offline launcher build pass; lint zero errors/eight existing
+  warnings; full suite 238/238; real offline/online browser checks 10/10. Server-bypass regression
+  failed with the guard removed and passed after restoration. Full named checks and limits:
+  `docs/verification/module-prerequisites.md`.
+- Delivered: `20d5931` committed and pushed; [PR #35](https://github.com/SirNeo-Coder/JavaShare/pull/35)
+  targets main and is attached. Nothing remains in progress. Next: teacher review and rollout,
+  including confirming Week 13/14 uploads. Teacher reports PR #33 merged, history migration
+  verified, Cloudflare Ready and Week 12 uploaded. The old temporary resume checkout is gone.
+  Temporary verification servers were stopped and disposable browser classrooms removed.
+- Continue from `docs/handoffs/rolling-module-tasks.md`. Hosted services, physical disconnected
+  Wi-Fi devices, Windows and other browsers remain unverified. No assistant merge or hosted action.

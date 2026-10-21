@@ -15,7 +15,9 @@ import { activityStateId, activityTask } from "../backend/src/module-activities"
 import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
-import { api, getApiUrl } from "./apiClient";
+import ModuleAccessNotice from "./ModuleAccessNotice";
+import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
+import { api, ApiError, getApiUrl } from "./apiClient";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
@@ -224,6 +226,7 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
   const [moduleActivity, setModuleActivity] = useState<StudentActivity | null>(null);
+  const [moduleAccessError, setModuleAccessError] = useState<{ classroomId: string; block: ModuleAccessBlock } | null>(null);
   const [weeklySelection, setWeeklySelection] = useState<{ studentId: string; classroomId: string; module: CourseModule } | null>(null);
   const [moduleProgressRevision, setModuleProgressRevision] = useState(0);
   const moduleEditorRef = useRef<ModuleEditorHandle>(null);
@@ -592,6 +595,7 @@ export default function Home() {
           forgetRealtimeClient();
           setUser(null);
           setModuleActivity(null);
+          setModuleAccessError(null);
           setData(null);
           setEnteredClassroomId(null);
           setChoosingStudentClass(false);
@@ -1687,21 +1691,48 @@ export default function Home() {
       );
     }
   }
+  function showModuleAccessError(error: unknown) {
+    if (classroomId && error instanceof ApiError && error.moduleAccess) {
+      setModuleAccessError({ classroomId, block: error.moduleAccess });
+      setProjectsOpen(false); setModulesOpen(false);
+    }
+  }
+
+  async function continuePrerequisite(moduleId: string) {
+    try {
+      const [module, progress] = await Promise.all([
+        api<CourseModule>(`/api/classrooms/${classroomId}/modules/${moduleId}`),
+        api<Progress>(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`),
+      ]);
+      const step = moduleResumeStep(module, progress.stepStates);
+      if (step) await startModuleActivity(module, step);
+    } catch (error) {
+      showModuleAccessError(error);
+      notify(error instanceof Error ? error.message : "Could not open prerequisite module");
+    }
+  }
+
   async function startModuleActivity(module: CourseModule, step?: StepBlock) {
     if (!classroomId || user?.role !== "student") return;
-    await moduleEditorRef.current?.save();
-    await persistCurrentCode();
-    const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/${step ? "activity" : "performance-project"}`, {
-      method: "POST", body: JSON.stringify(step ? { stepId: step.id } : {}),
-    });
-    // The worksheet may have been opened before the final module step unlocked the task.
-    const currentModule = step ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
-    setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
-    setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
-      classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "",
-      instruction: step ? activityTask(step).instruction : currentModule.performanceTask?.markdown ?? "",
-      expectedOutput: step ? activityTask(step).expectedOutput : "", stdin: step ? activityTask(step).stdin ?? "" : "", progress });
-    setProjectsOpen(false);
+    try {
+      await moduleEditorRef.current?.save();
+      await persistCurrentCode();
+      const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/${step ? "activity" : "performance-project"}`, {
+        method: "POST", body: JSON.stringify(step ? { stepId: step.id } : {}),
+      });
+      // The worksheet may have been opened before the final module step unlocked the task.
+      const currentModule = step ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
+      setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
+      setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
+        classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "",
+        instruction: step ? activityTask(step).instruction : currentModule.performanceTask?.markdown ?? "",
+        expectedOutput: step ? activityTask(step).expectedOutput : "", stdin: step ? activityTask(step).stdin ?? "" : "", progress });
+      setProjectsOpen(false);
+      setModuleAccessError(null);
+    } catch (error) {
+      showModuleAccessError(error);
+      throw error;
+    }
   }
 
   async function runCode() {
@@ -1803,6 +1834,7 @@ export default function Home() {
     forgetRealtimeClient(); // the live pass belongs to the signed-out user
     setUser(null);
     setModuleActivity(null);
+    setModuleAccessError(null);
     setData(null);
     setEnteredClassroomId(null);
     setChoosingStudentClass(false);
@@ -1818,6 +1850,7 @@ export default function Home() {
     try { await moduleEditorRef.current?.save(); }
     catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); return; }
     setModuleActivity(null);
+    setModuleAccessError(null);
     setChoosingStudentClass(user?.role === "student");
     setModulesOpen(false);
     setProjectsOpen(false);
@@ -2163,7 +2196,7 @@ export default function Home() {
                 const step = moduleResumeStep(module, progress.stepStates) ?? module.lessons.flatMap((lesson) => lesson.blocks).findLast((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
                 if (step?.language === "java") await startModuleActivity(module, step);
               }
-              catch (error) { notify(error instanceof Error ? error.message : "Could not open module project"); }
+              catch (error) { showModuleAccessError(error); notify(error instanceof Error ? error.message : "Could not open module project"); }
             }}><span className="team-icon">J</span><span className="team-copy"><b>Module project</b></span></button></div>
             <div className={`team-card ${currentModuleProject?.kind === "performance" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Personal performance-task project" onClick={async () => {
               try { await startModuleActivity(weeklyModule); }
@@ -2472,6 +2505,7 @@ export default function Home() {
               </button>
             </div>
           </div>
+          {moduleAccessError && moduleAccessError.classroomId === classroomId && <ModuleAccessNotice block={moduleAccessError.block} onContinue={(id) => void continuePrerequisite(id)} />}
           {currentModuleProject ? <StudentModuleActivity
             key={`${currentModuleProject.kind}:${currentModuleProject.moduleId}:${currentModuleProject.stepId}:${currentModuleProject.progress.updatedAt}`}
             activity={currentModuleProject} ref={moduleEditorRef}

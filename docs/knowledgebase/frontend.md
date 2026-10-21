@@ -45,3 +45,8 @@ it. Only the output pre is marked busy, leaving the status outside that accessib
 Web previews, saved-work lists and plain Save work do not show Java progress.
 
 Module samples and alterations: `StudentModuleActivity.tsx` restores per-step drafts and shows `ModuleRunFeedback` alongside the existing Java-running indicator. The worksheet and project buttons use `moduleResumeStep` in `moduleParts.ts` to continue unfinished work.
+
+Prerequisite UI (2026-10-21): `ModuleAccessNotice` shows the oldest unfinished linked module and
+Continue Week N. `ModuleViewer`/`ModuleWorkspace` and both Projects shortcuts preserve structured
+API restriction details through `ApiError`; Continue reuses saved-progress resume. Missing uploads
+and cycles display a repair message without an unusable Continue button. No navigation storage.
