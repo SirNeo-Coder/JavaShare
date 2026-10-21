@@ -441,3 +441,38 @@ sg docker -c 'CODESHARE_PLAYWRIGHT_MODULE=/home/ireneo/.cache/codex-runtimes/cod
 - ✔ both Projects shortcuts recheck changed prerequisites and offer Continue without overwriting later work
 - ✔ missing prerequisite has a teacher-upload message; teacher preview remains available
 - ✔ prerequisites online: banner, saved-step resume and ordered unlock through the real app
+
+## Main refresh and conflict resolution — 2026-10-22
+
+PR #35 was reapplied on main `c770731` (Java suggestions, PR #34). Both sets of
+progress notes, problem-index entries and prompt records were retained. Independent Java
+suggestion and prerequisite banner styles were both retained where they met at the end
+of the stylesheet. No feature logic or test fixture was changed by the resolution.
+
+- PASS `npm run build:all`: production frontend and backend.
+- PASS `npm run lint`: zero errors, the same eight existing warnings.
+- PASS `npm test`: **245/245**, zero failures and zero skips. All previous named
+  tests above passed again; the seven newly inherited tests are listed below.
+- PASS preservation comparison: original feature application/config/test files are unchanged;
+  only already-merged main editor additions were incorporated. For #36, all original curriculum
+  JSON/PDF/Word/supporting-file bytes are unchanged.
+- PASS documentation checks: no conflict markers, unique problem case numbers, existing
+  targets for every problem-index case link.
+- NOT REPEATED for this refresh: browser sessions, offline launcher build, document rendering,
+  mutation proofs and hosted rollout. Earlier evidence and limits above still apply.
+
+The teacher requested conflict repair for #35, #36 and #37 together. Main retains CKB-059
+(Java caret); prerequisites use CKB-060, curriculum CKB-061, subject sharing CKB-062.
+PR #36 stays a draft for curriculum review. No pull request was merged or deployed.
+
+### `tests/java-suggestions.test.mjs`
+
+Command: `npm test`. These isolated rule checks are new to this feature branch from main.
+
+- ✔ Java suggestions: keywords, standard names and print statements match typed prefixes
+- ✔ Java suggestions: current-file names are unique and ignore comments and string literals
+- ✔ Java suggestions: comments, escaped strings, characters and text blocks never open suggestions
+- ✔ Java suggestions: empty, short, selected, numeric and unsupported member prefixes stay quiet
+- ✔ Java suggestions: insertion replaces the full word and preserves surrounding code
+- ✔ Java suggestions: print snippets place the caret inside the parentheses
+- ✔ Java suggestions: the main statement keeps existing indentation and puts the caret in its body

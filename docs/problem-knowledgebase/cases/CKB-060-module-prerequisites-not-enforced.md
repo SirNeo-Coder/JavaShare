@@ -51,3 +51,5 @@ alteration id cannot satisfy changed requirements. Progress percentages include 
 
 - 2026-10-21 — Teacher approved prerequisites first, with required activities as the completion
   rule and personal submissions/liplets separate. Project naming/identity redesign deferred.
+
+- 2026-10-22 — Preserved this case during PR #35 conflict repair on main c770731; all 245 integrated tests pass. Distinct case ids reserved across the three open PRs.

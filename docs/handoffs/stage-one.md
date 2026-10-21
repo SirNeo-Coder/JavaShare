@@ -1,3 +1,14 @@
+> PR #35 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
+> `20a26fd`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
+> notes and the independent styles are preserved. Feature code/tests and curriculum files
+> were compared with the original PR and preserved byte-for-byte except inherited main editor
+> additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
+> subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 245/245,
+> no skips. All named checks and limits: `docs/verification/module-prerequisites.md`.
+> Resolution is complete; this record is committed and pushed to the same PR with a lease
+> protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
+> teacher review; merging another PR may require another refresh of the remaining branches.
+
 > Java code suggestions (2026-10-21): branch `codex/java-code-suggestions`, based on current
 > main `9fba8a7` (merged drawer/module work retained). Teacher approved Java-first local
 > keywords, common statements and current-file names in classroom, module and personal editors.
