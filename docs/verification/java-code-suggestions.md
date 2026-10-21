@@ -1,6 +1,7 @@
 # Java code suggestions — verification, 2026-10-21
 
 Branch `codex/java-code-suggestions`, based on main `9fba8a7` (includes merged drawer and module work).
+Implementation `5a8a3bf` is committed/pushed for [PR #34](https://github.com/SirNeo-Coder/JavaShare/pull/34).
 Teacher approved Java-first local keywords, statements and current-file names, with existing
 classroom/module/personal behavior retained. No dependency, API, schema or hosted change.
 

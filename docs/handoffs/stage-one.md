@@ -15,10 +15,11 @@
 > personal saves retain separate drafts and do not submit. Personal test access uses explicitly
 > seeded local fixture completion, and tests verify that suggestion editing never changes it.
 > [Every named test, commands, regression proof and limits](../verification/java-code-suggestions.md).
-> Implementation and verification are complete; next: commit/push branch and open review PR,
-> then teacher review and hosted rollout. Do not merge or deploy. Hosted online execution, physical
+> Implementation `5a8a3bf` is committed and pushed; [PR #34](https://github.com/SirNeo-Coder/JavaShare/pull/34)
+> is open against main and attached to this chat. No implementation work remains. Next: teacher
+> review and hosted rollout. Do not merge or deploy. Hosted online execution, physical
 > phones/input methods, screen-reader speech and two-device live editing were not retested.
-> All disposable test accounts are cleaned; stop only the temporary verification server.
+> No disposable suggestion accounts remain; our temporary verification server is stopped.
 > Unrelated logs, Supabase CLI cache, .claude and snippets are preserved.
 
 > Current approved drawer repair (2026-10-21): branch `codex/classroom-drawer-controls`, directly
