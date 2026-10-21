@@ -24,6 +24,9 @@ import {
   deleteSupabaseActivity,
   endSupabaseActivity,
   getSupabaseModule,
+  getSupabaseModuleSharing,
+  setSupabaseModuleSubject,
+  shareSupabaseModule,
   getSupabaseModuleProgress,
   prepareSupabaseModuleActivity,
   prepareSupabasePerformanceProject,
@@ -292,7 +295,7 @@ app.get("/api/bootstrap", requireAuth, async (req: AuthedRequest, res, next) => 
 // style class list). Reuses the same classroom-workspace setup as that starter class.
 app.post("/api/classes", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
   try {
-    const input = z.object({ name: z.string().trim().min(2).max(80), subject: z.string().trim().min(2).max(80).optional() }).parse(req.body);
+    const input = z.object({ name: z.string().trim().min(2).max(80), subject: z.enum(["Java", "Net MVC"]) }).parse(req.body);
     return res.status(201).json(await createSupabaseClassroom(req.user!.id, input));
   } catch (error) { next(error); }
 });
@@ -531,6 +534,25 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/project", requi
       stepId: z.string().trim().min(1).max(100).optional(),
     }).parse(req.body);
     return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt, stepId));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/module-sharing", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseModuleSharing(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.patch("/api/classrooms/:classroomId/module-subject", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { subject } = z.object({ subject: z.enum(["java", "net-mvc"]) }).parse(req.body);
+    return res.json(await setSupabaseModuleSubject(req.user!, String(req.params.classroomId), subject));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/share", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { expectedUpdatedAt } = z.object({ expectedUpdatedAt: z.string().datetime({ offset: true }).optional() }).parse(req.body);
+    return res.json(await shareSupabaseModule(req.user!, String(req.params.classroomId), String(req.params.moduleId), expectedUpdatedAt));
   } catch (error) { next(error); }
 });
 

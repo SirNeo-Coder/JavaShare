@@ -29,6 +29,27 @@
 > protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
 > teacher review; merging another PR may require another refresh of the remaining branches.
 
+> Current approved subject sharing (2026-10-22): `codex/subject-module-sharing`, based on main
+> `9fba8a7`, isolated worktree `/home/ireneo/.codex/worktrees/subject-module-sharing/JavaShare`.
+> Approved: each class uses exactly one Java or Net MVC module set; upload/correct once per
+> teacher/subject, include later classes, retain class-separated student projects/progress/submissions.
+> Implemented: shared library and additive migration, required subject for new classes, existing
+> class subject selection, explicit sharing/replacement of backed-up uploads, subject-wide delete
+> warning, shared catalog/reader/dashboard/summary paths and per-class legacy availability.
+> Existing old uploads stay readable until subject choice; original rows and all student work
+> remain stored afterward. Subject choice is permanent through the app to protect work scope.
+> Local migration applied; hosted services unchanged. Setup: `docs/subject-module-sharing-setup.md`.
+> Verification complete: full suite 229/229, browser 7/7 (actual local production app and offline
+> laptop Java), final focused checks 10/10; no skips. Baseline CKB-010 progress 4/4; deliberately
+> removing the subject filter failed 4 checks, restoring it passed 8/8. Production and offline
+> launcher builds pass; lint 0 errors/8 existing warnings. Named results, corrected initial
+> fixture/browser-test failures and unverified areas: `docs/verification/subject-module-sharing.md`.
+> Implementation and evidence are ready for commit/push and PR delivery. No app work remains.
+> Next: teacher reviews the PR, manually applies the hosted migration, rolls out the app and
+> selects subjects/shares old uploads. Hosted rollout, physical devices and disconnected Wi-Fi
+> remain unverified. Preserve the primary checkout’s ongoing Week 15–21 files, logs, CLI cache
+> and other unrelated work.
+
 > Java code suggestions (2026-10-21): branch `codex/java-code-suggestions`, based on current
 > main `9fba8a7` (merged drawer/module work retained). Teacher approved Java-first local
 > keywords, common statements and current-file names in classroom, module and personal editors.

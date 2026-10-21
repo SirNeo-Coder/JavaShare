@@ -74,3 +74,9 @@ sample-first support. Required upload fields, text-asset placement and named-dem
 are documented in CKB-061. Week 20 stays written work. Classroom file persistence, preserved
 thread-sample timing assumptions and visible/browser GUI execution remain separate limitations.
 Tests: `week15-week21-modules.test.mjs` and `week15-week21.browser.mjs`.
+
+Subject-specific shared modules: teacher-owned `subject_modules` and `classrooms.module_subject`;
+shared readers and owner-only subject/import routes in `supabase-repository.ts` / `routes.ts`.
+`ModuleSharing.tsx` is reused by Curriculum and the existing module upload view; class creation
+uses a two-option Subject select in `Landing.tsx`. Migration `20261022000100`; tests in
+`subject-module-sharing.test.mjs` and `subject-module-sharing.browser.mjs`; CKB-059.

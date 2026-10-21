@@ -38,7 +38,7 @@ function CreateClass({ onCreated }: { onCreated: () => void }) {
     setSaving(true);
     setMessage("");
     try {
-      await api("/api/classes", { method: "POST", body: JSON.stringify({ name, subject: subject || undefined }) });
+      await api("/api/classes", { method: "POST", body: JSON.stringify({ name, subject }) });
       setOpen(false);
       setName("");
       setSubject("");
@@ -58,8 +58,8 @@ function CreateClass({ onCreated }: { onCreated: () => void }) {
         <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} maxLength={80} />
       </label>
       <label>
-        Subject (optional)
-        <input value={subject} onChange={(event) => setSubject(event.target.value)} maxLength={80} />
+        Subject
+        <select value={subject} onChange={(event) => setSubject(event.target.value)} required><option value="" disabled>Choose a subject</option><option>Java</option><option>Net MVC</option></select>
       </label>
       {message && <div className="auth-message">{message}</div>}
       <button className="auth-submit" disabled={saving}>{saving ? "Creating…" : "Create class"}</button>

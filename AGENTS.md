@@ -187,3 +187,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Teacher previews remain available. Preserve existing files, drafts, completion history,
   earlier weeks, personal projects and submitted snapshots. Project naming/identity changes
   are separate work and were not approved in this slice.
+
+## Subject-specific shared modules (agreed 2026-10-22)
+
+- Each class has one module subject: Java or Net MVC. One teacher-owned module set is shared
+  across that teacher’s classes in the same subject, including classes created later.
+- Upload or correct a module once per subject. Java and Net MVC never share module content.
+  Student projects, completions, submissions and the weekly live-class module stay class-specific.
+- Preserve existing class uploads and student work. The teacher selects an existing class’s
+  subject, then explicitly shares saved uploads; a differing shared copy requires confirmation.
+- Shared deletion warns that it affects every class in that subject and keeps student work.

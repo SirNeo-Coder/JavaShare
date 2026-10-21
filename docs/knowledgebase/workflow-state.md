@@ -52,7 +52,7 @@ What teachers and students can do today. Keep this page current when their use o
 - **Not now** (or Escape) dismisses the displayed sessions while this page remains open, including trips into the workspace and back. Joining dismisses that chosen session. A new activity, or a session stopped and restarted while the page can observe the stop, can invite again. Reloading the page or signing out resets dismissal.
 - Live status refreshes on announcements, connection/reconnection, and returning to the tab, without a repeating status timer. If live passes or the live connection fail, students see an error with **Reconnect** and can still enter a class manually. Listening outside a workspace does not mark students Online in every class.
 - Session identity reuses the current activity or presentation project id, without a new database column. If the same activity/presentation stops and restarts entirely while disconnected, a previously dismissed invitation may remain dismissed; a persisted session-start marker would be needed to distinguish that case.
-- Each class's roster, modules, progress, teams, activities, and live-share state stay separate. Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
+- Each class’s roster, student progress, teams, activities, and live-share state stay separate. Assigned classes share their teacher’s module content by subject (Java or Net MVC). Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
 
 ## Weekly Java projects (approved workflow change, 2026-10-20)
 
@@ -298,3 +298,26 @@ Week 20 remains a written proposal. No app workflow or runner was changed. These
 copies: classroom disk support is still absent, original thread samples retain timing assumptions,
 and visible/browser GUI interaction remains unverified. Do not treat upload acceptance as rollout
 approval. Module and personal projects, paper assessment and submitted snapshots stay separate.
+
+## Subject-specific shared module sets (approved 2026-10-22)
+
+- **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one
+  teacher-owned module set. New classes immediately see that teacher’s existing subject modules.
+- **Curriculum → Add module** uploads once for every class in that subject. Re-uploading the same
+  module id updates their common content. Java accepts `java-1`/`java-2`; Net MVC accepts
+  `dotnet-1`/`dotnet-2`. Other teachers have independent libraries.
+- An older class retains its old content until its teacher uses **Choose this class’s subject**.
+  Choosing a subject is permanent through the app, clears only that class’s weekly pick, and
+  switches its module list to the shared subject set. Existing uploads remain in the database.
+- **Saved uploads from this class → Share across Java classes / Share across Net MVC classes**
+  adds an original upload to the common set. **Replace shared version** confirms the all-class
+  effect and refuses a stale confirmation if another update arrived. Other-subject backups
+  remain saved but cannot be shared into this class’s subject.
+- **Delete module** confirms all classes in that subject lose access; their affected weekly picks
+  are cleared. Student saved code, progress and submission snapshots remain stored.
+- Every student project, completion, availability switch and live-week selection stays scoped to
+  its original class. Shared content is used consistently by catalogs, previews, activity checks,
+  student summaries, carry-forward projects and the teacher dashboard.
+- Local/offline and hosted databases have independent libraries. Sharing does not transfer files
+  between them. Offline continues using laptop Java; no new remote assets or runner changes.
+- Setup and rollback limits: [subject-module-sharing-setup.md](../subject-module-sharing-setup.md).
