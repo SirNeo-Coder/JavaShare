@@ -5,6 +5,14 @@
 > additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
 > subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 245/245,
 > no skips. All named checks and limits: `docs/verification/module-prerequisites.md`.
+
+> PR #36 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
+> `5959716`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
+> notes and the independent styles are preserved. Feature code/tests and curriculum files
+> were compared with the original PR and preserved byte-for-byte except inherited main editor
+> additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
+> subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 276/276,
+> no skips. All named checks and limits: `docs/verification/week15-week21-step-additions.md`.
 > Resolution is complete; this record is committed and pushed to the same PR with a lease
 > protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
 > teacher review; merging another PR may require another refresh of the remaining branches.

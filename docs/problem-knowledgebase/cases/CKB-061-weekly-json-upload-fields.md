@@ -60,3 +60,5 @@ runtime readiness. Revised copies and limitations: docs/modules/week15-week21.md
 
 - 2026-10-22 — Teacher approved additive changes for Weeks 15–21, retaining existing lessons
   and samples and appending only task material. Original supplied files remain unchanged.
+
+- 2026-10-22 — Preserved this case during PR #36 conflict repair on main c770731; all 276 integrated tests pass. Distinct case ids reserved across the three open PRs.
