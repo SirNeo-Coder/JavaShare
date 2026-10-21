@@ -44,7 +44,10 @@
 > removing the subject filter failed 4 checks, restoring it passed 8/8. Production and offline
 > launcher builds pass; lint 0 errors/8 existing warnings. Named results, corrected initial
 > fixture/browser-test failures and unverified areas: `docs/verification/subject-module-sharing.md`.
-> Implementation and evidence are ready for commit/push and PR delivery. No app work remains.
+> Delivered: implementation `6b996e1` is committed and pushed; [PR #37](https://github.com/SirNeo-Coder/JavaShare/pull/37)
+> targets main and is attached to this chat. No app work remains. This documentation update
+> records delivery and is committed/pushed separately. The temporary local test server is stopped;
+> disposable test users/classes were cleaned. Existing classroom processes were preserved.
 > Next: teacher reviews the PR, manually applies the hosted migration, rolls out the app and
 > selects subjects/shares old uploads. Hosted rollout, physical devices and disconnected Wi-Fi
 > remain unverified. Preserve the primary checkout’s ongoing Week 15–21 files, logs, CLI cache

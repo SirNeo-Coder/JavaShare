@@ -41,7 +41,7 @@ Its original four progress tests were run and passed before editing.
   offline launcher build pass; lint 0 errors/8 existing warnings. The UI also waits for known
   sharing scope before enabling deletion, preventing a misleading class-only warning.
 - Browser checks, full named test evidence and final status: `docs/verification/subject-module-sharing.md`.
-- Branch: `codex/subject-module-sharing`.
+- Implementation: `6b996e1`, branch `codex/subject-module-sharing`; [PR #37](https://github.com/SirNeo-Coder/JavaShare/pull/37).
 
 ## Recurrence triage
 

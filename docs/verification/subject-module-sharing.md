@@ -1,6 +1,7 @@
 # Subject-specific shared modules — verification, 2026-10-22
 
-Branch: `codex/subject-module-sharing`, based on main `9fba8a7`. No hosted migration,
+Implementation: `6b996e1`, branch `codex/subject-module-sharing`, based on main `9fba8a7`;
+[review PR #37](https://github.com/SirNeo-Coder/JavaShare/pull/37). No hosted migration,
 deployment, settings change or merge was performed.
 
 ## Final results and limits
