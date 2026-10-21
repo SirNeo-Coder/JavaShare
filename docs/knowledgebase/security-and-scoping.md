@@ -75,3 +75,9 @@ startup/compile stops after 120 seconds. Combined stdout/stderr is capped at 64 
 The teacher explicitly accepts browser evidence as falsifiable practice completion;
 the authenticated server retains class, part, live-week, version and exact-output checks.
 Offline rejects browser result reporting and never loads CheerpJ. See setup/verification.
+
+Module prerequisite access (2026-10-21): every module content/progress/project/save/run/result/
+submission path checks the student's class-scoped current activity passes across the complete
+predecessor chain. No browser pass flag or progress percentage can substitute. Missing uploads
+and cycles block access. Live class permits the active module's ancestors; teachers retain full
+previews. Catalog metadata contains only the blocked module's reason and prerequisite identity.

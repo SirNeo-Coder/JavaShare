@@ -123,7 +123,7 @@ function requireTeacher(req: AuthedRequest, res: ApiResponse, next: NextFn) {
 
 const app = createRouter<AuthedRequest>((error, res) => {
   if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues[0]?.message || "Invalid request" });
-  if (error instanceof SupabaseRepositoryError) return res.status(error.status).json({ error: error.message });
+  if (error instanceof SupabaseRepositoryError) return res.status(error.status).json({ error: error.message, ...(error.moduleAccess ? { moduleAccess: error.moduleAccess } : {}) });
   console.error(error);
   return res.status(500).json({ error: "Unexpected server error" });
 });

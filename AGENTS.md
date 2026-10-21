@@ -171,3 +171,19 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   Renaming printed labels alone is insufficient. Keep the displayed sample unsolved.
 - Changed task requirements need new stable activity ids; retain old results without crediting
   them toward a different exercise. Keep module and personal work separate.
+
+## Rolling module prerequisites (agreed 2026-10-21)
+
+- Students must finish every required activity in the full `previousModuleId` chain before
+  starting a later module. Use the current activity identities and saved passes for that
+  student and class. Sample verification alone, performance submissions and paper liplets
+  do not satisfy or add to this prerequisite requirement.
+- Explain the earliest unfinished prerequisite prominently and provide Continue Week N to
+  resume its next unfinished step. Missing prerequisite uploads and circular links require
+  a clear teacher-repair message. Never silently skip a missing linked module.
+- Enforce access on the server across module content, progress, both project tracks, runs,
+  result recording and submissions, online and offline. During live class allow the weekly
+  module's prerequisite chain; unrelated modules retain the live restriction.
+- Teacher previews remain available. Preserve existing files, drafts, completion history,
+  earlier weeks, personal projects and submitted snapshots. Project naming/identity changes
+  are separate work and were not approved in this slice.

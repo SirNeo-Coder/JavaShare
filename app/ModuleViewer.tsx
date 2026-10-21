@@ -2,7 +2,9 @@
 
 // Existing module routes supply the catalog, worksheet, progress and teacher availability.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "./apiClient";
+import { api, ApiError } from "./apiClient";
+import ModuleAccessNotice from "./ModuleAccessNotice";
+import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import { runJava } from "./javaExecution";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
@@ -77,7 +79,7 @@ type PerformanceTask = {
 };
 type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
 export type CourseModule = { continues?: string; sampleFirst?: boolean; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
-type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean };
+type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean; moduleAccess?: ModuleAccessBlock };
 type StepStatus = "pass" | "fail";
 export type Progress = {
   moduleId: string;
@@ -395,17 +397,22 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
 export default function ModuleViewer({ role, classroomId, initialModuleId, embedded = false, drawer = false, active = true, worksheet = false, onOpenModule, onClose, onStartActivity, progressRevision = 0 }: Props) {
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [selected, setSelected] = useState<CourseModule | null>(null);
+  const [accessBlock, setAccessBlock] = useState<ModuleAccessBlock | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [summaries, setSummaries] = useState<Record<string, number>>({});
   const fileInput = useRef<HTMLInputElement>(null);
 
   const openModule = useCallback((moduleId: string) => {
+    setAccessBlock(null);
     if (onOpenModule) { onOpenModule(moduleId); return; }
     setError(null);
     api<CourseModule>(`/api/classrooms/${classroomId}/modules/${moduleId}`)
       .then(setSelected)
-      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Could not load module"));
+      .catch((loadError) => {
+        if (loadError instanceof ApiError && loadError.moduleAccess) { setSelected(null); setAccessBlock(loadError.moduleAccess); }
+        else setError(loadError instanceof Error ? loadError.message : "Could not load module");
+      });
   }, [classroomId, onOpenModule]);
 
   const refreshList = useCallback(() => {
@@ -434,7 +441,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
       setSummaries(Object.fromEntries(progress.map((item) => [item.moduleId, item.percent])));
     }).catch((loadError) => { if (!cancelled) setError(loadError instanceof Error ? loadError.message : "Could not load modules"); });
     return () => { cancelled = true; };
-  }, [drawer, active, classroomId, role]);
+  }, [drawer, active, classroomId, role, progressRevision]);
 
   const upload = async (file: File) => {
     setUploading(true);
@@ -476,6 +483,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             <button type="button" onClick={() => selected && !initialModuleId ? setSelected(null) : onClose?.()} aria-label={selected && !initialModuleId ? "Back to modules" : "Close"}>×</button>
           )}
         </header>
+        {accessBlock && <ModuleAccessNotice block={accessBlock} onContinue={openModule} />}
         {error && <p className="module-error">{error}</p>}
         {!selected && (
           <div className="module-list">
@@ -492,7 +500,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             {modules?.length === 0 && <p>No module uploaded for this class yet.</p>}
             {(drawer ? modules?.toSorted((a, b) => Number(Boolean(b.isActive)) - Number(Boolean(a.isActive)) || b.week - a.week) : modules)?.map((module) => (
               <div key={module.moduleId} className={`module-list-row${drawer ? " module-catalog-card" : ""}${drawer && module.isActive ? " module-weekly-card" : ""}`}>
-                {drawer ? <ModuleCatalogCard module={module} percent={summaries[module.moduleId] ?? 0} role={role} onOpen={() => openModule(module.moduleId)} /> : <button type="button" onClick={() => openModule(module.moduleId)}>Week {module.week} — {module.title}</button>}
+                {drawer ? <ModuleCatalogCard module={module} percent={summaries[module.moduleId] ?? 0} role={role} onOpen={() => module.moduleAccess ? setAccessBlock(module.moduleAccess) : openModule(module.moduleId)} /> : <button type="button" onClick={() => module.moduleAccess ? setAccessBlock(module.moduleAccess) : openModule(module.moduleId)}>Week {module.week} — {module.title}</button>}
                 {role === "teacher" && embedded && !drawer && <button type="button" className="danger-button" onClick={() => removeModule(module.moduleId)}>Delete</button>}
               </div>
             ))}

@@ -61,3 +61,9 @@ Real Java and compatibility checks: `tests/week12-week13-modules.test.mjs`; actu
 editor and browser Java 8 checks: `tests/week12-week13.browser.mjs`.
 
 Module resume: `moduleResumeStep` in `app/moduleParts.ts`, consumed by worksheet, catalog and weekly Module project. Saved step completion supplies the position; no navigation storage. CKB-058; `tests/module-resume.test.mjs` and `tests/module-resume.browser.mjs`.
+
+Cross-module prerequisites: `backend/src/module-prerequisites.ts` and the shared access guard in
+`supabase-repository.ts`; `ModuleAccessNotice`, `ModuleViewer`, `ModuleWorkspace`, `ModuleCatalogCard`
+and project-opening callers in `page.tsx`. Current step passes unlock the full predecessor chain;
+live class permits catch-up. CKB-060; `tests/module-prerequisites.test.mjs` and
+`tests/module-prerequisites.browser.mjs`. No migration or new endpoint.

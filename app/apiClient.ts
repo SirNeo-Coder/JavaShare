@@ -1,3 +1,10 @@
+import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
+
+export class ApiError extends Error {
+  readonly moduleAccess?: ModuleAccessBlock;
+  constructor(message: string, moduleAccess?: ModuleAccessBlock) { super(message); this.moduleAccess = moduleAccess; }
+}
+
 // Shared browser-side fetch helper, used by both the main workspace (page.tsx) and the module
 // viewer, so there is one place that knows how CodeShare's API calls carry the session cookie.
 const DEPLOYED_API_URL = process.env.NEXT_PUBLIC_API_URL || "";
@@ -18,6 +25,6 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     if (response.ok && path === "/api/auth/logout") window.dispatchEvent(new CustomEvent("codeshare:session", { detail: null }));
     if (response.status === 401 && !["/api/auth/login", "/api/auth/register"].includes(path)) window.dispatchEvent(new CustomEvent("codeshare:session-expired"));
   }
-  if (!response.ok) throw new Error(body?.error || "Request failed");
+  if (!response.ok) throw new ApiError(body?.error || "Request failed", body?.moduleAccess);
   return body as T;
 }

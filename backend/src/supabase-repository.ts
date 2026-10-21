@@ -1,3 +1,4 @@
+import { moduleAccessBlock, type ModuleAccessBlock } from "./module-prerequisites.ts";
 import { randomBytes } from "node:crypto";
 import { activityStateId, activityTask, activityAccess, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { type CourseModule } from "./course-module-schema.ts";
@@ -14,7 +15,8 @@ export type SupabaseSessionUser = {
 
 export class SupabaseRepositoryError extends Error {
   readonly status: number;
-  constructor(status: number, message: string) { super(message); this.status = status; }
+  readonly moduleAccess?: ModuleAccessBlock;
+  constructor(status: number, message: string, moduleAccess?: ModuleAccessBlock) { super(message); this.status = status; this.moduleAccess = moduleAccess; }
 }
 
 type ClassroomRow = { id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean; active_module_id: string | null };
@@ -1237,18 +1239,30 @@ async function requireClassroomMember(user: SupabaseSessionUser, classroomId: st
   if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Join the class before tracking module progress");
 }
 
-// While a live activity is running for a class, a student's module catalog locks to just the
-// teacher's weekly pick (classrooms.active_module_id) - every other module stays unreachable for
-// the duration, not only hidden in the UI. Teachers previewing are never locked: they may need to
-// open any module regardless of what's live. No live activity running means no lock at all.
-async function enforceModuleLiveLock(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
-  if (user.role !== "student") return;
+// All student module entry points share the same prerequisite and live-class decision.
+async function loadStudentModuleAccess(user: SupabaseSessionUser, classroomId: string) {
   const db = getSupabaseAdmin();
-  const { data: classroom, error } = await db.from("classrooms").select("current_activity_id,active_module_id").eq("id", classroomId).maybeSingle();
-  fail(error, "Could not check class status");
-  if (!classroom?.current_activity_id) return;
-  if (classroom.active_module_id && moduleId === classroom.active_module_id) return;
-  throw new SupabaseRepositoryError(403, "Only this week's module is open while class is live");
+  const [classroomResult, modulesResult, progressResult] = await Promise.all([
+    db.from("classrooms").select("current_activity_id,active_module_id").eq("id", classroomId).maybeSingle(),
+    db.from("course_modules").select("module_id,content").eq("classroom_id", classroomId),
+    db.from("module_progress").select("module_id,step_states").eq("student_id", user.id).eq("classroom_id", classroomId),
+  ]);
+  fail(classroomResult.error, "Could not check class status");
+  fail(modulesResult.error, "Could not check module prerequisites");
+  fail(progressResult.error, "Could not check prerequisite completion");
+  if (!classroomResult.data) throw new SupabaseRepositoryError(404, "Classroom not found");
+  const modules = new Map<string, CourseModule>(modulesResult.data.map((row) => [row.module_id, row.content as CourseModule]));
+  const states = new Map<string, Record<string, string>>(progressResult.data.map((row) => [row.module_id, row.step_states]));
+  const classroom = classroomResult.data;
+  return (module: CourseModule) => moduleAccessBlock(module, modules, states, classroom);
+}
+
+async function enforceStudentModuleAccess(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  if (user.role !== "student") return;
+  const access = await loadStudentModuleAccess(user, classroomId);
+  const row = await loadCourseModuleRow(classroomId, moduleId);
+  const block = access(row.content);
+  if (block) throw new SupabaseRepositoryError(403, block.message, block);
 }
 
 async function loadOrCreateModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string): Promise<ModuleProgressRow> {
@@ -1306,7 +1320,7 @@ function moduleProgressView(row: ModuleProgressRow, module: CourseModule) {
 export async function getSupabaseModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  await enforceModuleLiveLock(user, classroomId, moduleId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   return moduleProgressView(await loadOrCreateModuleProgress(user, classroomId, moduleId), courseRow.content);
 }
@@ -1316,7 +1330,7 @@ export async function getSupabaseModuleProgress(user: SupabaseSessionUser, class
 export async function setSupabaseModuleStepState(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string, status: ModuleStepStatus) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  await enforceModuleLiveLock(user, classroomId, moduleId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   const lesson = courseRow.content.lessons.find((item) => item.exitSlip.id === stepId || item.blocks.some((block) => block.type === "step" && block.id === stepId));
   if (!lesson) throw new SupabaseRepositoryError(400, "Step or exit slip not found in this module");
@@ -1336,7 +1350,7 @@ export async function setSupabaseModulePerformanceTask(
 ) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  await enforceModuleLiveLock(user, classroomId, moduleId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   if (!courseRow.content.performanceTask) throw new SupabaseRepositoryError(404, "Performance task not found in this module");
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
@@ -1357,7 +1371,7 @@ export async function setSupabaseModulePerformanceTask(
 async function requirePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have performance projects");
   await requireClassroomMember(user, classroomId);
-  await enforceModuleLiveLock(user, classroomId, moduleId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   if (!courseRow.content.performanceTask) throw new SupabaseRepositoryError(404, "Performance task not found in this module");
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
@@ -1395,7 +1409,7 @@ export async function saveSupabasePerformanceProject(user: SupabaseSessionUser, 
 async function requireModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module projects");
   await requireClassroomMember(user, classroomId);
-  await enforceModuleLiveLock(user, classroomId, moduleId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
   const { content } = await loadCourseModuleRow(classroomId, moduleId);
   const step = findActivity(content, stepId);
   if (!step) throw new SupabaseRepositoryError(404, "Activity not found in this module");
@@ -1483,7 +1497,7 @@ export async function recordSupabaseModuleActivityResult(
 export async function setSupabaseModuleProjectFiles(user: SupabaseSessionUser, classroomId: string, moduleId: string, files: Array<{ path: string; content: string }>, updatedAt?: string, stepId?: string) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  await enforceModuleLiveLock(user, classroomId, moduleId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   const data = await updateModuleProgressWithMerge(
     user, classroomId, moduleId,
@@ -1699,14 +1713,11 @@ export async function setSupabaseModuleAvailability(user: SupabaseSessionUser, c
   throw new SupabaseRepositoryError(409, "Module changed while saving. Please try again");
 }
 
-// isActive: this is the teacher's weekly pick (classrooms.active_module_id) for the class.
-// locked: a student may not open this module right now because a live activity is running and
-// this isn't the weekly pick - mirrors enforceModuleLiveLock so the catalog can grey it out
-// instead of a student discovering the lock only after tapping in.
-function courseModuleSummary(row: CourseModuleRow, classroom: Pick<ClassroomRow, "active_module_id" | "current_activity_id">, role: "teacher" | "student") {
+// Prerequisite cards stay selectable so students can open their explanation and Continue action.
+function courseModuleSummary(row: CourseModuleRow, classroom: Pick<ClassroomRow, "active_module_id" | "current_activity_id">, role: "teacher" | "student", block?: ModuleAccessBlock) {
   const isActive = row.module_id === classroom.active_module_id;
-  const locked = role === "student" && Boolean(classroom.current_activity_id) && !isActive;
-  return { moduleId: row.module_id, title: row.content.title, week: row.content.week, course: row.content.course, updatedAt: row.updated_at, isActive, locked };
+  const locked = role === "student" && block?.kind === "live";
+  return { moduleId: row.module_id, title: row.content.title, week: row.content.week, course: row.content.course, updatedAt: row.updated_at, isActive, locked, ...(block ? { moduleAccess: block } : {}) };
 }
 
 export async function uploadSupabaseModule(user: SupabaseSessionUser, classroomId: string, content: CourseModule) {
@@ -1727,7 +1738,11 @@ export async function listSupabaseModules(user: SupabaseSessionUser, classroomId
   if (!classroom) throw new SupabaseRepositoryError(404, "Classroom not found");
   const { data, error } = await db.from("course_modules").select("classroom_id,module_id,content,created_at,updated_at").eq("classroom_id", classroomId).order("created_at", { ascending: false });
   fail(error, "Could not list modules");
-  return (data as CourseModuleRow[]).map((row) => courseModuleSummary(row, classroom, user.role));
+  const access = user.role === "student" ? await loadStudentModuleAccess(user, classroomId) : undefined;
+  return (data as CourseModuleRow[]).map((row) => {
+    const block = access?.(row.content);
+    return courseModuleSummary(row, classroom, user.role, block);
+  });
 }
 
 // Teacher's weekly pick of one module for a class (docs/knowledgebase/workflow-state.md). null
@@ -1744,7 +1759,7 @@ export async function setSupabaseClassroomActiveModule(user: SupabaseSessionUser
 
 export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   await requireClassroomMember(user, classroomId);
-  await enforceModuleLiveLock(user, classroomId, moduleId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
   const row = await loadCourseModuleRow(classroomId, moduleId);
   if (user.role === "teacher") return { ...row.content, availability: moduleAvailability(row) };
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);

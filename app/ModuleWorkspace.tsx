@@ -3,13 +3,16 @@
 import { useRef, useState } from "react";
 import ModuleViewer, { type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { moduleResumeStep } from "./moduleParts";
-import { api } from "./apiClient";
+import { api, ApiError } from "./apiClient";
+import ModuleAccessNotice from "./ModuleAccessNotice";
+import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 
 export default function ModuleWorkspace({ classroomId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, progressRevision = 0 }: {
   onStartActivity: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
   classroomId: string; role: "teacher" | "student"; browserOpen: boolean; projectsOpen: boolean; onBrowserChange: (open: boolean) => void; onProjectsChange: (open: boolean) => void;
 }) {
+  const [accessBlock, setAccessBlock] = useState<ModuleAccessBlock | null>(null);
   const [error, setError] = useState("");
   const [selection, setSelection] = useState<{ id: string; visit: number } | null>(null);
   const [open, setOpen] = useState(false);
@@ -25,6 +28,24 @@ export default function ModuleWorkspace({ classroomId, role, browserOpen, projec
     else setOpen(true);
   };
   const closeModule = () => { onBrowserChange(false); close(true); };
+  const selectModule = async (id: string) => {
+    try {
+      setError(""); setAccessBlock(null);
+      if (role === "student") {
+        const [module, progress] = await Promise.all([
+          api<CourseModule>(`/api/classrooms/${classroomId}/modules/${id}`),
+          api<Progress>(`/api/classrooms/${classroomId}/modules/${id}/progress`),
+        ]);
+        const steps = module.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
+        const step = moduleResumeStep(module, progress.stepStates) ?? steps.at(-1);
+        if (step?.language === "java") await onStartActivity(module, step);
+      }
+      setSelection((current) => ({ id, visit: (current?.visit ?? 0) + 1 })); setOpen(true); setHoverPreview(false); onBrowserChange(false);
+    } catch (loadError) {
+      if (loadError instanceof ApiError && loadError.moduleAccess) setAccessBlock(loadError.moduleAccess);
+      else setError(loadError instanceof Error ? loadError.message : "Could not open the module project");
+    }
+  };
   return <>
     <nav className="workspace-rail rail-left" aria-label="Learning panels">
       <button ref={earRef} type="button" aria-label="Module" aria-expanded={moduleOpen} aria-controls={moduleId}
@@ -37,21 +58,8 @@ export default function ModuleWorkspace({ classroomId, role, browserOpen, projec
         onClick={() => { close(); onBrowserChange(false); onProjectsChange(!projectsOpen || projectsHoverPreview); setProjectsHoverPreview(false); }}><span aria-hidden="true">⌘</span> {role === "teacher" ? "Students / projects" : "Projects"}</button>
     </nav>
     <WorkspaceDrawer id="classroom-modules" title="Course modules" side="left" open={browserOpen} autoFocus={!hoverPreview} onClose={closeModule}>
-      <ModuleViewer role={role} classroomId={classroomId} embedded drawer active={browserOpen} progressRevision={progressRevision} onOpenModule={async (id) => {
-        try {
-          setError("");
-          if (role === "student") {
-            const [module, progress] = await Promise.all([
-              api<CourseModule>(`/api/classrooms/${classroomId}/modules/${id}`),
-              api<Progress>(`/api/classrooms/${classroomId}/modules/${id}/progress`),
-            ]);
-            const steps = module.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
-            const step = moduleResumeStep(module, progress.stepStates) ?? steps.at(-1);
-            if (step?.language === "java") await onStartActivity(module, step);
-          }
-          setSelection((current) => ({ id, visit: (current?.visit ?? 0) + 1 })); setOpen(true); setHoverPreview(false); onBrowserChange(false);
-        } catch (loadError) { setError(loadError instanceof Error ? loadError.message : "Could not open the module project"); }
-      }} />
+      <ModuleViewer role={role} classroomId={classroomId} embedded drawer active={browserOpen} progressRevision={progressRevision} onOpenModule={selectModule} />
+      {accessBlock && <ModuleAccessNotice block={accessBlock} onContinue={(id) => void selectModule(id)} />}
       {error && <p className="module-error" role="alert">{error}</p>}
     </WorkspaceDrawer>
     {selection && <div className="worksheet-drawer-group">

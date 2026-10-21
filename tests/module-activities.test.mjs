@@ -256,13 +256,16 @@ test("module activities: compile errors and a crash after the right output canno
 test("module activities: prior project is copied only for its owner/class and later saves never replace it", needsLocal, async () => {
   await withClass(async ({ admin, users, classroomId, upload, prepare, request, cookies, call }) => {
     const previous = "previous-module";
+    await upload({ ...fixture, id: previous });
+    const priorPasses = { [firstStateId]: "pass", [secondStateId]: "pass" };
     const priorFiles = [{ path: "src/Main.java", content: "student's previous Main" }, { path: "Vehicle.java", content: "student's previous Vehicle" }];
-    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous, project_files: priorFiles })).error, null);
+    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous, step_states: priorPasses, project_files: priorFiles })).error, null);
     await upload({ ...fixture, previousModuleId: previous });
     let prepared = await prepare();
     assert.equal(prepared.projectFiles.find((file) => file.path.endsWith("Main.java")).content, priorFiles[0].content);
     assert.equal(prepared.projectFiles.find((file) => file.path === "Vehicle.java").content, priorFiles[1].content);
     assert.ok(prepared.projectFiles.some((file) => file.path === "Jeepney.java"));
+    await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[2].id, module_id: previous, step_states: priorPasses });
     const other = await prepare(first.id, cookies[2]);
     assert.ok(!JSON.stringify(other.projectFiles).includes("student's previous"));
     const otherModule = { ...fixture, id: "separate-module", previousModuleId: undefined }; await upload(otherModule);
@@ -305,10 +308,12 @@ test("module activities: JSON supplies fixed program input and demo execution ca
 test("weekly Java projects: personal drafts roll forward separately, preserve submissions and never advance module progress", needsLocal, async () => {
   await withClass(async ({ admin, users, classroomId, upload, prepare, request, cookies, call }) => {
     const previous = "previous-module";
+    await upload({ ...fixture, id: previous });
+    const priorPasses = { [firstStateId]: "pass", [secondStateId]: "pass" };
     const moduleFiles = [{ path: "Main.java", content: "previous module Main" }];
     const personalFiles = [{ path: "Main.java", content: "previous personal Main" }, { path: "Own.java", content: "previous personal class" }];
     const snapshot = { files: personalFiles, status: "pass", submittedAt: new Date().toISOString() };
-    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous,
+    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous, step_states: priorPasses,
       project_files: moduleFiles, performance_task: { own: snapshot } })).error, null);
     await upload({ ...fixture, previousModuleId: previous });
     const base = `/api/classrooms/${classroomId}/modules/${fixture.id}/progress`;
@@ -368,6 +373,8 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     try {
       await admin.from("classroom_members").insert({ classroom_id: otherClass.data.id, user_id: users[1].id });
       await admin.from("course_modules").insert({ classroom_id: otherClass.data.id, module_id: fixture.id, content: { ...fixture, previousModuleId: previous }, created_by: users[0].id });
+      await admin.from("course_modules").insert({ classroom_id: otherClass.data.id, module_id: previous, content: { ...fixture, id: previous }, created_by: users[0].id });
+      await admin.from("module_progress").insert({ classroom_id: otherClass.data.id, student_id: users[1].id, module_id: previous, step_states: priorPasses });
       await admin.from("module_progress").insert({ classroom_id: otherClass.data.id, student_id: users[1].id, module_id: fixture.id, step_states: passed });
       response = await call(`/api/classrooms/${otherClass.data.id}/modules/${fixture.id}/progress/performance-project`, { method: "POST", headers: { cookie: cookies[1] } });
       assert.equal(response.status, 200); view = await response.json();
