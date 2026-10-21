@@ -446,3 +446,41 @@ passing entries including nested checks and their parent tests; no failed/skippe
 - ✔ weekly Java editor: personal shows its own source, input and explicit submission
 - ✔ weekly Java editor: alteration shows its own target and remembers completed tasks
 
+
+## Main refresh and three-PR conflict repair — 2026-10-22
+
+PR #37 was reapplied on main `c770731` (Java suggestions, PR #34). Both sets of progress
+notes, problem-index entries and prompt records were retained. The already-merged Java caret
+case remains CKB-059; prerequisites use CKB-060, curriculum CKB-061, subject sharing CKB-062.
+The subject-sharing case was renamed and its index/feature/prompt references updated.
+
+- PASS `npm run build:all`: production frontend and backend.
+- PASS `npm run lint`: 0 errors, the same 8 existing warnings.
+- PASS `npm test`: **236/236**, 0 failures, 0 skips. All original named tests above passed
+  again; seven inherited editor rule checks are listed below.
+- PASS the browser command above: **7/7**, 0 failures, 0 skips, actual local production app
+  with current main editor, subject selection/sharing/corrections/deletion scope and laptop Java.
+  The named checks are unchanged from the browser list above and all passed again.
+- PASS preservation comparison: all 16 original application/config/test files retain the
+  feature’s content; both its CSS additions and current main’s independent editor styles remain.
+- PASS documentation integrity: valid case-index links, distinct case numbers and no conflict
+  markers. No new feature logic or test fixtures were introduced by the resolution.
+- NOT REPEATED: offline launcher build and deliberate-break proof; earlier results above apply.
+  Hosted rollout, physical devices and actual Net MVC execution remain unverified.
+
+The teacher reports successful hosted SQL for the new library during this walkthrough; that
+result has not been independently queried. No assistant hosted change, deployment or merge.
+PRs #35 and #36 were refreshed separately; #36 remains draft for curriculum review. Each PR
+remains independent against current main; merging one may require another refresh of the others.
+
+### `tests/java-suggestions.test.mjs`
+
+Command: `npm test`. Isolated rules inherited from main:
+
+- ✔ Java suggestions: keywords, standard names and print statements match typed prefixes
+- ✔ Java suggestions: current-file names are unique and ignore comments and string literals
+- ✔ Java suggestions: comments, escaped strings, characters and text blocks never open suggestions
+- ✔ Java suggestions: empty, short, selected, numeric and unsupported member prefixes stay quiet
+- ✔ Java suggestions: insertion replaces the full word and preserves surrounding code
+- ✔ Java suggestions: print snippets place the caret inside the parentheses
+- ✔ Java suggestions: the main statement keeps existing indentation and puts the caret in its body

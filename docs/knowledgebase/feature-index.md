@@ -79,4 +79,4 @@ Subject-specific shared modules: teacher-owned `subject_modules` and `classrooms
 shared readers and owner-only subject/import routes in `supabase-repository.ts` / `routes.ts`.
 `ModuleSharing.tsx` is reused by Curriculum and the existing module upload view; class creation
 uses a two-option Subject select in `Landing.tsx`. Migration `20261022000100`; tests in
-`subject-module-sharing.test.mjs` and `subject-module-sharing.browser.mjs`; CKB-059.
+`subject-module-sharing.test.mjs` and `subject-module-sharing.browser.mjs`; CKB-062.

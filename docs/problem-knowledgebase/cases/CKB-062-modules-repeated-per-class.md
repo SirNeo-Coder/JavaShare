@@ -1,4 +1,4 @@
-# CKB-059 — Modules required a separate upload for each class
+# CKB-062 — Modules required a separate upload for each class
 
 - Status: resolved locally; hosted setup pending
 - First recorded: 2026-10-22
@@ -53,3 +53,9 @@ validation. If student progress leaks, use CKB-010; content sharing must never r
 
 - 2026-10-22 — Teacher approved one Java or Net MVC set per class, shared across own same-subject
   classes. Implementation and local verification; hosted rollout requires teacher action.
+
+- 2026-10-22 — During teacher-requested conflict repair of PRs #35/#36/#37, renamed this
+  case from CKB-059 to CKB-062 so main’s Java caret case and the other two feature cases
+  stay distinct. Preserved both documentation histories and the feature code. Integrated
+  suite 236/236 and actual browser 7/7 pass on main c770731. Teacher reports hosted SQL success;
+  app rollout remains unverified.

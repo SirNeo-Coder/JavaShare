@@ -29,6 +29,21 @@
 > protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
 > teacher review; merging another PR may require another refresh of the remaining branches.
 
+> Three-PR conflict repair (2026-10-22): subject sharing PR #37 updated on main `c770731`;
+> replayed implementation `200065c`. Teacher requested fixing #35/#36/#37. Both note sets
+> are preserved. Case numbers are unique: main caret issue 059, prerequisites 060, curriculum
+> 061, subject sharing 062. The original feature code/config/tests were preserved; current
+> main’s editor changes and both sets of independent styles are retained.
+> Verified: production build, lint 0 errors/8 existing warnings, full suite 236/236 and actual
+> local production browser 7/7 with laptop Java; no failures/skips. Named results and limits:
+> `docs/verification/subject-module-sharing.md`. Other branches separately pass 245 (#35) and
+> 276 (#36) tests. #36 remains draft. The teacher reports the hosted library SQL succeeded;
+> hosted app rollout is still pending and has not been independently verified.
+> Resolution and this note are committed/pushed to the existing feature branch with a lease
+> against its previously fetched head. No merge/deployment. Next: verify GitHub’s conflict-free
+> status, teacher review/merge and app build, then choose class subjects/share saved uploads.
+> Merging another PR can require refreshing the remaining branches again.
+
 > Current approved subject sharing (2026-10-22): `codex/subject-module-sharing`, based on main
 > `9fba8a7`, isolated worktree `/home/ireneo/.codex/worktrees/subject-module-sharing/JavaShare`.
 > Approved: each class uses exactly one Java or Net MVC module set; upload/correct once per
