@@ -490,8 +490,10 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   warnings; full suite 238/238; real offline/online browser checks 10/10. Server-bypass regression
   failed with the guard removed and passed after restoration. Full named checks and limits:
   `docs/verification/module-prerequisites.md`.
-- In progress: final commit/push/PR delivery. Next: teacher review and rollout, including confirming
-  Week 13/14 uploads. Teacher reports PR #33 merged, history migration verified, Cloudflare Ready
-  and Week 12 uploaded. The old temporary resume checkout is gone.
+- Delivered: `20d5931` committed and pushed; [PR #35](https://github.com/SirNeo-Coder/JavaShare/pull/35)
+  targets main and is attached. Nothing remains in progress. Next: teacher review and rollout,
+  including confirming Week 13/14 uploads. Teacher reports PR #33 merged, history migration
+  verified, Cloudflare Ready and Week 12 uploaded. The old temporary resume checkout is gone.
+  Temporary verification servers were stopped and disposable browser classrooms removed.
 - Continue from `docs/handoffs/rolling-module-tasks.md`. Hosted services, physical disconnected
   Wi-Fi devices, Windows and other browsers remain unverified. No assistant merge or hosted action.

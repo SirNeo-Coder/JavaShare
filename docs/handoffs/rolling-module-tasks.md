@@ -14,8 +14,11 @@
   full suite 238/238; real production browser checks 10/10 with laptop javac and actual browser
   CheerpJ. Removed server enforcement, observed regression failures, restored it and passed.
   Full names, intermediate test corrections and limits: `docs/verification/module-prerequisites.md`.
-- In progress: final commit/push and PR delivery. Next: teacher reviews the prerequisite PR,
-  then follows the existing app rollout and ensures all linked module files are uploaded.
+- Delivered: implementation `20d5931` committed and pushed; [PR #35](https://github.com/SirNeo-Coder/JavaShare/pull/35)
+  targets main and is attached to the chat. No code work remains in progress. Next: teacher
+  reviews the PR, then follows the existing app rollout and ensures all linked files are uploaded.
+  The GitHub connector could not create PRs (403); the authenticated CLI created it successfully.
+  Temporary verification servers were stopped; disposable browser classrooms were removed.
 - Prior rollout update supplied by teacher: PR #33 merged into main; history migration verified
   (`activity_projects`, `jsonb`, `NO`); Cloudflare active Ready; Week 12 uploaded. Week 13/14 live
   uploads remain unverified. The old `/tmp/codeshare-module-resume` checkout is gone; use

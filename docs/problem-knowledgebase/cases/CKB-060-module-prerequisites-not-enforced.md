@@ -31,6 +31,8 @@ banner and Continue Week N reuses the saved next-step selection. Existing files/
 
 ## Regression proof
 
+Implementation: `20d5931`; [PR #35](https://github.com/SirNeo-Coder/JavaShare/pull/35).
+
 - `tests/module-prerequisites.test.mjs`: pure chain/identity/live rules, rendered notice, real
   local-Supabase routes for every entry point, student/class isolation and saved-work preservation.
 - Removed the server access guard temporarily: the content regression returned 200 instead of
