@@ -622,3 +622,10 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .module-before-sample { margin-top:12px; font-size:12px; }
 .module-before-sample summary { cursor:pointer; }
 .module-activity-console .console>b { display:block; margin-bottom:10px; font:700 13px/1.5 var(--font-geist),sans-serif; }
+
+/* Java suggestions share the existing editor; no network or language service. */
+.code-suggestions { position:absolute; z-index:5; left:12px; bottom:34px; width:min(360px,calc(100% - 24px)); max-height:65%; display:flex; flex-direction:column; border:1px solid #7285ab; border-radius:6px; background:#172238; color:#edf3ff; box-shadow:0 4px 16px #0005; overflow:hidden; }
+.code-suggestions-help { padding:7px 9px; color:#bac8e2; font:10px/1.5 var(--font-geist),sans-serif; }
+.code-suggestions [role="listbox"] { overflow:auto; }
+.code-suggestions [role="option"] { display:block; width:100%; padding:7px 9px; border:0; border-radius:0; background:transparent; color:inherit; font:12px/1.4 var(--font-geist-mono),monospace; text-align:left; overflow-wrap:anywhere; cursor:pointer; }
+.code-suggestions [role="option"][aria-selected="true"],.code-suggestions [role="option"]:hover { background:#31508a; }
