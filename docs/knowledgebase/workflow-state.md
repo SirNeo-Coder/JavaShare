@@ -2,6 +2,21 @@
 
 What teachers and students can do today. Keep this page current when their use of CodeShare changes; no change-level classification is required.
 
+## Java code suggestions (2026-10-21)
+
+- In the classroom **Code editor**, **Module project**, and **Personal project**, typing two Java
+  characters opens **Java code suggestions**. Examples: `Sys` offers `System` and
+  `System.out.println(…)`; `ma` offers a `main` statement. Suggestions include Java keywords,
+  common types and names in the current file, without Java type checking or AI generation.
+- Use ↑/↓ to choose, Enter to insert, Escape to close, or click/tap an item. Print statements
+  leave the caret inside their parentheses; `main` retains the current indentation.
+  Tab/Shift+Tab still indent, and Ctrl+Enter still runs code. Read-only views retain normal Tab navigation.
+- Comments and strings, selected text and composing text do not open suggestions. Moving the
+  caret, scrolling, leaving the editor, or receiving changed live code closes the list.
+- Suggestions use bundled code online and offline. Accepting one edits only the current file;
+  existing Save work, Run code, explicit submission, live sharing and module completion rules apply.
+  HTML, CSS, JavaScript and the teacher worksheet's plain sample textareas retain their existing behavior.
+
 ## Java run status (2026-10-21)
 
 - The regular **Code editor → Console** used by teachers and students also shows the same

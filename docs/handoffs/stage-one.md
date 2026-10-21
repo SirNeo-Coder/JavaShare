@@ -1,3 +1,26 @@
+> Java code suggestions (2026-10-21): branch `codex/java-code-suggestions`, based on current
+> main `9fba8a7` (merged drawer/module work retained). Teacher approved Java-first local
+> keywords, common statements and current-file names in classroom, module and personal editors.
+> Done: two typed characters open Java code suggestions; arrows select, Enter/click/tap insert,
+> Escape closes, Tab still indents and Ctrl+Enter still runs. Print/main caret positions and
+> indentation retained. Read-only, other languages, comments/strings, composing text and selected
+> text stay quiet; changed external code closes stale suggestions. No AI, type service, dependency,
+> server, schema, migration or hosted settings change. Plain teacher worksheet textareas unchanged.
+> Browser checks found and fixed a fast-typing caret race (CKB-059) in the shared selection timing.
+> Final evidence: 228/228 automated tests, 11/11 actual offline production browser checks,
+> 6/6 focused shared-editor browser checks; production frontend/backend/offline launcher builds
+> pass; lint 0 errors/8 existing warnings. Deliberately restoring delayed caret selection caused
+> the fast-typing and indentation checks to fail (3 pass/3 fail including parent); restored
+> source passes all 6. Both roles ran an accepted suggestion with actual laptop Java; module and
+> personal saves retain separate drafts and do not submit. Personal test access uses explicitly
+> seeded local fixture completion, and tests verify that suggestion editing never changes it.
+> [Every named test, commands, regression proof and limits](../verification/java-code-suggestions.md).
+> Implementation and verification are complete; next: commit/push branch and open review PR,
+> then teacher review and hosted rollout. Do not merge or deploy. Hosted online execution, physical
+> phones/input methods, screen-reader speech and two-device live editing were not retested.
+> All disposable test accounts are cleaned; stop only the temporary verification server.
+> Unrelated logs, Supabase CLI cache, .claude and snippets are preserved.
+
 > Current approved drawer repair (2026-10-21): branch `codex/classroom-drawer-controls`, directly
 > based on main `9257ea7` (merged PR #31). Teacher approved one Module/Projects rail, reopening
 > the selected worksheet, hover opening and animated outside closing for Module, Projects and
