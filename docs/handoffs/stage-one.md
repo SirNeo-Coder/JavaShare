@@ -522,5 +522,6 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   [the active rolling handoff](rolling-module-tasks.md).
 - Open: classroom file persistence, original thread-sample timing and visible/browser GUI support
   remain separate decisions. Review copies are not a blanket classroom rollout approval.
-- Next: commit/push and open a teacher-review draft PR; never merge or deploy.
+- Delivered implementation `614ae27`, committed and pushed; [draft PR #36](https://github.com/SirNeo-Coder/JavaShare/pull/36) targets main.
+  Next: teacher reviews the package and runtime limits; never merge or deploy as an assistant.
   Files and limitations: [package index](../modules/week15-week21.md).

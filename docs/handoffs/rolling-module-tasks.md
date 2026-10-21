@@ -48,7 +48,7 @@ Each PDF retains its eight original pages and appends practice material (13 adde
 Each Word plan retains all original ZIP content and adds one activity-notes page. Exact page
 stream comparisons preserve all 56 original PDF pages; all 52 original Word renders are
 pixel-identical. Original supplied files in /home/ireneo/Documents/Java 2026 are unchanged.
-CKB-052/054 were consulted; CKB-060 records the six original upload failures and their corrections.
+CKB-052/054 were consulted; CKB-061 records the six original upload failures and their corrections.
 
 Verified: build:all passed; lint zero errors/eight existing image warnings; full suite
 269/269 with no failures/skips; offline launcher build passed with the existing database.
@@ -66,7 +66,12 @@ review copies classroom-ready. No application, schema, migration, hosted setting
 merge or real student data changed. The isolated production browser server is port 3022;
 disposable local fixtures clean up their own class/accounts. That server has been stopped.
 
-Next: commit/push this verified package and open a teacher-review draft PR.
+Delivered implementation `614ae27`, committed and pushed on this branch.
+Teacher-review draft: [PR #36](https://github.com/SirNeo-Coder/JavaShare/pull/36), targeting main.
+No approved implementation work remains in progress. Next: teacher reviews the package and
+its stated runtime limits; any file persistence, thread-sample changes or GUI rollout need
+their own proposal. The GitHub connector returned 403 for creation; the existing authenticated
+CLI created the draft successfully, and it is attached to the chat. No remaining permission block.
 Do not merge, deploy, change hosted settings or overwrite the supplied originals. Preserve
 unrelated logs/classroom.log, supabase/.temp/cli-latest, .claude/ and supabase/snippets/.
 

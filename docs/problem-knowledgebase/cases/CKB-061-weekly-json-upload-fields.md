@@ -1,4 +1,4 @@
-# CKB-060 — Later weekly JSON uploads lack required fields or contain text assets in Java steps
+# CKB-061 — Later weekly JSON uploads lack required fields or contain text assets in Java steps
 
 - Status: resolved for upload shape; runtime limitations remain explicitly open
 - First recorded: 2026-10-22
@@ -47,6 +47,7 @@ add matching PDF/Word appendices. Week 20 stays written work. No application or 
   exact JSON bytes: the same check passed. Reconstructing original content reproduces all six
   old validation failures and retains the already-valid Week 18 original.
 - Commands and every named result: docs/verification/week15-week21-step-additions.md.
+- Implementation: `614ae27`; review: [draft PR #36](https://github.com/SirNeo-Coder/JavaShare/pull/36).
 
 ## Recurrence triage
 
