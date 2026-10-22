@@ -75,6 +75,7 @@ the existing 120-second deadline. No hosted setting or migration is needed.
 
 - Hosted CPU exhaustion (CKB-065): a teacher-supplied module save returned 503 /
   exceededCpu / 10 ms CPU. Workers Free allows 10 ms per request; current requirement
-  is to stay free and investigate measured CPU reductions. See the CPU diagnosis
+  is to stay free. Local profiling identifies full-library parsing cost;
+  the metadata/reuse proposal awaits approval (docs/verification/free-worker-cpu-investigation.md). See the CPU diagnosis
   section of [Cloudflare setup](../cloudflare-setup.md#module-saves-fail-with-exceededcpu).
   Local passing tests and a healthy public read do not prove hosted saves fit the cap.

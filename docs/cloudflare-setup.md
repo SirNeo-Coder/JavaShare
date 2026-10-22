@@ -144,3 +144,8 @@ The teacher requires CodeShare to stay free. **No paid-plan change is approved.*
 The shared API error-message repair (CKB-064) prevents HTML parsing messages but
 does not reduce the server's CPU work. No hosted plan, limits, deployment, secrets
 or database changes have been made by the assistant.
+
+Local profiling is now complete. [Measured findings and the approval proposal](verification/free-worker-cpu-investigation.md)
+recommend small server-only module metadata reads and reusing the selected module
+within each request. This needs one new migration and server changes; neither is
+implemented or approved yet. Local profiles do not guarantee hosted requests fit 10 ms.

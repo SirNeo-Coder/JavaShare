@@ -32,7 +32,8 @@ read, not a signed-in module save. An earlier lookup used a misread hostname.
 
 Read-only code inspection shows the save checks membership/prerequisites, loads
 the module library and current module, and merges progress under a version check.
-These are potential profiling areas; no CPU profile identifies the hot operation.
+Local Worker profiling identifies full-library Supabase parsing as a major cost;
+see the comparison below.
 Do not remove access/version checks or assume slow network waits caused CPU usage.
 
 ## Durable solution
@@ -44,6 +45,14 @@ fitting the complete app under 10 ms is not established. Raising a local config
 value cannot bypass the Free cap. Preserve all membership/prerequisite/version
 checks and student drafts. Paid is documented only as the alternative the teacher
 declined; no pricing/hosting change is part of this repair.
+
+The stay-free investigation profiled the unchanged local Worker with two versus ten
+modules and a direct-handler control. Full-library parsing is a major measured cost;
+the control removes only part of the total. A metadata payload estimate is 2,934
+bytes versus 885,998 bytes full content. No CPU reduction is implemented or proven
+by that size estimate. [Evidence and next approval plan](../../verification/free-worker-cpu-investigation.md)
+propose one new server-only metadata read and request-local module reuse, preserving
+all access/progression/version rules. New code/schema needs separate approval.
 
 Teacher-only steps and acceptance checks are in [Cloudflare setup](../../cloudflare-setup.md#module-saves-fail-with-exceededcpu).
 The assistant has not changed billing, limits, hosted settings or deployments.
@@ -70,4 +79,5 @@ changing code. Preserve unsaved editor text and do not automatically retry write
 
 - 2026-10-22 — Teacher supplied a cleaned Worker invocation during the approved
   incident investigation. CPU exhaustion confirmed for the save. Response-message
-  mitigation passed locally; teacher requires Free and requested CPU-reduction investigation. No hosting action taken.
+  mitigation passed locally; teacher requires Free. Local Worker/control profiling identifies excessive full-module
+  parsing; metadata/reuse proposal awaits separate approval. No hosting action taken.

@@ -17,10 +17,18 @@
 > health lookup used a misread hostname; corrected public health returns 200/connected.
 > This is not proof of module-save recovery. Account plan/effective CPU limit unknown;
 > teacher explicitly requires Free and requested CPU-reduction investigation.
-> No profiling hotspot or runtime-budget repair is approved by the earlier display fix.
-> Next: commit/push this verified mitigation and diagnosis, open its PR for review,
-> then profile CPU work and propose the smallest reduction; new code needs plan approval. Teacher instructions
-> are in cloudflare-setup.md. No hosted changes, migration, deployment or merge.
+> Delivered: implementation `f256834` committed/pushed; [PR #39](https://github.com/SirNeo-Coder/JavaShare/pull/39)
+> is open against main and attached to the chat. GitHub connector PR creation returned
+> 403; existing gh login successfully created it. No merge or deployment.
+> Stay-free CPU investigation is complete: unchanged local Worker and direct-handler
+> control each ran 20-request phases with real Week 12–21 data. Full-library parsing
+> is a major measured cost; bypassing Next alone leaves most module cost. Candidate
+> metadata is 2,934 bytes versus 885,998 bytes full content, not a speed guarantee.
+> [Profile evidence and proposed next plan](../verification/free-worker-cpu-investigation.md).
+> Next: teacher review of #39 and explicit approval of metadata-only database reads
+> plus request-local module reuse. This requires one new migration and guarded server
+> changes; none is implemented/approved yet. Preserve access/version/progression rules.
+> No hosted CPU recovery claim. Temporary Worker/control/data/credentials are cleaned.
 > Physical Wi-Fi/disconnected operation and online CheerpJ were not rerun; local Java passed.
 > Original checkout and unrelated files remain untouched; temporary app/fixtures are cleaned.
 
