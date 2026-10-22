@@ -1,0 +1,947 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 20,
+  "id": "java-2-w20-module",
+  "title": "Self-Paced Module: Market Analysis and a System Proposal",
+  "continues": "Week 19 — Advanced Components and User Interaction",
+  "starterFiles": [
+    {
+      "path": "BoardingTask.java",
+      "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+    },
+    {
+      "path": "Bus.java",
+      "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+    },
+    {
+      "path": "ConvoyLeg.java",
+      "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+    },
+    {
+      "path": "DispatchThread.java",
+      "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+    },
+    {
+      "path": "FareCheck.java",
+      "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+    },
+    {
+      "path": "FareService.java",
+      "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+    },
+    {
+      "path": "InvalidDistanceException.java",
+      "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Jeepney.java",
+      "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+    },
+    {
+      "path": "LayoutDemo.java",
+      "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "LoadingBay.java",
+      "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+    },
+    {
+      "path": "Main.java",
+      "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class Main {\n  static JPanel createContent() {\n    JPanel root = new JPanel(new BorderLayout(8, 8));\n    root.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));\n    TerminalPanel panel = new TerminalPanel();\n    JLabel status = new JLabel(\"Not checked\");\n    JButton check = new JButton(\"Check ready\");\n    check.addActionListener(new ActionListener() {\n      public void actionPerformed(ActionEvent e) {\n        check.setEnabled(false);\n        status.setText(\"Checking...\");\n        new Thread(new ReadyTask(status, check),\n          \"Readiness\").start();\n      }\n    });\n    JPanel ready = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));\n    ready.add(check); ready.add(status);\n    root.add(new JLabel(\"Vehicle Terminal\"), BorderLayout.NORTH);\n    root.add(panel, BorderLayout.CENTER);\n    root.add(ready, BorderLayout.SOUTH);\n    return root;\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JFrame frame = new JFrame(\"Vehicle Terminal\");\n        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n        frame.setContentPane(createContent());\n        frame.setSize(720, 320);\n        frame.setMinimumSize(new Dimension(520, 300));\n        frame.setLocationRelativeTo(null);\n        frame.setVisible(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "OverloadException.java",
+      "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "ReadyReport.java",
+      "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+    },
+    {
+      "path": "ReadyTask.java",
+      "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "RequestDemo.java",
+      "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class RequestDemo extends JPanel\n    implements ActionListener {\n  private JCheckBox guide = new JCheckBox(\n    \"Guide\");\n  private JCheckBox sheet = new JCheckBox(\n    \"Practice sheet\");\n  private JRadioButton desk = new JRadioButton(\n    \"Desk\", true);\n  private JRadioButton room = new JRadioButton(\n    \"Classroom\");\n  private JList<String> subject = new JList<>(\n    new String[]{\"Java\", \"English\", \"Math\"});\n  private String name = \"My request\";\n  private JTextArea result = new JTextArea(4, 24);\n  public RequestDemo() {\n    setLayout(new BorderLayout(8, 8));\n    setBorder(BorderFactory.createEmptyBorder(8, 8,\n      8, 8));\n    ButtonGroup collect = new ButtonGroup();\n    collect.add(desk); collect.add(room);\n    JPanel materials = new JPanel();\n    materials.add(guide); materials.add(sheet);\n    JPanel place = new JPanel();\n    place.add(new JLabel(\"Collect at:\"));\n    place.add(desk); place.add(room);\n    JPanel options = new JPanel(new GridLayout(2,\n      1));\n    options.add(materials); options.add(place);\n    subject.setSelectionMode(\n      ListSelectionModel.SINGLE_SELECTION);\n    subject.setVisibleRowCount(3);\n    JLabel label = new JLabel(\"Subject:\");\n    label.setLabelFor(subject);\n    JPanel choices = new JPanel(new BorderLayout(4,\n      4));\n    choices.add(label, BorderLayout.NORTH);\n    choices.add(new JScrollPane(subject),\n      BorderLayout.CENTER);\n    choices.add(options, BorderLayout.SOUTH);\n    result.setEditable(false);\n    result.setLineWrap(true);\n      result.setWrapStyleWord(true);\n    result.setText(\n      \"Choose materials, then Preview.\");\n    JPanel actions = new JPanel();\n    for (String text : new String[]{\"Preview\",\n      \"Clear\", \"Info\", \"Rename\"}) {\n      JButton button = new JButton(text);\n      button.setMnemonic(text.charAt(0));\n      button.addActionListener(this);\n      actions.add(button);\n    }\n    add(choices, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  String summary() {\n    if (subject.getSelectedValue() == null) {\n      throw new IllegalArgumentException(\n        \"Choose a subject.\");\n    }\n    if (!guide.isSelected() && !sheet.isSelected(\n      )) {\n      throw new IllegalArgumentException(\n        \"Choose materials.\");\n    }\n    if (!desk.isSelected() && !room.isSelected())\n      {\n      throw new IllegalArgumentException(\n        \"Choose a place.\");\n    }\n    return subject.getSelectedValue() + \": Guide=\"\n      + guide.isSelected()\n      + \"; Sheet=\" + sheet.isSelected()\n      + \"; Place=\" + (desk.isSelected() ? \"Desk\" :\n        \"Classroom\");\n  }\n  void clearChoices() {\n    subject.clearSelection();\n    guide.setSelected(false); sheet.setSelected(\n      false);\n    desk.setSelected(true); result.setText(\n      \"Choices cleared.\");\n  }\n  void acceptName(String input) {\n    if (input == null) { return; }\n    String clean = input.trim();\n    if (clean.isEmpty() || clean.length() > 30) {\n      result.setText(\n        \"Use 1-30 characters for the name.\");\n      return;\n    }\n    name = clean; result.setText(\"Named: \" +\n      name);\n  }\n  void clearIfConfirmed(int answer) {\n    if (answer == JOptionPane.YES_OPTION) {\n      clearChoices();\n    } else if (answer == JOptionPane.NO_OPTION) {\n      result.setText(\"Kept choices (No).\");\n    } else if (answer ==\n      JOptionPane.CANCEL_OPTION) {\n      result.setText(\"Kept choices (Cancel).\");\n    } else {\n      result.setText(\"Kept choices (Closed).\");\n    }\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String command = e.getActionCommand();\n    if (\"Rename\".equals(command)) {\n      acceptName(JOptionPane.showInputDialog(this,\n        \"Request name (1-30 characters):\", name));\n      return;\n    }\n    if (\"Clear\".equals(command)) {\n      clearIfConfirmed(\n        JOptionPane.showConfirmDialog(this,\n        \"Clear subject and materials?\",\n        \"Confirm clear\",\n          JOptionPane.YES_NO_CANCEL_OPTION));\n      return;\n    }\n    try {\n      String text = name + \"\\n\" + summary();\n      if (\"Info\".equals(command)) {\n        JOptionPane.showMessageDialog(this, text,\n          \"Request information\",\n            JOptionPane.INFORMATION_MESSAGE);\n      } else {\n        result.setText(text);\n      }\n    } catch (IllegalArgumentException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(() -> {\n        JFrame f = new JFrame(\n          \"School materials request\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(new RequestDemo());\n        f.setSize(640, 420);\n        f.setMinimumSize(new Dimension(520, 380));\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n    });\n  }\n}\n"
+    },
+    {
+      "path": "TerminalPanel.java",
+      "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JComboBox<String> plate = new\n    JComboBox<>(\n    new String[]{\"NXA 123\", \"TRC 456\", \"BUS 789\",\n      \"NYB 321\"});\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result = new JLabel(\n    \"Choose plate and km\");\n  public TerminalPanel() {\n    setLayout(new BorderLayout(8, 8));\n    plate.setSelectedIndex(-1);\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate); d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.setMnemonic('Q');\n    quote.addActionListener(this);\n    JPanel form = new JPanel(new GridLayout(2, 2,\n      8, 8));\n    form.add(p); form.add(plate);\n    form.add(d); form.add(km);\n    JPanel actions = new JPanel(new FlowLayout(\n      FlowLayout.LEFT));\n    actions.add(quote);\n    add(form, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String chosen = (String) plate.getSelectedItem(\n      );\n    if (chosen == null) {\n      result.setText(\"Choose a plate first.\");\n      return;\n    }\n    try {\n      result.setText(FareService.quote(chosen,\n        km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+    },
+    {
+      "path": "ThemeLayoutCheck.java",
+      "content": "import java.awt.*;\nimport javax.swing.*;\npublic class ThemeLayoutCheck {\n  public static void main(String[] args) {\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel form = new JPanel(\n          new GridLayout(2, 2, 6, 6));\n        form.add(new JLabel(\"Item:\"));\n        form.add(new JTextField(\"Rice\", 8));\n        form.add(new JLabel(\"Quantity:\"));\n        form.add(new JTextField(\"2\", 8));\n        JPanel actions = new JPanel(\n          new FlowLayout());\n        actions.add(new JButton(\"Calculate\"));\n        JPanel root = new JPanel(\n          new BorderLayout(6, 6));\n        root.add(form, BorderLayout.CENTER);\n        root.add(actions, BorderLayout.SOUTH);\n        System.out.println(\"Form controls: \"\n          + form.getComponentCount());\n        System.out.println(\"Action controls: \"\n          + actions.getComponentCount());\n        System.out.println(\"Root groups: \"\n          + root.getComponentCount());\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "Tricycle.java",
+      "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+    },
+    {
+      "path": "Vehicle.java",
+      "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+    },
+    {
+      "path": "VehicleNotFoundException.java",
+      "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "java-2-w20-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Find a Useful Problem and Check the Need",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Distinguish a problem, a user need, evidence, an assumption and a proposed feature.",
+        "affective": "Respect users and report only what the available evidence supports.",
+        "psychomotor": "Write a problem statement, alternatives comparison and evidence record for your own theme."
+      },
+      "blocks": [
+        {
+          "type": "note",
+          "markdown": "Work in order. Write Activities 1–5 in a notebook or local text file and retain your notes. All work is possible offline using the module, existing programs, observation or labelled scenarios. No survey, paid tool, internet or personal-data collection is required."
+        },
+        {
+          "type": "note",
+          "markdown": "**Starting programs and retained files.** Vehicle: run java Main; retain the Week 18 launcher and readiness group, with Week 19’s JComboBox TerminalPanel. School-materials practice: run java RequestDemo; this is the final Preview, Info, Rename and confirmed Clear version. Optional LayoutDemo and ThemeLayoutCheck are earlier demonstrations, not either main program. Retain all model/exception/service/worker files, the five Week 16 helpers and Main_week16.txt, Main_week17.txt and Main_week18.txt. These starting files were recovered by applying Week 19 Steps 1–4 in order. No Java change is assigned this week. The assessment is a proposal for your own existing theme program."
+        },
+        {
+          "type": "note",
+          "markdown": "**Course history:** Week 11 classes/objects; 12 four OOP pillars; 13 exceptions; 14 collections; 15 file handling; 16 threads; 17 Swing basics; 18 layout managers/panels; 19 advanced components/user interaction."
+        },
+        {
+          "type": "definition",
+          "term": "Market analysis",
+          "markdown": "A careful look at intended users, their needs and existing alternatives. In this small school project, it helps you judge whether an improvement is useful; it does not require sales forecasts or an invented market size [YD] [IF]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Before adding another counter at a materials desk, find out what learners cannot finish at the current desk. A brighter sign may help more than a new computer."
+        },
+        {
+          "type": "text",
+          "markdown": "**Worked classroom scenario, not field research.** Imagine a school-materials desk using loose paper requests. The scenario says some requests omit a subject or collection place. Intended users are learners preparing a request and a desk helper reading it. No interview, survey or count of actual school requests was conducted."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Statement",
+            "How to record it"
+          ],
+          "rows": [
+            [
+              "Scenario fact: some paper requests omit a subject.",
+              "Given in this exercise; not evidence about our school."
+            ],
+            [
+              "Assumption A1: a complete summary would reduce clarification.",
+              "Unverified; compare completion and clarity in a later trial."
+            ],
+            [
+              "Proposed feature R1: show a complete request preview.",
+              "A design choice; not proof that users need or prefer it."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**User need:** prepare a clear request containing subject, materials and collection place. **Existing alternatives:** keep loose paper; use a labelled paper form; use the existing RequestDemo draft. Paper works without a powered computer. A labelled form may solve missing fields cheaply. RequestDemo can check choices, but does not submit requests, promise stock or save a record."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 1 | Own-theme need record.** In your notebook, name your existing theme program and one current capability. Write: \"[User] needs to [task] because [specific difficulty].\" Compare the present/manual process and one other available alternative. Record one item you actually observed, with its context, or label it an assumption and say what would verify it. Do not collect personal details. Finish with one limited improvement and why it may help."
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself:** \"Everyone wants my app\" is unsupported. Replace it with a named user group, task and labelled basis. Classmate role-play is classroom feedback, not field research. If evidence is absent, an honest assumption record is acceptable."
+        },
+        {
+          "type": "note",
+          "markdown": "**Code verification:** The retained final sources compile with Java 8 compatibility; FareCheck was run. Both launchers return their no-display message when forced headless. A normal launch could not connect to X11; no virtual display is available. Windows, resizing, physical keyboard/clicks and live dialogs were not checked in this preparation."
+        },
+        {
+          "type": "note",
+          "markdown": "**Time allocation:** 10 min recall; 20 min explanation; 25 min example comparison; 35 min own-theme record; 20 min review and slip; 10 min revision = 120 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Yale University [YD]. [Discovery](https://usability.yale.edu/ux/discovery). Brief excerpt: “real goals”. Identify users and their tasks before choosing features.\n\n2. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Brief excerpt: “success criteria”. Connect features to needs and keep within resource limits.\n\n3. Iowa State University Extension [IF]. [Feasibility Study Outline](https://www.extension.iastate.edu/Agdm/wholefarm/html/c5-66.html). Brief excerpt: “underlying assumptions”. Compare alternatives and examine assumptions before deciding.\n\n4. Iowa State University Extension [IP]. [Writing a Business Plan](https://www.extension.iastate.edu/agdm/wholefarm/html/c5-68.html). Brief excerpt: “supporting evidence”. Keep the plan honest, consistent and clear.\n\n5. Carnegie Mellon University [CP]. [Proposals](https://www.cmu.edu/student-success/other-resources/handouts/comm-supp-pdfs/proposals.pdf). Brief excerpt: “realistic plan”. Explain the need, scope, resources and completion plan.\n\n**Key validated facts:** Identify a specific user task [YD]; compare alternatives and label assumptions [IF]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Activity 1, answer the Monday exit slip."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w20-d1-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "java-2-w20-d1-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Activity 1, distinguish evidence, an assumption and a proposed feature using your own theme."
+          },
+          {
+            "id": "java-2-w20-d1-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "For your Activity 1 problem, compare the current/manual process with one alternative. Why might the simpler option be enough?"
+          },
+          {
+            "id": "java-2-w20-d1-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect Activity 1 to your own program from Weeks 11–19: name one existing capability and the user need it could support."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w20-d1"
+      }
+    },
+    {
+      "id": "java-2-w20-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Use SWOT to Make Practical Decisions",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Classify specific SWOT entries and explain how the project boundary affects classification.",
+        "affective": "Accept a fair challenge to a claim and acknowledge a limitation honestly.",
+        "psychomotor": "Complete an own-theme SWOT with a basis and practical action for each entry."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "SWOT analysis",
+          "markdown": "A check of strengths, weaknesses, opportunities and threats against one objective. Strengths and weaknesses are internal to the project or team; opportunities and threats come from outside that boundary [CAR]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A materials-desk team can improve its own request form. It cannot guarantee that the school will keep a computer available all afternoon. Name who controls the condition before classifying it."
+        },
+        {
+          "type": "text",
+          "markdown": "**Set the boundary first.** For this example, the project is a learner-built, single-computer request-draft tool. The learner controls its code and instructions; school access arrangements and power supply are outside the project. The objective is to prepare a complete draft, not to manage a whole office. The outside conditions below are hypothetical assumptions."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Type / specific entry",
+            "Basis / classification",
+            "Practical decision"
+          ],
+          "rows": [
+            [
+              "Strength: existing preview checks required choices.",
+              "Internal code capability in final RequestDemo; inspect summary().",
+              "Reuse the checks instead of redesigning them."
+            ],
+            [
+              "Weakness: drafts disappear when the program closes.",
+              "Internal limitation; final RequestDemo has no save/load feature.",
+              "Disclose the limit; consider one local save/load improvement."
+            ],
+            [
+              "Opportunity: the school may offer a supervised desk trial.",
+              "External possibility, not confirmed permission.",
+              "Ask for approval later; use only a classroom simulation now."
+            ],
+            [
+              "Threat: a shared-computer booking may be cancelled.",
+              "External access condition, assumed for this scenario.",
+              "Keep a labelled paper form as a fallback."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Do more than fill four boxes.** Link a strength to an opportunity: reuse validation during a possible supervised trial. Reduce a weakness against a threat: a save/load option may protect a draft between sessions, but it cannot replace access to a computer. Keep paper available. These decisions depend on a later feasibility check [CAR] [ID]."
+        },
+        {
+          "type": "text",
+          "markdown": "**Context matters.** \"No internet\" is a fixed external classroom condition here. It threatens an online-only design, but is not a useful threat entry for a fully offline tool unless you explain its effect. \"Our program cannot work offline\" is an internal weakness. \"Good design\" and \"many users\" are too vague. Replace them with a capability or condition and its basis."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 2 | Own-theme SWOT.** State your objective and project boundary. Write at least one specific S, W, O and T for your proposed improvement. For each, give evidence or an assumption label, explain its classification and write one action. Add two linked decisions using pairs of entries. Ask a partner to challenge one classification; revise it or explain why it still fits. Record this as classroom feedback."
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself:** if you write \"available laptop\", explain whether it is owned/controlled by your team (possible strength) or only a possible school loan (possible opportunity). A classification needs a stated boundary, not just a positive or negative word."
+        },
+        {
+          "type": "text",
+          "markdown": "**Plan your own SWOT decisions:** For S, W, O and T, write an entry and basis, why it is internal or external, and a useful action. Finish two linked decisions: use S with O; reduce W against T."
+        },
+        {
+          "type": "note",
+          "markdown": "**Time allocation:** 10 min recall; 20 min classification; 25 min worked SWOT; 35 min own-theme SWOT; 20 min partner check and slip; 10 min revision = 120 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Carleton College SERC [CAR]. [Analyze Your Course in Context](https://serc.carleton.edu/NAGTWorkshops/intro/analyze.html). Brief excerpt: “internal influences”. Separate internal and external factors, then use them in decisions.\n\n2. Idaho State University [ID]. [SWOT Quick Reference](https://www.isu.edu/media/libraries/student-affairs/marketing/newsletters/SWOT-Quick-Reference-document.pdf). Brief excerpt: “internal resources”. Review assets, limitations and outside conditions with others.\n\n3. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Brief excerpt: “success criteria”. Connect features to needs and keep within resource limits.\n\n4. Iowa State University Extension [IF]. [Feasibility Study Outline](https://www.extension.iastate.edu/Agdm/wholefarm/html/c5-66.html). Brief excerpt: “underlying assumptions”. Compare alternatives and examine assumptions before deciding.\n\n5. Yale University [YD]. [Discovery](https://usability.yale.edu/ux/discovery). Brief excerpt: “real goals”. Identify users and their tasks before choosing features.\n\n**Key validated facts:** Strengths and weaknesses are internal; opportunities and threats are external. Use the entries to choose actions [CAR]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Activity 2, answer the Tuesday exit slip."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w20-d2-slip",
+        "points": 20,
+        "questions": [
+          {
+            "id": "java-2-w20-d2-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Activity 2, define S, W, O and T and explain the internal/external boundary."
+          },
+          {
+            "id": "java-2-w20-d2-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Defend one classification in your own Activity 2 SWOT. State its basis or assumption and a practical action."
+          },
+          {
+            "id": "java-2-w20-d2-q3",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "For the stated learner-team boundary, fill S/W/O/T: (a) existing validation ___; (b) no save/load ___; (c) possible supervised school trial ___; (d) cancelled shared-computer booking ___."
+          },
+          {
+            "id": "java-2-w20-d2-q4",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect your Activity 2 SWOT to your existing program: explain two linked entries and a decision to reuse, limit or revise work."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w20-d2"
+      }
+    },
+    {
+      "id": "java-2-w20-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Check Whether the System Is Feasible",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain technical, operational, economic and schedule feasibility and justify a decision.",
+        "affective": "Value realistic commitments, support for users and honest estimates.",
+        "psychomotor": "Complete four feasibility checks, calculate costs and make a timed work plan."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Feasibility study",
+          "markdown": "A reasoned check of whether a proposed solution is practical with available resources. Check all four areas below before recommending proceed, revise or postpone [TO] [IF]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A desk plan needs more than a working form: someone must use it, help when it fails and have time to maintain it."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Check",
+            "Worked example / question still open"
+          ],
+          "rows": [
+            [
+              "Technical: can we build and support it?",
+              "Existing Java 8 Swing draft and Week 15 file-handling skills support a small local save/load option. JDK and one computer suffice. File validation and safe failure handling still need design and testing."
+            ],
+            [
+              "Operational: could people use and maintain it?",
+              "Plan a 30-minute orientation, clear labels and a paper fallback. Learner maintains source; a future desk helper would operate it. Helper availability and permission are assumptions, not commitments."
+            ],
+            [
+              "Economic: are benefits worth resources used?",
+              "Compare a labelled paper form with the software improvement. Count supplies, training and maintenance time; existing equipment is not cost-free to operate. Benefit is clearer reusable drafts, not proven money savings."
+            ],
+            [
+              "Schedule: can the work fit available time?",
+              "A hypothetical later 8-hour work allowance supports only a small extension. Allocate 1 h design + 3 h save/load + 2 h testing + 0.5 h orientation + 0.5 h notes + 1 h buffer = 8 h. This is not this week's lesson timetable."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Classroom estimates only, not researched prices.** Assume an already available computer and JDK, no new purchase, and shared power covered by the school. That does not prove a real budget. For a one-week trial, assume the following sample supply amounts. Before real use, verify actual prices, equipment access and support."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Resource / assumed basis",
+            "One-time",
+            "Recurring per trial week"
+          ],
+          "rows": [
+            [
+              "Orientation card: 2 sheets x P2",
+              "P4",
+              "P0"
+            ],
+            [
+              "Fallback forms: 5 sheets x P2",
+              "P0",
+              "P10"
+            ],
+            [
+              "Added hardware/software purchase: none in scenario",
+              "P0",
+              "P0"
+            ],
+            [
+              "Identified supply subtotal",
+              "P4",
+              "P10"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Recalculate:** first trial week = P4 + P10 = **P14** identified cash outlay. Four trial weeks = P4 + (4 x P10) = **P44**. These are partial supply totals, not total ownership cost. Developer time is included in the 8-hour plan, not priced as a wage. Operator time is estimated separately at 10 minutes per trial day: 5 days x 10 = 50 minutes/week. Power and future repairs are unpriced shared costs, not zero-cost findings."
+        },
+        {
+          "type": "text",
+          "markdown": "**Benefit estimate:** assume 10 drafts/week and 1 minute less clarification per draft: 10 x 1 = 10 minutes/week, not observed savings or earnings. This does not by itself justify 50 minutes of operation time. Compare the paper form in a later controlled trial before claiming a net benefit."
+        },
+        {
+          "type": "text",
+          "markdown": "**Decision:** revise to a small local draft extension and keep paper fallback; verify access, need and support before a real trial. Proceed only when essential resources and checks are credible. Postpone if a required computer or support is unavailable and no workable smaller scope remains."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 3 | Own-theme feasibility.** Complete four checks with available/missing resources, evidence or assumptions, a risk and an action. Separate one-time and recurring costs, state a time period, and show arithmetic. If no new cash purchase is needed, explain time and shared resources. Total a realistic work plan with testing and buffer. Choose proceed, revise or postpone and defend it."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 3 planning record:** For each feasibility area, record available/missing resources, a basis, and a risk/action. Total design, changes, tests, training, notes and buffer within your work allowance. State your decision and reason."
+        },
+        {
+          "type": "note",
+          "markdown": "**Time allocation:** 10 min recall; 25 min four checks; 25 min cost/time example; 30 min own-theme feasibility; 20 min review and slip; 10 min revision = 120 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. University of Toronto [TO]. [The Feasibility Study](https://www.cs.toronto.edu/~jm/340S/PDF6/Feasibility.pdf). Brief excerpt: “Operational Feasibility”. Check technology, use, costs and benefits, and time.\n\n2. Iowa State University Extension [IF]. [Feasibility Study Outline](https://www.extension.iastate.edu/Agdm/wholefarm/html/c5-66.html). Brief excerpt: “underlying assumptions”. Compare alternatives and examine assumptions before deciding.\n\n3. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Brief excerpt: “success criteria”. Connect features to needs and keep within resource limits.\n\n4. Carnegie Mellon University [CP]. [Proposals](https://www.cmu.edu/student-success/other-resources/handouts/comm-supp-pdfs/proposals.pdf). Brief excerpt: “realistic plan”. Explain the need, scope, resources and completion plan.\n\n5. Iowa State University Extension [IP]. [Writing a Business Plan](https://www.extension.iastate.edu/agdm/wholefarm/html/c5-68.html). Brief excerpt: “supporting evidence”. Keep the plan honest, consistent and clear.\n\n**Key validated facts:** A feasible plan considers technology, users, costs and time [TO]; examine estimates and their assumptions [IF]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Activity 3, answer the Wednesday exit slip."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w20-d3-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "java-2-w20-d3-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Activity 3, distinguish technical and operational feasibility. Give one question for each about your own proposal."
+          },
+          {
+            "id": "java-2-w20-d3-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "For your Activity 3 plan, show one cost or time calculation, label its assumptions and explain your proceed/revise/postpone decision."
+          },
+          {
+            "id": "java-2-w20-d3-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect Activity 3 to an earlier Java week: name a skill your existing program can reuse, a remaining limit, and its effect on your plan."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w20-d3"
+      }
+    },
+    {
+      "id": "java-2-w20-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Write a Short System Proposal",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Explain how needs, requirements, SWOT, resources and feasibility support one proposal.",
+        "affective": "Keep claims modest and protect the time and information of intended users.",
+        "psychomotor": "Draft a short proposal for an improvement to your existing own-theme program."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "System proposal",
+          "markdown": "A short plan explaining a useful problem, the intended improvement, the supporting basis, resources and a justified next decision. A requirement states what the system must do; scope sets the limits of the work [CP] [YS]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A proposal is the desk team's clear request to try a small change: what it helps, what it needs and what remains uncertain."
+        },
+        {
+          "type": "text",
+          "markdown": "**How the pieces fit.** Market analysis identifies the task and alternatives. SWOT exposes useful capabilities and risks. Feasibility checks whether the proposed work is realistic. The proposal combines these findings; a promising idea may still need revision before any implementation [IP]."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Need / basis",
+            "Limited requirement",
+            "How to check later"
+          ],
+          "rows": [
+            [
+              "Clear request draft; scenario missing fields.",
+              "R1: retain subject, materials and place validation and Preview.",
+              "Missing input is rejected; correction produces a full summary."
+            ],
+            [
+              "Resume a draft; assumption A2, not verified demand.",
+              "R2: save/load one local draft using a learner-controlled file; no personal data.",
+              "Reload a sample; handle missing/malformed files without losing current valid choices."
+            ],
+            [
+              "Recover safely; existing Week 19 behavior.",
+              "R3: retain safe Rename and confirmed Clear; warn before replacing an unsaved draft.",
+              "Cancel/No/close preserves current data; replacement requires explicit Yes."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Short proposal example | Hypothetical school-materials draft.** Intended users are a learner preparing a draft and a desk helper reading it. The classroom scenario describes incomplete loose-paper requests; this is not a finding about our school. A labelled paper form is a serious alternative because it needs no powered computer. The existing RequestDemo already previews subject, materials and place. Whether resuming a draft is useful is assumption A2; a later approved trial must check that task."
+        },
+        {
+          "type": "text",
+          "markdown": "**Proposed improvement and limits.** Add one local save/load draft option to the existing practice program while keeping R1 and R3. Use invented sample requests and an arbitrary request label, never a classmate's personal data. No online submission, stock promise, database or multiple simultaneous users is included. The current program does not yet save or load files."
+        },
+        {
+          "type": "text",
+          "markdown": "**Analysis and resources.** Reusable validation is a strength; no saved draft is a weakness. A possible supervised trial is an external opportunity; cancelled shared-computer access is an external threat. Reuse the controls, limit storage to one file and keep paper fallback. Java/Swing and prior file work make the idea plausible, but safe file handling remains unbuilt. Users would need orientation and a maintainer; neither school adoption nor helper support is confirmed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Cost, time and recommendation.** Use Wednesday’s assumptions: P4 one-time supplies, P10/week recurring supplies, P14 first week, plus unpriced shared costs and 50 minutes/week operator time. Plan 8 hours of later development and preparation, including testing and buffer. Benefits remain unverified. **Revise** to this small scope and verify A1/A2, access and support before an approved trial. If safe file handling exceeds the allowance, retain the current draft program and reassess. This example is a proposal, not a completed system."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 4 | Begin your own proposal.** Use your existing own-theme program, not Vehicle or a renamed copy of RequestDemo. Link three useful requirements to user needs and a later check. Reuse Activities 1–3; resolve contradictions. Use the proposal starter and planning record below. No new Java program is required."
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself:** a proposed capability must be labelled planned. Compiling an existing program cannot prove demand, adoption, usability or the success of an unbuilt feature."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 4 continued | Draft review.** Write a short proposal of about 2–3 notebook pages, plus compact tables if needed. Use the same user group, problem and scope in every section. A partner should be able to trace each requirement to a need and see why your decision follows. Record feedback as classroom feedback; revise one weak connection."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Plan before final writing",
+            "Your own theme / notes"
+          ],
+          "rows": [
+            [
+              "Existing program / current capability",
+              "________________________________________________"
+            ],
+            [
+              "User + task + specific difficulty",
+              "________________________________________________"
+            ],
+            [
+              "Evidence or assumption / verification",
+              "________________________________________________"
+            ],
+            [
+              "Alternative worth comparing / why",
+              "________________________________________________"
+            ],
+            [
+              "Largest risk / reduced scope or action",
+              "________________________________________________"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Common-error guide | Planning errors, not compiler messages**"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "If you see",
+            "What is wrong",
+            "Fix"
+          ],
+          "rows": [
+            [
+              "\"Everyone needs it\"; no basis.",
+              "An assumption is presented as a finding.",
+              "Name the user/task; label the assumption and verification need."
+            ],
+            [
+              "\"Good code\" in SWOT.",
+              "Entry is vague; no decision follows.",
+              "Name a capability/limit, classify it and give an action."
+            ],
+            [
+              "A team skill is an opportunity.",
+              "Boundary and control are unclear.",
+              "Treat an existing team skill as internal; explain context."
+            ],
+            [
+              "\"Free\" because the JDK is installed.",
+              "Time and shared resources are omitted.",
+              "List training, operation, maintenance and unpriced costs."
+            ],
+            [
+              "A large feature list with a tiny schedule.",
+              "Scope and available time disagree.",
+              "Reduce scope or revise the plan; retain checks and buffer."
+            ],
+            [
+              "Role-play is called a user survey.",
+              "Classroom feedback is mislabelled.",
+              "Label it role-play; state what real evidence is still missing."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Make the recommendation traceable:** Record need → requirement → later check; largest feasibility concern → action; decision → reason → verification need. State what is included, what is excluded and why, what your existing program already does, and what planned capability still needs building/testing."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 4 review record:** Record partner feedback as classroom feedback, the connection you revised, your reason/evidence or assumption, and a question still needing verification."
+        },
+        {
+          "type": "text",
+          "markdown": "**Proposal starter | Fill the blanks**\n\nMy existing program is ____; it already ____. My intended users are ____ who need to ____ because ____. Current alternatives are ____. My evidence is ____ / assumption A__ is ____, to verify by ____. My S/W/O/T entries and actions are ____. My three requirements, linked needs and checks are ____. Technical/operational/economic/schedule findings are ____. Resources and support are ____. One-time costs are ____; recurring costs per ____ are ____; unpriced resources are ____. My work plan totals ____ including testing and buffer. I recommend proceed/revise/postpone because ____. Before real use, verify ____. I revised ____ after ____."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Self-check",
+            "Status"
+          ],
+          "rows": [
+            [
+              "Same user, problem and scope throughout?",
+              "Yes / Not yet"
+            ],
+            [
+              "Claims labelled; assumptions have verification needs?",
+              "Yes / Not yet"
+            ],
+            [
+              "SWOT and four feasibility checks support the decision?",
+              "Yes / Not yet"
+            ],
+            [
+              "Three requirements connect to needs and existing code?",
+              "Yes / Not yet"
+            ],
+            [
+              "Costs, time, support and scope agree?",
+              "Yes / Not yet"
+            ],
+            [
+              "Limits and one revision explained honestly?",
+              "Yes / Not yet"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Time allocation:** 10 min recall; 30 min proposal model; 30 min requirements; 20 min review/slip; 30 min own-theme plan; 60 min proposal drafting = 180 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Iowa State University Extension [IP]. [Writing a Business Plan](https://www.extension.iastate.edu/agdm/wholefarm/html/c5-68.html). Brief excerpt: “supporting evidence”. Keep the plan honest, consistent and clear.\n\n2. Carnegie Mellon University [CP]. [Proposals](https://www.cmu.edu/student-success/other-resources/handouts/comm-supp-pdfs/proposals.pdf). Brief excerpt: “realistic plan”. Explain the need, scope, resources and completion plan.\n\n3. Yale University [YS]. [Define the Scope](https://usability.yale.edu/ux/plan/define-the-scope). Brief excerpt: “success criteria”. Connect features to needs and keep within resource limits.\n\n4. University of Toronto [TO]. [The Feasibility Study](https://www.cs.toronto.edu/~jm/340S/PDF6/Feasibility.pdf). Brief excerpt: “Operational Feasibility”. Check technology, use, costs and benefits, and time.\n\n5. Carleton College SERC [CAR]. [Analyze Your Course in Context](https://serc.carleton.edu/NAGTWorkshops/intro/analyze.html). Brief excerpt: “internal influences”. Separate internal and external factors, then use them in decisions.\n\n**Key validated facts:** A proposal connects a need to a realistic plan [CP]; check its claims and internal consistency [IP]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Activity 4, answer the Thursday exit slip."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w20-d4-slip",
+        "points": 15,
+        "questions": [
+          {
+            "id": "java-2-w20-d4-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Activity 4, distinguish a user need, a requirement and scope using your own proposal."
+          },
+          {
+            "id": "java-2-w20-d4-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Trace one own-theme requirement to its need, evidence or assumption, feasibility finding and later check."
+          },
+          {
+            "id": "java-2-w20-d4-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Connect Activity 4 to your existing program: what stays, what improvement is planned, and which rule or safe behavior must remain?"
+          }
+        ]
+      ,
+        "afterStep": "java-2-w20-d4"
+      }
+    },
+    {
+      "id": "java-2-w20-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "Your Own Proposal and Presentation",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Defend a recommendation and explain how a new constraint changes the proposal.",
+        "affective": "Answer questions honestly and respond constructively to feedback.",
+        "psychomotor": "Check, revise and present your own proposal with evidence or labelled assumptions."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Consistency check",
+          "markdown": "A review that asks whether the evidence, requirements, resources, costs, schedule and recommendation tell the same story. Revise a claim or plan when the parts disagree [IP] [CP]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Before opening your own counter, compare the promise on its sign with the supplies, staff and time actually available."
+        },
+        {
+          "type": "text",
+          "markdown": "**Activity 5 | Check, revise and present your own proposal.** Review your Activity 4 draft with the performance-task checklist and rubric. Trace a need to a requirement, a feasibility finding and the recommendation. Recalculate totals. Ask a partner to introduce a new constraint; record the response as classroom feedback. Complete one revision, then present your own work. Submit your proposal, Activities 1–3 notes, self-check and revision record. No implementation or online submission is required."
+        },
+        {
+          "type": "text",
+          "markdown": "**Worked-example check.** The single-computer draft tool has a planned, unbuilt R2. P4 + P10 = P14 first-week supplies; 8 hours is a separate later work estimate. With only 4 hours, use the paper form/current preview or postpone file work, then reassess. Apply this reasoning to your own program."
+        },
+        {
+          "type": "text",
+          "markdown": "**Own-theme task requirements**\n\n- Name your existing own-theme program and a current capability.\n- Define a specific problem, intended users and task.\n- Compare the manual/current process and another alternative.\n- Record evidence or labelled assumptions with verification needs.\n- Give specific S, W, O and T entries, their basis and actions.\n- Complete technical, operational, economic and schedule checks.\n- Link three limited requirements to needs and later checks.\n- Explain resources, costs, time, support and a realistic work plan.\n- Justify proceed, revise or postpone and state remaining limits.\n- Present briefly, answer honestly and record one revision."
+        },
+        {
+          "type": "text",
+          "markdown": "**Proposal starter | Fill the blanks**\n\nMy existing program is ____; it already ____. My intended users are ____ who need to ____ because ____. Current alternatives are ____. My evidence is ____ / assumption A__ is ____, to verify by ____. My S/W/O/T entries and actions are ____. My three requirements, linked needs and checks are ____. Technical/operational/economic/schedule findings are ____. Resources and support are ____. One-time costs are ____; recurring costs per ____ are ____; unpriced resources are ____. My work plan totals ____ including testing and buffer. I recommend proceed/revise/postpone because ____. Before real use, verify ____. I revised ____ after ____."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Self-check before presenting",
+            "Status"
+          ],
+          "rows": [
+            [
+              "Same user, problem and scope throughout?",
+              "Yes / Not yet"
+            ],
+            [
+              "Claims labelled; assumptions have verification needs?",
+              "Yes / Not yet"
+            ],
+            [
+              "SWOT and four feasibility checks support the decision?",
+              "Yes / Not yet"
+            ],
+            [
+              "Three requirements connect to needs and existing code?",
+              "Yes / Not yet"
+            ],
+            [
+              "Costs, time, support and scope agree?",
+              "Yes / Not yet"
+            ],
+            [
+              "Limits and one revision explained honestly?",
+              "Yes / Not yet"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Five-minute presentation**\n\n- 30 s: name your existing theme, user and problem.\n- 1 min: compare alternatives; point to evidence or assumptions.\n- 1 min: explain a SWOT decision and all four feasibility findings.\n- 1 min: show requirements, resource/time plan and recommendation.\n- 1 min: answer a question honestly; describe one revision.\n- 30 s: state what must be verified before real use."
+        },
+        {
+          "type": "text",
+          "markdown": "**Prepare using your own proposal**\n\n- Which claim in your own proposal is least certain?\n- Why is the manual alternative insufficient or still useful?\n- How does your existing program support one requirement?\n- What would you remove if available work time halved?\n- What evidence would change your recommendation?"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Criterion",
+            "Points"
+          ],
+          "rows": [
+            [
+              "Problem, users, alternatives and program connection",
+              "10"
+            ],
+            [
+              "Evidence, assumptions and verification needs",
+              "8"
+            ],
+            [
+              "Specific SWOT and practical decisions",
+              "8"
+            ],
+            [
+              "Four feasibility areas, resources, costs and work plan",
+              "10"
+            ],
+            [
+              "Useful requirements and justified recommendation",
+              "8"
+            ],
+            [
+              "Clear presentation, honest answers and revision",
+              "6"
+            ],
+            [
+              "TOTAL",
+              "50"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "For each criterion: full points = complete, specific and justified; about half = partly developed or weakly linked; zero = absent/unrelated. Award intermediate whole points for quality. Give credit for honest assumptions with verification needs. Slip scores are separate."
+        },
+        {
+          "type": "note",
+          "markdown": "For a large class, use circles of at most 12: 12 x 5 min = 60 min. Peer listeners record one reason and one question; the teacher rotates and reviews each proposal and record."
+        },
+        {
+          "type": "note",
+          "markdown": "**Time allocation:** 10 min recall; 35 min finish; 25 min consistency review; 20 min revision; 15 min rehearsal; 60 min presentations; 15 min slip/reflection = 180 min."
+        },
+        {
+          "type": "text",
+          "markdown": "1. Carnegie Mellon University [CP]. [Proposals](https://www.cmu.edu/student-success/other-resources/handouts/comm-supp-pdfs/proposals.pdf). Brief excerpt: “realistic plan”. Explain the need, scope, resources and completion plan.\n\n2. Iowa State University Extension [IP]. [Writing a Business Plan](https://www.extension.iastate.edu/agdm/wholefarm/html/c5-68.html). Brief excerpt: “supporting evidence”. Keep the plan honest, consistent and clear.\n\n3. University of Toronto [TO]. [The Feasibility Study](https://www.cs.toronto.edu/~jm/340S/PDF6/Feasibility.pdf). Brief excerpt: “Operational Feasibility”. Check technology, use, costs and benefits, and time.\n\n4. Yale University [YD]. [Discovery](https://usability.yale.edu/ux/discovery). Brief excerpt: “real goals”. Identify users and their tasks before choosing features.\n\n5. Carleton College SERC [CAR]. [Analyze Your Course in Context](https://serc.carleton.edu/NAGTWorkshops/intro/analyze.html). Brief excerpt: “internal influences”. Separate internal and external factors, then use them in decisions.\n\n**Key validated facts:** Defend a realistic scope and resource plan [CP]; revise unsupported claims [IP]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Activity 5 and your presentation, answer the Friday exit slip."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w20-d5-slip",
+        "points": 20,
+        "questions": [
+          {
+            "id": "java-2-w20-d5-q1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "In your own proposal and existing program, point to one current capability, its linked requirement, and the evidence or labelled assumption supporting it."
+          },
+          {
+            "id": "java-2-w20-d5-q2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend your own proceed/revise/postpone decision using your SWOT and feasibility findings. Name one uncertainty that could change it."
+          },
+          {
+            "id": "java-2-w20-d5-q3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "Your own proposal now has only half its planned work time. Revise its scope or recommendation, work plan and one requirement while preserving a useful task and necessary checks."
+          },
+          {
+            "id": "java-2-w20-d5-q4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your own first draft with your final proposal. Explain one revision, the feedback or reasoning behind it, and what still needs verification before real use."
+          }
+        ]
+      ,
+        "afterStep": "java-2-w20-d5"
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w20-pt",
+    "title": "Your Own Proposal and Presentation",
+    "markdown": "Start Thursday after the proposal model; complete and present Friday. Write a short proposal of about 2–3 notebook pages plus compact tables if needed. Propose an extension or improvement to your own existing theme program. Use Activities 1–3, the proposal starter and self-check. Submit the proposal, activity notes, self-check and revision record. No implementation or online submission is required.\n\n**Proposal starter**\n\nMy existing program is ____; it already ____. My intended users are ____ who need to ____ because ____. Current alternatives are ____. My evidence is ____ / assumption A__ is ____, to verify by ____. My S/W/O/T entries and actions are ____. My three requirements, linked needs and checks are ____. Technical/operational/economic/schedule findings are ____. Resources and support are ____. One-time costs are ____; recurring costs per ____ are ____; unpriced resources are ____. My work plan totals ____ including testing and buffer. I recommend proceed/revise/postpone because ____. Before real use, verify ____. I revised ____ after ____.\n\n**Self-check**\n\n- Same user, problem and scope throughout? Yes / Not yet\n- Claims labelled; assumptions have verification needs? Yes / Not yet\n- SWOT and four feasibility checks support the decision? Yes / Not yet\n- Three requirements connect to needs and existing code? Yes / Not yet\n- Costs, time, support and scope agree? Yes / Not yet\n- Limits and one revision explained honestly? Yes / Not yet\n\n**Task timetable**\n\nThursday: 10 min recall; 30 min proposal model; 30 min requirements; 20 min review/slip; 30 min own-theme plan; 60 min drafting = 180 min. Friday: 10 min recall; 35 min finish; 25 min consistency review; 20 min revision; 15 min rehearsal; 60 min presentations; 15 min slip/reflection = 180 min.\n\nFor a large class use circles of at most 12, peer records and teacher rotation. For each rubric criterion: full points = complete, specific and justified; about half = partly developed or weakly linked; zero = absent/unrelated. Award intermediate whole points. Honest assumptions with verification needs earn credit; do not invent evidence. Slip scores are separate.",
+    "checklist": [
+      "Name your existing own-theme program and a current capability.",
+      "Define a specific problem, intended users and task.",
+      "Compare the manual/current process and another alternative.",
+      "Record evidence or labelled assumptions with verification needs.",
+      "Give specific S, W, O and T entries, their basis and actions.",
+      "Complete technical, operational, economic and schedule checks.",
+      "Link three limited requirements to needs and later checks.",
+      "Explain resources, costs, time, support and a realistic work plan.",
+      "Justify proceed, revise or postpone and state remaining limits.",
+      "Present briefly, answer honestly and record one revision."
+    ],
+    "presentationOutline": [
+      "30 s: name your existing theme, user and problem.",
+      "1 min: compare alternatives; point to evidence or assumptions.",
+      "1 min: explain a SWOT decision and all four feasibility findings.",
+      "1 min: show requirements, resource/time plan and recommendation.",
+      "1 min: answer a question honestly; describe one revision.",
+      "30 s: state what must be verified before real use."
+    ],
+    "questionsToPrepare": [
+      "Which claim in your own proposal is least certain?",
+      "Why is the manual alternative insufficient or still useful?",
+      "How does your existing program support one requirement?",
+      "What would you remove if available work time halved?",
+      "What evidence would change your recommendation?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Problem, users, alternatives and program connection",
+        "points": 10
+      },
+      {
+        "criterion": "Evidence, assumptions and verification needs",
+        "points": 8
+      },
+      {
+        "criterion": "Specific SWOT and practical decisions",
+        "points": 8
+      },
+      {
+        "criterion": "Four feasibility areas, resources, costs and work plan",
+        "points": 10
+      },
+      {
+        "criterion": "Useful requirements and justified recommendation",
+        "points": 8
+      },
+      {
+        "criterion": "Clear presentation, honest answers and revision",
+        "points": 6
+      }
+    ],
+    "totalPoints": 50
+  ,
+    "starterFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main {\n    public static void main(String[] args) {\n        // Continue your own performance-task project; follow the original module requirements.\n    }\n}\n"
+      }
+    ],
+    "exampleFiles": [
+      {
+        "path": "Proposal.txt",
+        "content": "Follow the original module proposal examples, activities and rubric. This is a written task, not a code execution check.\n"
+      }
+    ]
+  }
+,
+  "previousModuleId": "java-2-w19"
+}

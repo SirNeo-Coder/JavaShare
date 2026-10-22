@@ -1,6 +1,18 @@
 # Rolling module tasks handoff
 
-## Current prerequisite slice — 2026-10-21
+> PR #36 refresh after #35 merged (2026-10-22): six documentation conflicts repaired on
+> main `3a59e99`. Both prerequisite and curriculum notes are retained. CKB-060 remains
+> prerequisites; CKB-061 remains curriculum. All 51 curriculum/fixture/test files are unchanged
+> from the previous pushed PR. Application/config/package files exactly match current main.
+> Production build passed; lint 0 errors/8 existing warnings; full suite 293/293, no failures
+> or skips. Named checks and limits: `docs/verification/week15-week21-step-additions.md`.
+> Browser, offline launcher, document renders and deliberate-break proof were not repeated
+> for this refresh. PR #36 stays draft for teacher curriculum review; Ready for review is
+> a separate human decision. Repair and evidence are committed/pushed to the same PR; no
+> merge, deployment, hosted action or curriculum rewrite. Next: check GitHub’s conflict
+> status, then continue curriculum review and its documented runtime limits.
+
+## Prerequisite slice now merged — 2026-10-21
 
 - Approved: require every current module activity in the full predecessor chain before starting
   a later module; personal submissions and handwritten liplets stay separate. Project naming
@@ -26,7 +38,54 @@
 - Still unverified: hosted deployment, Windows, physical disconnected Wi-Fi devices, other browsers.
   No assistant merge, deploy, hosted SQL or hosted settings changes. CKB-060 records this work.
 
-## Historical resume and task work
+Updated 2026-10-22. Current branch: `codex/week15-week21-step-additions`.
+Base: current main `3a59e99`, including Java suggestions and the merged prerequisite feature.
+
+## Current additive curriculum package
+
+The teacher approved Weeks 15–21 JSON, printed modules and lesson plans, with only required
+additions. Preserve the entire original lessons, sample source and outputs, stable ids,
+performance requirements, liplets and rubrics. No in-memory substitution or runner work is
+approved. Use Caveman for short chat replies and Ponytail for the smallest complete change.
+
+Prepared: seven review packages under docs/modules/week15 through week21, linked from
+`docs/modules/week15-week21.md`. There are 33 new explicit alteration tasks, sample-first
+metadata, weekly predecessor links, missing upload fields, complete baseline supporting
+sources and minimal Main forwarders for named demos. Text assets are preserved in supporting-files
+outside Java-only project arrays. Week 20 remains written work with zero code steps.
+
+Each PDF retains its eight original pages and appends practice material (13 added pages total).
+Each Word plan retains all original ZIP content and adds one activity-notes page. Exact page
+stream comparisons preserve all 56 original PDF pages; all 52 original Word renders are
+pixel-identical. Original supplied files in /home/ireneo/Documents/Java 2026 are unchanged.
+CKB-052/054 were consulted; CKB-061 records the six original upload failures and their corrections.
+
+Verified: build:all passed; lint zero errors/eight existing image warnings; full suite
+269/269 with no failures/skips; offline launcher build passed with the existing database.
+Every sample and alteration ran on real Java: disk exercises in disposable desktop folders,
+other weeks through the laptop execution function without a display. The upload regression
+was deliberately broken by removing Friday afterStep, failed, then passed after exact restoration.
+Local production browser passed 6/6, including all seven uploads, every code week opening with
+Java-only project files, actual sample/task feedback, completion, saved drafts and a real panel
+component alteration. Its disposable accounts/class were removed and test server stopped. Named results
+and initial corrected failures: docs/verification/week15-week21-step-additions.md.
+
+Rollout limits remain: classroom file APIs/persistence absent; original Week 16 sample timing
+assumptions deliberately retained; visible GUI and browser Java 8 unverified. Do not call these
+review copies classroom-ready. No application, schema, migration, hosted setting, deployment,
+merge or real student data changed. The isolated production browser server is port 3022;
+disposable local fixtures clean up their own class/accounts. That server has been stopped.
+
+Delivered implementation `614ae27`, committed and pushed on this branch.
+Teacher-review draft: [PR #36](https://github.com/SirNeo-Coder/JavaShare/pull/36), targeting main.
+No approved implementation work remains in progress. Next: teacher reviews the package and
+its stated runtime limits; any file persistence, thread-sample changes or GUI rollout need
+their own proposal. The GitHub connector returned 403 for creation; the existing authenticated
+CLI created the draft successfully, and it is attached to the chat. No remaining permission block.
+Do not merge, deploy, change hosted settings or overwrite the supplied originals. Preserve
+unrelated logs/classroom.log, supabase/.temp/cli-latest, .claude/ and supabase/snippets/.
+
+## Earlier integrated application work
 
 Updated 2026-10-21. Current branch: `codex/module-resume-and-logic-tasks`.
 Base: `codex/classroom-drawer-controls` (`d75d054`), which already contains current main's Java fixes.

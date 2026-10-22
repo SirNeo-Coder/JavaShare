@@ -288,3 +288,13 @@ What teachers and students can do today. Keep this page current when their use o
 - Live class permits earlier modules in the weekly module's prerequisite chain. Teacher previews
   stay available. The server applies the same restriction to direct module/project requests,
   saves, runs, browser results and submissions in online and offline modes. No migration.
+
+## Week 15 to 21 curriculum review copies 2026-10-22
+
+The teacher approved additive task material while preserving the original lessons and samples.
+[Review files](../modules/week15-week21.md) contain 33 explicit alteration tasks, complete targets,
+sample-first settings, weekly links, corrected upload fields and matching PDF/Word appendices.
+Week 20 remains a written proposal. No app workflow or runner was changed. These are review
+copies: classroom disk support is still absent, original thread samples retain timing assumptions,
+and visible/browser GUI interaction remains unverified. Do not treat upload acceptance as rollout
+approval. Module and personal projects, paper assessment and submitted snapshots stay separate.

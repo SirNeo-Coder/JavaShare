@@ -1,0 +1,21 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+public class Main {
+  public static void main(String[] args) {
+    Semaphore bays = new Semaphore(2);
+    List<Thread> line = new ArrayList<>();
+    line.add(new Thread(new LoadingBay("NXA 123", 0, bays)));
+    line.add(new Thread(new LoadingBay("TRC 456", 100, bays)));
+    line.add(new Thread(new LoadingBay("BUS 789", 200, bays)));
+    line.add(new Thread(new LoadingBay("NYB 321", 300, bays)));
+    for (Thread t : line) { t.start(); }
+    for (Thread t : line) {
+      try { t.join(); }
+      catch (InterruptedException e) {
+        System.out.println("main was interrupted");
+      }
+    }
+    System.out.println("All loaded. Free bays: " + bays.availablePermits());
+  }
+}

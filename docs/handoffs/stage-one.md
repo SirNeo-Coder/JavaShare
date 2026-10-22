@@ -1,3 +1,15 @@
+> PR #36 refresh after #35 merged (2026-10-22): six documentation conflicts repaired on
+> main `3a59e99`. Both prerequisite and curriculum notes are retained. CKB-060 remains
+> prerequisites; CKB-061 remains curriculum. All 51 curriculum/fixture/test files are unchanged
+> from the previous pushed PR. Application/config/package files exactly match current main.
+> Production build passed; lint 0 errors/8 existing warnings; full suite 293/293, no failures
+> or skips. Named checks and limits: `docs/verification/week15-week21-step-additions.md`.
+> Browser, offline launcher, document renders and deliberate-break proof were not repeated
+> for this refresh. PR #36 stays draft for teacher curriculum review; Ready for review is
+> a separate human decision. Repair and evidence are committed/pushed to the same PR; no
+> merge, deployment, hosted action or curriculum rewrite. Next: check GitHub’s conflict
+> status, then continue curriculum review and its documented runtime limits.
+
 > PR #35 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
 > `20a26fd`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
 > notes and the independent styles are preserved. Feature code/tests and curriculum files
@@ -5,6 +17,14 @@
 > additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
 > subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 245/245,
 > no skips. All named checks and limits: `docs/verification/module-prerequisites.md`.
+
+> PR #36 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
+> `5959716`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
+> notes and the independent styles are preserved. Feature code/tests and curriculum files
+> were compared with the original PR and preserved byte-for-byte except inherited main editor
+> additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
+> subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 276/276,
+> no skips. All named checks and limits: `docs/verification/week15-week21-step-additions.md`.
 > Resolution is complete; this record is committed and pushed to the same PR with a lease
 > protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
 > teacher review; merging another PR may require another refresh of the remaining branches.
@@ -508,3 +528,20 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   Temporary verification servers were stopped and disposable browser classrooms removed.
 - Continue from `docs/handoffs/rolling-module-tasks.md`. Hosted services, physical disconnected
   Wi-Fi devices, Windows and other browsers remain unverified. No assistant merge or hosted action.
+
+## Week 15 to 21 additive curriculum package 2026-10-22
+
+- Approved: add only required sample-first/task material and appendices; preserve original
+  lessons, code, outputs, ids, assessment and written Week 20. No runner changes or substitutions.
+- Branch: `codex/week15-week21-step-additions`, based on main `9fba8a7`.
+- Prepared: seven JSON/PDF/Word review packages, 33 tasks, required upload fields and weekly links.
+  Original supplied files and all original document pages remain unchanged.
+- Checked: build and offline build passed; lint zero errors/eight existing warnings; full suite
+  269/269; every sample/task ran on real Java; deliberately broken upload regression failed and
+  passed after restoration. Real local browser passed 6/6, including every code week opening. Delivery is tracked in
+  [the active rolling handoff](rolling-module-tasks.md).
+- Open: classroom file persistence, original thread-sample timing and visible/browser GUI support
+  remain separate decisions. Review copies are not a blanket classroom rollout approval.
+- Delivered implementation `614ae27`, committed and pushed; [draft PR #36](https://github.com/SirNeo-Coder/JavaShare/pull/36) targets main.
+  Next: teacher reviews the package and runtime limits; never merge or deploy as an assistant.
+  Files and limitations: [package index](../modules/week15-week21.md).

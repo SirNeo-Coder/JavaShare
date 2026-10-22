@@ -1,0 +1,158 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+public class RequestDemo extends JPanel
+    implements ActionListener {
+  private JCheckBox guide = new JCheckBox(
+    "Guide");
+  private JCheckBox sheet = new JCheckBox(
+    "Practice sheet");
+  private JRadioButton desk = new JRadioButton(
+    "Desk", true);
+  private JRadioButton room = new JRadioButton(
+    "Classroom");
+  private JList<String> subject = new JList<>(
+    new String[]{"Java", "English", "Math"});
+  private String name = "My request";
+  private JTextArea result = new JTextArea(4, 24);
+  public RequestDemo() {
+    setLayout(new BorderLayout(8, 8));
+    setBorder(BorderFactory.createEmptyBorder(8, 8,
+      8, 8));
+    ButtonGroup collect = new ButtonGroup();
+    collect.add(desk); collect.add(room);
+    JPanel materials = new JPanel();
+    materials.add(guide); materials.add(sheet);
+    JPanel place = new JPanel();
+    place.add(new JLabel("Collect at:"));
+    place.add(desk); place.add(room);
+    JPanel options = new JPanel(new GridLayout(2,
+      1));
+    options.add(materials); options.add(place);
+    subject.setSelectionMode(
+      ListSelectionModel.SINGLE_SELECTION);
+    subject.setVisibleRowCount(3);
+    JLabel label = new JLabel("Subject:");
+    label.setLabelFor(subject);
+    JPanel choices = new JPanel(new BorderLayout(4,
+      4));
+    choices.add(label, BorderLayout.NORTH);
+    choices.add(new JScrollPane(subject),
+      BorderLayout.CENTER);
+    choices.add(options, BorderLayout.SOUTH);
+    result.setEditable(false);
+    result.setLineWrap(true);
+      result.setWrapStyleWord(true);
+    result.setText(
+      "Choose materials, then Preview.");
+    JPanel actions = new JPanel();
+    for (String text : new String[]{"Preview",
+      "Clear", "Info", "Rename"}) {
+      JButton button = new JButton(text);
+      button.setMnemonic(text.charAt(0));
+      button.addActionListener(this);
+      actions.add(button);
+    }
+    add(choices, BorderLayout.NORTH);
+    add(result, BorderLayout.CENTER);
+    add(actions, BorderLayout.SOUTH);
+  }
+  String summary() {
+    if (subject.getSelectedValue() == null) {
+      throw new IllegalArgumentException(
+        "Choose a subject.");
+    }
+    if (!guide.isSelected() && !sheet.isSelected(
+      )) {
+      throw new IllegalArgumentException(
+        "Choose materials.");
+    }
+    if (!desk.isSelected() && !room.isSelected())
+      {
+      throw new IllegalArgumentException(
+        "Choose a place.");
+    }
+    return subject.getSelectedValue() + ": Guide="
+      + guide.isSelected()
+      + "; Sheet=" + sheet.isSelected()
+      + "; Place=" + (desk.isSelected() ? "Desk" :
+        "Classroom");
+  }
+  void clearChoices() {
+    subject.clearSelection();
+    guide.setSelected(false); sheet.setSelected(
+      false);
+    desk.setSelected(true); result.setText(
+      "Choices cleared.");
+  }
+  void acceptName(String input) {
+    if (input == null) { return; }
+    String clean = input.trim();
+    if (clean.isEmpty() || clean.length() > 30) {
+      result.setText(
+        "Use 1-30 characters for the name.");
+      return;
+    }
+    name = clean; result.setText("Named: " +
+      name);
+  }
+  void clearIfConfirmed(int answer) {
+    if (answer == JOptionPane.YES_OPTION) {
+      clearChoices();
+    } else if (answer == JOptionPane.NO_OPTION) {
+      result.setText("Kept choices (No).");
+    } else if (answer ==
+      JOptionPane.CANCEL_OPTION) {
+      result.setText("Kept choices (Cancel).");
+    } else {
+      result.setText("Kept choices (Closed).");
+    }
+  }
+  @Override public void actionPerformed(
+    ActionEvent e) {
+    String command = e.getActionCommand();
+    if ("Rename".equals(command)) {
+      acceptName(JOptionPane.showInputDialog(this,
+        "Request name (1-30 characters):", name));
+      return;
+    }
+    if ("Clear".equals(command)) {
+      clearIfConfirmed(
+        JOptionPane.showConfirmDialog(this,
+        "Clear subject and materials?",
+        "Confirm clear",
+          JOptionPane.YES_NO_CANCEL_OPTION));
+      return;
+    }
+    try {
+      String text = name + "\n" + summary();
+      if ("Info".equals(command)) {
+        JOptionPane.showMessageDialog(this, text,
+          "Request information",
+            JOptionPane.INFORMATION_MESSAGE);
+      } else {
+        result.setText(text);
+      }
+    } catch (IllegalArgumentException ex) {
+      result.setText(ex.getMessage());
+    }
+  }
+  public static void main(String[] args) {
+    if (GraphicsEnvironment.isHeadless()) {
+      System.out.println(
+        "No display: GUI not opened.");
+      return;
+    }
+    SwingUtilities.invokeLater(() -> {
+        JFrame f = new JFrame(
+          "School materials request");
+        f.setDefaultCloseOperation(
+          JFrame.DISPOSE_ON_CLOSE);
+        f.setContentPane(new RequestDemo());
+        f.setSize(640, 420);
+        f.setMinimumSize(new Dimension(520, 380));
+        f.setLocationRelativeTo(null);
+        f.setVisible(true);
+    });
+  }
+}

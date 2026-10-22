@@ -67,3 +67,10 @@ Cross-module prerequisites: `backend/src/module-prerequisites.ts` and the shared
 and project-opening callers in `page.tsx`. Current step passes unlock the full predecessor chain;
 live class permits catch-up. CKB-060; `tests/module-prerequisites.test.mjs` and
 `tests/module-prerequisites.browser.mjs`. No migration or new endpoint.
+
+Week 15–21 additive curriculum package: `docs/modules/week15-week21.md` links the seven JSON,
+module PDFs and lesson plans. Original samples stay unchanged; 33 alterations use existing
+sample-first support. Required upload fields, text-asset placement and named-demo Main forwarders
+are documented in CKB-061. Week 20 stays written work. Classroom file persistence, preserved
+thread-sample timing assumptions and visible/browser GUI execution remain separate limitations.
+Tests: `week15-week21-modules.test.mjs` and `week15-week21.browser.mjs`.

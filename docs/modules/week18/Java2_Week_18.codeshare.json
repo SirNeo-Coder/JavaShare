@@ -1,0 +1,1660 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 18,
+  "id": "java-2-w18-module",
+  "title": "Self-Paced Module: Layouts and Panels",
+  "continues": "Week 17 — Swing Basics",
+  "starterFiles": [
+    {
+      "path": "BoardingTask.java",
+      "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+    },
+    {
+      "path": "Bus.java",
+      "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+    },
+    {
+      "path": "ConvoyLeg.java",
+      "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+    },
+    {
+      "path": "DispatchThread.java",
+      "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+    },
+    {
+      "path": "FareCheck.java",
+      "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+    },
+    {
+      "path": "FareService.java",
+      "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+    },
+    {
+      "path": "InvalidDistanceException.java",
+      "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Jeepney.java",
+      "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+    },
+    {
+      "path": "LoadingBay.java",
+      "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+    },
+    {
+      "path": "Main.java",
+      "content": "import java.awt.GraphicsEnvironment;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class Main {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JFrame frame =\n          new JFrame(\"Vehicle Terminal\");\n        frame.setDefaultCloseOperation(\n          JFrame.EXIT_ON_CLOSE);\n        TerminalPanel panel = new TerminalPanel();\n        JLabel status = new JLabel(\"Not checked\");\n        JButton check =\n          new JButton(\"Check ready\");\n        check.addActionListener(\n          new ActionListener() {\n          public void actionPerformed(\n            ActionEvent e) {\n            check.setEnabled(false);\n            status.setText(\"Checking...\");\n            new Thread(\n              new ReadyTask(status, check),\n              \"Readiness\").start();\n          }\n        });\n        panel.add(check); panel.add(status);\n        frame.setContentPane(panel);\n        frame.setSize(720, 220);\n        frame.setLocationRelativeTo(null);\n        frame.setVisible(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "OverloadException.java",
+      "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "ReadyReport.java",
+      "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+    },
+    {
+      "path": "ReadyTask.java",
+      "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+    },
+    {
+      "path": "TerminalPanel.java",
+      "content": "import java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JTextField plate =\n    new JTextField(\"NXA 123\", 8);\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result =\n    new JLabel(\"Enter plate and km\");\n  public TerminalPanel() {\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate);\n    d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.addActionListener(this);\n    add(p); add(plate); add(d); add(km);\n    add(quote); add(result);\n  }\n  @Override public void actionPerformed(\n      ActionEvent e) {\n    try {\n      result.setText(FareService.quote(\n        plate.getText(), km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+    },
+    {
+      "path": "Tricycle.java",
+      "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+    },
+    {
+      "path": "Vehicle.java",
+      "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+    },
+    {
+      "path": "VehicleNotFoundException.java",
+      "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "java-2-w18-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Make Room: FlowLayout and Panels",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain how FlowLayout arranges and wraps controls, and name one limit when a window becomes too small.",
+        "affective": "Show concern for users by checking readable labels rather than hiding clipped controls.",
+        "psychomotor": "Create and run LayoutDemo.java, resize the school-computer window, and record wrapping or clipping."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Self-Paced Module: Layouts and Panels**"
+        },
+        {
+          "type": "text",
+          "markdown": "Java Programming · Grade 12 TVL · Cielito Zamora Senior High School\nContinues Week 17 Swing Basics"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Day / time",
+            "Topic",
+            "Work and exit slip"
+          ],
+          "rows": [
+            [
+              "Monday / 2 h",
+              "FlowLayout; JPanel groups",
+              "Step 1; Monday exit slip, bottom."
+            ],
+            [
+              "Tuesday / 2 h",
+              "BorderLayout regions",
+              "Step 2; Tuesday exit slip, middle."
+            ],
+            [
+              "Wednesday / 2 h",
+              "GridLayout; equal cells",
+              "Step 3; Wednesday exit slip, top."
+            ],
+            [
+              "Thursday / 3 h",
+              "Nested panels; own-theme start",
+              "Step 4; help on task plan Thursday exit slip, bottom."
+            ],
+            [
+              "Friday / 3 h",
+              "Own-theme task; presentations",
+              "Step 5; task; Friday exit slip, top."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**How to use:** Work in order, type and run the examples, predict changes, then record actual results. Answer each day’s exit slip. No classroom internet is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Offline:** JDK only; one named class per file, all in one folder. Compile `javac *.java`; run `java Main` for Vehicle. Step 1 uses `java LayoutDemo`; Step 5 uses `java ThemeLayoutCheck`. Error Guide: . Close the old window before rebuilding."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we left off and what changes**"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Files in your folder",
+            "Keep / add / replace"
+          ],
+          "rows": [
+            [
+              "Vehicle, Jeepney, Tricycle, Bus, OverloadException, InvalidDistanceException, VehicleNotFoundException (.java)",
+              "Retain all 7 model/exception files unchanged."
+            ],
+            [
+              "DispatchThread, BoardingTask, ReadyReport, ConvoyLeg, LoadingBay (.java)",
+              "Retain all 5 Week 16 helpers unchanged."
+            ],
+            [
+              "FareService.java, FareCheck.java, ReadyTask.java",
+              "Retain unchanged from Week 17 Step 5."
+            ],
+            [
+              "Main.java; TerminalPanel.java",
+              "Back up Main as Main_week17.txt before Step 2. Replace Main at Step 2; replace TerminalPanel at Steps 3–4."
+            ],
+            [
+              "LayoutDemo.java; ThemeLayoutCheck.java",
+              "Add at Steps 1 and 5. Keep Main_week16.txt; .txt backups do not compile. ThemeCheck was optional, not the final app."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "Catch-up: use the complete Week 17 Step 5 starting files from the teacher’s CodeShare copy. Keep the four sample vehicles and their constructor arguments; do not restart the model."
+        },
+        {
+          "type": "text",
+          "markdown": "**MONDAY  |  Make Room: FlowLayout and Panels**"
+        },
+        {
+          "type": "definition",
+          "term": "Layout manager and FlowLayout",
+          "markdown": "A layout manager is an object that decides the size and position of controls inside a container, an object that holds controls. A JPanel is a container for related controls. FlowLayout places controls in order at their preferred size, the size each control requests, and starts another row when needed [NTU] [HWS]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Jeepneys join a row at the terminal. When the row is full, the next vehicle joins another row. A longer name still needs room; the manager does not make the letters smaller."
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 1  Try a row that wraps**"
+        },
+        {
+          "type": "text",
+          "markdown": "Add LayoutDemo.java. Retain every Vehicle file. Compile javac *.java; run java LayoutDemo. This separate arrangement demo has no button actions. Run java Main to compare the Week 17 application."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w18-d1-s1",
+          "number": 1,
+          "instruction": "Add LayoutDemo.java. Retain every Vehicle file. Compile javac *.java; run java LayoutDemo. This separate arrangement demo has no button actions. Run java Main to compare the Week 17 application.",
+          "language": "java",
+          "files": [
+            {
+              "path": "LayoutDemo.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+            }
+          ,
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "FareCheck.java",
+              "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+            },
+            {
+              "path": "FareService.java",
+              "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) throws Exception {\n        LayoutDemo.main(args);\n    }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+            },
+            {
+              "path": "ReadyTask.java",
+              "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "TerminalPanel.java",
+              "content": "import java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JTextField plate =\n    new JTextField(\"NXA 123\", 8);\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result =\n    new JLabel(\"Enter plate and km\");\n  public TerminalPanel() {\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate);\n    d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.addActionListener(this);\n    add(p); add(plate); add(d); add(km);\n    add(quote); add(result);\n  }\n  @Override public void actionPerformed(\n      ActionEvent e) {\n    try {\n      result.setText(FareService.quote(\n        plate.getText(), km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "LayoutDemo.java",
+          "expectedOutput": "No display: GUI not opened."
+        ,
+          "activity": {
+            "id": "java-2-w18-d1-s1-alter-v1",
+            "instruction": "Build a second arrangement using GridLayout with two rows and two columns. Add the same terminal label and three vehicle buttons. Print its actual layout dimensions and control count. Keep the original FlowLayout window demo for comparison.\n\nBefore the existing headless check in `LayoutDemo.java`, add this console check. Keep the original sample message and the window code.\n\nJPanel grid = new JPanel(new GridLayout(2, 2, 8, 8));\n    grid.add(new JLabel(\"Terminal:\"));\n    grid.add(new JButton(\"Jeepney\"));\n    grid.add(new JButton(\"Tricycle\"));\n    grid.add(new JButton(\"Bus\"));\n    GridLayout layout = (GridLayout) grid.getLayout();\n    System.out.println(\"Grid: \" + layout.getRows() + \" x \" + layout.getColumns());\n    System.out.println(\"Controls: \" + grid.getComponentCount());",
+            "files": [],
+            "expectedOutput": "Grid: 2 x 2\nControls: 4\nNo display: GUI not opened.",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**LayoutDemo.java — first half**"
+        },
+        {
+          "type": "text",
+          "markdown": "**LayoutDemo.java — continued**"
+        },
+        {
+          "type": "text",
+          "markdown": "**Join both halves into one file.** Observed without a display: `No display: GUI not opened.` On a school display, resize to see rows wrap. Appearance is an expected check, not an observed result here."
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself.** Try FlowLayout.CENTER; predict and verify alignment, then restore LEFT. Narrow the window, then make it taller: wrapped rows need height. The demo buttons have no listeners; Vehicle’s actions remain unchanged."
+        },
+        {
+          "type": "text",
+          "markdown": "Sources [1 NTU] [2 HWS] [3 PRIN] [4 CMU] [5 NUS] (). **Key validated facts:** FlowLayout can wrap controls and uses their requested size [HWS]; a JPanel groups controls and can change its manager [NUS]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Step 1, answer the Monday exit slip."
+        },
+        {
+          "type": "text",
+          "markdown": "1. [NTU] Nanyang Technological University — GUI Programming. Excerpt: “layout manager”. [Open source](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html)\n2. [HWS] Hobart and William Smith Colleges — Basic Layout. Excerpt: “preferred size”. [Open source](https://math.hws.edu/javanotes-swing/c6/s6.html)\n3. [PRIN] Princeton University — Graphical User Interfaces, pp. 7, 10–11. Excerpt: “Layout hierarchy”. [Open source](https://www.cs.princeton.edu/courses/archive/spring04/cos333/11swing1.pdf)\n4. [CMU] Carnegie Mellon University, hosted Java Tutorial — Using Layout Managers. Excerpt: “equal size”. [Open source](https://www.cs.cmu.edu/afs/cs/academic/class/15212-s98/www/java/tutorial/ui/layout/using.html)\n5. [NUS] National University of Singapore, hosted Java Tutorial — How to Use Panels. Excerpt: “Adding Components”. [Open source](https://www.comp.nus.edu.sg/~cs3283/ftp/Java/JavaTutorial/uiswing/components/panel.html)\n\n**Key validated facts:** FlowLayout can wrap controls and uses their requested size [HWS]; a JPanel groups controls and can change its manager [NUS]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w18-d1-slip",
+        "points": 15,
+        "afterStep": "java-2-w18-d1-s1",
+        "questions": [
+          {
+            "id": "java-2-w18-d1-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Step 1, what is a layout manager? What does a JPanel group?"
+          },
+          {
+            "id": "java-2-w18-d1-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, what happens when a FlowLayout row runs out of width? Why might you also need more height?"
+          },
+          {
+            "id": "java-2-w18-d1-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "How does keeping the Week 17 Vehicle program while adding a separate layout demo connect to reusing classes from Weeks 11–12?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w18-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Give Each Group a Place: BorderLayout",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the five BorderLayout regions and why related controls share a child JPanel.",
+        "affective": "Value clear grouping that helps a first-time terminal clerk find an action.",
+        "psychomotor": "Back up Main.java as Main_week17.txt and replace the launcher with a working BorderLayout arrangement."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**TUESDAY  |  Give Each Group a Place: BorderLayout**"
+        },
+        {
+          "type": "definition",
+          "term": "BorderLayout",
+          "markdown": "BorderLayout divides a container into NORTH (top), SOUTH (bottom), EAST (right), WEST (left), and CENTER. Put one component or panel in each used region. The center receives the space left after the edges; unused regions take no space [HWS] [CMU]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Think of a school office: a heading above, service work in the middle, and a status counter below. Each counter can itself hold a group of controls."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Region",
+            "Size behavior",
+            "Vehicle use"
+          ],
+          "rows": [
+            [
+              "NORTH / SOUTH",
+              "Full available width; requested height",
+              "Heading / readiness group"
+            ],
+            [
+              "WEST / EAST",
+              "Requested width; remaining middle height",
+              "Unused this week"
+            ],
+            [
+              "CENTER",
+              "All space left after edges and gaps",
+              "TerminalPanel"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 2  Give the terminal clear regions**"
+        },
+        {
+          "type": "text",
+          "markdown": "First copy Main.java to Main_week17.txt. Replace Main.java below. Retain TerminalPanel.java and ReadyTask.java unchanged. Compile javac *.java; run java Main."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w18-d2-s2",
+          "number": 2,
+          "instruction": "First copy Main.java to Main_week17.txt. Replace Main.java below. Retain TerminalPanel.java and ReadyTask.java unchanged. Compile javac *.java; run java Main.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class Main {\n  static JPanel createContent() {\n    JPanel root = new JPanel(new BorderLayout(8, 8));\n    root.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));\n    TerminalPanel panel = new TerminalPanel();\n    JLabel status = new JLabel(\"Not checked\");\n    JButton check = new JButton(\"Check ready\");\n    check.addActionListener(new ActionListener() {\n      public void actionPerformed(ActionEvent e) {\n        check.setEnabled(false);\n        status.setText(\"Checking...\");\n        new Thread(new ReadyTask(status, check),\n          \"Readiness\").start();\n      }\n    });\n    JPanel ready = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));\n    ready.add(check); ready.add(status);\n    root.add(new JLabel(\"Vehicle Terminal\"), BorderLayout.NORTH);\n    root.add(panel, BorderLayout.CENTER);\n    root.add(ready, BorderLayout.SOUTH);\n    return root;\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JFrame frame = new JFrame(\"Vehicle Terminal\");\n        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n        frame.setContentPane(createContent());\n        frame.setSize(720, 320);\n        frame.setMinimumSize(new Dimension(520, 300));\n        frame.setLocationRelativeTo(null);\n        frame.setVisible(true);\n      }\n    });\n  }\n}\n"
+            }
+          ,
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "FareCheck.java",
+              "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+            },
+            {
+              "path": "FareService.java",
+              "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+            },
+            {
+              "path": "ReadyTask.java",
+              "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "TerminalPanel.java",
+              "content": "import java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JTextField plate =\n    new JTextField(\"NXA 123\", 8);\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result =\n    new JLabel(\"Enter plate and km\");\n  public TerminalPanel() {\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate);\n    d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.addActionListener(this);\n    add(p); add(plate); add(d); add(km);\n    add(quote); add(result);\n  }\n  @Override public void actionPerformed(\n      ActionEvent e) {\n    try {\n      result.setText(FareService.quote(\n        plate.getText(), km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "LayoutDemo.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "No display: GUI not opened."
+        ,
+          "activity": {
+            "id": "java-2-w18-d2-s2-alter-v1",
+            "instruction": "Move the readiness group from SOUTH to EAST in createContent(). Print how many controls occupy the EAST group.\n\nBefore the existing headless check in `Main.java`, add this console check. Keep the original sample message and the window code.\n\nJPanel root = createContent();\n    JPanel east = (JPanel) ((BorderLayout) root.getLayout()).getLayoutComponent(BorderLayout.EAST);\n    System.out.println(\"East controls: \" + east.getComponentCount());",
+            "files": [],
+            "expectedOutput": "East controls: 2\nNo display: GUI not opened.",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**Main.java**"
+        },
+        {
+          "type": "text",
+          "markdown": "**Read the structure.** `createContent()` returns the root panel. It runs inside invokeLater on the event dispatch thread (EDT), the thread that handles interface work. createEmptyBorder adds an outer margin."
+        },
+        {
+          "type": "text",
+          "markdown": "**Preserve behavior.** The readiness listener and ReadyTask stay the same. The new ready panel holds the button and status once, instead of appending them to TerminalPanel. Fare logic is untouched."
+        },
+        {
+          "type": "text",
+          "markdown": "**Observed without a display:** `No display: GUI not opened.`"
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself.** Name root’s three children. Why must two controls share a group before going into CENTER? Test Quote fare during Check ready."
+        },
+        {
+          "type": "text",
+          "markdown": "**School-display check.** Check heading, fare panel and readiness order. Try the 520 × 300 minimum and larger sizes. setMinimumSize limits shrinking; still check clipping. Test Tab, Shift+Tab and Space."
+        },
+        {
+          "type": "text",
+          "markdown": "Sources [1 NTU] [2 HWS] [3 PRIN] [4 CMU] [5 NUS] (). **Key validated facts:** BorderLayout gives remaining room to the center [CMU]; a child panel can contain several controls within one region [NUS]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Step 2, answer the Tuesday exit slip."
+        },
+        {
+          "type": "text",
+          "markdown": "1. [NTU] Nanyang Technological University — GUI Programming. Excerpt: “layout manager”. [Open source](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html)\n2. [HWS] Hobart and William Smith Colleges — Basic Layout. Excerpt: “preferred size”. [Open source](https://math.hws.edu/javanotes-swing/c6/s6.html)\n3. [PRIN] Princeton University — Graphical User Interfaces, pp. 7, 10–11. Excerpt: “Layout hierarchy”. [Open source](https://www.cs.princeton.edu/courses/archive/spring04/cos333/11swing1.pdf)\n4. [CMU] Carnegie Mellon University, hosted Java Tutorial — Using Layout Managers. Excerpt: “equal size”. [Open source](https://www.cs.cmu.edu/afs/cs/academic/class/15212-s98/www/java/tutorial/ui/layout/using.html)\n5. [NUS] National University of Singapore, hosted Java Tutorial — How to Use Panels. Excerpt: “Adding Components”. [Open source](https://www.comp.nus.edu.sg/~cs3283/ftp/Java/JavaTutorial/uiswing/components/panel.html)\n\n**Key validated facts:** BorderLayout gives remaining room to the center [CMU]; a child panel can contain several controls within one region [NUS]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w18-d2-slip",
+        "points": 20,
+        "afterStep": "java-2-w18-d2-s2",
+        "questions": [
+          {
+            "id": "java-2-w18-d2-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Step 2, name the five BorderLayout regions and identify the one that receives remaining space."
+          },
+          {
+            "id": "java-2-w18-d2-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 2, why are Check ready and its status placed in one JPanel before adding the group to SOUTH?"
+          },
+          {
+            "id": "java-2-w18-d2-q3",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Choose the region in Step 2: (a) heading; (b) TerminalPanel; (c) readiness group. (d) Name that group’s manager."
+          },
+          {
+            "id": "java-2-w18-d2-q4",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 2, how do the retained ReadyTask and its invokeLater update connect to Week 16 threads and Week 17 responsiveness?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w18-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Line Up the Form: GridLayout",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Predict GridLayout cell order and size, including the effect of adding an extra component.",
+        "affective": "Work patiently with a partner to correct a misleading label-field order.",
+        "psychomotor": "Replace TerminalPanel.java with an equal-cell form and verify retained fare listeners and input errors."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**WEDNESDAY  |  Line Up the Form: GridLayout**"
+        },
+        {
+          "type": "definition",
+          "term": "GridLayout",
+          "markdown": "GridLayout arranges controls in equal cells, filling each row from left to right before starting the next row. Each cell holds one component. The order of add calls therefore determines the label-field pairs [NTU] [HWS]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A class seating chart has equal spaces. Place a label and its field next to each other, like partners assigned to a row. A large result message is a poor fit for a tiny equal cell."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Constructor idea",
+            "What it does",
+            "Limit"
+          ],
+          "rows": [
+            [
+              "3 rows, 2 columns, gaps 8 / 8",
+              "Six controls fill three rows",
+              "Buttons and result also stretch."
+            ],
+            [
+              "0 rows, 2 columns",
+              "Rows grow to keep two columns",
+              "Useful for a growing two-column form."
+            ],
+            [
+              "Rows greater than zero",
+              "Rows stay fixed; columns are computed",
+              "Adding a seventh control to 3 rows creates 3 columns."
+            ],
+            [
+              "0 rows, 0 columns",
+              "Invalid",
+              "At least one dimension must be nonzero."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 3  Try equal cells**"
+        },
+        {
+          "type": "text",
+          "markdown": "Replace TerminalPanel.java only. Keep Tuesday Main.java and all model, service, test and worker files. Compile javac *.java; run java Main."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w18-d3-s3",
+          "number": 3,
+          "instruction": "Replace TerminalPanel.java only. Keep Tuesday Main.java and all model, service, test and worker files. Compile javac *.java; run java Main.",
+          "language": "java",
+          "files": [
+            {
+              "path": "TerminalPanel.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JTextField plate =\n    new JTextField(\"NXA 123\", 8);\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result =\n    new JLabel(\"Enter plate and km\");\n  public TerminalPanel() {\n    setLayout(new GridLayout(3, 2, 8, 8));\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate);\n    d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.addActionListener(this);\n    add(p); add(plate); add(d); add(km);\n    add(quote); add(result);\n  }\n  @Override public void actionPerformed(\n      ActionEvent e) {\n    try {\n      result.setText(FareService.quote(\n        plate.getText(), km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+            }
+          ,
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "FareCheck.java",
+              "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+            },
+            {
+              "path": "FareService.java",
+              "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class Main {\n  static JPanel createContent() {\n    JPanel root = new JPanel(new BorderLayout(8, 8));\n    root.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));\n    TerminalPanel panel = new TerminalPanel();\n    JLabel status = new JLabel(\"Not checked\");\n    JButton check = new JButton(\"Check ready\");\n    check.addActionListener(new ActionListener() {\n      public void actionPerformed(ActionEvent e) {\n        check.setEnabled(false);\n        status.setText(\"Checking...\");\n        new Thread(new ReadyTask(status, check),\n          \"Readiness\").start();\n      }\n    });\n    JPanel ready = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));\n    ready.add(check); ready.add(status);\n    root.add(new JLabel(\"Vehicle Terminal\"), BorderLayout.NORTH);\n    root.add(panel, BorderLayout.CENTER);\n    root.add(ready, BorderLayout.SOUTH);\n    return root;\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JFrame frame = new JFrame(\"Vehicle Terminal\");\n        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n        frame.setContentPane(createContent());\n        frame.setSize(720, 320);\n        frame.setMinimumSize(new Dimension(520, 300));\n        frame.setLocationRelativeTo(null);\n        frame.setVisible(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+            },
+            {
+              "path": "ReadyTask.java",
+              "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "LayoutDemo.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "No display: GUI not opened."
+        ,
+          "activity": {
+            "id": "java-2-w18-d3-s3-alter-v1",
+            "instruction": "Change TerminalPanel from three rows and two columns to two rows and three columns. Print its actual GridLayout dimensions.\n\nBefore the existing headless check in `Main.java`, add this console check. Keep the original sample message and the window code.\n\njava.awt.GridLayout grid = (java.awt.GridLayout) new TerminalPanel().getLayout();\n    System.out.println(\"Grid: \" + grid.getRows() + \" x \" + grid.getColumns());",
+            "files": [],
+            "expectedOutput": "Grid: 2 x 3\nNo display: GUI not opened.",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**TerminalPanel.java**"
+        },
+        {
+          "type": "text",
+          "markdown": "**Observed console result**"
+        },
+        {
+          "type": "text",
+          "markdown": "No display: GUI not opened."
+        },
+        {
+          "type": "text",
+          "markdown": "**Keep the rules.** Only the layout import and constructor arrangement changed. The fields, `setLabelFor` links, listener registration, `FareService.quote` call and all three catches remain. InvalidDistanceException extends RuntimeException directly; keep its separate catch. Fares are classroom practice values, not LTFRB rates."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Input",
+            "Expected feedback to verify on the display"
+          ],
+          "rows": [
+            [
+              "NXA 123 / 5",
+              "NXA 123: P15.00"
+            ],
+            [
+              "NXA 123 / abc; then 5",
+              "Enter a number for km.; then NXA 123: P15.00"
+            ],
+            [
+              "NXA 123 / 0; ZZZ / 5",
+              "Use a finite km above 0.; Unknown plate: ZZZ"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself.** Predict the 3 × 2 arrangement: Plate / field; Distance / field; Quote fare / result. Notice the button and result are stretched. The temporary grid is useful for comparison; Thursday will separate unlike controls."
+        },
+        {
+          "type": "text",
+          "markdown": "Sources [1 NTU] [2 HWS] [3 PRIN] [4 CMU] [5 NUS] (). **Key validated facts:** GridLayout gives controls equal cells and follows add order [HWS] [NTU]; use a separate group when those equal sizes are unsuitable [NUS]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Step 3, answer the Wednesday exit slip."
+        },
+        {
+          "type": "text",
+          "markdown": "1. [NTU] Nanyang Technological University — GUI Programming. Excerpt: “layout manager”. [Open source](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html)\n2. [HWS] Hobart and William Smith Colleges — Basic Layout. Excerpt: “preferred size”. [Open source](https://math.hws.edu/javanotes-swing/c6/s6.html)\n3. [PRIN] Princeton University — Graphical User Interfaces, pp. 7, 10–11. Excerpt: “Layout hierarchy”. [Open source](https://www.cs.princeton.edu/courses/archive/spring04/cos333/11swing1.pdf)\n4. [CMU] Carnegie Mellon University, hosted Java Tutorial — Using Layout Managers. Excerpt: “equal size”. [Open source](https://www.cs.cmu.edu/afs/cs/academic/class/15212-s98/www/java/tutorial/ui/layout/using.html)\n5. [NUS] National University of Singapore, hosted Java Tutorial — How to Use Panels. Excerpt: “Adding Components”. [Open source](https://www.comp.nus.edu.sg/~cs3283/ftp/Java/JavaTutorial/uiswing/components/panel.html)\n\n**Key validated facts:** GridLayout gives controls equal cells and follows add order [HWS] [NTU]; use a separate group when those equal sizes are unsuitable [NUS]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w18-d3-slip",
+        "points": 15,
+        "afterStep": "java-2-w18-d3-s3",
+        "questions": [
+          {
+            "id": "java-2-w18-d3-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Step 3, what does GridLayout(3, 2, 8, 8) mean? Describe the cell sizes."
+          },
+          {
+            "id": "java-2-w18-d3-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 3, why must each label be added before its matching field? Give one limit of equal cells."
+          },
+          {
+            "id": "java-2-w18-d3-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 3, which separate catch handles invalid distance? Explain why rearranging controls must preserve the Week 13 exception rules."
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w18-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Build a Clear Interface: Nested Panels",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Explain which manager controls each group in a nested panel structure while tracing unchanged model calls and workers.",
+        "affective": "Respect users’ time by preserving validation, error recovery, and a responsive interface.",
+        "psychomotor": "Build nested form/action panels, test the retained readiness worker, and begin an approved own-theme plan."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**THURSDAY  |  Build a Clear Interface: Nested Panels**"
+        },
+        {
+          "type": "definition",
+          "term": "Nested panels",
+          "markdown": "Nested panels are panels placed inside other panels. Each panel uses its own layout manager for its direct children. A parent treats a whole child panel as one component, so a form, an action row, and feedback can follow different arrangements [PRIN] [NUS]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A terminal contains counters; each counter contains its own forms and buttons. Changing the form arrangement does not change the fare rules or the loading-bay worker."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Parent → child group",
+            "Manager of direct children",
+            "Why it helps"
+          ],
+          "rows": [
+            [
+              "root → heading / TerminalPanel / ready",
+              "BorderLayout",
+              "Different jobs occupy stable regions."
+            ],
+            [
+              "TerminalPanel → form / result / actions",
+              "BorderLayout",
+              "The result has room; button need not stretch."
+            ],
+            [
+              "form → two label-field pairs",
+              "GridLayout(2, 2, 8, 8)",
+              "Equal aligned cells for similar inputs."
+            ],
+            [
+              "actions → Quote fare; ready → check + status",
+              "FlowLayout",
+              "Small related controls sit in a row."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**STEP 4  Nest panels for a useful form**"
+        },
+        {
+          "type": "text",
+          "markdown": "Replace TerminalPanel.java only. Keep Tuesday Main.java and every other file. Compile javac *.java; run java Main. Run java FareCheck again to check the retained model."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w18-d4-s4",
+          "number": 4,
+          "instruction": "Replace TerminalPanel.java only. Keep Tuesday Main.java and every other file. Compile javac *.java; run java Main. Run java FareCheck again to check the retained model.",
+          "language": "java",
+          "files": [
+            {
+              "path": "TerminalPanel.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JTextField plate =\n    new JTextField(\"NXA 123\", 8);\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result =\n    new JLabel(\"Enter plate and km\");\n  public TerminalPanel() {\n    setLayout(new BorderLayout(8, 8));\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate);\n    d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.addActionListener(this);\n    JPanel form = new JPanel(new GridLayout(2, 2, 8, 8));\n    form.add(p); form.add(plate);\n    form.add(d); form.add(km);\n    JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));\n    actions.add(quote);\n    add(form, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  @Override public void actionPerformed(\n      ActionEvent e) {\n    try {\n      result.setText(FareService.quote(\n        plate.getText(), km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+            }
+          ,
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "FareCheck.java",
+              "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+            },
+            {
+              "path": "FareService.java",
+              "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class Main {\n  static JPanel createContent() {\n    JPanel root = new JPanel(new BorderLayout(8, 8));\n    root.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));\n    TerminalPanel panel = new TerminalPanel();\n    JLabel status = new JLabel(\"Not checked\");\n    JButton check = new JButton(\"Check ready\");\n    check.addActionListener(new ActionListener() {\n      public void actionPerformed(ActionEvent e) {\n        check.setEnabled(false);\n        status.setText(\"Checking...\");\n        new Thread(new ReadyTask(status, check),\n          \"Readiness\").start();\n      }\n    });\n    JPanel ready = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));\n    ready.add(check); ready.add(status);\n    root.add(new JLabel(\"Vehicle Terminal\"), BorderLayout.NORTH);\n    root.add(panel, BorderLayout.CENTER);\n    root.add(ready, BorderLayout.SOUTH);\n    return root;\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JFrame frame = new JFrame(\"Vehicle Terminal\");\n        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n        frame.setContentPane(createContent());\n        frame.setSize(720, 320);\n        frame.setMinimumSize(new Dimension(520, 300));\n        frame.setLocationRelativeTo(null);\n        frame.setVisible(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+            },
+            {
+              "path": "ReadyTask.java",
+              "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "LayoutDemo.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "No display: GUI not opened."
+        ,
+          "activity": {
+            "id": "java-2-w18-d4-s4-alter-v1",
+            "instruction": "Move the Quote fare action group from SOUTH to EAST within TerminalPanel. Print the actual number of EAST controls.\n\nBefore the existing headless check in `Main.java`, add this console check. Keep the original sample message and the window code.\n\nTerminalPanel panel = new TerminalPanel();\n    javax.swing.JPanel east = (javax.swing.JPanel) ((java.awt.BorderLayout) panel.getLayout()).getLayoutComponent(java.awt.BorderLayout.EAST);\n    System.out.println(\"East controls: \" + east.getComponentCount());",
+            "files": [],
+            "expectedOutput": "East controls: 1\nNo display: GUI not opened.",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**TerminalPanel.java**"
+        },
+        {
+          "type": "text",
+          "markdown": "**Observed without a display:** `No display: GUI not opened.`"
+        },
+        {
+          "type": "text",
+          "markdown": "**One component has one parent.** Add each field to the form once. Adding that same object to another panel moves it out of the first. Every BorderLayout region holds one component; a child JPanel lets that component contain a group [NUS]."
+        },
+        {
+          "type": "note",
+          "markdown": "**Check yourself.** Trace root CENTER → TerminalPanel NORTH → form → km. Trace a click to the unchanged FareService.quote call. The form grid keeps pairs aligned; the action flow keeps the button near its requested size."
+        },
+        {
+          "type": "text",
+          "markdown": "**Before your own theme:** run the checks. On a school display, test normal → bad → corrected input; resize; use Tab and Space; quote a fare while Check ready is waiting. Then show the teacher your plan and use Thursday’s final hour to build."
+        },
+        {
+          "type": "text",
+          "markdown": "Sources [1 NTU] [2 HWS] [3 PRIN] [4 CMU] [5 NUS] (). **Key validated facts:** Panels can contain panels [PRIN]; each panel has a manager, and position arguments must suit that manager [NUS]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Step 4, answer the Thursday exit slip."
+        },
+        {
+          "type": "text",
+          "markdown": "**ERROR GUIDE  |  Keep this page beside your computer**"
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "error: cannot find symbol; symbol: class GridLayout",
+              "means": "The layout class is not imported or is misspelled.",
+              "fix": "Add import java.awt.*; and check capital letters. Swing imports alone do not import AWT layout managers."
+            },
+            {
+              "see": "java.lang.IllegalArgumentException: rows and cols cannot both be zero",
+              "means": "new GridLayout(0, 0) is invalid.",
+              "fix": "Use a positive row or column count, such as new GridLayout(0, 2)."
+            },
+            {
+              "see": "NumberFormatException: For input string: \"abc\"",
+              "means": "Distance text is not a number.",
+              "fix": "Keep the catch and show helpful feedback; correct the field and try again."
+            },
+            {
+              "see": "InvalidDistanceException: Use a finite km above 0.",
+              "means": "Zero, negative, NaN or infinity is invalid.",
+              "fix": "Use a finite positive number. Keep the separate InvalidDistanceException catch."
+            },
+            {
+              "see": "VehicleNotFoundException: Unknown plate: ZZZ",
+              "means": "No sample vehicle has that plate.",
+              "fix": "Use a known plate. Do not change the model merely to hide a typo."
+            },
+            {
+              "see": "java.awt.AWTError: Can't connect to X11 window server using ':0' as the value of the DISPLAY variable.",
+              "means": "This workspace cannot reach its display server.",
+              "fix": "Use a school computer with a working display. A headless check cannot prove a window looks or responds correctly."
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "These messages were reproduced during preparation with JDK 21. Programs were compiled with Java 8 API and language compatibility. Line numbers, warnings and display-server wording can differ on school computers. The AWTError came from a separate forced-display probe, not a classroom program."
+        },
+        {
+          "type": "text",
+          "markdown": "**When the code compiles but the arrangement is wrong**"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Symptom",
+            "Check and repair"
+          ],
+          "rows": [
+            [
+              "A control is missing",
+              "Use one direct child per BorderLayout region. Add related controls to a group panel first."
+            ],
+            [
+              "A label is beside the wrong field",
+              "Check GridLayout add order; pair label then field. Keep setLabelFor."
+            ],
+            [
+              "Flow controls vanish after narrowing",
+              "Rows wrap but still need enough height. Make the window taller; do not use setBounds or a null layout."
+            ],
+            [
+              "Text is clipped",
+              "Try 520 × 300, 720 × 320 and larger; inspect the longest normal feedback. Managers cannot fit unlimited text into a tiny window."
+            ],
+            [
+              "Button is silent or the window freezes",
+              "Retain registration and all catches. Keep sleep, join, await and slow file work out of listeners."
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**What was actually verified**"
+        },
+        {
+          "type": "text",
+          "markdown": "**Compilation:** all complete examples passed Java 8 compatibility checks. **Program logic:** model rules, invalid input, recovery, readiness completion/interruption and fare actions during waiting passed. **Layout calculations:** Flow wrapping, equal cells and nested bounds passed; normal labels fitted at panel sizes 520 × 300, 720 × 320 and 900 × 480. **Window appearance:** not observed. **Resizing:** calculations checked; live resizing not observed. **User actions:** listener calls checked; physical clicks, focus order, keyboard navigation and closing not observed."
+        },
+        {
+          "type": "text",
+          "markdown": "**School checks:** run java FareCheck; compare normal and invalid cases from . In java Main test Tab, Shift+Tab and Space, bad → corrected input, resizing and Quote fare during readiness. Record actual results. Very long messages may still clip; use the longest normal feedback in your test."
+        },
+        {
+          "type": "text",
+          "markdown": "**Five opened university references used each teaching day**"
+        },
+        {
+          "type": "text",
+          "markdown": "**[1 NTU] Nanyang Technological University** — GUI Programming. Excerpt: “layout manager”. [Open source](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html)"
+        },
+        {
+          "type": "text",
+          "markdown": "**[2 HWS] Hobart and William Smith Colleges** — Basic Layout. Excerpt: “preferred size”. [Open source](https://math.hws.edu/javanotes-swing/c6/s6.html)"
+        },
+        {
+          "type": "text",
+          "markdown": "**[3 PRIN] Princeton University** — Graphical User Interfaces, pp. 7, 10–11. Excerpt: “Layout hierarchy”. [Open source](https://www.cs.princeton.edu/courses/archive/spring04/cos333/11swing1.pdf)"
+        },
+        {
+          "type": "text",
+          "markdown": "**[4 CMU] Carnegie Mellon University, hosted Java Tutorial** — Using Layout Managers. Excerpt: “equal size”. [Open source](https://www.cs.cmu.edu/afs/cs/academic/class/15212-s98/www/java/tutorial/ui/layout/using.html)"
+        },
+        {
+          "type": "text",
+          "markdown": "**[5 NUS] National University of Singapore, hosted Java Tutorial** — How to Use Panels. Excerpt: “Adding Components”. [Open source](https://www.comp.nus.edu.sg/~cs3283/ftp/Java/JavaTutorial/uiswing/components/panel.html)"
+        },
+        {
+          "type": "text",
+          "markdown": "CMU and NUS host older Java Tutorial material; cited layout concepts apply here. Use this module’s Java 8 EDT startup."
+        },
+        {
+          "type": "text",
+          "markdown": "1. [NTU] Nanyang Technological University — GUI Programming. Excerpt: “layout manager”. [Open source](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html)\n2. [HWS] Hobart and William Smith Colleges — Basic Layout. Excerpt: “preferred size”. [Open source](https://math.hws.edu/javanotes-swing/c6/s6.html)\n3. [PRIN] Princeton University — Graphical User Interfaces, pp. 7, 10–11. Excerpt: “Layout hierarchy”. [Open source](https://www.cs.princeton.edu/courses/archive/spring04/cos333/11swing1.pdf)\n4. [CMU] Carnegie Mellon University, hosted Java Tutorial — Using Layout Managers. Excerpt: “equal size”. [Open source](https://www.cs.cmu.edu/afs/cs/academic/class/15212-s98/www/java/tutorial/ui/layout/using.html)\n5. [NUS] National University of Singapore, hosted Java Tutorial — How to Use Panels. Excerpt: “Adding Components”. [Open source](https://www.comp.nus.edu.sg/~cs3283/ftp/Java/JavaTutorial/uiswing/components/panel.html)\n\n**Key validated facts:** Panels can contain panels [PRIN]; each panel has a manager, and position arguments must suit that manager [NUS]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w18-d4-slip",
+        "points": 15,
+        "afterStep": "java-2-w18-d4-s4",
+        "questions": [
+          {
+            "id": "java-2-w18-d4-q1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Step 4, what is a nested panel? Name the managers used for the form and action group."
+          },
+          {
+            "id": "java-2-w18-d4-q2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 4, trace the km field through its parent panels. Why does one manager not control all descendants?"
+          },
+          {
+            "id": "java-2-w18-d4-q3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Explain how Step 4 preserves the Week 12 model and the Week 16–17 worker. Which part changes, and which behavior stays?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w18-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "Your Own Theme: Layout Performance Task and Presentation",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Defend layout choices in the learner’s own theme using test evidence and explain one improvement.",
+        "affective": "Report test results honestly, acknowledge a limitation, and give respectful peer feedback.",
+        "psychomotor": "Finish, test, and present the learner’s own theme interface with useful nested panels and suitable managers."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**STEP 5  Transfer the layout idea to your theme**"
+        },
+        {
+          "type": "text",
+          "markdown": "Optional: add ThemeLayoutCheck.java; compile javac *.java; run java ThemeLayoutCheck. It checks grouped panels without a window or listener. Your own-theme task needs working model calls and actions. Vehicle still starts with java Main."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w18-d5-s5",
+          "number": 5,
+          "instruction": "Optional: add ThemeLayoutCheck.java; compile javac *.java; run java ThemeLayoutCheck. It checks grouped panels without a window or listener. Your own-theme task needs working model calls and actions. Vehicle still starts with java Main.",
+          "language": "java",
+          "files": [
+            {
+              "path": "ThemeLayoutCheck.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class ThemeLayoutCheck {\n  public static void main(String[] args) {\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel form = new JPanel(\n          new GridLayout(2, 2, 6, 6));\n        form.add(new JLabel(\"Item:\"));\n        form.add(new JTextField(\"Rice\", 8));\n        form.add(new JLabel(\"Quantity:\"));\n        form.add(new JTextField(\"2\", 8));\n        JPanel actions = new JPanel(\n          new FlowLayout());\n        actions.add(new JButton(\"Calculate\"));\n        JPanel root = new JPanel(\n          new BorderLayout(6, 6));\n        root.add(form, BorderLayout.CENTER);\n        root.add(actions, BorderLayout.SOUTH);\n        System.out.println(\"Form controls: \"\n          + form.getComponentCount());\n        System.out.println(\"Action controls: \"\n          + actions.getComponentCount());\n        System.out.println(\"Root groups: \"\n          + root.getComponentCount());\n      }\n    });\n  }\n}\n"
+            }
+          ,
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {\n  private Vehicle vehicle;\n  private int[] groups;\n  private String result = \"not run yet\";\n  public BoardingTask(Vehicle vehicle, int[] groups) {\n    this.vehicle = vehicle;\n    this.groups = groups;\n  }\n  @Override public void run() {\n    try {\n      for (int g : groups) {\n        vehicle.board(g);\n        Thread.sleep(50);\n      }\n      result = \"all boarded\";\n    } catch (OverloadException e) {\n      result = \"stopped: \" + e.getMessage();\n    } catch (InterruptedException e) {\n      result = \"interrupted\";\n    }\n  }\n  public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\npublic class ConvoyLeg implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CyclicBarrier barrier;\n  public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.barrier = barrier;\n  }\n  private void driveTo(String stop)\n      throws InterruptedException, BrokenBarrierException {\n    Thread.sleep(delayMs);\n    System.out.println(plate + \" arrived at \" + stop);\n    int stillComing = barrier.await();\n    if (stillComing == 0) {\n      System.out.println(\"-- All here at \" + stop\n        + \". The convoy moves on together!\");\n    }\n  }\n  @Override public void run() {\n    try {\n      driveTo(\"Monumento\");\n      driveTo(\"Recto\");\n    } catch (InterruptedException | BrokenBarrierException e) {\n      System.out.println(plate + \" left the convoy: \" + e);\n    }\n  }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {\n  private Vehicle vehicle;\n  private int trips;\n  private double collected = 0;\n  private String ranOn = \"not run yet\";\n  public DispatchThread(Vehicle vehicle, int trips) {\n    super(vehicle.getPlateNumber());\n    this.vehicle = vehicle;\n    this.trips = trips;\n  }\n  @Override public void run() {\n    ranOn = Thread.currentThread().getName();\n    for (int i = 1; i <= trips; i++) {\n      collected = collected + vehicle.quoteFare(5);\n      try { Thread.sleep(100); }\n      catch (InterruptedException e) { return; }\n    }\n  }\n  public double getCollected() { return collected; }\n  public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "FareCheck.java",
+              "content": "public class FareCheck {\n  public static void main(String[] args) {\n    String[][] cases = {{\"NXA 123\", \"5\"}, {\"TRC 456\", \"2\"},\n      {\"BUS 789\", \"4\"}, {\"NYB 321\", \"6\"}, {\"nxA 123\", \" 5 \"},\n      {\"ZZZ\", \"5\"}, {\"NXA 123\", \"abc\"}, {\"NXA 123\", \"0\"},\n      {\"NXA 123\", \"NaN\"}, {\"NXA 123\", \"1e309\"}};\n    for (String[] c : cases) {\n      try {\n        System.out.println(\n          FareService.quote(c[0], c[1]));\n      } catch (VehicleNotFoundException |\n        NumberFormatException | InvalidDistanceException e) {\n        System.out.println(\n          e.getClass().getSimpleName() + \": \"\n          + e.getMessage());\n      }\n    }\n  }\n}\n"
+            },
+            {
+              "path": "FareService.java",
+              "content": "import java.util.Locale;\npublic class FareService {\n  public static String quote(\n      String plate, String distance)\n      throws VehicleNotFoundException {\n    double km =\n      Double.parseDouble(distance.trim());\n    if (!Double.isFinite(km) || km <= 0) {\n      throw new InvalidDistanceException(\n        \"Use a finite km above 0.\");\n    }\n    Vehicle[] fleet = {\n      new Jeepney(\"NXA 123\", \"Mang Ramon\",\n        \"Monumento-Divisoria\"),\n      new Tricycle(\"TRC 456\", \"Kuya Ben\",\n        \"Bagong Silang TODA\"),\n      new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n      new Jeepney(\"NYB 321\", \"Mang Tonyo\",\n        \"Sangandaan-Recto\")\n    };\n    String key = plate.trim()\n      .toUpperCase(Locale.ROOT);\n    for (Vehicle v : fleet) {\n      if (v.getPlateNumber().equals(key)) {\n        double fare = v.quoteFare(km);\n        if (!Double.isFinite(fare)) {\n          throw new InvalidDistanceException(\n            \"Distance is too large.\");\n        }\n        return String.format(Locale.ROOT,\n          \"%s: P%.2f\", key, fare);\n      }\n    }\n    throw new VehicleNotFoundException(\n      \"Unknown plate: \" + key);\n  }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\npublic class LoadingBay implements Runnable {\n  private String plate;\n  private int arriveMs;\n  private Semaphore bays;\n  public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n    this.plate = plate;\n    this.arriveMs = arriveMs;\n    this.bays = bays;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(arriveMs);\n      System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n      bays.acquire();\n      try {\n        System.out.println(\"   \" + plate + \" is loading in a bay\");\n        Thread.sleep(400);\n        System.out.println(\"   \" + plate + \" leaves the bay\");\n      } finally { bays.release(); }\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) throws Exception {\n        ThemeLayoutCheck.main(args);\n    }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\npublic class ReadyReport implements Runnable {\n  private String plate;\n  private int delayMs;\n  private CountDownLatch latch;\n  public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n    this.plate = plate;\n    this.delayMs = delayMs;\n    this.latch = latch;\n  }\n  @Override public void run() {\n    try {\n      Thread.sleep(delayMs);\n      System.out.println(plate + \" reports: ready\");\n    } catch (InterruptedException e) {\n      System.out.println(plate + \" was interrupted\");\n    } finally { latch.countDown(); }\n  }\n}\n"
+            },
+            {
+              "path": "ReadyTask.java",
+              "content": "import javax.swing.*;\npublic class ReadyTask implements Runnable {\n  private JLabel status;\n  private JButton button;\n  public ReadyTask(\n      JLabel status, JButton button) {\n    this.status = status;\n    this.button = button;\n  }\n  @Override public void run() {\n    String message;\n    try {\n      Thread.sleep(1500);\n      message = \"Ready: NXA 123\";\n    } catch (InterruptedException e) {\n      Thread.currentThread().interrupt();\n      message = \"Check interrupted; try again.\";\n    }\n    final String outcome = message;\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        status.setText(outcome);\n        button.setEnabled(true);\n      }\n    });\n  }\n}\n"
+            },
+            {
+              "path": "TerminalPanel.java",
+              "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class TerminalPanel extends JPanel\n    implements ActionListener {\n  private JTextField plate =\n    new JTextField(\"NXA 123\", 8);\n  private JTextField km = new JTextField(\"5\", 5);\n  private JLabel result =\n    new JLabel(\"Enter plate and km\");\n  public TerminalPanel() {\n    setLayout(new BorderLayout(8, 8));\n    JLabel p = new JLabel(\"Plate:\");\n    JLabel d = new JLabel(\"Distance (km):\");\n    p.setLabelFor(plate);\n    d.setLabelFor(km);\n    JButton quote = new JButton(\"Quote fare\");\n    quote.addActionListener(this);\n    JPanel form = new JPanel(new GridLayout(2, 2, 8, 8));\n    form.add(p); form.add(plate);\n    form.add(d); form.add(km);\n    JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT));\n    actions.add(quote);\n    add(form, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  @Override public void actionPerformed(\n      ActionEvent e) {\n    try {\n      result.setText(FareService.quote(\n        plate.getText(), km.getText()));\n    } catch (NumberFormatException ex) {\n      result.setText(\"Enter a number for km.\");\n    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());\n    } catch (InvalidDistanceException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "LayoutDemo.java",
+              "content": "import java.awt.*;\nimport javax.swing.*;\npublic class LayoutDemo {\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel row = new JPanel(\n          new FlowLayout(FlowLayout.LEFT, 8, 8));\n        row.add(new JLabel(\"Terminal:\"));\n        row.add(new JButton(\"Jeepney\"));\n        row.add(new JButton(\"Tricycle\"));\n        row.add(new JButton(\"Bus\"));\n        JFrame f = new JFrame(\n          \"Flow layout practice\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(row);\n        f.setSize(420, 180);\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n      }\n    });\n  }\n}\n"
+            }
+          ],
+          "run": "ThemeLayoutCheck.java",
+          "expectedOutput": "Form controls: 4\nAction controls: 1\nRoot groups: 2"
+        ,
+          "activity": {
+            "id": "java-2-w18-d5-s5-alter-v1",
+            "instruction": "Add a Reset button to the existing actions panel. Keep the form and root groups unchanged; print their actual counts as before.",
+            "files": [],
+            "expectedOutput": "Form controls: 4\nAction controls: 2\nRoot groups: 2",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**ThemeLayoutCheck.java — first half**"
+        },
+        {
+          "type": "text",
+          "markdown": "**ThemeLayoutCheck.java — continued**"
+        },
+        {
+          "type": "text",
+          "markdown": "**Join both halves.** Observed output: `Form controls: 4`; `Action controls: 1`; `Root groups: 2`. The example checks arrangement only, not a completed theme app."
+        },
+        {
+          "type": "text",
+          "markdown": "**FRIDAY  |  Your Own Theme: Layout Performance Task and Presentation**"
+        },
+        {
+          "type": "definition",
+          "term": "Own-theme interface arrangement",
+          "markdown": "An interface arrangement should serve its intended user. Extend your own theme program from Week 12 with useful groups of controls. Choose managers for a reason, preserve working rules and listeners, and prove the result with observed tests [HWS] [PRIN] [NUS]."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Arrange your own store, canteen, gadget, or school-service counter around the user’s task. Show a classmate where to start without giving a spoken explanation."
+        },
+        {
+          "type": "text",
+          "markdown": "Start Thursday after Step 4; present Friday. Extend your own theme; keep its useful model rules and existing workers. Learn all three managers, but use only those that serve your design."
+        },
+        {
+          "type": "text",
+          "markdown": "**Requirements checklist**"
+        },
+        {
+          "type": "text",
+          "markdown": "□ Extend your own theme and retain its model classes and useful actions."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Use at least one JPanel inside another; name each group’s purpose."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Choose appropriate managers; explain your choices. You need not use all three."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Keep clear labels, helpful feedback, and label-to-field associations."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Preserve working listeners, correct model calls, and useful validation."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Allow correction after invalid input without restarting."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Create and update controls on the event dispatch thread (EDT)."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Keep existing slow work on a worker; retain safe updates and prevent duplicate jobs."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Test normal, bad, corrected, resized, and keyboard-driven use; record actual results."
+        },
+        {
+          "type": "text",
+          "markdown": "□ Submit source, approved plan, test evidence and self-check; present your own code."
+        },
+        {
+          "type": "text",
+          "markdown": "**Plan before typing  |  Teacher checks first**"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Plan item",
+            "Your decision"
+          ],
+          "rows": [
+            [
+              "Theme / intended user",
+              "(your answer)"
+            ],
+            [
+              "Existing model + method",
+              "(your answer)"
+            ],
+            [
+              "Groups + manager / reason",
+              "(your answer)\n(your answer)"
+            ],
+            [
+              "Input rules + feedback",
+              "(your answer)"
+            ],
+            [
+              "Worker behavior to retain",
+              "(your answer)"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Testing evidence  |  Write exact inputs**"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Test / expected",
+            "Actual / pass or fix"
+          ],
+          "rows": [
+            [
+              "Normal input / model result",
+              "(your answer)"
+            ],
+            [
+              "Bad or blank / helpful error",
+              "(your answer)"
+            ],
+            [
+              "Corrected input / recovers",
+              "(your answer)"
+            ],
+            [
+              "Smaller/larger / readable",
+              "(your answer)"
+            ],
+            [
+              "Tab, Shift+Tab, Space / usable",
+              "(your answer)"
+            ],
+            [
+              "Other action during worker / responds, if used",
+              "(your answer)"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Self-check before presenting**"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Check",
+            "Yes / Not yet"
+          ],
+          "rows": [
+            [
+              "Useful nested groups + managers",
+              "Yes / Not yet"
+            ],
+            [
+              "Own model + actions + recovery",
+              "Yes / Not yet"
+            ],
+            [
+              "EDT + safe worker, if used",
+              "Yes / Not yet"
+            ],
+            [
+              "Readable, keyboard usable, evidence",
+              "Yes / Not yet"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Two 3-hour days**"
+        },
+        {
+          "type": "text",
+          "markdown": "**Thursday:** first 90 min: nesting and checks; next 30 min: Step 4 lab/slip; final 60 min: approved own-theme plan and first working arrangement.\n**Friday:** first 90 min: retrieval, repair, peer tests, teacher check and rehearsal; final 90 min: presentations and Friday exit slip. For large classes use parallel circles of up to 15, with peer evidence and teacher rotation."
+        },
+        {
+          "type": "text",
+          "markdown": "Also test one boundary and the longest normal message. Record the size used. Keep failures visible until fixed. If no worker is needed, explain why; retain any existing one safely."
+        },
+        {
+          "type": "text",
+          "markdown": "**Starter fragment  |  Fill blanks**"
+        },
+        {
+          "type": "text",
+          "markdown": "Starter fragment with blanks; incomplete planning code:\n`JPanel form = new JPanel(new ___(2, 2, 8, 8));`\n`JPanel actions = new JPanel(new ___());`\n`JPanel root = new JPanel(new ___(8, 8));`\n`root.add(form, BorderLayout.___);`\n`root.add(actions, BorderLayout.___);`"
+        },
+        {
+          "type": "text",
+          "markdown": "Fragment only, not a complete program. Add your labelled inputs to form, useful buttons to actions, and feedback to an appropriate region. Keep your existing listener and model call. Do not replace working rules with blanks."
+        },
+        {
+          "type": "text",
+          "markdown": "**Five-minute presentation**"
+        },
+        {
+          "type": "text",
+          "markdown": "• Introduce your theme and intended user (30 s)."
+        },
+        {
+          "type": "text",
+          "markdown": "• Run one normal action (1 min)."
+        },
+        {
+          "type": "text",
+          "markdown": "• Show bad input, recovery, resizing, keyboard use; show responsiveness if applicable (2 min)."
+        },
+        {
+          "type": "text",
+          "markdown": "• Point to nested panels, managers and a retained model call (1 min)."
+        },
+        {
+          "type": "text",
+          "markdown": "• Answer one question (30 s)."
+        },
+        {
+          "type": "text",
+          "markdown": "**Prepare to answer using your code**"
+        },
+        {
+          "type": "text",
+          "markdown": "• Which group needs this manager, and why?"
+        },
+        {
+          "type": "text",
+          "markdown": "• Which panel is nested in which parent?"
+        },
+        {
+          "type": "text",
+          "markdown": "• How did you preserve listeners and model rules?"
+        },
+        {
+          "type": "text",
+          "markdown": "• What proves resizing and keyboard use work?"
+        },
+        {
+          "type": "text",
+          "markdown": "• Which test failed, what changed, and what remains?"
+        },
+        {
+          "type": "text",
+          "markdown": "**Scoring rubric  |  50 points**"
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Criterion",
+            "Pts",
+            "Score"
+          ],
+          "rows": [
+            [
+              "Useful arrangement and manager choices",
+              "10",
+              "(your answer)"
+            ],
+            [
+              "Purposeful nested panels",
+              "8",
+              "(your answer)"
+            ],
+            [
+              "Own model, actions, validation and recovery",
+              "10",
+              "(your answer)"
+            ],
+            [
+              "EDT and preserved background behavior",
+              "8",
+              "(your answer)"
+            ],
+            [
+              "Readability, keyboard use and test evidence",
+              "8",
+              "(your answer)"
+            ],
+            [
+              "Presentation and own-code explanations",
+              "6",
+              "(your answer)"
+            ],
+            [
+              "TOTAL",
+              "50",
+              "(your answer)"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "Sources [1 NTU] [2 HWS] [3 PRIN] [4 CMU] [5 NUS] (). **Key validated facts:** Choose a layout to suit the task [HWS]; nested groups organize controls [PRIN] and the add method must match their manager [NUS]."
+        },
+        {
+          "type": "note",
+          "markdown": "After Step 5 and your own-theme presentation, answer the Friday exit slip."
+        },
+        {
+          "type": "text",
+          "markdown": "1. [NTU] Nanyang Technological University — GUI Programming. Excerpt: “layout manager”. [Open source](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html)\n2. [HWS] Hobart and William Smith Colleges — Basic Layout. Excerpt: “preferred size”. [Open source](https://math.hws.edu/javanotes-swing/c6/s6.html)\n3. [PRIN] Princeton University — Graphical User Interfaces, pp. 7, 10–11. Excerpt: “Layout hierarchy”. [Open source](https://www.cs.princeton.edu/courses/archive/spring04/cos333/11swing1.pdf)\n4. [CMU] Carnegie Mellon University, hosted Java Tutorial — Using Layout Managers. Excerpt: “equal size”. [Open source](https://www.cs.cmu.edu/afs/cs/academic/class/15212-s98/www/java/tutorial/ui/layout/using.html)\n5. [NUS] National University of Singapore, hosted Java Tutorial — How to Use Panels. Excerpt: “Adding Components”. [Open source](https://www.comp.nus.edu.sg/~cs3283/ftp/Java/JavaTutorial/uiswing/components/panel.html)\n\n**Key validated facts:** Choose a layout to suit the task [HWS]; nested groups organize controls [PRIN] and the add method must match their manager [NUS]."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w18-d5-slip",
+        "points": 20,
+        "afterStep": "java-2-w18-d5-s5",
+        "questions": [
+          {
+            "id": "java-2-w18-d5-q1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "In your own theme code, identify a panel inside another panel. Name both managers and the line that connects your useful action to its listener."
+          },
+          {
+            "id": "java-2-w18-d5-q2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend one manager choice in your own code using your resizing or clipping test. Explain why another manager would serve that group less well."
+          },
+          {
+            "id": "java-2-w18-d5-q3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "A school office needs two labelled inputs, an action row, and feedback. Adapt your own panel structure to this task. State what you would retain or change and why."
+          },
+          {
+            "id": "java-2-w18-d5-q4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your own program before and after this week. Describe one failed test, the repair, and evidence of the new result. Identify one remaining improvement."
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w18-pt",
+    "title": "Your Own Theme: Layout Performance Task and Presentation",
+    "markdown": "**STEP 5  Transfer the layout idea to your theme**\n\nOptional: add ThemeLayoutCheck.java; compile javac *.java; run java ThemeLayoutCheck. It checks grouped panels without a window or listener. Your own-theme task needs working model calls and actions. Vehicle still starts with java Main.\n\n**ThemeLayoutCheck.java — first half**\n\n**ThemeLayoutCheck.java — continued**\n\n**Join both halves.** Observed output: `Form controls: 4`; `Action controls: 1`; `Root groups: 2`. The example checks arrangement only, not a completed theme app.\n\n**FRIDAY  |  Your Own Theme: Layout Performance Task and Presentation**\n\nAn interface arrangement should serve its intended user. Extend your own theme program from Week 12 with useful groups of controls. Choose managers for a reason, preserve working rules and listeners, and prove the result with observed tests [HWS] [PRIN] [NUS].\n\nArrange your own store, canteen, gadget, or school-service counter around the user’s task. Show a classmate where to start without giving a spoken explanation.\n\nStart Thursday after Step 4; present Friday. Extend your own theme; keep its useful model rules and existing workers. Learn all three managers, but use only those that serve your design.\n\n**Requirements checklist**\n\n□ Extend your own theme and retain its model classes and useful actions.\n\n□ Use at least one JPanel inside another; name each group’s purpose.\n\n□ Choose appropriate managers; explain your choices. You need not use all three.\n\n□ Keep clear labels, helpful feedback, and label-to-field associations.\n\n□ Preserve working listeners, correct model calls, and useful validation.\n\n□ Allow correction after invalid input without restarting.\n\n□ Create and update controls on the event dispatch thread (EDT).\n\n□ Keep existing slow work on a worker; retain safe updates and prevent duplicate jobs.\n\n□ Test normal, bad, corrected, resized, and keyboard-driven use; record actual results.\n\n□ Submit source, approved plan, test evidence and self-check; present your own code.\n\n**Plan before typing  |  Teacher checks first**\n\nPlan item | Your decision\nTheme / intended user | (your answer)\nExisting model + method | (your answer)\nGroups + manager / reason | (your answer)\n(your answer)\nInput rules + feedback | (your answer)\nWorker behavior to retain | (your answer)\n\n**Testing evidence  |  Write exact inputs**\n\nTest / expected | Actual / pass or fix\nNormal input / model result | (your answer)\nBad or blank / helpful error | (your answer)\nCorrected input / recovers | (your answer)\nSmaller/larger / readable | (your answer)\nTab, Shift+Tab, Space / usable | (your answer)\nOther action during worker / responds, if used | (your answer)\n\n**Self-check before presenting**\n\nCheck | Yes / Not yet\nUseful nested groups + managers | Yes / Not yet\nOwn model + actions + recovery | Yes / Not yet\nEDT + safe worker, if used | Yes / Not yet\nReadable, keyboard usable, evidence | Yes / Not yet\n\n**Two 3-hour days**\n\n**Thursday:** first 90 min: nesting and checks; next 30 min: Step 4 lab/slip; final 60 min: approved own-theme plan and first working arrangement.\n**Friday:** first 90 min: retrieval, repair, peer tests, teacher check and rehearsal; final 90 min: presentations and Friday exit slip. For large classes use parallel circles of up to 15, with peer evidence and teacher rotation.\n\nAlso test one boundary and the longest normal message. Record the size used. Keep failures visible until fixed. If no worker is needed, explain why; retain any existing one safely.\n\n**Starter fragment  |  Fill blanks**\n\nStarter fragment with blanks; incomplete planning code:\n`JPanel form = new JPanel(new ___(2, 2, 8, 8));`\n`JPanel actions = new JPanel(new ___());`\n`JPanel root = new JPanel(new ___(8, 8));`\n`root.add(form, BorderLayout.___);`\n`root.add(actions, BorderLayout.___);`\n\nFragment only, not a complete program. Add your labelled inputs to form, useful buttons to actions, and feedback to an appropriate region. Keep your existing listener and model call. Do not replace working rules with blanks.\n\n**Five-minute presentation**\n\n• Introduce your theme and intended user (30 s).\n\n• Run one normal action (1 min).\n\n• Show bad input, recovery, resizing, keyboard use; show responsiveness if applicable (2 min).\n\n• Point to nested panels, managers and a retained model call (1 min).\n\n• Answer one question (30 s).\n\n**Prepare to answer using your code**\n\n• Which group needs this manager, and why?\n\n• Which panel is nested in which parent?\n\n• How did you preserve listeners and model rules?\n\n• What proves resizing and keyboard use work?\n\n• Which test failed, what changed, and what remains?\n\n**Scoring rubric  |  50 points**\n\nCriterion | Pts | Score\nUseful arrangement and manager choices | 10 | (your answer)\nPurposeful nested panels | 8 | (your answer)\nOwn model, actions, validation and recovery | 10 | (your answer)\nEDT and preserved background behavior | 8 | (your answer)\nReadability, keyboard use and test evidence | 8 | (your answer)\nPresentation and own-code explanations | 6 | (your answer)\nTOTAL | 50 | (your answer)\n\nSources [1 NTU] [2 HWS] [3 PRIN] [4 CMU] [5 NUS] (). **Key validated facts:** Choose a layout to suit the task [HWS]; nested groups organize controls [PRIN] and the add method must match their manager [NUS].\n\nAfter Step 5 and your own-theme presentation, answer the Friday exit slip.\n\n1. [NTU] Nanyang Technological University — GUI Programming. Excerpt: “layout manager”. [Open source](https://www3.ntu.edu.sg/home/ehchua/programming/java/J4a_GUI.html)\n2. [HWS] Hobart and William Smith Colleges — Basic Layout. Excerpt: “preferred size”. [Open source](https://math.hws.edu/javanotes-swing/c6/s6.html)\n3. [PRIN] Princeton University — Graphical User Interfaces, pp. 7, 10–11. Excerpt: “Layout hierarchy”. [Open source](https://www.cs.princeton.edu/courses/archive/spring04/cos333/11swing1.pdf)\n4. [CMU] Carnegie Mellon University, hosted Java Tutorial — Using Layout Managers. Excerpt: “equal size”. [Open source](https://www.cs.cmu.edu/afs/cs/academic/class/15212-s98/www/java/tutorial/ui/layout/using.html)\n5. [NUS] National University of Singapore, hosted Java Tutorial — How to Use Panels. Excerpt: “Adding Components”. [Open source](https://www.comp.nus.edu.sg/~cs3283/ftp/Java/JavaTutorial/uiswing/components/panel.html)\n\n**Key validated facts:** Choose a layout to suit the task [HWS]; nested groups organize controls [PRIN] and the add method must match their manager [NUS].",
+    "checklist": [
+      "Extend your own theme and retain its model classes and useful actions.",
+      "Use at least one JPanel inside another; name each group’s purpose.",
+      "Choose appropriate managers; explain your choices. You need not use all three.",
+      "Keep clear labels, helpful feedback, and label-to-field associations.",
+      "Preserve working listeners, correct model calls, and useful validation.",
+      "Allow correction after invalid input without restarting.",
+      "Create and update controls on the event dispatch thread (EDT).",
+      "Keep existing slow work on a worker; retain safe updates and prevent duplicate jobs.",
+      "Test normal, bad, corrected, resized, and keyboard-driven use; record actual results.",
+      "Submit source, approved plan, test evidence and self-check; present your own code."
+    ],
+    "exampleFiles": [
+      {
+        "path": "ThemeLayoutCheck.java",
+        "content": "import java.awt.*;\nimport javax.swing.*;\npublic class ThemeLayoutCheck {\n  public static void main(String[] args) {\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JPanel form = new JPanel(\n          new GridLayout(2, 2, 6, 6));\n        form.add(new JLabel(\"Item:\"));\n        form.add(new JTextField(\"Rice\", 8));\n        form.add(new JLabel(\"Quantity:\"));\n        form.add(new JTextField(\"2\", 8));\n        JPanel actions = new JPanel(\n          new FlowLayout());\n        actions.add(new JButton(\"Calculate\"));\n        JPanel root = new JPanel(\n          new BorderLayout(6, 6));\n        root.add(form, BorderLayout.CENTER);\n        root.add(actions, BorderLayout.SOUTH);\n        System.out.println(\"Form controls: \"\n          + form.getComponentCount());\n        System.out.println(\"Action controls: \"\n          + actions.getComponentCount());\n        System.out.println(\"Root groups: \"\n          + root.getComponentCount());\n      }\n    });\n  }\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main {\n    public static void main(String[] args) {\n        // Continue your own performance-task project; follow the original module requirements.\n    }\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce your theme and intended user (30 s).",
+      "Run one normal action (1 min).",
+      "Show bad input, recovery, resizing, keyboard use; show responsiveness if applicable (2 min).",
+      "Point to nested panels, managers and a retained model call (1 min).",
+      "Answer one question (30 s)."
+    ],
+    "questionsToPrepare": [
+      "Which group needs this manager, and why?",
+      "Which panel is nested in which parent?",
+      "How did you preserve listeners and model rules?",
+      "What proves resizing and keyboard use work?",
+      "Which test failed, what changed, and what remains?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Useful arrangement and manager choices",
+        "points": 10
+      },
+      {
+        "criterion": "Purposeful nested panels",
+        "points": 8
+      },
+      {
+        "criterion": "Own model, actions, validation and recovery",
+        "points": 10
+      },
+      {
+        "criterion": "EDT and preserved background behavior",
+        "points": 8
+      },
+      {
+        "criterion": "Readability, keyboard use and test evidence",
+        "points": 8
+      },
+      {
+        "criterion": "Presentation and own-code explanations",
+        "points": 6
+      }
+    ],
+    "totalPoints": 50
+  }
+,
+  "previousModuleId": "java-2-w17",
+  "sampleFirst": true
+}

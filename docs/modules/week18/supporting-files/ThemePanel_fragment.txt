@@ -1,0 +1,5 @@
+JPanel form = new JPanel(new ___(2, 2, 8, 8));
+JPanel actions = new JPanel(new ___());
+JPanel root = new JPanel(new ___(8, 8));
+root.add(form, BorderLayout.___);
+root.add(actions, BorderLayout.___);
