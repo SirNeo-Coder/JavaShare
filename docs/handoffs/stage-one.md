@@ -614,6 +614,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   Restoring the old comparator failed three regressions; restoring the fix passed all four.
 - Initial build dependency-link failure and browser timing failures are recorded alongside
   final named results in `docs/verification/module-catalog-order.md`. CKB-066 records the bug.
-- In progress: branch delivery for review. Next: teacher reviews the PR, merges and rolls
-  out the app. Hosted ordering and real classroom Wi-Fi remain unverified. No assistant
-  merge, deployment or hosted setting changes.
+- Delivered: implementation `9d17fe1` committed and pushed; [PR #40](https://github.com/SirNeo-Coder/JavaShare/pull/40)
+  is open against main. No implementation work remains in progress.
+- Next: teacher reviews/merges #40 and rolls out the app. Hosted ordering and real
+  classroom Wi-Fi remain unverified. No assistant merge, deployment or hosted setting changes.

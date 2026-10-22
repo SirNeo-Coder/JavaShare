@@ -32,7 +32,7 @@ No changes to saved data, prerequisites, Java execution or the meaning of comple
 - `node tests/module-catalog-order.test.mjs`: restoring the original comparator caused
   three failures; restoring the fix passed all four checks.
 - Full named results, browser evidence and commands: [verification](../../verification/module-catalog-order.md).
-- Commit: the implementation commit containing this record on `codex/module-catalog-order`.
+- Commit: `9d17fe1` on `codex/module-catalog-order`; [PR #40](https://github.com/SirNeo-Coder/JavaShare/pull/40).
 
 ## Recurrence triage
 
