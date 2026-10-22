@@ -103,6 +103,8 @@ test("completion-only modules: read-only preparation, small summaries and guarde
       assert.equal(result.passed, true); assert.equal(result.progress.stepStates[key], "pass");
       assert.equal(result.progress.stepStates[sampleStateId(step)], "pass");
       assert.deepEqual(result.progress.projectFiles, payload.files);
+      assert.equal(result.module.lessons[1].closed, false, "the same completion response returns newly unlocked lesson content");
+      assert.equal(result.module.lessons[1].blocks[0].activity.instruction, next.activity.instruction);
       const replay = await call(`${base}/progress/complete`, cookies[1], "POST", payload);
       assert.equal(replay.status, 200); assert.equal((await replay.json()).progress.updatedAt, result.progress.updatedAt);
       const failed = await call(`${base}/progress/complete`, cookies[1], "POST", { ...payload, completionId: randomUUID(), updatedAt: result.progress.updatedAt, success: false });

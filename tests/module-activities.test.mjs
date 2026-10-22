@@ -244,11 +244,14 @@ test("module activities: compile errors and a crash after the right output canno
   await withClass(async ({ prepare, run, request }) => {
     const prepared = await prepare();
     const broken = prepared.projectFiles.filter((file) => file.path === "Main.java");
+    const savedBefore = (await request("/progress")).json();
     let response = await run(broken); let result = await response.json();
     assert.equal(result.success, false); assert.equal(result.passed, false); assert.match(result.output, /cannot find symbol/);
+    assert.deepEqual((await (await request("/progress")).json()).projectFiles, (await savedBefore).projectFiles, "failed run must not save its module code");
     const crash = [{ path: "Main.java", content: 'public class Main { public static void main(String[] args) { System.out.println("Capacity: 20"); throw new IllegalStateException("crash"); } }' }];
     response = await run(crash); result = await response.json();
     assert.equal(result.success, false); assert.equal(result.passed, false);
+    assert.deepEqual((await (await request("/progress")).json()).projectFiles, (await savedBefore).projectFiles, "crash must not save its module code");
     assert.equal((await (await request()).json()).lessons[1].closed, true);
   });
 });
@@ -438,7 +441,7 @@ test("sample first: real Java verifies samples, completes alterations, restores 
     assert.equal(r.passed, false); assert.equal(r.progress.stepStates[activityStateId(one)], "pass");
     p = await prepare(two.id);
     assert.deepEqual(p.projectFiles, stale.projectFiles);
-    reopened = await prepare(one.id); assert.deepEqual(reopened.projectFiles, bad, "reopening restores later exploratory edits");
+    reopened = await prepare(one.id); assert.deepEqual(reopened.projectFiles, completedFiles, "failed exploratory edits stay local and do not replace the completed server project");
     assert.deepEqual(reopened.performanceTask.own.files, backup, "sample loading never changes personal submissions");
     const other = await prepare(one.id, cookies[2]);
     assert.equal(other.stepStates[activityStateId(one)], undefined); assert.equal(other.activityProjects.beforeSampleFiles, undefined);

@@ -1459,17 +1459,34 @@ export async function runSupabaseModuleActivity(
   files: ModuleFile[], updatedAt: string,
   execute: (files: ModuleFile[], stdin: string) => Promise<{ mode: string; success: boolean; output: string }>,
 ) {
-  const { content, step, progress: beforeRun } = await requireModuleActivity(user, classroomId, moduleId, stepId);
+  const { content, step, progress: beforeRun, moduleVersion } = await requireModuleActivity(user, classroomId, moduleId, stepId);
   if (step.language !== "java") throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java only");
-  // Save before running; if execution is unavailable the student's work still survives.
   if (beforeRun.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "This module project changed in another tab. Reopen the activity before running");
-  const saved = JSON.stringify(files) === JSON.stringify(beforeRun.project_files)
-    ? moduleProgressView(beforeRun, content)
-    : await setSupabaseModuleProjectFiles(user, classroomId, moduleId, files, updatedAt, stepId);
-  if (content.sampleFirst && step.activity?.id && beforeRun.activity_projects?.activeKey !== activityStateId(step)) throw new SupabaseRepositoryError(409, "Open this step in the code editor before running it");
-  const result = await execute(files, (samplePending(content, step, beforeRun.step_states) ? step : activityTask(step)).stdin ?? "");
+  const sample = samplePending(content, step, beforeRun.step_states);
+  const result = await execute(files, (sample ? step : activityTask(step)).stdin ?? "");
   if (result.mode === "demo") throw new SupabaseRepositoryError(503, "Java execution is unavailable here. Run this activity in offline classroom mode");
-  return recordSupabaseModuleActivityResult(user, classroomId, moduleId, stepId, saved.updatedAt, result);
+  const { check, sampleMatched, passed } = checkModuleRun(content, step, beforeRun.step_states, files, result);
+  if (!passed) return { ...result, passed, check, sampleMatched, progress: moduleProgressView(beforeRun, content) };
+  const stateId = check === "sample" ? sampleStateId(step) : activityStateId(step);
+  const progress = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
+    if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
+    const states = { ...row.step_states, [stateId]: "pass" as const };
+    if (check === "sample") return { step_states: states };
+    if (!content.sampleFirst || !step.activity?.id) return { project_files: files, step_states: states };
+    const key = activityStateId(step);
+    const history = row.activity_projects ?? {};
+    return {
+      project_files: files,
+      step_states: states,
+      activity_projects: {
+        ...history,
+        activeKey: key,
+        drafts: { ...history.drafts, [key]: files },
+        ...(!history.beforeSampleFiles && !history.activeKey && row.project_files.length ? { beforeSampleFiles: row.project_files } : {}),
+      },
+    };
+  }, "Could not save the completed module activity");
+  return { ...result, passed, check, sampleMatched, progress: moduleProgressView(progress, content), module: studentModuleView(content, progress.step_states, moduleVersion) };
 }
 
 // Browser results are practice evidence, explicitly approved by the teacher, not grades.
@@ -1510,7 +1527,7 @@ export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, 
   const accepted = (row: ModuleProgressRow) => row.activity_projects?.checkpoints?.[key]?.id === checkpoint.completionId
     && row.activity_projects.checkpoints[key].moduleVersion === moduleVersion && row.step_states[key] === "pass" && sameFiles(row.activity_projects.drafts?.[key]);
   const reply = (row: ModuleProgressRow) => ({ mode: "browser", success: true, output: checkpoint.output, check: "task" as const,
-    passed: true, sampleMatched: matchesSample(checkpoint, step), progress: moduleProgressView(row, content) });
+    passed: true, sampleMatched: matchesSample(checkpoint, step), progress: moduleProgressView(row, content), module: studentModuleView(content, row.step_states, moduleVersion) });
   if (accepted(progress)) return reply(progress);
   if (progress.updated_at !== checkpoint.updatedAt) throw new SupabaseRepositoryError(409, "This module project changed in another tab. Your device draft is kept; reopen before syncing.");
   const history = progress.activity_projects ?? {};
@@ -1890,15 +1907,10 @@ export async function setSupabaseClassroomActiveModule(user: SupabaseSessionUser
   return { activeModuleId: moduleId };
 }
 
-export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
-  await requireClassroomMember(user, classroomId);
-  await enforceStudentModuleAccess(user, classroomId, moduleId);
-  const row = await loadCourseModuleRow(classroomId, moduleId);
-  if (user.role === "teacher") return { ...row.content, availability: moduleAvailability(row) };
-  const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
-  const access = activityAccess(row.content, progress.step_states);
+function studentModuleView(content: CourseModule, states: Record<string, string>, moduleVersion?: string) {
+  const access = activityAccess(content, states);
   const openSteps = new Set(access.openStepIds);
-  const lessons = row.content.lessons.map((lesson) => {
+  const lessons = content.lessons.map((lesson) => {
     const steps = lesson.blocks.filter((block) => block.type === "step");
     const blocks = lesson.blocks.map((block, index) => {
       const owner = lesson.blocks.slice(index).find((item) => item.type === "step") ?? steps.at(-1);
@@ -1912,12 +1924,21 @@ export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: 
     return { ...lesson, closed: !open, blocks, exitSlip: steps.length && !openSteps.has(activityStateId(steps.at(-1)!)) ? { ...lesson.exitSlip, questions: [] } : lesson.exitSlip };
   });
   return {
-    id: row.content.id, title: row.content.title, course: row.content.course, week: row.content.week, moduleVersion: row.updated_at,
-    continues: row.content.continues, starterFiles: row.content.starterFiles, sampleFirst: row.content.sampleFirst,
+    id: content.id, title: content.title, course: content.course, week: content.week, ...(moduleVersion ? { moduleVersion } : {}),
+    continues: content.continues, starterFiles: content.starterFiles, sampleFirst: content.sampleFirst,
     lessons, availability: { openLessonIds: lessons.filter((lesson) => !lesson.closed).map((lesson) => lesson.id), performanceTaskOpen: access.performanceTaskOpen },
-    ...(row.content.performanceTask ? access.performanceTaskOpen ? { performanceTask: row.content.performanceTask }
-      : { closedPerformanceTask: { title: row.content.performanceTask.title } } : {}),
+    ...(content.performanceTask ? access.performanceTaskOpen ? { performanceTask: content.performanceTask }
+      : { closedPerformanceTask: { title: content.performanceTask.title } } : {}),
   };
+}
+
+export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  await requireClassroomMember(user, classroomId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
+  const row = await loadCourseModuleRow(classroomId, moduleId);
+  if (user.role === "teacher") return { ...row.content, availability: moduleAvailability(row) };
+  const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
+  return studentModuleView(row.content, progress.step_states, row.updated_at);
 }
 
 export async function deleteSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {

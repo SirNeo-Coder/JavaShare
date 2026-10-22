@@ -1716,15 +1716,15 @@ export default function Home() {
     if (!classroomId || user?.role !== "student") return;
     try {
       await moduleEditorRef.current?.save();
-      await persistCurrentCode();
-      const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/${step ? "activity" : "performance-project"}`, {
-        method: "POST", body: JSON.stringify(step ? { stepId: step.id } : {}),
+      if (!step) await persistCurrentCode();
+      const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/${step ? `activity?stepId=${encodeURIComponent(step.id)}` : "performance-project"}`, {
+        ...(step ? {} : { method: "POST", body: JSON.stringify({}) }),
       });
       // The worksheet may have been opened before the final module step unlocked the task.
       const currentModule = step ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
       setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
       setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
-        classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "",
+        classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "", studentId: user.id,
         instruction: step ? activityTask(step).instruction : currentModule.performanceTask?.markdown ?? "",
         expectedOutput: step ? activityTask(step).expectedOutput : "", stdin: step ? activityTask(step).stdin ?? "" : "", progress });
       setProjectsOpen(false);
@@ -2869,7 +2869,7 @@ export default function Home() {
             </div>
           </footer></>}
         </section>
-        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
+        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} studentId={user.id} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
         <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} autoFocus={!chatHoverPreview} onClose={() => { setChatOpen(false); setChatHoverPreview(false); }}>
           <div className="chat">
                   <div className="chat-toolbar">

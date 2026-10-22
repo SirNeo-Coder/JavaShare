@@ -146,6 +146,8 @@ POST .../progress/complete accepts exact files/output plus optional unchanged-sa
 evidence, source/project versions and an idempotency id. Server-owned checks reject
 non-completion, access violations and stale versions. Accepted ids live in existing
 activity_projects JSON; no table/column changes. Existing endpoints remain compatible.
+Successful completion replies also include the newly unlocked, access-filtered module
+content so the browser can refresh its device cache without an extra module request.
 GET progress supports includeModuleVersion=1 for device-cache validation; normal
 response shape is retained. Student content replies include moduleVersion.
 The browser switches to this path in the completion-only feature; offline/personal
