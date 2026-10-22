@@ -1,3 +1,15 @@
+> PR #36 refresh after #35 merged (2026-10-22): six documentation conflicts repaired on
+> main `3a59e99`. Both prerequisite and curriculum notes are retained. CKB-060 remains
+> prerequisites; CKB-061 remains curriculum. All 51 curriculum/fixture/test files are unchanged
+> from the previous pushed PR. Application/config/package files exactly match current main.
+> Production build passed; lint 0 errors/8 existing warnings; full suite 293/293, no failures
+> or skips. Named checks and limits: `docs/verification/week15-week21-step-additions.md`.
+> Browser, offline launcher, document renders and deliberate-break proof were not repeated
+> for this refresh. PR #36 stays draft for teacher curriculum review; Ready for review is
+> a separate human decision. Repair and evidence are committed/pushed to the same PR; no
+> merge, deployment, hosted action or curriculum rewrite. Next: check GitHub’s conflict
+> status, then continue curriculum review and its documented runtime limits.
+
 > PR #35 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
 > `20a26fd`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
 > notes and the independent styles are preserved. Feature code/tests and curriculum files

@@ -468,3 +468,52 @@ Command: `npm test`. These isolated rule checks are new to this feature branch f
 - ✔ Java suggestions: insertion replaces the full word and preserves surrounding code
 - ✔ Java suggestions: print snippets place the caret inside the parentheses
 - ✔ Java suggestions: the main statement keeps existing indentation and puts the caret in its body
+
+## Refresh after PR #35 merged — 2026-10-22
+
+The teacher reported six fresh documentation conflicts in draft PR #36 after PR #35 merged.
+Reapplied the curriculum branch on main `3a59e99`, retaining prerequisite and curriculum
+sections in both handoffs, feature/workflow pages, problem index and prompt map. CKB-060
+remains prerequisites; CKB-061 remains curriculum.
+
+- PASS `npm run build:all`: production frontend and backend.
+- PASS `npm run lint`: zero errors, the same eight existing warnings.
+- PASS `npm test`: **293/293**, no failures or skips. All previously named tests above
+  passed again; the 17 newly inherited prerequisite checks are listed below.
+- PASS preservation: all 51 curriculum/supporting/fixture/test files match the previous
+  pushed PR byte-for-byte; no original JSON, PDF or Word content changed.
+- PASS application comparison: app, backend, supabase, scripts and package files exactly
+  match current main. This repair introduces no application change.
+- PASS documentation: valid case-index links, unique numbers, no conflict markers, and
+  `git diff --check`.
+- NOT REPEATED: browser checks, offline launcher build, renders and deliberate-break proof.
+  Earlier browser evidence predates merged prerequisite enforcement and does not verify
+  the combined browser workflow. Hosted rollout and original runtime limits stay unverified.
+  The PR remains draft for teacher curriculum review. No merge or deployment was performed.
+
+The handoffs identify the merged prerequisite feature and this still-open curriculum draft.
+Original notes are retained as history.
+
+### `tests/module-prerequisites.test.mjs`
+
+Command: `npm test`. These named checks exercise isolated rules and real authenticated local
+server/database paths, rather than a new browser session. Pass marks/names are copied from
+the runner, omitting timings.
+
+- ✔ module prerequisites: oldest unfinished ancestor blocks later weeks even when the immediate predecessor passed
+- ✔ module prerequisites: sample verification, failed tasks and superseded ids cannot unlock a later module
+- ✔ module prerequisites: missing and cyclic links give teacher repair messages without looping
+- ✔ module prerequisites: live class permits the weekly chain but still blocks unrelated modules
+- ✔ module prerequisites: banner names the earliest week and offers Continue; missing modules offer no dead button
+- ✔ blocks content before prerequisites
+- ✔ blocks progress before prerequisites
+- ✔ blocks module project before prerequisites
+- ✔ blocks paper record before prerequisites
+- ✔ blocks activity before prerequisites
+- ✔ blocks laptop run before prerequisites
+- ✔ blocks browser result before prerequisites
+- ✔ blocks personal open before prerequisites
+- ✔ blocks personal save before prerequisites
+- ✔ blocks submission before prerequisites
+- ✔ live class catch-up, ordered unlock, teacher preview and student/class isolation
+- ✔ module prerequisites: real routes reject every later-module entry, isolate students/classes and preserve saved work

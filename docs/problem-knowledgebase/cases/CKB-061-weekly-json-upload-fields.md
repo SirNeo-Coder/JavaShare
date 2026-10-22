@@ -62,3 +62,7 @@ runtime readiness. Revised copies and limitations: docs/modules/week15-week21.md
   and samples and appending only task material. Original supplied files remain unchanged.
 
 - 2026-10-22 — Preserved this case during PR #36 conflict repair on main c770731; all 276 integrated tests pass. Distinct case ids reserved across the three open PRs.
+
+- 2026-10-22 — Refreshed draft PR #36 after prerequisite PR #35 merged. Preserved all
+  curriculum bytes and both documentation histories. App/config files match main; full
+  suite 293/293, build/lint and document checks pass. Browser/rollout not repeated.
