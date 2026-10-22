@@ -1,5 +1,13 @@
 # Frontend (pages)
 
+Module draft recovery (2026-10-23): `moduleDeviceStore.ts` validates sample evidence with the
+existing output/exception rules and stores lesson version plus task identity. Changed or legacy
+drafts become readable backups in `StudentModuleActivity.tsx`. The editor waits for restoration
+before accepting edits. `ModuleWorkspace.tsx` checks content freshness against progress before
+choosing a step; `page.tsx` checks it again when opening the editor. Local passes show
+**Passed locally — awaiting sync** until acceptance, including after reload/retry.
+CKB-067/068/069; tests in module-device-store, module-run-feedback, and module-draft-recovery.browser.
+
 | File | What it is |
 | --- | --- |
 | `app/layout.tsx` | Page title, link preview, theme and font-size start-up script |

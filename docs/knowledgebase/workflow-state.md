@@ -362,6 +362,15 @@ recovery remains unverified.
 
 ## Module work saved on completion (approved 2026-10-22)
 
+- Recovery fixes (2026-10-23): verified expected-error samples remain verified after reopening,
+  so unfinished alterations remain editable. After a lesson/task changes, or when opening an
+  older unversioned device draft, load the current sample and preserve earlier code under
+  **Work saved before lesson changes**. Verify the current sample, then copy any earlier edits
+  still needed. Existing backups remain readable after subsequent corrections.
+- A locally passing task shows **Passed locally — awaiting sync** until CodeShare accepts it.
+  Failed sync and reload retain that status and queued evidence. Only acceptance announces
+  **Completed — next activity unlocked**. Server checks and personal submissions stay separate.
+
 - Student **Module** content is cached on that device for five minutes. The cache is scoped to
   student, class and module. Each module activity's working code and sample verification stay in
   that device's IndexedDB; **Save work** saves locally.
