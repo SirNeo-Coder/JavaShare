@@ -29,7 +29,7 @@ test("Weeks 12–13 offline: real uploads, editor sample verification, completio
     }
     const context = await browser.newContext({ baseURL: "http://localhost:3022", viewport: { width: 1500, height: 1050 } });
     assert.equal((await context.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
-    const created = await context.request.post("/api/classes", { data: { name: "Weeks 12–13 curriculum verification" } });
+    const created = await context.request.post("/api/classes", { data: { subject: "Java", name: "Weeks 12–13 curriculum verification" } });
     assert.equal(created.status(), 201); classroomId = (await created.json()).id;
     for (const content of modules) assert.equal((await context.request.post(`/api/classrooms/${classroomId}/modules`, { data: content })).status(), 201);
     assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);

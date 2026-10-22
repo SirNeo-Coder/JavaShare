@@ -1,3 +1,19 @@
+> PR #37 integration refresh (2026-10-22): branch `codex/subject-module-sharing`, based on
+> main `82cd333` after PRs #35/#36 merged. Resolved documentation/UI/server conflicts while
+> retaining subject sharing and prerequisite gates. The prerequisite lookup now uses the same
+> teacher/subject library as the catalog; student completion remains separate per class.
+> Build, backend build, offline launcher build pass; lint 0 errors/8 existing warnings; full
+> suite 302/302; focused 26/26; real local subject browser 7/7 and prerequisite browser 5/5.
+> Shared-chain regression failed before the fix and passed after. All curriculum assets match main.
+> EXTRA CURRICULUM BROWSER FAILED: preserved Week 18–21 links omit predecessor -module suffixes
+> (CKB-063); temporary diagnostic run 3 pass/3 fail, also an undiagnosed Week 17 feedback timeout.
+> No lesson rewrite or bypass. Evidence and every additional named check:
+> `docs/verification/subject-module-sharing.md`. This repair and record are committed/pushed to
+> existing PR #37. Teacher reports hosted SQL success; hosted app rollout remains unverified.
+> Next: verify GitHub conflicts/checks and teacher review/merge; separately approve a plan for
+> CKB-063 if desired. No assistant merge, deployment or hosted action. Older draft-PR notes below
+> are history; #35 and #36 have since been merged by the teacher.
+
 > PR #36 refresh after #35 merged (2026-10-22): six documentation conflicts repaired on
 > main `3a59e99`. Both prerequisite and curriculum notes are retained. CKB-060 remains
 > prerequisites; CKB-061 remains curriculum. All 51 curriculum/fixture/test files are unchanged
@@ -28,6 +44,45 @@
 > Resolution is complete; this record is committed and pushed to the same PR with a lease
 > protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
 > teacher review; merging another PR may require another refresh of the remaining branches.
+
+> Three-PR conflict repair (2026-10-22): subject sharing PR #37 updated on main `c770731`;
+> replayed implementation `200065c`. Teacher requested fixing #35/#36/#37. Both note sets
+> are preserved. Case numbers are unique: main caret issue 059, prerequisites 060, curriculum
+> 061, subject sharing 062. The original feature code/config/tests were preserved; current
+> main’s editor changes and both sets of independent styles are retained.
+> Verified: production build, lint 0 errors/8 existing warnings, full suite 236/236 and actual
+> local production browser 7/7 with laptop Java; no failures/skips. Named results and limits:
+> `docs/verification/subject-module-sharing.md`. Other branches separately pass 245 (#35) and
+> 276 (#36) tests. #36 remains draft. The teacher reports the hosted library SQL succeeded;
+> hosted app rollout is still pending and has not been independently verified.
+> Resolution and this note are committed/pushed to the existing feature branch with a lease
+> against its previously fetched head. No merge/deployment. Next: verify GitHub’s conflict-free
+> status, teacher review/merge and app build, then choose class subjects/share saved uploads.
+> Merging another PR can require refreshing the remaining branches again.
+
+> Current approved subject sharing (2026-10-22): `codex/subject-module-sharing`, based on main
+> `9fba8a7`, isolated worktree `/home/ireneo/.codex/worktrees/subject-module-sharing/JavaShare`.
+> Approved: each class uses exactly one Java or Net MVC module set; upload/correct once per
+> teacher/subject, include later classes, retain class-separated student projects/progress/submissions.
+> Implemented: shared library and additive migration, required subject for new classes, existing
+> class subject selection, explicit sharing/replacement of backed-up uploads, subject-wide delete
+> warning, shared catalog/reader/dashboard/summary paths and per-class legacy availability.
+> Existing old uploads stay readable until subject choice; original rows and all student work
+> remain stored afterward. Subject choice is permanent through the app to protect work scope.
+> Local migration applied; hosted services unchanged. Setup: `docs/subject-module-sharing-setup.md`.
+> Verification complete: full suite 229/229, browser 7/7 (actual local production app and offline
+> laptop Java), final focused checks 10/10; no skips. Baseline CKB-010 progress 4/4; deliberately
+> removing the subject filter failed 4 checks, restoring it passed 8/8. Production and offline
+> launcher builds pass; lint 0 errors/8 existing warnings. Named results, corrected initial
+> fixture/browser-test failures and unverified areas: `docs/verification/subject-module-sharing.md`.
+> Delivered: implementation `6b996e1` is committed and pushed; [PR #37](https://github.com/SirNeo-Coder/JavaShare/pull/37)
+> targets main and is attached to this chat. No app work remains. This documentation update
+> records delivery and is committed/pushed separately. The temporary local test server is stopped;
+> disposable test users/classes were cleaned. Existing classroom processes were preserved.
+> Next: teacher reviews the PR, manually applies the hosted migration, rolls out the app and
+> selects subjects/shares old uploads. Hosted rollout, physical devices and disconnected Wi-Fi
+> remain unverified. Preserve the primary checkout’s ongoing Week 15–21 files, logs, CLI cache
+> and other unrelated work.
 
 > Java code suggestions (2026-10-21): branch `codex/java-code-suggestions`, based on current
 > main `9fba8a7` (merged drawer/module work retained). Teacher approved Java-first local

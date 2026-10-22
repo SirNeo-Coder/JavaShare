@@ -138,7 +138,7 @@ async function withClass(action) {
       assert.equal(error, null); users.push(data.user);
       await admin.from("profiles").update({ role }).eq("id", data.user.id);
     }
-    const created = await admin.from("classrooms").insert({ name: "Module activity test", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
+    const created = await admin.from("classrooms").insert({ name: "Module activity test", module_subject: "java", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
     assert.equal(created.error, null); classroomId = created.data.id;
     assert.equal((await admin.from("classroom_members").insert(users.map((user) => ({ classroom_id: classroomId, user_id: user.id })))).error, null);
     const cookies = [];

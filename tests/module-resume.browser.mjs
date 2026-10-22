@@ -31,7 +31,7 @@ for (const mode of process.env.RESUME_BROWSER_MODE ? [process.env.RESUME_BROWSER
     const context = await browser.newContext({ baseURL, viewport: { width: 1500, height: 1050 } });
     const login = async (user) => assert.equal((await context.request.post("/api/auth/login", { data: { email: user.email, password } })).status(), 200);
     await login(users[0]);
-    const created = await context.request.post("/api/classes", { data: { name: "Disposable module resume checks" } });
+    const created = await context.request.post("/api/classes", { data: { subject: "Java", name: "Disposable module resume checks" } });
     assert.equal(created.status(), 201); classroomId = (await created.json()).id;
     assert.equal((await context.request.post(`/api/classrooms/${classroomId}/modules`, { data: content })).status(), 201);
     assert.equal((await admin.from("classroom_members").insert(users.slice(1).map((user) => ({ classroom_id: classroomId, user_id: user.id })))).error, null);

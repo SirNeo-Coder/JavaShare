@@ -28,7 +28,7 @@ test("Weeks 15–21 local browser: uploads, sample gate, completion, saved draft
     }
     const context = await browser.newContext({ baseURL: "http://localhost:3022", viewport: { width: 1500, height: 1050 } });
     assert.equal((await context.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
-    const created = await context.request.post("/api/classes", { data: { name: "Week 15–21 disposable verification" } });
+    const created = await context.request.post("/api/classes", { data: { subject: "Java", name: "Week 15–21 disposable verification" } });
     assert.equal(created.status(), 201); classroomId = (await created.json()).id;
     await t.test("all seven revised JSON files upload through the real app", async () => {
       for (const content of contents) assert.equal((await context.request.post(`/api/classrooms/${classroomId}/modules`, { data: content })).status(), 201, `Week ${content.week}`);

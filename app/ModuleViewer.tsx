@@ -1,6 +1,7 @@
 "use client";
 
 // Existing module routes supply the catalog, worksheet, progress and teacher availability.
+import ModuleSharing from "./ModuleSharing";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "./apiClient";
 import ModuleAccessNotice from "./ModuleAccessNotice";
@@ -400,6 +401,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
   const [accessBlock, setAccessBlock] = useState<ModuleAccessBlock | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [sharingSubject, setSharingSubject] = useState<"java" | "net-mvc" | null | undefined>(undefined);
   const [summaries, setSummaries] = useState<Record<string, number>>({});
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -459,6 +461,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
   };
 
   const removeModule = async (moduleId: string) => {
+    if (!window.confirm(`Delete this module from ${sharingSubject ? `all your ${sharingSubject === "java" ? "Java" : "Net MVC"} classes` : "this class"}? Saved student work and submissions will be kept.`)) return;
     try {
       await api(`/api/classrooms/${classroomId}/modules/${moduleId}`, { method: "DELETE" });
       if (selected?.id === moduleId) setSelected(null);
@@ -490,8 +493,9 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             {drawer && modules && role === "student" && <div className="catalog-progress"><span>{Object.values(summaries).filter((percent) => percent === 100).length} / {modules.length}</span> modules completed</div>}
             {role === "teacher" && embedded && !drawer && (
               <div className="module-upload">
+                <ModuleSharing classroomId={classroomId} onReady={setSharingSubject} onChanged={refreshList} />
                 <label>Upload module
-                <input ref={fileInput} type="file" accept=".json" onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])} disabled={uploading} />
+                <input ref={fileInput} type="file" accept=".json" onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])} disabled={uploading || !sharingSubject} />
                 </label>
                 {uploading && <small>Uploading…</small>}
               </div>
@@ -501,7 +505,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             {(drawer ? modules?.toSorted((a, b) => Number(Boolean(b.isActive)) - Number(Boolean(a.isActive)) || b.week - a.week) : modules)?.map((module) => (
               <div key={module.moduleId} className={`module-list-row${drawer ? " module-catalog-card" : ""}${drawer && module.isActive ? " module-weekly-card" : ""}`}>
                 {drawer ? <ModuleCatalogCard module={module} percent={summaries[module.moduleId] ?? 0} role={role} onOpen={() => module.moduleAccess ? setAccessBlock(module.moduleAccess) : openModule(module.moduleId)} /> : <button type="button" onClick={() => module.moduleAccess ? setAccessBlock(module.moduleAccess) : openModule(module.moduleId)}>Week {module.week} — {module.title}</button>}
-                {role === "teacher" && embedded && !drawer && <button type="button" className="danger-button" onClick={() => removeModule(module.moduleId)}>Delete</button>}
+                {role === "teacher" && embedded && !drawer && <button type="button" className="danger-button" disabled={sharingSubject === undefined} onClick={() => removeModule(module.moduleId)}>Delete</button>}
               </div>
             ))}
           </div>

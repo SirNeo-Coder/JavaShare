@@ -140,14 +140,14 @@ test("class list and creation: a teacher creates classes, a student joins one, a
     // A student may not create a class.
     assert.equal((await call("/api/classes", { method: "POST", headers: { cookie: studentCookie }, body: JSON.stringify({ name: "Nope" }) })).status, 403);
 
-    const createA = await call("/api/classes", { method: "POST", headers: { cookie: teacherCookie }, body: JSON.stringify({ name: "Second Period", subject: "AP CS A" }) });
+    const createA = await call("/api/classes", { method: "POST", headers: { cookie: teacherCookie }, body: JSON.stringify({ name: "Second Period", subject: "Java" }) });
     assert.equal(createA.status, 201);
     const classroomA = await createA.json();
     classroomAId = classroomA.id;
     assert.equal(classroomA.name, "Second Period");
     assert.match(classroomA.joinCode, /^[0-9A-F]{6}$/, "a generated join code must satisfy the DB's upper(join_code) check");
 
-    const createB = await call("/api/classes", { method: "POST", headers: { cookie: teacherCookie }, body: JSON.stringify({ name: "Third Period" }) });
+    const createB = await call("/api/classes", { method: "POST", headers: { cookie: teacherCookie }, body: JSON.stringify({ name: "Third Period", subject: "Net MVC" }) });
     const classroomB = await createB.json();
     classroomBId = classroomB.id;
     assert.notEqual(classroomA.joinCode, classroomB.joinCode);

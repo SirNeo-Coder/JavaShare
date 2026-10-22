@@ -109,7 +109,8 @@ History appears in progress responses only for opted-in modules, keeping old res
 
 `module-prerequisites.ts` walks the declared predecessor chain and reuses `activityAccess` and
 current activity ids to find the oldest unfinished module. `loadStudentModuleAccess` reads only
-this class's modules and this student's class-scoped step states; it creates no progress rows.
+the same teacher/subject library as the catalog (or legacy class uploads before subject selection)
+and this student's class-scoped step states; it creates no progress rows.
 `enforceStudentModuleAccess` guards every content/progress/project/submission path, including
 activity preparation and both execution-result paths. Teacher previews bypass student gates.
 Live access includes the active module's ancestors. Invalid/missing chains block safely.
@@ -118,3 +119,17 @@ Existing catalog replies may include `moduleAccess` (kind, message, and prerequi
 A blocked request returns HTTP 403 with the same metadata beside `error`; `ApiError` preserves
 it for the prominent banner and Continue action. Live-only cards remain disabled; prerequisite
 cards open their explanation. Existing routes, database identities and saved work are retained.
+
+## Subject module sharing (2026-10-22)
+
+- `POST /api/classes` now requires `subject: "Java" | "Net MVC"` and sets `module_subject`.
+- `GET /api/classrooms/:classroomId/module-sharing`: owner-only subject and saved-upload
+  summaries, including subject match, whether content is already shared, and shared timestamp.
+- `PATCH /api/classrooms/:classroomId/module-subject`: owner assigns `java` or `net-mvc` once.
+- `POST /api/classrooms/:classroomId/modules/:moduleId/share`: shares a saved class upload;
+  `expectedUpdatedAt` is required when explicitly replacing a shared version.
+- Existing module list/read/upload/delete routes resolve the selected teacher/subject library;
+  legacy unassigned classes keep their old read behavior. Dashboard and progress-summary reads
+  use the same resolver. Availability remains class-specific for older clients.
+- Source: `supabase-repository.ts` (`loadCourseModules`, `loadCourseModuleRow`,
+  `getSupabaseModuleSharing`, `setSupabaseModuleSubject`, `shareSupabaseModule`), `routes.ts`.

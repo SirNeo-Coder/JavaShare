@@ -256,6 +256,9 @@ html[data-theme="dark"] .preview-console .log-warn,html[data-theme="dark"] .prev
 .modules-button { padding:0 12px; }
 .module-viewer-modal { width:min(780px,100%); }
 .module-list { display:grid; gap:10px; }
+.module-sharing { margin: 12px 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.module-sharing select, .module-sharing button { max-width: 100%; margin: 4px 0; }
+.module-sharing li { margin: 8px 0; }
 .module-upload { padding:10px; border:1px dashed var(--line); border-radius:8px; }
 .module-list-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:var(--surface); }
 .module-list-row>button:first-child { border:0; background:none; color:#315cdb; font-weight:800; font-size:11px; text-align:left; }

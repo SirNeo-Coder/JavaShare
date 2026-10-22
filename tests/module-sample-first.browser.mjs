@@ -31,7 +31,7 @@ for (const mode of (process.env.SAMPLE_BROWSER_MODE ? [process.env.SAMPLE_BROWSE
       }
       const context = await browser.newContext({ baseURL, viewport: { width: 1500, height: 1050 } });
       assert.equal((await context.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
-      const created = await context.request.post("/api/classes", { data: { name: `Sample-first ${mode} verification` } });
+      const created = await context.request.post("/api/classes", { data: { subject: "Java", name: `Sample-first ${mode} verification` } });
       assert.equal(created.status(), 201); classroomId = (await created.json()).id;
       assert.equal((await context.request.post(`/api/classrooms/${classroomId}/modules`, { data: content })).status(), 201);
       assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);

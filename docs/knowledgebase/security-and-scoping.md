@@ -81,3 +81,17 @@ submission path checks the student's class-scoped current activity passes across
 predecessor chain. No browser pass flag or progress percentage can substitute. Missing uploads
 and cycles block access. Live class permits the active module's ancestors; teachers retain full
 previews. Catalog metadata contains only the blocked module's reason and prerequisite identity.
+
+## Shared subject modules (2026-10-22)
+
+Class membership is still checked before module reads. Assigned-class library queries always
+filter by that class’s `teacher_id` and `module_subject`; student claims never choose the owner
+or subject. Subject selection, saved-upload inspection/sharing, uploads and deletion require the
+class owner. New classes accept exactly Java or Net MVC. The app refuses subsequent subject
+changes and checks the matching course family on upload/import; database constraints also prevent
+a Java/.NET mismatch. Existing unassigned classes remain compatible for reads, but must choose
+a subject before new uploads. Replacement imports require the current shared `updated_at` to
+avoid overwriting a concurrent correction. All student progress queries retain their class key.
+
+Prerequisite links resolve inside that same teacher/subject library. Completion is still looked
+up by student and class; finishing a shared week in one class never opens it in another class.

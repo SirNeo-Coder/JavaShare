@@ -32,7 +32,7 @@ async function withClass(action) {
       if (role === "teacher") assert.equal((await admin.from("profiles").update({ role }).eq("id", data.user.id)).error, null);
     }
     for (const suffix of ["A", "B"]) {
-      const { data, error } = await admin.from("classrooms").insert({ name: `Availability ${suffix}`, join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
+      const { data, error } = await admin.from("classrooms").insert({ name: `Availability ${suffix}`, module_subject: "java", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
       assert.equal(error, null); classrooms.push(data.id);
       assert.equal((await admin.from("classroom_members").insert([{ classroom_id: data.id, user_id: users[0].id }, { classroom_id: data.id, user_id: users[1].id }])).error, null);
     }

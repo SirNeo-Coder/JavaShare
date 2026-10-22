@@ -31,7 +31,7 @@ async function withClass(action) {
       assert.equal(response.status, 200); cookies.push(response.headers.get("set-cookie").split(";")[0]);
     }
     for (const label of ["A", "B"]) {
-      const response = await call("/api/classes", { method: "POST", headers: { cookie: cookies[0] }, body: JSON.stringify({ name: `Web class ${label}` }) });
+      const response = await call("/api/classes", { method: "POST", headers: { cookie: cookies[0] }, body: JSON.stringify({ name: `Web class ${label}`, subject: "Net MVC" }) });
       assert.equal(response.status, 201); classes.push(await response.json());
     }
     for (const [classIndex, userIndex] of [[0, 2], [0, 3], [1, 2]]) {

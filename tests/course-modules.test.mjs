@@ -33,7 +33,7 @@ test("course modules: teacher uploads, class members read, only the teacher may 
   const student = await createUser("Course Modules Student");
   const outsider = await createUser("Course Modules Outsider");
   await admin.from("profiles").update({ role: "teacher" }).eq("id", teacher.id);
-  const { data: classroom } = await admin.from("classrooms").insert({ name: "Course modules test class", join_code: `CM${Date.now()}`.slice(0, 12).toUpperCase(), teacher_id: teacher.id }).select("id").single();
+  const { data: classroom } = await admin.from("classrooms").insert({ name: "Course modules test class", module_subject: "java", join_code: `CM${Date.now()}`.slice(0, 12).toUpperCase(), teacher_id: teacher.id }).select("id").single();
   const classroomId = classroom.id;
   await admin.from("classroom_members").insert([{ classroom_id: classroomId, user_id: teacher.id }, { classroom_id: classroomId, user_id: student.id }]);
 
