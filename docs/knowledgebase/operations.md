@@ -72,3 +72,9 @@ CKB-056: `runner.js` fetches both JARs as complete binary downloads into `/str/`
 before starting the compiler; it no longer relies on HTTP Range support from the
 asset host. Startup messages identify the last loading stage without extending
 the existing 120-second deadline. No hosted setting or migration is needed.
+
+- Hosted CPU exhaustion (CKB-065): a teacher-supplied module save returned 503 /
+  exceededCpu / 10 ms CPU. Workers Free allows 10 ms per request; current requirement
+  is to stay free and investigate measured CPU reductions. See the CPU diagnosis
+  section of [Cloudflare setup](../cloudflare-setup.md#module-saves-fail-with-exceededcpu).
+  Local passing tests and a healthy public read do not prove hosted saves fit the cap.

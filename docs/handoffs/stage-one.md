@@ -1,3 +1,29 @@
+> Approved service-error mitigation (2026-10-22): `codex/api-service-errors`, isolated
+> checkout `/tmp/codeshare-api-errors`, based on main `21766ba`. Teacher approved the
+> response-handling repair, regression proof, required checks and evidence-based 503
+> investigation after screenshots showed Module worksheet JSON parsing errors.
+> Done: the shared helper reports unreadable error responses with their HTTP status,
+> retains JSON/prerequisite details and normal session events, rejects malformed success
+> and does not retry writes. Protected HTML 401s now reach existing sign-in recovery.
+> Only app/apiClient.ts changes application behavior; callers needed no changes or cleanup.
+> Checks: offline launcher build (including build:all) passes; lint 0 errors/8 existing
+> warnings; full suite 311/311 with no skips; local production browser 4/4 including
+> unsaved-code preservation, retry, real laptop Java/sample completion and HTML 401 sign-out.
+> Original-helper regression proof: 6 fail/3 pass; restored helper 9/9. All names,
+> commands and limits: [verification](../verification/api-service-errors.md). CKB-064,
+> prompt map and frontend/workflow pages updated. Approval covers normal branch/PR delivery.
+> Diagnosis updated from teacher log: the module-project save was terminated by
+> Cloudflare for exceededCpu at 10 ms CPU / 404 ms total time (CKB-065). Earlier
+> health lookup used a misread hostname; corrected public health returns 200/connected.
+> This is not proof of module-save recovery. Account plan/effective CPU limit unknown;
+> teacher explicitly requires Free and requested CPU-reduction investigation.
+> No profiling hotspot or runtime-budget repair is approved by the earlier display fix.
+> Next: commit/push this verified mitigation and diagnosis, open its PR for review,
+> then profile CPU work and propose the smallest reduction; new code needs plan approval. Teacher instructions
+> are in cloudflare-setup.md. No hosted changes, migration, deployment or merge.
+> Physical Wi-Fi/disconnected operation and online CheerpJ were not rerun; local Java passed.
+> Original checkout and unrelated files remain untouched; temporary app/fixtures are cleaned.
+
 > PR #37 integration refresh (2026-10-22): branch `codex/subject-module-sharing`, based on
 > main `82cd333` after PRs #35/#36 merged. Resolved documentation/UI/server conflicts while
 > retaining subject sharing and prerequisite gates. The prerequisite lookup now uses the same
