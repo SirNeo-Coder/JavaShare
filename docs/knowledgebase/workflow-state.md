@@ -335,3 +335,14 @@ continue to block later work. Week 20 remains written work. No migration or prer
 change. [Re-upload steps and limits](../curriculum-prerequisite-reupload.md). The teacher reports
 uploading the four corrections with no apparent problem (2026-10-22). Independent hosted/student
 recovery remains unverified.
+
+## Course modules ordering (approved 2026-10-22)
+
+- The classroom **Course modules** drawer shows unfinished modules in increasing week order
+  (Week 12 through Week 21 for the current set), then completed modules in increasing week order.
+- Saved 100% completion moves a module below every unfinished module. After Week 12 completes,
+  Week 13 becomes the first card. Opening the drawer or refreshing progress updates the order.
+- The weekly pick keeps its badge but does not override week/completion order. Teacher drawer
+  browsing has no student progress and follows increasing week order. Curriculum stays as before.
+- Sorting changes only the display; module locks, saved files, task checks and submissions use
+  their existing rules. The same display rule applies online and offline. See CKB-066.

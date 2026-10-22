@@ -50,3 +50,8 @@ Prerequisite UI (2026-10-21): `ModuleAccessNotice` shows the oldest unfinished l
 Continue Week N. `ModuleViewer`/`ModuleWorkspace` and both Projects shortcuts preserve structured
 API restriction details through `ApiError`; Continue reuses saved-progress resume. Missing uploads
 and cycles display a repair message without an unusable Continue button. No navigation storage.
+
+Course modules ordering: `sortModuleCatalog` in `app/ModuleViewer.tsx` sorts drawer cards
+by saved completion (100% last), then increasing week. The weekly badge stays visible without
+overriding order. `tests/module-catalog-order.test.mjs` checks the rule;
+`tests/module-catalog-order.browser.mjs` checks the actual local app. CKB-066.
