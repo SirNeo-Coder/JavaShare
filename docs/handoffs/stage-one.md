@@ -1,3 +1,24 @@
+> Latest clarified requirement (2026-10-22): teacher wants student Module project
+> code saved to the server only when the task completes successfully. Earlier
+> "local activities; sync later" direction is narrowed: task completion is the sync
+> point, rather than a generic later whole-module Sync progress workflow.
+> [Revised concrete proposal](../verification/local-module-practice-proposal.md)
+> is ready for explicit implementation approval. Online module drafts, sample
+> verification and unsuccessful runs stay local; one guarded completion checkpoint
+> saves exact successful code/progress, then unlocks the next step. Earlier completed
+> status must not make a later failed run overwrite successful code. Keep retry
+> evidence locally on failed sync and do not silently overwrite newer remote work.
+> Later locked steps remain server-withheld; downloading hidden future tasks is no
+> longer proposed. Essential sign-in/read requests remain. Include lightweight server
+> metadata/read reuse so the completion save does not reproduce CKB-065's CPU failure.
+> Expected scope: module browser/editor/callers/local draft helper, guarded server
+> checkpoint and one new migration; personal submissions/offline runner preserved.
+> CKB-065 and CKB-035 apply. No new app/schema/config/tests changed or run for this
+> proposal. Next: teacher approves/revises this plan under AGENTS.md. Branch
+> codex/api-service-errors / PR #39 still contains only the tested error-message repair
+> and investigation/proposal records; earlier error-message approval does not cover
+> this changed implementation. Original checkout/unrelated files remain untouched.
+
 > Approved service-error mitigation (2026-10-22): `codex/api-service-errors`, isolated
 > checkout `/tmp/codeshare-api-errors`, based on main `21766ba`. Teacher approved the
 > response-handling repair, regression proof, required checks and evidence-based 503
