@@ -1,3 +1,21 @@
+> Active approved completion-only module saving (2026-10-22): teacher explicitly
+> approved the combined plan: cache downloaded lessons/local unfinished drafts,
+> save online Module project code only after task success, and lighten server checks.
+> Branch codex/module-completion-saves starts at current main 23053f1; isolated
+> checkout /tmp/codeshare-api-errors reuses dependencies. Original checkout untouched.
+> Server step done: service-role-only lightweight metadata, selected-module read reuse,
+> read-only step preparation and one guarded/idempotent completion checkpoint. New
+> migration 20261022000200 applied locally only; teacher rollout/rollback guide is
+> docs/module-completion-setup.md. Old endpoints/teacher response shapes preserved.
+> Checks: build:all passes; focused existing module integration checks 67/67, extended
+> completion checks 7/7, no skips. Deliberate opening-write mutation fails the regression;
+> restored checks pass. CKB-065, backend KB and approved AGENTS rule updated.
+> In progress/next: device content/draft storage, local sample/task checking and
+> completion-only editor/caller integration, request-count/conflict/browser/offline
+> checks, full build/lint/suite, repeated Worker profile, final PR. No hosted CPU
+> recovery claim. Personal/submission/laptop paths must remain compatible. No merge,
+> deploy, hosted settings or hosted SQL. PR #39's error-message repair remains separate.
+
 > Current CKB-063 repair — 2026-10-22
 >
 > Teacher approved correcting only the Week 18–21 predecessor references and preserving all

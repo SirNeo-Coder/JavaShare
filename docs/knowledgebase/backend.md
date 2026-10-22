@@ -133,3 +133,21 @@ cards open their explanation. Existing routes, database identities and saved wor
   use the same resolver. Availability remains class-specific for older clients.
 - Source: `supabase-repository.ts` (`loadCourseModules`, `loadCourseModuleRow`,
   `getSupabaseModuleSharing`, `setSupabaseModuleSubject`, `shareSupabaseModule`), `routes.ts`.
+
+## Completion-only module server groundwork (2026-10-22)
+
+Migration 20261022000200_module_access_summaries.sql adds service-role-only
+codeshare_module_summaries (metadata and current activity ids, no Java/output/text)
+and codeshare_complete_module_activity (atomic project/progress write guarded by
+source and project timestamps). Prerequisite, catalog and student summary reads
+use the former; enforcement no longer rereads the selected module.
+GET .../progress/activity?stepId= prepares working files without persisting code/history.
+POST .../progress/complete accepts exact files/output plus optional unchanged-sample
+evidence, source/project versions and an idempotency id. Server-owned checks reject
+non-completion, access violations and stale versions. Accepted ids live in existing
+activity_projects JSON; no table/column changes. Existing endpoints remain compatible.
+GET progress supports includeModuleVersion=1 for device-cache validation; normal
+response shape is retained. Student content replies include moduleVersion.
+The browser switches to this path in the completion-only feature; offline/personal
+paths retain their existing endpoints. Teacher applies hosted SQL before rollout:
+[setup](../module-completion-setup.md). Hosted CPU recovery is not yet verified.

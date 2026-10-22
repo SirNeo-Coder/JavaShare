@@ -197,3 +197,20 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Preserve existing class uploads and student work. The teacher selects an existing class’s
   subject, then explicitly shares saved uploads; a differing shared copy requires confirmation.
 - Shared deletion warns that it affects every class in that subject and keeps student work.
+
+## Completion-only online module saving (agreed 2026-10-22)
+
+- Online Module project practice keeps downloaded authorized lessons, unfinished
+  per-step code, sample verification and unsuccessful runs on the student's device.
+  Save code/progress to the server only on successful task completion. A later
+  unsuccessful run must not replace an earlier successful project or completion.
+- Send one guarded completion checkpoint; the server validates current sample/task
+  output, identity/class/access, stable activity ids and module/project versions.
+  Save code and progress together. Retry without duplicate saves and preserve local
+  work on failed sync or conflicts. Server acceptance unlocks the next step.
+- Keep local-only status explicit. Other devices/teacher progress receive accepted
+  completions, not unfinished drafts. Later locked content stays server-withheld.
+  Preserve account/idle-expiry safety, personal/submission separation, backups and
+  the existing laptop/offline runner path. Initial reads/sign-in requests remain.
+- Keep hosted prerequisite/catalog reads small using server-only summaries derived
+  from current content. No stored duplicate curriculum or removal of access checks.
