@@ -80,3 +80,9 @@ shared readers and owner-only subject/import routes in `supabase-repository.ts` 
 `ModuleSharing.tsx` is reused by Curriculum and the existing module upload view; class creation
 uses a two-option Subject select in `Landing.tsx`. Migration `20261022000100`; tests in
 `subject-module-sharing.test.mjs` and `subject-module-sharing.browser.mjs`; CKB-062.
+
+Actual Week 12–21 prerequisite chain: `tests/week15-week21-modules.test.mjs` compares each
+`previousModuleId` with its predecessor file's existing `id`. Weeks 18–21 references use the
+preserved `-module` ids; CKB-063. The curriculum browser supplies actual earlier uploads and
+disposable completion records, checks re-upload preservation and real blocking/unlocking.
+Teacher steps: `docs/curriculum-prerequisite-reupload.md`. Access rules remain unchanged.
