@@ -484,3 +484,163 @@ Command: `npm test`. Isolated rules inherited from main:
 - ✔ Java suggestions: insertion replaces the full word and preserves surrounding code
 - ✔ Java suggestions: print snippets place the caret inside the parentheses
 - ✔ Java suggestions: the main statement keeps existing indentation and puts the caret in its body
+
+## PR #37 after prerequisites and curriculum merged — 2026-10-22
+
+Base: main `82cd333` (PRs #35 and #36 merged). Branch: `codex/subject-module-sharing`.
+Preserved both documentation histories, approved subject sharing, the prerequisite banners/guards
+and all curriculum assets. No migration changes. Resolved the catalog selection/deletion UI
+conflict and connected `loadStudentModuleAccess` to the existing shared content resolver.
+Student completion queries still filter by student and class. Adapted direct test callers to
+provide the approved Java subject; prerequisite fixtures now update/delete the shared library.
+
+- PASS `npm run build:all`: frontend and backend production builds.
+- PASS `npm run lint`: 0 errors, 8 existing warnings.
+- PASS `npm test`: **302/302**, no failures, skips or cancellations. All 236 previously listed
+  checks passed again; the 66 additional names are grouped below.
+- PASS `node --test tests/subject-module-sharing.test.mjs tests/module-prerequisites.test.mjs`:
+  **26/26**, no failures/skips. These call real routes and local Supabase; standalone prerequisite
+  functions/UI markup also test the rules in isolation.
+- PASS `npm run classroom:offline -- --build-only`: existing local Supabase retained; offline
+  production build ready.
+- PASS real production browser `tests/subject-module-sharing.browser.mjs`: **7/7**.
+- PASS real production browser `tests/module-prerequisites.browser.mjs`: offline **5/5**.
+  Includes actual laptop Java, saved-step Continue, changed prerequisite ids, both Projects
+  shortcuts, missing uploads, teacher preview and zero external browser requests.
+- PASS byte comparison: `git diff origin/main -- docs/modules tests/fixtures` is empty.
+  This repair preserves every merged lesson, plan, PDF, JSON and curriculum edit fixture.
+
+Browser commands (temporary production app at localhost:3022, local Supabase/laptop Java):
+
+```text
+CODESHARE_PLAYWRIGHT_MODULE=<bundled Playwright>/index.mjs PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=<local Chromium> SUBJECT_BROWSER_URL=http://localhost:3022 node --test tests/subject-module-sharing.browser.mjs
+CODESHARE_PLAYWRIGHT_MODULE=<bundled Playwright>/index.mjs PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=<local Chromium> PREREQUISITE_BROWSER_MODE=offline node --test tests/module-prerequisites.browser.mjs
+```
+
+### Failed checks and unverified areas
+
+**Additional curriculum browser check failed; it is not included in the 12 passing browser checks.**
+`node --test tests/week15-week21.browser.mjs` with the same bundled browser settings initially
+passed upload, then correctly refused Week 15 because the fixture omitted linked Week 14.
+A temporary diagnostic fixture uploaded real Weeks 12–14 and seeded disposable earlier passes.
+That run was **3 passed / 3 failed** (including the parent): Week 16 sample/task/save checks passed;
+Week 18 preparation failed because its `java-2-w17` link does not match Week 17's actual
+`java-2-w17-module` id. Weeks 19–21 have equivalent mismatches: see **CKB-063**. A Week 17
+feedback wait also timed out; that separate result was not diagnosed or claimed successful.
+The temporary diagnostic changes were removed; only the required subject field remains in the
+committed curriculum browser fixture. No lesson ids or prerequisite links were rewritten.
+
+The passing full suite covers actual sample/alteration execution and content preservation; it
+does not prove the real curriculum predecessor chain opens. The dedicated synthetic shared-chain
+and prerequisite browser suites pass. A curriculum-link repair needs a separate approved plan.
+
+Hosted application rollout, online CheerpJ, physical devices, disconnected classroom Wi-Fi,
+actual Net MVC execution and visible GUI behavior were not repeated/verified. The teacher reports
+hosted library SQL success; no assistant hosted changes, deployment or PR merge occurred.
+Other browser scripts received the required subject in class creation but were not rerun.
+
+### Integration regression proof and corrected test fixture
+
+With the original class-only prerequisite query, the new shared-only regression failed:
+actual `moduleAccess.kind` was `missing`, expected `prerequisite` (7 passed, 2 failed including
+parent). Switching that one query to `loadCourseModules` made the regression pass. The first
+focused rerun also exposed an extra progress row created by opening the disposable later module;
+cleanup now removes both temporary module rows. Final focused run: 26/26. The check proves that
+completion in class A opens its later shared module while the same student in class B stays blocked.
+The earlier deliberate subject-filter removal proof is retained above; it was not repeated here.
+
+### Additional full-suite names
+
+Command: `npm test`. Marks below are copied from its final successful output; all earlier names
+in this document passed again too.
+
+#### `tests/module-prerequisites.test.mjs`
+
+- ✔ module prerequisites: oldest unfinished ancestor blocks later weeks even when the immediate predecessor passed
+- ✔ module prerequisites: sample verification, failed tasks and superseded ids cannot unlock a later module
+- ✔ module prerequisites: missing and cyclic links give teacher repair messages without looping
+- ✔ module prerequisites: live class permits the weekly chain but still blocks unrelated modules
+- ✔ module prerequisites: banner names the earliest week and offers Continue; missing modules offer no dead button
+- ✔ blocks content before prerequisites
+- ✔ blocks progress before prerequisites
+- ✔ blocks module project before prerequisites
+- ✔ blocks paper record before prerequisites
+- ✔ blocks activity before prerequisites
+- ✔ blocks laptop run before prerequisites
+- ✔ blocks browser result before prerequisites
+- ✔ blocks personal open before prerequisites
+- ✔ blocks personal save before prerequisites
+- ✔ blocks submission before prerequisites
+- ✔ live class catch-up, ordered unlock, teacher preview and student/class isolation
+- ✔ module prerequisites: real routes reject every later-module entry, isolate students/classes and preserve saved work
+
+#### `tests/subject-module-sharing.test.mjs`
+
+- ✔ shared-only prerequisites unlock per class and never reuse another class's completion
+
+#### `tests/week15-week21-modules.test.mjs`
+
+- ✔ Week 15: upload accepts additions and every original lesson value survives
+- ✔ Week 16: upload accepts additions and every original lesson value survives
+- ✔ Week 17: upload accepts additions and every original lesson value survives
+- ✔ Week 18: upload accepts additions and every original lesson value survives
+- ✔ Week 19: upload accepts additions and every original lesson value survives
+- ✔ Week 20: upload accepts additions and every original lesson value survives
+- ✔ Week 21: upload accepts additions and every original lesson value survives
+- ✔ Weeks 15–21: old samples and headless messages cannot pass new tasks or bypass their sample gate
+- ✔ Week 15 Step 1: disk sample and alteration
+- ✔ Week 15 Step 2: disk sample and alteration
+- ✔ Week 15 Step 3: disk sample and alteration
+- ✔ Week 15 Step 4: disk sample and alteration
+- ✔ Week 15 Step 5: disk sample and alteration
+- ✔ Week 15 Step 6: disk sample and alteration
+- ✔ Week 15 Step 7: disk sample and alteration
+- ✔ Week 15 Step 8: disk sample and alteration
+- ✔ Week 15 Step 9: disk sample and alteration
+- ✔ Week 15 Step 10: disk sample and alteration
+- ✔ Week 15: original disk samples and each independent alteration match real Java output
+- ✔ Week 16 Step 1: sample and alteration
+- ✔ Week 16 Step 2: sample and alteration
+- ✔ Week 16 Step 3: sample and alteration
+- ✔ Week 16 Step 4: sample and alteration
+- ✔ Week 16 Step 5: sample and alteration
+- ✔ Week 16 Step 6: sample and alteration
+- ✔ Week 16 Step 7: sample and alteration
+- ✔ Week 16: complete samples and meaningful alterations run through the classroom laptop runner
+- ✔ Week 17 Step 1: sample and alteration
+- ✔ Week 17 Step 2: sample and alteration
+- ✔ Week 17 Step 3: sample and alteration
+- ✔ Week 17 Step 4: sample and alteration
+- ✔ Week 17 Step 5: sample and alteration
+- ✔ Week 17 Step 6: sample and alteration
+- ✔ Week 17: complete samples and meaningful alterations run through the classroom laptop runner
+- ✔ Week 18 Step 1: sample and alteration
+- ✔ Week 18 Step 2: sample and alteration
+- ✔ Week 18 Step 3: sample and alteration
+- ✔ Week 18 Step 4: sample and alteration
+- ✔ Week 18 Step 5: sample and alteration
+- ✔ Week 18: complete samples and meaningful alterations run through the classroom laptop runner
+- ✔ Week 19 Step 1: sample and alteration
+- ✔ Week 19 Step 2: sample and alteration
+- ✔ Week 19 Step 3: sample and alteration
+- ✔ Week 19 Step 4: sample and alteration
+- ✔ Week 19: complete samples and meaningful alterations run through the classroom laptop runner
+- ✔ Week 21 Step 1: sample and alteration
+- ✔ Week 21: complete samples and meaningful alterations run through the classroom laptop runner
+- ✔ Week 15: classroom file access stays blocked while desktop exercises remain explicitly separate
+
+### Prerequisite real-browser names
+
+Command: the offline prerequisite browser command above.
+
+- ✔ Week 14 names Week 12 and Continue restores the next unfinished saved step during live class
+- ✔ Week 13 must pass before Week 14 opens; reload retains the ordered unlock and Week 14 work
+- ✔ both Projects shortcuts recheck changed prerequisites and offer Continue without overwriting later work
+- ✔ missing prerequisite has a teacher-upload message; teacher preview remains available
+- ✔ prerequisites offline: banner, saved-step resume and ordered unlock through the real app
+
+Subject-sharing browser names are unchanged from the earlier real-browser section; all seven passed again.
+
+Final documentation check: `node --test tests/kb-search.test.mjs` passed 2/2 again after
+recording CKB-063 (names already listed above). Case links, changed-file conflict-marker scan,
+all eight adapted browser scripts’ syntax and unchanged curriculum comparison passed.

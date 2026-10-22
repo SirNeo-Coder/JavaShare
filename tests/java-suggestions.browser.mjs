@@ -29,7 +29,7 @@ test('Java suggestions: real classroom, module and personal editors', async t =>
       const context=await browser.newContext({baseURL,viewport:{width:1500,height:1000},hasTouch:true}); contexts.push(context);
       assert.equal((await context.request.post('/api/auth/login',{data:{email:user.email,password}})).status(),200);
     }
-    const created=await contexts[0].request.post('/api/classes',{data:{name:'Disposable suggestions classroom'}});
+    const created=await contexts[0].request.post('/api/classes',{data:{subject: "Java", name:'Disposable suggestions classroom'}});
     assert.equal(created.status(),201); classroomId=(await created.json()).id;
     assert.equal((await contexts[0].request.post(`/api/classrooms/${classroomId}/modules`,{data:fixture})).status(),201);
     assert.equal((await admin.from('classroom_members').insert({classroom_id:classroomId,user_id:users[1].id})).error,null);

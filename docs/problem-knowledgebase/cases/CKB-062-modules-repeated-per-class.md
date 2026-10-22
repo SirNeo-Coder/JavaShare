@@ -1,6 +1,6 @@
 # CKB-062 — Modules required a separate upload for each class
 
-- Status: resolved locally; hosted setup pending
+- Status: resolved locally; teacher reports hosted SQL success; app rollout unverified
 - First recorded: 2026-10-22
 - Last verified: 2026-10-22
 - Area: module library / class subject / Curriculum
@@ -59,3 +59,11 @@ validation. If student progress leaks, use CKB-010; content sharing must never r
   stay distinct. Preserved both documentation histories and the feature code. Integrated
   suite 236/236 and actual browser 7/7 pass on main c770731. Teacher reports hosted SQL success;
   app rollout remains unverified.
+
+- 2026-10-22 — Refreshed PR #37 on main 82cd333 after prerequisites/curriculum merged.
+  Combined CKB-060/062 regression showed a shared predecessor reported missing because the guard
+  queried only course_modules. Reused loadCourseModules for that lookup; retained student/class
+  progress filters. Regression failed before the fix and passed after. Build/offline build pass,
+  lint 0 errors/8 existing warnings, suite 302/302, focused 26/26, subject browser 7/7 and offline
+  prerequisite browser 5/5. Separate curriculum browser failures/CKB-063 are recorded prominently
+  in the verification report; no lesson assets changed.

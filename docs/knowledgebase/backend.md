@@ -109,7 +109,8 @@ History appears in progress responses only for opted-in modules, keeping old res
 
 `module-prerequisites.ts` walks the declared predecessor chain and reuses `activityAccess` and
 current activity ids to find the oldest unfinished module. `loadStudentModuleAccess` reads only
-this class's modules and this student's class-scoped step states; it creates no progress rows.
+the same teacher/subject library as the catalog (or legacy class uploads before subject selection)
+and this student's class-scoped step states; it creates no progress rows.
 `enforceStudentModuleAccess` guards every content/progress/project/submission path, including
 activity preparation and both execution-result paths. Teacher previews bypass student gates.
 Live access includes the active module's ancestors. Invalid/missing chains block safely.

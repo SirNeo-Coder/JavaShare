@@ -95,7 +95,7 @@ test("module prerequisites: real routes reject every later-module entry, isolate
       assert.equal(response.status, 200); cookies.push(response.headers.get("set-cookie").split(";")[0]);
     }
     for (let index = 0; index < 2; index++) {
-      const response = await call("/api/classes", cookies[0], "POST", { name: `Prerequisite class ${index}` });
+      const response = await call("/api/classes", cookies[0], "POST", { subject: "Java", name: `Prerequisite class ${index}` });
       assert.equal(response.status, 201); classes.push((await response.json()).id);
       assert.equal((await admin.from("classroom_members").insert(users.slice(1).map((user) => ({ classroom_id: classes[index], user_id: user.id })))).error, null);
       for (const content of contents) assert.equal((await call(`/api/classrooms/${classes[index]}/modules`, cookies[0], "POST", content)).status, 201);
@@ -148,7 +148,7 @@ test("module prerequisites: real routes reject every later-module entry, isolate
       assert.equal(opened.status, 200); const view = await opened.json();
       assert.equal(view.performanceProjectFiles.find((file) => file.path === "Main.java").content, files[0].content); assert.deepEqual(view.performanceTask.own, snapshot);
       assert.deepEqual(view.projectFiles, files);
-      await admin.from("course_modules").delete().eq("classroom_id", classes[0]).eq("module_id", contents[0].id);
+      assert.equal((await call(base(contents[0].id), cookies[0], "DELETE")).status, 200);
       const missing = await call(base(), cookies[1]); assert.equal(missing.status, 403);
       assert.equal((await missing.json()).moduleAccess.kind, "missing", "old passes cannot substitute for a missing uploaded prerequisite");
       assert.equal((await call(base(), cookies[0])).status, 200);

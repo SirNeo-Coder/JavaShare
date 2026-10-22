@@ -1,3 +1,19 @@
+> PR #37 integration refresh (2026-10-22): branch `codex/subject-module-sharing`, based on
+> main `82cd333` after PRs #35/#36 merged. Resolved documentation/UI/server conflicts while
+> retaining subject sharing and prerequisite gates. The prerequisite lookup now uses the same
+> teacher/subject library as the catalog; student completion remains separate per class.
+> Build, backend build, offline launcher build pass; lint 0 errors/8 existing warnings; full
+> suite 302/302; focused 26/26; real local subject browser 7/7 and prerequisite browser 5/5.
+> Shared-chain regression failed before the fix and passed after. All curriculum assets match main.
+> EXTRA CURRICULUM BROWSER FAILED: preserved Week 18–21 links omit predecessor -module suffixes
+> (CKB-063); temporary diagnostic run 3 pass/3 fail, also an undiagnosed Week 17 feedback timeout.
+> No lesson rewrite or bypass. Evidence and every additional named check:
+> `docs/verification/subject-module-sharing.md`. This repair and record are committed/pushed to
+> existing PR #37. Teacher reports hosted SQL success; hosted app rollout remains unverified.
+> Next: verify GitHub conflicts/checks and teacher review/merge; separately approve a plan for
+> CKB-063 if desired. No assistant merge, deployment or hosted action. Older draft-PR notes below
+> are history; #35 and #36 have since been merged by the teacher.
+
 > PR #36 refresh after #35 merged (2026-10-22): six documentation conflicts repaired on
 > main `3a59e99`. Both prerequisite and curriculum notes are retained. CKB-060 remains
 > prerequisites; CKB-061 remains curriculum. All 51 curriculum/fixture/test files are unchanged

@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { activityStateId } from "../backend/src/module-activities.ts";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/sample-module.codeshare.json", import.meta.url)));
 let local;
@@ -87,6 +88,28 @@ test("subject modules: one subject per class, one upload per teacher/subject, se
       const inB = await ok(await call(modulePath(b, `/${fixture.id}/progress`), studentCookie));
       assert.deepEqual(inB.stepStates, {}); assert.deepEqual(inB.projectFiles, []); assert.deepEqual(inB.performanceTask, {});
       assert.equal((await ok(await call(modulePath(mvc), teacherCookie)))[0].title, net.title);
+    });
+    await t.test("shared-only prerequisites unlock per class and never reuse another class's completion", async () => {
+      const before = { ...fixture, id: "shared-before", week: 1 };
+      const after = { ...fixture, id: "shared-after", week: 2, previousModuleId: before.id };
+      try {
+        for (const content of [before, after]) await ok(await call(modulePath(a), teacherCookie, "POST", content), 201);
+        const { count, error } = await admin.from("course_modules").select("id", { count: "exact", head: true }).in("classroom_id", [a, b]);
+        assert.equal(error, null); assert.equal(count, 0, "both classes use only the shared library");
+        const list = await ok(await call(modulePath(b), studentCookie));
+        assert.equal(list.find((row) => row.moduleId === after.id).moduleAccess.kind, "prerequisite");
+        assert.equal(list.find((row) => row.moduleId === after.id).moduleAccess.moduleId, before.id);
+        assert.equal((await call(modulePath(a, `/${after.id}`), studentCookie)).status, 403);
+        assert.equal((await call(modulePath(b, `/${after.id}/progress/activity`), studentCookie, "POST", { stepId: after.lessons[0].blocks[0].id })).status, 403);
+        const passes = Object.fromEntries(before.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step").map((step) => [activityStateId(step), "pass"]));
+        assert.equal((await admin.from("module_progress").insert({ classroom_id: a, student_id: users[1].id, module_id: before.id, step_states: passes })).error, null);
+        assert.equal((await call(modulePath(a, `/${after.id}`), studentCookie)).status, 200);
+        assert.equal((await call(modulePath(b, `/${after.id}`), studentCookie)).status, 403);
+        assert.equal((await ok(await call(modulePath(a), studentCookie))).find((row) => row.moduleId === after.id).moduleAccess, undefined);
+      } finally {
+        for (const content of [after, before]) await ok(await call(modulePath(a, `/${content.id}`), teacherCookie, "DELETE"));
+        assert.equal((await admin.from("module_progress").delete().eq("classroom_id", a).eq("student_id", users[1].id).in("module_id", [before.id, after.id])).error, null);
+      }
     });
     await t.test("old uploads stay readable before subject selection and remain backed up; conflicting sharing needs the selected current version", async () => {
       const { data, error } = await admin.from("classrooms").insert({ name: "Legacy uploads", subject: "Old class label", teacher_id: users[0].id, join_code: randomUUID().slice(0, 8).toUpperCase() }).select("id").single();

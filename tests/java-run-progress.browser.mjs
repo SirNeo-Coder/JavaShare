@@ -32,7 +32,7 @@ for (const mode of ["offline", "online"]) {
       }
       const context = await browser.newContext({ baseURL: mode === "offline" ? "http://localhost:3032" : "http://localhost:3030", viewport: { width: 1500, height: 1050 }, reducedMotion: "no-preference" });
       assert.equal((await context.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
-      const created = await context.request.post("/api/classes", { data: { name: `Java progress ${mode}` } });
+      const created = await context.request.post("/api/classes", { data: { subject: "Java", name: `Java progress ${mode}` } });
       assert.equal(created.status(), 201); classroomId = (await created.json()).id;
       assert.equal((await context.request.post(`/api/classrooms/${classroomId}/modules`, { data: fixture })).status(), 201);
       assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);

@@ -39,7 +39,7 @@ for (const mode of process.env.PREREQUISITE_BROWSER_MODE ? [process.env.PREREQUI
     const context = await browser.newContext({ baseURL: `http://localhost:${mode === "offline" ? 3022 : 3020}`, viewport: { width: 1500, height: 1050 } });
     const login = async (user) => assert.equal((await context.request.post("/api/auth/login", { data: { email: user.email, password } })).status(), 200);
     await login(users[0]);
-    const created = await context.request.post("/api/classes", { data: { name: "Disposable prerequisite browser class" } });
+    const created = await context.request.post("/api/classes", { data: { subject: "Java", name: "Disposable prerequisite browser class" } });
     assert.equal(created.status(), 201); classroomId = (await created.json()).id;
     assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);
     for (const content of contents) {
@@ -113,7 +113,7 @@ for (const mode of process.env.PREREQUISITE_BROWSER_MODE ? [process.env.PREREQUI
     await t.test("both Projects shortcuts recheck changed prerequisites and offer Continue without overwriting later work", async () => {
       for (const name of ["Module project", "Personal performance-task project"]) {
         const revised = structuredClone(contents[0]); revised.lessons[0].blocks[0].activity.id += "-revised";
-        assert.equal((await admin.from("course_modules").update({ content: revised }).eq("classroom_id", classroomId).eq("module_id", revised.id)).error, null);
+        assert.equal((await admin.from("subject_modules").update({ content: revised }).eq("teacher_id", users[0].id).eq("subject", "java").eq("module_id", revised.id)).error, null);
         await page.getByRole("button", { name: "Projects", exact: true }).click();
         await page.getByRole("button", { name, exact: true }).click();
         const notice = page.locator(".module-access-notice:visible");
@@ -123,13 +123,13 @@ for (const mode of process.env.PREREQUISITE_BROWSER_MODE ? [process.env.PREREQUI
         assert.equal(await editor.inputValue(), code(13));
         const later = (await admin.from("module_progress").select("project_files").eq("classroom_id", classroomId).eq("student_id", users[1].id).eq("module_id", contents[2].id).single()).data;
         assert.equal(later.project_files[0].content, "preserve Week 14");
-        await admin.from("course_modules").update({ content: contents[0] }).eq("classroom_id", classroomId).eq("module_id", contents[0].id);
+        await admin.from("subject_modules").update({ content: contents[0] }).eq("teacher_id", users[0].id).eq("subject", "java").eq("module_id", contents[0].id);
         await page.reload(); await page.locator(".classroom-workspace").waitFor(); await openCatalog(); await select(14);
         await worksheet.locator("article:not([hidden])").waitFor();
       }
     });
     await t.test("missing prerequisite has a teacher-upload message; teacher preview remains available", async () => {
-      await admin.from("course_modules").delete().eq("classroom_id", classroomId).eq("module_id", contents[1].id);
+      await admin.from("subject_modules").delete().eq("teacher_id", users[0].id).eq("subject", "java").eq("module_id", contents[1].id);
       await page.reload(); await page.locator(".classroom-workspace").waitFor(); await openCatalog(); await select(14);
       const notice = catalog.locator(".module-access-notice");
       assert.match(await notice.textContent(), /teacher needs to upload prerequisite module browser-prerequisite-13/);

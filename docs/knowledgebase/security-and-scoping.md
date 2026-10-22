@@ -92,3 +92,6 @@ changes and checks the matching course family on upload/import; database constra
 a Java/.NET mismatch. Existing unassigned classes remain compatible for reads, but must choose
 a subject before new uploads. Replacement imports require the current shared `updated_at` to
 avoid overwriting a concurrent correction. All student progress queries retain their class key.
+
+Prerequisite links resolve inside that same teacher/subject library. Completion is still looked
+up by student and class; finishing a shared week in one class never opens it in another class.

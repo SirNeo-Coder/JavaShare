@@ -1244,14 +1244,13 @@ async function loadStudentModuleAccess(user: SupabaseSessionUser, classroomId: s
   const db = getSupabaseAdmin();
   const [classroomResult, modulesResult, progressResult] = await Promise.all([
     db.from("classrooms").select("current_activity_id,active_module_id").eq("id", classroomId).maybeSingle(),
-    db.from("course_modules").select("module_id,content").eq("classroom_id", classroomId),
+    loadCourseModules(classroomId),
     db.from("module_progress").select("module_id,step_states").eq("student_id", user.id).eq("classroom_id", classroomId),
   ]);
   fail(classroomResult.error, "Could not check class status");
-  fail(modulesResult.error, "Could not check module prerequisites");
   fail(progressResult.error, "Could not check prerequisite completion");
   if (!classroomResult.data) throw new SupabaseRepositoryError(404, "Classroom not found");
-  const modules = new Map<string, CourseModule>(modulesResult.data.map((row) => [row.module_id, row.content as CourseModule]));
+  const modules = new Map<string, CourseModule>(modulesResult.map((row) => [row.module_id, row.content]));
   const states = new Map<string, Record<string, string>>(progressResult.data.map((row) => [row.module_id, row.step_states]));
   const classroom = classroomResult.data;
   return (module: CourseModule) => moduleAccessBlock(module, modules, states, classroom);

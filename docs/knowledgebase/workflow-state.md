@@ -321,3 +321,10 @@ approval. Module and personal projects, paper assessment and submitted snapshots
 - Local/offline and hosted databases have independent libraries. Sharing does not transfer files
   between them. Offline continues using laptop Java; no new remote assets or runner changes.
 - Setup and rollback limits: [subject-module-sharing-setup.md](../subject-module-sharing-setup.md).
+
+Earlier-week requirements use the shared subject set too. Upload each linked week once; a student
+still completes its tasks separately in each class, including after a shared correction.
+
+Known curriculum limit (CKB-063): original Weeks 18–21 reference predecessor ids without the
+actual -module suffix. The prerequisite message therefore blocks those links until the curriculum
+references are corrected in a separately approved change. The PR #37 repair preserves these files.

@@ -29,7 +29,7 @@ test("workspace drawers: real offline classroom pointer and keyboard interaction
     }
     const setup = await browser.newContext({ baseURL });
     assert.equal((await setup.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
-    const created = await setup.request.post("/api/classes", { data: { name: "Drawer browser verification" } });
+    const created = await setup.request.post("/api/classes", { data: { subject: "Java", name: "Drawer browser verification" } });
     assert.equal(created.status(), 201);
     const classroom = await created.json(); classroomId = classroom.id;
     assert.equal((await setup.request.post(`/api/classrooms/${classroomId}/modules`, { data: fixture })).status(), 201);
