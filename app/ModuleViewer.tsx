@@ -81,6 +81,11 @@ type PerformanceTask = {
 type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
 export type CourseModule = { continues?: string; sampleFirst?: boolean; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
 type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean; moduleAccess?: ModuleAccessBlock };
+export function sortModuleCatalog(modules: ModuleSummary[], summaries: Record<string, number>) {
+  return modules.toSorted((a, b) =>
+    Number(summaries[a.moduleId] === 100) - Number(summaries[b.moduleId] === 100) || a.week - b.week);
+}
+
 type StepStatus = "pass" | "fail";
 export type Progress = {
   moduleId: string;
@@ -502,7 +507,7 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
             )}
             {modules === null && <p>Loading…</p>}
             {modules?.length === 0 && <p>No module uploaded for this class yet.</p>}
-            {(drawer ? modules?.toSorted((a, b) => Number(Boolean(b.isActive)) - Number(Boolean(a.isActive)) || b.week - a.week) : modules)?.map((module) => (
+            {(drawer && modules ? sortModuleCatalog(modules, summaries) : modules)?.map((module) => (
               <div key={module.moduleId} className={`module-list-row${drawer ? " module-catalog-card" : ""}${drawer && module.isActive ? " module-weekly-card" : ""}`}>
                 {drawer ? <ModuleCatalogCard module={module} percent={summaries[module.moduleId] ?? 0} role={role} onOpen={() => module.moduleAccess ? setAccessBlock(module.moduleAccess) : openModule(module.moduleId)} /> : <button type="button" onClick={() => module.moduleAccess ? setAccessBlock(module.moduleAccess) : openModule(module.moduleId)}>Week {module.week} — {module.title}</button>}
                 {role === "teacher" && embedded && !drawer && <button type="button" className="danger-button" disabled={sharingSubject === undefined} onClick={() => removeModule(module.moduleId)}>Delete</button>}

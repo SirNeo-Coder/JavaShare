@@ -58,3 +58,7 @@ trigger the existing sign-in recovery even if their body is HTML; login/registra
 failures do not. Malformed successful responses are rejected, 204 stays empty, and
 requests are never automatically retried. CKB-064; tests/api-client.test.mjs and
 tests/api-client.browser.mjs. This changes error reporting, not service availability.
+Course modules ordering: `sortModuleCatalog` in `app/ModuleViewer.tsx` sorts drawer cards
+by saved completion (100% last), then increasing week. The weekly badge stays visible without
+overriding order. `tests/module-catalog-order.test.mjs` checks the rule;
+`tests/module-catalog-order.browser.mjs` checks the actual local app. CKB-066.
