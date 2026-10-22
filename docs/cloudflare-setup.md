@@ -108,3 +108,44 @@ The Cloudflare changes are on the branch `cloudflare-c2` (pull request c2). Beca
 ## Undoing
 
 Nothing here changes Supabase, Vercel, or Render. To stop using Cloudflare, delete the **codeshare** Worker in **Workers & Pages** (open it, then **Settings**, then **Delete**). In GitHub, under **Settings**, then **Applications**, you can also remove the Cloudflare app.
+
+## Module saves fail with exceededCpu
+
+CKB-065 (2026-10-22): the teacher supplied a failed module-project save with
+status 503, `outcome: exceededCpu`, `cpuTimeMs: 10` and `wallTimeMs: 404`.
+That request exhausted its CPU allowance. CPU is time executing code, separate
+from total request time, which includes waiting on Supabase.
+
+[Cloudflare's limits](https://developers.cloudflare.com/workers/platform/limits/#cpu-time)
+list 10 ms per request on Workers Free. This matches the invocation, although the
+account plan/effective setting has not been inspected. A working public health
+page does not establish that a heavier signed-in save stays within this limit.
+
+The teacher requires CodeShare to stay free. **No paid-plan change is approved.**
+
+1. Keep unsaved work in the editor; copy it locally before refreshing after a
+   failed save. A failed response does not establish whether a database write
+   happened, so reload saved progress carefully before trying again.
+2. Keep one cleaned example per failed route: status, outcome, CPU and total time.
+   Omit cookies, keys, account/trace ids, network identifiers and student information.
+3. Profile the existing app locally with representative Week 12–21 module content.
+   Compare cold/warm requests and identify actual CPU work before proposing changes.
+   [Cloudflare's profiling guide](https://developers.cloudflare.com/workers/observability/dev-tools/cpu-usage/)
+   explains local CPU profiling. Laptop/Node timing alone does not prove hosted CPU usage.
+4. Propose the smallest measured reduction, preserving class/student scope,
+   prerequisites, saved versions, draft backups and offline behavior. A local
+   cpu_ms setting cannot raise the Workers Free cap. Do not remove validation or
+   access checks just to make a request faster. Code changes need the normal plan approval.
+5. After the teacher reviews/merges an approved repair and the normal build runs,
+   check **Modules → Week 13 → Save work**, **Run code**, progress and reload on
+   the affected browser. Inspect the resulting Worker invocations for success and
+   CPU use. Check the other failed routes too; one save log does not prove their causes.
+
+The shared API error-message repair (CKB-064) prevents HTML parsing messages but
+does not reduce the server's CPU work. No hosted plan, limits, deployment, secrets
+or database changes have been made by the assistant.
+
+Local profiling is now complete. [Measured findings and the approval proposal](verification/free-worker-cpu-investigation.md)
+recommend small server-only module metadata reads and reusing the selected module
+within each request. This needs one new migration and server changes; neither is
+implemented or approved yet. Local profiles do not guarantee hosted requests fit 10 ms.
