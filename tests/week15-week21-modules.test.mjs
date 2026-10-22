@@ -10,11 +10,13 @@ import { test } from "node:test";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 import { executeLocallyResult } from "../backend/src/java-runner.ts";
 import { activityAccess, activityStateId, matchesActivityOutput, matchesSample, samplePending, sampleStateId } from "../backend/src/module-activities.ts";
+import { moduleAccessBlock } from "../backend/src/module-prerequisites.ts";
 
 const load = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url)));
 const originals = load("./fixtures/week15-week21-originals.json");
 const edits = load("./fixtures/week15-week21-task-edits.json");
-const modules = Array.from({ length: 7 }, (_, i) => load(`../docs/modules/week${15 + i}/Java2_Week_${15 + i}.codeshare.json`));
+const curriculum = Array.from({ length: 10 }, (_, i) => load(`../docs/modules/week${12 + i}/Java2_Week_${12 + i}.codeshare.json`));
+const modules = curriculum.filter((content) => content.week >= 15);
 const steps = (content) => content.lessons.flatMap((lesson) => lesson.blocks.filter((block) => block.type === "step"));
 const digest = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const exec = promisify(execFile);
@@ -29,10 +31,36 @@ const alter = (step) => step.files.map((file) => {
   return { ...file, content };
 });
 
+test("Weeks 12–21: actual curriculum links resolve and current tasks control ordered access", () => {
+  const available = new Map(curriculum.map((content) => [content.id, content]));
+  const states = new Map();
+  const quiet = { current_activity_id: null, active_module_id: null };
+  assert.equal(curriculum[0].previousModuleId, undefined);
+  for (const [index, content] of curriculum.entries()) {
+    if (index) assert.equal(content.previousModuleId, curriculum[index - 1].id, `Week ${content.week} must reference the actual preceding module id`);
+  }
+  for (const [index, content] of curriculum.entries()) {
+    assert.equal(moduleAccessBlock(content, available, states, quiet), undefined, `Week ${content.week} opens after its predecessors pass`);
+    const required = steps(content);
+    const passed = Object.fromEntries(required.map((step) => [activityStateId(step), "pass"]));
+    states.set(content.id, passed);
+    if (!required.length) continue; // Week 20 remains written work, without invented code tasks.
+    const first = required[0];
+    states.set(content.id, { ...passed, [activityStateId(first)]: "fail", [sampleStateId(first)]: "pass", [first.id]: "pass" });
+    for (const later of curriculum.slice(index + 1)) {
+      assert.equal(moduleAccessBlock(later, available, states, quiet)?.moduleId, content.id, `Week ${later.week} must wait for unfinished Week ${content.week}, despite sample/legacy passes`);
+    }
+    states.set(content.id, passed);
+  }
+  for (const content of curriculum) assert.equal(moduleAccessBlock(content, available, states, quiet), undefined);
+  available.delete(curriculum[5].id);
+  assert.equal(moduleAccessBlock(curriculum[6], available, states, quiet)?.kind, "missing", "completion cannot substitute for a missing upload");
+});
+
 for (const content of modules) {
   test(`Week ${content.week}: upload accepts additions and every original lesson value survives`, () => {
     const parsed = courseModule.parse(content), before = originals[content.week];
-    assert.equal(parsed.previousModuleId, `java-2-w${content.week - 1}`);
+    assert.equal(parsed.previousModuleId, curriculum.find((previous) => previous.week === content.week - 1).id);
     const restored = structuredClone(content);
     delete restored.previousModuleId;
     delete restored.sampleFirst;

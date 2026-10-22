@@ -44,3 +44,7 @@ instead of changing the sorting rule. Do not assume the weekly pick must appear 
 
 - 2026-10-22 — Teacher approved the read-only diagnosis and explicit increasing-week,
   unfinished-first proposal. Implemented the display change with no migrations.
+
+- 2026-10-22 — PR #40 conflict repair: current main `ce73db0` includes the CKB-063
+  curriculum correction. Resolved the three documentation overlaps by retaining the
+  corrected CKB-063 history and CKB-066 ordering notes. Application code had no conflict.

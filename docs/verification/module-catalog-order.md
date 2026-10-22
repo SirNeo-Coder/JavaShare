@@ -1,13 +1,13 @@
 # Module catalog ordering verification — 2026-10-22
 
-Branch: `codex/module-catalog-order`, based on main `21766ba`.
+Branch: `codex/module-catalog-order`, originally based on main `21766ba`; updated with main `ce73db0` after PR #38 merged.
 
 ## Results and limits
 
 - `npm run build:all`: passed (Next.js production build and backend TypeScript).
 - `npm run lint`: 0 errors, 8 existing warnings (image tags and an effect dependency).
-- `npm test`: 306 passed, 0 failed, 0 skipped. Full suite repeated with a reporter
-  before the file glob to capture the file grouping below; 306 passed again.
+- `npm test` after updating with main `ce73db0`: 307 passed, 0 failed, 0 skipped.
+  The original implementation passed 306/306 before main added the curriculum-link check.
 - `git diff --check`: passed.
 - `npm run classroom:offline -- --check`: local Supabase/offline configuration passed.
 - Initial isolated build failed because Next.js cannot resolve dependencies through a
@@ -35,11 +35,10 @@ completed, equal weeks and no modules. They do not go through sign-in or a brows
 
 ## Full suite: names grouped by file
 
-Commands: `npm test`, then
-`node --test --test-reporter=/tmp/module-order-reporter.mjs 'tests/*.test.mjs'`.
-The temporary reporter captured the runner's pass marks and names, grouped below.
-Backend tests use disposable local Supabase data where relevant; Java integration
-tests execute real laptop Java. UI rendering tests render components without a browser.
+Command after resolving the conflicts: `npm test`. All 307 runner pass marks and names
+from the final run are grouped by file below. Original rule-failure proof remains above.
+Backend tests use disposable local Supabase data where relevant; Java integration tests
+execute real laptop Java. UI rendering tests render components without a browser.
 
 ### tests/api-router.test.mjs
 
@@ -469,6 +468,7 @@ tests execute real laptop Java. UI rendering tests render components without a b
 ### tests/week15-week21-modules.test.mjs
 
 ```text
+✔ Weeks 12–21: actual curriculum links resolve and current tasks control ordered access
 ✔ Week 15: upload accepts additions and every original lesson value survives
 ✔ Week 16: upload accepts additions and every original lesson value survives
 ✔ Week 17: upload accepts additions and every original lesson value survives
@@ -561,3 +561,18 @@ the final test explicitly waits for the worksheet to close before pressing Run c
 as the existing prerequisite browser test does. The final rerun passed all checks.
 These initial failures are not counted as passes. Hosted and real-device testing remain
 unverified; online ordering shares the same client code but online Java was not retested.
+
+## PR #40 conflict resolution — 2026-10-22
+
+- Updated the working branch with main `ce73db0` (curriculum correction PR #38).
+- Only `workflow-state.md`, `problem-index.md` and `prompt-map/2026-10.md` conflicted.
+  Kept the corrected CKB-063 history and the CKB-066 ordering notes; removed obsolete
+  notes that said the curriculum correction still needed approval. No application conflict.
+- Compared the module-ordering component and both ordering tests with the pre-update
+  branch: identical. Compared the four corrected weekly JSON files and their two tests
+  with current main: identical. No student work or module identities changed.
+- Re-ran `npm run build:all`: passed; `npm run lint`: 0 errors/8 existing warnings;
+  `npm test`: 307/307, no skips; actual local browser test: 4/4.
+- Checked unresolved-file list and `git diff --check`: clear. Original deliberate-break
+  regression proof remains applicable because the ordering implementation did not change.
+- No PR merge into main, hosted changes, deployment or hosted re-test.

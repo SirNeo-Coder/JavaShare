@@ -1,6 +1,6 @@
 # CKB-063 — Later curriculum links do not match the uploaded module ids
 
-- Status: investigating; verified content mismatch, repair not approved
+- Status: resolved locally; teacher reports corrected uploads caused no problem; independent hosted verification pending
 - First recorded: 2026-10-22
 - Last verified: 2026-10-22
 - Area: Weeks 17–21 curriculum / cross-module prerequisites
@@ -21,11 +21,13 @@ preservation tests did not validate this complete actual-file chain.
 
 ## Durable solution
 
-Proposed for a separate approved repair: make predecessor references match existing uploaded ids,
-preserve module ids/student work, and test the complete actual curriculum chain. Do not weaken
-moduleAccessBlock or silently alias unrelated uploads. No lesson file was changed in PR #37 repair.
+Teacher-approved repair: change only Weeks 18–21 `previousModuleId` references to the actual
+preceding ids (`java-2-w17-module` through `java-2-w20-module`). Preserve module/activity ids and
+every other JSON byte. No guard, alias, lesson, schema, migration or runner change.
+Re-upload the four files through **Java class → Curriculum → Add module** with the same ids;
+[teacher instructions](../../curriculum-prerequisite-reupload.md) explain preservation and scope.
 
-## Regression proof
+## Discovery evidence before repair
 
 - tests/week15-week21.browser.mjs: every code week opens its first project with Java files only.
 - Command: node --test tests/week15-week21.browser.mjs (local production app, bundled Playwright).
@@ -33,8 +35,29 @@ moduleAccessBlock or silently alias unrelated uploads. No lesson file was change
   disposable prior passes; Week 18 still failed with HTTP 403 missing java-2-w17.
 - Diagnostic run: 3 passed / 3 failed including parent. A Week 17 feedback wait also timed out;
   that separate failure is undiagnosed. Diagnostic fixture changes were removed.
-- No fix applied, so no passing regression proof yet. Evidence/limits:
+- At discovery no fix or passing regression proof existed. Historical evidence/limits:
   docs/verification/subject-module-sharing.md, PR #37 repair on codex/subject-module-sharing.
+
+## Repair regression proof — 2026-10-22
+
+- `tests/week15-week21-modules.test.mjs` loads the actual Weeks 12–21, compares links to actual
+  predecessor ids and exercises the unchanged access check with unfinished/current/sample/legacy
+  records. Missing uploads still block. Week 20 remains written work.
+- The new regression failed before correction (`java-2-w17` versus `java-2-w17-module`) and passed
+  afterward. Each of the four wrong links was then independently restored: all four trials failed;
+  restoring the corrected files passed again. Every other JSON byte is unchanged against main.
+- `tests/week15-week21.browser.mjs` now supplies all ten real modules and disposable earlier passes.
+  Real routes block/unlock each affected code week, including Week 21 through written Week 20.
+  Browser Run code completes a Week 16 alteration and unlocks Week 17 while Week 18 stays blocked.
+  Teacher UI re-upload preserves the entire saved student row: module/personal drafts, sample and
+  retired task evidence, per-step history, backup and submitted snapshots.
+- Build/offline launcher build pass; lint 0 errors/8 existing warnings; full suite 303/303;
+  focused shared/prerequisite checks 26/26; curriculum browser 8/8, offline prerequisites 5/5,
+  subject sharing 7/7. No final failures or skips. Named checks/commands, initial build failure,
+  fixture setup limits and unverified areas: [verification](../../verification/curriculum-prerequisite-links.md).
+- The separate Week 17 feedback timeout did not recur locally; its cause is still unknown.
+  No feedback change was made. The teacher reports uploading the four corrections with no apparent
+  problem. Independent hosted recovery and physical offline devices are unverified.
 
 ## Recurrence triage
 
@@ -46,3 +69,14 @@ this mismatched reference. Keep student/class completion separate (CKB-010/060/0
 
 - 2026-10-22 — Found while repairing PR #37 conflicts. Recorded for teacher review; curriculum
   preserved exactly as merged. No app workaround or hosted change.
+
+- 2026-10-22 — Teacher approved the four-reference repair, actual-file regression, disposable
+  browser setup, preservation checks and PR delivery. Local repair verified on
+  `codex/curriculum-prerequisite-links`, based on merged shared-library main `21766ba`.
+  No hosted change, merge or deployment.
+
+- Delivered as `e162e87`, [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38).
+  Named local checks pass; teacher review and independent hosted verification remain open.
+
+- 2026-10-22 — Teacher reports: uploaded the corrected files and saw no apparent problem.
+  Recorded as teacher confirmation, not an independently observed hosted/student test.

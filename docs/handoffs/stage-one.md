@@ -1,3 +1,35 @@
+> Current CKB-063 repair — 2026-10-22
+>
+> Teacher approved correcting only the Week 18–21 predecessor references and preserving all
+> module/activity ids, lessons, code, outputs and student history. Branch:
+> `codex/curriculum-prerequisite-links`, based on main `21766ba` (shared-library PR #37 merged),
+> isolated checkout `/tmp/codeshare-curriculum-links`. The original checkout is untouched.
+>
+> Done: four `previousModuleId` corrections, actual Week 12–21 chain/access regression,
+> disposable browser uploads/completion setup, real ordered-unlock and exact saved-record
+> re-upload checks, teacher upload guide and CKB/index/workflow updates. App/server, prerequisite
+> rules, Java/Net MVC separation, schemas and migrations are unchanged. Every other JSON byte
+> and every other curriculum asset matches main.
+>
+> Verified: build and offline launcher build pass; lint 0 errors/8 existing warnings; full suite
+> 303/303, focused shared/prerequisite 26/26; real local curriculum browser 8/8, offline
+> prerequisites 5/5, subject sharing 7/7, no skips. Regression fails before correction and for
+> each independently restored bad link; corrected files pass again. Named checks and setup
+> failures: `docs/verification/curriculum-prerequisite-links.md`.
+>
+> Delivered: implementation `e162e87`, committed and pushed;
+> [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38) targets main and is open for review.
+> No code work remains in progress. Teacher reports uploading corrected Weeks 18–21 with no
+> apparent problem (2026-10-22). This is teacher confirmation, not an independent hosted/student
+> check. Next: teacher reviews the PR; retain the existing ids and prerequisite requirements.
+> Teacher guide: `docs/curriculum-prerequisite-reupload.md`. Student drafts, completions and
+> submitted snapshots stay saved; unfinished earlier tasks still block later weeks.
+>
+> Open: independent hosted/student recovery checks, physical offline devices, online/visible GUI behavior and
+> existing curriculum runtime limits. Week 17 feedback timeout did not recur locally; its cause
+> remains unknown and feedback code was not changed. No merge, deployment or hosted change.
+> Earlier PR #37 notes below are historical; its CKB-063 repair proposal is superseded here.
+
 > PR #37 integration refresh (2026-10-22): branch `codex/subject-module-sharing`, based on
 > main `82cd333` after PRs #35/#36 merged. Resolved documentation/UI/server conflicts while
 > retaining subject sharing and prerequisite gates. The prerequisite lookup now uses the same
@@ -618,3 +650,11 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   is open against main. No implementation work remains in progress.
 - Next: teacher reviews/merges #40 and rolls out the app. Hosted ordering and real
   classroom Wi-Fi remain unverified. No assistant merge, deployment or hosted setting changes.
+
+- PR #40 conflict update (2026-10-22): updated branch with main `ce73db0`, preserving
+  the completed CKB-063 curriculum correction and all module-ordering notes. Only three
+  documentation files conflicted; module-ordering code/tests and corrected JSON/tests
+  were verified unchanged. Build passed; lint 0 errors/8 existing warnings; 307/307 full
+  tests with no skips; real local browser 4/4. Resolution is committed and pushed on the
+  same branch for review. No implementation work remains; teacher review/merge/rollout
+  remain next. Named evidence is updated in `docs/verification/module-catalog-order.md`.
