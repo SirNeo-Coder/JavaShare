@@ -1,3 +1,34 @@
+> Current CKB-063 repair — 2026-10-22
+>
+> Teacher approved correcting only the Week 18–21 predecessor references and preserving all
+> module/activity ids, lessons, code, outputs and student history. Branch:
+> `codex/curriculum-prerequisite-links`, based on main `21766ba` (shared-library PR #37 merged),
+> isolated checkout `/tmp/codeshare-curriculum-links`. The original checkout is untouched.
+>
+> Done: four `previousModuleId` corrections, actual Week 12–21 chain/access regression,
+> disposable browser uploads/completion setup, real ordered-unlock and exact saved-record
+> re-upload checks, teacher upload guide and CKB/index/workflow updates. App/server, prerequisite
+> rules, Java/Net MVC separation, schemas and migrations are unchanged. Every other JSON byte
+> and every other curriculum asset matches main.
+>
+> Verified: build and offline launcher build pass; lint 0 errors/8 existing warnings; full suite
+> 303/303, focused shared/prerequisite 26/26; real local curriculum browser 8/8, offline
+> prerequisites 5/5, subject sharing 7/7, no skips. Regression fails before correction and for
+> each independently restored bad link; corrected files pass again. Named checks and setup
+> failures: `docs/verification/curriculum-prerequisite-links.md`.
+>
+> Local implementation and verification are complete. In progress: commit/push and PR delivery.
+> Next: teacher reviews the PR and uploads
+> only corrected Weeks 18–21 through **Java class → Curriculum → Add module**, keeping existing
+> ids. Earlier weeks must exist in that teacher's Java library. Refresh/reopen after saving edits.
+> Teacher guide: `docs/curriculum-prerequisite-reupload.md`. Student drafts, completions and
+> submitted snapshots stay saved; unfinished earlier tasks still block later weeks.
+>
+> Open: hosted re-upload/recovery, physical offline devices, online/visible GUI behavior and
+> existing curriculum runtime limits. Week 17 feedback timeout did not recur locally; its cause
+> remains unknown and feedback code was not changed. No merge, deployment or hosted change.
+> Earlier PR #37 notes below are historical; its CKB-063 repair proposal is superseded here.
+
 > PR #37 integration refresh (2026-10-22): branch `codex/subject-module-sharing`, based on
 > main `82cd333` after PRs #35/#36 merged. Resolved documentation/UI/server conflicts while
 > retaining subject sharing and prerequisite gates. The prerequisite lookup now uses the same

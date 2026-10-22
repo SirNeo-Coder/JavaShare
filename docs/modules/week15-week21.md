@@ -25,7 +25,9 @@ and match its separate target to earn **Completed**. Old sample passes cannot co
 baseline after a previous exercise; small Main.java forwarding files run existing named demos.
 Backups and data text files remain readable in the supporting-files folder rather than Java-only project arrays.
 
-The weekly links continue Week 14 through Week 21. Module and personal work remain separate.
+The weekly links continue Week 14 through Week 21. CKB-063 corrects only the Weeks 18–21
+predecessor references to the existing `-module` ids; the complete Week 12–21 chain is checked.
+[Re-upload the four corrected JSON files without resetting student work](../curriculum-prerequisite-reupload.md). Module and personal work remain separate.
 Week 20 remains written work: there are no invented code steps, console targets or automatic grades.
 
 ## Limits before classroom rollout

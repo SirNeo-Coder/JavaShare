@@ -325,6 +325,12 @@ approval. Module and personal projects, paper assessment and submitted snapshots
 Earlier-week requirements use the shared subject set too. Upload each linked week once; a student
 still completes its tasks separately in each class, including after a shared correction.
 
-Known curriculum limit (CKB-063): original Weeks 18–21 reference predecessor ids without the
-actual -module suffix. The prerequisite message therefore blocks those links until the curriculum
-references are corrected in a separately approved change. The PR #37 repair preserves these files.
+Curriculum reference correction (CKB-063, approved 2026-10-22): Weeks 18–21 now reference the
+actual preceding ids with their `-module` suffix. Week 12–21 links are checked against the real
+files. Re-upload the four corrected JSON files through **Java class → Curriculum → Add module**
+with the existing module/activity ids; all Java classes share the corrected content, while their
+student files, completions and submissions remain separate and unchanged. Refresh/reopen Modules
+after saving current edits. Full-chain prerequisites still apply, so unfinished earlier tasks
+continue to block later work. Week 20 remains written work. No migration or prerequisite-rule
+change. [Re-upload steps and limits](../curriculum-prerequisite-reupload.md). Hosted re-upload
+and recovery remain teacher actions and are unverified.
