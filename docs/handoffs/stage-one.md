@@ -16,6 +16,60 @@
 > recovery claim. Personal/submission/laptop paths must remain compatible. No merge,
 > deploy, hosted settings or hosted SQL. PR #39's error-message repair remains separate.
 
+> Latest clarified requirement (2026-10-22): teacher wants student Module project
+> code saved to the server only when the task completes successfully. Earlier
+> "local activities; sync later" direction is narrowed: task completion is the sync
+> point, rather than a generic later whole-module Sync progress workflow.
+> [Revised concrete proposal](../verification/local-module-practice-proposal.md)
+> is ready for explicit implementation approval. Online module drafts, sample
+> verification and unsuccessful runs stay local; one guarded completion checkpoint
+> saves exact successful code/progress, then unlocks the next step. Earlier completed
+> status must not make a later failed run overwrite successful code. Keep retry
+> evidence locally on failed sync and do not silently overwrite newer remote work.
+> Later locked steps remain server-withheld; downloading hidden future tasks is no
+> longer proposed. Essential sign-in/read requests remain. Include lightweight server
+> metadata/read reuse so the completion save does not reproduce CKB-065's CPU failure.
+> Expected scope: module browser/editor/callers/local draft helper, guarded server
+> checkpoint and one new migration; personal submissions/offline runner preserved.
+> CKB-065 and CKB-035 apply. No new app/schema/config/tests changed or run for this
+> proposal. Next: teacher approves/revises this plan under AGENTS.md. Branch
+> codex/api-service-errors / PR #39 still contains only the tested error-message repair
+> and investigation/proposal records; earlier error-message approval does not cover
+> this changed implementation. Original checkout/unrelated files remain untouched.
+
+> Approved service-error mitigation (2026-10-22): `codex/api-service-errors`, isolated
+> checkout `/tmp/codeshare-api-errors`, based on main `21766ba`. Teacher approved the
+> response-handling repair, regression proof, required checks and evidence-based 503
+> investigation after screenshots showed Module worksheet JSON parsing errors.
+> Done: the shared helper reports unreadable error responses with their HTTP status,
+> retains JSON/prerequisite details and normal session events, rejects malformed success
+> and does not retry writes. Protected HTML 401s now reach existing sign-in recovery.
+> Only app/apiClient.ts changes application behavior; callers needed no changes or cleanup.
+> Checks: offline launcher build (including build:all) passes; lint 0 errors/8 existing
+> warnings; full suite 311/311 with no skips; local production browser 4/4 including
+> unsaved-code preservation, retry, real laptop Java/sample completion and HTML 401 sign-out.
+> Original-helper regression proof: 6 fail/3 pass; restored helper 9/9. All names,
+> commands and limits: [verification](../verification/api-service-errors.md). CKB-064,
+> prompt map and frontend/workflow pages updated. Approval covers normal branch/PR delivery.
+> Diagnosis updated from teacher log: the module-project save was terminated by
+> Cloudflare for exceededCpu at 10 ms CPU / 404 ms total time (CKB-065). Earlier
+> health lookup used a misread hostname; corrected public health returns 200/connected.
+> This is not proof of module-save recovery. Account plan/effective CPU limit unknown;
+> teacher explicitly requires Free and requested CPU-reduction investigation.
+> Delivered: implementation `f256834` committed/pushed; [PR #39](https://github.com/SirNeo-Coder/JavaShare/pull/39)
+> is open against main and attached to the chat. GitHub connector PR creation returned
+> 403; existing gh login successfully created it. No merge or deployment.
+> Stay-free CPU investigation is complete: unchanged local Worker and direct-handler
+> control each ran 20-request phases with real Week 12–21 data. Full-library parsing
+> is a major measured cost; bypassing Next alone leaves most module cost. Candidate
+> metadata is 2,934 bytes versus 885,998 bytes full content, not a speed guarantee.
+> [Profile evidence and proposed next plan](../verification/free-worker-cpu-investigation.md).
+> Next: teacher review of #39 and explicit approval of metadata-only database reads
+> plus request-local module reuse. This requires one new migration and guarded server
+> changes; none is implemented/approved yet. Preserve access/version/progression rules.
+> No hosted CPU recovery claim. Temporary Worker/control/data/credentials are cleaned.
+> Physical Wi-Fi/disconnected operation and online CheerpJ were not rerun; local Java passed.
+> Original checkout and unrelated files remain untouched; temporary app/fixtures are cleaned.
 > Current CKB-063 repair — 2026-10-22
 >
 > Teacher approved correcting only the Week 18–21 predecessor references and preserving all

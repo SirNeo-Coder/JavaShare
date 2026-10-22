@@ -55,6 +55,13 @@ Continue Week N. `ModuleViewer`/`ModuleWorkspace` and both Projects shortcuts pr
 API restriction details through `ApiError`; Continue reuses saved-progress resume. Missing uploads
 and cycles display a repair message without an unusable Continue button. No navigation storage.
 
+Shared API errors (2026-10-22): `app/apiClient.ts` handles non-JSON error pages centrally.
+Callers show a CodeShare message with the HTTP status instead of a JSON parsing error.
+Server JSON messages and prerequisite details remain intact. Protected 401 responses
+trigger the existing sign-in recovery even if their body is HTML; login/registration
+failures do not. Malformed successful responses are rejected, 204 stays empty, and
+requests are never automatically retried. CKB-064; tests/api-client.test.mjs and
+tests/api-client.browser.mjs. This changes error reporting, not service availability.
 Course modules ordering: `sortModuleCatalog` in `app/ModuleViewer.tsx` sorts drawer cards
 by saved completion (100% last), then increasing week. The weekly badge stays visible without
 overriding order. `tests/module-catalog-order.test.mjs` checks the rule;

@@ -2,6 +2,19 @@
 
 What teachers and students can do today. Keep this page current when their use of CodeShare changes; no change-level classification is required.
 
+## Service error messages (2026-10-22)
+
+- If a request receives an HTML or empty error page, **Modules**, **Module worksheet**,
+  and other screens using the shared request helper show a readable CodeShare message
+  containing the failure status, for example **CodeShare could not complete the request
+  (503). Please try again.** Existing JSON explanations remain visible.
+- A protected request returning 401 still returns the classroom to **Sign in**, including
+  when its error body is HTML. Failed sign-in/registration does not trigger that recovery.
+- Error handling does not automatically retry saves or runs. A later deliberate retry
+  can succeed when service returns. This does not establish recovery from the reported
+  hosted save: its Worker log confirms CPU exhaustion at 10 ms (CKB-065).
+  A hosting-budget remedy or separately approved CPU investigation is still needed.
+
 ## Java code suggestions (2026-10-21)
 
 - In the classroom **Code editor**, **Module project**, and **Personal project**, typing two Java
