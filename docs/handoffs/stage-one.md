@@ -1,4 +1,19 @@
-> Active approved completion-only module saving (2026-10-22): teacher explicitly
+> Current module draft recovery (2026-10-23): teacher approved fixing the three review findings.
+> Branch `codex/module-draft-recovery`, isolated managed worktree, based on main `fc0972c`
+> after PR #41 merged. Expected-error sample verification survives reopening; changed/legacy
+> drafts retain readable code backups and lose obsolete evidence; pending sync no longer claims
+> completion. The module picker and editor refresh stale content before restoring current work.
+> CKB-067/068/069 record the defects. No schema or backend changes; personal projects remain separate.
+> Verification: 329/329 full suite, 7/7 actual production browser checks, 9/9 focused rule/render
+> checks after three deliberately failing mutations. Online runner/503 responses are controlled;
+> offline uses real laptop javac. Build:all passes; lint has 0 errors and 8 existing warnings;
+> offline launcher configuration check passes. Every named result, initial failures, and limits:
+> [module draft recovery verification](../verification/module-draft-recovery.md).
+> Implementation and verification are complete. Delivery: commit/push this branch and open its PR
+> against main, then record that PR here. Teacher review/rollout remain next. No assistant merge,
+> deployment or hosted settings/SQL. Hosted CPU, real CheerpJ and physical Wi-Fi are unverified.
+
+> Earlier completion-only module saving (2026-10-22): teacher explicitly
 > approved the combined plan: cache downloaded lessons/local unfinished drafts,
 > save online Module project code only after task success, and lighten server checks.
 > Branch codex/module-completion-saves starts at current main 23053f1; isolated

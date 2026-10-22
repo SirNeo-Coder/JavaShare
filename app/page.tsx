@@ -1721,12 +1721,14 @@ export default function Home() {
         ...(step ? {} : { method: "POST", body: JSON.stringify({}) }),
       });
       // The worksheet may have been opened before the final module step unlocked the task.
-      const currentModule = step ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
+      const currentModule = step && module.moduleVersion === progress.moduleVersion ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
+      const currentStep = step ? currentModule.lessons.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === step.id) : undefined;
+      if (step && (!currentStep || currentModule.moduleVersion !== progress.moduleVersion)) throw new Error("This lesson changed while opening. Reopen it to load the current sample; your device draft is kept.");
       setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
       setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
-        classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "", studentId: user.id,
-        instruction: step ? activityTask(step).instruction : currentModule.performanceTask?.markdown ?? "",
-        expectedOutput: step ? activityTask(step).expectedOutput : "", stdin: step ? activityTask(step).stdin ?? "" : "", progress });
+        classroomId, moduleId: module.id, moduleTitle: currentModule.title, stepId: currentStep?.id ?? "", stateId: currentStep ? activityStateId(currentStep) : "", studentId: user.id,
+        instruction: currentStep ? activityTask(currentStep).instruction : currentModule.performanceTask?.markdown ?? "",
+        expectedOutput: currentStep ? activityTask(currentStep).expectedOutput : "", stdin: currentStep ? activityTask(currentStep).stdin ?? "" : "", progress });
       setProjectsOpen(false);
       setModuleAccessError(null);
     } catch (error) {

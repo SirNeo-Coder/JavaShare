@@ -29,3 +29,14 @@ test("module feedback: sample-first editor shows baseline target before allowing
   assert.match(html, /Run the sample first/); assert.match(html, /Expected sample output/); assert.match(html, /SAMPLE OUTPUT/);
   assert.match(html, /readOnly=/); assert.doesNotMatch(html, /TASK OUTPUT/);
 });
+
+test("module feedback: local passes wait for server acceptance even after an earlier completion", () => {
+  for (const completed of [false, true]) {
+    const result = { check: "task", passed: true, success: true, sampleMatched: false, syncPending: true };
+    const pending = render({ result, completed });
+    assert.match(pending, /Passed locally — awaiting sync/);
+    assert.match(pending, /next activity opens after CodeShare accepts/);
+    assert.doesNotMatch(pending, /Completed|next activity unlocked|module-run-feedback passed/);
+    assert.match(render({ result: { ...result, syncPending: false }, completed: true }), /Completed — next activity unlocked/);
+  }
+});

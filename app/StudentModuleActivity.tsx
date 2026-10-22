@@ -8,8 +8,8 @@ import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import type { CourseModule, ModuleFile, Progress, StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
-import { checkModuleRun, samplePending, sampleStateId, sourcePath } from "../backend/src/module-activities";
-import { moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
+import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath } from "../backend/src/module-activities";
+import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 
 export type StudentActivity = {
   kind: "module" | "performance"; module: CourseModule;
@@ -18,13 +18,14 @@ export type StudentActivity = {
 };
 export type ModuleEditorHandle = { save: () => Promise<void> };
 
-type RunCheck = { check: "sample" | "task"; passed: boolean; sampleMatched: boolean; success: boolean };
+type RunCheck = { check: "sample" | "task"; passed: boolean; sampleMatched: boolean; success: boolean; syncPending?: boolean };
 
 export function ModuleRunFeedback({ result, completed, pendingSample, expectedError }: {
   result: RunCheck | null; completed: boolean; pendingSample: boolean; expectedError?: string;
 }) {
-  const good = result?.passed ?? completed;
-  const title = result?.check === "sample" ? result.passed
+  const good = !result?.syncPending && (result?.passed ?? completed);
+  const title = result?.syncPending ? "Passed locally — awaiting sync."
+    : result?.check === "sample" ? result.passed
     ? expectedError ? "Expected error observed — now complete Your task." : "Sample verified — now complete Your task."
     : "Sample not verified — run the supplied sample unchanged."
     : result ? result.passed ? "Completed — next activity unlocked."
@@ -33,6 +34,7 @@ export function ModuleRunFeedback({ result, completed, pendingSample, expectedEr
       : completed ? "Completed — your progress is saved." : pendingSample ? "First, run the sample unchanged." : "Not checked yet — complete Your task, then Run code.";
   return <div className={`module-run-feedback ${good ? "passed" : result ? "retry" : "ready"}`} role="status" aria-live="polite">
     <strong>{title}</strong>
+    {result?.syncPending && <p>Your code is kept on this device. The next activity opens after CodeShare accepts this completion.</p>}
     {result?.check === "sample" && result.passed && <p>Sample verification is saved. This step stays open until your alteration matches Expected task output.</p>}
     {result && !result.passed && <p>{completed ? "This task was completed earlier. Your saved completion remains." : "Progress has not advanced. Compare Actual output with the expected output above."}</p>}
   </div>;
@@ -72,7 +74,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
   const [deviceReady, setDeviceReady] = useState(personal);
   const localKey = moduleRecordKey("activity", activity.studentId, activity.classroomId, activity.moduleId, activity.stepId);
-  const draftRef = useRef<{ sample?: { files: ModuleFile[]; success: boolean; output: string }; pending?: Record<string, unknown> }>({});
+  const draftRef = useRef<Omit<ModuleDeviceDraft, "files">>({ moduleVersion: activity.progress.moduleVersion, stateId: activity.stateId });
+  const [backups, setBackups] = useState<ModuleDeviceDraft["backups"]>([]);
   const runnerRef = useRef<Awaited<ReturnType<typeof getJavaRunner>> | null>(null);
   const busyRef = useRef(false);
   const base = `/api/classrooms/${activity.classroomId}/modules/${activity.moduleId}/progress`;
@@ -92,19 +95,30 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   useEffect(() => {
     if (personal) return;
     let active = true;
-    void readDeviceRecord<{ files: ModuleFile[]; sample?: { files: ModuleFile[]; success: boolean; output: string }; pending?: Record<string, unknown> }>(localKey).then((draft) => {
+    void readDeviceRecord<ModuleDeviceDraft>(localKey).then(async (saved) => {
       if (!active) return;
-      if (draft) {
-        setFiles(draft.files);
-        setPath(draft.files.find((file) => /(?:^|\/)Main\.java$/.test(file.path))?.path ?? draft.files[0]?.path ?? "");
-        setSavedFiles(JSON.stringify(draft.files));
-        draftRef.current = { sample: draft.sample, pending: draft.pending };
-        if (draft.sample?.success) setStepStates((current) => ({ ...current, [sampleStateId(step!)]: "pass" }));
+      if (step) {
+        const needsSample = samplePending(activity.module, step, activity.progress.stepStates);
+        const draft = restoreModuleDraft(saved, { files: needsSample ? mergeProjectFiles(activity.progress.projectFiles, step.files) : activity.progress.projectFiles,
+          moduleVersion: activity.progress.moduleVersion, stateId: activity.stateId }, step, needsSample);
+        await writeDeviceRecord(localKey, draft);
+        if (!active) return;
+        const { files: restoredFiles, ...evidence } = draft;
+        setFiles(restoredFiles);
+        setPath(restoredFiles.find((file) => /(?:^|\/)Main\.java$/.test(file.path))?.path ?? restoredFiles[0]?.path ?? "");
+        setSavedFiles(JSON.stringify(restoredFiles));
+        draftRef.current = evidence;
+        setBackups(draft.backups);
+        if (draft.sample) setStepStates((current) => ({ ...current, [sampleStateId(step)]: "pass" }));
+        if (draft.pending) {
+          setLastCheck({ check: "task", passed: true, sampleMatched: false, success: true, syncPending: true });
+          setStatus("Passed locally — awaiting sync");
+        }
       }
     }).catch((storageError) => setError(storageError instanceof Error ? `Device storage is unavailable: ${storageError.message}` : "Device storage is unavailable"))
       .finally(() => { if (active) setDeviceReady(true); });
     return () => { active = false; };
-  }, [localKey, personal, step]);
+  }, [activity.module, activity.progress, activity.stateId, localKey, personal, step]);
 
   const save = async () => {
     if (busyRef.current) throw new Error("Wait for the current save or run to finish");
@@ -143,9 +157,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           if (result.passed) onChecked();
         } else {
           const result = await runJava(files, checkInput, runner);
-          const localStates = { ...stepStates, ...(draftRef.current.sample?.success ? { [sampleStateId(step!)]: "pass" as const } : {}) };
-          const check = checkModuleRun(activity.module, { ...step!, activity: step!.activity ? { ...step!.activity, stdin: step!.activity.stdin ?? "" } : undefined } as Parameters<typeof checkModuleRun>[1], localStates, files, result);
-          setOutput(result.output); setLastCheck({ ...check, success: result.success });
+          const check = checkModuleRun(activity.module, { ...step!, activity: step!.activity ? { ...step!.activity, stdin: step!.activity.stdin ?? "" } : undefined } as Parameters<typeof checkModuleRun>[1], stepStates, files, result);
+          setOutput(result.output); setLastCheck({ ...check, success: result.success, syncPending: check.check === "task" && check.passed });
           if (check.check === "sample" && check.passed) {
             draftRef.current.sample = { files, success: result.success, output: result.output };
             setStepStates((current) => ({ ...current, [sampleStateId(step!)]: "pass" }));
@@ -162,12 +175,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
             await writeDeviceRecord(moduleRecordKey("content", activity.studentId, activity.classroomId, activity.moduleId), { value: synced.module, savedAt: Date.now() });
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setStepStates(progress.current.stepStates); setStatus("Completed — saved to CodeShare"); onChecked();
+            setLastCheck((current) => current ? { ...current, syncPending: false } : current);
           } else setStatus(check.check === "sample" ? "Sample not verified" : "Try again");
         }
       }
     } catch (runError) {
       setError(runError instanceof Error ? runError.message : "Could not run this activity");
-      if (draftRef.current.pending) setStatus("Completed on this device — sync pending");
+      if (draftRef.current.pending) setStatus("Passed locally — awaiting sync");
     } finally { busyRef.current = false; setBusy(false); setRunMessage(null); }
   };
 
@@ -183,6 +197,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         await writeDeviceRecord(moduleRecordKey("content", activity.studentId, activity.classroomId, activity.moduleId), { value: synced.module, savedAt: Date.now() });
         await writeDeviceRecord(localKey, { files, ...draftRef.current });
         setStepStates(synced.progress.stepStates); setStatus("Completed — saved to CodeShare"); onChecked();
+        setLastCheck((current) => current ? { ...current, syncPending: false } : current);
       } catch (syncError) { setError(syncError instanceof Error ? syncError.message : "Could not sync completed task"); }
       finally { busyRef.current = false; setBusy(false); }
     };
@@ -227,7 +242,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
           <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>
         </div>
-        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={busy || pendingSample} onChange={(content) => setFiles((current) => current.map((file) => file.path === path ? { ...file, content } : file))} />
+        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={busy || pendingSample || !deviceReady} onChange={(content) => setFiles((current) => current.map((file) => file.path === path ? { ...file, content } : file))} />
         <div className="editor-status"><span>{path}</span><span>{dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
       </section>
       <aside className="right-panel module-activity-console">
@@ -241,6 +256,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           }} /></label> : <><b>{pendingSample ? step?.expectedError ? "Expected error" : "Expected sample output" : task ? "Expected task output" : "Expected output"}</b><pre>{pendingSample ? step?.expectedError ?? step?.expectedOutput : activity.expectedOutput}</pre></>}
           {checkInput && <><b>Program input for this check</b><pre>{checkInput}</pre></>}
           {!personal && activity.progress.activityProjects?.beforeSampleFiles && <details className="module-before-sample"><summary>Work saved before sample loading</summary>{activity.progress.activityProjects.beforeSampleFiles.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</details>}
+          {!personal && Boolean(backups?.length) && <details className="module-before-sample"><summary>Work saved before lesson changes</summary><p>Your earlier code is kept below. Run the current sample first, then copy any changes you still need.</p>{backups?.map((backup, index) => <div key={index}><b>Backup {index + 1}</b>{backup.files.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</div>)}</details>}
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>

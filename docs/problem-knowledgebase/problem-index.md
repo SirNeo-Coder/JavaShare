@@ -4,6 +4,9 @@ Search symptoms, user wording, features, and test language here first.
 
 | Case | Symptom and search terms | Root-cause class | Status | Evidence |
 | --- | --- | --- | --- | --- |
+| [CKB-067](cases/CKB-067-error-sample-draft-reload.md) | verified expected error lost on reload, alteration read-only | execution success used as verification | resolved locally | draft unit mutation and online/offline browser |
+| [CKB-068](cases/CKB-068-stale-device-draft-evidence.md) | corrected lesson restores old code/evidence or wrong step | missing draft identity/version; stale lesson with fresh progress | resolved locally | draft unit mutation and teacher-correction browser |
+| [CKB-069](cases/CKB-069-completion-banner-before-sync.md) | Completed banner while sync fails | local pass displayed before server acceptance | resolved locally | feedback mutation and browser retry |
 | [CKB-001](cases/CKB-001-login-subtitle-still-says-java.md) | login card says "Collaborative Java classroom" after rename, old name, JavaShare leftover, sign-in screen text | missed literal during rename | resolved, checked on screen | `ee95ef2` (PR #1) |
 | [CKB-002](cases/CKB-002-web-preview-wrong-line-numbers.md) | web preview console wrong line number, error points to wrong line, line off by one, after stylesheet or script tag | line-mapping logic claimed an empty line early | resolved, unit tests failed before fix | `5ca6334` (PR #2) |
 | [CKB-003](cases/CKB-003-web-project-says-java-files.md) | sidebar says "3 Java file(s)" for a web project, Repository count wrong language | hard-coded Java wording | resolved, checked on screen | `02bb903` (PR #2) |
