@@ -3,6 +3,9 @@
 Branch: `codex/curriculum-prerequisite-links`, based on main `21766ba` after shared-library
 PR #37 merged. Teacher approved the repair plan in this chat. No merge, deployment, hosted
 upload/settings/SQL, migration or real student record was changed.
+Implementation `e162e87` is pushed; [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38)
+is open for teacher review. The GitHub connector refused PR creation with HTTP 403; the
+authenticated GitHub CLI created it successfully. Temporary test servers were stopped.
 
 ## Outcome
 
@@ -647,4 +650,3 @@ Command: `sg docker -c 'npm test'`.
 - ✔ weekly Java editor: module shows sample output and only module source
 - ✔ weekly Java editor: personal shows its own source, input and explicit submission
 - ✔ weekly Java editor: alteration shows its own target and remembers completed tasks
-

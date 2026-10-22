@@ -17,8 +17,9 @@
 > each independently restored bad link; corrected files pass again. Named checks and setup
 > failures: `docs/verification/curriculum-prerequisite-links.md`.
 >
-> Local implementation and verification are complete. In progress: commit/push and PR delivery.
-> Next: teacher reviews the PR and uploads
+> Delivered: implementation `e162e87`, committed and pushed;
+> [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38) targets main and is open for review.
+> No code work remains in progress. Next: teacher reviews the PR and uploads
 > only corrected Weeks 18–21 through **Java class → Curriculum → Add module**, keeping existing
 > ids. Earlier weeks must exist in that teacher's Java library. Refresh/reopen after saving edits.
 > Teacher guide: `docs/curriculum-prerequisite-reupload.md`. Student drafts, completions and

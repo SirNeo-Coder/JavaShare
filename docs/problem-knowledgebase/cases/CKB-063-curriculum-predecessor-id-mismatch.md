@@ -73,3 +73,6 @@ this mismatched reference. Keep student/class completion separate (CKB-010/060/0
   browser setup, preservation checks and PR delivery. Local repair verified on
   `codex/curriculum-prerequisite-links`, based on merged shared-library main `21766ba`.
   No hosted change, merge or deployment.
+
+- Delivered as `e162e87`, [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38).
+  Named local checks pass; teacher review/re-upload and hosted verification remain open.
