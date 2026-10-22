@@ -11,6 +11,7 @@ import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
 import { activityStateId } from "../backend/src/module-activities";
 import ModuleCatalogCard from "./ModuleCatalogCard";
+import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
 // CodeEditor (the full syntax-highlighted editor) renders invisible text when there are many
 // small instances nested inside this scrollable modal - confirmed in the browser (DOM and
@@ -79,7 +80,7 @@ type PerformanceTask = {
   totalPoints: number;
 };
 type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
-export type CourseModule = { continues?: string; sampleFirst?: boolean; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
+export type CourseModule = { moduleVersion?: string; continues?: string; sampleFirst?: boolean; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
 type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean; moduleAccess?: ModuleAccessBlock };
 export function sortModuleCatalog(modules: ModuleSummary[], summaries: Record<string, number>) {
   return modules.toSorted((a, b) =>
@@ -93,6 +94,7 @@ export type Progress = {
   performanceProjectFiles: ModuleFile[];
   percent: number;
   updatedAt: string;
+  moduleVersion?: string;
   activityProjects?: import("../backend/src/module-activities").ActivityProjects;
   // Covers both step blocks and a lesson's exitSlip, keyed by whichever's own "id" - one flag
   // per module couldn't tell lessons apart (CKB-007).
@@ -100,7 +102,7 @@ export type Progress = {
   performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>>;
 };
 
-type Props = { onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
+type Props = { studentId?: string; onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
 
 function isStepBlock(block: Block): block is StepBlock {
   return block.type === "step";
@@ -400,7 +402,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   );
 }
 
-export default function ModuleViewer({ role, classroomId, initialModuleId, embedded = false, drawer = false, active = true, worksheet = false, onOpenModule, onClose, onStartActivity, progressRevision = 0 }: Props) {
+export default function ModuleViewer({ role, classroomId, studentId, initialModuleId, embedded = false, drawer = false, active = true, worksheet = false, onOpenModule, onClose, onStartActivity, progressRevision = 0 }: Props) {
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [selected, setSelected] = useState<CourseModule | null>(null);
   const [accessBlock, setAccessBlock] = useState<ModuleAccessBlock | null>(null);
@@ -410,17 +412,34 @@ export default function ModuleViewer({ role, classroomId, initialModuleId, embed
   const [summaries, setSummaries] = useState<Record<string, number>>({});
   const fileInput = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (role !== "student" || !studentId || !selected) return;
+    let active = true;
+    void readDeviceRecord<{ value: CourseModule; savedAt: number }>(moduleRecordKey("content", studentId, classroomId, selected.id))
+      .then((cached) => { if (active && cached && JSON.stringify(cached.value) !== JSON.stringify(selected)) setSelected(cached.value); })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [classroomId, progressRevision, role, selected, studentId]);
+
   const openModule = useCallback((moduleId: string) => {
     setAccessBlock(null);
     if (onOpenModule) { onOpenModule(moduleId); return; }
     setError(null);
-    api<CourseModule>(`/api/classrooms/${classroomId}/modules/${moduleId}`)
-      .then(setSelected)
-      .catch((loadError) => {
+    void (async () => {
+      const key = studentId && role === "student" ? moduleRecordKey("content", studentId, classroomId, moduleId) : "";
+      const cached = key ? await readDeviceRecord<{ value: CourseModule; savedAt: number }>(key).catch(() => null) : null;
+      if (cached && isFreshDeviceRecord(cached)) { setSelected(cached.value); return; }
+      try {
+        const value = await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${moduleId}`);
+        setSelected(value);
+        if (key) await writeDeviceRecord(key, { value, savedAt: Date.now() }).catch(() => undefined);
+      } catch (loadError) {
+        if (cached && !(loadError instanceof ApiError)) { setSelected(cached.value); return; }
         if (loadError instanceof ApiError && loadError.moduleAccess) { setSelected(null); setAccessBlock(loadError.moduleAccess); }
         else setError(loadError instanceof Error ? loadError.message : "Could not load module");
-      });
-  }, [classroomId, onOpenModule]);
+      }
+    })();
+  }, [classroomId, onOpenModule, role, studentId]);
 
   const refreshList = useCallback(() => {
     api<ModuleSummary[]>(`/api/classrooms/${classroomId}/modules`)

@@ -1,3 +1,21 @@
+> Active approved completion-only module saving (2026-10-22): teacher explicitly
+> approved the combined plan: cache downloaded lessons/local unfinished drafts,
+> save online Module project code only after task success, and lighten server checks.
+> Branch codex/module-completion-saves starts at current main 23053f1; isolated
+> checkout /tmp/codeshare-api-errors reuses dependencies. Original checkout untouched.
+> Server step done: service-role-only lightweight metadata, selected-module read reuse,
+> read-only step preparation and one guarded/idempotent completion checkpoint. New
+> migration 20261022000200 applied locally only; teacher rollout/rollback guide is
+> docs/module-completion-setup.md. Old endpoints/teacher response shapes preserved.
+> Checks: build:all passes; focused existing module integration checks 67/67, extended
+> completion checks 7/7, no skips. Deliberate opening-write mutation fails the regression;
+> restored checks pass. CKB-065, backend KB and approved AGENTS rule updated.
+> In progress/next: device content/draft storage, local sample/task checking and
+> completion-only editor/caller integration, request-count/conflict/browser/offline
+> checks, full build/lint/suite, repeated Worker profile, final PR. No hosted CPU
+> recovery claim. Personal/submission/laptop paths must remain compatible. No merge,
+> deploy, hosted settings or hosted SQL. PR #39's error-message repair remains separate.
+
 > Latest clarified requirement (2026-10-22): teacher wants student Module project
 > code saved to the server only when the task completes successfully. Earlier
 > "local activities; sync later" direction is narrowed: task completion is the sync
@@ -712,3 +730,24 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   tests with no skips; real local browser 4/4. Resolution is committed and pushed on the
   same branch for review. No implementation work remains; teacher review/merge/rollout
   remain next. Named evidence is updated in `docs/verification/module-catalog-order.md`.
+
+## Module CPU reduction — 2026-10-22
+
+- Teacher approved keeping CodeShare on the free plan by caching module content and
+  unfinished module work on each student's device, then saving module code only after
+  a successful task. Personal performance-task saves remain unchanged.
+- Branch: `codex/module-completion-saves`, based on the guarded completion checkpoint
+  groundwork in `20dfbd9`. Work is isolated in `/tmp/codeshare-api-errors-recovery`.
+- Done: read-only module preparation, student/class-scoped device cache, local module
+  drafts and sample evidence, one validated online completion checkpoint, same-id retry
+  after sync failure, and updated filtered cache content in the successful response.
+  Offline still uses classroom-laptop Java; only successful module results are saved.
+- Verified: full suite 316/316 with no skips; lint 0 errors/8 existing warnings;
+  Next.js/backend and offline launcher builds pass; online production browser 9/9.
+  Regression mutation of the old pre-run save fails as expected and passes after restore.
+  Offline browser attempt was interrupted before reporting cases; see
+  `docs/verification/module-completion-saves.md` for exact evidence and limits.
+- Delivered: implementation `869333e` is committed and pushed; [PR #41](https://github.com/SirNeo-Coder/JavaShare/pull/41)
+  is open against main. Next: teacher reviews the branch and decides whether to deploy.
+  No hosted settings, database, or deployment were changed; free-plan CPU recovery and
+  physical classroom Wi-Fi remain unverified.

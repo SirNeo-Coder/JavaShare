@@ -26,9 +26,13 @@
 The browser calls the server with `api()` in `app/page.tsx` (cookies included) and joins live channels through `realtimeClient()` in `app/realtime.ts`.
 
 Online Java uses shared `app/javaExecution.ts` from practice/classroom Run code,
-StudentModuleActivity (module and personal), and ModuleViewer previews. Module runs
-save first, run in browser when configured, then report success/output with saved
-version. Personal/practice runs do not write module completion. JavaRunnerBrand uses
+StudentModuleActivity (module and personal), and ModuleViewer previews. Module activity
+files and sample verification stay in per-student IndexedDB drafts; browser runs check
+locally and only successful task completion sends a guarded checkpoint. The response
+includes the newly unlocked, server-filtered module view and refreshes the local cache.
+Offline runs still use the laptop runner and sync successful results to local Supabase.
+The separate personal performance project keeps its existing server-save and submission
+behavior. JavaRunnerBrand uses
 a locally served CheerpJ logo and is shown only after online execution is requested.
 
 `StudentModuleActivity.tsx` shows `JavaRunProgress` immediately above **Actual output** for

@@ -1,6 +1,6 @@
 "use client";
 
-import { useImperativeHandle, useRef, useState, type Ref } from "react";
+import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref } from "react";
 import CodeEditor from "./CodeEditor";
 import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
@@ -8,11 +8,12 @@ import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import type { CourseModule, ModuleFile, Progress, StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
-import { sourcePath, samplePending } from "../backend/src/module-activities";
+import { checkModuleRun, samplePending, sampleStateId, sourcePath } from "../backend/src/module-activities";
+import { moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
 export type StudentActivity = {
   kind: "module" | "performance"; module: CourseModule;
-  classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string;
+  classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string; studentId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
 };
 export type ModuleEditorHandle = { save: () => Promise<void> };
@@ -69,52 +70,126 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const completed = !personal && stepStates[activity.stateId] === "pass";
   const checkInput = pendingSample ? step?.stdin ?? "" : activity.stdin;
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
+  const [deviceReady, setDeviceReady] = useState(personal);
+  const localKey = moduleRecordKey("activity", activity.studentId, activity.classroomId, activity.moduleId, activity.stepId);
+  const draftRef = useRef<{ sample?: { files: ModuleFile[]; success: boolean; output: string }; pending?: Record<string, unknown> }>({});
+  const runnerRef = useRef<Awaited<ReturnType<typeof getJavaRunner>> | null>(null);
   const busyRef = useRef(false);
   const base = `/api/classrooms/${activity.classroomId}/modules/${activity.moduleId}/progress`;
   const projectPath = `${base}/${personal ? "performance-project" : "project"}`;
   const dirty = JSON.stringify(files) !== savedFiles;
+  const saveDeviceDraft = useCallback(async (nextFiles = files) => {
+    await writeDeviceRecord(localKey, { files: nextFiles, ...draftRef.current });
+    setSavedFiles(JSON.stringify(nextFiles));
+  }, [files, localKey]);
+
+  useEffect(() => {
+    if (personal || !deviceReady) return;
+    const timer = setTimeout(() => { void saveDeviceDraft().catch((storageError) => setError(storageError instanceof Error ? `Device storage is unavailable: ${storageError.message}` : "Device storage is unavailable")); }, 250);
+    return () => clearTimeout(timer);
+  }, [files, deviceReady, personal, saveDeviceDraft]);
+
+  useEffect(() => {
+    if (personal) return;
+    let active = true;
+    void readDeviceRecord<{ files: ModuleFile[]; sample?: { files: ModuleFile[]; success: boolean; output: string }; pending?: Record<string, unknown> }>(localKey).then((draft) => {
+      if (!active) return;
+      if (draft) {
+        setFiles(draft.files);
+        setPath(draft.files.find((file) => /(?:^|\/)Main\.java$/.test(file.path))?.path ?? draft.files[0]?.path ?? "");
+        setSavedFiles(JSON.stringify(draft.files));
+        draftRef.current = { sample: draft.sample, pending: draft.pending };
+        if (draft.sample?.success) setStepStates((current) => ({ ...current, [sampleStateId(step!)]: "pass" }));
+      }
+    }).catch((storageError) => setError(storageError instanceof Error ? `Device storage is unavailable: ${storageError.message}` : "Device storage is unavailable"))
+      .finally(() => { if (active) setDeviceReady(true); });
+    return () => { active = false; };
+  }, [localKey, personal, step]);
 
   const save = async () => {
     if (busyRef.current) throw new Error("Wait for the current save or run to finish");
     if (!dirty) return;
     busyRef.current = true; setBusy(true); setError("");
     try {
-      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt, ...(!personal ? { stepId: activity.stepId } : {}) }) });
-      setSavedFiles(JSON.stringify(files));
+      if (personal) progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+      else await saveDeviceDraft();
     } finally { busyRef.current = false; setBusy(false); }
   };
   useImperativeHandle(ref, () => ({ save }));
 
   const run = async () => {
-    if (busyRef.current) return;
+    if (busyRef.current || !deviceReady) return;
     busyRef.current = true; setBusy(true); setError("");
     setLastCheck(null);
-    setRunMessage("Saving your code…");
+    setRunMessage("Saving your code on this device…");
     try {
-      // Save first so failures or an unavailable runner never discard the student's edits.
-      progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt, ...(!personal ? { stepId: activity.stepId } : {}) }) });
-      setSavedFiles(JSON.stringify(files));
+      if (!personal) await saveDeviceDraft();
+      else {
+        progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+        setSavedFiles(JSON.stringify(files));
+      }
       setRunMessage("Java is loading or running… Please wait.");
       if (personal) {
         await javaConsole.run(files, stdin, () => setStdin(""));
       } else {
-        const runner = await getJavaRunner();
-        const browserResult = runner.mode === "browser" ? await runJava(files, checkInput, runner) : null;
-        setRunMessage(browserResult ? "Checking your output…" : "Running Java and checking output… Please wait.");
-        const result = await api<RunCheck & { output: string; progress: Progress }>(`${base}/${browserResult ? "browser-result" : "run"}`, {
-          method: "POST", body: JSON.stringify({ stepId: activity.stepId, updatedAt: progress.current.updatedAt, ...(browserResult ? { success: browserResult.success, output: browserResult.output } : { files }) }),
-        });
-        progress.current = result.progress;
-        setStepStates(result.progress.stepStates);
-        setOutput(result.output);
-        setLastCheck(result);
-        setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : result.check === "sample" && result.passed ? "Sample verified" : "Try again");
-        onChecked();
+        const runner = runnerRef.current ?? await getJavaRunner();
+        runnerRef.current = runner;
+        if (runner.mode !== "browser") {
+          setRunMessage("Running Java and checking output… Please wait.");
+          const result = await api<RunCheck & { output: string; progress: Progress; module?: CourseModule }>(`${base}/run`, { method: "POST", body: JSON.stringify({ stepId: activity.stepId, updatedAt: progress.current.updatedAt, files }) });
+          progress.current = { ...result.progress, moduleVersion: progress.current.moduleVersion }; setStepStates(result.progress.stepStates); setOutput(result.output); setLastCheck(result);
+          if (result.module) await writeDeviceRecord(moduleRecordKey("content", activity.studentId, activity.classroomId, activity.moduleId), { value: result.module, savedAt: Date.now() });
+          setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : result.check === "sample" && result.passed ? "Sample verified" : "Try again");
+          if (result.passed) onChecked();
+        } else {
+          const result = await runJava(files, checkInput, runner);
+          const localStates = { ...stepStates, ...(draftRef.current.sample?.success ? { [sampleStateId(step!)]: "pass" as const } : {}) };
+          const check = checkModuleRun(activity.module, { ...step!, activity: step!.activity ? { ...step!.activity, stdin: step!.activity.stdin ?? "" } : undefined } as Parameters<typeof checkModuleRun>[1], localStates, files, result);
+          setOutput(result.output); setLastCheck({ ...check, success: result.success });
+          if (check.check === "sample" && check.passed) {
+            draftRef.current.sample = { files, success: result.success, output: result.output };
+            setStepStates((current) => ({ ...current, [sampleStateId(step!)]: "pass" }));
+            await writeDeviceRecord(localKey, { files, ...draftRef.current });
+            setStatus("Sample verified on this device");
+          } else if (check.check === "task" && check.passed) {
+            const pending = { stepId: activity.stepId, updatedAt: progress.current.updatedAt, moduleVersion: progress.current.moduleVersion, completionId: crypto.randomUUID(), files, success: true, output: result.output, ...(draftRef.current.sample ? { sample: draftRef.current.sample } : {}) };
+            draftRef.current.pending = pending;
+            await writeDeviceRecord(localKey, { files, ...draftRef.current });
+            setRunMessage("Syncing your completed task…");
+            const synced = await api<{ progress: Progress; module: CourseModule }>(`${base}/complete`, { method: "POST", body: JSON.stringify(pending) });
+            progress.current = { ...synced.progress, moduleVersion: progress.current.moduleVersion };
+            draftRef.current.pending = undefined;
+            await writeDeviceRecord(moduleRecordKey("content", activity.studentId, activity.classroomId, activity.moduleId), { value: synced.module, savedAt: Date.now() });
+            await writeDeviceRecord(localKey, { files, ...draftRef.current });
+            setStepStates(progress.current.stepStates); setStatus("Completed — saved to CodeShare"); onChecked();
+          } else setStatus(check.check === "sample" ? "Sample not verified" : "Try again");
+        }
       }
     } catch (runError) {
       setError(runError instanceof Error ? runError.message : "Could not run this activity");
+      if (draftRef.current.pending) setStatus("Completed on this device — sync pending");
     } finally { busyRef.current = false; setBusy(false); setRunMessage(null); }
   };
+
+  useEffect(() => {
+    if (personal || !deviceReady) return;
+    const retry = async () => {
+      const pending = draftRef.current.pending;
+      if (!pending || busyRef.current || !navigator.onLine) return;
+      busyRef.current = true; setBusy(true); setError("");
+      try {
+        const synced = await api<{ progress: Progress; module: CourseModule }>(`${base}/complete`, { method: "POST", body: JSON.stringify(pending) });
+        progress.current = { ...synced.progress, moduleVersion: progress.current.moduleVersion }; draftRef.current.pending = undefined;
+        await writeDeviceRecord(moduleRecordKey("content", activity.studentId, activity.classroomId, activity.moduleId), { value: synced.module, savedAt: Date.now() });
+        await writeDeviceRecord(localKey, { files, ...draftRef.current });
+        setStepStates(synced.progress.stepStates); setStatus("Completed — saved to CodeShare"); onChecked();
+      } catch (syncError) { setError(syncError instanceof Error ? syncError.message : "Could not sync completed task"); }
+      finally { busyRef.current = false; setBusy(false); }
+    };
+    window.addEventListener("online", retry);
+    void retry();
+    return () => window.removeEventListener("online", retry);
+  }, [activity.classroomId, activity.moduleId, activity.studentId, base, deviceReady, files, localKey, onChecked, personal]);
 
   const submit = async () => {
     if (busyRef.current) return;
@@ -153,7 +228,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>
         </div>
         <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={busy || pendingSample} onChange={(content) => setFiles((current) => current.map((file) => file.path === path ? { ...file, content } : file))} />
-        <div className="editor-status"><span>{path}</span><span>{dirty ? "Unsaved changes — click Save work" : "Your project is saved"}</span></div>
+        <div className="editor-status"><span>{path}</span><span>{dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
       </section>
       <aside className="right-panel module-activity-console">
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
@@ -180,7 +255,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div>{personal && <button type="button" className="run-button" disabled={busy} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button><button type="button" className="run-button" disabled={busy} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button></div>
+      <div>{personal && <button type="button" className="run-button" disabled={busy} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button><button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button></div>
     </footer>
   </>;
 }

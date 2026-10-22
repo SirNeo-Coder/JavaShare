@@ -8,9 +8,14 @@ export type ModuleAccessBlock = {
   week?: number;
 };
 
+export type ModuleAccessSummary = Pick<CourseModule, "id" | "week" | "previousModuleId"> & {
+  requiredActivityIds: string[];
+};
+type AccessModule = CourseModule | ModuleAccessSummary;
+
 // Walk the declared links, never infer prerequisites from week numbers or upload order.
-function prerequisiteChain(module: CourseModule, modules: Map<string, CourseModule>): { chain: CourseModule[]; block?: ModuleAccessBlock } {
-  const chain: CourseModule[] = [];
+function prerequisiteChain(module: AccessModule, modules: Map<string, AccessModule>): { chain: AccessModule[]; block?: ModuleAccessBlock } {
+  const chain: AccessModule[] = [];
   const seen = new Set([module.id]);
   let previous = module.previousModuleId;
   while (previous) {
@@ -25,7 +30,7 @@ function prerequisiteChain(module: CourseModule, modules: Map<string, CourseModu
 }
 
 export function moduleAccessBlock(
-  module: CourseModule, modules: Map<string, CourseModule>, states: Map<string, Record<string, string>>,
+  module: AccessModule, modules: Map<string, AccessModule>, states: Map<string, Record<string, string>>,
   classroom: { current_activity_id: string | null; active_module_id: string | null },
 ): ModuleAccessBlock | undefined {
   if (classroom.current_activity_id) {
@@ -36,6 +41,10 @@ export function moduleAccessBlock(
   }
   const { chain, block } = prerequisiteChain(module, modules);
   if (block) return block;
-  const unfinished = chain.reverse().find((item) => !activityAccess(item, states.get(item.id) ?? {}).performanceTaskOpen);
+  const unfinished = chain.reverse().find((item) => {
+    const saved = states.get(item.id) ?? {};
+    return "requiredActivityIds" in item ? !item.requiredActivityIds.every((id) => saved[id] === "pass")
+      : !activityAccess(item, saved).performanceTaskOpen;
+  });
   if (unfinished) return { kind: "prerequisite", message: `Complete Week ${unfinished.week} before starting Week ${module.week}.`, moduleId: unfinished.id, week: unfinished.week };
 }

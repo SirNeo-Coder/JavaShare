@@ -7,10 +7,11 @@ import { api, ApiError } from "./apiClient";
 import ModuleAccessNotice from "./ModuleAccessNotice";
 import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import WorkspaceDrawer from "./WorkspaceDrawer";
+import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
-export default function ModuleWorkspace({ classroomId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, progressRevision = 0 }: {
+export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, progressRevision = 0 }: {
   onStartActivity: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
-  classroomId: string; role: "teacher" | "student"; browserOpen: boolean; projectsOpen: boolean; onBrowserChange: (open: boolean) => void; onProjectsChange: (open: boolean) => void;
+  classroomId: string; studentId?: string; role: "teacher" | "student"; browserOpen: boolean; projectsOpen: boolean; onBrowserChange: (open: boolean) => void; onProjectsChange: (open: boolean) => void;
 }) {
   const [accessBlock, setAccessBlock] = useState<ModuleAccessBlock | null>(null);
   const [error, setError] = useState("");
@@ -32,8 +33,14 @@ export default function ModuleWorkspace({ classroomId, role, browserOpen, projec
     try {
       setError(""); setAccessBlock(null);
       if (role === "student") {
+        const key = studentId ? moduleRecordKey("content", studentId, classroomId, id) : "";
+        const cached = key ? await readDeviceRecord<{ value: CourseModule; savedAt: number }>(key).catch(() => null) : null;
+        const moduleRequest = cached && isFreshDeviceRecord(cached) ? Promise.resolve(cached.value) : api<CourseModule>(`/api/classrooms/${classroomId}/modules/${id}`).then(async (value) => {
+          if (key) await writeDeviceRecord(key, { value, savedAt: Date.now() }).catch(() => undefined);
+          return value;
+        }).catch((error) => { if (cached && !(error instanceof ApiError)) return cached.value; throw error; });
         const [module, progress] = await Promise.all([
-          api<CourseModule>(`/api/classrooms/${classroomId}/modules/${id}`),
+          moduleRequest,
           api<Progress>(`/api/classrooms/${classroomId}/modules/${id}/progress`),
         ]);
         const steps = module.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
@@ -58,13 +65,13 @@ export default function ModuleWorkspace({ classroomId, role, browserOpen, projec
         onClick={() => { close(); onBrowserChange(false); onProjectsChange(!projectsOpen || projectsHoverPreview); setProjectsHoverPreview(false); }}><span aria-hidden="true">⌘</span> {role === "teacher" ? "Students / projects" : "Projects"}</button>
     </nav>
     <WorkspaceDrawer id="classroom-modules" title="Course modules" side="left" open={browserOpen} autoFocus={!hoverPreview} onClose={closeModule}>
-      <ModuleViewer role={role} classroomId={classroomId} embedded drawer active={browserOpen} progressRevision={progressRevision} onOpenModule={selectModule} />
+      <ModuleViewer role={role} classroomId={classroomId} studentId={studentId} embedded drawer active={browserOpen} progressRevision={progressRevision} onOpenModule={selectModule} />
       {accessBlock && <ModuleAccessNotice block={accessBlock} onContinue={(id) => void selectModule(id)} />}
       {error && <p className="module-error" role="alert">{error}</p>}
     </WorkspaceDrawer>
     {selection && <div className="worksheet-drawer-group">
       <WorkspaceDrawer id="classroom-worksheet" title="Module worksheet" side="left" className="worksheet-drawer" open={open && !browserOpen && !projectsOpen} autoFocus={!hoverPreview} onClose={() => close(true)}>
-        <ModuleViewer key={selection.visit} role={role} classroomId={classroomId} initialModuleId={selection.id} embedded worksheet progressRevision={progressRevision} onStartActivity={async (module, step) => { await onStartActivity(module, step); close(); }} onClose={() => { close(); onBrowserChange(true); }} />
+        <ModuleViewer key={selection.visit} role={role} classroomId={classroomId} studentId={studentId} initialModuleId={selection.id} embedded worksheet progressRevision={progressRevision} onStartActivity={async (module, step) => { await onStartActivity(module, step); close(); }} onClose={() => { close(); onBrowserChange(true); }} />
       </WorkspaceDrawer>
     </div>}
   </>;

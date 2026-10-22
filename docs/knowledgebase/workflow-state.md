@@ -359,3 +359,19 @@ recovery remains unverified.
   browsing has no student progress and follows increasing week order. Curriculum stays as before.
 - Sorting changes only the display; module locks, saved files, task checks and submissions use
   their existing rules. The same display rule applies online and offline. See CKB-066.
+
+## Module work saved on completion (approved 2026-10-22)
+
+- Student **Module** content is cached on that device for five minutes. The cache is scoped to
+  student, class and module. Each module activity's working code and sample verification stay in
+  that device's IndexedDB; **Save work** saves locally.
+- Online Java runs in the browser. A failed run stays on the device and does not replace the last
+  completed module project. A successful task sends one guarded completion checkpoint containing
+  the code, run result and any required unchanged-sample evidence. A delayed checkpoint retries
+  with the same id so it cannot duplicate completion. Newly unlocked content arrives in that same
+  response and refreshes the device cache.
+- Offline classroom runs continue through laptop Java and save successful code/completion to local
+  Supabase. Personal performance-task projects keep their separate save and submit behavior.
+- Clearing browser storage removes unfinished device drafts. The server keeps successful module
+  completions and their saved project files. Local browser/device behavior is verified; hosted
+  Cloudflare CPU recovery remains unverified. See CKB-065 and the completion-only verification.

@@ -35,13 +35,19 @@ for (const mode of ["offline", "online"]) {
       const created = await context.request.post("/api/classes", { data: { subject: "Java", name: `Java progress ${mode}` } });
       assert.equal(created.status(), 201); classroomId = (await created.json()).id;
       assert.equal((await context.request.post(`/api/classrooms/${classroomId}/modules`, { data: fixture })).status(), 201);
+      assert.equal((await context.request.patch(`/api/classrooms/${classroomId}/modules/${fixture.id}/availability`, { data: { target: "performance-task", open: true } })).status(), 200);
       assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);
       assert.equal((await context.request.post("/api/auth/login", { data: { email: users[1].email, password } })).status(), 200);
       const page = await context.newPage(); page.setDefaultTimeout(180000);
+      let moduleContentRequests = 0;
+      page.on("request", (request) => {
+        if (request.method() === "GET" && request.url().endsWith(`/api/classrooms/${classroomId}/modules/${fixture.id}`)) moduleContentRequests++;
+      });
       await page.goto("/"); await page.locator(".classroom-workspace").waitFor();
       await page.locator('.workspace-rail button[aria-controls="classroom-modules"]').click();
       await page.locator("#classroom-modules .module-catalog-card").first().getByRole("button").first().click();
       await page.locator(".student-module-project").waitFor();
+      assert.equal(moduleContentRequests, 1, "module content should be downloaded once and reused from this device's cache");
       await page.getByRole("button", { name: "Close module worksheet", exact: true }).click();
       const indicator = page.locator(".java-run-progress");
       const consoleOutput = page.getByLabel("Program output", { exact: true });
@@ -57,46 +63,53 @@ for (const mode of ["offline", "online"]) {
 
       await t.test("shows saving and startup immediately, checking until the actual result, and honors reduced motion", async () => {
         assert.equal(await indicator.count(), 0);
-        const save = await hold("**/progress/project"), config = await hold("**/api/java-runner");
-        const result = await hold(`**/progress/${mode === "offline" ? "run" : "browser-result"}`);
+        const config = await hold("**/api/java-runner");
+        const result = await hold(`**/progress/${mode === "offline" ? "run" : "complete"}`);
         await runButton().click();
-        await save.seen; assert.match(await indicator.textContent(), /Saving your code/);
-        save.release(); await config.seen;
+        assert.match(await indicator.textContent(), /Saving your code on this device|Java is loading or running/);
+        await config.seen;
         assert.match(await indicator.textContent(), /Java is loading or running/);
         assert.equal(await page.locator(".console[aria-busy='true']").count(), 1);
         assert.equal(await indicator.locator(".java-run-spinner").evaluate((el) => getComputedStyle(el).animationName), "java-run-spin");
         await page.screenshot({ path: `/tmp/java-progress-${mode}-loading.png`, fullPage: true });
         config.release(); await result.seen;
-        assert.match(await indicator.textContent(), mode === "offline" ? /Running Java and checking output/ : /Checking your output/);
+        assert.match(await indicator.textContent(), mode === "offline" ? /Running Java and checking output/ : /Syncing your completed task/);
         await page.emulateMedia({ reducedMotion: "reduce" });
         assert.equal(await indicator.locator(".java-run-spinner").evaluate((el) => getComputedStyle(el).animationName), "none");
-        const checked = page.waitForResponse((response) => response.url().endsWith(`/progress/${mode === "offline" ? "run" : "browser-result"}`));
-        result.release(); assert.equal((await checked).status(), 200); await idle();
+        const checked = page.waitForResponse((response) => response.url().endsWith(`/progress/${mode === "offline" ? "run" : "complete"}`));
+        result.release();
+        const checkedResponse = await checked;
+        assert.equal(checkedResponse.status(), 200);
+        assert.ok((await checkedResponse.json()).module?.performanceTask, "successful module completion returns the newly unlocked task in the same response");
+        await idle();
         assert.match(await consoleOutput.textContent(), /Java status check/);
+        const saved = await (await context.request.get(`/api/classrooms/${classroomId}/modules/${fixture.id}/progress`)).json();
+        assert.equal(saved.stepStates[fixture.lessons[0].blocks[0].id], "pass", "successful code must sync its completed module step");
         assert.equal(await page.locator('.student-module-project img[alt="CheerpJ"]').count(), mode === "online" ? 1 : 0);
       });
 
-      await t.test("a failed run clears the indicator and the next run recovers", async () => {
-        await page.route("**/progress/project", (route) => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Temporary verification failure" }) }), { times: 1 });
-        await runButton().click(); await page.getByRole("alert").filter({ hasText: "Temporary verification failure" }).waitFor();
-        await idle(); assert.equal(await indicator.count(), 0);
-        if (mode === "offline") await delay(1600); // Respect the existing 1.5-second laptop run limit.
-        const checked = page.waitForResponse((response) => response.url().endsWith(`/progress/${mode === "offline" ? "run" : "browser-result"}`));
-        await runButton().click(); assert.equal((await checked).status(), 200); await idle();
+      await t.test("failed runs stay on this device and never replace the completed server project", async () => {
+        const before = await (await context.request.get(`/api/classrooms/${classroomId}/modules/${fixture.id}/progress`)).json();
+        const editor = page.getByRole("textbox", { name: "Java source code editor", exact: true });
+        const working = await editor.inputValue();
+        await editor.fill("public class Main { invalid java }");
+        if (mode === "offline") await delay(1600);
+        const failed = mode === "offline" ? page.waitForResponse((response) => response.url().endsWith("/progress/run")) : null;
+        await runButton().click(); if (failed) assert.equal((await failed).status(), 200); await idle();
+        assert.match(await consoleOutput.textContent(), /error/i);
+        const after = await (await context.request.get(`/api/classrooms/${classroomId}/modules/${fixture.id}/progress`)).json();
+        assert.deepEqual(after.projectFiles, before.projectFiles, "failed code must not overwrite the last completed server project");
+        assert.equal(await indicator.count(), 0);
+        await editor.fill(working);
+        if (mode === "offline") await delay(1600);
+        const checked = page.waitForResponse((response) => response.url().endsWith(`/progress/${mode === "offline" ? "run" : "complete"}`));
+        await runButton().click();
+        const retried = await checked; assert.equal(retried.status(), 200, await retried.text()); await idle();
         assert.match(await consoleOutput.textContent(), /Java status check/);
       });
 
-      await t.test("compiler errors clear progress and remain visible in Actual output", async () => {
-        if (mode === "offline") await delay(1600);
-        await page.getByRole("textbox", { name: "Java source code editor", exact: true }).fill("public class Main { invalid java }");
-        const checked = page.waitForResponse((response) => response.url().endsWith(`/progress/${mode === "offline" ? "run" : "browser-result"}`));
-        await runButton().click(); assert.equal((await checked).status(), 200); await idle();
-        assert.match(await consoleOutput.textContent(), /error/i);
-        assert.equal(await indicator.count(), 0);
-      });
-
       await page.getByRole("button", { name: "Return to class project", exact: true }).click();
-      await page.getByRole("button", { name: "Module worksheet", exact: true }).focus(); await page.keyboard.press("Enter");
+      await page.getByRole("button", { name: "Module", exact: true }).click();
       await page.locator("#classroom-worksheet").getByRole("button", { name: /Performance task/ }).click();
       await page.getByRole("button", { name: "Work on performance task", exact: true }).click();
       await page.locator(".student-module-project").waitFor();

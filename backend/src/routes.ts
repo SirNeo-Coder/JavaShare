@@ -29,6 +29,7 @@ import {
   shareSupabaseModule,
   getSupabaseModuleProgress,
   prepareSupabaseModuleActivity,
+  completeSupabaseModuleActivity,
   prepareSupabasePerformanceProject,
   saveSupabasePerformanceProject,
   runSupabaseModuleActivity,
@@ -501,7 +502,7 @@ app.get("/api/submissions", requireAuth, async (req: AuthedRequest, res, next) =
 // performance-task submissions (sample code run, student's own version). moduleId is the
 // module file's own "id" field.
 app.get("/api/classrooms/:classroomId/modules/:moduleId/progress", requireAuth, async (req: AuthedRequest, res, next) => {
-  try { return res.json(await getSupabaseModuleProgress(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  try { return res.json(await getSupabaseModuleProgress(req.user!, String(req.params.classroomId), String(req.params.moduleId), req.query.includeModuleVersion === "1")); }
   catch (error) { next(error); }
 });
 
@@ -679,6 +680,24 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-pro
   try {
     const { files, updatedAt } = z.object({ files: javaFiles, updatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
     return res.json(await saveSupabasePerformanceProject(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/modules/:moduleId/progress/activity", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const stepId = z.string().trim().min(1).max(100).parse(req.query.stepId);
+    return res.json(await prepareSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, stepId, false));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    if (localJavaEnabled) throw new SupabaseRepositoryError(403, "Offline progress must use the classroom Java runner");
+    if (!process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(503, "Online Java is not configured");
+    const evidence = z.object({ files: javaFiles, success: z.boolean(), output: z.string().max(70000) });
+    const checkpoint = evidence.extend({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }),
+      moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional() }).parse(req.body);
+    return res.json(await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint));
   } catch (error) { next(error); }
 });
 

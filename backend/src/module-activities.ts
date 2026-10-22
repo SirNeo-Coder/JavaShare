@@ -14,7 +14,7 @@ export function samplePending(module: { sampleFirst?: boolean }, step: { id: str
   return Boolean(module.sampleFirst && step.activity?.id && states[activityStateId(step)] !== "pass" && states[sampleStateId(step)] !== "pass");
 }
 
-export type ActivityProjects = { activeKey?: string; drafts?: Record<string, ModuleFile[]>; beforeSampleFiles?: ModuleFile[] };
+export type ActivityProjects = { activeKey?: string; drafts?: Record<string, ModuleFile[]>; beforeSampleFiles?: ModuleFile[]; checkpoints?: Record<string, { id: string; moduleVersion: string }> };
 
 export function activityTask(step: { instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string;
   activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string } }) {
@@ -88,4 +88,14 @@ export function matchesSample(result: { success: boolean; output: string }, step
 
 export function unchangedSample(files: ModuleFile[], sample: ModuleFile[]) {
   return sample.every((file) => files.some((saved) => sourcePath(saved.path) === sourcePath(file.path) && saved.content === file.content));
+}
+
+export function checkModuleRun(module: { sampleFirst?: boolean },
+  step: Pick<ActivityStep, "id" | "activity" | "instruction" | "files" | "expectedOutput" | "expectedError" | "stdin">,
+  states: Record<string, string>, files: ModuleFile[], result: { success: boolean; output: string }) {
+  const check = samplePending(module, step, states) ? "sample" as const : "task" as const;
+  const sampleMatched = matchesSample(result, step);
+  const passed = check === "sample" ? sampleMatched && unchangedSample(files, step.files)
+    : matchesActivityOutput(result, activityTask(step).expectedOutput);
+  return { check, sampleMatched, passed };
 }
