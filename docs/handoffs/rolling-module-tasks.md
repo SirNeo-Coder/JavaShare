@@ -1,6 +1,6 @@
 # Rolling module tasks handoff
 
-## Current prerequisite slice — 2026-10-21
+## Prerequisite slice now merged — 2026-10-21
 
 - Approved: require every current module activity in the full predecessor chain before starting
   a later module; personal submissions and handwritten liplets stay separate. Project naming
@@ -26,10 +26,8 @@
 - Still unverified: hosted deployment, Windows, physical disconnected Wi-Fi devices, other browsers.
   No assistant merge, deploy, hosted SQL or hosted settings changes. CKB-060 records this work.
 
-## Historical resume and task work
-
 Updated 2026-10-22. Current branch: `codex/week15-week21-step-additions`.
-Base: `origin/main` at `9fba8a7`; the separate Java suggestions branch is not included.
+Base: current main `3a59e99`, including Java suggestions and the merged prerequisite feature.
 
 ## Current additive curriculum package
 
