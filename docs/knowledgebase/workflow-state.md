@@ -328,3 +328,14 @@ still completes its tasks separately in each class, including after a shared cor
 Known curriculum limit (CKB-063): original Weeks 18–21 reference predecessor ids without the
 actual -module suffix. The prerequisite message therefore blocks those links until the curriculum
 references are corrected in a separately approved change. The PR #37 repair preserves these files.
+
+## Course modules ordering (approved 2026-10-22)
+
+- The classroom **Course modules** drawer shows unfinished modules in increasing week order
+  (Week 12 through Week 21 for the current set), then completed modules in increasing week order.
+- Saved 100% completion moves a module below every unfinished module. After Week 12 completes,
+  Week 13 becomes the first card. Opening the drawer or refreshing progress updates the order.
+- The weekly pick keeps its badge but does not override week/completion order. Teacher drawer
+  browsing has no student progress and follows increasing week order. Curriculum stays as before.
+- Sorting changes only the display; module locks, saved files, task checks and submissions use
+  their existing rules. The same display rule applies online and offline. See CKB-066.

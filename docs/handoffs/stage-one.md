@@ -600,3 +600,20 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Delivered implementation `614ae27`, committed and pushed; [draft PR #36](https://github.com/SirNeo-Coder/JavaShare/pull/36) targets main.
   Next: teacher reviews the package and runtime limits; never merge or deploy as an assistant.
   Files and limitations: [package index](../modules/week15-week21.md).
+
+## Course modules order — 2026-10-22
+
+- Teacher approved: unfinished weeks increase from Week 12 through Week 21; completed
+  modules move below them so the next unfinished week is first.
+- Branch: `codex/module-catalog-order`, isolated checkout `/tmp/codeshare-module-order`,
+  based on main `21766ba`. Original checkout and its existing changes are preserved.
+- Done: drawer uses existing saved 100% completion, then increasing week; weekly badges
+  remain visible. No saved-work, lock, execution, schema or configuration changes.
+- Verified: production build passes; lint 0 errors/8 existing warnings; full suite 306/306,
+  0 skips; local real-browser checks 4/4 including laptop Java completion and reload.
+  Restoring the old comparator failed three regressions; restoring the fix passed all four.
+- Initial build dependency-link failure and browser timing failures are recorded alongside
+  final named results in `docs/verification/module-catalog-order.md`. CKB-066 records the bug.
+- In progress: branch delivery for review. Next: teacher reviews the PR, merges and rolls
+  out the app. Hosted ordering and real classroom Wi-Fi remain unverified. No assistant
+  merge, deployment or hosted setting changes.
