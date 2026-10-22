@@ -1,6 +1,6 @@
 # CKB-063 — Later curriculum links do not match the uploaded module ids
 
-- Status: resolved locally; teacher re-upload and hosted verification pending
+- Status: resolved locally; teacher reports corrected uploads caused no problem; independent hosted verification pending
 - First recorded: 2026-10-22
 - Last verified: 2026-10-22
 - Area: Weeks 17–21 curriculum / cross-module prerequisites
@@ -56,7 +56,8 @@ Re-upload the four files through **Java class → Curriculum → Add module** wi
   subject sharing 7/7. No final failures or skips. Named checks/commands, initial build failure,
   fixture setup limits and unverified areas: [verification](../../verification/curriculum-prerequisite-links.md).
 - The separate Week 17 feedback timeout did not recur locally; its cause is still unknown.
-  No feedback change was made. Hosted re-upload/recovery and physical offline devices are unverified.
+  No feedback change was made. The teacher reports uploading the four corrections with no apparent
+  problem. Independent hosted recovery and physical offline devices are unverified.
 
 ## Recurrence triage
 
@@ -75,4 +76,7 @@ this mismatched reference. Keep student/class completion separate (CKB-010/060/0
   No hosted change, merge or deployment.
 
 - Delivered as `e162e87`, [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38).
-  Named local checks pass; teacher review/re-upload and hosted verification remain open.
+  Named local checks pass; teacher review and independent hosted verification remain open.
+
+- 2026-10-22 — Teacher reports: uploaded the corrected files and saw no apparent problem.
+  Recorded as teacher confirmation, not an independently observed hosted/student test.

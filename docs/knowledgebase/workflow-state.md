@@ -332,5 +332,6 @@ with the existing module/activity ids; all Java classes share the corrected cont
 student files, completions and submissions remain separate and unchanged. Refresh/reopen Modules
 after saving current edits. Full-chain prerequisites still apply, so unfinished earlier tasks
 continue to block later work. Week 20 remains written work. No migration or prerequisite-rule
-change. [Re-upload steps and limits](../curriculum-prerequisite-reupload.md). Hosted re-upload
-and recovery remain teacher actions and are unverified.
+change. [Re-upload steps and limits](../curriculum-prerequisite-reupload.md). The teacher reports
+uploading the four corrections with no apparent problem (2026-10-22). Independent hosted/student
+recovery remains unverified.

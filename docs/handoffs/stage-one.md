@@ -19,13 +19,13 @@
 >
 > Delivered: implementation `e162e87`, committed and pushed;
 > [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38) targets main and is open for review.
-> No code work remains in progress. Next: teacher reviews the PR and uploads
-> only corrected Weeks 18–21 through **Java class → Curriculum → Add module**, keeping existing
-> ids. Earlier weeks must exist in that teacher's Java library. Refresh/reopen after saving edits.
+> No code work remains in progress. Teacher reports uploading corrected Weeks 18–21 with no
+> apparent problem (2026-10-22). This is teacher confirmation, not an independent hosted/student
+> check. Next: teacher reviews the PR; retain the existing ids and prerequisite requirements.
 > Teacher guide: `docs/curriculum-prerequisite-reupload.md`. Student drafts, completions and
 > submitted snapshots stay saved; unfinished earlier tasks still block later weeks.
 >
-> Open: hosted re-upload/recovery, physical offline devices, online/visible GUI behavior and
+> Open: independent hosted/student recovery checks, physical offline devices, online/visible GUI behavior and
 > existing curriculum runtime limits. Week 17 feedback timeout did not recur locally; its cause
 > remains unknown and feedback code was not changed. No merge, deployment or hosted change.
 > Earlier PR #37 notes below are historical; its CKB-063 repair proposal is superseded here.

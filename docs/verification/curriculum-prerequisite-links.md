@@ -7,6 +7,13 @@ Implementation `e162e87` is pushed; [PR #38](https://github.com/SirNeo-Coder/Jav
 is open for teacher review. The GitHub connector refused PR creation with HTTP 403; the
 authenticated GitHub CLI created it successfully. Temporary test servers were stopped.
 
+## Teacher follow-up — 2026-10-22
+
+The teacher reports uploading the four corrected JSON files and seeing no apparent problem.
+This is teacher confirmation; no independent hosted/student session or completion test was run.
+This documentation-only follow-up reruns the two named `tests/kb-search.test.mjs` checks below;
+app builds and browser suites were not repeated because no code, fixture or JSON changed.
+
 ## Outcome
 
 Only `previousModuleId` changed in the Week 18, 19, 20 and 21 JSON files:
