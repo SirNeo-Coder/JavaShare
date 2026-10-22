@@ -693,6 +693,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   Regression mutation of the old pre-run save fails as expected and passes after restore.
   Offline browser attempt was interrupted before reporting cases; see
   `docs/verification/module-completion-saves.md` for exact evidence and limits.
-- Next: commit, push this branch and open a review PR. Teacher reviews and deploys if
-  desired. No hosted settings, database, or deployment were changed; free-plan CPU
-  recovery and physical classroom Wi-Fi remain unverified.
+- Delivered: implementation `869333e` is committed and pushed; [PR #41](https://github.com/SirNeo-Coder/JavaShare/pull/41)
+  is open against main. Next: teacher reviews the branch and decides whether to deploy.
+  No hosted settings, database, or deployment were changed; free-plan CPU recovery and
+  physical classroom Wi-Fi remain unverified.
