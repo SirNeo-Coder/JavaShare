@@ -766,3 +766,19 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   is open against main. Next: teacher reviews the branch and decides whether to deploy.
   No hosted settings, database, or deployment were changed; free-plan CPU recovery and
   physical classroom Wi-Fi remain unverified.
+
+## Personal performance-task workflow — 2026-10-23
+
+- Teacher approved the implementation plan in this chat, including successful-run submission,
+  frozen per-module copies, submission progress independent of review, and teacher checklist review.
+- Branch: `codex/personal-performance-workflow`. Implementation reuses the main editor, Console,
+  existing personal draft/submission JSON and class permissions. Week 20 remains paper work.
+- Initial checkpoint: build passed; lint zero errors/eight existing warnings; 275/275 tests passed
+  with local Supabase. Offline student/teacher browser passed 4/4. Three deliberate-break checks
+  failed with submission, continuation and review guards removed, then passed after restoration.
+- In progress: integrate current main `7946f0b`, which was newer than the starting checkout;
+  preserve module prerequisite checks, shared subject modules, completion-only saves and draft
+  recovery. Repeat validation on the integrated version before PR delivery. Online input/Stop
+  and teacher execution checks are running; no final integrated claim yet.
+- Next: finish integration and verification, update knowledge/problem records, commit, push and
+  open the teacher-review PR. No merge, deploy, hosted settings or hosted database changes.
