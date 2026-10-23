@@ -783,7 +783,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   production browser 4/4; online production browser 5/5, including input, Stop and teacher runs.
   Production and offline-launcher builds passed; lint zero errors/eight
   existing warnings. Three deliberate-break regressions failed, then passed when restored.
-- Verification complete; committing and pushing the final evidence for PR delivery. Named results,
+- Delivered: implementation `3a18c3e` and verification `24bd381` committed and pushed.
+  [PR #44](https://github.com/SirNeo-Coder/JavaShare/pull/44) is open against main. Named results,
   earlier failures and limits are in `docs/verification/personal-performance-workflow.md`.
 - Problem record: CKB-070. Rules, workflow, route/storage/permission maps and prior case links updated.
 - Next: teacher reviews the PR and decides rollout. No merge, deploy, hosted settings or hosted
