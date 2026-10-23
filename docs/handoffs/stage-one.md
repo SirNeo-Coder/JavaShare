@@ -8,7 +8,9 @@
 > index, prompt map, operations and this handoff updated. Build:all passes; lint
 > passes with 0 errors/8 existing warnings; full suite 325/325, no skips; diff clean.
 > Sandbox/dependency failures and named final checks are recorded in
-> docs/verification/module-summary-repair.md. In progress: commit/push/PR delivery.
+> docs/verification/module-summary-repair.md. Repair documentation e1a5a16 is
+> committed/pushed; [PR #43](https://github.com/SirNeo-Coder/JavaShare/pull/43)
+> is open against main for review. No local implementation work remains.
 > Next: teacher supplies five function/permission readiness values and confirms
 > both roles can open Module and a student's successful activity survives reload.
 > Hosted CPU recovery is separate and unverified. No app/test/config/migration

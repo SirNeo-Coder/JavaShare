@@ -6,6 +6,8 @@ existing update, confirmed all four prerequisites, applied the transactional SQL
 package, and reports: SQL succeeded and Module now loads. This is teacher-reported
 hosted recovery, not an independent assistant browser check.
 
+Documentation commit: e1a5a16; review: [PR #43](https://github.com/SirNeo-Coder/JavaShare/pull/43).
+
 ## Final checks
 
 - `npm run build:all`: PASS (Next.js production build and backend TypeScript build).

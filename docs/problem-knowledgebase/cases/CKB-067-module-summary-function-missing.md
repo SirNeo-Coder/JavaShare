@@ -54,7 +54,8 @@ completion UPDATE or replace module/progress data. No new migration or app chang
   Module loading after applying the existing migration. Five-value function/permission
   readiness and actual student completion/reload verification remain pending. No destructive missing-function mutation was run
   against a shared database.
-- Branch: codex/module-summary-repair. No hosted SQL executed by the assistant.
+- Documentation commit: e1a5a16, branch codex/module-summary-repair, PR #43.
+  No hosted SQL executed by the assistant.
 
 ## Recurrence triage
 
