@@ -9,7 +9,8 @@ import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
-export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, progressRevision = 0 }: {
+export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, onSelectModule, progressRevision = 0 }: {
+  onSelectModule?: (module: CourseModule) => void;
   onStartActivity: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
   classroomId: string; studentId?: string; role: "teacher" | "student"; browserOpen: boolean; projectsOpen: boolean; onBrowserChange: (open: boolean) => void; onProjectsChange: (open: boolean) => void;
 }) {
@@ -39,13 +40,16 @@ export default function ModuleWorkspace({ classroomId, studentId, role, browserO
           if (key) await writeDeviceRecord(key, { value, savedAt: Date.now() }).catch(() => undefined);
           return value;
         }).catch((error) => { if (cached && !(error instanceof ApiError)) return cached.value; throw error; });
-        const [module, progress] = await Promise.all([
+        const [loadedModule, progress] = await Promise.all([
           moduleRequest,
-          api<Progress>(`/api/classrooms/${classroomId}/modules/${id}/progress`),
+          api<Progress>(`/api/classrooms/${classroomId}/modules/${id}/progress?includeModuleVersion=1`),
         ]);
-        const steps = module.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
-        const step = moduleResumeStep(module, progress.stepStates) ?? steps.at(-1);
-        if (step?.language === "java") await onStartActivity(module, step);
+        const currentModule = loadedModule.moduleVersion === progress.moduleVersion ? loadedModule : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${id}`);
+        if (key && currentModule !== loadedModule) await writeDeviceRecord(key, { value: currentModule, savedAt: Date.now() }).catch(() => undefined);
+        onSelectModule?.(currentModule);
+        const steps = currentModule.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
+        const step = moduleResumeStep(currentModule, progress.stepStates) ?? steps.at(-1);
+        if (step?.language === "java") await onStartActivity(currentModule, step);
       }
       setSelection((current) => ({ id, visit: (current?.visit ?? 0) + 1 })); setOpen(true); setHoverPreview(false); onBrowserChange(false);
     } catch (loadError) {

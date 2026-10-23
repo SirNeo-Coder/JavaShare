@@ -43,3 +43,7 @@ supporting Java files; it is not proof that a personal project exists.
 ## History
 
 - 2026-10-20 — Teacher approved the two separate rolling projects and sample-output progression; online multi-file Java requested next.
+
+2026-10-23 extension: CKB-070 removes lesson starters from personal initialization, returns current
+work exactly, and prefers preceding submitted personal files over later draft edits. Existing
+snapshots remain unchanged; paper Week 20 is crossed without inventing a Java submission.

@@ -1,3 +1,23 @@
+import { matchesSample, unchangedSample, type ModuleFile } from "../backend/src/module-activities.ts";
+
+export type ModuleDeviceDraft = {
+  files: ModuleFile[]; moduleVersion?: string; stateId?: string;
+  sample?: { files: ModuleFile[]; success: boolean; output: string };
+  pending?: Record<string, unknown>;
+  backups?: { files: ModuleFile[]; moduleVersion?: string; stateId?: string }[];
+};
+
+export function restoreModuleDraft(draft: ModuleDeviceDraft | null, current: Pick<ModuleDeviceDraft, "files" | "moduleVersion" | "stateId">,
+  step: { files: ModuleFile[]; expectedOutput: string; expectedError?: string }, needsSample: boolean): ModuleDeviceDraft {
+  if (!draft) return current;
+  const sameActivity = Boolean(current.moduleVersion) && draft.moduleVersion === current.moduleVersion && draft.stateId === current.stateId;
+  const sample = sameActivity && draft.sample && matchesSample(draft.sample, step) && unchangedSample(draft.sample.files, step.files) ? draft.sample : undefined;
+  if (!sameActivity || (needsSample && !sample && !unchangedSample(draft.files, step.files))) {
+    return { ...current, backups: [...(draft.backups ?? []), { files: draft.files, moduleVersion: draft.moduleVersion, stateId: draft.stateId }] };
+  }
+  return { ...draft, sample };
+}
+
 const STORE = "codeshare-module-device-v1";
 const FRESH_FOR = 5 * 60 * 1000;
 

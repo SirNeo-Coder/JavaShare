@@ -32,6 +32,10 @@ import {
   completeSupabaseModuleActivity,
   prepareSupabasePerformanceProject,
   saveSupabasePerformanceProject,
+  beginSupabasePersonalRun,
+  recordSupabasePersonalRun,
+  getSupabasePersonalSubmission,
+  saveSupabasePersonalReview,
   runSupabaseModuleActivity,
   recordSupabaseModuleActivityResult,
   getSupabaseStudentWebProject,
@@ -698,6 +702,37 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", req
     const checkpoint = evidence.extend({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }),
       moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional() }).parse(req.body);
     return res.json(await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/personal-run", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { updatedAt, stdin = "" } = z.object({ updatedAt: z.string().datetime({ offset: true }), stdin: z.string().max(10000).optional() }).parse(req.body);
+    const classroomId = String(req.params.classroomId), moduleId = String(req.params.moduleId);
+    const progress = await beginSupabasePersonalRun(req.user!, classroomId, moduleId, updatedAt);
+    if (!localJavaEnabled && process.env.JAVA_RUNNER_URL) return res.json({ progress });
+    const result = await executeJava(req.user!.id, progress.performanceProjectFiles, stdin);
+    return res.json({ ...result, progress: await recordSupabasePersonalRun(req.user!, classroomId, moduleId, progress.updatedAt, result.mode !== "demo" && result.success) });
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/personal-result", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    if (localJavaEnabled || !process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(403, "Browser run results are only accepted in online browser mode");
+    const { updatedAt, success } = z.object({ updatedAt: z.string().datetime({ offset: true }), success: z.boolean() }).parse(req.body);
+    return res.json(await recordSupabasePersonalRun(req.user!, String(req.params.classroomId), String(req.params.moduleId), updatedAt, success));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-submission", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabasePersonalSubmission(req.user!, String(req.params.classroomId), String(req.params.studentId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.put("/api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-review", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { submissionId, checked } = z.object({ submissionId: z.string().min(1).max(100), checked: z.array(z.boolean()).max(1000) }).parse(req.body);
+    return res.json(await saveSupabasePersonalReview(req.user!, String(req.params.classroomId), String(req.params.studentId), String(req.params.moduleId), submissionId, checked));
   } catch (error) { next(error); }
 });
 

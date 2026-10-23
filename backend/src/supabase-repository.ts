@@ -1,5 +1,6 @@
+import { paperPerformanceTask, personalProjectFiles, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { activityStateId, activityTask, activityAccess, checkModuleRun, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
@@ -1225,11 +1226,11 @@ export async function restoreSupabaseSavedWork(user: SupabaseSessionUser, savedW
 // closed lessons; students must not receive closed content just to calculate a percentage.
 type ModuleStepStatus = "pass" | "fail";
 type ModulePerformanceVariant = "sample" | "own";
-type ModulePerformanceEntry = { files: Array<{ path: string; content: string }>; status: ModuleStepStatus; submittedAt: string };
+type ModulePerformanceEntry = PersonalSubmission;
 type ModuleProgressRow = {
   student_id: string; classroom_id: string; module_id: string;
   step_states: Record<string, ModuleStepStatus>;
-  performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>> & { project?: { files: ModuleFile[] } };
+  performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>> & { project?: { files: ModuleFile[]; successfulRun?: string } };
   project_files: Array<{ path: string; content: string }>;
   activity_projects?: ActivityProjects;
   updated_at: string;
@@ -1355,12 +1356,21 @@ export async function setSupabaseModulePerformanceTask(
   await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   if (!courseRow.content.performanceTask) throw new SupabaseRepositoryError(404, "Performance task not found in this module");
+  if (paperPerformanceTask(courseRow.content)) throw new SupabaseRepositoryError(400, "Submit this proposal on paper to your teacher");
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
   if (!activityAccess(courseRow.content, progress.step_states).performanceTaskOpen) throw new SupabaseRepositoryError(403, "Complete the module activities before the performance task");
   const data = await updateModuleProgressWithMerge(
     user, classroomId, moduleId,
     (row) => {
       if (updatedAt && row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "This project changed in another tab. Reopen it before submitting");
+      if (variant === "own") {
+        const project = row.performance_task.project;
+        if (!updatedAt || !project?.successfulRun || project.successfulRun !== personalFilesHash(project.files) || personalFilesHash(files) !== project.successfulRun) {
+          throw new SupabaseRepositoryError(409, "Run the current personal files successfully before submitting");
+        }
+        return { performance_task: { ...row.performance_task, own: { id: randomBytes(16).toString("hex"), files: project.files,
+          status: "pass", submittedAt: new Date().toISOString(), checklist: [...courseRow.content.performanceTask!.checklist] } } };
+      }
       return { performance_task: { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } } };
     },
     "Could not save performance task submission",
@@ -1376,6 +1386,7 @@ async function requirePerformanceProject(user: SupabaseSessionUser, classroomId:
   await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
   if (!courseRow.content.performanceTask) throw new SupabaseRepositoryError(404, "Performance task not found in this module");
+  if (paperPerformanceTask(courseRow.content)) throw new SupabaseRepositoryError(400, "Submit this proposal on paper to your teacher");
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
   if (!activityAccess(courseRow.content, progress.step_states).performanceTaskOpen) throw new SupabaseRepositoryError(403, "Complete the module activities before the performance task");
   return { content: courseRow.content, progress };
@@ -1383,18 +1394,26 @@ async function requirePerformanceProject(user: SupabaseSessionUser, classroomId:
 
 export async function prepareSupabasePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   const { content, progress } = await requirePerformanceProject(user, classroomId, moduleId);
-  let previous: ModuleFile[] = [];
-  if (content.previousModuleId && !progress.performance_task.project && !progress.performance_task.own) {
-    const { data, error } = await getSupabaseAdmin().from("module_progress").select("performance_task")
-      .eq("student_id", user.id).eq("classroom_id", classroomId).eq("module_id", content.previousModuleId).maybeSingle();
-    fail(error, "Could not load the previous personal project");
-    previous = data?.performance_task?.project?.files ?? data?.performance_task?.own?.files ?? [];
+  let previous: ModuleProgressRow["performance_task"] | undefined;
+  if (!progress.performance_task.project && !progress.performance_task.own) {
+    let previousId = content.previousModuleId;
+    const visited = new Set([moduleId]);
+    while (previousId && !visited.has(previousId)) {
+      visited.add(previousId);
+      const db = getSupabaseAdmin();
+      const { data, error } = await db.from("module_progress").select("performance_task")
+        .eq("student_id", user.id).eq("classroom_id", classroomId).eq("module_id", previousId).maybeSingle();
+      fail(error, "Could not load the previous personal project");
+      previous = data?.performance_task;
+      if (previous?.own || previous?.project) break;
+      const prior = await loadCourseModuleRow(classroomId, previousId);
+      previousId = prior && paperPerformanceTask(prior.content) ? prior.content.previousModuleId : undefined;
+    }
   }
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
-    const files = mergeProjectFiles(content.starterFiles, content.performanceTask!.starterFiles, previous,
-      row.performance_task.project?.files ?? row.performance_task.own?.files ?? []);
+    const files = personalProjectFiles(content.performanceTask!.starterFiles, previous, row.performance_task);
     if (files.length > 50 || files.some((file) => file.path.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(file.path))) throw new SupabaseRepositoryError(400, "This performance task needs at most 50 valid Java files");
-    return { performance_task: { ...row.performance_task, project: { files } } };
+    return { performance_task: { ...row.performance_task, project: { ...row.performance_task.project, files } } };
   }, "Could not open your personal project");
   return moduleProgressView(saved, content);
 }
@@ -1406,6 +1425,61 @@ export async function saveSupabasePerformanceProject(user: SupabaseSessionUser, 
     return { performance_task: { ...row.performance_task, project: { files } } };
   }, "Could not save your personal project");
   return moduleProgressView(saved, content);
+}
+
+function personalFilesHash(files: ModuleFile[]) {
+  return createHash("sha256").update(JSON.stringify(files.map(({ path, content }) => ({ path, content })).sort((a, b) => a.path.localeCompare(b.path)))).digest("hex");
+}
+
+export async function beginSupabasePersonalRun(user: SupabaseSessionUser, classroomId: string, moduleId: string, updatedAt: string) {
+  const { content } = await requirePerformanceProject(user, classroomId, moduleId);
+  if (paperPerformanceTask(content)) throw new SupabaseRepositoryError(400, "This proposal is submitted on paper");
+  const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
+    if (row.updated_at !== updatedAt || !row.performance_task.project) throw new SupabaseRepositoryError(409, "Save and reopen the current personal project before running");
+    return { performance_task: { ...row.performance_task, project: { files: row.performance_task.project.files } } };
+  }, "Could not start the personal run");
+  return moduleProgressView(saved, content);
+}
+
+export async function recordSupabasePersonalRun(user: SupabaseSessionUser, classroomId: string, moduleId: string, updatedAt: string, success: boolean) {
+  const { content } = await requirePerformanceProject(user, classroomId, moduleId);
+  const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
+    const project = row.performance_task.project;
+    if (row.updated_at !== updatedAt || !project) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
+    return { performance_task: { ...row.performance_task, project: { files: project.files, ...(success ? { successfulRun: personalFilesHash(project.files) } : {}) } } };
+  }, "Could not save the personal run result");
+  return moduleProgressView(saved, content);
+}
+
+export async function getSupabasePersonalSubmission(user: SupabaseSessionUser, classroomId: string, studentId: string, moduleId: string) {
+  await teacherStudentWorkspace(user, classroomId, studentId);
+  const { content } = await loadCourseModuleRow(classroomId, moduleId);
+  const db = getSupabaseAdmin();
+  const { data, error } = await db.from("module_progress").select("*").eq("classroom_id", classroomId).eq("student_id", studentId).eq("module_id", moduleId).maybeSingle();
+  fail(error, "Could not load the personal submission");
+  let submission = (data as ModuleProgressRow | null)?.performance_task.own;
+  if (!submission) throw new SupabaseRepositoryError(404, "No personal submission for this module");
+  if (!submission.checklist) {
+    const saved = await updateModuleProgressWithMerge({ ...user, id: studentId }, classroomId, moduleId, (row) => {
+      const own = row.performance_task.own;
+      if (!own) throw new SupabaseRepositoryError(409, "The submission changed. Reopen it");
+      return { performance_task: { ...row.performance_task, own: own.checklist ? own : { ...own, checklist: [...(content.performanceTask?.checklist ?? [])], legacyChecklist: true } } };
+    }, "Could not preserve the submission checklist");
+    submission = saved.performance_task.own!;
+  }
+  return { module: content, submission, submissionId: submission.id ?? submission.submittedAt };
+}
+
+export async function saveSupabasePersonalReview(user: SupabaseSessionUser, classroomId: string, studentId: string, moduleId: string, submissionId: string, checked: boolean[]) {
+  await teacherStudentWorkspace(user, classroomId, studentId);
+  await loadCourseModuleRow(classroomId, moduleId);
+  const saved = await updateModuleProgressWithMerge({ ...user, id: studentId }, classroomId, moduleId, (row) => {
+    const own = row.performance_task.own;
+    if (!own || (own.id ?? own.submittedAt) !== submissionId) throw new SupabaseRepositoryError(409, "The student resubmitted. Reopen the submission before reviewing");
+    if (!own.checklist || checked.length !== own.checklist.length) throw new SupabaseRepositoryError(400, "Review every item from the saved submission checklist");
+    return { performance_task: { ...row.performance_task, own: { ...own, review: { checked, savedAt: new Date().toISOString() } } } };
+  }, "Could not save the teacher review");
+  return saved.performance_task.own!.review!;
 }
 
 async function requireModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string) {
@@ -1631,10 +1705,10 @@ function moduleCompletionPercent(module: CourseModule | ModuleSummaryRow["conten
   const steps = "requiredActivityIds" in module ? module.requiredActivityIds
     : module.lessons.flatMap((lesson) => lesson.blocks.filter((block) => block.type === "step")).map(activityStateId);
   const hasTask = "hasPerformanceTask" in module ? module.hasPerformanceTask : Boolean(module.performanceTask);
-  const total = steps.length + (hasTask ? 2 : 0);
+  const total = steps.length + (hasTask && !paperPerformanceTask(module) ? 1 : 0);
   if (total === 0) return 0;
   const stepsDone = steps.filter((step) => progress.step_states[step] === "pass").length;
-  const taskDone = hasTask ? (progress.performance_task.sample ? 1 : 0) + (progress.performance_task.own ? 1 : 0) : 0;
+  const taskDone = hasTask && !paperPerformanceTask(module) && progress.performance_task.own ? 1 : 0;
   return Math.round(((stepsDone + taskDone) / total) * 100);
 }
 
@@ -1672,6 +1746,7 @@ export async function getSupabaseTeacherClassProgress(user: SupabaseSessionUser,
       return {
         moduleId: module_id,
         percent: moduleCompletionPercent(content, progress),
+        personalSubmitted: Boolean(progress.performance_task.own),
         submissions: content.performanceTask ? Number(Boolean(progress.performance_task.sample)) + Number(Boolean(progress.performance_task.own)) : 0,
       };
     });

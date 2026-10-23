@@ -86,3 +86,10 @@ Actual Week 12–21 prerequisite chain: `tests/week15-week21-modules.test.mjs` c
 preserved `-module` ids; CKB-063. The curriculum browser supplies actual earlier uploads and
 disposable completion records, checks re-upload preservation and real blocking/unlocking.
 Teacher steps: `docs/curriculum-prerequisite-reupload.md`. Access rules remain unchanged.
+
+Personal submission/review: `personal-performance.ts`, personal run/result and teacher review
+routes in `routes.ts`, frozen snapshot/run evidence in `supabase-repository.ts`; existing main
+`StudentModuleActivity`, `PersonalSubmissionChecklist`, `TeacherClassDashboard`, `Landing`,
+`page`, `ModuleWorkspace` and `ModuleViewer`. CKB-067; tests in `personal-performance`,
+`browser-java-progress`, `module-activities`, `weekly-java-project-ui`, and actual screens in
+`personal-performance.browser.mjs`. No new migration or dependency.

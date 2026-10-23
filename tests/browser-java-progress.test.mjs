@@ -95,7 +95,7 @@ test("online Java progress: browser evidence obeys membership, exact output, suc
     const forged = await call(`/api/classrooms/${classroomId}/modules/${fixture.id}/progress/step`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ stepId: first.id, status: "pass" }) });
     assert.equal(forged.status, 403);
     result = await (await report()).json();
-    assert.equal(result.passed, true); assert.equal(result.progress.percent, 25);
+    assert.equal(result.passed, true); assert.equal(result.progress.percent, 33);
     assert.equal((await (await request()).json()).lessons[1].closed, false);
     assert.equal((await (await request("", undefined, cookies[2])).json()).lessons[1].closed, true);
     progress.updatedAt = result.progress.updatedAt;
@@ -156,5 +156,106 @@ test("online sample first: server-owned stages reject edited samples and save ve
     r = await (await report("later failed exploration", false)).json();
     assert.equal(r.passed, false); assert.equal(r.progress.stepStates["task:browser-sample-first"], "pass");
     assert.equal((await (await request()).json()).lessons[1].closed, false);
+  });
+});
+
+test("personal browser runs: failure, stale files and direct submission refused; review binds to a frozen submission", needsLocal, async () => {
+  await withClass(async ({ call, request, prepare, cookies, classroomId, admin, users, upload }) => {
+    await prepare();
+    await admin.from("module_progress").update({ step_states: { [first.id]: "pass", [second.id]: "pass" } }).eq("classroom_id", classroomId).eq("student_id", users[1].id);
+    const base = `/api/classrooms/${classroomId}/modules/${fixture.id}/progress`;
+    const post = (suffix, body, cookie = cookies[1], method = "POST") => call(`${base}/${suffix}`, { method, headers: { cookie }, body: JSON.stringify(body) });
+    const read = async () => (await request("/progress")).json();
+    let view = await (await post("performance-project", {})).json();
+    const submit = () => post("performance-task", { variant: "own", status: "pass", files: view.performanceProjectFiles, updatedAt: view.updatedAt }, cookies[1], "PUT");
+    assert.equal((await submit()).status, 409);
+    const run = async (success) => {
+      const started = await post("personal-run", { updatedAt: view.updatedAt });
+      assert.equal(started.status, 200, await started.clone().text()); view = (await started.json()).progress;
+      const response = await post("personal-result", { updatedAt: view.updatedAt, success });
+      assert.equal(response.status, 200, await response.clone().text()); view = await response.json();
+    };
+    for (const reason of ["compiler error", "runtime error", "Stop", "execution timeout", "input timeout"]) {
+      await run(false); assert.equal((await submit()).status, 409, reason);
+    }
+    await run(true);
+    assert.equal(view.performanceTask.own, undefined, "running is not submission");
+    assert.equal(view.percent, 67);
+    for (const change of [
+      (files) => files.map((f, i) => i ? f : { ...f, content: `${f.content}\n// edited` }),
+      (files) => [...files, { path: "Extra.java", content: "class Extra {}" }],
+      (files) => files.filter((f) => f.path !== "Extra.java"),
+      (files) => files.map((f, i) => i ? f : { ...f, path: "Renamed.java" }),
+    ]) {
+      const stale = view.updatedAt;
+      view = await (await post("performance-project", { updatedAt: view.updatedAt, files: change(view.performanceProjectFiles) }, cookies[1], "PUT")).json();
+      assert.equal((await submit()).status, 409);
+      assert.equal((await post("personal-result", { updatedAt: stale, success: true })).status, 409);
+      await run(true);
+    }
+    assert.equal((await post("personal-result", { updatedAt: view.updatedAt, success: true }, cookies[0])).status, 403);
+    assert.equal((await post("personal-result", { updatedAt: view.updatedAt, success: true }, cookies[3])).status, 403);
+    const submitted = await submit(); assert.equal(submitted.status, 200); view = await submitted.json();
+    assert.equal(view.percent, 100, "submission earns credit without review");
+    const frozen = structuredClone(view.performanceTask.own);
+    const reviewBase = `/api/classes/${classroomId}/students/${users[1].id}/modules/${fixture.id}`;
+    const reviewGet = (cookie = cookies[0], path = reviewBase) => call(`${path}/personal-submission`, { headers: { cookie } });
+    const reviewPut = (body, cookie = cookies[0]) => call(`${reviewBase}/personal-review`, { method: "PUT", headers: { cookie }, body: JSON.stringify(body) });
+    assert.equal((await reviewGet(cookies[1])).status, 403);
+    assert.equal((await reviewGet(cookies[3])).status, 403);
+    const otherTeacher = await admin.auth.admin.createUser({ email: `${randomUUID()}@review.example.test`, password: randomUUID(), email_confirm: true });
+    try {
+      await admin.from("profiles").update({ role: "teacher" }).eq("id", otherTeacher.data.user.id);
+      const { getSupabasePersonalSubmission } = await import("../backend/src/supabase-repository.ts");
+      await assert.rejects(() => getSupabasePersonalSubmission({ id: otherTeacher.data.user.id, role: "teacher" }, classroomId, users[1].id, fixture.id), (e) => e.status === 403);
+    } finally { await admin.auth.admin.deleteUser(otherTeacher.data.user.id); }
+    assert.equal((await reviewGet(cookies[0], reviewBase.replace(users[1].id, users[3].id))).status, 404);
+    let review = await (await reviewGet()).json();
+    assert.deepEqual(review.submission.checklist, fixture.performanceTask.checklist);
+    await upload({ ...fixture, performanceTask: { ...fixture.performanceTask, checklist: ["Changed after submission"] } });
+    review = await (await reviewGet()).json();
+    assert.deepEqual(review.submission.checklist, frozen.checklist, "module changes cannot reinterpret an existing checklist");
+    const checked = frozen.checklist.map(() => true);
+    assert.equal((await reviewPut({ submissionId: review.submissionId, checked: [] })).status, 400);
+    assert.equal((await reviewPut({ submissionId: review.submissionId, checked }, cookies[1])).status, 403);
+    assert.equal((await reviewPut({ submissionId: review.submissionId, checked })).status, 200);
+    assert.equal((await read()).percent, 100);
+    assert.deepEqual((await read()).stepStates, view.stepStates);
+    view = await read();
+    view = await (await post("performance-project", { updatedAt: view.updatedAt, files: [{ path: "Main.java", content: "new draft" }] }, cookies[1], "PUT")).json();
+    assert.deepEqual(view.performanceTask.own.files, frozen.files);
+    assert.deepEqual(view.performanceTask.own.review.checked, checked);
+    await run(true); const replacement = await submit(); assert.equal(replacement.status, 200); view = await replacement.json();
+    assert.notEqual(view.performanceTask.own.id, frozen.id);
+    assert.equal(view.performanceTask.own.review, undefined);
+    assert.deepEqual(view.performanceTask.own.checklist, ["Changed after submission"]);
+    assert.equal((await reviewPut({ submissionId: review.submissionId, checked })).status, 409);
+  });
+});
+
+test("personal compatibility: legacy snapshots retain files and freeze their first review checklist; paper week carries the personal track", needsLocal, async () => {
+  await withClass(async ({ admin, users, classroomId, cookies, call, upload, prepare, request }) => {
+    await prepare();
+    const own = { files: [{ path: "Main.java", content: "old personal submission" }], status: "pass", submittedAt: new Date().toISOString() };
+    await admin.from("module_progress").update({ performance_task: { own }, step_states: { [first.id]: "pass", [second.id]: "pass" } }).eq("classroom_id", classroomId).eq("student_id", users[1].id);
+    const reviewPath = `/api/classes/${classroomId}/students/${users[1].id}/modules/${fixture.id}/personal-submission`;
+    const review = await (await call(reviewPath, { headers: { cookie: cookies[0] } })).json();
+    assert.equal(review.submission.legacyChecklist, true);
+    assert.deepEqual(review.submission.files, own.files);
+    await upload({ ...fixture, performanceTask: { ...fixture.performanceTask, checklist: ["later content"] } });
+    const again = await (await call(reviewPath, { headers: { cookie: cookies[0] } })).json();
+    assert.deepEqual(again.submission.checklist, review.submission.checklist);
+    const paper = { ...fixture, id: "paper-week", course: "java-2", week: 20, previousModuleId: fixture.id, lessons: fixture.lessons.map((lesson) => ({ ...lesson, blocks: [{ type: "text", markdown: "Written proposal" }], exitSlip: { ...lesson.exitSlip, afterStep: lesson.id } })) };
+    await upload(paper);
+    assert.equal((await request("/progress/performance-project", {}, cookies[1], paper.id)).status, 400);
+    const submitPaper = await call(`/api/classrooms/${classroomId}/modules/${paper.id}/progress/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: own.files, status: "pass" }) });
+    assert.equal(submitPaper.status, 400);
+    const next = { ...fixture, id: "after-paper", week: 21, previousModuleId: paper.id };
+    await upload(next);
+    await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: next.id, step_states: { [first.id]: "pass", [second.id]: "pass" } });
+    const opened = await request("/progress/performance-project", {}, cookies[1], next.id);
+    assert.equal(opened.status, 200, await opened.clone().text());
+    assert.deepEqual((await opened.json()).performanceProjectFiles, own.files);
+    assert.deepEqual((await (await request("/progress")).json()).performanceTask.own.files, own.files);
   });
 });

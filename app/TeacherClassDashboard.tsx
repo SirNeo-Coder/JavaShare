@@ -41,8 +41,8 @@ function DeleteModuleDialog({ title, subject, busy, error, dialogRef, onCancel, 
   </dialog>;
 }
 
-export default function TeacherClassDashboard({ classroom, name, onClasses, onEnter, onLogout }: {
-  classroom: LiveClassroom; name: string; onClasses: () => void; onEnter: () => void; onLogout: () => void;
+export default function TeacherClassDashboard({ classroom, name, onClasses, onEnter, onLogout, onReviewPersonal }: {
+  classroom: LiveClassroom; name: string; onClasses: () => void; onEnter: () => void; onLogout: () => void; onReviewPersonal?: (studentId: string, studentName: string, moduleId: string) => Promise<void>;
 }) {
   const [section, setSection] = useState<Section>("Overview");
   const [data, setData] = useState<ClassProgress | null>(null);
@@ -125,6 +125,12 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
           <h3>{module.title}</h3><p className="teacher-course-name">{module.course.replaceAll("-", " ")}</p>
           <div className="teacher-module-facts"><span><b>{module.lessons}</b>Lessons</span><span><b>{module.steps}</b>Practice steps</span><span><b>{forStudent ? forStudent.modules.find((item) => item.moduleId === module.moduleId)?.submissions ?? 0 : module.submissions}</b>Task submissions</span></div>
           <Meter percent={percent} label={forStudent ? "Saved completion" : "Average student completion"} />
+          {forStudent && forStudent.modules.find((item) => item.moduleId === module.moduleId)?.personalSubmitted && <button className="teacher-card-action" disabled={busy} onClick={async () => {
+            setBusy(true); setError("");
+            try { await onReviewPersonal?.(forStudent.id, forStudent.name, module.moduleId); }
+            catch (error) { setError(error instanceof Error ? error.message : "Could not open personal submission"); }
+            finally { setBusy(false); }
+          }}>Review personal submission</button>}
           {!forStudent && <><p className="teacher-card-caption"><b>{module.completedStudents}/{totals?.students ?? 0}</b> students finished</p><button className="teacher-card-action" onClick={() => { setPreviewId(module.moduleId); heading.current?.focus(); }}>View module details <span aria-hidden="true">›</span></button><button className="teacher-delete-link" onClick={(event) => { deleteTrigger.current = event.currentTarget; setError(""); setDeleteId(module.moduleId); }} disabled={busy || sharingSubject === undefined}>Delete module</button></>}
         </div>
       </article>;

@@ -14,6 +14,7 @@ type Props = {
   classrooms: LandingClassroom[];
   initialClassroomId?: string | null;
   onEnter: (classroomId: string) => void;
+  onReviewPersonal?: (classroomId: string, studentId: string, studentName: string, moduleId: string) => Promise<void>;
   onLogout: () => void;
   onRefresh: () => Promise<void>;
   onLiveStatusChange: (classrooms: LiveClassroom[]) => void;
@@ -122,7 +123,7 @@ function LiveClassInvitation({ classrooms, onJoin, onDismiss }: { classrooms: Li
   );
 }
 
-export default function Landing({ role, name, classrooms, initialClassroomId, onEnter, onLogout, onRefresh, onLiveStatusChange, dismissedLiveSessions, onDismissLiveClasses }: Props) {
+export default function Landing({ role, name, classrooms, initialClassroomId, onEnter, onLogout, onRefresh, onLiveStatusChange, dismissedLiveSessions, onDismissLiveClasses, onReviewPersonal }: Props) {
   const [selectedClassroomId, setSelectedClassroomId] = useState(role === "teacher" ? initialClassroomId ?? null : null);
   const [liveClassrooms, setLiveClassrooms] = useState<Record<string, LiveClassroom>>({});
   const displayedClassrooms = classrooms.map((item) => liveClassrooms[item.id] || item);
@@ -197,7 +198,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
     };
   }, [role, classroomIds, connectionAttempt]);
 
-  if (role === "teacher" && classroom) return <TeacherClassDashboard key={classroom.id} classroom={classroom} name={name} onClasses={() => setSelectedClassroomId(null)} onEnter={() => enterClassroom(classroom)} onLogout={onLogout} />;
+  if (role === "teacher" && classroom) return <TeacherClassDashboard key={classroom.id} classroom={classroom} name={name} onClasses={() => setSelectedClassroomId(null)} onEnter={() => enterClassroom(classroom)} onLogout={onLogout} onReviewPersonal={(studentId, studentName, moduleId) => onReviewPersonal?.(classroom.id, studentId, studentName, moduleId) ?? Promise.resolve()} />;
 
   return (
     <main className="teacher-dashboard">

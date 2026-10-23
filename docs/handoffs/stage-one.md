@@ -18,6 +18,22 @@
 > changes. Existing migration untouched; no new dependency or offline runtime change.
 
 > Active approved completion-only module saving (2026-10-22): teacher explicitly
+> Current module draft recovery (2026-10-23): teacher approved fixing the three review findings.
+> Branch `codex/module-draft-recovery`, isolated managed worktree, based on main `fc0972c`
+> after PR #41 merged. Expected-error sample verification survives reopening; changed/legacy
+> drafts retain readable code backups and lose obsolete evidence; pending sync no longer claims
+> completion. The module picker and editor refresh stale content before restoring current work.
+> CKB-067/068/069 record the defects. No schema or backend changes; personal projects remain separate.
+> Verification: 329/329 full suite, 7/7 actual production browser checks, 9/9 focused rule/render
+> checks after three deliberately failing mutations. Online runner/503 responses are controlled;
+> offline uses real laptop javac. Build:all passes; lint has 0 errors and 8 existing warnings;
+> offline launcher configuration check passes. Every named result, initial failures, and limits:
+> [module draft recovery verification](../verification/module-draft-recovery.md).
+> Implementation and verification are complete. Delivery: commit/push this branch and open its PR
+> against main, then record that PR here. Teacher review/rollout remain next. No assistant merge,
+> deployment or hosted settings/SQL. Hosted CPU, real CheerpJ and physical Wi-Fi are unverified.
+
+> Earlier completion-only module saving (2026-10-22): teacher explicitly
 > approved the combined plan: cache downloaded lessons/local unfinished drafts,
 > save online Module project code only after task success, and lighten server checks.
 > Branch codex/module-completion-saves starts at current main 23053f1; isolated
@@ -770,3 +786,26 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   is open against main. Next: teacher reviews the branch and decides whether to deploy.
   No hosted settings, database, or deployment were changed; free-plan CPU recovery and
   physical classroom Wi-Fi remain unverified.
+
+## Personal performance-task workflow — 2026-10-23
+
+- Teacher approved the implementation plan in this chat: successful-run submission, frozen
+  per-module copies, submission progress independent of review, and teacher checklist review.
+- Branch: `codex/personal-performance-workflow`, based on main `7946f0b`. Preserves prerequisite
+  checks, shared subject modules, completion-only module saves and device draft recovery.
+- Done: Projects exposes personal Java work; current drafts remain intact; linked modules prefer
+  prior submitted personal files. Exact saved files must run successfully before submission.
+  Teacher Students → student → module → Review personal submission opens read-only frozen files
+  in the main editor with ordinary Java execution and the complete frozen checklist in Projects.
+  Resubmission resets that copy's review. Java 2 Week 20 remains paper work and is skipped during
+  personal carry-forward. No new migration or dependency.
+- Verified: 335/335 automated tests with actual local Supabase and Java; no skips. Offline
+  production browser 4/4; online production browser 5/5, including input, Stop and teacher runs.
+  Production and offline-launcher builds passed; lint zero errors/eight
+  existing warnings. Three deliberate-break regressions failed, then passed when restored.
+- Delivered: implementation `3a18c3e` and verification `24bd381` committed and pushed.
+  [PR #44](https://github.com/SirNeo-Coder/JavaShare/pull/44) is open against main. Named results,
+  earlier failures and limits are in `docs/verification/personal-performance-workflow.md`.
+- Problem record: CKB-070. Rules, workflow, route/storage/permission maps and prior case links updated.
+- Next: teacher reviews the PR and decides rollout. No merge, deploy, hosted settings or hosted
+  database changes. Windows and physical disconnected classroom Wi-Fi remain unverified.

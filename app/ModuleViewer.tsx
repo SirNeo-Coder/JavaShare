@@ -9,6 +9,7 @@ import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import { runJava } from "./javaExecution";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
+import { paperPerformanceTask } from "../backend/src/personal-performance";
 import { activityStateId } from "../backend/src/module-activities";
 import ModuleCatalogCard from "./ModuleCatalogCard";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
@@ -187,10 +188,10 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
 }
 
 function PerformanceTaskSlot({
-  label, files: initialFiles, classroomId, moduleId, variant, submitted, onSubmitted, role, onStart,
+  label, files: initialFiles, variant, submitted, role, onStart, paper = false,
 }: {
-  label: string; files: ModuleFile[]; classroomId: string; moduleId: string; variant: "sample" | "own";
-  submitted?: StepStatus; onSubmitted: (progress: Progress) => void; role: "teacher" | "student"; onStart?: () => Promise<void>;
+  label: string; files: ModuleFile[]; variant: "sample" | "own";
+  submitted?: StepStatus; role: "teacher" | "student"; onStart?: () => Promise<void>; paper?: boolean;
 }) {
   const [files, setFiles] = useState(initialFiles);
   const [output, setOutput] = useState<string | null>(null);
@@ -208,17 +209,7 @@ function PerformanceTaskSlot({
     }
   };
 
-  const submit = async () => {
-    setBusy(true);
-    try {
-      const updated = await api<Progress>(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", body: JSON.stringify({ variant, files, status: "pass" }) });
-      onSubmitted(updated);
-    } catch (error) {
-      setOutput(error instanceof Error ? error.message : "Could not submit this version");
-    } finally {
-      setBusy(false);
-    }
-  };
+  if (paper) return variant === "own" ? <p>Submit this proposal on paper to your teacher. No Java run or online submission is required.</p> : null;
 
   if (role === "student" && variant === "own") return <div className="module-step">
     <b>Personal performance-task project</b>
@@ -245,7 +236,6 @@ function PerformanceTaskSlot({
       />
       <div className="module-step-actions">
         {canRun && <button type="button" onClick={runIt} disabled={busy}>{busy ? "Running…" : "Run"}</button>}
-        {role === "student" && <button type="button" onClick={submit} disabled={busy}>{busy ? "Submitting…" : "Submit this version"}</button>}
       </div>
       <JavaRunnerBrand />{output !== null && <pre className="module-step-output">{output}</pre>}
     </div>
@@ -267,7 +257,6 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   const [error, setError] = useState<string | null>(null);
   const [lessonPage, setLessonPage] = useState(0);
   const [paperPage, setPaperPage] = useState<number | null>(null);
-  const applyProgress = (updated: Progress) => setProgress((current) => !current || updated.updatedAt >= current.updatedAt ? updated : current);
 
   useEffect(() => {
     if (role !== "student") return;
@@ -294,7 +283,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
     const currentPage = Math.max(0, Math.min(paperPage ?? (role === "student" ? resumePage : 0), totalPages - 1));
     const current = pages[currentPage];
     const partDone = (part: typeof parts[number]) => !part.closed && part.blocks.filter(isStepBlock).every((step) => progress.stepStates[activityStateId(step)] === "pass");
-    const taskDone = progress.performanceTask.sample?.status === "pass" && progress.performanceTask.own?.status === "pass";
+    const taskDone = Boolean(progress.performanceTask.own);
     const completed = parts.filter(partDone).length + Number(hasTask && taskDone);
     return <div className="worksheet-content">
       {role === "teacher" && <p className="module-preview-note">Teacher preview — running code does not save student progress.</p>}
@@ -324,8 +313,8 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
           {module.closedPerformanceTask && <p className="module-preview-note">Complete the previous part first</p>}
           {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
-            <PerformanceTaskSlot label="Sample code" files={module.performanceTask.exampleFiles} classroomId={classroomId} moduleId={module.id} variant="sample" role={role} submitted={progress.performanceTask.sample?.status} onSubmitted={applyProgress} />
-            <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role} onStart={() => onStartActivity?.(module) ?? Promise.resolve()} submitted={progress.performanceTask.own?.status} onSubmitted={applyProgress} />
+            <PerformanceTaskSlot label="Sample code" files={module.performanceTask.exampleFiles} variant="sample" role={role} paper={paperPerformanceTask(module)} submitted={progress.performanceTask.sample?.status} />
+            <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} variant="own" role={role} paper={paperPerformanceTask(module)} onStart={() => onStartActivity?.(module) ?? Promise.resolve()} submitted={progress.performanceTask.own?.status} />
             {module.performanceTask.presentationOutline?.length ? <><h3 className="paper-heading">Presentation</h3><ol>{module.performanceTask.presentationOutline.map((item, index) => <li key={index}>{item}</li>)}</ol></> : null}
             {module.performanceTask.questionsToPrepare?.length ? <><h3 className="paper-heading">Prepare for these questions</h3><ul>{module.performanceTask.questionsToPrepare.map((item, index) => <li key={index}>{item}</li>)}</ul></> : null}
             {module.performanceTask.rubric?.length ? <ModulePaperBlock block={{ type: "table", columns: ["Criterion", "Points"], rows: module.performanceTask.rubric.map((row) => [row.criterion, String(row.points)]) }} /> : null}
@@ -384,14 +373,12 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
           <Markdown markdown={module.performanceTask.markdown} />
           <ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
           <PerformanceTaskSlot
-            label="Sample code" files={module.performanceTask.exampleFiles} classroomId={classroomId} moduleId={module.id} variant="sample" role={role}
+            label="Sample code" files={module.performanceTask.exampleFiles} variant="sample" role={role} paper={paperPerformanceTask(module)}
             submitted={progress.performanceTask.sample?.status}
-            onSubmitted={applyProgress}
           />
           <PerformanceTaskSlot
-            label="Your own version" files={module.performanceTask.starterFiles} classroomId={classroomId} moduleId={module.id} variant="own" role={role} onStart={() => onStartActivity?.(module) ?? Promise.resolve()}
+            label="Your own version" files={module.performanceTask.starterFiles} variant="own" role={role} paper={paperPerformanceTask(module)} onStart={() => onStartActivity?.(module) ?? Promise.resolve()}
             submitted={progress.performanceTask.own?.status}
-            onSubmitted={applyProgress}
           />
         </section>
       )}
