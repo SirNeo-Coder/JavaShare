@@ -225,7 +225,7 @@ test("module activities: real multi-file Java result unlocks only that student, 
     response = await run(solution);
     assert.equal(response.status, 200, await response.clone().text()); result = await response.json();
     assert.equal(result.passed, true); assert.equal(result.output.trim(), "Capacity: 20");
-    assert.equal(result.progress.percent, 25);
+    assert.equal(result.progress.percent, 33);
     assert.equal(result.progress.stepStates[firstStateId], "pass");
     assert.equal(result.progress.stepStates[fixture.lessons[0].exitSlip.id], undefined);
     view = await (await request()).json();
@@ -235,7 +235,7 @@ test("module activities: real multi-file Java result unlocks only that student, 
     assert.deepEqual(reopened.projectFiles, solution, "opening the next activity preserves the student's evolving project");
     const final = solution.map((file) => file.path.endsWith("Main.java") ? { ...file, content: 'public class Main { public static void main(String[] args) { for (int i = 3; i >= 1; i--) System.out.println(i); } }' } : file);
     result = await (await run(final, second.id)).json();
-    assert.equal(result.passed, true); assert.equal(result.progress.percent, 50);
+    assert.equal(result.passed, true); assert.equal(result.progress.percent, 67);
     assert.ok((await (await request()).json()).performanceTask);
   });
 });
@@ -334,7 +334,7 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     assert.equal(view.performanceProjectFiles.find((file) => file.path.endsWith("Main.java")).content, "previous personal Main");
     assert.ok(view.performanceProjectFiles.some((file) => file.path === "Own.java"));
     assert.deepEqual(view.projectFiles, prepared.projectFiles);
-    assert.equal(view.percent, 50, "preparing a draft is not a submission");
+    assert.equal(view.percent, 67, "preparing a draft is not a submission");
     assert.equal(view.performanceTask.own, undefined);
     assert.equal((await personal({}, "POST", cookies[0])).status, 403);
     assert.equal((await personal({}, "POST", cookies[2])).status, 403);
@@ -349,11 +349,15 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     const executed = await call("/api/execute", { method: "POST", headers: { cookie: cookies[1] }, body: JSON.stringify({ files: ownFiles }) });
     const result = await executed.json(); assert.equal(result.success, true); assert.equal(result.output, "Personal OOP\n");
     const afterRun = await (await request("/progress")).json();
-    assert.deepEqual(afterRun.stepStates, passed); assert.equal(afterRun.percent, 50);
+    assert.deepEqual(afterRun.stepStates, passed); assert.equal(afterRun.percent, 67);
     assert.deepEqual(afterRun.performanceProjectFiles, ownFiles);
     assert.deepEqual(afterRun.projectFiles, prepared.projectFiles);
     assert.equal((await call(`${base}/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: personalFiles, status: "pass", updatedAt: beforeSave }) })).status, 409, "a stale tab cannot replace the submission");
-    const submitted = await call(`${base}/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: ownFiles, status: "pass" }) });
+    await delay(1550);
+    const personalRun = await call(`${base}/personal-run`, { method: "POST", headers: { cookie: cookies[1] }, body: JSON.stringify({ updatedAt: view.updatedAt }) });
+    assert.equal(personalRun.status, 200, await personalRun.clone().text());
+    view = (await personalRun.json()).progress;
+    const submitted = await call(`${base}/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: ownFiles, status: "pass", updatedAt: view.updatedAt }) });
     assert.equal(submitted.status, 200);
     response = await personal({ files: [{ path: "Main.java", content: "later personal edit" }], updatedAt: (await submitted.json()).updatedAt }, "PUT");
     assert.equal(response.status, 200); view = await response.json();
@@ -369,7 +373,7 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     await admin.from("module_progress").update({ step_states: passed }).eq("classroom_id", classroomId).eq("module_id", next.id).eq("student_id", users[1].id);
     response = await request("/progress/performance-project", {}, cookies[1], next.id);
     assert.equal(response.status, 200); view = await response.json();
-    assert.equal(view.performanceProjectFiles.find((file) => file.path === "Main.java").content, "later personal edit");
+    assert.deepEqual(view.performanceProjectFiles, ownFiles, "next week prefers the submitted personal version");
     // Same module id in a different class must never find this student's prior project.
     const otherClass = await admin.from("classrooms").insert({ name: "Other weekly class", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
     assert.equal(otherClass.error, null);
@@ -471,5 +475,40 @@ test("sample first: a declared runtime error verifies only the demonstration and
     p = await prepare(one.id, cookies[2]);
     assert.deepEqual(p.projectFiles, files); assert.equal(samplePending(content, one, p.stepStates), false);
     assert.equal(p.stepStates[sampleStateId(one)], undefined, "no fabricated sample pass for an existing completion");
+  });
+});
+
+test("personal offline runs: compile failure, crash and timeout cannot submit; handled exceptions can", needsLocal, async () => {
+  await withClass(async ({ admin, users, classroomId, prepare, call, request, cookies }) => {
+    await prepare();
+    await admin.from("module_progress").update({ step_states: { [first.id]: "pass", [second.id]: "pass" } }).eq("classroom_id", classroomId).eq("student_id", users[1].id);
+    const base = `/api/classrooms/${classroomId}/modules/${fixture.id}/progress`;
+    const post = (suffix, body, method = "POST") => call(`${base}/${suffix}`, { method, headers: { cookie: cookies[1] }, body: JSON.stringify(body) });
+    let view = await (await post("performance-project", {})).json();
+    const initial = await (await request("/progress")).json();
+    for (const [source, success] of [
+      ["not valid Java", false],
+      ['public class Main { public static void main(String[] a) { System.out.println("Looks correct"); throw new RuntimeException("failed"); } }', false],
+      ['public class Main { public static void main(String[] a) { while (true) {} } }', false],
+      ['public class Main { public static void main(String[] a) { try { throw new RuntimeException("handled"); } catch (RuntimeException e) { System.out.println("Coffee shop recovered"); } } }', true],
+    ]) {
+      view = await (await post("performance-project", { files: [{ path: "Main.java", content: source }], updatedAt: view.updatedAt }, "PUT")).json();
+      await delay(1550);
+      const response = await post("personal-run", { updatedAt: view.updatedAt });
+      assert.equal(response.status, 200, await response.clone().text());
+      const run = await response.json(); assert.equal(run.success, success); view = run.progress;
+      assert.equal(view.performanceTask.own, undefined);
+      assert.equal(view.percent, initial.percent);
+      const submitted = await post("performance-task", { variant: "own", status: "pass", files: view.performanceProjectFiles, updatedAt: view.updatedAt }, "PUT");
+      assert.equal(submitted.status, success ? 200 : 409, await submitted.clone().text());
+      if (success) view = await submitted.json();
+    }
+    assert.equal(view.percent, 100);
+    assert.equal(view.performanceTask.own.review, undefined);
+    assert.equal((await post("personal-result", { updatedAt: view.updatedAt, success: true })).status, 403, "offline refuses browser claims");
+    const before = await (await request("/progress")).json();
+    const teacherRun = await call("/api/execute", { method: "POST", headers: { cookie: cookies[0] }, body: JSON.stringify({ files: before.performanceTask.own.files }) });
+    assert.equal((await teacherRun.json()).success, true);
+    assert.deepEqual(await (await request("/progress")).json(), before, "teacher execution never changes the student record");
   });
 });

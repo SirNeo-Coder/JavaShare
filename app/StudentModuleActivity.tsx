@@ -12,7 +12,8 @@ import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, source
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 
 export type StudentActivity = {
-  kind: "module" | "performance"; module: CourseModule;
+  kind: "module" | "performance" | "review";
+  review?: { studentId: string; studentName: string; submissionId: string; submission: import("../backend/src/personal-performance").PersonalSubmission }; module: CourseModule;
   classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string; studentId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
 };
@@ -51,7 +52,8 @@ export function JavaRunProgress({ message, waiting = false }: { message: string 
 export default function StudentModuleActivity({ activity, ref, onChecked, onClose }: {
   activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void;
 }) {
-  const personal = activity.kind === "performance";
+  const review = activity.kind === "review";
+  const personal = activity.kind !== "module";
   const task = !personal && activity.stateId.startsWith("task:");
   const [files, setFiles] = useState<ModuleFile[]>(personal ? activity.progress.performanceProjectFiles : activity.progress.projectFiles);
   const [stdin, setStdin] = useState("");
@@ -71,6 +73,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const pendingSample = !personal && Boolean(step && samplePending(activity.module, step, stepStates));
   const completed = !personal && stepStates[activity.stateId] === "pass";
   const checkInput = pendingSample ? step?.stdin ?? "" : activity.stdin;
+  const [successfulFiles, setSuccessfulFiles] = useState<string | null>(null);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
   const [deviceReady, setDeviceReady] = useState(personal);
   const localKey = moduleRecordKey("activity", activity.studentId, activity.classroomId, activity.moduleId, activity.stepId);
@@ -122,10 +125,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
 
   const save = async () => {
     if (busyRef.current) throw new Error("Wait for the current save or run to finish");
-    if (!dirty) return;
+    if (review || !dirty) return;
     busyRef.current = true; setBusy(true); setError("");
     try {
-      if (personal) progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+      if (personal) {
+        progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
+        setSavedFiles(JSON.stringify(files));
+      }
       else await saveDeviceDraft();
     } finally { busyRef.current = false; setBusy(false); }
   };
@@ -134,9 +140,10 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const run = async () => {
     if (busyRef.current || !deviceReady) return;
     busyRef.current = true; setBusy(true); setError("");
-    setLastCheck(null);
+    setLastCheck(null); setSuccessfulFiles(null);
     setRunMessage("Saving your code on this device…");
     try {
+      if (review) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, stdin, () => setStdin("")); return; }
       if (!personal) await saveDeviceDraft();
       else {
         progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
@@ -144,7 +151,17 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       }
       setRunMessage("Java is loading or running… Please wait.");
       if (personal) {
-        await javaConsole.run(files, stdin, () => setStdin(""));
+        const started = await api<{ progress: Progress; success?: boolean; output?: string }>(`${base}/personal-run`, {
+          method: "POST", body: JSON.stringify({ updatedAt: progress.current.updatedAt, stdin }),
+        });
+        progress.current = started.progress;
+        let success = started.success;
+        if (success === undefined) {
+          const result = await javaConsole.run(files, stdin, () => setStdin(""));
+          progress.current = await api<Progress>(`${base}/personal-result`, { method: "POST", body: JSON.stringify({ updatedAt: progress.current.updatedAt, success: result.success }) });
+          success = result.success;
+        } else setOutput(started.output ?? "");
+        if (success) setSuccessfulFiles(JSON.stringify(files));
       } else {
         const runner = runnerRef.current ?? await getJavaRunner();
         runnerRef.current = runner;
@@ -207,7 +224,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   }, [activity.classroomId, activity.moduleId, activity.studentId, base, deviceReady, files, localKey, onChecked, personal]);
 
   const submit = async () => {
-    if (busyRef.current) return;
+    if (busyRef.current || review || successfulFiles !== JSON.stringify(files)) return;
     try {
       await save();
       if (busyRef.current) return;
@@ -220,6 +237,16 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     finally { busyRef.current = false; setBusy(false); }
   };
 
+  const changeFiles = (next: ModuleFile[]) => { setFiles(next); setSuccessfulFiles(null); };
+  const renameFile = () => {
+    const entered = window.prompt("New Java file path", path)?.trim().replace(/\\/g, "/");
+    if (!entered || entered === path) return;
+    if (entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered) || files.some((file) => file.path !== path && sourcePath(file.path) === sourcePath(entered))) {
+      setError("Choose a unique Java filename."); return;
+    }
+    changeFiles(files.map((file) => file.path === path ? { ...file, path: entered } : file)); setPath(entered);
+  };
+
   const addFile = (event: React.FormEvent) => {
     event.preventDefault();
     const entered = newPath.trim().replace(/\\/g, "/");
@@ -228,7 +255,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     }
     const name = entered.split("/").at(-1)!.slice(0, -5);
     const packageName = sourcePath(entered).split("/").slice(0, -1).join(".");
-    setFiles([...files, { path: entered, content: `${packageName ? `package ${packageName};\n\n` : ""}public class ${name} {\n\n}\n` }]);
+    changeFiles([...files, { path: entered, content: `${packageName ? `package ${packageName};\n\n` : ""}public class ${name} {\n\n}\n` }]);
     setPath(entered); setNewPath(""); setAddingFile(false); setError("");
   };
 
@@ -237,19 +264,23 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       if (event.ctrlKey && event.key === "Enter" && !javaConsole.waiting) { event.preventDefault(); void run(); }
     }}>
       <section className="editor-card">
-        <div className="workspace-card-heading"><b>{personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>Java</span></div>
+        <div className="workspace-card-heading"><b>{review ? "Submitted personal project — read-only" : personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>Java</span></div>
         <div className="file-tabs" aria-label={personal ? "Personal project files" : "Module project files"}>
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
-          <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>
+          {!review && <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>}
         </div>
-        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={busy || pendingSample || !deviceReady} onChange={(content) => setFiles((current) => current.map((file) => file.path === path ? { ...file, content } : file))} />
-        <div className="editor-status"><span>{path}</span><span>{dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
+        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={review || busy || pendingSample || !deviceReady} onChange={(content) => changeFiles(files.map((file) => file.path === path ? { ...file, content } : file))} />
+        <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
+        {personal && !review && <div className="module-step-actions"><button type="button" disabled={busy} onClick={renameFile}>Rename file</button><button type="button" disabled={busy || files.length < 2} onClick={() => {
+          if (!window.confirm(`Delete ${path}?`)) return;
+          const remaining = files.filter((file) => file.path !== path); changeFiles(remaining); setPath(remaining[0].path);
+        }}>Delete file</button></div>}
       </section>
       <aside className="right-panel module-activity-console">
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
-          {personal ? <label>Program input<textarea value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
+          {personal ? <label>Program input<textarea aria-label="Program input" value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");
             }
@@ -260,6 +291,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
+        {personal && !review && <p role="status">{successfulFiles === JSON.stringify(files) ? "Run succeeded — ready to submit this version." : "Run the current files successfully before submitting."} Submission records progress, not a grade or teacher approval.</p>}
         {!personal && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} expectedError={step?.expectedError} />}
         <JavaRunnerBrand />
         <JavaRunProgress message={runMessage} waiting={javaConsole.waiting} />
@@ -271,7 +303,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div>{personal && <button type="button" className="run-button" disabled={busy} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button><button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button></div>
+      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button>}</div>
     </footer>
   </>;
 }

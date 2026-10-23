@@ -766,3 +766,26 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   is open against main. Next: teacher reviews the branch and decides whether to deploy.
   No hosted settings, database, or deployment were changed; free-plan CPU recovery and
   physical classroom Wi-Fi remain unverified.
+
+## Personal performance-task workflow — 2026-10-23
+
+- Teacher approved the implementation plan in this chat: successful-run submission, frozen
+  per-module copies, submission progress independent of review, and teacher checklist review.
+- Branch: `codex/personal-performance-workflow`, based on main `7946f0b`. Preserves prerequisite
+  checks, shared subject modules, completion-only module saves and device draft recovery.
+- Done: Projects exposes personal Java work; current drafts remain intact; linked modules prefer
+  prior submitted personal files. Exact saved files must run successfully before submission.
+  Teacher Students → student → module → Review personal submission opens read-only frozen files
+  in the main editor with ordinary Java execution and the complete frozen checklist in Projects.
+  Resubmission resets that copy's review. Java 2 Week 20 remains paper work and is skipped during
+  personal carry-forward. No new migration or dependency.
+- Verified: 335/335 automated tests with actual local Supabase and Java; no skips. Offline
+  production browser 4/4; online production browser 5/5, including input, Stop and teacher runs.
+  Production and offline-launcher builds passed; lint zero errors/eight
+  existing warnings. Three deliberate-break regressions failed, then passed when restored.
+- Delivered: implementation `3a18c3e` and verification `24bd381` committed and pushed.
+  [PR #44](https://github.com/SirNeo-Coder/JavaShare/pull/44) is open against main. Named results,
+  earlier failures and limits are in `docs/verification/personal-performance-workflow.md`.
+- Problem record: CKB-070. Rules, workflow, route/storage/permission maps and prior case links updated.
+- Next: teacher reviews the PR and decides rollout. No merge, deploy, hosted settings or hosted
+  database changes. Windows and physical disconnected classroom Wi-Fi remain unverified.

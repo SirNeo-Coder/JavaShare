@@ -17,7 +17,7 @@ test("module activity screen: signing in starts safely before a class or project
 
 test("module activity screen: main Java editor has project tabs, sample output, Console, Run code and Save work", () => {
   const html = renderToStaticMarkup(createElement(StudentModuleActivity, {
-    activity: { classroomId: "class", moduleId: "module", moduleTitle: "Vehicle project", stepId: "step", stateId: "step:activity", instruction: "Change the capacity", expectedOutput: "Capacity: 25", stdin: "", progress: { projectFiles: [{ path: "Main.java", content: "class Main {}" }, { path: "Vehicle.java", content: "abstract class Vehicle {}" }], stepStates: {}, updatedAt: "", percent: 0 } },
+    activity: { kind: "module", classroomId: "class", moduleId: "module", moduleTitle: "Vehicle project", stepId: "step", stateId: "step:activity", instruction: "Change the capacity", expectedOutput: "Capacity: 25", stdin: "", progress: { projectFiles: [{ path: "Main.java", content: "class Main {}" }, { path: "Vehicle.java", content: "abstract class Vehicle {}" }], stepStates: {}, updatedAt: "", percent: 0 } },
     ref: { current: null }, onChecked() {}, onClose() {},
   }));
   assert.match(html, /Java source code editor/);

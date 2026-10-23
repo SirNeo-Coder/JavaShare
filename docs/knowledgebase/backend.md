@@ -153,3 +153,16 @@ response shape is retained. Student content replies include moduleVersion.
 The browser switches to this path in the completion-only feature; offline/personal
 paths retain their existing endpoints. Teacher applies hosted SQL before rollout:
 [setup](../module-completion-setup.md). Hosted CPU recovery is not yet verified.
+
+Personal performance workflow (2026-10-23): `POST .../progress/personal-run` invalidates earlier
+run evidence and uses saved personal files; offline executes laptop Java, online returns the
+saved version for browser execution. `POST .../progress/personal-result` accepts browser success
+only in online browser mode and rejects stale versions. Existing `PUT .../performance-task`
+requires matching saved files and successful-run evidence for `own`; client pass flags alone fail.
+
+Teacher-only `GET /api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-submission`
+loads the frozen copy and preserves a legacy checklist on first review. `PUT` at the corresponding
+`personal-review` path checks submission identity and the complete checkbox array. Both enforce
+class ownership/current student membership. Teacher execution uses the existing ordinary runner;
+it has no student progress writes. `personal-performance.ts` holds the small shared paper-week and
+personal initialization rules. Shared subject content is read through the existing module loader.

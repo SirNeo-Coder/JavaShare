@@ -95,3 +95,10 @@ avoid overwriting a concurrent correction. All student progress queries retain t
 
 Prerequisite links resolve inside that same teacher/subject library. Completion is still looked
 up by student and class; finishing a shared week in one class never opens it in another class.
+
+Personal task review/submission (2026-10-23): browser success remains explicitly accepted practice
+evidence, not a grade. Personal submission checks identity/class/module access, saved-version
+freshness and a server-computed file hash; offline refuses browser claims. Teacher checklist
+routes require class ownership and current student membership. A submission-specific id prevents
+old review ticks from overwriting a resubmission. Frozen teacher-run files never use student-save
+or completion routes. Existing class isolation, live restrictions and prerequisite checks remain.
