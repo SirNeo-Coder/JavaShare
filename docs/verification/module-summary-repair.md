@@ -47,9 +47,9 @@ a local database without the required function.
 
 ## Remaining limits
 
-The five-value function/permission readiness check, both teacher/student role checks,
-and actual completion/reload verification remain pending unless later teacher
-results are recorded below. Hosted CPU recovery is a separate incident and is not
+Teacher subsequently confirms all five function/permission readiness values true.
+Both teacher/student role checks and actual completion/reload verification remain
+unconfirmed; the all-true reply is recorded as SQL readiness evidence only. Hosted CPU recovery is a separate incident and is not
 proven by module-list recovery. Physical Wi-Fi and an offline launcher/browser run
 were not repeated: this branch changes documentation only. Existing local route/
 Supabase/real Java tests ran as part of the suite.

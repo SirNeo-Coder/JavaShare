@@ -11,8 +11,9 @@
 > docs/verification/module-summary-repair.md. Repair documentation e1a5a16 is
 > committed/pushed; [PR #43](https://github.com/SirNeo-Coder/JavaShare/pull/43)
 > is open against main for review. No local implementation work remains.
-> Next: teacher supplies five function/permission readiness values and confirms
-> both roles can open Module and a student's successful activity survives reload.
+> Teacher confirms all five function/permission readiness values true. Next:
+> confirm both roles can open Module and a student's successful activity survives
+> reload; the teacher's all-true reply is recorded only as readiness evidence.
 > Hosted CPU recovery is separate and unverified. No app/test/config/migration
 > changes. Existing migration untouched; no new dependency or offline runtime change.
 

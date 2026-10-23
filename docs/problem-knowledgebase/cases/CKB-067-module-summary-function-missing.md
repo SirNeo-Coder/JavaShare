@@ -51,8 +51,9 @@ completion UPDATE or replace module/progress data. No new migration or app chang
 - Current check commands and results: docs/verification/module-summary-repair.md.
 - Teacher confirms all four prerequisite values true (shared library, class subject,
   project files and per-step drafts). Teacher reports SQL success and recovered
-  Module loading after applying the existing migration. Five-value function/permission
-  readiness and actual student completion/reload verification remain pending. No destructive missing-function mutation was run
+  Module loading after applying the existing migration. Teacher confirms all five
+  function/permission readiness values true. Actual student completion/reload
+  verification remains pending. No destructive missing-function mutation was run
   against a shared database.
 - Documentation commit: e1a5a16, branch codex/module-summary-repair, PR #43.
   No hosted SQL executed by the assistant.
@@ -69,4 +70,5 @@ local builds/tests with a repaired hosted service.
 - 2026-10-23 — Teacher provided module-list errors and read-only database results;
   missing summary function confirmed in checked project. Teacher approved the
   existing update; all prerequisites true, teacher SQL succeeded and Module now
-  loads. Five-value permission and student completion/reload checks remain pending.
+  loads. Teacher subsequently confirms all five function/permission readiness
+  values true; actual student completion/reload checks remain unconfirmed.

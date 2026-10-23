@@ -3,8 +3,8 @@
 Status: implementation merged in PR #41; hosted database readiness must be checked.
 On 2026-10-23 the teacher confirmed the summary function was missing and approved
 applying this existing update. The teacher subsequently reports SQL success and
-recovered Module loading (CKB-067); final permissions/student saved-progress checks
-remain pending.
+recovered Module loading (CKB-067), with all five function/permission readiness
+values true; student saved-progress checks remain pending.
 This guide is for the teacher; assistants do not change hosted services.
 
 ## Repair when Module shows Unexpected server error
