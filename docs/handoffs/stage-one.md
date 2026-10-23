@@ -769,16 +769,22 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 ## Personal performance-task workflow — 2026-10-23
 
-- Teacher approved the implementation plan in this chat, including successful-run submission,
-  frozen per-module copies, submission progress independent of review, and teacher checklist review.
-- Branch: `codex/personal-performance-workflow`. Implementation reuses the main editor, Console,
-  existing personal draft/submission JSON and class permissions. Week 20 remains paper work.
-- Initial checkpoint: build passed; lint zero errors/eight existing warnings; 275/275 tests passed
-  with local Supabase. Offline student/teacher browser passed 4/4. Three deliberate-break checks
-  failed with submission, continuation and review guards removed, then passed after restoration.
-- In progress: integrate current main `7946f0b`, which was newer than the starting checkout;
-  preserve module prerequisite checks, shared subject modules, completion-only saves and draft
-  recovery. Repeat validation on the integrated version before PR delivery. Online input/Stop
-  and teacher execution checks are running; no final integrated claim yet.
-- Next: finish integration and verification, update knowledge/problem records, commit, push and
-  open the teacher-review PR. No merge, deploy, hosted settings or hosted database changes.
+- Teacher approved the implementation plan in this chat: successful-run submission, frozen
+  per-module copies, submission progress independent of review, and teacher checklist review.
+- Branch: `codex/personal-performance-workflow`, based on main `7946f0b`. Preserves prerequisite
+  checks, shared subject modules, completion-only module saves and device draft recovery.
+- Done: Projects exposes personal Java work; current drafts remain intact; linked modules prefer
+  prior submitted personal files. Exact saved files must run successfully before submission.
+  Teacher Students → student → module → Review personal submission opens read-only frozen files
+  in the main editor with ordinary Java execution and the complete frozen checklist in Projects.
+  Resubmission resets that copy's review. Java 2 Week 20 remains paper work and is skipped during
+  personal carry-forward. No new migration or dependency.
+- Verified: 335/335 automated tests with actual local Supabase and Java; no skips. Offline
+  production browser 4/4; online production browser 5/5, including input, Stop and teacher runs.
+  Production and offline-launcher builds passed; lint zero errors/eight
+  existing warnings. Three deliberate-break regressions failed, then passed when restored.
+- Verification complete; committing and pushing the final evidence for PR delivery. Named results,
+  earlier failures and limits are in `docs/verification/personal-performance-workflow.md`.
+- Problem record: CKB-070. Rules, workflow, route/storage/permission maps and prior case links updated.
+- Next: teacher reviews the PR and decides rollout. No merge, deploy, hosted settings or hosted
+  database changes. Windows and physical disconnected classroom Wi-Fi remain unverified.

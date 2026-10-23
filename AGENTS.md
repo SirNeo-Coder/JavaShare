@@ -214,3 +214,23 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   the existing laptop/offline runner path. Initial reads/sign-in requests remain.
 - Keep hosted prerequisite/catalog reads small using server-only summaries derived
   from current content. No stored duplicate curriculum or removal of access checks.
+
+## Personal performance-task submissions and review (agreed 2026-10-23)
+
+- Keep personal files separate from module samples. Initialize from personal starters or the
+  preceding personal submission, falling back to its draft only when no submission exists.
+  Preserve current work exactly. Carry personal work across the written Week 20 proposal.
+- Submit this version requires successful execution of the exact saved personal files, checked
+  on the server too. Edits, additions, deletions, renames and unsuccessful runs invalidate it.
+  Use approved browser evidence online and laptop Java offline; personal output has no sample target.
+- Submission earns its personal-task progress credit and shows Submitted, not a grade or teacher
+  approval. Review never gates progression. Preserve lesson and predecessor checks and live locks.
+- Keep one frozen personal submission per student/class/module. Explicit resubmission replaces
+  only that module's copy and clears its review. Existing submissions and drafts remain separate.
+- Teacher dashboard → Students → student → module → Review personal submission opens the frozen
+  files read-only in the main editor. Teacher runs never modify student files or progress.
+  Projects shows the complete frozen checklist with teacher-only ticks and Save review.
+  Check class ownership, student membership and submission identity on the server.
+- Preserve the checklist used for each submission. Older copies without one retain their files
+  and clearly identify the current checklist captured when first opened for review.
+- Week 20 remains a paper proposal with no Java run or online submission requirement.

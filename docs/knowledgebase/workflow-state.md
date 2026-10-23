@@ -384,3 +384,26 @@ recovery remains unverified.
 - Clearing browser storage removes unfinished device drafts. The server keeps successful module
   completions and their saved project files. Local browser/device behavior is verified; hosted
   Cloudflare CPU recovery remains unverified. See CKB-065 and the completion-only verification.
+
+## Personal performance-task submission and teacher review (2026-10-23)
+
+Projects now exposes Personal performance-task project and Choose module before a Java activity
+has been opened. Work on performance task and the Projects button reopen the same personal draft.
+New drafts use personal starters or the preceding submitted personal project, falling back to its
+draft. Existing current work is returned unchanged; lesson starter files are never imported.
+The Java 2 Week 20 proposal stays on paper, and later personal work carries across that paper week.
+
+Run code saves personal files and records actual successful execution against those files.
+Submit this version stays disabled until that succeeds; file changes or unsuccessful runs require
+another run. Online uses the approved browser result, offline uses laptop Java. Personal output
+has no expected-output comparison. Saving/running alone earns no progress. Explicit submission
+freezes the current files, earns the single personal-task credit, and shows Submitted. Earlier
+sample copies remain readable but are not a second required performance submission.
+
+Teacher dashboard → Students → student → module → Review personal submission opens frozen files
+read-only in the main editor. Run code, Console, Program input and Stop retain their normal mode
+behavior and never update student progress. Projects shows every saved checklist item and Save
+review. Resubmission replaces only that module's submitted copy and clears the previous review;
+a stale review cannot attach to the replacement. Checklist review is separate from progress/grades.
+Legacy submissions preserve their files and label checklists captured from current content at
+first review. Module completion-only saves, device recovery, prerequisites and live locks remain.

@@ -237,7 +237,7 @@ test("personal compatibility: legacy snapshots retain files and freeze their fir
   await withClass(async ({ admin, users, classroomId, cookies, call, upload, prepare, request }) => {
     await prepare();
     const own = { files: [{ path: "Main.java", content: "old personal submission" }], status: "pass", submittedAt: new Date().toISOString() };
-    await admin.from("module_progress").update({ performance_task: { own } }).eq("classroom_id", classroomId).eq("student_id", users[1].id);
+    await admin.from("module_progress").update({ performance_task: { own }, step_states: { [first.id]: "pass", [second.id]: "pass" } }).eq("classroom_id", classroomId).eq("student_id", users[1].id);
     const reviewPath = `/api/classes/${classroomId}/students/${users[1].id}/modules/${fixture.id}/personal-submission`;
     const review = await (await call(reviewPath, { headers: { cookie: cookies[0] } })).json();
     assert.equal(review.submission.legacyChecklist, true);
@@ -245,7 +245,7 @@ test("personal compatibility: legacy snapshots retain files and freeze their fir
     await upload({ ...fixture, performanceTask: { ...fixture.performanceTask, checklist: ["later content"] } });
     const again = await (await call(reviewPath, { headers: { cookie: cookies[0] } })).json();
     assert.deepEqual(again.submission.checklist, review.submission.checklist);
-    const paper = { ...fixture, id: "paper-week", course: "java-2", week: 20, previousModuleId: fixture.id };
+    const paper = { ...fixture, id: "paper-week", course: "java-2", week: 20, previousModuleId: fixture.id, lessons: fixture.lessons.map((lesson) => ({ ...lesson, blocks: [{ type: "text", markdown: "Written proposal" }], exitSlip: { ...lesson.exitSlip, afterStep: lesson.id } })) };
     await upload(paper);
     assert.equal((await request("/progress/performance-project", {}, cookies[1], paper.id)).status, 400);
     const submitPaper = await call(`/api/classrooms/${classroomId}/modules/${paper.id}/progress/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: own.files, status: "pass" }) });

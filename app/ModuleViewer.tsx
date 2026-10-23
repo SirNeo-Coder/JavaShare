@@ -157,7 +157,7 @@ export function ModulePaperBlock({ block }: { block: OtherBlock }) {
 }
 
 function StepView({ step, status, role, printed = false, sampleFirst = false, onStart }: {
-  step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; sampleFirst?: boolean; onStart?: () => Promise<void>; paper?: boolean;
+  step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; sampleFirst?: boolean; onStart?: () => Promise<void>;
 }) {
   const [files, setFiles] = useState(step.files);
   const [output, setOutput] = useState<string | null>(null);

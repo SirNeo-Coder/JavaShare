@@ -27,8 +27,8 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
     const student = await browser.newContext({ baseURL, viewport: { width: 1500, height: 1050 } });
     const teacher = await browser.newContext({ baseURL, viewport: { width: 1500, height: 1050 } });
     assert.equal((await teacher.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
-    const created = await teacher.request.post("/api/classes", { data: { name: "Personal workflow browser test", moduleSubject: "java" } });
-    assert.equal(created.status(), 201); classId = (await created.json()).id;
+    const created = await teacher.request.post("/api/classes", { data: { name: "Personal workflow browser test", subject: "Java" } });
+    assert.equal(created.status(), 201, await created.text()); classId = (await created.json()).id;
     assert.equal((await teacher.request.post(`/api/classrooms/${classId}/modules`, { data: fixture })).status(), 201);
     await admin.from("classroom_members").insert({ classroom_id: classId, user_id: users[1].id });
     await admin.from("module_progress").insert({ classroom_id: classId, student_id: users[1].id, module_id: fixture.id,

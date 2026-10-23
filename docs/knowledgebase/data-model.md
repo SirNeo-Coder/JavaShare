@@ -48,3 +48,11 @@ Assigned classes resolve content through their owner and selected subject. Unass
 classes read `course_modules` as before; its rows remain original-upload backups after assignment.
 Legacy availability changes remain in `course_modules`, separately per class. `module_progress`
 keys and all student file/completion/submission fields are unchanged.
+
+Personal submission extension (2026-10-23): existing `performance_task.project` may also contain
+`successfulRun`, a server-computed hash of the exact file paths/content. Personal save/run-start
+clears it; only an accepted successful run sets it. `own` retains files/status/submittedAt and adds
+`id`, frozen `checklist`, optional `legacyChecklist`, and `review: {checked, savedAt}`. Submission
+always snapshots the saved project after verifying its run evidence; a new id and omitted review
+reset only that module's review. Class/student/module scope and conditional merge writes remain.
+No new table, column, migration or renamed data. Existing sample snapshots remain stored.
