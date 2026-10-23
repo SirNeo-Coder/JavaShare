@@ -79,3 +79,11 @@ the existing 120-second deadline. No hosted setting or migration is needed.
   the metadata/reuse proposal awaits approval (docs/verification/free-worker-cpu-investigation.md). See the CPU diagnosis
   section of [Cloudflare setup](../cloudflare-setup.md#module-saves-fail-with-exceededcpu).
   Local passing tests and a healthy public read do not prove hosted saves fit the cap.
+
+- Module-list HTTP 500 after PR #41: existing tables are insufficient when
+  `codeshare_module_summaries(uuid)` is absent (CKB-067). Follow the prerequisite,
+  transaction and function-readiness steps in [completion-only setup](../module-completion-setup.md).
+  The teacher applies unchanged migration `20261022000200_module_access_summaries.sql`;
+  check actual teacher/student module loading afterwards. Teacher reports SQL success
+  and recovered Module loading on 2026-10-23; permissions/student completion checks
+  remain pending.

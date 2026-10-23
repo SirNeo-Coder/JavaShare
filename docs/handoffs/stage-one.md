@@ -1,3 +1,19 @@
+> Module-loading repair recovered (2026-10-23), branch `codex/module-summary-repair`
+> based on saved origin/main fc0972c. CKB-067: module lists failed with 500 because
+> required `codeshare_module_summaries(uuid)` was absent, despite existing tables
+> and read grants. Teacher approved existing unchanged migration 20261022000200,
+> confirmed all four prerequisites and applied the transactional SQL package.
+> Teacher reports SQL succeeded and Module now loads. Assistant changed no hosted
+> services. Done: setup/prerequisite/transaction/readiness instructions; incident,
+> index, prompt map, operations and this handoff updated. Build:all passes; lint
+> passes with 0 errors/8 existing warnings; full suite 325/325, no skips; diff clean.
+> Sandbox/dependency failures and named final checks are recorded in
+> docs/verification/module-summary-repair.md. In progress: commit/push/PR delivery.
+> Next: teacher supplies five function/permission readiness values and confirms
+> both roles can open Module and a student's successful activity survives reload.
+> Hosted CPU recovery is separate and unverified. No app/test/config/migration
+> changes. Existing migration untouched; no new dependency or offline runtime change.
+
 > Active approved completion-only module saving (2026-10-22): teacher explicitly
 > approved the combined plan: cache downloaded lessons/local unfinished drafts,
 > save online Module project code only after task success, and lighten server checks.
