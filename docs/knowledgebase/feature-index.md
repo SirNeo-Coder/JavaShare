@@ -89,7 +89,7 @@ Teacher steps: `docs/curriculum-prerequisite-reupload.md`. Access rules remain u
 
 Personal submission/review: `personal-performance.ts`, personal run/result and teacher review
 routes in `routes.ts`, frozen snapshot/run evidence in `supabase-repository.ts`; existing main
-`StudentModuleActivity`, `PersonalSubmissionChecklist`, `TeacherClassDashboard`, `Landing`,
+`StudentModuleActivity`, `PersonalSubmissionChecklist` (also `PersonalTaskChecklist`, the student's device-only self-check in Projects), `TeacherClassDashboard`, `Landing`,
 `page`, `ModuleWorkspace` and `ModuleViewer`. CKB-067; tests in `personal-performance`,
 `browser-java-progress`, `module-activities`, `weekly-java-project-ui`, and actual screens in
 `personal-performance.browser.mjs`. No new migration or dependency.

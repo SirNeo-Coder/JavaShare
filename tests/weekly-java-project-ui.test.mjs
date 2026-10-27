@@ -39,3 +39,15 @@ test("personal submission: button starts disabled and teacher editor cannot save
   assert.match(review, /Run code/);
   assert.doesNotMatch(review, /Save work|Submit this version|Rename file|Delete file|Add personal Java file/);
 });
+
+test("personal task checklist: read-only items, ticks restored only from this device's storage", () => {
+  const { PersonalTaskChecklist } = tsxRequire("../app/PersonalSubmissionChecklist.tsx", import.meta.url);
+  const items = ["Compiles", "Prints 5 lines"];
+  const show = () => renderToStaticMarkup(createElement(PersonalTaskChecklist, { items, storageKey: "k" }));
+  const blank = show();
+  assert.equal(blank.match(/type="checkbox"/g).length, 2); assert.doesNotMatch(blank, /checked=""|<textarea|<button/);
+  assert.match(blank, /Saved on this device only, not a submission or grade/);
+  globalThis.localStorage = { getItem: (key) => key === "k" ? JSON.stringify(["Prints 5 lines"]) : null };
+  try { assert.match(show(), /<input type="checkbox"\/> Compiles.*checked=""\/> Prints 5 lines/s); }
+  finally { delete globalThis.localStorage; }
+});

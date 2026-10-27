@@ -25,3 +25,19 @@ export default function PersonalSubmissionChecklist({ activity }: { activity: St
     }}>Save review</button><p role="status">{message}</p>
   </section>;
 }
+
+// Student self-check: ticks stay in this browser only and never reach progress or the teacher review.
+export function PersonalTaskChecklist({ items, storageKey }: { items: string[]; storageKey: string }) {
+  const [done, setDone] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) ?? "[]"); } catch { return []; }
+  });
+  return <section aria-label="Performance task checklist">
+    <b>Performance task checklist</b>
+    <p>Tick what your project already does. Saved on this device only, not a submission or grade.</p>
+    {items.map((item, index) => <label key={index} style={{ display: "block", marginBottom: 8 }}><input type="checkbox" checked={done.includes(item)} onChange={(event) => {
+      const next = event.target.checked ? [...done, item] : done.filter((value) => value !== item);
+      setDone(next);
+      try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch {}
+    }} /> {item}</label>)}
+  </section>;
+}
