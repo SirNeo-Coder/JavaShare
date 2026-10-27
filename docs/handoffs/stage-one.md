@@ -7,7 +7,9 @@
 > (not module project or teacher review). No server, schema or data change. Verification: see the
 > PR; new render test in `tests/weekly-java-project-ui.test.mjs` shown failing with the list removed
 > and with it shown in review, passing restored; `tests/personal-performance.browser.mjs` checks
-> the Console list. Next: teacher merges into main and re-uploads the weekly JSON files.
+> the Console list. PR #56 merged into main. Teacher re-uploaded Weeks 12–19 and 21 on the online
+> site (a first attempt used the old pre-steps files from a folder still on the old branch) and confirmed
+> the steps now show. Done.
 
 > Performance task steps (2026-10-27): teacher asked for a step-by-step procedure students can
 > follow to meet the performance-task requirements, including when to use the new Copy code, and
