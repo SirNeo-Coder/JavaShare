@@ -34,6 +34,14 @@
       });
       /* global cheerpjInit, cheerpjRunLibrary, cheerpOSAddStringFile */
       status("Starting Java 8");
+      // CheerpJ's /files filesystem is one IndexedDB database that survives a full reload, so a
+      // student's own File calls (mkdir/createNewFile/delete) can see files an earlier run left
+      // behind even though this is a fresh frame (CKB-072). Clear it before every run.
+      await new Promise((resolve) => {
+        const timeout = setTimeout(resolve, 2000);
+        const clear = indexedDB.deleteDatabase("cjFS_/files/");
+        clear.onsuccess = clear.onerror = clear.onblocked = () => { clearTimeout(timeout); resolve(); };
+      });
       await cheerpjInit({ version: 8, status: "none", javaProperties: ["codeshare.browser=true"], natives: {
         Java_CodeShareJava_running: () => send("codeshare-java-running"),
         Java_CodeShareJava_output: (_lib, output) => send("codeshare-java-output", { output }),

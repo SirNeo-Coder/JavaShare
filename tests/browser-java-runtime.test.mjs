@@ -4,22 +4,29 @@ import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 const source = readFileSync(new URL("../java-runtime/public/runner.js", import.meta.url), "utf8");
 
-function runtime(downloadFails = false, execute, download = async () => ({ ok: true, arrayBuffer: async () => new Uint8Array([80, 75, 0, 255]).buffer })) {
+function runtime(downloadFails = false, execute, download = async () => ({ ok: true, arrayBuffer: async () => new Uint8Array([80, 75, 0, 255]).buffer }), deleteDatabase) {
   let options, call, classpath;
   const listeners = new Set();
-  const posts = [], downloads = [], strings = new Map(), parent = { postMessage: (data, origin) => posts.push({ data, origin }) };
+  const posts = [], downloads = [], dbDeletes = [], strings = new Map(), parent = { postMessage: (data, origin) => posts.push({ data, origin }) };
   runInNewContext(source, {
     parent, window: { addEventListener: (_, callback) => listeners.add(callback), removeEventListener: (_, callback) => listeners.delete(callback) },
     document: { querySelector: () => ({}), createElement: () => ({}), head: { append: (script) => queueMicrotask(() => downloadFails ? script.onerror() : script.onload()) } },
-    cheerpjInit: async (value) => { options = value; },
+    cheerpjInit: async (value) => { assert.ok(options === undefined, "the stale filesystem must be cleared before Java starts"); options = value; },
     fetch: async (...args) => { downloads.push(args); return download(...args); },
     cheerpOSAddStringFile: (path, content) => { assert.match(path, /^\/str\/[^/]+$/); strings.set(path, content); },
     cheerpjRunLibrary: async (path) => { classpath = path; return { CodeShareJava: {
       runSources: async (...args) => { call = args; options.natives.Java_CodeShareJava_running(); return JSON.stringify({ success: true, output: "leftright\n" }); },
       runInteractiveSources: async (...args) => { call = args; options.natives.Java_CodeShareJava_running(); return JSON.stringify(await execute(options.natives)); },
     } }; },
+    indexedDB: { deleteDatabase: (name) => {
+      dbDeletes.push(name);
+      const request = {};
+      if (deleteDatabase !== "hang") queueMicrotask(() => deleteDatabase === "blocked" ? request.onblocked?.() : deleteDatabase === "error" ? request.onerror?.() : request.onsuccess?.());
+      return request;
+    } },
+    setTimeout, clearTimeout,
   });
-  return { posts, strings, downloads, get classpath() { return classpath; }, get call() { return call; }, receive: (data, source = parent, origin = "https://class.example.test") => Promise.all([...listeners].map((receive) => receive({ source, origin, data }))) };
+  return { posts, strings, downloads, dbDeletes, get classpath() { return classpath; }, get call() { return call; }, receive: (data, source = parent, origin = "https://class.example.test") => Promise.all([...listeners].map((receive) => receive({ source, origin, data }))) };
 }
 const request = { type: "codeshare-java-run", id: "test-run", stdin: "7\n", mainClass: "app.Main", files: [
   { path: "app/Main.java", content: "main" }, { path: "left/Helper.java", content: "left" }, { path: "right/Helper.java", content: "right" },
@@ -35,6 +42,26 @@ test("browser runtime: only the parent starts Java; flat strings preserve duplic
   assert.deepEqual(JSON.parse(JSON.stringify(runner.posts.at(-1))), { data: { type: "codeshare-java-result", id: "test-run", success: true, output: "leftright\n" }, origin: "https://class.example.test" });
   const count = runner.posts.length;
   await runner.receive(request); assert.equal(runner.posts.length, count, "one frame runs once");
+});
+
+test("browser runtime: clears CheerpJ's persistent filesystem before every run, including a stuck delete (CKB-072)", async () => {
+  for (const mode of ["success", "blocked", "error"]) {
+    const runner = runtime(false, undefined, undefined, mode);
+    await runner.receive(request);
+    assert.deepEqual(runner.dbDeletes, ["cjFS_/files/"]);
+    assert.equal(runner.posts.at(-1).data.success, true, `mode ${mode} must still let the run start`);
+  }
+});
+
+test("browser runtime: a delete that never fires any event cannot hang the run past its own fallback", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const runner = runtime(false, undefined, undefined, "hang");
+  const running = runner.receive(request);
+  await settle();
+  assert.equal(runner.posts.some(({ data }) => data.type === "codeshare-java-result"), false, "Java has not finished while the clear is still pending");
+  t.mock.timers.tick(2000);
+  await running;
+  assert.equal(runner.posts.at(-1).data.success, true);
 });
 
 test("browser runtime: whole-file downloads preserve binary compiler JARs without Range support (CKB-056)", async () => {
