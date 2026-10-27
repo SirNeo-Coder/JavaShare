@@ -1,6 +1,6 @@
 # CKB-073 — CheerpJ's File.delete() reports success on a non-empty directory
 
-- Status: investigating; no fix available from CodeShare's side
+- Status: known limitation; teacher directs running affected steps offline for now
 - First recorded: 2026-10-27
 - Last verified: 2026-10-27
 - Area: online Java / CheerpJ browser runtime (`java.io.File` semantics)
@@ -46,19 +46,17 @@ to CodeShare to correct this specific method's return value or behavior.
 ## Durable solution
 
 None available from CodeShare's side — this is a CheerpJ vendor limitation, not an
-application bug. No application code change is proposed for this case. Options for the
-teacher to choose from, none implemented yet:
+application bug. No application code change is proposed for this case.
 
-1. Run file-handling steps that depend on this exact behavior (deleting a non-empty
-   directory and checking the result) via the offline/classroom laptop runner instead,
-   where a real JVM gives the correct result (confirmed: `backend/src/java-runner.ts`
-   is unaffected by this, real `javac`/`java` matches `expectedOutput` exactly).
-2. Leave the module content as-is and accept that this one check may not verify online
-   until CheerpJ fixes its own `delete()` implementation upstream.
-3. Revise this specific step's online-path expectations — not attempted; would mean
-   diverging the online `expectedOutput` from what real Java actually does, which risks
-   teaching students incorrect `File.delete()` semantics. A curriculum decision, not a
-   bug fix, and out of scope to decide unilaterally.
+**Teacher decision (2026-10-27): run file-handling steps that depend on this exact
+behavior (deleting a non-empty directory and checking the result) via the
+offline/classroom laptop runner instead**, where a real JVM gives the correct result
+(confirmed: `backend/src/java-runner.ts` is unaffected by this, real `javac`/`java`
+matches `expectedOutput` exactly). `docs/modules/week15/README.md` and
+`docs/knowledgebase/workflow-state.md` note this. The module content and its online
+`expectedOutput` are unchanged — the two other options (accepting the online mismatch
+as-is, or revising the step's online expectations to match CheerpJ's incorrect behavior)
+were not chosen.
 
 ## Regression proof
 
@@ -82,3 +80,6 @@ matches: if so, this case applies, not CKB-072.
   CKB-072's fix resolved the `mkdir` mismatch, but one line remained wrong. Isolated and
   confirmed directly against the live CheerpJ runtime as a separate, upstream limitation
   with no CodeShare-side fix available.
+- 2026-10-27 — Teacher directed running affected file-handling steps offline for now.
+  Noted in `docs/modules/week15/README.md` and `docs/knowledgebase/workflow-state.md`;
+  no module content or application code changed.

@@ -318,6 +318,19 @@ copies: classroom disk support is still absent, original thread samples retain t
 and visible/browser GUI interaction remains unverified. Do not treat upload acceptance as rollout
 approval. Module and personal projects, paper assessment and submitted snapshots stay separate.
 
+## Week 15 file-handling steps run offline for now (2026-10-27)
+
+CheerpJ's `/files` virtual filesystem was shared across separate online Java runs (one
+IndexedDB database per browser origin, not reset per run); the first part of this is
+fixed — the runner now clears it before every run (CKB-072). A second, unfixable part
+remains: CheerpJ's `File.delete()` reports success on a non-empty directory instead of
+refusing it, unlike a real JVM (CKB-073; confirmed directly against the live CheerpJ
+runtime, no CodeShare-side fix exists). The teacher has directed running Week 15's
+file-handling steps (deleting a non-empty folder and checking the result, e.g. Activity
+Two) on the classroom laptop's offline Java (`npm run classroom:offline`) for now, where
+a real JVM gives the correct result. No module content, `expectedOutput`, or application
+code changed because of this; only this guidance and the CKB-072 runner fix shipped.
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one
