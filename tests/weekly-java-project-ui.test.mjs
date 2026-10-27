@@ -67,3 +67,49 @@ test("save work colour: personal button starts blue (saved); module and review k
   assert.match(render(activity), /class="run-button"[^>]*>Save work/);
   assert.doesNotMatch(render({ ...activity, kind: "review" }), /Save work/);
 });
+
+const copyModule = { lessons: [{ blocks: [
+  { type: "step", number: 1, files: [{ path: "Main.java", content: "SAMPLE ONE" }, { path: "Vehicle.java", content: "SUPPORT" }] },
+  { type: "text", markdown: "not code" },
+  { type: "step", number: 2, files: [{ path: "Main.java", content: "SAMPLE TWO" }, { path: "Vehicle.java", content: "SUPPORT" }] },
+  { type: "step", number: 3, locked: true, files: [{ path: "Main.java", content: "LOCKED" }] },
+] }], performanceTask: { exampleFiles: [{ path: "Shop.java", content: "TASK SAMPLE" }] } };
+
+test("copy module code: unlocked samples and task Sample code, once each, locked steps left out", () => {
+  const { moduleCode } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  assert.deepEqual(moduleCode(copyModule), [
+    { label: "Step 1 · Main.java", content: "SAMPLE ONE" }, { label: "Step 1 · Vehicle.java", content: "SUPPORT" },
+    { label: "Step 2 · Main.java", content: "SAMPLE TWO" }, { label: "Sample code · Shop.java", content: "TASK SAMPLE" },
+  ]);
+  assert.deepEqual(moduleCode({}), []);
+});
+
+test("copy module code: personal project offers it without touching its own files; module and review do not", () => {
+  const personal = render({ ...activity, kind: "performance", module: copyModule });
+  assert.match(personal, /Code from this module/); assert.match(personal, /copies only the code, not the file name/);
+  assert.equal(personal.match(/>Copy code</g).length, 4); assert.doesNotMatch(personal, /LOCKED/);
+  assert.match(personal, /class="file-tab active"[^>]*>Own.java</); assert.doesNotMatch(personal, /file-tab[^>]*>(Main|Shop|Vehicle).java</);
+  for (const kind of ["module", "review"]) assert.doesNotMatch(render({ ...activity, kind, module: copyModule }), /Code from this module|Copy code/);
+});
+
+test("copy module code: clipboard on secure pages, older copy command on plain-http classroom pages", async () => {
+  const { copyText } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  const calls = [];
+  const area = { style: {}, select: () => calls.push(`select ${area.value}`), remove: () => calls.push("remove") };
+  const set = (name, value) => Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
+  const saved = ["window", "navigator", "document"].map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)]);
+  try {
+    set("navigator", { clipboard: { writeText: async (text) => calls.push(`clipboard ${text}`) } });
+    set("document", { createElement: () => area, body: { append: () => calls.push("append") }, execCommand: (command) => { calls.push(command); return true; } });
+    set("window", { isSecureContext: true });
+    await copyText("A");
+    set("window", { isSecureContext: false });
+    await copyText("B");
+    assert.deepEqual(calls, ["clipboard A", "append", "select B", "copy", "remove"]);
+    document.execCommand = () => false;
+    await assert.rejects(copyText("C"), /Copy failed/);
+    assert.equal(calls.at(-1), "remove");
+  } finally {
+    for (const [name, descriptor] of saved) { if (descriptor) Object.defineProperty(globalThis, name, descriptor); else delete globalThis[name]; }
+  }
+});
