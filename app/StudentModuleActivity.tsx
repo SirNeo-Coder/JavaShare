@@ -6,7 +6,7 @@ import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
-import { PerformanceTaskSteps, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
+import { PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
 import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath } from "../backend/src/module-activities";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
@@ -58,27 +58,6 @@ export function changedLines(saved: ModuleFile[], current: ModuleFile[]) {
   return Math.max(before.length - kept, after.length - kept);
 }
 
-// Module code the student can already see (unlocked lesson samples, then the performance task's Sample code),
-// offered for copying into the personal project. Only the code is copied; the student's own filenames stay.
-export function moduleCode(module: CourseModule) {
-  const seen = new Set<string>();
-  return [
-    ...(module?.lessons ?? []).flatMap((lesson) => lesson.blocks)
-      .filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked)
-      .flatMap((step) => step.files.map((file) => ({ label: `Step ${step.number} · ${file.path}`, content: file.content }))),
-    ...(module?.performanceTask?.exampleFiles ?? []).map((file) => ({ label: `Sample code · ${file.path}`, content: file.content })),
-  ].filter(({ content }) => !seen.has(content) && Boolean(seen.add(content)));
-}
-
-// Offline classroom pages are plain http, where browsers turn off navigator.clipboard; use the older copy command there.
-export async function copyText(text: string) {
-  if (window.isSecureContext && navigator.clipboard) return navigator.clipboard.writeText(text);
-  const area = document.createElement("textarea");
-  area.value = text; area.style.position = "fixed"; area.style.opacity = "0";
-  document.body.append(area); area.select();
-  try { if (!document.execCommand("copy")) throw new Error("Copy failed"); } finally { area.remove(); }
-}
-
 export function JavaRunProgress({ message, waiting = false }: { message: string | null; waiting?: boolean }) {
   if (!message) return null;
   return <div className="java-run-progress" role="status" aria-live="polite">
@@ -99,7 +78,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [newPath, setNewPath] = useState("");
   const [addingFile, setAddingFile] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
-  const codeToCopy = personal && !review ? moduleCode(activity.module) : [];
+  // Modules with steps offer their copyable samples on the steps themselves instead.
+  const codeToCopy = personal && !review && !activity.module?.performanceTask?.steps?.length ? moduleCode(activity.module) : [];
   const [busy, setBusy] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -335,7 +315,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
-          {personal && !review && <PerformanceTaskSteps steps={activity.module?.performanceTask?.steps} />}
+          {personal && !review && <PerformanceTaskSteps steps={activity.module?.performanceTask?.steps} module={activity.module} />}
           {personal ? <label>Program input<textarea aria-label="Program input" value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");

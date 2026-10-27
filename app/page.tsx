@@ -2251,7 +2251,7 @@ export default function Home() {
               try { await startModuleActivity(weeklyModule); }
               catch (error) { notify(error instanceof Error ? error.message : "Could not open personal project"); }
             }}><span className="team-icon">J</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>}
-            <PerformanceTaskSteps steps={weeklyModule.performanceTask?.steps} />
+            <PerformanceTaskSteps steps={weeklyModule.performanceTask?.steps} module={weeklyModule} />
             {weeklyModule.performanceTask?.checklist.length ? <PersonalTaskChecklist key={weeklyModule.id} items={weeklyModule.performanceTask.checklist} storageKey={`codeshare-task-checklist:${user.id}:${classroomId}:${weeklyModule.id}`} /> : null}
           </div>}
           <div className="team-list">

@@ -60,7 +60,7 @@ One file per teaching week, named `<Course>_Week_NN.codeshare.json` (for example
 
 `{ "id": "java-2-w15-pt", "title": "...", "markdown": "...", "steps": ["..."], "checklist": ["..."], "exampleFiles": File[], "starterFiles": File[], "presentationOutline": ["..."], "questionsToPrepare": ["..."], "rubric": [ { "criterion": "...", "points": 10 } ], "totalPoints": 50 }`
 
-`steps` is optional (at most 30 lines of 500 characters): a numbered "How to build it, step by step" guide shown in Projects, in the personal project's Console under **Your performance task**, and on the module's Performance task page. It may use **bold** and `code`. Name copyable samples exactly as **Code from this module** labels them, e.g. `**Step 4 · Main.java**` (a sample identical to an earlier step's file carries that step's label). Files without `steps` show no guide.
+`steps` is optional (at most 30 lines of 500 characters): a numbered "How to build it, step by step" guide shown in Projects, in the personal project's Console under **Your performance task**, and on the module's Performance task page. It may use **bold** and `code`. Name copyable samples in bold exactly as CodeShare labels them, e.g. `**Step 4 · Main.java**` or `**Sample code · Main.java**` (a sample identical to an earlier step's file carries that step's label); each named sample gets a **Copy** button at the end of its step. Files without `steps` show no guide and keep the Console's **Code from this module** list.
 
 ### Parts
 

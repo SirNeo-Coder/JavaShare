@@ -103,7 +103,8 @@ What teachers and students can do today. Keep this page current when their use o
   (locked steps stay hidden). **Copy code** copies only the code, never a filename or a new file; the
   student pastes it into their own file with Ctrl+V and changes it. Nothing saves until **Save work** or
   **Run code**. On plain-http classroom pages (offline) it uses the browser's older copy command.
-  Module project and teacher review do not show it. (2026-10-27)
+  Module project and teacher review do not show it. (2026-10-27) Modules whose JSON has
+  `performanceTask.steps` no longer show this fold-out; their copy buttons sit on the steps instead.
 - Opening another project/module/class or signing out saves the active project first; save
   failures stop the transition. New saves/submissions reject stale tabs. Reload before saving
   can still lose unsaved edits. The personal draft is `performance_task.project.files`, separate
@@ -450,8 +451,11 @@ device shows them unticked. Teacher review ticks remain teacher-only.
 Performance task steps (2026-10-27): when a module's JSON has `performanceTask.steps`, Projects
 shows a numbered **How to build it, step by step** guide above the Performance task checklist, and
 the module's Performance task page shows it above the checklist. The personal project's Console shows
-it under **Your performance task**, above Program input (not in the module project or teacher review). Steps are read-only text and name
-which **Code from this module** sample to copy (for example **Step 4 · Main.java**). Weeks 12–19 and
+it under **Your performance task**, above Program input (not in the module project or teacher review). Steps are read-only text.
+A step that names a sample in bold (for example **Step 4 · Main.java**) ends with its own button,
+**Copy Step 4 · Main.java**, which copies that sample's code only (no filename), shows **Copied**, and
+uses the same plain-http fallback offline. These step buttons replace the Console's **Code from this
+module** fold-out for that module; modules without steps keep the fold-out. Weeks 12–19 and
 21 carry steps; Week 20 stays a paper proposal. Already-uploaded modules show steps only after the
 teacher re-uploads the updated JSON (same ids, progress kept). No server, progress or grading change.
 

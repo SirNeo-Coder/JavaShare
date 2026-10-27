@@ -6,8 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 
-const { PerformanceTaskSteps } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
-const { moduleCode } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+const { PerformanceTaskSteps, moduleCode, stepCode } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/sample-module.codeshare.json", import.meta.url), "utf8"));
 const weeks = [12, 13, 14, 15, 16, 17, 18, 19, 21];
 const load = (week) => JSON.parse(readFileSync(new URL(`../docs/modules/week${week}/Java2_Week_${week}.codeshare.json`, import.meta.url), "utf8"));
@@ -28,14 +27,17 @@ test("performance task steps: numbered list with inline formatting; nothing with
 });
 
 for (const week of weeks) {
-  test(`Week ${week}: performance task steps upload and every named sample is offered in Code from this module`, () => {
+  test(`Week ${week}: performance task steps upload and every named sample has a Copy button on its step`, () => {
     const content = load(week);
     const steps = courseModule.parse(content).performanceTask.steps;
     assert.ok(steps.length >= 5, "steps survive upload");
     const offered = new Set(moduleCode(content).map((code) => code.label));
     const named = steps.flatMap((step) => [...step.matchAll(/\*\*((?:Step \d+|Sample code) · [^*]+)\*\*/g)].map((match) => match[1]));
     assert.ok(named.length > 0);
+    for (const step of steps) assert.doesNotMatch(step, /Code from this module/, "steps carry their own Copy buttons; that Console list is hidden");
     for (const label of named) assert.ok(offered.has(label), `Week ${week}: "${label}" is not a Copy code entry`);
+    const buttons = steps.flatMap((step) => stepCode(step, content).map((code) => code.label));
+    assert.deepEqual(new Set(buttons), new Set(named), "every named sample gets a Copy button on its step");
   });
 }
 

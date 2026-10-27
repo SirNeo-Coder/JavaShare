@@ -76,7 +76,7 @@ const copyModule = { lessons: [{ blocks: [
 ] }], performanceTask: { exampleFiles: [{ path: "Shop.java", content: "TASK SAMPLE" }] } };
 
 test("copy module code: unlocked samples and task Sample code, once each, locked steps left out", () => {
-  const { moduleCode } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  const { moduleCode } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
   assert.deepEqual(moduleCode(copyModule), [
     { label: "Step 1 · Main.java", content: "SAMPLE ONE" }, { label: "Step 1 · Vehicle.java", content: "SUPPORT" },
     { label: "Step 2 · Main.java", content: "SAMPLE TWO" }, { label: "Sample code · Shop.java", content: "TASK SAMPLE" },
@@ -93,7 +93,7 @@ test("copy module code: personal project offers it without touching its own file
 });
 
 test("copy module code: clipboard on secure pages, older copy command on plain-http classroom pages", async () => {
-  const { copyText } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  const { copyText } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
   const calls = [];
   const area = { style: {}, select: () => calls.push(`select ${area.value}`), remove: () => calls.push("remove") };
   const set = (name, value) => Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
@@ -121,4 +121,21 @@ test("performance task steps: personal Console shows the module's steps; module 
   assert.match(personal, /<ol><li>.*<b>theme<\/b>.*<\/li><li>.*<code>toLine\(\)<\/code>.*<\/li><\/ol>/);
   for (const kind of ["module", "review"]) assert.doesNotMatch(render({ ...activity, kind, module: stepsModule }), /How to build it/);
   assert.doesNotMatch(render({ ...activity, kind: "performance" }), /How to build it/);
+});
+
+test("step copy code: a step naming a sample gets its own button; the Console list hides when the module has steps", () => {
+  const { stepCode } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
+  assert.deepEqual(stepCode("Copy **Step 2 · Main.java** and **Sample code · Shop.java**", copyModule), [
+    { label: "Step 2 · Main.java", content: "SAMPLE TWO" }, { label: "Sample code · Shop.java", content: "TASK SAMPLE" },
+  ]);
+  assert.deepEqual(stepCode("Plan on paper; see Step 2 · Main.java later", copyModule), [], "only bold labels count");
+  assert.deepEqual(stepCode("Copy **Step 3 · Main.java**", copyModule), [], "locked samples are never offered");
+  assert.deepEqual(stepCode("Copy **Step 9 · Gone.java**", copyModule), []);
+  const withSteps = { ...copyModule, performanceTask: { ...copyModule.performanceTask, steps: ["Plan your theme", "Copy **Step 1 · Vehicle.java** and change it", "Compare **Step 2 · Main.java** with **Sample code · Shop.java**"] } };
+  const personal = render({ ...activity, kind: "performance", module: withSteps });
+  assert.doesNotMatch(personal, /Code from this module|>Copy code</);
+  assert.equal(personal.match(/<button type="button">Copy (Step|Sample)/g).length, 3);
+  assert.match(personal, /<li><span>Plan your theme<\/span><\/li>/, "a step without a sample has no button");
+  assert.match(personal, /Vehicle.java<\/b>.*<button type="button">Copy Step 1 · Vehicle.java<\/button>/);
+  assert.match(personal, /class="file-tab active"[^>]*>Own.java</);
 });

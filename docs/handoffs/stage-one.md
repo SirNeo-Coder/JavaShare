@@ -1,3 +1,14 @@
+> Copy code on each step (2026-10-27): the teacher felt the Console's **Code from this module** list
+> was the wrong place and approved putting copy buttons on the steps, with the recommended option:
+> hide the Console list for modules that have steps, keep it for modules without. Branch
+> `feature/step-copy-code`, based on origin/main `2f91227`, worktree `../JavaShare-task-steps`.
+> Changes: `moduleCode`/`copyText` moved from `app/StudentModuleActivity.tsx` to `app/ModuleViewer.tsx`
+> (a shared home avoids a circular import); new `stepCode` and a **Copy <label>** button at the end
+> of each step naming a sample, in Projects, the Console and the module page; Console fold-out hidden
+> when `performanceTask.steps` exists. Week 12 step 4 reworded (it pointed at the hidden list), so
+> Week 12 needs one re-upload; other weeks unchanged. No server, schema or data change.
+> Verification: see the PR. Next: teacher review, merge, online deploy, re-upload Week 12.
+
 > Performance task steps in the Console (2026-10-27): the teacher looked for the steps in the
 > personal project's Console box **Your performance task** and approved also showing them there,
 > keeping them in Projects and on the module page. (PR #54 had merged into its stacked base branch,
