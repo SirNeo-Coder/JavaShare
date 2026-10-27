@@ -41,6 +41,16 @@ export function ModuleRunFeedback({ result, completed, pendingSample, expectedEr
   </div>;
 }
 
+// Lines added/removed/edited since the last save, across all files. Line multiset, not a real diff:
+// moved lines count as unchanged, which is close enough for the Save work colour.
+export function changedLines(saved: ModuleFile[], current: ModuleFile[]) {
+  const lines = (files: ModuleFile[]) => files.flatMap((file) => file.content.split("\n"));
+  const before = lines(saved), after = lines(current), left = new Map<string, number>();
+  for (const line of before) left.set(line, (left.get(line) ?? 0) + 1);
+  const kept = after.filter((line) => { const n = left.get(line) ?? 0; left.set(line, n - 1); return n > 0; }).length;
+  return Math.max(before.length - kept, after.length - kept);
+}
+
 export function JavaRunProgress({ message, waiting = false }: { message: string | null; waiting?: boolean }) {
   if (!message) return null;
   return <div className="java-run-progress" role="status" aria-live="polite">
@@ -84,6 +94,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const base = `/api/classrooms/${activity.classroomId}/modules/${activity.moduleId}/progress`;
   const projectPath = `${base}/${personal ? "performance-project" : "project"}`;
   const dirty = JSON.stringify(files) !== savedFiles;
+  const saveColour = !dirty ? "saved" : changedLines(JSON.parse(savedFiles), files) >= 10 ? "many-changes" : "editing";
   const saveDeviceDraft = useCallback(async (nextFiles = files) => {
     await writeDeviceRecord(localKey, { files: nextFiles, ...draftRef.current });
     setSavedFiles(JSON.stringify(nextFiles));
@@ -141,7 +152,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     if (busyRef.current || !deviceReady) return;
     busyRef.current = true; setBusy(true); setError("");
     setLastCheck(null); setSuccessfulFiles(null);
-    setRunMessage("Saving your code on this device…");
+    setRunMessage(personal ? "Saving your project…" : "Saving your code on this device…");
     try {
       if (review) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, stdin, () => setStdin("")); return; }
       if (!personal) await saveDeviceDraft();
@@ -303,7 +314,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button>}</div>
+      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button>}</div>
     </footer>
   </>;
 }

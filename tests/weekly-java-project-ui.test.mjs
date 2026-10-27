@@ -51,3 +51,19 @@ test("personal task checklist: read-only items, ticks restored only from this de
   try { assert.match(show(), /<input type="checkbox"\/> Compiles.*checked=""\/> Prints 5 lines/s); }
   finally { delete globalThis.localStorage; }
 });
+
+test("save work colour: changed lines count edits once, ignore renames, and span all files", () => {
+  const { changedLines } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  const saved = [{ path: "Main.java", content: "a\nb\nc" }, { path: "Car.java", content: "x\ny" }];
+  assert.equal(changedLines(saved, saved), 0);
+  assert.equal(changedLines(saved, [{ ...saved[0], content: "a\nB\nc" }, saved[1]]), 1);
+  assert.equal(changedLines(saved, [saved[0], { path: "Bus.java", content: "x\ny" }]), 0);
+  assert.equal(changedLines(saved, [{ ...saved[0], content: `a\nb\nc${"\nnew".repeat(10)}` }, saved[1]]), 10);
+  assert.equal(changedLines(saved, [saved[0]]), 2);
+});
+
+test("save work colour: personal button starts blue (saved); module and review keep the plain button", () => {
+  assert.match(render({ ...activity, kind: "performance" }), /class="run-button save-saved"[^>]*>Save work/);
+  assert.match(render(activity), /class="run-button"[^>]*>Save work/);
+  assert.doesNotMatch(render({ ...activity, kind: "review" }), /Save work/);
+});

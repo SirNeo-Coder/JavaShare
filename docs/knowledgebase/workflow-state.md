@@ -439,3 +439,10 @@ student may tick what their project already does. Ticks stay in that browser onl
 `codeshare-task-checklist:<student>:<class>:<module>`), never reach the server, progress, the
 submission or the teacher's review, and are not a grade. Clearing browser storage or switching
 device shows them unticked. Teacher review ticks remain teacher-only.
+
+Personal project Save work colour (2026-10-27): blue when everything is saved, green while there
+are a few unsaved edits, red once 10 or more lines are added, removed or edited since the last
+save or run (counted across all personal files; renamed or moved lines do not count). The status
+text above the code still says Unsaved changes / Your project is saved. Run code shows "Saving
+your project…" while it saves personal files to the server; the module project keeps "Saving your
+code on this device…". Module project and teacher review buttons are unchanged.
