@@ -1,3 +1,19 @@
+> Copy module code into the personal project (2026-10-27): teacher approved letting students copy
+> module code into their personal project, code only (personal filenames differ from the module's),
+> with the recommended scope: unlocked lesson step samples plus the performance task's Sample code.
+> Branch `feature/personal-copy-module-code`, based on origin/main `f2fbdd2`, in its own worktree
+> (`../JavaShare-module-code-copy`) because another session was editing `feature/teacher-live-help`
+> in the main checkout. Changes: `moduleCode`, `copyText` and the **Code from this module** fold-out
+> in `app/StudentModuleActivity.tsx` (personal project only; not module project or teacher review).
+> Copy code copies text only; it never adds, renames or saves files. Offline classroom pages are
+> plain http, where browsers turn off `navigator.clipboard`, so it falls back to
+> `document.execCommand("copy")`. No server, schema or data change. Verification: 351/351 full suite;
+> three new unit/render tests each shown failing when broken and passing restored; new
+> `tests/personal-copy-module-code.browser.mjs` passed on an offline-settings production build over
+> the laptop's network address (plain http, real Ctrl+V paste) and on localhost, and failed with the
+> fallback removed; `build:all` passes; lint 0 errors, 8 existing warnings. Not checked: online
+> CheerpJ mode, hosted HTTPS site, phones/tablets, dark theme. Next: teacher review of the PR.
+
 > Personal project Save work colours (2026-10-27): teacher declined auto-save (Run code already
 > saves personal files to the server) and approved: fix the personal Run code message to "Saving
 > your project…", and colour the personal project's Save work button blue (saved), green (a few
