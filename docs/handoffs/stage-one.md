@@ -1,3 +1,22 @@
+> Teacher live help (2026-10-27): teacher approved seeing and editing what a selected student is
+> working on. Selecting a student in **Students / projects** shows their open Module project or
+> Personal performance-task project live (heading "Live: <name> · Module project/Personal project
+> · <module>", student name cursor); the teacher can type and the student sees it with a "Teacher"
+> cursor. Only the student's Save work / device draft / successful run keeps it. Students send only
+> while the teacher has their card selected (teacher tracks Presence `{ teacher: true }` on the
+> student's own team channel), never on group or Teacher Demo channels. Selecting a group lets the
+> teacher type in its shared code while a member is online; teacher never auto-saves group files.
+> Branch `feature/teacher-live-help`, based on main `f2fbdd2`. Changes: new `app/liveText.ts`
+> (existing typing helpers moved out of `page.tsx` + mirror/guard helpers), `app/page.tsx`,
+> `app/StudentModuleActivity.tsx`; no server, schema, migration or policy change. AGENTS.md rule
+> "Teacher live help" added. Verification: 352/352 full suite (4 new rule tests); offline
+> production browser test `tests/teacher-live-help.browser.mjs` 7/7; existing
+> `personal-performance.browser.mjs` 6/6; four deliberate breaks each shown failing then restored;
+> `build:all` passes; lint 0 errors, 8 existing warnings. Not checked: online/hosted Realtime,
+> launcher-owned `classroom:offline` on port 3000 (tests used a separate production server on 3032
+> with the same local Supabase and laptop Java settings), second physical device, dark theme.
+> Next: push and open the PR for teacher review.
+
 > Personal project Save work colours (2026-10-27): teacher declined auto-save (Run code already
 > saves personal files to the server) and approved: fix the personal Run code message to "Saving
 > your project…", and colour the personal project's Save work button blue (saved), green (a few
@@ -8,8 +27,8 @@
 > full suite; offline production browser test 6/6 including the new colour/wording step; unit
 > line-count test and browser wording step each shown failing when broken and passing restored;
 > `build:all` passes; lint 0 errors, 8 existing warnings. Online browser mode and dark theme were
-> not checked on screen. Pushed; [PR #51](https://github.com/SirNeo-Coder/JavaShare/pull/51) is open
-> against main. Next: teacher review.
+> not checked on screen. Pushed; [PR #51](https://github.com/SirNeo-Coder/JavaShare/pull/51) was
+> merged into main by the teacher (merge commit `f2fbdd2`, 2026-10-27). Done.
 
 > Student performance-task checklist in Projects (2026-10-27): teacher approved showing each
 > module's performance-task checklist to students in the Projects panel, read-only, with boxes the

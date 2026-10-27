@@ -26,7 +26,8 @@ Private channels `team:<teamId>` and `class:<classroomId>` (policies in `supabas
   - class channel: `class:live-share`, `class:live-share-update`, `class:activity-deployed`, `class:activity-ended`, `class:chat-muted`, `groups:updated`
   - team channel: `chat:message`, `file:updated`, `team:submitted`, `team:profile-updated`, `team:permissions-updated`
 - **Browser to browsers** (sent directly on the channel; capped):
-  - team: `team:file-operation` (typing; 3 a second), `team:cursor` (4 a second), `team:active-file`, `team:sync-request` (a newcomer asks), answered with `team:active-file` and `team:live-snapshots` (unsaved typing)
+  - team: `team:file-operation` (typing; 3 a second), `team:cursor` (4 a second), `team:active-file`, `team:sync-request` (a newcomer asks), answered with `team:active-file` and `team:live-snapshots` (unsaved typing). The teacher sends `team:file-operation`/`team:cursor` on a group channel while a member is online.
+  - teacher live help, on the student's own workspace channel only (never bound to the chat channel): `team:module-live` (open module/personal file snapshot, or `kind: null` when closed), `team:module-operation` (typing both ways; 3 a second), `team:module-cursor` (4 a second). The student sends only while the teacher tracks Presence `{ teacher: true }` on that team channel, i.e. has the card selected. Helpers in `app/liveText.ts`.
   - class (teacher only): `class:live-share-draft` (2 a second)
 - **Invitations outside the workspace:** students receive existing activity and live-share announcements on their joined classes' private channels, then re-read the lightweight bootstrap summaries. They do not track Presence or receive team channels there.
 - **Who's online:** Presence on the workspace's class channel, keyed by user id. Used by the workspace sidebar, the auto-group roster, and `/teacher/accounts`.

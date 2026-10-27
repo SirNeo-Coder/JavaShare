@@ -25,6 +25,7 @@ import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
 import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, releaseRealtimeChannels, throttle } from "./realtime";
+import { applyOperation, createOperation, localEdit, pointAt, remoteEdit, shareModuleLive, takeOperation, teacherWatching, type FileOperation, type LiveMirror, type TextPoint } from "./liveText";
 
 const FRESH_LESSON_CODE = `public class Main {
     public static void main(String[] args) {
@@ -143,16 +144,7 @@ type LiveShare = {
   studentName?: string;
   files?: FileData[];
 };
-type TextPoint = { line: number; column: number };
-type FileOperation = {
-  teamId: string;
-  fileId: string;
-  start: TextPoint;
-  end: TextPoint;
-  text: string;
-  content: string;
-  sequence: number;
-};
+type ModuleLive = { kind: "module" | "performance"; moduleTitle: string; path: string; content: string; editable: boolean; studentId: string; studentName: string };
 type RemoteCursor = TextPoint & {
   userId: string;
   name: string;
@@ -168,59 +160,6 @@ function collaboratorColor(id: string) {
   }
   const hue = Math.abs(hash) % 360;
   return `hsl(${hue} 72% 43%)`;
-}
-
-function pointAt(source: string, offset: number): TextPoint {
-  const before = source.slice(0, offset).split("\n");
-  return { line: before.length - 1, column: before.at(-1)?.length ?? 0 };
-}
-
-function createOperation(
-  previous: string,
-  next: string,
-  teamId: string,
-  fileId: string,
-  sequence: number,
-): FileOperation {
-  let start = 0;
-  while (
-    start < previous.length &&
-    start < next.length &&
-    previous[start] === next[start]
-  )
-    start += 1;
-  let suffix = 0;
-  while (
-    suffix < previous.length - start &&
-    suffix < next.length - start &&
-    previous[previous.length - 1 - suffix] === next[next.length - 1 - suffix]
-  )
-    suffix += 1;
-  return {
-    teamId,
-    fileId,
-    start: pointAt(previous, start),
-    end: pointAt(previous, previous.length - suffix),
-    text: next.slice(start, next.length - suffix),
-    content: next,
-    sequence,
-  };
-}
-
-function applyOperation(source: string, operation: FileOperation) {
-  const lines = source.split("\n");
-  const offsetAt = ({ line, column }: TextPoint) => {
-    const safeLine = Math.max(0, Math.min(lines.length - 1, line));
-    return (
-      lines
-        .slice(0, safeLine)
-        .reduce((length, item) => length + item.length + 1, 0) +
-      Math.min(column, lines[safeLine]?.length ?? 0)
-    );
-  };
-  const start = offsetAt(operation.start);
-  const end = Math.max(start, offsetAt(operation.end));
-  return source.slice(0, start) + operation.text + source.slice(end);
 }
 
 export default function Home() {
@@ -349,6 +288,27 @@ export default function Home() {
       void classChannelRef.current?.send({ type: "broadcast", event: "class:live-share-draft", payload: draft });
     }, LIVE_CAPS.liveShareMs),
   );
+  // Teacher live help: the module or personal project file a student has open, shared both ways
+  // while the teacher has that student selected (the teacher marks this with presence on the channel).
+  const moduleMirrorRef = useRef<LiveMirror | null>(null);
+  const moduleEditableRef = useRef(false);
+  const teacherWatchingRef = useRef(false);
+  const [studentWatched, setStudentWatched] = useState(false);
+  const [moduleLive, setModuleLive] = useState<ModuleLive | null>(null);
+  const [moduleCursors, setModuleCursors] = useState<RemoteCursor[]>([]);
+  const [sendModuleOperation] = useState(() =>
+    throttle(() => {
+      const channel = teamChannelRef.current, mirror = moduleMirrorRef.current, sendTeamId = liveRef.current.team?.id;
+      if (!channel || !mirror || !sendTeamId) return; // kept in the mirror until the next send
+      const operation = takeOperation(mirror, sendTeamId, ++groupDraftSequenceRef.current);
+      if (operation) void channel.send({ type: "broadcast", event: "team:module-operation", payload: operation });
+    }, LIVE_CAPS.typingMs),
+  );
+  const [sendModuleCursor] = useState(() =>
+    throttle((cursor: TextPoint & { path: string; userId: string; name: string }) => {
+      void teamChannelRef.current?.send({ type: "broadcast", event: "team:module-cursor", payload: cursor });
+    }, LIVE_CAPS.cursorMs),
+  );
   const consoleInputRef = useRef<HTMLTextAreaElement | null>(null);
   const studentPhotoInputRef = useRef<HTMLInputElement | null>(null);
   const teacherPhotoInputRef = useRef<HTMLInputElement | null>(null);
@@ -372,6 +332,8 @@ export default function Home() {
   const currentSavedCopy =
     activeSavedWork?.projectId === activeProjectId ? activeSavedWork : null;
   const currentModuleProject = moduleProjectForClass(moduleActivity, data?.classrooms[0]?.id, user?.role);
+  const teamOnline = Boolean(team?.members.some((member) => onlineUserIds.includes(member.id)));
+  const studentLiveView = user?.role === "teacher" && moduleLive && team?.members.some((member) => member.id === moduleLive.studentId) && onlineUserIds.includes(moduleLive.studentId) ? moduleLive : null;
   const workspaceTitle = currentModuleProject
     ? `${currentModuleProject.kind === "performance" ? "Personal project" : "Module project"} · ${currentModuleProject.moduleTitle}` :
     user?.role === "student" && currentSavedCopy
@@ -729,6 +691,9 @@ export default function Home() {
     setActiveSavedWork(null);
     setPreview(null);
     setPreviewLogs([]);
+    moduleMirrorRef.current = null;
+    setModuleLive(null);
+    setModuleCursors([]);
   }
 
   useEffect(() => {
@@ -1025,6 +990,34 @@ export default function Home() {
         setSyncStatus(`Following ${selection.updatedBy}`);
       },
     );
+    // Module live events are bound to the selected workspace's own channel only, never the shared
+    // chat channel, which every classmate can send on.
+    const moduleHandlers: typeof handlers = [];
+    const onModule = <T,>(event: string, handler: (payload: T) => void) =>
+      moduleHandlers.push({ event, handler: handler as (payload: never) => void });
+    onModule("team:module-live", (live: ModuleLive | { kind: null; studentId: string }) => {
+      if (user?.role !== "teacher" || !liveRef.current.team?.members.some((member) => member.id === live.studentId)) return;
+      moduleMirrorRef.current = live.kind ? { path: live.path, content: live.content, base: null } : null;
+      setModuleLive(live.kind ? live : null);
+      setModuleCursors([]);
+    });
+    onModule("team:module-operation", (operation: FileOperation) => {
+      const mirror = moduleMirrorRef.current;
+      if (user?.role === "student") {
+        if (!shareModuleLive(user.role, liveRef.current.team, teacherWatchingRef.current)) return;
+        moduleEditorRef.current?.applyEdit(operation.fileId, (content) => applyOperation(content, operation));
+      }
+      if (mirror?.path !== operation.fileId) return;
+      remoteEdit(mirror, operation);
+      if (user?.role === "teacher") setModuleLive((live) => live && { ...live, content: mirror.content });
+    });
+    onModule("team:module-cursor", (cursor: TextPoint & { path: string; userId: string; name: string }) => {
+      if (moduleMirrorRef.current?.path !== cursor.path) return;
+      setModuleCursors((items) => [
+        ...items.filter((item) => item.userId !== cursor.userId),
+        { ...cursor, color: collaboratorColor(cursor.userId), photoUrl: memberPhotoUrlsRef.current.get(cursor.userId) || null },
+      ]);
+    });
     on(
       "file:updated",
       (update: {
@@ -1079,6 +1072,13 @@ export default function Home() {
         const teamChannel = await join(`team:${teamId}`);
         if (cancelled) return;
         teamChannel.on("broadcast", { event: "team:sync-request" }, answerSyncRequest);
+        for (const { event, handler } of moduleHandlers)
+          teamChannel.on("broadcast", { event }, ({ payload }) => handler(payload as never));
+        if (user?.role === "student")
+          teamChannel.on("presence", { event: "sync" }, () => {
+            teacherWatchingRef.current = teacherWatching(teamChannel.presenceState());
+            setStudentWatched(teacherWatchingRef.current);
+          });
         teamChannel.subscribe((status) => {
           if (status !== "SUBSCRIBED") {
             teamChannelRef.current = null;
@@ -1087,6 +1087,8 @@ export default function Home() {
           }
           teamChannelRef.current = teamChannel;
           setSyncStatus("Live classroom connected");
+          // Selecting a student's or group's card is what turns on their live module sharing.
+          if (user?.role === "teacher" && !liveRef.current.team?.isTeacherWorkspace) void teamChannel.track({ teacher: true });
           // Ask teammates for their unsaved typing and current file, and share ours.
           void teamChannel.send({ type: "broadcast", event: "team:sync-request", payload: {} });
           answerSyncRequest();
@@ -1107,6 +1109,8 @@ export default function Home() {
       cancelled = true;
       teamChannelRef.current = null;
       classChannelRef.current = null;
+      teacherWatchingRef.current = false;
+      setStudentWatched(false);
       void releaseChannels();
     };
   }, [
@@ -1323,7 +1327,7 @@ export default function Home() {
   useEffect(() => {
     if (!activeFile || code === lastSaved.current) return;
     if (code === remoteGroupDraftRef.current) return;
-    if (user?.role === "student") return;
+    if (user?.role === "student" || team?.isGroup) return;
     saveTimerRef.current = setTimeout(async () => {
       setSyncStatus("Saving…");
       try {
@@ -1353,7 +1357,13 @@ export default function Home() {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [code, activeFile, user?.role]);
+  }, [code, activeFile, user?.role, team?.isGroup]);
+
+  useEffect(() => {
+    if (!moduleActivity) moduleMirrorRef.current = null;
+    sendModuleSnapshot();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resend only when watching or the open project changes
+  }, [studentWatched, moduleActivity]);
 
   function notify(message: string) {
     setToast(message);
@@ -1383,17 +1393,41 @@ export default function Home() {
       };
       sendLiveShareDraft(draft);
     }
-    if (user?.role === "student" && teamId && activeFile) {
+    if (user?.role === "teacher" && team?.isGroup)
+      setSyncStatus("Your changes appear on the group's screens; their Save work keeps them");
+    if ((user?.role === "student" || team?.isGroup) && teamId && activeFile) {
       unsentBaseRef.current ??= { fileId: activeFile.id, content: code };
       sendTyping(teamId, activeFile.id, nextCode);
     }
   }
   function updateCursor(offset: number) {
-    if (user?.role !== "student" || !teamId || !activeFile) return;
-    sendCursor({ teamId, fileId: activeFile.id, ...pointAt(code, offset), userId: user.id, name: user.name });
+    if (!user || (user.role !== "student" && !team?.isGroup) || !teamId || !activeFile) return;
+    sendCursor({ teamId, fileId: activeFile.id, ...pointAt(code, offset), userId: user.id, name: user.role === "teacher" ? "Teacher" : user.name });
+  }
+  // Students only: send the open module/personal file to the watching teacher, or say it closed.
+  function sendModuleSnapshot() {
+    if (!user || !shareModuleLive(user.role, team, teacherWatchingRef.current)) return;
+    const mirror = moduleMirrorRef.current;
+    const kind = moduleActivity?.kind;
+    if (mirror) mirror.base = null;
+    void teamChannelRef.current?.send({ type: "broadcast", event: "team:module-live", payload: mirror && moduleActivity && (kind === "module" || kind === "performance")
+      ? { kind, moduleTitle: moduleActivity.moduleTitle, path: mirror.path, content: mirror.content, editable: moduleEditableRef.current, studentId: user.id, studentName: user.name }
+      : { kind: null, studentId: user.id } });
+  }
+  function editModuleLive(content: string) {
+    const mirror = moduleMirrorRef.current;
+    if (!mirror) return;
+    localEdit(mirror, content);
+    setModuleLive((live) => live && { ...live, content });
+    sendModuleOperation();
+  }
+  function moveModuleCursor(offset: number) {
+    const mirror = moduleMirrorRef.current;
+    if (mirror && user) sendModuleCursor({ path: mirror.path, ...pointAt(mirror.content, offset), userId: user.id, name: user.role === "teacher" ? "Teacher" : user.name });
   }
   async function persistCurrentCode() {
-    if (!activeFile || code === lastSaved.current) return;
+    // The teacher's typing in a group reaches members live; the group's own Save work keeps it.
+    if (!activeFile || code === lastSaved.current || (user?.role === "teacher" && team?.isGroup)) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     setSyncStatus("Saving…");
     const result = await api<{ content: string; version: number }>(
@@ -2527,8 +2561,29 @@ export default function Home() {
             activity={currentModuleProject} ref={moduleEditorRef}
             onChecked={() => setModuleProgressRevision((revision) => revision + 1)}
             onClose={() => setModuleActivity(null)}
+            live={user.role === "student" ? {
+              cursors: moduleCursors,
+              onFile: (path, content, editable) => {
+                moduleMirrorRef.current = { path, content, base: null };
+                moduleEditableRef.current = editable;
+                setModuleCursors([]);
+                sendModuleSnapshot();
+              },
+              onEdit: (path, content) => {
+                const mirror = moduleMirrorRef.current;
+                if (mirror?.path !== path) return;
+                localEdit(mirror, content);
+                if (shareModuleLive(user.role, team, teacherWatchingRef.current)) sendModuleOperation();
+              },
+              onCursor: (offset) => { if (shareModuleLive(user.role, team, teacherWatchingRef.current)) moveModuleCursor(offset); },
+            } : undefined}
           /> : <><div className="content-grid">
-            <section className="editor-card">
+            {studentLiveView ? <section className="editor-card student-module-project" aria-label="Student live project">
+              <div className="workspace-card-heading"><b>Live: {studentLiveView.studentName} · {studentLiveView.kind === "performance" ? "Personal project" : "Module project"} · {studentLiveView.moduleTitle}</b><span>Java</span></div>
+              <div className="file-tabs"><button type="button" className="file-tab active">{studentLiveView.path}</button></div>
+              <CodeEditor value={studentLiveView.content} onChange={editModuleLive} onCursorChange={moveModuleCursor} remoteCursors={moduleCursors} readOnly={!studentLiveView.editable} language="java" />
+              <div className="editor-status"><span>{studentLiveView.path}</span><span>{studentLiveView.editable ? "Your changes appear on the student's screen. Their Save work or a successful run keeps them." : "Read-only until the student runs the unchanged sample."}</span></div>
+            </section> : <section className="editor-card">
               <div className="workspace-card-heading"><b><span aria-hidden="true">⌘</span> Code editor</b><span>{languageLabel(activeFile?.language || "java")}</span></div>
               <div className="file-tabs">
                 {team.files.map((file) => (
@@ -2607,7 +2662,7 @@ export default function Home() {
                 language={activeFile?.language || "java"}
                 files={team.files.map((file) => file.content)}
                 readOnly={
-                  (user.role === "teacher" && !team.isTeacherWorkspace) ||
+                  (user.role === "teacher" && !team.isTeacherWorkspace && !(team.isGroup && teamOnline)) ||
                   (team.isGroup &&
                     myGroupMembership?.editingLocked &&
                     team.leaderId !== user.id)
@@ -2631,8 +2686,9 @@ export default function Home() {
                 <span className="saved">
                   {code !== lastSaved.current ? "●" : "✓"} {syncStatus}
                 </span>
+                {user.role === "teacher" && team.isGroup && !teamOnline && <span>Editing opens when a group member is online</span>}
               </div>
-            </section>
+            </section>}
             <aside className="right-panel">
               <JavaRunnerBrand /><div className="workspace-card-heading"><b><span aria-hidden="true">›_</span> Console</b><span className="terminal-status">● Terminal</span></div>
               <div className="panel-tabs">
