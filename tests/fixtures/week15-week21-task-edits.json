@@ -9,8 +9,8 @@
   "java-2-w15-d1-s2": [
     {
       "path": "Main.java",
-      "from": "System.out.println(\"Delete the folder? \" + folder.delete());",
-      "to": "System.out.println(\"Delete trips.txt? \" + trips.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());"
+      "from": "System.out.println(\"Delete it again? \" + old.delete());",
+      "to": "System.out.println(\"Delete it again? \" + old.delete());\n        System.out.println(\"Delete trips.txt? \" + trips.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());"
     },
     {
       "path": "Main.java",
