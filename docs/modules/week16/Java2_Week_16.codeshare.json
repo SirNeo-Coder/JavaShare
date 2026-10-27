@@ -962,6 +962,20 @@
     "id": "java-2-w16-pt",
     "title": "Performance Task: Make Your Program Do Many Things at Once",
     "markdown": "Open your own program from your Four Pillars Performance Task (your sari-sari store, pets, gadgets, school personnel, or shapes theme). Give it **helpers that work at the same time**, and make them wait for each other the right way. Start on Thursday after the Thursday exit slip; finish and present on Friday.\n\n**Reuse this week's code.** Your helper class works like `BoardingTask` (Step 4) or `DispatchThread` (Step 1); the latch like Step 5; the barrier like Step 6; the semaphore like Step 7. The example shows only the latch: **you must add a second tool.**\n\n**Example (sari-sari store, two cashiers):**\n\n- Ana rang up Bread P12\n- Ben rang up Soap P18\n- Ana rang up Rice P55\n- Ben rang up Coffee P9\n- Ana's total: P67 / Ben's total: P27 / Store total: P94\n\n**Testing tip:** run your program at least four ways: (1) normally; (2) three times in a row: the totals must be identical; (3) change one sleep time: the order of messages changes, but the totals do not; (4) give one helper bad data: it must be caught and the others must still finish. No run may end in `Exception in thread \"main\"`, and none may hang.\n\n**Plan before you type** (show your teacher): for each helper, write its name, whether it is a Thread or a Runnable, its job, its own data, and which tool joins it in, and why.",
+    "steps": [
+      "In Projects, click **Personal performance-task project**. Your own program opens.",
+      "On paper, for each helper write its name, whether it is a Thread or a Runnable, its job, its own data, and which tool waits for it, and why. Show your teacher.",
+      "Add a helper class file. Copy **Step 4 · BoardingTask.java** (Runnable) or **Step 1 · DispatchThread.java** (Thread), paste it, and change it for your theme. Give each helper a name that is printed.",
+      "In `main`, make at least 3 helpers and begin each with `start()`, never `run()`, like **Step 2 · Main.java**. Each helper changes only its own data.",
+      "Use `Thread.sleep()` to show that work takes time, and handle every `InterruptedException`.",
+      "Add a `CountDownLatch`: `countDown()` in `finally` inside each helper, and `await()` in `main`, like **Step 5 · ReadyReport.java**. **Sample code · Cashier.java** shows the store example.",
+      "Add a second tool that fits your story: a `Semaphore`, like **Step 7 · LoadingBay.java**, or a `CyclicBarrier`, like **Step 6 · ConvoyLeg.java**.",
+      "Print the results after everyone has finished, in a fixed order, like **Step 3 · Main.java**.",
+      "Give one helper bad data and catch it inside its `run()`. The other helpers must still finish.",
+      "Test four ways: normally; three times in a row (same totals); with one sleep time changed (order changes, totals do not); with bad data in one helper. No run may crash or hang.",
+      "Add a comment on each part, for example `// LATCH: store opens when both cashiers finish`.",
+      "Tick each item in the **Performance task checklist**, then click **Submit this version**."
+    ],
     "checklist": [
       "At least 3 helper objects from your theme, each doing its own job on its own thread",
       "Helpers built with extends Thread or implements Runnable; each has a name that is printed",

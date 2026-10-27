@@ -64,6 +64,7 @@ for (const content of modules) {
     const restored = structuredClone(content);
     delete restored.previousModuleId;
     delete restored.sampleFirst;
+    delete restored.performanceTask.steps;
     for (const lesson of restored.lessons) {
       if (before.missingSlipIds.includes(lesson.id)) delete lesson.exitSlip.afterStep;
       for (const step of lesson.blocks.filter((block) => block.type === "step")) {
