@@ -62,6 +62,25 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
       await page.waitForFunction((value) => document.querySelector('textarea[aria-label="Java source code editor"]')?.value === value, main);
       assert.equal(await editor.inputValue(), main);
     });
+    await t.test("Projects shows the task checklist; student ticks stay on this device after reload", async () => {
+      const before = await read();
+      const list = () => projects.getByRole("region", { name: "Performance task checklist" });
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      assert.equal(await list().getByRole("checkbox").count(), fixture.performanceTask.checklist.length);
+      await list().getByRole("checkbox", { name: fixture.performanceTask.checklist[0] }).check();
+      await page.reload(); await page.locator(".classroom-workspace").waitFor();
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await projects.getByRole("button", { name: "Choose module" }).click();
+      await page.locator("#classroom-modules .module-catalog-card").filter({ hasText: fixture.title }).getByRole("button").first().click();
+      await page.locator("#classroom-worksheet").waitFor();
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      assert.equal(await list().getByRole("checkbox", { name: fixture.performanceTask.checklist[0] }).isChecked(), true);
+      assert.equal(await list().getByRole("checkbox", { name: fixture.performanceTask.checklist[1] }).isChecked(), false);
+      assert.deepEqual(await read(), before);
+      await projects.screenshot({ path: `/tmp/codeshare-personal-${mode}-checklist.png` });
+      await projects.getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction((value) => document.querySelector('textarea[aria-label="Java source code editor"]')?.value === value, main);
+    });
     if (mode === "online") await t.test("live Program input works and Stop invalidates a previously successful run", async () => {
       await editor.fill('import java.util.Scanner; public class Main { public static void main(String[] a) { System.out.println("Order?"); System.out.println("Coffee " + new Scanner(System.in).nextLine()); } }');
       const waiting = async () => {

@@ -1,3 +1,16 @@
+> Student performance-task checklist in Projects (2026-10-27): teacher approved showing each
+> module's performance-task checklist to students in the Projects panel, read-only, with boxes the
+> student may tick for what their project already does. Branch `feature/personal-task-checklist`,
+> based on origin/main `3b662d7`. `PersonalTaskChecklist` (in `app/PersonalSubmissionChecklist.tsx`)
+> renders under Personal performance-task project once a module is chosen (`app/page.tsx`). Ticks
+> are saved in that browser only (`codeshare-task-checklist:<student>:<class>:<module>`); no server,
+> schema, progress, submission or teacher-review change. Teacher review ticks stay teacher-only.
+> Verification: 346/346 full suite; offline production browser test 5/5 (local Supabase, laptop
+> Java) including the new tick-survives-reload step; unit test shown failing with tick restore
+> broken, passing restored; `build:all` passes; lint 0 errors, 8 existing warnings. Online browser
+> mode not run (no runner on 3033/3034; the panel code is the same online). Pushed;
+> [PR #50](https://github.com/SirNeo-Coder/JavaShare/pull/50) is open against main. Next: teacher review.
+
 > Java member suggestions (2026-10-27): teacher approved extending the existing Java code
 > suggestions (merged PR #34, 2026-10-21) to also suggest a variable's declared class's own
 > public methods and public fields after typing `.` — the gap that work's own shortcut comment

@@ -432,3 +432,10 @@ review. Resubmission replaces only that module's submitted copy and clears the p
 a stale review cannot attach to the replacement. Checklist review is separate from progress/grades.
 Legacy submissions preserve their files and label checklists captured from current content at
 first review. Module completion-only saves, device recovery, prerequisites and live locks remain.
+
+Student Projects (2026-10-27): after a module is chosen, Projects lists that module's
+Performance task checklist under Personal performance-task project. Items are read-only; the
+student may tick what their project already does. Ticks stay in that browser only (key
+`codeshare-task-checklist:<student>:<class>:<module>`), never reach the server, progress, the
+submission or the teacher's review, and are not a grade. Clearing browser storage or switching
+device shows them unticked. Teacher review ticks remain teacher-only.

@@ -1,7 +1,7 @@
 "use client";
 
 import { paperPerformanceTask } from "../backend/src/personal-performance";
-import PersonalSubmissionChecklist from "./PersonalSubmissionChecklist";
+import PersonalSubmissionChecklist, { PersonalTaskChecklist } from "./PersonalSubmissionChecklist";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -2217,6 +2217,7 @@ export default function Home() {
               try { await startModuleActivity(weeklyModule); }
               catch (error) { notify(error instanceof Error ? error.message : "Could not open personal project"); }
             }}><span className="team-icon">J</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>}
+            {weeklyModule.performanceTask?.checklist.length ? <PersonalTaskChecklist key={weeklyModule.id} items={weeklyModule.performanceTask.checklist} storageKey={`codeshare-task-checklist:${user.id}:${classroomId}:${weeklyModule.id}`} /> : null}
           </div>}
           <div className="team-list">
             {data.teams.map((item, index) => {
