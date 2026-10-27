@@ -74,6 +74,7 @@ const performanceTask = z.object({
   id: z.string().trim().min(1).max(100),
   title: z.string().max(200),
   markdown: z.string().max(10000),
+  steps: z.array(z.string().max(500)).max(30).optional(),
   checklist: z.array(z.string().max(500)).min(1),
   exampleFiles: z.array(file).min(1).max(50),
   starterFiles: z.array(file).min(1).max(50),

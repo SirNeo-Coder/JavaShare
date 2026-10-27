@@ -446,6 +446,13 @@ student may tick what their project already does. Ticks stay in that browser onl
 submission or the teacher's review, and are not a grade. Clearing browser storage or switching
 device shows them unticked. Teacher review ticks remain teacher-only.
 
+Performance task steps (2026-10-27): when a module's JSON has `performanceTask.steps`, Projects
+shows a numbered **How to build it, step by step** guide above the Performance task checklist, and
+the module's Performance task page shows it above the checklist. Steps are read-only text and name
+which **Code from this module** sample to copy (for example **Step 4 · Main.java**). Weeks 12–19 and
+21 carry steps; Week 20 stays a paper proposal. Already-uploaded modules show steps only after the
+teacher re-uploads the updated JSON (same ids, progress kept). No server, progress or grading change.
+
 Personal project Save work colour (2026-10-27): blue when everything is saved, green while there
 are a few unsaved edits, red once 10 or more lines are added, removed or edited since the last
 save or run (counted across all personal files; renamed or moved lines do not count). The status

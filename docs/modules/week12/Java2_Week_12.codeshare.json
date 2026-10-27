@@ -651,6 +651,18 @@
     "id": "java-2-w12-performance",
     "title": "Build and present your own OOP program",
     "markdown": "Use the Vehicle program as your model, then build a different theme: sari-sari store items, school personnel/pay, pets/care cost, gadgets/warranty, shapes/area, or a teacher-approved theme. Do not copy the Vehicle theme. Work in the separate personal project. Plan class names, fields, methods and setter validation before coding. Run and save as often as needed; submit explicitly when ready. Paper liplets and teacher assessment remain separate.",
+    "steps": [
+      "Choose your theme: sari-sari store items, school personnel and pay, pets and care cost, gadgets and warranty, shapes and area, or one your teacher approves. Not vehicles.",
+      "On paper, plan your parent class, at least two child classes, their private fields, one abstract method, and one setter rule that refuses bad data. Show your teacher.",
+      "In Projects, click **Personal performance-task project**. Add a file for your parent class.",
+      "Open **Code from this module** and click **Copy code** on **Step 1 · Vehicle.java**. Paste it into your parent file, then rename the class, fields, constructor and getters for your theme. Keep `this.` in the constructor.",
+      "Change the setter so it refuses bad data for your theme, like `setPassengers` refuses -3. **Run code** and check that a bad value is refused.",
+      "Add a file for each child. Copy **Step 3 · Jeepney.java**, paste it, and change it: `extends` your parent, call `super(...)`, and add one private field with its getter.",
+      "Make your parent `abstract` with one abstract method, like `computeFare` in **Step 8 · Vehicle.java**. Each child overrides it in its own way.",
+      "In `Main.java`, make a parent-type array that holds objects of each child, and loop over it calling the overridden method, like **Step 6 · Main.java**. **Run code**.",
+      "Add a comment naming each pillar where it appears: encapsulation, inheritance, polymorphism, abstraction.",
+      "Tick each item in the **Performance task checklist**, then click **Submit this version**."
+    ],
     "checklist": [
       "One abstract parent with at least one abstract method",
       "At least three private parent fields, constructor using this, and getters",
