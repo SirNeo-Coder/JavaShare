@@ -13,12 +13,29 @@ export function getApiUrl() {
   return DEPLOYED_API_URL;
 }
 
+// A stalled connection (classroom Wi-Fi) must not hang this call forever: callers like the
+// module editor's Run/Save stay locked (readOnly) until the request settles, so an unresolved
+// fetch leaves the editor stuck non-editable with no error shown.
+const REQUEST_TIMEOUT_MS = 20000;
+
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${getApiUrl()}${path}`, {
-    ...options,
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...options.headers },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  options.signal?.addEventListener("abort", () => controller.abort(), { once: true });
+  let response: Response;
+  try {
+    response = await fetch(`${getApiUrl()}${path}`, {
+      ...options,
+      signal: controller.signal,
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...options.headers },
+    });
+  } catch (error) {
+    if (controller.signal.aborted && !options.signal?.aborted) throw new ApiError("Request timed out. Check your connection and try again.");
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
   const body = response.status === 204 ? null : await response.json().catch(() => {
     if (response.ok) throw new ApiError(`CodeShare returned an unreadable response (${response.status}). Please try again.`);
     return null;
