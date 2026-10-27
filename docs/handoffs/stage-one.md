@@ -8,7 +8,8 @@
 > full suite; offline production browser test 6/6 including the new colour/wording step; unit
 > line-count test and browser wording step each shown failing when broken and passing restored;
 > `build:all` passes; lint 0 errors, 8 existing warnings. Online browser mode and dark theme were
-> not checked on screen. Next: PR for review.
+> not checked on screen. Pushed; [PR #51](https://github.com/SirNeo-Coder/JavaShare/pull/51) is open
+> against main. Next: teacher review.
 
 > Student performance-task checklist in Projects (2026-10-27): teacher approved showing each
 > module's performance-task checklist to students in the Projects panel, read-only, with boxes the
