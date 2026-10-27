@@ -859,6 +859,20 @@
     "id": "java-2-w14-pt",
     "title": "Performance Task: Manage Your Data with Collections",
     "markdown": "Open your own program from last week's Performance Task (your sari-sari store, pets, gadgets, school personnel, or shapes theme). Replace its arrays with collections, and add a List, a Set, and a Map that each do a real job. Start on Thursday after the Thursday exit slip; finish and present on Friday.\n\n**Example (sari-sari store).** Do yours your own way:\n\n- A Map of product to pieces in stock (a TreeMap, so the report is A to Z)\n- A List of sales, in order, with repeats allowed\n- A Set of customers, each counted once: adding Ana a second time is refused\n- Sales today: 3 / Different customers: Ana, Ben\n\n**Testing tip:** before you present, run your program at least four times: once normally, once adding a duplicate to your Set, once typing a key that exists, and once typing a key that does not exist. Every run must end with a friendly message, never an `Exception in thread \"main\"` report.\n\n**Plan before you type** (show your teacher): for your List, Set, and Map write the class you will use, what it holds, and why this one and not the others. For your Iterator, write which items it will remove, and why.\n\n**Schedule:** Thursday — Steps 7 to 10, the Thursday strip, then the plan and your List and Set. Friday — build the Map, the find method, and the loops; a classmate tries to break it; presentations and Q&A.",
+    "steps": [
+      "In Projects, click **Personal performance-task project**. Your own program from last week opens.",
+      "On paper, for your List, Set and Map, write the class you will use, what it holds, and why. For your Iterator, write which items it removes, and why. Show your teacher.",
+      "Replace your array with a List of at least 4 objects from at least 2 subclasses, like **Step 1 · Main.java**. **Run code**.",
+      "Add a Set that refuses a duplicate, and print what `add()` returns, like **Step 3 · Main.java**.",
+      "Make your own checked NotFound exception: copy **Step 5 · VehicleNotFoundException.java** and rename it for your theme.",
+      "Add a Map that looks up an object by a key (an ID, name or code) and a find method that throws your NotFound exception, like `findVehicle` in **Step 5 · Main.java**.",
+      "Add an index `for` loop that numbers the items and a for-each loop that adds up or counts something, like **Step 7 · Main.java**.",
+      "Add an Iterator that safely removes some items, like **Step 9 · Main.java**. Then loop over your Map with `entrySet()`, like **Step 10 · Main.java**.",
+      "Let the user type a key in Console. A missing key shows a friendly message, never a crash. **Step 11 · Main.java** shows a finished store example.",
+      "Test four times: normally, adding a duplicate to your Set, typing a key that exists, and typing a key that does not exist.",
+      "Add a comment on each part, for example `// SET: no duplicate IDs`.",
+      "Tick each item in the **Performance task checklist**, then click **Submit this version**."
+    ],
     "checklist": [
       "A List of your objects with at least 4, from at least 2 subclasses",
       "A Set that refuses a duplicate — show add() returning false",

@@ -16,7 +16,7 @@ import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
 import { activityStateId, activityTask } from "../backend/src/module-activities";
 import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
-import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
+import { PerformanceTaskSteps, type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
 import ModuleAccessNotice from "./ModuleAccessNotice";
 import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
@@ -2217,6 +2217,7 @@ export default function Home() {
               try { await startModuleActivity(weeklyModule); }
               catch (error) { notify(error instanceof Error ? error.message : "Could not open personal project"); }
             }}><span className="team-icon">J</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>}
+            <PerformanceTaskSteps steps={weeklyModule.performanceTask?.steps} />
             {weeklyModule.performanceTask?.checklist.length ? <PersonalTaskChecklist key={weeklyModule.id} items={weeklyModule.performanceTask.checklist} storageKey={`codeshare-task-checklist:${user.id}:${classroomId}:${weeklyModule.id}`} /> : null}
           </div>}
           <div className="team-list">

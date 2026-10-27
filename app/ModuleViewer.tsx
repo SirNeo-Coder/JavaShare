@@ -72,6 +72,7 @@ type PerformanceTask = {
   id: string;
   title: string;
   markdown: string;
+  steps?: string[];
   checklist: string[];
   exampleFiles: ModuleFile[];
   starterFiles: ModuleFile[];
@@ -141,6 +142,11 @@ function Markdown({ markdown }: { markdown: string }) {
       })}
     </>
   );
+}
+
+export function PerformanceTaskSteps({ steps }: { steps?: string[] }) {
+  if (!steps?.length) return null;
+  return <section aria-label="Performance task steps"><b>How to build it, step by step</b><ol>{steps.map((step, index) => <li key={index}>{renderInline(step, `${index}`)}</li>)}</ol></section>;
 }
 
 export function ModulePaperBlock({ block }: { block: OtherBlock }) {
@@ -312,7 +318,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
         {hasTask && <article className="worksheet-paper" hidden={currentPage !== pages.length} aria-label="Performance task">
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
           {module.closedPerformanceTask && <p className="module-preview-note">Complete the previous part first</p>}
-          {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
+          {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><PerformanceTaskSteps steps={module.performanceTask.steps} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
             <PerformanceTaskSlot label="Sample code" files={module.performanceTask.exampleFiles} variant="sample" role={role} paper={paperPerformanceTask(module)} submitted={progress.performanceTask.sample?.status} />
             <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} variant="own" role={role} paper={paperPerformanceTask(module)} onStart={() => onStartActivity?.(module) ?? Promise.resolve()} submitted={progress.performanceTask.own?.status} />
             {module.performanceTask.presentationOutline?.length ? <><h3 className="paper-heading">Presentation</h3><ol>{module.performanceTask.presentationOutline.map((item, index) => <li key={index}>{item}</li>)}</ol></> : null}
@@ -371,6 +377,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
         <section className="module-lesson" hidden={paged && lessonPage !== module.lessons.length}>
           <h3>{module.performanceTask.title}</h3>
           <Markdown markdown={module.performanceTask.markdown} />
+          <PerformanceTaskSteps steps={module.performanceTask.steps} />
           <ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
           <PerformanceTaskSlot
             label="Sample code" files={module.performanceTask.exampleFiles} variant="sample" role={role} paper={paperPerformanceTask(module)}

@@ -1,3 +1,24 @@
+> Performance task steps (2026-10-27): teacher asked for a step-by-step procedure students can
+> follow to meet the performance-task requirements, including when to use the new Copy code, and
+> approved: an optional `performanceTask.steps` list in each weekly JSON, shown as a numbered
+> **How to build it, step by step** guide above the Performance task checklist in Projects and on
+> the module's Performance task page. Branch `feature/personal-task-steps`, stacked on
+> `feature/personal-copy-module-code` (`0d7b8f5`, not yet merged) in its own worktree
+> (`../JavaShare-task-steps`) so the steps' **Code from this module** references exist; merge the
+> copy-code PR first. Changes: schema field (`backend/src/course-module-schema.ts`),
+> `PerformanceTaskSteps` in `app/ModuleViewer.tsx`, one line in `app/page.tsx`; steps drafted for
+> Weeks 12–19 and 21 from each week's own task text and checklist (Week 20 stays paper). No server
+> route, database, progress or grading change. Teacher must re-upload the updated weekly JSON files
+> for steps to appear (same ids, progress kept); assistants never upload to hosted services.
+> Verification: full suite 363/363; new `tests/performance-task-steps.test.mjs` (12 tests: schema keeps
+> steps, list renders, every named sample matches a real Copy code label in each week) caught three
+> wrong labels while drafting; schema, render and label breaks each shown failing, passing restored;
+> offline production browser test 6/6 (local Supabase, laptop Java) with new steps checks in Projects
+> and the worksheet, shown failing with the Projects list removed and passing restored; real Week 12
+> content checked in Projects on screen; `build:all` passes; lint 0 errors, 8 existing warnings.
+> Not checked: online CheerpJ mode, hosted site, phones, dark theme. Next: teacher reviews the step
+> wording per week and the PR.
+
 > Copy module code into the personal project (2026-10-27): teacher approved letting students copy
 > module code into their personal project, code only (personal filenames differ from the module's),
 > with the recommended scope: unlocked lesson step samples plus the performance task's Sample code.
