@@ -2604,6 +2604,7 @@ export default function Home() {
                 onCursorChange={updateCursor}
                 remoteCursors={remoteCursors}
                 language={activeFile?.language || "java"}
+                files={team.files.map((file) => file.content)}
                 readOnly={
                   (user.role === "teacher" && !team.isTeacherWorkspace) ||
                   (team.isGroup &&

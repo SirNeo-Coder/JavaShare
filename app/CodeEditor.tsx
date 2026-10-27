@@ -111,9 +111,9 @@ function analyze(code: string, language: string) {
 }
 
 type RemoteCursor = { userId: string; name: string; line: number; column: number; color: string; photoUrl?: string | null };
-type Props = { value: string; onChange: (value: string) => void; onCursorChange?: (offset: number) => void; remoteCursors?: RemoteCursor[]; readOnly?: boolean; language?: string };
+type Props = { value: string; onChange: (value: string) => void; onCursorChange?: (offset: number) => void; remoteCursors?: RemoteCursor[]; readOnly?: boolean; language?: string; files?: string[] };
 
-export default function CodeEditor({ value, onChange, onCursorChange, remoteCursors = [], readOnly = false, language = "java" }: Props) {
+export default function CodeEditor({ value, onChange, onCursorChange, remoteCursors = [], readOnly = false, language = "java", files }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLPreElement>(null);
   const numbersRef = useRef<HTMLDivElement>(null);
@@ -126,7 +126,7 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
   const suggestionId = useId();
   const [completion, setCompletion] = useState<{ value: string; cursor: number; index: number } | null>(null);
   const suggestions = useMemo(() => !readOnly && language === "java" && completion?.value === value
-    ? javaSuggestions(value, completion.cursor) : null, [readOnly, language, completion, value]);
+    ? javaSuggestions(value, completion.cursor, completion.cursor, files) : null, [readOnly, language, completion, value, files]);
   const selected = suggestions ? Math.min(completion?.index ?? 0, suggestions.items.length - 1) : 0;
   const lineCount = Math.max(1, value.split("\n").length);
   const analysis = useMemo(() => analyze(value, language), [value, language]);

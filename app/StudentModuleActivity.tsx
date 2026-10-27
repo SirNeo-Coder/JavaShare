@@ -269,7 +269,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
           {!review && <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>}
         </div>
-        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={review || busy || pendingSample || !deviceReady} onChange={(content) => changeFiles(files.map((file) => file.path === path ? { ...file, content } : file))} />
+        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={review || busy || pendingSample || !deviceReady} files={files.map((file) => file.content)} onChange={(content) => changeFiles(files.map((file) => file.path === path ? { ...file, content } : file))} />
         <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
         {personal && !review && <div className="module-step-actions"><button type="button" disabled={busy} onClick={renameFile}>Rename file</button><button type="button" disabled={busy || files.length < 2} onClick={() => {
           if (!window.confirm(`Delete ${path}?`)) return;
