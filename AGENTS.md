@@ -234,3 +234,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Preserve the checklist used for each submission. Older copies without one retain their files
   and clearly identify the current checklist captured when first opened for review.
 - Week 20 remains a paper proposal with no Java run or online submission requirement.
+
+## Teacher live help (agreed 2026-10-27)
+
+- Selecting a student in **Students / projects** shows the Module project or Personal
+  performance-task project that student has open, live with their name cursor, and the teacher
+  may edit it. This is help, not grading or submission: the teacher never saves into student files;
+  the student's Save work or a successful run keeps the teacher's changes.
+- Unfinished work travels only while the teacher has that student selected, and only on the
+  student's own one-person workspace channel, never a group or Teacher Demo channel. This is the
+  one exception to "teacher progress receives completions, not unfinished drafts"; drafts are still
+  never saved to the server by this feature.
+- Selecting a group lets the teacher type in the group's shared code while a member is online;
+  members' Save work keeps it. The teacher never auto-saves into group files.

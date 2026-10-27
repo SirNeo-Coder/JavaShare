@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref } from "react";
+import { useCallback, useEffect, useImperativeHandle, useRef, useState, type ComponentProps, type Ref } from "react";
 import CodeEditor from "./CodeEditor";
 import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
@@ -17,7 +17,14 @@ export type StudentActivity = {
   classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string; studentId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
 };
-export type ModuleEditorHandle = { save: () => Promise<void> };
+export type ModuleEditorHandle = { save: () => Promise<void>; applyEdit: (path: string, edit: (content: string) => string) => void };
+// Teacher live help: the open file, typing and cursor go to the watching teacher; their cursor comes back.
+export type ModuleLiveLink = {
+  cursors: ComponentProps<typeof CodeEditor>["remoteCursors"];
+  onFile: (path: string, content: string, editable: boolean) => void;
+  onEdit: (path: string, content: string) => void;
+  onCursor: (offset: number) => void;
+};
 
 type RunCheck = { check: "sample" | "task"; passed: boolean; sampleMatched: boolean; success: boolean; syncPending?: boolean };
 
@@ -80,8 +87,8 @@ export function JavaRunProgress({ message, waiting = false }: { message: string 
   </div>;
 }
 
-export default function StudentModuleActivity({ activity, ref, onChecked, onClose }: {
-  activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void;
+export default function StudentModuleActivity({ activity, ref, onChecked, onClose, live }: {
+  activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void; live?: ModuleLiveLink;
 }) {
   const review = activity.kind === "review";
   const personal = activity.kind !== "module";
@@ -169,7 +176,21 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       else await saveDeviceDraft();
     } finally { busyRef.current = false; setBusy(false); }
   };
-  useImperativeHandle(ref, () => ({ save }));
+  const editable = !review && deviceReady && !pendingSample;
+  // A teacher's edit lands like the student's own typing: unsaved until Save work or a run keeps it.
+  const applyEdit = (editPath: string, edit: (content: string) => string) => {
+    if (!editable) return;
+    setFiles((current) => current.map((file) => file.path === editPath ? { ...file, content: edit(file.content) } : file));
+    setSuccessfulFiles(null);
+  };
+  useImperativeHandle(ref, () => ({ save, applyEdit }));
+  // A new snapshot only when the open file or editability changes; typing travels as edits.
+  const sentFile = useRef("");
+  useEffect(() => {
+    if (review || !live || sentFile.current === `${editable}:${path}`) return;
+    sentFile.current = `${editable}:${path}`;
+    live.onFile(path, files.find((file) => file.path === path)?.content ?? "", editable);
+  }, [review, live, path, editable, files]);
 
   const run = async () => {
     if (busyRef.current || !deviceReady) return;
@@ -303,7 +324,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
           {!review && <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>}
         </div>
-        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={review || busy || pendingSample || !deviceReady} files={files.map((file) => file.content)} onChange={(content) => changeFiles(files.map((file) => file.path === path ? { ...file, content } : file))} />
+        <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language="java" readOnly={review || busy || pendingSample || !deviceReady} files={files.map((file) => file.content)} remoteCursors={live?.cursors} onCursorChange={live?.onCursor} onChange={(content) => { changeFiles(files.map((file) => file.path === path ? { ...file, content } : file)); live?.onEdit(path, content); }} />
         <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
         {personal && !review && <div className="module-step-actions"><button type="button" disabled={busy} onClick={renameFile}>Rename file</button><button type="button" disabled={busy || files.length < 2} onClick={() => {
           if (!window.confirm(`Delete ${path}?`)) return;
