@@ -655,7 +655,7 @@
       "Choose your theme: sari-sari store items, school personnel and pay, pets and care cost, gadgets and warranty, shapes and area, or one your teacher approves. Not vehicles.",
       "On paper, plan your parent class, at least two child classes, their private fields, one abstract method, and one setter rule that refuses bad data. Show your teacher.",
       "In Projects, click **Personal performance-task project**. Add a file for your parent class.",
-      "Open **Code from this module** and click **Copy code** on **Step 1 · Vehicle.java**. Paste it into your parent file, then rename the class, fields, constructor and getters for your theme. Keep `this.` in the constructor.",
+      "Copy **Step 1 · Vehicle.java** with the button at the end of this step. Paste it into your parent file, then rename the class, fields, constructor and getters for your theme. Keep `this.` in the constructor.",
       "Change the setter so it refuses bad data for your theme, like `setPassengers` refuses -3. **Run code** and check that a bad value is refused.",
       "Add a file for each child. Copy **Step 3 · Jeepney.java**, paste it, and change it: `extends` your parent, call `super(...)`, and add one private field with its getter.",
       "Make your parent `abstract` with one abstract method, like `computeFare` in **Step 8 · Vehicle.java**. Each child overrides it in its own way.",

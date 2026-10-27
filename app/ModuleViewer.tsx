@@ -144,9 +144,41 @@ function Markdown({ markdown }: { markdown: string }) {
   );
 }
 
-export function PerformanceTaskSteps({ steps }: { steps?: string[] }) {
+// Module code the student can already see (unlocked lesson samples, then the performance task's Sample code),
+// offered for copying into the personal project. Only the code is copied; the student's own filenames stay.
+export function moduleCode(module: CourseModule) {
+  const seen = new Set<string>();
+  return [
+    ...(module?.lessons ?? []).flatMap((lesson) => lesson.blocks)
+      .filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked)
+      .flatMap((step) => step.files.map((file) => ({ label: `Step ${step.number} · ${file.path}`, content: file.content }))),
+    ...(module?.performanceTask?.exampleFiles ?? []).map((file) => ({ label: `Sample code · ${file.path}`, content: file.content })),
+  ].filter(({ content }) => !seen.has(content) && Boolean(seen.add(content)));
+}
+
+// Offline classroom pages are plain http, where browsers turn off navigator.clipboard; use the older copy command there.
+export async function copyText(text: string) {
+  if (window.isSecureContext && navigator.clipboard) return navigator.clipboard.writeText(text);
+  const area = document.createElement("textarea");
+  area.value = text; area.style.position = "fixed"; area.style.opacity = "0";
+  document.body.append(area); area.select();
+  try { if (!document.execCommand("copy")) throw new Error("Copy failed"); } finally { area.remove(); }
+}
+
+// Samples a step names in bold exactly as moduleCode labels them, e.g. **Step 4 · Main.java**.
+export function stepCode(step: string, module?: CourseModule) {
+  const codes = module ? moduleCode(module) : [];
+  const labels = new Set([...step.matchAll(/\*\*((?:Step \d+|Sample code) · [^*]+)\*\*/g)].map((match) => match[1]));
+  return codes.filter((code) => labels.has(code.label));
+}
+
+export function PerformanceTaskSteps({ steps, module }: { steps?: string[]; module?: CourseModule }) {
+  const [copied, setCopied] = useState("");
+  const [failed, setFailed] = useState(false);
   if (!steps?.length) return null;
-  return <section aria-label="Performance task steps"><b>How to build it, step by step</b><ol>{steps.map((step, index) => <li key={index}>{renderInline(step, `${index}`)}</li>)}</ol></section>;
+  return <section aria-label="Performance task steps"><b>How to build it, step by step</b><ol>{steps.map((step, index) => <li key={index}>{renderInline(step, `${index}`)}
+    {stepCode(step, module).map((code) => <span key={code.label}> <button type="button" onClick={() => void copyText(code.content).then(() => { setCopied(code.label); setFailed(false); }, () => setFailed(true))}>{copied === code.label ? "Copied" : `Copy ${code.label}`}</button></span>)}
+  </li>)}</ol>{failed && <p role="alert">Could not copy. Try again.</p>}</section>;
 }
 
 export function ModulePaperBlock({ block }: { block: OtherBlock }) {
@@ -318,7 +350,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
         {hasTask && <article className="worksheet-paper" hidden={currentPage !== pages.length} aria-label="Performance task">
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
           {module.closedPerformanceTask && <p className="module-preview-note">Complete the previous part first</p>}
-          {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><PerformanceTaskSteps steps={module.performanceTask.steps} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
+          {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><PerformanceTaskSteps steps={module.performanceTask.steps} module={module} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
             <PerformanceTaskSlot label="Sample code" files={module.performanceTask.exampleFiles} variant="sample" role={role} paper={paperPerformanceTask(module)} submitted={progress.performanceTask.sample?.status} />
             <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} variant="own" role={role} paper={paperPerformanceTask(module)} onStart={() => onStartActivity?.(module) ?? Promise.resolve()} submitted={progress.performanceTask.own?.status} />
             {module.performanceTask.presentationOutline?.length ? <><h3 className="paper-heading">Presentation</h3><ol>{module.performanceTask.presentationOutline.map((item, index) => <li key={index}>{item}</li>)}</ol></> : null}
@@ -377,7 +409,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
         <section className="module-lesson" hidden={paged && lessonPage !== module.lessons.length}>
           <h3>{module.performanceTask.title}</h3>
           <Markdown markdown={module.performanceTask.markdown} />
-          <PerformanceTaskSteps steps={module.performanceTask.steps} />
+          <PerformanceTaskSteps steps={module.performanceTask.steps} module={module} />
           <ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
           <PerformanceTaskSlot
             label="Sample code" files={module.performanceTask.exampleFiles} variant="sample" role={role} paper={paperPerformanceTask(module)}
