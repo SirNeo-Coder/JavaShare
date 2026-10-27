@@ -15,7 +15,8 @@
 > `build:all` passes; lint 0 errors, 8 existing warnings. Not checked: online/hosted Realtime,
 > launcher-owned `classroom:offline` on port 3000 (tests used a separate production server on 3032
 > with the same local Supabase and laptop Java settings), second physical device, dark theme.
-> Next: push and open the PR for teacher review.
+> Pushed; [PR #53](https://github.com/SirNeo-Coder/JavaShare/pull/53) is open against main.
+> Next: teacher review.
 
 > Personal project Save work colours (2026-10-27): teacher declined auto-save (Run code already
 > saves personal files to the server) and approved: fix the personal Run code message to "Saving
