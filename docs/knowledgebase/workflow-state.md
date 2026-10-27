@@ -21,6 +21,12 @@ What teachers and students can do today. Keep this page current when their use o
   characters opens **Java code suggestions**. Examples: `Sys` offers `System` and
   `System.out.println(…)`; `ma` offers a `main` statement. Suggestions include Java keywords,
   common types and names in the current file, without Java type checking or AI generation.
+- Typing `.` right after a variable name offers that variable's declared class's own **public
+  methods and public fields** (for example `trike.` offers `showInfo()` and `driverName` when
+  `trike` was declared as `Tricycle trike = new Tricycle(...)`), searching every file in the
+  current project so a class defined in a separate file still resolves. This is a same-project
+  regex lookup, not full Java type checking: it does not see inherited members, and `System.`
+  keeps offering the bundled `System.out` snippets rather than class members (2026-10-27).
 - Use ↑/↓ to choose, Enter to insert, Escape to close, or click/tap an item. Print statements
   leave the caret inside their parentheses; `main` retains the current indentation.
   Tab/Shift+Tab still indent, and Ctrl+Enter still runs code. Read-only views retain normal Tab navigation.

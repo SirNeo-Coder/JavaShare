@@ -65,3 +65,52 @@ test("Java suggestions: the main statement keeps existing indentation and puts t
   assert.equal(result.value, "class Main {\n    public static void main(String[] args) {\n        \n    }\n}");
   assert.equal(result.value.slice(result.cursor), "\n    }\n}");
 });
+
+const TRICYCLE_CLASS = `
+public class Tricycle {
+    private int passengers;
+    public String driverName;
+
+    public Tricycle(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public void showInfo() {
+        System.out.println(driverName);
+    }
+
+    public int getPassengers(int extra) { return passengers; }
+
+    private void secretHelper() {}
+}
+`;
+
+test("Java suggestions: 'varName.' lists the declared class's public methods and fields, not private ones", () => {
+  const code = `${TRICYCLE_CLASS}\nTricycle trike = new Tricycle("Ann");\ntrike.`;
+  assert.deepEqual(labels(code).sort(), ["driverName", "getPassengers(int extra)", "showInfo()"]);
+});
+
+test("Java suggestions: member completion resolves the class across a different project file", () => {
+  const main = `Tricycle trike = new Tricycle("Ann");\ntrike.sh`;
+  assert.deepEqual(javaSuggestions(main, main.length, main.length, [TRICYCLE_CLASS]).items.map((item) => item.label), ["showInfo()"]);
+});
+
+test("Java suggestions: member completion filters by the typed prefix and stays quiet for unknown variables or types", () => {
+  const code = `${TRICYCLE_CLASS}\nTricycle trike = new Tricycle("Ann");\ntrike.get`;
+  assert.deepEqual(labels(code), ["getPassengers(int extra)"]);
+  assert.equal(javaSuggestions("ghost.", 6), null);
+  assert.equal(javaSuggestions("Mystery m = new Mystery();\nm.", 30), null);
+});
+
+test("Java suggestions: inserting a suggested method places the caret inside its parentheses", () => {
+  const code = `${TRICYCLE_CLASS}\nTricycle trike = new Tricycle("Ann");\ntrike.sh`;
+  const suggestions = javaSuggestions(code, code.length);
+  const result = insertJavaSuggestion(code, suggestions.from, suggestions.to, suggestions.items.find((item) => item.label === "showInfo()"));
+  assert.ok(result.value.endsWith("trike.showInfo()"));
+  assert.equal(result.value[result.cursor - 1], "(");
+  assert.equal(result.value[result.cursor], ")");
+});
+
+test("Java suggestions: 'System.' member access is unaffected by class-based member completion", () => {
+  assert.deepEqual(labels("System.out."), ["System.out.println(…)", "System.out.print(…)"]);
+});

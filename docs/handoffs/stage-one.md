@@ -1,3 +1,20 @@
+> Java member suggestions (2026-10-27): teacher approved extending the existing Java code
+> suggestions (merged PR #34, 2026-10-21) to also suggest a variable's declared class's own
+> public methods and public fields after typing `.` — the gap that work's own shortcut comment
+> named ("use a language server if typed member completion is needed"). Branch
+> `feature/java-member-completion`, based on current main `04187ef`. `app/javaSuggestions.ts`
+> gained a regex-based (not type-checking) class-member lookup reused by the existing suggestion
+> UI in `app/CodeEditor.tsx`, unchanged; `files` threading in `app/page.tsx` and
+> `app/StudentModuleActivity.tsx` lets the lookup resolve a class defined in a different project
+> file. `System.` keeps its existing snippet behavior untouched. Verification: full suite 340/340
+> including all 12 `tests/java-suggestions.test.mjs` cases (4 new); `build:all` and `lint` (0
+> errors, 8 pre-existing warnings) pass; real-app check in the classroom Code editor confirms
+> cross-file resolution (`Tricycle` declared in a second file), prefix filtering, arrow/Enter
+> insertion placing the caret correctly immediately after insertion (no CKB-059 regression), and a
+> real `javac` run of the inserted call. Implementation and verification complete; branch pushed
+> and [PR #46](https://github.com/SirNeo-Coder/JavaShare/pull/46) is open against main. Teacher
+> review and rollout are next. No schema, server, or hosted-settings changes.
+>
 > Module-loading repair recovered (2026-10-23), branch `codex/module-summary-repair`
 > based on saved origin/main fc0972c. CKB-067: module lists failed with 500 because
 > required `codeshare_module_summaries(uuid)` was absent, despite existing tables
