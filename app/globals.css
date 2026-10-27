@@ -342,6 +342,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .classroom-workspace .actionbar { padding:0 12px; border-color:#bfc9d9; background:transparent; }
 .classroom-workspace .actionbar .run-button:first-child { border-color:#eab04b; background:#ffc45d; color:#17233b; box-shadow:0 2px 5px #13244c19; }
 .classroom-workspace .actionbar .run-button:first-child kbd { color:#71521a; }
+.actionbar .run-button.save-saved { border-color:#3560e5; background:#456cec; color:#fff; }.actionbar .run-button.save-editing { border-color:#23966d; background:#2ca979; color:#fff; }.actionbar .run-button.save-many-changes { border-color:#c9523e; background:#d95d47; color:#fff; }.actionbar .run-button[class*="save-"]:disabled { opacity:.6; }
 .workspace-rail { position:absolute; z-index:15; top:31%; display:grid; gap:12px; }
 .rail-left { left:0; }.rail-right { right:0; }
 .workspace-rail button { display:flex; align-items:center; gap:10px; writing-mode:vertical-rl; padding:12px 7px; border:1px solid #405584; border-radius:0 6px 6px 0; background:#15294f; color:#ffce7b; font-size:9px; font-weight:700; box-shadow:0 3px 9px #0b162c3d; }

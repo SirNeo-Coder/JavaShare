@@ -81,6 +81,26 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
       await projects.getByRole("button", { name: "Personal performance-task project", exact: true }).click();
       await page.waitForFunction((value) => document.querySelector('textarea[aria-label="Java source code editor"]')?.value === value, main);
     });
+    await t.test("Save work is blue when saved, green for a few edits, red at 10+ changed lines; Run code says Saving your project…", async () => {
+      const colour = async (name) => {
+        await page.waitForFunction((name) => [...document.querySelectorAll("button")].find((b) => b.textContent === "Save work")?.classList.contains(`save-${name}`), name);
+        await page.getByRole("button", { name: "Save work", exact: true }).locator("..").screenshot({ path: `/tmp/codeshare-personal-${mode}-save-${name}.png` });
+      };
+      await colour("saved");
+      await editor.fill(`${main}\n// one change`); await colour("editing");
+      await editor.fill(`${main}\n${Array.from({ length: 10 }, (_, i) => `// change ${i}`).join("\n")}`); await colour("many-changes");
+      await page.getByRole("button", { name: "Save work", exact: true }).click(); await colour("saved");
+      assert.match((await read()).performanceProjectFiles[0].content, /change 9/);
+      await editor.fill(main); await colour("many-changes");
+      await page.route("**/progress/performance-project", async (route) => { await new Promise((done) => setTimeout(done, 1500)); await route.continue(); });
+      if (mode === "offline") await page.waitForTimeout(1550);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.getByText("Saving your project…", { exact: true }).first().waitFor();
+      await page.getByRole("button", { name: /Run code/ }).waitFor({ timeout: 180000 });
+      await page.unroute("**/progress/performance-project");
+      await colour("saved");
+      assert.equal((await read()).performanceProjectFiles[0].content, main);
+    });
     if (mode === "online") await t.test("live Program input works and Stop invalidates a previously successful run", async () => {
       await editor.fill('import java.util.Scanner; public class Main { public static void main(String[] a) { System.out.println("Order?"); System.out.println("Coffee " + new Scanner(System.in).nextLine()); } }');
       const waiting = async () => {

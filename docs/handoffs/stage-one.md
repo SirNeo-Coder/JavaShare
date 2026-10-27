@@ -1,3 +1,15 @@
+> Personal project Save work colours (2026-10-27): teacher declined auto-save (Run code already
+> saves personal files to the server) and approved: fix the personal Run code message to "Saving
+> your project…", and colour the personal project's Save work button blue (saved), green (a few
+> unsaved edits) or red (10+ changed lines since the last save/run). Branch
+> `feature/save-work-colours`, based on origin/main `1db24df`. Changes: `changedLines` and the
+> colour class in `app/StudentModuleActivity.tsx`, three colour rules in `app/globals.css`. Module
+> project and teacher review unchanged; no server, schema or data change. Verification: 348/348
+> full suite; offline production browser test 6/6 including the new colour/wording step; unit
+> line-count test and browser wording step each shown failing when broken and passing restored;
+> `build:all` passes; lint 0 errors, 8 existing warnings. Online browser mode and dark theme were
+> not checked on screen. Next: PR for review.
+
 > Student performance-task checklist in Projects (2026-10-27): teacher approved showing each
 > module's performance-task checklist to students in the Projects panel, read-only, with boxes the
 > student may tick for what their project already does. Branch `feature/personal-task-checklist`,
@@ -9,7 +21,8 @@
 > Java) including the new tick-survives-reload step; unit test shown failing with tick restore
 > broken, passing restored; `build:all` passes; lint 0 errors, 8 existing warnings. Online browser
 > mode not run (no runner on 3033/3034; the panel code is the same online). Pushed;
-> [PR #50](https://github.com/SirNeo-Coder/JavaShare/pull/50) is open against main. Next: teacher review.
+> [PR #50](https://github.com/SirNeo-Coder/JavaShare/pull/50) was merged into main by the teacher
+> (merge commit `1db24df`, 2026-10-27). Done.
 
 > Java member suggestions (2026-10-27): teacher approved extending the existing Java code
 > suggestions (merged PR #34, 2026-10-21) to also suggest a variable's declared class's own
