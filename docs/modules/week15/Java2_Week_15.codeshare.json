@@ -215,7 +215,7 @@
           "files": [
             {
               "path": "Main.java",
-              "content": "import java.io.File;\nimport java.io.IOException;\nimport java.util.Arrays;\n\npublic class Main {\n    public static void main(String[] args) {\n        File folder = new File(\"records\");             // a folder is also a File\n        System.out.println(\"Folder made? \" + folder.mkdir());\n        System.out.println(\"Is a folder? \" + folder.isDirectory());\n\n        File trips = new File(folder, \"trips.txt\");    // records/trips.txt\n        File old = new File(folder, \"old_log.txt\");    // records/old_log.txt\n        try {\n            trips.createNewFile();\n            old.createNewFile();\n        } catch (IOException e) {\n            System.out.println(\"Could not create: \" + e.getMessage());\n        }\n\n        String[] names = folder.list();                // names inside the folder\n        Arrays.sort(names);                            // list() promises no order\n        System.out.println(\"Inside records: \" + Arrays.toString(names));\n\n        System.out.println(\"Delete old_log.txt? \" + old.delete());\n        System.out.println(\"Delete it again? \" + old.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());\n        System.out.println(\"Left inside: \" + Arrays.toString(folder.list()));\n    }\n}\n"
+              "content": "import java.io.File;\nimport java.io.IOException;\nimport java.util.Arrays;\n\npublic class Main {\n    public static void main(String[] args) {\n        File folder = new File(\"records\");             // a folder is also a File\n        System.out.println(\"Folder made? \" + folder.mkdir());\n        System.out.println(\"Is a folder? \" + folder.isDirectory());\n\n        File trips = new File(folder, \"trips.txt\");    // records/trips.txt\n        File old = new File(folder, \"old_log.txt\");    // records/old_log.txt\n        try {\n            trips.createNewFile();\n            old.createNewFile();\n        } catch (IOException e) {\n            System.out.println(\"Could not create: \" + e.getMessage());\n        }\n\n        String[] names = folder.list();                // names inside the folder\n        Arrays.sort(names);                            // list() promises no order\n        System.out.println(\"Inside records: \" + Arrays.toString(names));\n\n        System.out.println(\"Delete old_log.txt? \" + old.delete());\n        System.out.println(\"Delete it again? \" + old.delete());\n        System.out.println(\"Left inside: \" + Arrays.toString(folder.list()));\n    }\n}\n"
             }
           ,
             {
@@ -248,12 +248,12 @@
             }
           ],
           "run": "Main.java",
-          "expectedOutput": "Folder made? true\nIs a folder? true\nInside records: [old_log.txt, trips.txt]\nDelete old_log.txt? true\nDelete it again? false\nDelete the folder? false\nLeft inside: [trips.txt]",
+          "expectedOutput": "Folder made? true\nIs a folder? true\nInside records: [old_log.txt, trips.txt]\nDelete old_log.txt? true\nDelete it again? false\nLeft inside: [trips.txt]",
           "checkYourself": "Run Step 2 again. Now `Folder made?` says **false** (the folder already exists) and the list shows `old_log.txt` again, because `createNewFile()` made it again. Why does `Arrays.sort(names)` come before printing? (`list()` promises no order, so sorting makes everyone's output match.)"
         ,
           "activity": {
             "id": "java-2-w15-d1-s2-alter-v1",
-            "instruction": "After deleting old_log.txt twice, delete trips.txt and print \"Delete trips.txt? \" plus the result. Then run the existing folder deletion and listing. Print an empty array if folder.list() is null because the folder was deleted. Start with a clean records folder.",
+            "instruction": "After deleting old_log.txt twice, delete trips.txt and print \"Delete trips.txt? \" plus the result. Then delete the folder and print \"Delete the folder? \" plus the result, then print what is left inside it. Print an empty array if folder.list() is null because the folder was deleted. Start with a clean records folder.",
             "files": [],
             "expectedOutput": "Folder made? true\nIs a folder? true\nInside records: [old_log.txt, trips.txt]\nDelete old_log.txt? true\nDelete it again? false\nDelete trips.txt? true\nDelete the folder? true\nLeft inside: []",
             "stdin": ""
@@ -261,7 +261,7 @@
         },
         {
           "type": "note",
-          "markdown": "**Read it carefully:** the second `delete()` gave **false**: there was nothing left to delete. The folder also refused to be deleted: Java only deletes a folder when it is **empty**, and `trips.txt` is still inside. These methods **return false** instead of throwing an exception, so always check what they return."
+          "markdown": "**Read it carefully:** the second `delete()` gave **false**: there was nothing left to delete. `records/` still has `trips.txt` inside it, so it is not yet empty. In your task below, you will see that Java only deletes a folder when it is **empty**. These methods **return false** instead of throwing an exception, so always check what they return."
         }
       ],
       "exitSlip": {

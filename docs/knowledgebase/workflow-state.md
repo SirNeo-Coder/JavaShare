@@ -318,18 +318,24 @@ copies: classroom disk support is still absent, original thread samples retain t
 and visible/browser GUI interaction remains unverified. Do not treat upload acceptance as rollout
 approval. Module and personal projects, paper assessment and submitted snapshots stay separate.
 
-## Week 15 file-handling steps run offline for now (2026-10-27)
+## Week 15 CheerpJ file-handling issues resolved (2026-10-27)
 
 CheerpJ's `/files` virtual filesystem was shared across separate online Java runs (one
-IndexedDB database per browser origin, not reset per run); the first part of this is
-fixed — the runner now clears it before every run (CKB-072). A second, unfixable part
-remains: CheerpJ's `File.delete()` reports success on a non-empty directory instead of
+IndexedDB database per browser origin, not reset per run), so a student's own
+`mkdir()`/`createNewFile()` calls could see a prior run's leftover files. Fixed — the
+runner now clears that filesystem before every run (CKB-072).
+
+Separately, CheerpJ's `File.delete()` reports success on a non-empty directory instead of
 refusing it, unlike a real JVM (CKB-073; confirmed directly against the live CheerpJ
-runtime, no CodeShare-side fix exists). The teacher has directed running Week 15's
-file-handling steps (deleting a non-empty folder and checking the result, e.g. Activity
-Two) on the classroom laptop's offline Java (`npm run classroom:offline`) for now, where
-a real JVM gives the correct result. No module content, `expectedOutput`, or application
-code changed because of this; only this guidance and the CKB-072 runner fix shipped.
+runtime; no CodeShare-side fix exists for CheerpJ's own bug). A repo-wide check found this
+was exercised in exactly one place across the whole curriculum (weeks 12–21): the Week 15
+Step 2 sample. Rather than keep running that step offline, the teacher directed removing
+the one line that deletes a non-empty folder from the sample, with its matching
+`expectedOutput` line and teaching note updated to match — see
+`docs/modules/week15/README.md`. The step's own task still demonstrates deleting a
+(genuinely empty) folder, which is unaffected by this CheerpJ bug. No step in the
+curriculum needs to run offline for this reason anymore; the earlier guidance here is
+superseded.
 
 ## Subject-specific shared module sets (approved 2026-10-22)
 

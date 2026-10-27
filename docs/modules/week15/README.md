@@ -2,8 +2,9 @@
 
 File exercises retain real disk access and the original file setup. CodeShare classroom file access/persistence is not supported by this update. Verify these exercises in a separate desktop Java folder; do not treat this JSON as classroom-ready.
 
-The JSON preserves all original lesson text, code, sample outputs, ids, liplets and rubrics.
-It adds 10 separately identified alteration tasks, sample-first verification,
+The JSON preserves all original lesson text, code, sample outputs, ids, liplets and rubrics,
+with one later exception: Step 2's sample Java no longer deletes the (non-empty) `records`
+folder — see "Running these steps" below. It adds 10 separately identified alteration tasks, sample-first verification,
 the preceding-module link and missing upload fields. The original non-code Week 20 work stays intact.
 Complete per-step supporting sources restore a sample after an earlier console check; a minimal
 Main.java forwards to each existing named demo when needed by the classroom runner.
@@ -22,11 +23,19 @@ Verification and limitations: docs/verification/week15-week21-step-additions.md.
 
 ## Running these steps (2026-10-27)
 
-Steps that delete a non-empty folder (for example Activity Two, "Folders, listing, and
-deleting") can fail online verification even with the unedited sample, because CheerpJ's
-`File.delete()` incorrectly reports success on a non-empty directory instead of refusing
-it (CKB-073, no fix available from CodeShare). The teacher has directed running this
-module's file-handling steps on the classroom laptop's offline Java (`npm run
-classroom:offline`) for now, where a real JVM gives the correct result. A separate,
-already-fixed issue (CKB-072) made `mkdir()` return `false` on a second online run by
-reusing a prior run's leftover files; that part is resolved.
+Two CheerpJ (online Java) issues surfaced in Step 2, "Folders, listing, and deleting":
+
+- `mkdir()` could return `false` on a second online run because CheerpJ reused a prior
+  run's leftover files instead of starting clean. Fixed (CKB-072); every run now gets a
+  clean CheerpJ filesystem.
+- `File.delete()` incorrectly reports success on a non-empty directory instead of
+  refusing it, unlike a real JVM (CKB-073, no fix available from CodeShare — this is a
+  CheerpJ bug). The sample no longer exercises this: the step's
+  `System.out.println("Delete the folder? " + folder.delete());` line (called while
+  `records/` still had `trips.txt` inside it) was removed, along with its matching
+  `expectedOutput` line and the note explaining it. The step's own task still deletes the
+  folder, but only after the student has made it genuinely empty, which CheerpJ handles
+  correctly either way. No other step in weeks 12–21 calls `.delete()` on a directory.
+
+Both issues are resolved for this module; no step needs to run offline for this reason
+anymore.
