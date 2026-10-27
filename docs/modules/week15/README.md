@@ -19,3 +19,14 @@ hosted service or submitted student work changes. The personal project remains s
 
 Reference edits used only by tests: tests/fixtures/week15-week21-task-edits.json.
 Verification and limitations: docs/verification/week15-week21-step-additions.md.
+
+## Running these steps (2026-10-27)
+
+Steps that delete a non-empty folder (for example Activity Two, "Folders, listing, and
+deleting") can fail online verification even with the unedited sample, because CheerpJ's
+`File.delete()` incorrectly reports success on a non-empty directory instead of refusing
+it (CKB-073, no fix available from CodeShare). The teacher has directed running this
+module's file-handling steps on the classroom laptop's offline Java (`npm run
+classroom:offline`) for now, where a real JVM gives the correct result. A separate,
+already-fixed issue (CKB-072) made `mkdir()` return `false` on a second online run by
+reusing a prior run's leftover files; that part is resolved.
