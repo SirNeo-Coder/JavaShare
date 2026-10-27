@@ -1,3 +1,14 @@
+> Performance task steps in the Console (2026-10-27): the teacher looked for the steps in the
+> personal project's Console box **Your performance task** and approved also showing them there,
+> keeping them in Projects and on the module page. (PR #54 had merged into its stacked base branch,
+> not main; the same change reached main as PR #55.) Branch `feature/console-task-steps`, based on
+> origin/main `8a3f078`, worktree `../JavaShare-task-steps`. Change: one line in
+> `app/StudentModuleActivity.tsx` reusing `PerformanceTaskSteps`, student personal project only
+> (not module project or teacher review). No server, schema or data change. Verification: see the
+> PR; new render test in `tests/weekly-java-project-ui.test.mjs` shown failing with the list removed
+> and with it shown in review, passing restored; `tests/personal-performance.browser.mjs` checks
+> the Console list. Next: teacher merges into main and re-uploads the weekly JSON files.
+
 > Performance task steps (2026-10-27): teacher asked for a step-by-step procedure students can
 > follow to meet the performance-task requirements, including when to use the new Copy code, and
 > approved: an optional `performanceTask.steps` list in each weekly JSON, shown as a numbered

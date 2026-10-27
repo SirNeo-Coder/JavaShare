@@ -6,7 +6,7 @@ import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
-import type { CourseModule, ModuleFile, Progress, StepBlock } from "./ModuleViewer";
+import { PerformanceTaskSteps, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
 import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath } from "../backend/src/module-activities";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
@@ -335,6 +335,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
+          {personal && !review && <PerformanceTaskSteps steps={activity.module?.performanceTask?.steps} />}
           {personal ? <label>Program input<textarea aria-label="Program input" value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");

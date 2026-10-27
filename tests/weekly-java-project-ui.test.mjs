@@ -113,3 +113,12 @@ test("copy module code: clipboard on secure pages, older copy command on plain-h
     for (const [name, descriptor] of saved) { if (descriptor) Object.defineProperty(globalThis, name, descriptor); else delete globalThis[name]; }
   }
 });
+
+test("performance task steps: personal Console shows the module's steps; module and review do not", () => {
+  const stepsModule = { performanceTask: { steps: ["Plan your **theme**", "Copy `toLine()` and change it"] } };
+  const personal = render({ ...activity, kind: "performance", module: stepsModule });
+  assert.match(personal, /Your performance task[\s\S]*How to build it, step by step[\s\S]*Program input/);
+  assert.match(personal, /<ol><li>.*<b>theme<\/b>.*<\/li><li>.*<code>toLine\(\)<\/code>.*<\/li><\/ol>/);
+  for (const kind of ["module", "review"]) assert.doesNotMatch(render({ ...activity, kind, module: stepsModule }), /How to build it/);
+  assert.doesNotMatch(render({ ...activity, kind: "performance" }), /How to build it/);
+});
