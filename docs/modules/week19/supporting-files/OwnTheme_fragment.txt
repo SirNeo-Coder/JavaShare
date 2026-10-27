@@ -1,0 +1,9 @@
+JComboBox<String> choice =
+  new JComboBox<>(___);
+JCheckBox extra = new JCheckBox("___");
+JPanel form =
+  new JPanel(new ___(2, 2, 8, 8));
+String input = JOptionPane.showInputDialog(
+  form, "___");
+if (input == ___) { return; }
+// Validate input before changing your model.

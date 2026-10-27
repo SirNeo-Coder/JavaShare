@@ -54,7 +54,39 @@ test("workspace drawers: closed panels stay mounted but inaccessible so closing 
   assert.match(renderDrawer(true, "left", "Course modules"), /aria-label="Course modules"/);
 });
 
+const { default: ModuleWorkspace } = tsxRequire("../app/ModuleWorkspace.tsx", import.meta.url);
+test("workspace rails: one Module control and the role's Projects control share the fixed left rail", () => {
+  for (const role of ["teacher", "student"]) {
+    const html = renderToStaticMarkup(createElement(ModuleWorkspace, {
+      classroomId: "local-class", role, browserOpen: false, projectsOpen: false,
+      onBrowserChange() {}, onProjectsChange() {}, async onStartActivity() {},
+    }));
+    assert.equal((html.match(/aria-label="Module"/g) || []).length, 1);
+    assert.match(html, /aria-controls="classroom-projects"/);
+    assert.match(html, role === "teacher" ? /Students \/ projects/ : /> Projects</);
+    assert.doesNotMatch(html, /worksheet-ear|worksheet-hover-bridge/);
+  }
+});
+
 const { ModuleContent } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
+test("module worksheet: alteration instructions and target stay separate from the sample", () => {
+  const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
+  course.lessons[0].blocks[0].activity.id = "capacity-change";
+  const html = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true }));
+  assert.match(html, /Sample code/); assert.match(html, /Sample output/);
+  assert.match(html, /Your task/); assert.match(html, /Expected task output/);
+  assert.match(html, /Capacity: 20/); assert.match(html, /Capacity: 25/);
+});
+
+test("module parts: a locked next task does not hide the current task's discussion", () => {
+  const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
+  course.lessons.forEach((lesson) => { lesson.blocks[0].part = "Vehicle"; });
+  course.lessons[1].blocks[0].locked = true;
+  const [part] = groupModuleParts(course);
+  assert.equal(part.closed, false);
+  course.lessons[0].blocks[0].locked = true;
+  assert.equal(groupModuleParts(course)[0].closed, true);
+});
 test("module pages: inactive lessons and task editors stay mounted so navigation cannot discard drafts", () => {
   const course = JSON.parse(readFileSync(new URL("./fixtures/sample-module.codeshare.json", import.meta.url), "utf8"));
   course.availability = { openLessonIds: course.lessons.map((lesson) => lesson.id), performanceTaskOpen: true };

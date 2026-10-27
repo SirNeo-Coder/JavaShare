@@ -1,0 +1,408 @@
+{
+  "java-2-w15-d1-s1": [
+    {
+      "path": "Main.java",
+      "from": "System.out.println(\"Created now? \" + made);",
+      "to": "System.out.println(\"Created now? \" + made);\n            System.out.println(\"Created again? \" + report.createNewFile());"
+    }
+  ],
+  "java-2-w15-d1-s2": [
+    {
+      "path": "Main.java",
+      "from": "System.out.println(\"Delete the folder? \" + folder.delete());",
+      "to": "System.out.println(\"Delete trips.txt? \" + trips.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());"
+    },
+    {
+      "path": "Main.java",
+      "from": "Arrays.toString(folder.list())",
+      "to": "Arrays.toString(folder.list() == null ? new String[0] : folder.list())"
+    }
+  ],
+  "java-2-w15-d2-s3": [
+    {
+      "path": "Main.java",
+      "from": "commas",
+      "to": "newlines"
+    },
+    {
+      "path": "Main.java",
+      "from": "firstDone = true;",
+      "to": "newlines++;\n                    firstDone = true;"
+    },
+    {
+      "path": "Main.java",
+      "from": "} else if (ch == ',') {\n                    newlines++;\n                }",
+      "to": "}"
+    },
+    {
+      "path": "Main.java",
+      "from": "Commas in the file: ",
+      "to": "Newline characters in the file: "
+    }
+  ],
+  "java-2-w15-d2-s4": [
+    {
+      "path": "Main.java",
+      "from": "fleet.add(toVehicle(line));",
+      "to": "Vehicle vehicle = toVehicle(line);\n                    if (vehicle instanceof Bus) fleet.add(vehicle);"
+    }
+  ],
+  "java-2-w15-d3-s5": [
+    {
+      "path": "Main.java",
+      "from": "total = total + sc.nextDouble();\n                count++;",
+      "to": "double fare = sc.nextDouble();\n                if (fare >= 15.00) {\n                    total = total + fare;\n                    count++;\n                }"
+    }
+  ],
+  "java-2-w15-d3-s6": [
+    {
+      "path": "Main.java",
+      "from": "!line.trim().isEmpty()",
+      "to": "line.startsWith(\"Tricycle,\")"
+    }
+  ],
+  "java-2-w15-d4-s7": [
+    {
+      "path": "Main.java",
+      "from": "new FileWriter(\"trip_log.txt\")) {   // same file again",
+      "to": "new FileWriter(\"trip_log.txt\", true)) {   // same file again"
+    }
+  ],
+  "java-2-w15-d4-s8": [
+    {
+      "path": "Main.java",
+      "from": "new FileWriter(\"trip_log.txt\", true)",
+      "to": "new FileWriter(\"trip_log.txt\")"
+    }
+  ],
+  "java-2-w15-d4-s9": [
+    {
+      "path": "Main.java",
+      "from": "new Tricycle(\"TRC 654\", \"Mang Lito\", \"Bagong Silang TODA\")",
+      "to": "new Bus(\"BUS 654\", \"Mang Lito\", 30)"
+    }
+  ],
+  "java-2-w15-d4-s10": [
+    {
+      "path": "Main.java",
+      "from": "String[] part = line.split(\",\");\n                count++;",
+      "to": "String[] part = line.split(\",\");\n                if (!part[0].equals(\"Bus\")) {\n                    line = in.readLine();\n                    continue;\n                }\n                count++;"
+    }
+  ],
+  "java-2-w16-d2-s1": [
+    {
+      "path": "Main.java",
+      "from": "new DispatchThread(jeep, 5)",
+      "to": "new DispatchThread(jeep, 3)"
+    },
+    {
+      "path": "Main.java",
+      "from": "Collected after 5 trips: P",
+      "to": "Collected after 3 trips: P"
+    }
+  ],
+  "java-2-w16-d2-s2": [
+    {
+      "path": "Main.java",
+      "from": "wrong.run();",
+      "to": "wrong.start();\n        try { wrong.join(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }"
+    }
+  ],
+  "java-2-w16-d2-s3": [
+    {
+      "path": "Main.java",
+      "from": ", 5));",
+      "to": ", 2));"
+    },
+    {
+      "path": "Main.java",
+      "from": "        long begin = System.currentTimeMillis();\n",
+      "to": ""
+    },
+    {
+      "path": "Main.java",
+      "from": "        long ms = System.currentTimeMillis() - begin;\n",
+      "to": ""
+    },
+    {
+      "path": "Main.java",
+      "from": "        System.out.println(\"Finished in under 1 second? \" + (ms < 1000));\n",
+      "to": ""
+    }
+  ],
+  "java-2-w16-d3-s4": [
+    {
+      "path": "Main.java",
+      "from": "new int[] {2, 2, 1}",
+      "to": "new int[] {1, 1, 1}"
+    }
+  ],
+  "java-2-w16-d3-s5": [
+    {
+      "path": "Main.java",
+      "from": "new CountDownLatch(4)",
+      "to": "new CountDownLatch(3)"
+    },
+    {
+      "path": "Main.java",
+      "from": "        new Thread(new ReadyReport(\"BUS 789\", 300, latch)).start();\n",
+      "to": ""
+    },
+    {
+      "path": "Main.java",
+      "from": "        System.out.println(\"Dispatcher waits. Reports still needed: \" + latch.getCount());\n",
+      "to": ""
+    },
+    {
+      "path": "ReadyReport.java",
+      "from": "            System.out.println(plate + \" reports: ready\");\n",
+      "to": ""
+    },
+    {
+      "path": "ReadyReport.java",
+      "from": "            System.out.println(plate + \" was interrupted\");",
+      "to": "            Thread.currentThread().interrupt();"
+    }
+  ],
+  "java-2-w16-d4-s6": [
+    {
+      "path": "Main.java",
+      "from": "new CyclicBarrier(3)",
+      "to": "new CyclicBarrier(2, new Runnable() {\n            private int releases;\n            public void run() { System.out.println(\"Convoy release \" + (++releases)); }\n        })"
+    },
+    {
+      "path": "Main.java",
+      "from": "        Thread b = new Thread(new ConvoyLeg(\"NYB 321\", 100, barrier));\n",
+      "to": ""
+    },
+    {
+      "path": "Main.java",
+      "from": "        b.start();\n",
+      "to": ""
+    },
+    {
+      "path": "Main.java",
+      "from": "            b.join();\n",
+      "to": ""
+    },
+    {
+      "path": "ConvoyLeg.java",
+      "from": "        System.out.println(plate + \" arrived at \" + stop);\n",
+      "to": ""
+    },
+    {
+      "path": "ConvoyLeg.java",
+      "from": "        int stillComing = barrier.await(); // wait for the others\n        if (stillComing == 0) {            // 0 = the LAST one to arrive\n            System.out.println(\"-- All here at \" + stop + \". The convoy moves on together!\");\n        }",
+      "to": "        barrier.await(); // wait for the others"
+    }
+  ],
+  "java-2-w16-d4-s7": [
+    {
+      "path": "Main.java",
+      "from": "new Semaphore(2)",
+      "to": "new Semaphore(1)"
+    },
+    {
+      "path": "LoadingBay.java",
+      "from": "            System.out.println(plate + \" arrives. Free bays: \" + bays.availablePermits());\n",
+      "to": ""
+    },
+    {
+      "path": "LoadingBay.java",
+      "from": "                System.out.println(\"   \" + plate + \" is loading in a bay\");\n",
+      "to": ""
+    },
+    {
+      "path": "LoadingBay.java",
+      "from": "                System.out.println(\"   \" + plate + \" leaves the bay\");\n",
+      "to": ""
+    },
+    {
+      "path": "LoadingBay.java",
+      "from": "            System.out.println(plate + \" was interrupted\");\n",
+      "to": "            Thread.currentThread().interrupt();\n"
+    }
+  ],
+  "java-2-w17-d1-s1": [
+    {
+      "path": "TerminalPanel.java",
+      "from": "add(new JLabel(\"Monumento-Divisoria\"));",
+      "to": "add(new JLabel(\"Monumento-Divisoria\"));\n    add(new JLabel(\"Capacity: 20\"));"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "System.out.println(\"Panel controls: \" + new TerminalPanel().getComponentCount());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w17-d2-s2": [
+    {
+      "path": "TerminalPanel.java",
+      "from": "new JTextField(\"NXA 123\", 8)",
+      "to": "new JTextField(\"  TRC 456  \", 8)"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "TerminalPanel panel = new TerminalPanel();\n    panel.actionPerformed(null);\n    System.out.println(((JLabel) panel.getComponent(3)).getText());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w17-d3-s3": [
+    {
+      "path": "TerminalPanel.java",
+      "from": "new JTextField(\"5\", 5)",
+      "to": "new JTextField(\"8\", 5)"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "TerminalPanel panel = new TerminalPanel();\n    panel.actionPerformed(null);\n    System.out.println(((JLabel) panel.getComponent(5)).getText());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w17-d3-s4": [
+    {
+      "path": "FareCheck.java",
+      "from": "{\"BUS 789\", \"4\"}",
+      "to": "{\"BUS 789\", \"8\"}"
+    }
+  ],
+  "java-2-w17-d4-s5": [
+    {
+      "path": "Main.java",
+      "from": "main(String[] args) {",
+      "to": "main(String[] args) throws Exception {"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "SwingUtilities.invokeAndWait(() -> {});\n    JLabel status = new JLabel(\"Not checked\");\n    JButton button = new JButton(\"Check ready\");\n    button.setEnabled(false);\n    Thread worker = new Thread(new ReadyTask(status, button));\n    worker.start();\n    worker.interrupt();\n    worker.join();\n    SwingUtilities.invokeAndWait(() -> {\n      System.out.println(status.getText());\n      System.out.println(\"Button enabled: \" + button.isEnabled());\n    });\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w17-d5-s6": [
+    {
+      "path": "ThemeCheck.java",
+      "from": "new StoreItem(55)",
+      "to": "new StoreItem(60)"
+    },
+    {
+      "path": "ThemeCheck.java",
+      "from": "{\"2\",\"0\",\"abc\"}",
+      "to": "{\"3\",\"0\",\"abc\"}"
+    }
+  ],
+  "java-2-w18-d1-s1": [
+    {
+      "path": "LayoutDemo.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "JPanel grid = new JPanel(new GridLayout(2, 2, 8, 8));\n    grid.add(new JLabel(\"Terminal:\"));\n    grid.add(new JButton(\"Jeepney\"));\n    grid.add(new JButton(\"Tricycle\"));\n    grid.add(new JButton(\"Bus\"));\n    GridLayout layout = (GridLayout) grid.getLayout();\n    System.out.println(\"Grid: \" + layout.getRows() + \" x \" + layout.getColumns());\n    System.out.println(\"Controls: \" + grid.getComponentCount());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w18-d2-s2": [
+    {
+      "path": "Main.java",
+      "from": "root.add(ready, BorderLayout.SOUTH);",
+      "to": "root.add(ready, BorderLayout.EAST);"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "JPanel root = createContent();\n    JPanel east = (JPanel) ((BorderLayout) root.getLayout()).getLayoutComponent(BorderLayout.EAST);\n    System.out.println(\"East controls: \" + east.getComponentCount());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w18-d3-s3": [
+    {
+      "path": "TerminalPanel.java",
+      "from": "new GridLayout(3, 2, 8, 8)",
+      "to": "new GridLayout(2, 3, 8, 8)"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "java.awt.GridLayout grid = (java.awt.GridLayout) new TerminalPanel().getLayout();\n    System.out.println(\"Grid: \" + grid.getRows() + \" x \" + grid.getColumns());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w18-d4-s4": [
+    {
+      "path": "TerminalPanel.java",
+      "from": "add(actions, BorderLayout.SOUTH);",
+      "to": "add(actions, BorderLayout.EAST);"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "TerminalPanel panel = new TerminalPanel();\n    javax.swing.JPanel east = (javax.swing.JPanel) ((java.awt.BorderLayout) panel.getLayout()).getLayoutComponent(java.awt.BorderLayout.EAST);\n    System.out.println(\"East controls: \" + east.getComponentCount());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w18-d5-s5": [
+    {
+      "path": "ThemeLayoutCheck.java",
+      "from": "actions.add(new JButton(\"Calculate\"));",
+      "to": "actions.add(new JButton(\"Calculate\"));\n        actions.add(new JButton(\"Reset\"));"
+    }
+  ],
+  "java-2-w19-d1-s1": [
+    {
+      "path": "TerminalPanel.java",
+      "from": "plate.setSelectedIndex(-1);",
+      "to": "plate.setSelectedIndex(1);"
+    },
+    {
+      "path": "Main.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "TerminalPanel panel = new TerminalPanel();\n    panel.actionPerformed(null);\n    javax.swing.JLabel result = (javax.swing.JLabel) ((java.awt.BorderLayout) panel.getLayout()).getLayoutComponent(java.awt.BorderLayout.CENTER);\n    System.out.println(result.getText());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w19-d2-s2": [
+    {
+      "path": "RequestDemo.java",
+      "from": "collect.add(desk); collect.add(room);",
+      "to": "collect.add(desk); collect.add(room);\n    room.setSelected(true);"
+    },
+    {
+      "path": "RequestDemo.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "RequestDemo demo = new RequestDemo();\n    demo.guide.setSelected(true);\n    System.out.println(demo.summary());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w19-d3-s3": [
+    {
+      "path": "RequestDemo.java",
+      "from": "desk.setSelected(true); result.setText(",
+      "to": "room.setSelected(true); result.setText("
+    },
+    {
+      "path": "RequestDemo.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "RequestDemo demo = new RequestDemo();\n    demo.clearChoices();\n    demo.subject.setSelectedIndex(2);\n    demo.sheet.setSelected(true);\n    System.out.println(demo.summary());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w19-d4-s4": [
+    {
+      "path": "RequestDemo.java",
+      "from": "clean.length() > 30",
+      "to": "clean.length() > 12"
+    },
+    {
+      "path": "RequestDemo.java",
+      "from": "Use 1-30 characters for the name.",
+      "to": "Use 1-12 characters for the name."
+    },
+    {
+      "path": "RequestDemo.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "RequestDemo demo = new RequestDemo();\n    demo.acceptName(\"Classroom materials\");\n    System.out.println(demo.result.getText());\n    System.out.println(\"Name retained: \" + demo.name);\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ],
+  "java-2-w21-d3-s1": [
+    {
+      "path": "RequestDemo.java",
+      "from": "bar.add(request); bar.add(view);",
+      "to": "JMenuItem reset = new JMenuItem(\"Reset\");\n    reset.setActionCommand(\"Clear\");\n    reset.addActionListener(this);\n    request.add(reset);\n    bar.add(request); bar.add(view);"
+    },
+    {
+      "path": "RequestDemo.java",
+      "from": "if (GraphicsEnvironment.isHeadless()) {",
+      "to": "JMenu request = new RequestDemo().createMenuBar().getMenu(0);\n    System.out.println(\"Request items: \" + request.getItemCount());\n    System.out.println(\"Reset action: \" + request.getItem(3).getActionCommand());\n    if (GraphicsEnvironment.isHeadless()) {"
+    }
+  ]
+}

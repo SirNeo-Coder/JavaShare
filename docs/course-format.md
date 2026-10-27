@@ -117,3 +117,93 @@ Existing sample/own records and assessment remain compatible. Personal input is 
 Teacher availability switches do not gate students; their old API/data remain compatible. The
 weekly live-class restriction still applies. Online multi-file Java uses Java 8 in the browser after [runner setup](online-java-setup.md);
 offline mode continues compiling all classes together with laptop javac.
+
+### Small alteration tasks and rolling projects (approved 2026-10-20)
+
+Keep the printed sample in the step's `files`, `instruction`, `expectedOutput`, and optional
+`stdin`. Add a separately identified `activity` for the student alteration:
+
+```json
+"activity": {
+  "id": "java-2-w14-d1-s1-alter-v1",
+  "instruction": "Change the removal from index 1 to index 3. Keep the other output lines.",
+  "files": [],
+  "expectedOutput": "the complete, verified output after the alteration",
+  "stdin": ""
+}
+```
+
+A nonempty stable `activity.id` opts into task checking and one-step-at-a-time unlocking.
+It must be unique across the module's lesson, sample, slip and task ids, including generated
+progress keys. Completion is stored under `task:<activity.id>`; old sample and legacy
+`<step id>:activity` records remain stored but cannot complete this new task. Change the task id
+when changing what a task requires. Keep published module, lesson and sample step ids.
+
+The worksheet shows Sample code, Sample output, Your task and Expected task output. The main
+editor checks the task's output/input, not the sample's. Only successful execution with matching
+output completes it. Compiler-error and crash examples remain demonstrations; give students a
+successful alteration to check. Make required outputs predictable: do not require HashSet order,
+a particular stack trace or elapsed thread timing. Older JSON without explicit task ids keeps
+its existing sample checks and part access.
+
+Opening a task combines supporting classes, sample files and any task starter files, then keeps
+previous-week and current saved files in preference to templates. Students make the stated code
+changes themselves; opening a later task never replaces an existing Main.java. Task `files` can
+add missing supporting classes, but must not contain the solved alteration.
+
+Use `previousModuleId` for the preceding module in this class. A missing previous project falls
+back to starter files. Once this week's project exists, opening it again never recopy-overwrites
+it. Module and personal projects roll forward separately; previous weeks and submitted snapshots
+are unchanged. No new table, column or migration.
+
+The first revised example is [Week 14](modules/week14/README.md). New
+[Week 12](modules/week12/README.md) and [Week 13](modules/week13/README.md) JSON now supply the
+preceding chain `java-2-w12` → `java-2-w13` → `java-2-w14`. Upload them in order in the same class.
+Deploy the app change before uploading a task-enabled file.
+The old playbook checker validates sample runs only; updating the generation prompt/playbook and
+its checker is a later stage.
+
+## Optional sample-first workflow
+
+Set module-level `"sampleFirst": true` to require sample verification before each explicitly
+identified alteration (`activity.id`). Existing files omitting this field keep their prior behavior.
+The main editor loads each step's `files` on first opening and adds supporting starter/rolling
+classes. Reopening a started step resumes its saved draft; existing completions stay completed.
+The unchanged supplied sample must run with its own `stdin` and `expectedOutput` before alteration
+editing opens. This saves `sample:<activity.id>` evidence only. The alteration then checks its own
+input/output and completes only after successful execution. Sample evidence never opens the next
+step or counts toward task completion. Samples are not silently reloaded over saved edits.
+
+For an intentional Java runtime-error demonstration, add a step-level `expectedError` containing
+the fully qualified exception type, for example `"java.util.ConcurrentModificationException"`.
+The check requires an unsuccessful run with that exception as the first error line, allowing JVM
+stack-frame differences and the browser's absent thread prefix. It is a verified demonstration,
+never a completed alteration. All ordinary samples and alterations require successful execution.
+Use deterministic sample output; platform-specific exception messages should be printed explicitly
+and unordered collection iteration must be checked on each supported runner before publishing.
+Do not change a task's requirement without a new stable activity id; sample-key collisions are
+rejected at upload, alongside existing step/task/lesson/exit-slip collisions.
+
+## Resume and exercise quality (2026-10-21)
+
+The student worksheet and Module project action choose the next unfinished step from server-saved
+completion. Sample verification or a failed task attempt does not advance this position. Completed
+module steps lead to the performance-task page; teacher previews still begin at Overview.
+
+An alteration must use the lesson's behavior to produce changed output: for example swap objects,
+reject invalid state, change a calculation or exercise a different catch path. Renaming printed text
+alone is insufficient. Supply the complete expected output while keeping sample code unsolved.
+Weeks 12/13 revised requirements use new `-v2` activity identities so earlier `-v1` passes remain
+stored without passing a different exercise. No original module, lesson or step identity is renamed.
+
+## Later weekly review copies 2026-10-22
+
+[Weeks 15–21](modules/week15-week21.md) add alteration metadata and matching appendices while
+preserving original sample code and outputs. Include complete per-step supporting sources so a
+previous alteration cannot corrupt the next baseline. Existing named demo launchers receive a
+small Main.java forwarding file for the current classroom runner. Text data/backups are retained
+in the package supporting-files folder, outside both step and starter project arrays; this does
+not implement runtime file access. Reading/presentation-only lessons may use their existing lesson id as the required
+exitSlip.afterStep descriptive anchor; it is not a code-completion or handwritten-liplet gate.
+Week 20 has no invented executable steps. See the linked package's file, timing and GUI limits
+before classroom rollout. The schema, application and original files are unchanged.

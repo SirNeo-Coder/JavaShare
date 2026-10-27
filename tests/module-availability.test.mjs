@@ -32,7 +32,7 @@ async function withClass(action) {
       if (role === "teacher") assert.equal((await admin.from("profiles").update({ role }).eq("id", data.user.id)).error, null);
     }
     for (const suffix of ["A", "B"]) {
-      const { data, error } = await admin.from("classrooms").insert({ name: `Availability ${suffix}`, join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
+      const { data, error } = await admin.from("classrooms").insert({ name: `Availability ${suffix}`, module_subject: "java", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
       assert.equal(error, null); classrooms.push(data.id);
       assert.equal((await admin.from("classroom_members").insert([{ classroom_id: data.id, user_id: users[0].id }, { classroom_id: data.id, user_id: users[1].id }])).error, null);
     }
@@ -120,7 +120,7 @@ test("module availability: reupload preserves work and new parts require their p
     await request(id, "/progress");
     await admin.from("module_progress").update({ step_states: states }).eq("classroom_id", id).eq("student_id", users[1].id);
     const taskResponse = await request(id, "/progress/performance-task", { method: "PUT", body: { variant: "sample", files: fixture.performanceTask.exampleFiles, status: "pass" } });
-    assert.equal(taskResponse.status, 200); assert.equal((await taskResponse.json()).percent, 75);
+    assert.equal(taskResponse.status, 200); assert.equal((await taskResponse.json()).percent, 67);
     const correction = structuredClone(fixture); correction.title = "Corrected module";
     const newLesson = structuredClone(fixture.lessons[1]); newLesson.id = "new-lesson"; newLesson.exitSlip.id = "new-slip"; newLesson.blocks[0].id = "new-step"; newLesson.exitSlip.afterStep = "new-step";
     const lastLesson = structuredClone(newLesson); lastLesson.id = "last-lesson"; lastLesson.exitSlip.id = "last-slip"; lastLesson.blocks[0].id = "last-step";
@@ -132,7 +132,7 @@ test("module availability: reupload preserves work and new parts require their p
     const saved = await (await request(id, "/progress")).json();
     assert.equal(saved.stepStates[fixture.lessons[0].blocks[0].id], "pass");
     assert.equal(saved.performanceTask.sample.status, "pass");
-    assert.equal(saved.percent, 50, "three saved items out of six; no paper marks in the denominator");
+    assert.equal(saved.percent, 40, "two completed lessons out of four lessons plus one personal submission; sample copies earn no extra credit");
   });
 });
 

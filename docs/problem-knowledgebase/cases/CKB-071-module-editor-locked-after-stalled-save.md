@@ -1,4 +1,4 @@
-# CKB-058 — Module editor stayed non-editable after a stalled save/run
+# CKB-071 — Module editor stayed non-editable after a stalled save/run
 
 - Status: resolved
 - First recorded: 2026-10-27

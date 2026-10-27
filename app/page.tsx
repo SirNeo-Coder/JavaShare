@@ -1,5 +1,8 @@
 "use client";
 
+import { paperPerformanceTask } from "../backend/src/personal-performance";
+import PersonalSubmissionChecklist from "./PersonalSubmissionChecklist";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { RealtimeChannel } from "@supabase/supabase-js";
@@ -7,13 +10,17 @@ import CodeEditor, { languageLabel } from "./CodeEditor";
 import Landing from "./Landing";
 import { studentEntryClassroom, rememberedStudentClassroom, rememberStudentClassroom } from "./studentClassroomEntry";
 import WorkspaceDrawer from "./WorkspaceDrawer";
+import useOutsideDismiss from "./useOutsideDismiss";
 import ModuleWorkspace from "./ModuleWorkspace";
+import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
-import { activityStateId } from "../backend/src/module-activities";
+import { activityStateId, activityTask } from "../backend/src/module-activities";
 import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import type { CourseModule, StepBlock, Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
-import { api, getApiUrl } from "./apiClient";
+import ModuleAccessNotice from "./ModuleAccessNotice";
+import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
+import { api, ApiError, getApiUrl } from "./apiClient";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
@@ -222,11 +229,14 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
   const [moduleActivity, setModuleActivity] = useState<StudentActivity | null>(null);
+  const [moduleAccessError, setModuleAccessError] = useState<{ classroomId: string; block: ModuleAccessBlock } | null>(null);
   const [weeklySelection, setWeeklySelection] = useState<{ studentId: string; classroomId: string; module: CourseModule } | null>(null);
   const [moduleProgressRevision, setModuleProgressRevision] = useState(0);
   const moduleEditorRef = useRef<ModuleEditorHandle>(null);
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatHoverPreview, setChatHoverPreview] = useState(false);
+  useOutsideDismiss("classroom-projects", projectsOpen, () => setProjectsOpen(false));
   const [dismissedLiveSessions, setDismissedLiveSessions] = useState<Record<string, string>>({});
   const [homeClassroomId, setHomeClassroomId] = useState<string | null>(null);
   const [enteredClassroomId, setEnteredClassroomId] = useState<string | null>(null);
@@ -588,6 +598,7 @@ export default function Home() {
           forgetRealtimeClient();
           setUser(null);
           setModuleActivity(null);
+          setModuleAccessError(null);
           setData(null);
           setEnteredClassroomId(null);
           setChoosingStudentClass(false);
@@ -1189,6 +1200,7 @@ export default function Home() {
       setActivityStarter("");
       setActiveTeam(0);
       await loadWorkspace("groups");
+      setChatHoverPreview(false);
       setChatOpen(true);
       notify(
         `Deployed ${activity.title} to ${result.students} students in ${result.groups} group${result.groups === 1 ? "" : "s"}`,
@@ -1682,21 +1694,50 @@ export default function Home() {
       );
     }
   }
+  function showModuleAccessError(error: unknown) {
+    if (classroomId && error instanceof ApiError && error.moduleAccess) {
+      setModuleAccessError({ classroomId, block: error.moduleAccess });
+      setProjectsOpen(false); setModulesOpen(false);
+    }
+  }
+
+  async function continuePrerequisite(moduleId: string) {
+    try {
+      const [module, progress] = await Promise.all([
+        api<CourseModule>(`/api/classrooms/${classroomId}/modules/${moduleId}`),
+        api<Progress>(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`),
+      ]);
+      const step = moduleResumeStep(module, progress.stepStates);
+      if (step) await startModuleActivity(module, step);
+    } catch (error) {
+      showModuleAccessError(error);
+      notify(error instanceof Error ? error.message : "Could not open prerequisite module");
+    }
+  }
+
   async function startModuleActivity(module: CourseModule, step?: StepBlock) {
     if (!classroomId || user?.role !== "student") return;
-    await moduleEditorRef.current?.save();
-    await persistCurrentCode();
-    const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/${step ? "activity" : "performance-project"}`, {
-      method: "POST", body: JSON.stringify(step ? { stepId: step.id } : {}),
-    });
-    // The worksheet may have been opened before the final module step unlocked the task.
-    const currentModule = step ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
-    setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
-    setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
-      classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step?.id ?? "", stateId: step ? activityStateId(step) : "",
-      instruction: step?.instruction ?? currentModule.performanceTask?.markdown ?? "",
-      expectedOutput: step?.expectedOutput ?? "", stdin: step?.stdin ?? "", progress });
-    setProjectsOpen(false);
+    try {
+      await moduleEditorRef.current?.save();
+      if (!step) await persistCurrentCode();
+      const progress = await api<Progress>(`/api/classrooms/${classroomId}/modules/${module.id}/progress/${step ? `activity?stepId=${encodeURIComponent(step.id)}` : "performance-project"}`, {
+        ...(step ? {} : { method: "POST", body: JSON.stringify({}) }),
+      });
+      // The worksheet may have been opened before the final module step unlocked the task.
+      const currentModule = step && module.moduleVersion === progress.moduleVersion ? module : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${module.id}`);
+      const currentStep = step ? currentModule.lessons.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === step.id) : undefined;
+      if (step && (!currentStep || currentModule.moduleVersion !== progress.moduleVersion)) throw new Error("This lesson changed while opening. Reopen it to load the current sample; your device draft is kept.");
+      setWeeklySelection({ studentId: user.id, classroomId, module: currentModule });
+      setModuleActivity({ kind: step ? "module" : "performance", module: currentModule,
+        classroomId, moduleId: module.id, moduleTitle: currentModule.title, stepId: currentStep?.id ?? "", stateId: currentStep ? activityStateId(currentStep) : "", studentId: user.id,
+        instruction: currentStep ? activityTask(currentStep).instruction : currentModule.performanceTask?.markdown ?? "",
+        expectedOutput: currentStep ? activityTask(currentStep).expectedOutput : "", stdin: currentStep ? activityTask(currentStep).stdin ?? "" : "", progress });
+      setProjectsOpen(false);
+      setModuleAccessError(null);
+    } catch (error) {
+      showModuleAccessError(error);
+      throw error;
+    }
   }
 
   async function runCode() {
@@ -1798,6 +1839,7 @@ export default function Home() {
     forgetRealtimeClient(); // the live pass belongs to the signed-out user
     setUser(null);
     setModuleActivity(null);
+    setModuleAccessError(null);
     setData(null);
     setEnteredClassroomId(null);
     setChoosingStudentClass(false);
@@ -1813,6 +1855,7 @@ export default function Home() {
     try { await moduleEditorRef.current?.save(); }
     catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); return; }
     setModuleActivity(null);
+    setModuleAccessError(null);
     setChoosingStudentClass(user?.role === "student");
     setModulesOpen(false);
     setProjectsOpen(false);
@@ -1846,6 +1889,14 @@ export default function Home() {
           setWorkspaceError("");
           setHomeClassroomId(classroomId);
           setEnteredClassroomId(classroomId);
+        }}
+        onReviewPersonal={async (classId, studentId, studentName, moduleId) => {
+          const result = await api<{ module: CourseModule; submission: import("../backend/src/personal-performance").PersonalSubmission; submissionId: string }>(`/api/classes/${classId}/students/${studentId}/modules/${moduleId}/personal-submission`);
+          setModuleActivity({ kind: "review", studentId, module: result.module, classroomId: classId, moduleId, moduleTitle: result.module.title,
+            stepId: "", stateId: "", instruction: result.module.performanceTask?.markdown ?? "", expectedOutput: "", stdin: "",
+            review: { studentId, studentName, submissionId: result.submissionId, submission: result.submission },
+            progress: { moduleId, projectFiles: [], performanceProjectFiles: result.submission.files, percent: 0, updatedAt: "", stepStates: {}, performanceTask: { own: result.submission } } });
+          setData(null); setActiveTeam(0); setHomeClassroomId(classId); setEnteredClassroomId(classId); setProjectsOpen(true);
         }}
         onLogout={logout}
         onRefresh={async () => { await loadWorkspace(); }}
@@ -2034,12 +2085,10 @@ export default function Home() {
         </div>
       </header>
       <section className="workspace classroom-workspace">
-        <nav className="workspace-rail rail-left" aria-label="Learning panels">
-          <button type="button" aria-expanded={modulesOpen} aria-controls="classroom-modules" onClick={() => { setProjectsOpen(false); setModulesOpen(!modulesOpen); }}><span aria-hidden="true">▤</span> Module <span aria-hidden="true">{modulesOpen ? "‹" : "›"}</span></button>
-          <button type="button" aria-expanded={projectsOpen} aria-controls="classroom-projects" onClick={() => { setModulesOpen(false); setProjectsOpen(!projectsOpen); }}><span aria-hidden="true">⌘</span> {user.role === "teacher" ? "Students / projects" : "Projects"}</button>
-        </nav>
         <nav className="workspace-rail rail-right" aria-label="Chat panel">
-          <button type="button" aria-expanded={chatOpen} aria-controls="classroom-chat" onClick={() => setChatOpen(!chatOpen)}><span aria-hidden="true">☏</span> Chat <span aria-hidden="true">{chatOpen ? "›" : "‹"}</span></button>
+          <button type="button" aria-expanded={chatOpen} aria-controls="classroom-chat" onPointerEnter={(event) => { if (event.pointerType === "mouse" && !chatOpen) { setChatHoverPreview(true); setChatOpen(true); } }}
+            onKeyDown={(event) => { if (event.key === "Escape") setChatOpen(false); }}
+            onClick={() => { setChatOpen(!chatOpen || chatHoverPreview); setChatHoverPreview(false); }}><span aria-hidden="true">☏</span> Chat <span aria-hidden="true">{chatOpen ? "›" : "‹"}</span></button>
         </nav>
         <aside id="classroom-projects" aria-label={user.role === "teacher" ? "Students and projects" : "Projects"} data-open={projectsOpen} aria-hidden={!projectsOpen} inert={!projectsOpen} className="sidebar classroom-projects" onKeyDown={(event) => { if (event.key === "Escape") setProjectsOpen(false); }}>
           <div className="projects-heading"><b>{user.role === "teacher" ? "Students and projects" : "My projects"}</b><button type="button" aria-label="Close projects" onClick={() => setProjectsOpen(false)}>×</button></div>
@@ -2149,17 +2198,25 @@ export default function Home() {
             accept="image/jpeg,image/png,image/webp"
             onChange={uploadStudentPhoto}
           />
+          {currentModuleProject?.kind === "review" && <PersonalSubmissionChecklist key={currentModuleProject.review!.submissionId} activity={currentModuleProject} />}
+          {user.role === "student" && !weeklyModule && <div className="team-list"><b>Personal performance-task project</b><p>Choose your module to open its Java projects.</p><button type="button" onClick={() => { setProjectsOpen(false); setModulesOpen(true); }}>Choose module</button></div>}
           {weeklyModule && <div className="team-list" aria-label="Weekly Java projects">
             <b>{weeklyModule.title}</b>
             <div className={`team-card ${currentModuleProject?.kind === "module" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Module project" onClick={async () => {
-              const step = weeklyModule.lessons.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
-              try { if (step) await startModuleActivity(weeklyModule, step); }
-              catch (error) { notify(error instanceof Error ? error.message : "Could not open module project"); }
+              try {
+                const [module, progress] = await Promise.all([
+                  api<CourseModule>(`/api/classrooms/${classroomId}/modules/${weeklyModule.id}`),
+                  api<Progress>(`/api/classrooms/${classroomId}/modules/${weeklyModule.id}/progress`),
+                ]);
+                const step = moduleResumeStep(module, progress.stepStates) ?? module.lessons.flatMap((lesson) => lesson.blocks).findLast((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
+                if (step?.language === "java") await startModuleActivity(module, step);
+              }
+              catch (error) { showModuleAccessError(error); notify(error instanceof Error ? error.message : "Could not open module project"); }
             }}><span className="team-icon">J</span><span className="team-copy"><b>Module project</b></span></button></div>
-            <div className={`team-card ${currentModuleProject?.kind === "performance" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Personal performance-task project" onClick={async () => {
+            {paperPerformanceTask(weeklyModule) ? <p>Week 20 proposal: submit on paper to your teacher.</p> : <div className={`team-card ${currentModuleProject?.kind === "performance" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Personal performance-task project" onClick={async () => {
               try { await startModuleActivity(weeklyModule); }
               catch (error) { notify(error instanceof Error ? error.message : "Could not open personal project"); }
-            }}><span className="team-icon">J</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>
+            }}><span className="team-icon">J</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>}
           </div>}
           <div className="team-list">
             {data.teams.map((item, index) => {
@@ -2314,7 +2371,7 @@ export default function Home() {
           {currentModuleProject ? <div className="assignment-block">
             <span className="eyebrow">{currentModuleProject.kind === "performance" ? "PERSONAL PERFORMANCE TASK" : "MODULE PROJECT"}</span>
             <h3>{currentModuleProject.moduleTitle}</h3>
-            <p>{currentModuleProject.kind === "performance" ? "Your own Java project, continued from the previous week. Saving and running do not submit it." : "Use the module sample code and match its expected output to progress."}</p>
+            <p>{currentModuleProject.kind === "review" ? "Frozen submitted files. Teacher runs never change student progress." : currentModuleProject.kind === "performance" ? "Your own Java project, continued from the previous week. Saving and running do not submit it." : "Use the module sample code and match its expected output to progress."}</p>
             <p>Java files are in the editor tabs.</p>
           </div> : <div className="assignment-block">
             <span className="eyebrow">CURRENT ASSIGNMENT</span>
@@ -2463,6 +2520,7 @@ export default function Home() {
               </button>
             </div>
           </div>
+          {moduleAccessError && moduleAccessError.classroomId === classroomId && <ModuleAccessNotice block={moduleAccessError.block} onContinue={(id) => void continuePrerequisite(id)} />}
           {currentModuleProject ? <StudentModuleActivity
             key={`${currentModuleProject.kind}:${currentModuleProject.moduleId}:${currentModuleProject.stepId}:${currentModuleProject.progress.updatedAt}`}
             activity={currentModuleProject} ref={moduleEditorRef}
@@ -2586,7 +2644,7 @@ export default function Home() {
                   aria-expanded={chatOpen}
                   aria-controls="classroom-chat"
                   className={chatOpen ? "active" : ""}
-                  onClick={() => setChatOpen((open) => !open)}
+                  onClick={() => { setChatHoverPreview(false); setChatOpen((open) => !open); }}
                 >
                   {!data.currentActivity
                     ? "Classroom chat"
@@ -2826,8 +2884,8 @@ export default function Home() {
             </div>
           </footer></>}
         </section>
-        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
-        <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} onClose={() => setChatOpen(false)}>
+        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} studentId={user.id} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onSelectModule={(module) => setWeeklySelection({ studentId: user.id, classroomId, module })} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
+        <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} autoFocus={!chatHoverPreview} onClose={() => { setChatOpen(false); setChatHoverPreview(false); }}>
           <div className="chat">
                   <div className="chat-toolbar">
                     <b>

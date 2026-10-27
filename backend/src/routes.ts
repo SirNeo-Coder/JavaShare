@@ -24,10 +24,18 @@ import {
   deleteSupabaseActivity,
   endSupabaseActivity,
   getSupabaseModule,
+  getSupabaseModuleSharing,
+  setSupabaseModuleSubject,
+  shareSupabaseModule,
   getSupabaseModuleProgress,
   prepareSupabaseModuleActivity,
+  completeSupabaseModuleActivity,
   prepareSupabasePerformanceProject,
   saveSupabasePerformanceProject,
+  beginSupabasePersonalRun,
+  recordSupabasePersonalRun,
+  getSupabasePersonalSubmission,
+  saveSupabasePersonalReview,
   runSupabaseModuleActivity,
   recordSupabaseModuleActivityResult,
   getSupabaseStudentWebProject,
@@ -123,7 +131,7 @@ function requireTeacher(req: AuthedRequest, res: ApiResponse, next: NextFn) {
 
 const app = createRouter<AuthedRequest>((error, res) => {
   if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues[0]?.message || "Invalid request" });
-  if (error instanceof SupabaseRepositoryError) return res.status(error.status).json({ error: error.message });
+  if (error instanceof SupabaseRepositoryError) return res.status(error.status).json({ error: error.message, ...(error.moduleAccess ? { moduleAccess: error.moduleAccess } : {}) });
   console.error(error);
   return res.status(500).json({ error: "Unexpected server error" });
 });
@@ -292,7 +300,7 @@ app.get("/api/bootstrap", requireAuth, async (req: AuthedRequest, res, next) => 
 // style class list). Reuses the same classroom-workspace setup as that starter class.
 app.post("/api/classes", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
   try {
-    const input = z.object({ name: z.string().trim().min(2).max(80), subject: z.string().trim().min(2).max(80).optional() }).parse(req.body);
+    const input = z.object({ name: z.string().trim().min(2).max(80), subject: z.enum(["Java", "Net MVC"]) }).parse(req.body);
     return res.status(201).json(await createSupabaseClassroom(req.user!.id, input));
   } catch (error) { next(error); }
 });
@@ -498,7 +506,7 @@ app.get("/api/submissions", requireAuth, async (req: AuthedRequest, res, next) =
 // performance-task submissions (sample code run, student's own version). moduleId is the
 // module file's own "id" field.
 app.get("/api/classrooms/:classroomId/modules/:moduleId/progress", requireAuth, async (req: AuthedRequest, res, next) => {
-  try { return res.json(await getSupabaseModuleProgress(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  try { return res.json(await getSupabaseModuleProgress(req.user!, String(req.params.classroomId), String(req.params.moduleId), req.query.includeModuleVersion === "1")); }
   catch (error) { next(error); }
 });
 
@@ -525,11 +533,31 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-tas
 // separate from the two performance-task submissions above.
 app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/project", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const { files, updatedAt } = z.object({
+    const { files, updatedAt, stepId } = z.object({
       files: z.array(z.object({ path: z.string().trim().min(1).max(160), content: z.string().max(200000) })).min(1).max(50),
       updatedAt: z.string().datetime({ offset: true }).optional(),
+      stepId: z.string().trim().min(1).max(100).optional(),
     }).parse(req.body);
-    return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt));
+    return res.json(await setSupabaseModuleProjectFiles(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt, stepId));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/module-sharing", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseModuleSharing(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.patch("/api/classrooms/:classroomId/module-subject", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { subject } = z.object({ subject: z.enum(["java", "net-mvc"]) }).parse(req.body);
+    return res.json(await setSupabaseModuleSubject(req.user!, String(req.params.classroomId), subject));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/share", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { expectedUpdatedAt } = z.object({ expectedUpdatedAt: z.string().datetime({ offset: true }).optional() }).parse(req.body);
+    return res.json(await shareSupabaseModule(req.user!, String(req.params.classroomId), String(req.params.moduleId), expectedUpdatedAt));
   } catch (error) { next(error); }
 });
 
@@ -656,6 +684,55 @@ app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-pro
   try {
     const { files, updatedAt } = z.object({ files: javaFiles, updatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
     return res.json(await saveSupabasePerformanceProject(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/modules/:moduleId/progress/activity", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const stepId = z.string().trim().min(1).max(100).parse(req.query.stepId);
+    return res.json(await prepareSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, stepId, false));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    if (localJavaEnabled) throw new SupabaseRepositoryError(403, "Offline progress must use the classroom Java runner");
+    if (!process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(503, "Online Java is not configured");
+    const evidence = z.object({ files: javaFiles, success: z.boolean(), output: z.string().max(70000) });
+    const checkpoint = evidence.extend({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }),
+      moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional() }).parse(req.body);
+    return res.json(await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/personal-run", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { updatedAt, stdin = "" } = z.object({ updatedAt: z.string().datetime({ offset: true }), stdin: z.string().max(10000).optional() }).parse(req.body);
+    const classroomId = String(req.params.classroomId), moduleId = String(req.params.moduleId);
+    const progress = await beginSupabasePersonalRun(req.user!, classroomId, moduleId, updatedAt);
+    if (!localJavaEnabled && process.env.JAVA_RUNNER_URL) return res.json({ progress });
+    const result = await executeJava(req.user!.id, progress.performanceProjectFiles, stdin);
+    return res.json({ ...result, progress: await recordSupabasePersonalRun(req.user!, classroomId, moduleId, progress.updatedAt, result.mode !== "demo" && result.success) });
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/personal-result", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    if (localJavaEnabled || !process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(403, "Browser run results are only accepted in online browser mode");
+    const { updatedAt, success } = z.object({ updatedAt: z.string().datetime({ offset: true }), success: z.boolean() }).parse(req.body);
+    return res.json(await recordSupabasePersonalRun(req.user!, String(req.params.classroomId), String(req.params.moduleId), updatedAt, success));
+  } catch (error) { next(error); }
+});
+
+app.get("/api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-submission", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabasePersonalSubmission(req.user!, String(req.params.classroomId), String(req.params.studentId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.put("/api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-review", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const { submissionId, checked } = z.object({ submissionId: z.string().min(1).max(100), checked: z.array(z.boolean()).max(1000) }).parse(req.body);
+    return res.json(await saveSupabasePersonalReview(req.user!, String(req.params.classroomId), String(req.params.studentId), String(req.params.moduleId), submissionId, checked));
   } catch (error) { next(error); }
 });
 

@@ -105,13 +105,15 @@ Keep the rolling handoff for the current stage current: `docs/handoffs/stage-one
 - Each student has two separate Java projects per module per class: the module project and the
   personal performance-task project. Each rolls forward from its own preceding week's work;
   never mix the tracks or overwrite earlier weeks, current edits, or submitted snapshots.
-- The module project uses the module's sample code, all supporting Java classes, and exact expected
-  output. Successful runs complete its steps and unlock the next part. Legacy separate challenge
-  JSON remains readable but does not determine module progression.
+- Modules with explicit `activity.id` show sample code/output separately from a small alteration
+  task and its expected output. Successful task runs earn Completed and unlock the next step.
+  Modules without explicit task ids retain sample-output checks and part unlocking. Legacy
+  separate challenge JSON remains readable. Never reuse old sample/challenge passes for new tasks.
 - Both projects use the main code editor. Saving or running the personal project is not submission
   or grading, and never completes a module step. Submit the personal version explicitly.
-- Successful code execution with the required output completes a task; all tasks in a part unlock
-  the next part automatically for that student. Teacher availability switches do not gate progress.
+- Successful code execution with the required output completes a task. Explicit alteration tasks
+  unlock one step at a time; older sample modules unlock by part. Teacher availability switches
+  do not gate progress.
 - Handwritten liplets are submitted to the teacher and assessed separately; they do not block
   student progression. Output completion is not a grade or proof of conceptual understanding.
 
@@ -142,6 +144,93 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   output while running and wait for answers in Program input. Enter sends an answer;
   Stop cancels the run. Keep the five-second execution budget separate from the
   two-minute input wait. A stopped or timed-out run is unsuccessful.
-- Module sample checks keep their JSON-supplied input and existing server-owned output
+- Module practice checks keep their JSON-supplied input and existing server-owned sample/task output
   and saved-version checks. Personal runs do not submit or complete module steps.
 - Offline keeps laptop javac and its existing input-before-Run behavior for this slice.
+
+## Sample verification before alterations (agreed 2026-10-21)
+
+- Modules opting into `sampleFirst` load the selected step's sample on first opening in the main
+  editor, including its supplied Java files and rolling supporting classes. Save each step's
+  working files separately before switching; reopening a started step restores its saved edits.
+  Preserve a readable backup of work that existed before sample loading and all existing completions.
+- Run the unchanged sample before editing its alteration. Save sample verification separately;
+  it never completes the task or opens the next step. Declared intentional runtime errors show
+  Expected error observed and verify only the demonstration. A failed alteration never completes.
+- Show a prominent result banner above Actual output: sample verified, unchanged sample output,
+  mismatch, or Completed. Keep the latest run result separate from an earlier saved completion.
+- Existing JSON without `sampleFirst` retains its prior progression. Module/personal tracks,
+  submitted snapshots, class/student scope, stale-write checks and offline laptop Java stay intact.
+
+## Module resume and meaningful alterations (agreed 2026-10-21)
+
+- Reopening a module resumes its next unfinished step from server-saved completion, including
+  after reload or sign-in on another browser. Completed sample steps lead to the performance task.
+- Small alterations must exercise the lesson's behavior: object state, inherited methods, collection
+  operations, calculations, conditions or exception paths. Show the complete expected changed output.
+  Renaming printed labels alone is insufficient. Keep the displayed sample unsolved.
+- Changed task requirements need new stable activity ids; retain old results without crediting
+  them toward a different exercise. Keep module and personal work separate.
+
+## Rolling module prerequisites (agreed 2026-10-21)
+
+- Students must finish every required activity in the full `previousModuleId` chain before
+  starting a later module. Use the current activity identities and saved passes for that
+  student and class. Sample verification alone, performance submissions and paper liplets
+  do not satisfy or add to this prerequisite requirement.
+- Explain the earliest unfinished prerequisite prominently and provide Continue Week N to
+  resume its next unfinished step. Missing prerequisite uploads and circular links require
+  a clear teacher-repair message. Never silently skip a missing linked module.
+- Enforce access on the server across module content, progress, both project tracks, runs,
+  result recording and submissions, online and offline. During live class allow the weekly
+  module's prerequisite chain; unrelated modules retain the live restriction.
+- Teacher previews remain available. Preserve existing files, drafts, completion history,
+  earlier weeks, personal projects and submitted snapshots. Project naming/identity changes
+  are separate work and were not approved in this slice.
+
+## Subject-specific shared modules (agreed 2026-10-22)
+
+- Each class has one module subject: Java or Net MVC. One teacher-owned module set is shared
+  across that teacher’s classes in the same subject, including classes created later.
+- Upload or correct a module once per subject. Java and Net MVC never share module content.
+  Student projects, completions, submissions and the weekly live-class module stay class-specific.
+- Preserve existing class uploads and student work. The teacher selects an existing class’s
+  subject, then explicitly shares saved uploads; a differing shared copy requires confirmation.
+- Shared deletion warns that it affects every class in that subject and keeps student work.
+
+## Completion-only online module saving (agreed 2026-10-22)
+
+- Online Module project practice keeps downloaded authorized lessons, unfinished
+  per-step code, sample verification and unsuccessful runs on the student's device.
+  Save code/progress to the server only on successful task completion. A later
+  unsuccessful run must not replace an earlier successful project or completion.
+- Send one guarded completion checkpoint; the server validates current sample/task
+  output, identity/class/access, stable activity ids and module/project versions.
+  Save code and progress together. Retry without duplicate saves and preserve local
+  work on failed sync or conflicts. Server acceptance unlocks the next step.
+- Keep local-only status explicit. Other devices/teacher progress receive accepted
+  completions, not unfinished drafts. Later locked content stays server-withheld.
+  Preserve account/idle-expiry safety, personal/submission separation, backups and
+  the existing laptop/offline runner path. Initial reads/sign-in requests remain.
+- Keep hosted prerequisite/catalog reads small using server-only summaries derived
+  from current content. No stored duplicate curriculum or removal of access checks.
+
+## Personal performance-task submissions and review (agreed 2026-10-23)
+
+- Keep personal files separate from module samples. Initialize from personal starters or the
+  preceding personal submission, falling back to its draft only when no submission exists.
+  Preserve current work exactly. Carry personal work across the written Week 20 proposal.
+- Submit this version requires successful execution of the exact saved personal files, checked
+  on the server too. Edits, additions, deletions, renames and unsuccessful runs invalidate it.
+  Use approved browser evidence online and laptop Java offline; personal output has no sample target.
+- Submission earns its personal-task progress credit and shows Submitted, not a grade or teacher
+  approval. Review never gates progression. Preserve lesson and predecessor checks and live locks.
+- Keep one frozen personal submission per student/class/module. Explicit resubmission replaces
+  only that module's copy and clears its review. Existing submissions and drafts remain separate.
+- Teacher dashboard → Students → student → module → Review personal submission opens the frozen
+  files read-only in the main editor. Teacher runs never modify student files or progress.
+  Projects shows the complete frozen checklist with teacher-only ticks and Save review.
+  Check class ownership, student membership and submission identity on the server.
+- Preserve the checklist used for each submission. Older copies without one retain their files
+  and clearly identify the current checklist captured when first opened for review.
+- Week 20 remains a paper proposal with no Java run or online submission requirement.

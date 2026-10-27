@@ -1,0 +1,427 @@
+{
+  "15": {
+    "original": "403e799df22b981c1244e2e99225a44b6c417695c3ff82eac0c4d58df73f7ac7",
+    "originalFile": "b62f2aa74f83d2e729d730eeae947c18979664c1fa1a4c85f3bf7258b83e9bfd",
+    "originalStepFiles": {
+      "java-2-w15-d1-s1": [
+        "Main.java"
+      ],
+      "java-2-w15-d1-s2": [
+        "Main.java"
+      ],
+      "java-2-w15-d2-s3": [
+        "fleet.txt",
+        "Main.java"
+      ],
+      "java-2-w15-d2-s4": [
+        "Main.java"
+      ],
+      "java-2-w15-d3-s5": [
+        "fares.txt",
+        "Main.java"
+      ],
+      "java-2-w15-d3-s6": [
+        "Main.java"
+      ],
+      "java-2-w15-d4-s7": [
+        "Main.java"
+      ],
+      "java-2-w15-d4-s8": [
+        "Main.java"
+      ],
+      "java-2-w15-d4-s9": [
+        "Main.java"
+      ],
+      "java-2-w15-d4-s10": [
+        "Main.java"
+      ]
+    },
+    "originalStarterCount": 8,
+    "originalStarterPaths": [
+      "Bus.java",
+      "InvalidDistanceException.java",
+      "Jeepney.java",
+      "Main.java",
+      "OverloadException.java",
+      "Tricycle.java",
+      "Vehicle.java",
+      "VehicleNotFoundException.java"
+    ],
+    "originalPersonalStarterPaths": [
+      "LoadTemplate.txt"
+    ],
+    "assetHashes": {
+      "LoadTemplate.txt": "b13ca4e7a9538aa2ab840a7aca647115e60186915d7f968b735a020285c6af5c",
+      "fleet.txt": "17cf35615fde8698f67113159e83888d67bda3c4a9d3970f8df5bc714a475303",
+      "fares.txt": "5a34f0392a962395f96f965869ab787ce962d1aa985122dcd425417396579b49"
+    },
+    "missingSlipIds": [
+      "java-2-w15-d5"
+    ],
+    "addedStarter": false,
+    "addedExample": false,
+    "relocated": [
+      {
+        "step": "java-2-w15-d2-s3",
+        "file": {
+          "path": "fleet.txt",
+          "content": "Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nTricycle,TRC 456,Kuya Ben,Bagong Silang TODA\nBus,BUS 789,Aling Rosa,50\nJeepney,NYB 321,Mang Tonyo,Sangandaan-Recto\n"
+        }
+      },
+      {
+        "step": "java-2-w15-d3-s5",
+        "file": {
+          "path": "fares.txt",
+          "content": "13.00 15.00 20.50\n27.50 13.00\n"
+        }
+      }
+    ],
+    "pdf": "Java_File_Handling_Module.pdf",
+    "notice": "File exercises retain real disk access and the original file setup. CodeShare classroom file access/persistence is not supported by this update. Verify these exercises in a separate desktop Java folder; do not treat this JSON as classroom-ready."
+  },
+  "16": {
+    "original": "0e7596411999cfdae8a1b1974e7d81ee8a8dea2803f240176ff1b18cdd14c150",
+    "originalFile": "d987498479ed8cd0c038bef5ee20abb12696ec9119f407f4f63db8551d75c523",
+    "originalStepFiles": {
+      "java-2-w16-d2-s1": [
+        "DispatchThread.java",
+        "Main.java"
+      ],
+      "java-2-w16-d2-s2": [
+        "Main.java"
+      ],
+      "java-2-w16-d2-s3": [
+        "Main.java"
+      ],
+      "java-2-w16-d3-s4": [
+        "BoardingTask.java",
+        "Main.java"
+      ],
+      "java-2-w16-d3-s5": [
+        "ReadyReport.java",
+        "Main.java"
+      ],
+      "java-2-w16-d4-s6": [
+        "ConvoyLeg.java",
+        "Main.java"
+      ],
+      "java-2-w16-d4-s7": [
+        "LoadingBay.java",
+        "Main.java"
+      ]
+    },
+    "originalStarterCount": 8,
+    "originalStarterPaths": [
+      "Bus.java",
+      "InvalidDistanceException.java",
+      "Jeepney.java",
+      "Main.java",
+      "OverloadException.java",
+      "Tricycle.java",
+      "Vehicle.java",
+      "VehicleNotFoundException.java"
+    ],
+    "originalPersonalStarterPaths": [
+      "HelperTemplate.txt"
+    ],
+    "assetHashes": {
+      "HelperTemplate.txt": "d5055611433b0defed2d0f2eee53ae33310100ff6747848ee0dc76f2e6a41319"
+    },
+    "missingSlipIds": [
+      "java-2-w16-d5"
+    ],
+    "addedStarter": false,
+    "addedExample": false,
+    "relocated": [],
+    "pdf": "Java_Threads_Module.pdf",
+    "notice": "Alteration output avoids elapsed-time and thread-order checks. Original samples are unchanged; Steps 3, 5, 6 and 7 still contain timing/order assumptions and may not verify reliably. This JSON needs sample review before classroom rollout."
+  },
+  "17": {
+    "original": "ca56c6d0e25ba82a4216afcf195a2cfb5076106b469c218d017ae9d2820fc63d",
+    "originalFile": "70e0d720dcfe7776381875b97578e2e79310c023f1d995b44dbc776d3fd36a71",
+    "originalStepFiles": {
+      "java-2-w17-d1-s1": [
+        "Main.java",
+        "TerminalPanel.java"
+      ],
+      "java-2-w17-d2-s2": [
+        "TerminalPanel.java"
+      ],
+      "java-2-w17-d3-s3": [
+        "FareService.java",
+        "TerminalPanel.java"
+      ],
+      "java-2-w17-d3-s4": [
+        "FareCheck.java"
+      ],
+      "java-2-w17-d4-s5": [
+        "ReadyTask.java",
+        "Main.java"
+      ],
+      "java-2-w17-d5-s6": [
+        "ThemeCheck.java"
+      ]
+    },
+    "originalStarterCount": 14,
+    "originalStarterPaths": [
+      "BoardingTask.java",
+      "Bus.java",
+      "ConvoyLeg.java",
+      "DispatchThread.java",
+      "InvalidDistanceException.java",
+      "Jeepney.java",
+      "LoadingBay.java",
+      "Main.java",
+      "Main_week16.txt",
+      "OverloadException.java",
+      "ReadyReport.java",
+      "Tricycle.java",
+      "Vehicle.java",
+      "VehicleNotFoundException.java"
+    ],
+    "originalPersonalStarterPaths": null,
+    "assetHashes": {
+      "Main_week16.txt": "9932ef2b62a96cbe0ff6d54d78d0203a5315f30a81d8c448c93848246f949738"
+    },
+    "missingSlipIds": [],
+    "addedStarter": true,
+    "addedExample": false,
+    "relocated": [],
+    "pdf": "Java_Swing_Basics_Module.pdf",
+    "notice": "Console checks exercise component state, layout or event behavior without opening a window. The message No display: GUI not opened. alone never completes an alteration. Check the actual interface on a school computer; browser GUI rendering and interaction remain unverified."
+  },
+  "18": {
+    "original": "de073089523ee535e4a5aa0e2d7d733632913abfb2f3b40a1b26fd0ace2f29c6",
+    "originalFile": "d70743b53ebba3594a2e566780471588fbf77c01de10ae5e059c3c83b6024102",
+    "originalStepFiles": {
+      "java-2-w18-d1-s1": [
+        "LayoutDemo.java"
+      ],
+      "java-2-w18-d2-s2": [
+        "Main.java"
+      ],
+      "java-2-w18-d3-s3": [
+        "TerminalPanel.java"
+      ],
+      "java-2-w18-d4-s4": [
+        "TerminalPanel.java"
+      ],
+      "java-2-w18-d5-s5": [
+        "ThemeLayoutCheck.java"
+      ]
+    },
+    "originalStarterCount": 19,
+    "originalStarterPaths": [
+      "BoardingTask.java",
+      "Bus.java",
+      "ConvoyLeg.java",
+      "DispatchThread.java",
+      "FareCheck.java",
+      "FareService.java",
+      "InvalidDistanceException.java",
+      "Jeepney.java",
+      "LoadingBay.java",
+      "Main.java",
+      "Main_week16.txt",
+      "Main_week17.txt",
+      "OverloadException.java",
+      "ReadyReport.java",
+      "ReadyTask.java",
+      "TerminalPanel.java",
+      "Tricycle.java",
+      "Vehicle.java",
+      "VehicleNotFoundException.java"
+    ],
+    "originalPersonalStarterPaths": [
+      "ThemePanel_fragment.txt"
+    ],
+    "assetHashes": {
+      "Main_week16.txt": "9932ef2b62a96cbe0ff6d54d78d0203a5315f30a81d8c448c93848246f949738",
+      "Main_week17.txt": "45f5066e7dd27e1cd6864bff110e250b23e28a0d337998a82a040c7d806d78cd",
+      "ThemePanel_fragment.txt": "efb7ff2fa76887cd62b7893f75ba4c8f8d2dae9dcf7bb451ce2709686846c7fd"
+    },
+    "missingSlipIds": [],
+    "addedStarter": false,
+    "addedExample": false,
+    "relocated": [],
+    "pdf": "Java_Layouts_and_Panels_Module.pdf",
+    "notice": "Console checks exercise component state, layout or event behavior without opening a window. The message No display: GUI not opened. alone never completes an alteration. Check the actual interface on a school computer; browser GUI rendering and interaction remain unverified."
+  },
+  "19": {
+    "original": "727448861b73d44518954cabdff9b6b795dd0305f9aa75da6672549ea2c3b3e2",
+    "originalFile": "217c3672828723fa3db2b488fd6a67b2ce25e3d18f96be177dc6f3e1beb0c27e",
+    "originalStepFiles": {
+      "java-2-w19-d1-s1": [
+        "Main_week18.txt",
+        "TerminalPanel.java"
+      ],
+      "java-2-w19-d2-s2": [
+        "RequestDemo.java"
+      ],
+      "java-2-w19-d3-s3": [
+        "RequestDemo.java"
+      ],
+      "java-2-w19-d4-s4": [
+        "RequestDemo.java"
+      ]
+    },
+    "originalStarterCount": 21,
+    "originalStarterPaths": [
+      "BoardingTask.java",
+      "Bus.java",
+      "ConvoyLeg.java",
+      "DispatchThread.java",
+      "FareCheck.java",
+      "FareService.java",
+      "InvalidDistanceException.java",
+      "Jeepney.java",
+      "LayoutDemo.java",
+      "LoadingBay.java",
+      "Main.java",
+      "Main_week16.txt",
+      "Main_week17.txt",
+      "OverloadException.java",
+      "ReadyReport.java",
+      "ReadyTask.java",
+      "TerminalPanel.java",
+      "ThemeLayoutCheck.java",
+      "Tricycle.java",
+      "Vehicle.java",
+      "VehicleNotFoundException.java"
+    ],
+    "originalPersonalStarterPaths": [
+      "OwnTheme_fragment.txt"
+    ],
+    "assetHashes": {
+      "Main_week16.txt": "9932ef2b62a96cbe0ff6d54d78d0203a5315f30a81d8c448c93848246f949738",
+      "Main_week17.txt": "45f5066e7dd27e1cd6864bff110e250b23e28a0d337998a82a040c7d806d78cd",
+      "OwnTheme_fragment.txt": "0090bb50db93ecb01376f0384bc6a139f8a8cfdf4311e66c393fbf77f029d67a",
+      "Main_week18.txt": "db3a51b4dc1f28f681854a1f5ba77634fffc5e0df2de4e4edbaf85150fa662ba"
+    },
+    "missingSlipIds": [],
+    "addedStarter": false,
+    "addedExample": false,
+    "relocated": [
+      {
+        "step": "java-2-w19-d1-s1",
+        "file": {
+          "path": "Main_week18.txt",
+          "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class Main {\n  static JPanel createContent() {\n    JPanel root = new JPanel(new BorderLayout(8, 8));\n    root.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));\n    TerminalPanel panel = new TerminalPanel();\n    JLabel status = new JLabel(\"Not checked\");\n    JButton check = new JButton(\"Check ready\");\n    check.addActionListener(new ActionListener() {\n      public void actionPerformed(ActionEvent e) {\n        check.setEnabled(false);\n        status.setText(\"Checking...\");\n        new Thread(new ReadyTask(status, check),\n          \"Readiness\").start();\n      }\n    });\n    JPanel ready = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));\n    ready.add(check); ready.add(status);\n    root.add(new JLabel(\"Vehicle Terminal\"), BorderLayout.NORTH);\n    root.add(panel, BorderLayout.CENTER);\n    root.add(ready, BorderLayout.SOUTH);\n    return root;\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(new Runnable() {\n      public void run() {\n        JFrame frame = new JFrame(\"Vehicle Terminal\");\n        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n        frame.setContentPane(createContent());\n        frame.setSize(720, 320);\n        frame.setMinimumSize(new Dimension(520, 300));\n        frame.setLocationRelativeTo(null);\n        frame.setVisible(true);\n      }\n    });\n  }\n}\n"
+        }
+      }
+    ],
+    "pdf": "Java_Advanced_Components_and_User_Interaction_Module.pdf",
+    "notice": "Console checks exercise component state, layout or event behavior without opening a window. The message No display: GUI not opened. alone never completes an alteration. Check the actual interface on a school computer; browser GUI rendering and interaction remain unverified."
+  },
+  "20": {
+    "original": "fdcee6fd0adbe23955a827a272604f47af3c8ef19e60dbdf1803cc1e61e0b91b",
+    "originalFile": "4f4be32c6472653b4595cca6f3cebe285117c6761b4d0a5cfd3b6fc23c3cdf5a",
+    "originalStepFiles": {},
+    "originalStarterCount": 23,
+    "originalStarterPaths": [
+      "BoardingTask.java",
+      "Bus.java",
+      "ConvoyLeg.java",
+      "DispatchThread.java",
+      "FareCheck.java",
+      "FareService.java",
+      "InvalidDistanceException.java",
+      "Jeepney.java",
+      "LayoutDemo.java",
+      "LoadingBay.java",
+      "Main.java",
+      "Main_week16.txt",
+      "Main_week17.txt",
+      "Main_week18.txt",
+      "OverloadException.java",
+      "ReadyReport.java",
+      "ReadyTask.java",
+      "RequestDemo.java",
+      "TerminalPanel.java",
+      "ThemeLayoutCheck.java",
+      "Tricycle.java",
+      "Vehicle.java",
+      "VehicleNotFoundException.java"
+    ],
+    "originalPersonalStarterPaths": null,
+    "assetHashes": {
+      "Main_week16.txt": "9932ef2b62a96cbe0ff6d54d78d0203a5315f30a81d8c448c93848246f949738",
+      "Main_week17.txt": "45f5066e7dd27e1cd6864bff110e250b23e28a0d337998a82a040c7d806d78cd",
+      "Main_week18.txt": "db3a51b4dc1f28f681854a1f5ba77634fffc5e0df2de4e4edbaf85150fa662ba"
+    },
+    "missingSlipIds": [
+      "java-2-w20-d1",
+      "java-2-w20-d2",
+      "java-2-w20-d3",
+      "java-2-w20-d4",
+      "java-2-w20-d5"
+    ],
+    "addedStarter": true,
+    "addedExample": true,
+    "relocated": [],
+    "pdf": "Java_Market_Analysis_and_System_Proposal_Module.pdf",
+    "notice": "This week remains a written proposal. No code steps, artificial output checks or automatic completion were added. Keep paper assessment and your own proposal separate from the module project."
+  },
+  "21": {
+    "original": "d303ece24d2d7ba998b9e7900108b9060dc687d0528149a16414b03feb1bb4aa",
+    "originalFile": "37c27d8dda35033e05fbf78b9ec18b96620c5d70389908d0d5e4b9abf110b12f",
+    "originalStepFiles": {
+      "java-2-w21-d3-s1": [
+        "RequestDemo_week20.txt",
+        "RequestDemo.java"
+      ]
+    },
+    "originalStarterCount": 23,
+    "originalStarterPaths": [
+      "BoardingTask.java",
+      "Bus.java",
+      "ConvoyLeg.java",
+      "DispatchThread.java",
+      "FareCheck.java",
+      "FareService.java",
+      "InvalidDistanceException.java",
+      "Jeepney.java",
+      "LayoutDemo.java",
+      "LoadingBay.java",
+      "Main.java",
+      "Main_week16.txt",
+      "Main_week17.txt",
+      "Main_week18.txt",
+      "OverloadException.java",
+      "ReadyReport.java",
+      "ReadyTask.java",
+      "RequestDemo.java",
+      "TerminalPanel.java",
+      "ThemeLayoutCheck.java",
+      "Tricycle.java",
+      "Vehicle.java",
+      "VehicleNotFoundException.java"
+    ],
+    "originalPersonalStarterPaths": null,
+    "assetHashes": {
+      "Main_week16.txt": "9932ef2b62a96cbe0ff6d54d78d0203a5315f30a81d8c448c93848246f949738",
+      "Main_week17.txt": "45f5066e7dd27e1cd6864bff110e250b23e28a0d337998a82a040c7d806d78cd",
+      "Main_week18.txt": "db3a51b4dc1f28f681854a1f5ba77634fffc5e0df2de4e4edbaf85150fa662ba",
+      "RequestDemo_week20.txt": "3e250220251adc41eb6e2aab0d22ed9b4039d9a2f6c2a18ba53d902edf08f98a"
+    },
+    "missingSlipIds": [
+      "java-2-w21-d1",
+      "java-2-w21-d2",
+      "java-2-w21-d4",
+      "java-2-w21-d5"
+    ],
+    "addedStarter": true,
+    "addedExample": true,
+    "relocated": [
+      {
+        "step": "java-2-w21-d3-s1",
+        "file": {
+          "path": "RequestDemo_week20.txt",
+          "content": "import java.awt.*;\nimport java.awt.event.*;\nimport javax.swing.*;\npublic class RequestDemo extends JPanel\n    implements ActionListener {\n  private JCheckBox guide = new JCheckBox(\n    \"Guide\");\n  private JCheckBox sheet = new JCheckBox(\n    \"Practice sheet\");\n  private JRadioButton desk = new JRadioButton(\n    \"Desk\", true);\n  private JRadioButton room = new JRadioButton(\n    \"Classroom\");\n  private JList<String> subject = new JList<>(\n    new String[]{\"Java\", \"English\", \"Math\"});\n  private String name = \"My request\";\n  private JTextArea result = new JTextArea(4, 24);\n  public RequestDemo() {\n    setLayout(new BorderLayout(8, 8));\n    setBorder(BorderFactory.createEmptyBorder(8, 8,\n      8, 8));\n    ButtonGroup collect = new ButtonGroup();\n    collect.add(desk); collect.add(room);\n    JPanel materials = new JPanel();\n    materials.add(guide); materials.add(sheet);\n    JPanel place = new JPanel();\n    place.add(new JLabel(\"Collect at:\"));\n    place.add(desk); place.add(room);\n    JPanel options = new JPanel(new GridLayout(2,\n      1));\n    options.add(materials); options.add(place);\n    subject.setSelectionMode(\n      ListSelectionModel.SINGLE_SELECTION);\n    subject.setVisibleRowCount(3);\n    JLabel label = new JLabel(\"Subject:\");\n    label.setLabelFor(subject);\n    JPanel choices = new JPanel(new BorderLayout(4,\n      4));\n    choices.add(label, BorderLayout.NORTH);\n    choices.add(new JScrollPane(subject),\n      BorderLayout.CENTER);\n    choices.add(options, BorderLayout.SOUTH);\n    result.setEditable(false);\n    result.setLineWrap(true);\n      result.setWrapStyleWord(true);\n    result.setText(\n      \"Choose materials, then Preview.\");\n    JPanel actions = new JPanel();\n    for (String text : new String[]{\"Preview\",\n      \"Clear\", \"Info\", \"Rename\"}) {\n      JButton button = new JButton(text);\n      button.setMnemonic(text.charAt(0));\n      button.addActionListener(this);\n      actions.add(button);\n    }\n    add(choices, BorderLayout.NORTH);\n    add(result, BorderLayout.CENTER);\n    add(actions, BorderLayout.SOUTH);\n  }\n  String summary() {\n    if (subject.getSelectedValue() == null) {\n      throw new IllegalArgumentException(\n        \"Choose a subject.\");\n    }\n    if (!guide.isSelected() && !sheet.isSelected(\n      )) {\n      throw new IllegalArgumentException(\n        \"Choose materials.\");\n    }\n    if (!desk.isSelected() && !room.isSelected())\n      {\n      throw new IllegalArgumentException(\n        \"Choose a place.\");\n    }\n    return subject.getSelectedValue() + \": Guide=\"\n      + guide.isSelected()\n      + \"; Sheet=\" + sheet.isSelected()\n      + \"; Place=\" + (desk.isSelected() ? \"Desk\" :\n        \"Classroom\");\n  }\n  void clearChoices() {\n    subject.clearSelection();\n    guide.setSelected(false); sheet.setSelected(\n      false);\n    desk.setSelected(true); result.setText(\n      \"Choices cleared.\");\n  }\n  void acceptName(String input) {\n    if (input == null) { return; }\n    String clean = input.trim();\n    if (clean.isEmpty() || clean.length() > 30) {\n      result.setText(\n        \"Use 1-30 characters for the name.\");\n      return;\n    }\n    name = clean; result.setText(\"Named: \" +\n      name);\n  }\n  void clearIfConfirmed(int answer) {\n    if (answer == JOptionPane.YES_OPTION) {\n      clearChoices();\n    } else if (answer == JOptionPane.NO_OPTION) {\n      result.setText(\"Kept choices (No).\");\n    } else if (answer ==\n      JOptionPane.CANCEL_OPTION) {\n      result.setText(\"Kept choices (Cancel).\");\n    } else {\n      result.setText(\"Kept choices (Closed).\");\n    }\n  }\n  @Override public void actionPerformed(\n    ActionEvent e) {\n    String command = e.getActionCommand();\n    if (\"Rename\".equals(command)) {\n      acceptName(JOptionPane.showInputDialog(this,\n        \"Request name (1-30 characters):\", name));\n      return;\n    }\n    if (\"Clear\".equals(command)) {\n      clearIfConfirmed(\n        JOptionPane.showConfirmDialog(this,\n        \"Clear subject and materials?\",\n        \"Confirm clear\",\n          JOptionPane.YES_NO_CANCEL_OPTION));\n      return;\n    }\n    try {\n      String text = name + \"\\n\" + summary();\n      if (\"Info\".equals(command)) {\n        JOptionPane.showMessageDialog(this, text,\n          \"Request information\",\n            JOptionPane.INFORMATION_MESSAGE);\n      } else {\n        result.setText(text);\n      }\n    } catch (IllegalArgumentException ex) {\n      result.setText(ex.getMessage());\n    }\n  }\n  public static void main(String[] args) {\n    if (GraphicsEnvironment.isHeadless()) {\n      System.out.println(\n        \"No display: GUI not opened.\");\n      return;\n    }\n    SwingUtilities.invokeLater(() -> {\n        JFrame f = new JFrame(\n          \"School materials request\");\n        f.setDefaultCloseOperation(\n          JFrame.DISPOSE_ON_CLOSE);\n        f.setContentPane(new RequestDemo());\n        f.setSize(640, 420);\n        f.setMinimumSize(new Dimension(520, 380));\n        f.setLocationRelativeTo(null);\n        f.setVisible(true);\n    });\n  }\n}\n"
+        }
+      }
+    ],
+    "pdf": "Java_Complete_GUI_Application_Module.pdf",
+    "notice": "Console checks exercise component state, layout or event behavior without opening a window. The message No display: GUI not opened. alone never completes an alteration. Check the actual interface on a school computer; browser GUI rendering and interaction remain unverified."
+  }
+}

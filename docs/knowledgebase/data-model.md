@@ -5,7 +5,7 @@ Source: `supabase/migrations/` (the code is authoritative). Every table has row-
 | Table | Holds | Links |
 | --- | --- | --- |
 | `profiles` | Name, email, role (`teacher`/`student`), password-reset flags, `photo_path` | 1:1 with Supabase `auth.users` (created by trigger `handle_new_user`) |
-| `classrooms` | Class name, subject, `join_code`, `live_share_project_id`, `current_activity_id`, `chat_muted`, `active_module_id` (text, the teacher's weekly module pick - matches `course_modules.module_id`, not a foreign key, for the same reason `module_progress.module_id` isn't one; added by `20261018000600_module_weekly_active_and_shared_project.sql`) | `teacher_id` -> profiles |
+| `classrooms` | Class name, subject, nullable `module_subject` (`java` or `net-mvc`, existing rows remain unassigned), `join_code`, `live_share_project_id`, `current_activity_id`, `chat_muted`, `active_module_id` (text, the teacher's weekly module pick - matches `course_modules.module_id`, not a foreign key, for the same reason `module_progress.module_id` isn't one; added by `20261018000600_module_weekly_active_and_shared_project.sql`) | `teacher_id` -> profiles |
 | `classroom_members` | Who joined which class | classroom <-> profile |
 | `teams` | A workspace: personal (`owner_id` set) or group (`owner_id` null); `slug` (`teacher-demo` = the teacher's lesson workspace, `student-<id>`, `group-...`); `leader_id`, `chat_muted`, `editing_locked` | `classroom_id` |
 | `team_members` | Who is in which team | team <-> profile |
@@ -24,3 +24,35 @@ Notes:
 - Since migration `20261016000200`, the `anon` and `authenticated` roles have no table privileges. Only the server (service role) reads and writes tables. Functions `can_join_realtime_topic` and `can_broadcast_realtime_topic` back the live-channel policies on `realtime.messages`.
 - A student's personal team can hold several personal projects ("My Practice Code" plus web projects). Activity projects have `activity_id` set.
 - Language values are free text on purpose so `csharp` and module languages need no schema change (see `../course-format.md`).
+
+Sample-first addition (2026-10-21): `module_progress.activity_projects` is an additive JSON object
+with optional `activeKey`, `drafts` (task completion key to that step's complete working file list),
+and `beforeSampleFiles` (the pre-update working copy). `project_files` remains the active rolling
+project so existing weekly carry-forward readers keep working. Saves update the active draft and
+working copy together under the existing `updated_at` comparison. `step_states` also accepts
+`sample:<activity.id>` for sample verification; only the existing task key completes an alteration.
+The column is introduced by `20261021000100_module_activity_projects.sql`; older readers ignore it.
+
+## Subject library addition (2026-10-22)
+
+Migration `20261022000100_subject_module_library.sql` adds nullable `classrooms.module_subject`
+without renaming existing subject labels. New classes require one subject; older classes choose
+once through the teacher-only route.
+
+`subject_modules` stores a single whole JSON module per `(teacher_id, subject, module_id)`, with
+its own id and timestamps. Teacher deletion cascades; deleting a class does not remove a library.
+The database restricts subjects/course families and enables row-level security, revoking direct
+anonymous/authenticated access. Only server-side service-role access is granted.
+
+Assigned classes resolve content through their owner and selected subject. Unassigned legacy
+classes read `course_modules` as before; its rows remain original-upload backups after assignment.
+Legacy availability changes remain in `course_modules`, separately per class. `module_progress`
+keys and all student file/completion/submission fields are unchanged.
+
+Personal submission extension (2026-10-23): existing `performance_task.project` may also contain
+`successfulRun`, a server-computed hash of the exact file paths/content. Personal save/run-start
+clears it; only an accepted successful run sets it. `own` retains files/status/submittedAt and adds
+`id`, frozen `checklist`, optional `legacyChecklist`, and `review: {checked, savedAt}`. Submission
+always snapshots the saved project after verifying its run evidence; a new id and omitted review
+reset only that module's review. Class/student/module scope and conditional merge writes remain.
+No new table, column, migration or renamed data. Existing sample snapshots remain stored.

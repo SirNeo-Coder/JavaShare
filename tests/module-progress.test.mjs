@@ -16,6 +16,19 @@ function localSupabase() {
 }
 const local = localSupabase();
 
+// Browser practice evidence is accepted online; these tests exercise storage, not Java itself.
+process.env.JAVA_RUNNER_URL = "https://java.example.test/";
+async function readyPersonal(call, cookie, classroomId, moduleId) {
+  const base = `/api/classrooms/${classroomId}/modules/${moduleId}/progress`;
+  const request = (suffix, body, method = "POST") => call(`${base}/${suffix}`, { method, headers: { cookie }, body: JSON.stringify(body) });
+  let view = await (await request("performance-project", {})).json();
+  const started = await request("personal-run", { updatedAt: view.updatedAt });
+  assert.equal(started.status, 200, await started.clone().text()); view = (await started.json()).progress;
+  const result = await request("personal-result", { updatedAt: view.updatedAt, success: true });
+  assert.equal(result.status, 200, await result.clone().text()); view = await result.json();
+  return { variant: "own", files: view.performanceProjectFiles, status: "pass", updatedAt: view.updatedAt };
+}
+
 test("module progress: step checklist, exit slip, and both performance-task versions (new feature, no prior CKB)", { skip: !local && "local Supabase is not running" }, async () => {
   Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", JWT_SECRET: "module-progress-test-secret" });
   const { handleApi } = await import("../backend/src/routes.ts");
@@ -77,14 +90,15 @@ test("module progress: step checklist, exit slip, and both performance-task vers
     assert.equal(afterSample.performanceTask.sample.status, "pass");
     assert.equal(afterSample.performanceTask.own, undefined);
 
-    const afterOwn = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ variant: "own", files: [{ path: "Main.java", content: "public class Main { public static void main(String[] a) {} }" }], status: "fail" }) })).json();
+    const personalBody = await readyPersonal(call, cookie, classroomId, moduleId);
+    const afterOwn = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify(personalBody) })).json();
     assert.equal(afterOwn.performanceTask.sample.status, "pass", "the sample-code submission must survive submitting the own-version one");
-    assert.equal(afterOwn.performanceTask.own.status, "fail");
+    assert.equal(afterOwn.performanceTask.own.status, "pass");
 
     const final = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
     assert.deepEqual(final.stepStates, { ...passedSteps, [exitSlipId]: "pass" });
     assert.equal(final.performanceTask.sample.status, "pass");
-    assert.equal(final.performanceTask.own.status, "fail");
+    assert.equal(final.performanceTask.own.status, "pass");
 
     // A teacher has no module progress of their own.
     const teacherLogin = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email: teacher.email, password }) });
@@ -220,16 +234,21 @@ test("module progress: two simultaneous performance-task submissions don't lose 
     // (e.g. two browser tabs, or a slow network making two "Run" clicks overlap). Both submissions
     // must be kept - a read-then-overwrite of the whole performance_task column can silently drop
     // whichever one loses the race.
-    const [sampleResponse, ownResponse] = await Promise.all([
+    const personalBody = await readyPersonal(call, cookie, classroomId, moduleId);
+    let [sampleResponse, ownResponse] = await Promise.all([
       call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ variant: "sample", files: task.exampleFiles, status: "pass" }) }),
-      call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ variant: "own", files: [{ path: "Main.java", content: "public class Main { public static void main(String[] a) {} }" }], status: "fail" }) }),
+      call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify(personalBody) }),
     ]);
     assert.equal(sampleResponse.status, 200);
-    assert.equal(ownResponse.status, 200);
+    if (ownResponse.status === 409) {
+      const current = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
+      ownResponse = await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress/performance-task`, { method: "PUT", headers: { cookie }, body: JSON.stringify({ ...personalBody, updatedAt: current.updatedAt }) });
+    }
+    assert.equal(ownResponse.status, 200, await ownResponse.clone().text());
 
     const final = await (await call(`/api/classrooms/${classroomId}/modules/${moduleId}/progress`, { headers: { cookie } })).json();
     assert.equal(final.performanceTask.sample?.status, "pass", "the sample submission must not be lost to the race");
-    assert.equal(final.performanceTask.own?.status, "fail", "the own-version submission must not be lost to the race");
+    assert.equal(final.performanceTask.own?.status, "pass", "the own-version submission must not be lost to the race");
   } finally {
     await admin.from("module_progress").delete().eq("student_id", student.user.id);
     await admin.from("classrooms").delete().eq("id", classroomId);

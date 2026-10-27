@@ -38,7 +38,7 @@ Nothing live is kept in server memory any more. File saves emit `file:updated`. 
 - `POST /api/classrooms/:id/modules/:moduleId/progress/activity` prepares the selected unlocked
   step's project. It combines supporting starter files, optional activity files and the student's
   optional preceding module project, keeping the current project's existing files.
-- `POST .../progress/run` validates Java source paths, membership, the existing weekly live lock,
+- `POST .../progress/run` validates Java source paths, membership, cross-module prerequisites and live-week access,
   the activity's existence and its part's prerequisites. It saves the project, runs it through
   the existing rate/concurrency-limited Java runner, and writes pass/fail from the actual result.
   Demo mode never passes. A previous pass survives later failed practice runs.
@@ -84,3 +84,85 @@ identity/class/Java step/part/live week and saved version, compares its own expe
 output and retains earlier passes. It uses `recordSupabaseModuleActivityResult`,
 also used by the laptop path. The teacher accepts browser result falsification for
 practice; this is not grading. No browser-supplied expected output/pass flag is used.
+
+## Explicit alteration tasks (2026-10-20)
+
+The existing activity/run/browser-result/project routes also serve tasks with `activity.id`.
+`activityTask` chooses server-owned task input/output; `activityStateId` uses `task:<id>` so
+sample and legacy challenge passes cannot count. `activityAccess.openStepIds` enforces
+individual prerequisites in opted-in modules; legacy modules retain part access. Student module
+responses redact future task instructions/files/output while keeping their identity for status.
+Current and previous project files still win over starter/sample/task templates. No migration,
+runner change, new route, settings or live event.
+
+Sample-first modules (`sampleFirst: true`, 2026-10-21) reuse the existing activity/run/browser-result
+routes. Preparation snapshots the active step, resumes a saved draft or loads the new sample,
+and preserves pre-update files. Project saves include `stepId` as well as `updatedAt`; both must
+identify the current draft. The server selects the sample or task check from saved progress,
+never a client pass flag or requested stage. Sample verification requires the unchanged supplied
+step files and its declared result. Expected runtime errors compare the exception type across
+laptop JVM / browser stack formats, separately from successful alteration execution. Result
+responses add `check`, `sampleMatched` and the latest `passed`; prior completion stays monotonic.
+History appears in progress responses only for opted-in modules, keeping old response shapes.
+
+## Cross-module prerequisites (2026-10-21)
+
+`module-prerequisites.ts` walks the declared predecessor chain and reuses `activityAccess` and
+current activity ids to find the oldest unfinished module. `loadStudentModuleAccess` reads only
+the same teacher/subject library as the catalog (or legacy class uploads before subject selection)
+and this student's class-scoped step states; it creates no progress rows.
+`enforceStudentModuleAccess` guards every content/progress/project/submission path, including
+activity preparation and both execution-result paths. Teacher previews bypass student gates.
+Live access includes the active module's ancestors. Invalid/missing chains block safely.
+
+Existing catalog replies may include `moduleAccess` (kind, message, and prerequisite moduleId/week).
+A blocked request returns HTTP 403 with the same metadata beside `error`; `ApiError` preserves
+it for the prominent banner and Continue action. Live-only cards remain disabled; prerequisite
+cards open their explanation. Existing routes, database identities and saved work are retained.
+
+## Subject module sharing (2026-10-22)
+
+- `POST /api/classes` now requires `subject: "Java" | "Net MVC"` and sets `module_subject`.
+- `GET /api/classrooms/:classroomId/module-sharing`: owner-only subject and saved-upload
+  summaries, including subject match, whether content is already shared, and shared timestamp.
+- `PATCH /api/classrooms/:classroomId/module-subject`: owner assigns `java` or `net-mvc` once.
+- `POST /api/classrooms/:classroomId/modules/:moduleId/share`: shares a saved class upload;
+  `expectedUpdatedAt` is required when explicitly replacing a shared version.
+- Existing module list/read/upload/delete routes resolve the selected teacher/subject library;
+  legacy unassigned classes keep their old read behavior. Dashboard and progress-summary reads
+  use the same resolver. Availability remains class-specific for older clients.
+- Source: `supabase-repository.ts` (`loadCourseModules`, `loadCourseModuleRow`,
+  `getSupabaseModuleSharing`, `setSupabaseModuleSubject`, `shareSupabaseModule`), `routes.ts`.
+
+## Completion-only module server groundwork (2026-10-22)
+
+Migration 20261022000200_module_access_summaries.sql adds service-role-only
+codeshare_module_summaries (metadata and current activity ids, no Java/output/text)
+and codeshare_complete_module_activity (atomic project/progress write guarded by
+source and project timestamps). Prerequisite, catalog and student summary reads
+use the former; enforcement no longer rereads the selected module.
+GET .../progress/activity?stepId= prepares working files without persisting code/history.
+POST .../progress/complete accepts exact files/output plus optional unchanged-sample
+evidence, source/project versions and an idempotency id. Server-owned checks reject
+non-completion, access violations and stale versions. Accepted ids live in existing
+activity_projects JSON; no table/column changes. Existing endpoints remain compatible.
+Successful completion replies also include the newly unlocked, access-filtered module
+content so the browser can refresh its device cache without an extra module request.
+GET progress supports includeModuleVersion=1 for device-cache validation; normal
+response shape is retained. Student content replies include moduleVersion.
+The browser switches to this path in the completion-only feature; offline/personal
+paths retain their existing endpoints. Teacher applies hosted SQL before rollout:
+[setup](../module-completion-setup.md). Hosted CPU recovery is not yet verified.
+
+Personal performance workflow (2026-10-23): `POST .../progress/personal-run` invalidates earlier
+run evidence and uses saved personal files; offline executes laptop Java, online returns the
+saved version for browser execution. `POST .../progress/personal-result` accepts browser success
+only in online browser mode and rejects stale versions. Existing `PUT .../performance-task`
+requires matching saved files and successful-run evidence for `own`; client pass flags alone fail.
+
+Teacher-only `GET /api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-submission`
+loads the frozen copy and preserves a legacy checklist on first review. `PUT` at the corresponding
+`personal-review` path checks submission identity and the complete checkbox array. Both enforce
+class ownership/current student membership. Teacher execution uses the existing ordinary runner;
+it has no student progress writes. `personal-performance.ts` holds the small shared paper-week and
+personal initialization rules. Shared subject content is read through the existing module loader.

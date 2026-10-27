@@ -1,4 +1,6 @@
-type ModuleCard = { title: string; week: number; course: string; isActive?: boolean; locked?: boolean };
+import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
+
+type ModuleCard = { title: string; week: number; course: string; isActive?: boolean; locked?: boolean; moduleAccess?: ModuleAccessBlock };
 
 // Saved progress and availability come from the existing module routes.
 export default function ModuleCatalogCard({ module, percent, role, onOpen }: {
@@ -11,12 +13,12 @@ export default function ModuleCatalogCard({ module, percent, role, onOpen }: {
         <span>{module.course.toUpperCase()}</span>
       </span>
       <strong>{module.title}</strong>
-      <span className="catalog-card-description">{module.locked ? "Available after the live class" : "Read the lesson and practise your code."}</span>
+      <span className="catalog-card-description">{module.moduleAccess?.message ?? (module.locked ? "Available after the live class" : "Read the lesson and practise your code.")}</span>
       {role === "student" && <>
         <span className="catalog-card-meter"><i style={{ width: `${percent}%` }} /></span>
         <span className="catalog-card-footer">
           <span>{percent}% complete</span>
-          <b>{module.locked ? "Locked" : percent === 100 ? "Review lesson →" : "Continue lesson →"}</b>
+          <b>{module.locked || module.moduleAccess ? "Locked" : percent === 100 ? "Review lesson →" : "Continue lesson →"}</b>
         </span>
       </>}
     </button>

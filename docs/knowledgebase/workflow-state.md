@@ -2,6 +2,34 @@
 
 What teachers and students can do today. Keep this page current when their use of CodeShare changes; no change-level classification is required.
 
+## Service error messages (2026-10-22)
+
+- If a request receives an HTML or empty error page, **Modules**, **Module worksheet**,
+  and other screens using the shared request helper show a readable CodeShare message
+  containing the failure status, for example **CodeShare could not complete the request
+  (503). Please try again.** Existing JSON explanations remain visible.
+- A protected request returning 401 still returns the classroom to **Sign in**, including
+  when its error body is HTML. Failed sign-in/registration does not trigger that recovery.
+- Error handling does not automatically retry saves or runs. A later deliberate retry
+  can succeed when service returns. This does not establish recovery from the reported
+  hosted save: its Worker log confirms CPU exhaustion at 10 ms (CKB-065).
+  A hosting-budget remedy or separately approved CPU investigation is still needed.
+
+## Java code suggestions (2026-10-21)
+
+- In the classroom **Code editor**, **Module project**, and **Personal project**, typing two Java
+  characters opens **Java code suggestions**. Examples: `Sys` offers `System` and
+  `System.out.println(…)`; `ma` offers a `main` statement. Suggestions include Java keywords,
+  common types and names in the current file, without Java type checking or AI generation.
+- Use ↑/↓ to choose, Enter to insert, Escape to close, or click/tap an item. Print statements
+  leave the caret inside their parentheses; `main` retains the current indentation.
+  Tab/Shift+Tab still indent, and Ctrl+Enter still runs code. Read-only views retain normal Tab navigation.
+- Comments and strings, selected text and composing text do not open suggestions. Moving the
+  caret, scrolling, leaving the editor, or receiving changed live code closes the list.
+- Suggestions use bundled code online and offline. Accepting one edits only the current file;
+  existing Save work, Run code, explicit submission, live sharing and module completion rules apply.
+  HTML, CSS, JavaScript and the teacher worksheet's plain sample textareas retain their existing behavior.
+
 ## Java run status (2026-10-21)
 
 - The regular **Code editor → Console** used by teachers and students also shows the same
@@ -37,7 +65,7 @@ What teachers and students can do today. Keep this page current when their use o
 - **Not now** (or Escape) dismisses the displayed sessions while this page remains open, including trips into the workspace and back. Joining dismisses that chosen session. A new activity, or a session stopped and restarted while the page can observe the stop, can invite again. Reloading the page or signing out resets dismissal.
 - Live status refreshes on announcements, connection/reconnection, and returning to the tab, without a repeating status timer. If live passes or the live connection fail, students see an error with **Reconnect** and can still enter a class manually. Listening outside a workspace does not mark students Online in every class.
 - Session identity reuses the current activity or presentation project id, without a new database column. If the same activity/presentation stops and restarts entirely while disconnected, a previously dismissed invitation may remain dismissed; a persisted session-start marker would be needed to distinguish that case.
-- Each class's roster, modules, progress, teams, activities, and live-share state stay separate. Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
+- Each class’s roster, student progress, teams, activities, and live-share state stay separate. Assigned classes share their teacher’s module content by subject (Java or Net MVC). Progress summaries are loaded when opening the class or a student's progress; they are not a live dashboard.
 
 ## Weekly Java projects (approved workflow change, 2026-10-20)
 
@@ -45,20 +73,21 @@ What teachers and students can do today. Keep this page current when their use o
   module in each class. Both use the main Java editor, supporting class tabs, Add file,
   **Save work** and **Run code**. The Projects drawer offers both for the selected module;
   the worksheet's **Work in code editor** and **Work on performance task** open the same projects.
-- Module progress checks the printed sample's `files`, `expectedOutput` and optional `stdin`.
-  Legacy `activity` JSON and challenge results stay stored, but no longer determine progression.
-  The sample step id is the completion key; old `:activity` passes do not unlock sample steps.
+- Legacy modules check the printed sample. Modules with explicit `activity.id` instead verify
+  the separate alteration target and store `task:<activity.id>` completion. Old sample passes
+  cannot complete new tasks. `sampleFirst` additionally verifies the unchanged sample before editing.
   Compilation and execution must succeed. Match spaces/blank lines exactly; normalize CRLF
   and allow one final newline (Java println). Failed exploratory runs retain earlier passes.
-- The first part opens automatically. Every required sample step in a part must pass to unlock
-  the next part for that student. Locked content and premature requests are refused server-side.
+- Explicit alteration tasks open one step at a time; legacy samples open one part at a time.
+  Locked content and premature requests are refused server-side. Reopening resumes unfinished work.
   Handwritten liplets are assessed separately and do not gate progress. Teacher availability
-  switches do not gate progress. The existing weekly live-class lock remains enforced.
+  switches do not gate progress. During live class, the weekly module and its prerequisite chain are available; unrelated modules remain locked.
 - `previousModuleId` links the preceding week. Module files copy only the previous module project;
   personal files copy only the previous personal working project (or its submitted own version
-  for older records). Supporting starter classes are added; existing student files win. Each
+  for older records). Supporting starter classes are added. Sample-first steps load their own supplied sources on
+  first opening and restore their draft on revisits; legacy projects retain existing-file precedence. Each
   copy is saved independently and never changes the preceding week. The teacher must supply
-  the stable link in weekly JSON; a missing link starts with the supplied starter files.
+  the stable link in weekly JSON. No declared link starts with the supplied starter files; a declared link to a missing upload blocks access with a teacher-upload message.
 - The personal task opens after the module steps pass, as before. **Run code** accepts personal
   program input and does not check a module target. **Submit this version** saves a separate
   own-version snapshot. Later draft edits do not change that submission. Existing sample and
@@ -66,7 +95,7 @@ What teachers and students can do today. Keep this page current when their use o
 - Opening another project/module/class or signing out saves the active project first; save
   failures stop the transition. New saves/submissions reject stale tabs. Reload before saving
   can still lose unsaved edits. The personal draft is `performance_task.project.files`, separate
-  from `performance_task.sample` and `.own`; drafts never count as submissions. No migration.
+  from `performance_task.sample` and `.own`; drafts never count as submissions. Sample-first history uses the additive migration described below.
 - Offline Java compiles all project files on the laptop, including Java packages with Main.java.
   Online execution uses Java 8/CheerpJ on a separate public runner origin after the teacher's setup. Students keep Run code; first run needs internet and displays CheerpJ attribution. Browser-reported results are practice evidence, not grades. Server access, exact expected output and saved-version checks remain authoritative. No new migration.
 
@@ -116,7 +145,7 @@ What teachers and students can do today. Keep this page current when their use o
 - The classroom uses the Figma reference's dark editor and Console with a yellow **Run code**
   button. File editing, program input, saved work, submissions and teacher live share keep their
   existing handlers and permissions.
-- **Module** on the left edge or **Modules** in the top bar opens the module browser. The weekly
+- One fixed **Module** tab on the left edge opens the module browser before selection, then reopens the selected worksheet. **Modules** in the student top bar always opens the browser. The weekly
   pick appears first when one exists; cards show the student's saved percentage and server's live
   lock. Selecting a module opens a separate wide worksheet drawer; **Performance task** has its own page.
   Later parts remain locked until their required activities are passed. Navigation keeps editors mounted, so switching
@@ -129,7 +158,7 @@ What teachers and students can do today. Keep this page current when their use o
   during an individual activity, group chat in a group activity. Existing messages, live delivery,
   teacher mute and group-leader permissions are reused. Both Enter and **Send message** submit
   through the same existing handler. The Console remains available independently.
-- Drawer **×** or Escape from within the drawer closes it and restores the previous focus. At
+- Hovering **Module**, **Projects / Students / projects**, or **Chat** slides its panel open without taking editor focus. Leaving keeps it open. Clicking outside slides it closed, including a pinned panel. The first click on a hover-opened tab keeps it open; the next toggles it closed. Touch and keyboard activation also toggle. Drawer **×** or Escape from within the drawer closes it and restores focus. At
   wide desktop widths (1400 pixels and above), **Pin** reserves workspace space for a drawer;
   narrower screens use overlays. The chat conversation area stays light in both saved themes,
   matching the Figma reference, with a navy heading.
@@ -148,14 +177,15 @@ What teachers and students can do today. Keep this page current when their use o
   tables/notes in reading order, with the liplet at the end. **Previous page / Next page** walk through the
   digital pages; their page count is separate from physical printed PDF pages. **Work in code editor** opens the activity in the main saved module project. Page switches and drawer closing keep
   drafts mounted. Reloading, changing module or leaving the classroom still does not save a draft.
-- After selecting a module, its additional **Module** ear previews the worksheet on mouse hover.
-  Moving into the worksheet keeps the preview open; leaving closes it unless pinned. Clicking or
-  keyboard-activating the ear keeps it open. **Pin** keeps it visible; at wide desktop widths it
-  also reserves space. **× / Escape** closes it, with keyboard focus returned to its ear.
+- After selecting a module, the same fixed **Module** tab reopens its worksheet; there is no
+  additional tab that can cover **Projects**. Hover opens it, leaving keeps it open, and outside
+  click or **× / Escape** closes it. **Pin** reserves space at wide desktop widths. The tabs
+  remain reachable while a worksheet is open, including smaller screens.
 - **All modules** returns to the existing browser. Selecting a card again reloads its current
-  content and teacher availability; merely closing/reopening the ear preserves the current visit. Projects temporarily covers the worksheet and hides its ear without dropping the selected
-  page or draft; closing Projects restores that visit. The classroom top bar and existing chat
-  system are retained. Class-home upload, availability, progress and submission
+  content and teacher availability; closing/reopening the tab preserves the current visit.
+  Opening **Projects** closes the worksheet while keeping its selected page and draft; reopening
+  **Module** returns to that visit. Closing Projects does not automatically reopen the worksheet.
+  The classroom top bar and existing chat system are retained. Class-home upload, availability, progress and submission
   routes retain their existing storage and permissions. No new route, dependency or migration.
 
 ## Teacher class dashboard (approved workflow change, 2026-10-20)
@@ -200,3 +230,180 @@ What teachers and students can do today. Keep this page current when their use o
   expected-output checks. Personal Run is separate from Submit this version.
 - Offline still runs laptop javac with input supplied before Run. No new route, migration,
   dependency, hosted secret or hosted setting is needed.
+
+## Sample verification before alterations (approved 2026-10-21)
+
+- Revised Week 14 opts into `sampleFirst: true`. **Work in code editor** loads the current step's
+  sample on first opening. Supporting classes roll forward; each step's saved working files are
+  kept independently. Reopening resumes those edits. Work present before the update remains
+  readable under **Work saved before sample loading**. The previous week and personal drafts and
+  submissions are never changed by module sample loading.
+- The sample editor stays read-only until the student presses **Run code** and verifies the
+  unchanged supplied sources and sample result. **Sample verified — now complete Your task.**
+  saves verification without completing the task, advancing its percentage, or opening the next step.
+  A sample with an explicit `expectedError` verifies the declared exception and shows
+  **Expected error observed**; it cannot earn task completion.
+- The same editor then opens for the small alteration and shows **Expected task output**.
+  A matching successful task run saves **Completed** immediately and unlocks the next activity.
+  The prominent banner sits above **Actual output**, outside the scrolling instructions.
+  Other banners distinguish unchanged sample output and a mismatch. A failed later run reports
+  its failure while explicitly retaining earlier saved completion. Reopening shows saved completion.
+- An additive `module_progress.activity_projects` column stores module-only working drafts;
+  sample evidence uses separate `sample:<activity.id>` keys. Existing completion keys stay intact
+  and already completed tasks are not forced to repeat a sample or given invented sample passes.
+  Older JSON without `sampleFirst` keeps its existing checks. Old cached clients attempting to
+  save a new-flow project without its step identity are refused, rather than overwriting another step.
+- Apply the new migration before deploying this app and re-uploading the revised Week 14 JSON.
+  See `docs/module-sample-first-setup.md`. No assistant hosted migration or deployment is performed.
+
+## Weeks 12 and 13 JSON (approved 2026-10-21)
+
+- New Week 12 OOP and Week 13 exception-handling JSON use sample verification followed by small
+  alterations with separate expected outputs. Upload Week 12, then 13, then 14 in the same class;
+  stable predecessor ids connect their module projects. Week 13 finishes with the exact supporting
+  classes Week 14 expects. No app or migration change is needed beyond the sample-first setup.
+- Week 12 preserves the printed three-session catch-up order, grouped by the four pillars plus
+  synthesis. Week 13 follows its five-day plan. Complete per-step sources run in the main editor;
+  deliberately uncompilable/crashing demonstrations remain reading examples. Liplets stay separate.
+- Week 13's disk example is reading material. Its runnable checked-exception practice uses an
+  approved in-memory driver list and `Exception`, since the runner blocks `java.io` imports.
+  This does not enable disk access or verify file-handling skills.
+- The personal performance project retains the student's own theme and track. Neither new module
+  inserts Vehicle starter classes into it. Original PDF/DOCX documents and the generation prompt
+  remain unchanged. Source mapping and evidence: `docs/modules/week12/README.md`,
+  `docs/modules/week13/README.md`, `docs/verification/week12-week13-modules.md`.
+
+## Resuming and lesson logic (2026-10-21)
+
+- Student module worksheets and the Module project button use saved completion to reopen the next
+  unfinished step. Sample verification or a failed run keeps that step unfinished. Reload and
+  another browser use the same server progress. Once all steps pass, the worksheet opens the
+  performance task; completed modules without one open their final page. Teachers start at Overview.
+- Weeks 12 and 13 include object state, inherited behavior, reversed object reports, polymorphic
+  array swaps and exception-path tasks, each with complete changed output. Renaming output alone
+  is insufficient. Revised requirements have `-v2` ids; old records stay saved and cannot skip them.
+- First opening loads that step's complete sample; revisiting restores its saved draft. Module
+  sources, personal sources, earlier weeks and submissions remain separate. The sample history
+  migration and revised JSON must accompany the app rollout; hosted steps remain teacher actions.
+
+## Rolling module prerequisites (2026-10-21)
+
+- **Modules** shows why a later week is locked. Selecting it displays **Complete Week 12 before
+  starting Week 14**, for example, and **Continue Week 12** opens that student's next unfinished
+  step using saved progress. The rule follows declared links, not week numbers or upload order.
+- All required module activities in every preceding module must pass. Current alteration ids
+  count; sample verification, failed runs and old task identities cannot bypass new tasks.
+  Personal performance-task submissions and handwritten liplets remain separate. Existing
+  progress percentages still include submissions, so prerequisite readiness does not mean 100%.
+- Week 12 completion unlocks Week 13; Week 13 completion then unlocks Week 14. Existing later
+  work stays saved but cannot be reopened until prerequisites are satisfied. Missing linked
+  modules ask for a teacher upload; circular links ask for corrected module files.
+- Live class permits earlier modules in the weekly module's prerequisite chain. Teacher previews
+  stay available. The server applies the same restriction to direct module/project requests,
+  saves, runs, browser results and submissions in online and offline modes. No migration.
+
+## Week 15 to 21 curriculum review copies 2026-10-22
+
+The teacher approved additive task material while preserving the original lessons and samples.
+[Review files](../modules/week15-week21.md) contain 33 explicit alteration tasks, complete targets,
+sample-first settings, weekly links, corrected upload fields and matching PDF/Word appendices.
+Week 20 remains a written proposal. No app workflow or runner was changed. These are review
+copies: classroom disk support is still absent, original thread samples retain timing assumptions,
+and visible/browser GUI interaction remains unverified. Do not treat upload acceptance as rollout
+approval. Module and personal projects, paper assessment and submitted snapshots stay separate.
+
+## Subject-specific shared module sets (approved 2026-10-22)
+
+- **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one
+  teacher-owned module set. New classes immediately see that teacher’s existing subject modules.
+- **Curriculum → Add module** uploads once for every class in that subject. Re-uploading the same
+  module id updates their common content. Java accepts `java-1`/`java-2`; Net MVC accepts
+  `dotnet-1`/`dotnet-2`. Other teachers have independent libraries.
+- An older class retains its old content until its teacher uses **Choose this class’s subject**.
+  Choosing a subject is permanent through the app, clears only that class’s weekly pick, and
+  switches its module list to the shared subject set. Existing uploads remain in the database.
+- **Saved uploads from this class → Share across Java classes / Share across Net MVC classes**
+  adds an original upload to the common set. **Replace shared version** confirms the all-class
+  effect and refuses a stale confirmation if another update arrived. Other-subject backups
+  remain saved but cannot be shared into this class’s subject.
+- **Delete module** confirms all classes in that subject lose access; their affected weekly picks
+  are cleared. Student saved code, progress and submission snapshots remain stored.
+- Every student project, completion, availability switch and live-week selection stays scoped to
+  its original class. Shared content is used consistently by catalogs, previews, activity checks,
+  student summaries, carry-forward projects and the teacher dashboard.
+- Local/offline and hosted databases have independent libraries. Sharing does not transfer files
+  between them. Offline continues using laptop Java; no new remote assets or runner changes.
+- Setup and rollback limits: [subject-module-sharing-setup.md](../subject-module-sharing-setup.md).
+
+Earlier-week requirements use the shared subject set too. Upload each linked week once; a student
+still completes its tasks separately in each class, including after a shared correction.
+
+Curriculum reference correction (CKB-063, approved 2026-10-22): Weeks 18–21 now reference the
+actual preceding ids with their `-module` suffix. Week 12–21 links are checked against the real
+files. Re-upload the four corrected JSON files through **Java class → Curriculum → Add module**
+with the existing module/activity ids; all Java classes share the corrected content, while their
+student files, completions and submissions remain separate and unchanged. Refresh/reopen Modules
+after saving current edits. Full-chain prerequisites still apply, so unfinished earlier tasks
+continue to block later work. Week 20 remains written work. No migration or prerequisite-rule
+change. [Re-upload steps and limits](../curriculum-prerequisite-reupload.md). The teacher reports
+uploading the four corrections with no apparent problem (2026-10-22). Independent hosted/student
+recovery remains unverified.
+
+## Course modules ordering (approved 2026-10-22)
+
+- The classroom **Course modules** drawer shows unfinished modules in increasing week order
+  (Week 12 through Week 21 for the current set), then completed modules in increasing week order.
+- Saved 100% completion moves a module below every unfinished module. After Week 12 completes,
+  Week 13 becomes the first card. Opening the drawer or refreshing progress updates the order.
+- The weekly pick keeps its badge but does not override week/completion order. Teacher drawer
+  browsing has no student progress and follows increasing week order. Curriculum stays as before.
+- Sorting changes only the display; module locks, saved files, task checks and submissions use
+  their existing rules. The same display rule applies online and offline. See CKB-066.
+
+## Module work saved on completion (approved 2026-10-22)
+
+- Recovery fixes (2026-10-23): verified expected-error samples remain verified after reopening,
+  so unfinished alterations remain editable. After a lesson/task changes, or when opening an
+  older unversioned device draft, load the current sample and preserve earlier code under
+  **Work saved before lesson changes**. Verify the current sample, then copy any earlier edits
+  still needed. Existing backups remain readable after subsequent corrections.
+- A locally passing task shows **Passed locally — awaiting sync** until CodeShare accepts it.
+  Failed sync and reload retain that status and queued evidence. Only acceptance announces
+  **Completed — next activity unlocked**. Server checks and personal submissions stay separate.
+
+- Student **Module** content is cached on that device for five minutes. The cache is scoped to
+  student, class and module. Each module activity's working code and sample verification stay in
+  that device's IndexedDB; **Save work** saves locally.
+- Online Java runs in the browser. A failed run stays on the device and does not replace the last
+  completed module project. A successful task sends one guarded completion checkpoint containing
+  the code, run result and any required unchanged-sample evidence. A delayed checkpoint retries
+  with the same id so it cannot duplicate completion. Newly unlocked content arrives in that same
+  response and refreshes the device cache.
+- Offline classroom runs continue through laptop Java and save successful code/completion to local
+  Supabase. Personal performance-task projects keep their separate save and submit behavior.
+- Clearing browser storage removes unfinished device drafts. The server keeps successful module
+  completions and their saved project files. Local browser/device behavior is verified; hosted
+  Cloudflare CPU recovery remains unverified. See CKB-065 and the completion-only verification.
+
+## Personal performance-task submission and teacher review (2026-10-23)
+
+Projects now exposes Personal performance-task project and Choose module before a Java activity
+has been opened. Work on performance task and the Projects button reopen the same personal draft.
+New drafts use personal starters or the preceding submitted personal project, falling back to its
+draft. Existing current work is returned unchanged; lesson starter files are never imported.
+The Java 2 Week 20 proposal stays on paper, and later personal work carries across that paper week.
+
+Run code saves personal files and records actual successful execution against those files.
+Submit this version stays disabled until that succeeds; file changes or unsuccessful runs require
+another run. Online uses the approved browser result, offline uses laptop Java. Personal output
+has no expected-output comparison. Saving/running alone earns no progress. Explicit submission
+freezes the current files, earns the single personal-task credit, and shows Submitted. Earlier
+sample copies remain readable but are not a second required performance submission.
+
+Teacher dashboard → Students → student → module → Review personal submission opens frozen files
+read-only in the main editor. Run code, Console, Program input and Stop retain their normal mode
+behavior and never update student progress. Projects shows every saved checklist item and Save
+review. Resubmission replaces only that module's submitted copy and clears the previous review;
+a stale review cannot attach to the replacement. Checklist review is separate from progress/grades.
+Legacy submissions preserve their files and label checklists captured from current content at
+first review. Module completion-only saves, device recovery, prerequisites and live locks remain.

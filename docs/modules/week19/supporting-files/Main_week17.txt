@@ -1,0 +1,40 @@
+import java.awt.GraphicsEnvironment;
+import java.awt.event.*;
+import javax.swing.*;
+public class Main {
+  public static void main(String[] args) {
+    if (GraphicsEnvironment.isHeadless()) {
+      System.out.println(
+        "No display: GUI not opened.");
+      return;
+    }
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        JFrame frame =
+          new JFrame("Vehicle Terminal");
+        frame.setDefaultCloseOperation(
+          JFrame.EXIT_ON_CLOSE);
+        TerminalPanel panel = new TerminalPanel();
+        JLabel status = new JLabel("Not checked");
+        JButton check =
+          new JButton("Check ready");
+        check.addActionListener(
+          new ActionListener() {
+          public void actionPerformed(
+            ActionEvent e) {
+            check.setEnabled(false);
+            status.setText("Checking...");
+            new Thread(
+              new ReadyTask(status, check),
+              "Readiness").start();
+          }
+        });
+        panel.add(check); panel.add(status);
+        frame.setContentPane(panel);
+        frame.setSize(720, 220);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+      }
+    });
+  }
+}

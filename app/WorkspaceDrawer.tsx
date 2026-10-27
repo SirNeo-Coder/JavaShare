@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import useOutsideDismiss from "./useOutsideDismiss";
 
-export default function WorkspaceDrawer({ id, title, side, open, onClose, children, className = "", autoFocus = true, onPinnedChange }: {
-  id: string; title: string; side: "left" | "right"; open: boolean; onClose: () => void; children: ReactNode; className?: string; autoFocus?: boolean; onPinnedChange?: (pinned: boolean) => void;
+export default function WorkspaceDrawer({ id, title, side, open, onClose, children, className = "", autoFocus = true }: {
+  id: string; title: string; side: "left" | "right"; open: boolean; onClose: () => void; children: ReactNode; className?: string; autoFocus?: boolean;
 }) {
   const [pinned, setPinned] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
+  useOutsideDismiss(id, open, onClose);
 
   useEffect(() => {
     if (!open || !autoFocus) return;
@@ -24,7 +26,7 @@ export default function WorkspaceDrawer({ id, title, side, open, onClose, childr
       <header className="drawer-heading">
         <span className="drawer-symbol" aria-hidden="true">{side === "left" ? "▤" : "☏"}</span>
         <div><b>{title}</b><small>{side === "left" ? "Read, practise, and keep learning" : "Your classroom conversations"}</small></div>
-        <button type="button" className="drawer-pin" aria-pressed={pinned} onClick={() => { setPinned(!pinned); onPinnedChange?.(!pinned); }}>{pinned ? "Unpin" : "Pin"}</button>
+        <button type="button" className="drawer-pin" aria-pressed={pinned} onClick={() => setPinned(!pinned)}>{pinned ? "Unpin" : "Pin"}</button>
         <button ref={closeRef} type="button" onClick={onClose} aria-label={`Close ${title.toLowerCase()}`}>×</button>
       </header>
       <div className="drawer-body">{children}</div>

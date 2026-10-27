@@ -1,6 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type UIEvent } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type UIEvent } from "react";
+import { insertJavaSuggestion, javaSuggestions } from "./javaSuggestions";
 
 const TAB = "    ";
 const JAVA_TOKEN = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|@[A-Za-z_$][\w$]*|\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|true|false|null)\b|\b(?:String|System|Object|Integer|Double|Float|Long|Boolean|Character|Math|Override|ArrayList|List|Map|Set|View|TextView|Activity|ViewGroup|ArrayAdapter)\b|\b\d+(?:\.\d+)?(?:[fFdDlL])?\b)/g;
@@ -122,6 +123,11 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
   const localChangeRef = useRef(false);
   const selectionRef = useRef({ start: 0, end: 0 });
   const [cursor, setCursor] = useState(0);
+  const suggestionId = useId();
+  const [completion, setCompletion] = useState<{ value: string; cursor: number; index: number } | null>(null);
+  const suggestions = useMemo(() => !readOnly && language === "java" && completion?.value === value
+    ? javaSuggestions(value, completion.cursor) : null, [readOnly, language, completion, value]);
+  const selected = suggestions ? Math.min(completion?.index ?? 0, suggestions.items.length - 1) : 0;
   const lineCount = Math.max(1, value.split("\n").length);
   const analysis = useMemo(() => analyze(value, language), [value, language]);
   const matched = useMemo(() => {
@@ -139,7 +145,11 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
     const previous = previousValueRef.current;
     previousValueRef.current = value;
     if (previous === value) return;
-    if (localChangeRef.current) { localChangeRef.current = false; return; }
+    if (localChangeRef.current) {
+      localChangeRef.current = false;
+      textareaRef.current?.setSelectionRange(selectionRef.current.start, selectionRef.current.end);
+      return;
+    }
     let prefix = 0;
     while (prefix < previous.length && prefix < value.length && previous[prefix] === value[prefix]) prefix += 1;
     let suffix = 0;
@@ -154,6 +164,7 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
   }, [value]);
 
   function syncScroll(event: UIEvent<HTMLTextAreaElement>) {
+    setCompletion(null);
     if (highlightRef.current) {
       highlightRef.current.scrollTop = event.currentTarget.scrollTop;
       highlightRef.current.scrollLeft = event.currentTarget.scrollLeft;
@@ -167,6 +178,36 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
       cursorsRef.current.scrollTop = event.currentTarget.scrollTop;
       cursorsRef.current.scrollLeft = event.currentTarget.scrollLeft;
     }
+  }
+
+  function acceptSuggestion(index: number) {
+    if (!suggestions || readOnly) return;
+    const next = insertJavaSuggestion(value, suggestions.from, suggestions.to, suggestions.items[index]);
+    setCompletion(null);
+    localChangeRef.current = next.value !== value;
+    selectionRef.current = { start: next.cursor, end: next.cursor };
+    setCursor(next.cursor);
+    onChange(next.value);
+    onCursorChange?.(next.cursor);
+    textareaRef.current?.setSelectionRange(next.cursor, next.cursor);
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (readOnly || event.nativeEvent.isComposing || event.keyCode === 229) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) { setCompletion(null); return; }
+    if (suggestions) {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        const index = (selected + (event.key === "ArrowDown" ? 1 : -1) + suggestions.items.length) % suggestions.items.length;
+        setCompletion((current) => current && { ...current, index });
+        requestAnimationFrame(() => document.getElementById(`${suggestionId}-${index}`)?.scrollIntoView({ block: "nearest" }));
+        return;
+      }
+      if (event.key === "Enter") { event.preventDefault(); acceptSuggestion(selected); return; }
+      if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); setCompletion(null); return; }
+    }
+    if (event.key === "Tab") setCompletion(null);
+    handleTab(event);
   }
 
   function handleTab(event: KeyboardEvent<HTMLTextAreaElement>) {
@@ -208,10 +249,10 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
         nextEnd = end + TAB.length * affectedLines;
       }
     }
-    localChangeRef.current = true;
+    localChangeRef.current = next !== value;
     selectionRef.current = { start: nextStart, end: nextEnd };
     onChange(next);
-    requestAnimationFrame(() => textareaRef.current?.setSelectionRange(nextStart, nextEnd));
+    textareaRef.current?.setSelectionRange(nextStart, nextEnd);
   }
 
   return <div className="code-editor">
@@ -228,12 +269,18 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
         onChange={(event) => {
           localChangeRef.current = true;
           selectionRef.current = { start: event.currentTarget.selectionStart, end: event.currentTarget.selectionEnd };
+          setCursor(event.currentTarget.selectionStart);
+          setCompletion(!(event.nativeEvent as InputEvent).isComposing && event.currentTarget.selectionStart === event.currentTarget.selectionEnd
+            ? { value: event.target.value, cursor: event.currentTarget.selectionStart, index: 0 } : null);
           onChange(event.target.value);
         }}
-        onKeyDown={handleTab}
+        onKeyDown={handleKeyDown}
+        onBlur={() => setCompletion(null)}
+        onCompositionStart={() => setCompletion(null)}
         onScroll={syncScroll}
         onSelect={(event) => {
           selectionRef.current = { start: event.currentTarget.selectionStart, end: event.currentTarget.selectionEnd };
+          if (event.currentTarget.selectionStart !== completion?.cursor || event.currentTarget.selectionEnd !== completion?.cursor) setCompletion(null);
           setCursor(event.currentTarget.selectionStart);
           onCursorChange?.(event.currentTarget.selectionStart);
         }}
@@ -245,7 +292,18 @@ export default function CodeEditor({ value, onChange, onCursorChange, remoteCurs
         data-gramm_editor="false"
         data-enable-grammarly="false"
         aria-label={`${languageLabel(language)} source code editor`}
+        aria-autocomplete={language === "java" && !readOnly ? "list" : undefined}
+        aria-controls={suggestions ? suggestionId : undefined}
+        aria-activedescendant={suggestions ? `${suggestionId}-${selected}` : undefined}
+        aria-describedby={suggestions ? `${suggestionId}-help` : undefined}
       />
+      {suggestions && <div className="code-suggestions">
+        <div id={`${suggestionId}-help`} className="code-suggestions-help">Java suggestions · ↑↓ choose · Enter insert · Esc close</div>
+        <div id={suggestionId} role="listbox" aria-label="Java code suggestions">
+          {suggestions.items.map((item, index) => <button key={item.label} id={`${suggestionId}-${index}`} type="button" role="option" aria-selected={index === selected} tabIndex={-1}
+            onPointerDown={(event) => event.preventDefault()} onClick={() => acceptSuggestion(index)}>{item.label}</button>)}
+        </div>
+      </div>}
       {analysis.diagnostics.length > 0 && <div className="code-diagnostics" role="status" title={analysis.diagnostics.map((item) => `Line ${item.line}: ${item.message}`).join("\n")}><b>{analysis.diagnostics.length}</b> {analysis.diagnostics[0].message} <span>Line {analysis.diagnostics[0].line}</span></div>}
     </div>
   </div>;

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import { api } from "./apiClient";
 import ModuleViewer from "./ModuleViewer";
+import ModuleSharing from "./ModuleSharing";
 import TeacherWebProjects from "./TeacherWebProjects";
 import type { LiveClassroom } from "./liveClasses";
 import type { getSupabaseTeacherClassProgress } from "../backend/src/supabase-repository";
@@ -31,17 +32,17 @@ function Meter({ percent, label = "Progress" }: { percent: number; label?: strin
   return <div className="teacher-meter"><div><span>{label}</span><b>{percent}%</b></div><progress aria-label={label} value={percent} max={100} /></div>;
 }
 
-function DeleteModuleDialog({ title, busy, error, dialogRef, onCancel, onDelete }: { title: string; busy: boolean; error: string; dialogRef: RefObject<HTMLDialogElement | null>; onCancel: () => void; onDelete: () => void }) {
+function DeleteModuleDialog({ title, subject, busy, error, dialogRef, onCancel, onDelete }: { subject: "java" | "net-mvc" | null; title: string; busy: boolean; error: string; dialogRef: RefObject<HTMLDialogElement | null>; onCancel: () => void; onDelete: () => void }) {
   useEffect(() => { dialogRef.current?.showModal(); }, [dialogRef]);
   return <dialog className="teacher-delete-dialog" ref={dialogRef} aria-labelledby="teacher-delete-title" onCancel={(event) => { event.preventDefault(); if (!busy) onCancel(); }}>
-    <h2 id="teacher-delete-title">Delete {title}?</h2><p>This removes the uploaded module from this class. Students will no longer be able to open it.</p>
+    <h2 id="teacher-delete-title">Delete {title}?</h2><p>This removes the module from {subject ? `all your ${subject === "java" ? "Java" : "Net MVC"} classes` : "this class"}. Students will no longer be able to open it. Saved student work and submissions are kept.</p>
     {error && <p role="alert">{error}</p>}
     <div><button onClick={onCancel} disabled={busy} autoFocus>Cancel</button><button className="teacher-danger" onClick={onDelete} disabled={busy}>{busy ? "Deleting…" : "Delete module"}</button></div>
   </dialog>;
 }
 
-export default function TeacherClassDashboard({ classroom, name, onClasses, onEnter, onLogout }: {
-  classroom: LiveClassroom; name: string; onClasses: () => void; onEnter: () => void; onLogout: () => void;
+export default function TeacherClassDashboard({ classroom, name, onClasses, onEnter, onLogout, onReviewPersonal }: {
+  classroom: LiveClassroom; name: string; onClasses: () => void; onEnter: () => void; onLogout: () => void; onReviewPersonal?: (studentId: string, studentName: string, moduleId: string) => Promise<void>;
 }) {
   const [section, setSection] = useState<Section>("Overview");
   const [data, setData] = useState<ClassProgress | null>(null);
@@ -56,6 +57,7 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
   const [webStudent, setWebStudent] = useState<Student | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [sharingSubject, setSharingSubject] = useState<"java" | "net-mvc" | null | undefined>(undefined);
   const uploadInput = useRef<HTMLInputElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const deleteTrigger = useRef<HTMLButtonElement | null>(null);
@@ -123,7 +125,13 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
           <h3>{module.title}</h3><p className="teacher-course-name">{module.course.replaceAll("-", " ")}</p>
           <div className="teacher-module-facts"><span><b>{module.lessons}</b>Lessons</span><span><b>{module.steps}</b>Practice steps</span><span><b>{forStudent ? forStudent.modules.find((item) => item.moduleId === module.moduleId)?.submissions ?? 0 : module.submissions}</b>Task submissions</span></div>
           <Meter percent={percent} label={forStudent ? "Saved completion" : "Average student completion"} />
-          {!forStudent && <><p className="teacher-card-caption"><b>{module.completedStudents}/{totals?.students ?? 0}</b> students finished</p><button className="teacher-card-action" onClick={() => { setPreviewId(module.moduleId); heading.current?.focus(); }}>View module details <span aria-hidden="true">›</span></button><button className="teacher-delete-link" onClick={(event) => { deleteTrigger.current = event.currentTarget; setError(""); setDeleteId(module.moduleId); }} disabled={busy}>Delete module</button></>}
+          {forStudent && forStudent.modules.find((item) => item.moduleId === module.moduleId)?.personalSubmitted && <button className="teacher-card-action" disabled={busy} onClick={async () => {
+            setBusy(true); setError("");
+            try { await onReviewPersonal?.(forStudent.id, forStudent.name, module.moduleId); }
+            catch (error) { setError(error instanceof Error ? error.message : "Could not open personal submission"); }
+            finally { setBusy(false); }
+          }}>Review personal submission</button>}
+          {!forStudent && <><p className="teacher-card-caption"><b>{module.completedStudents}/{totals?.students ?? 0}</b> students finished</p><button className="teacher-card-action" onClick={() => { setPreviewId(module.moduleId); heading.current?.focus(); }}>View module details <span aria-hidden="true">›</span></button><button className="teacher-delete-link" onClick={(event) => { deleteTrigger.current = event.currentTarget; setError(""); setDeleteId(module.moduleId); }} disabled={busy || sharingSubject === undefined}>Delete module</button></>}
         </div>
       </article>;
     })}
@@ -141,7 +149,8 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
     <div className="teacher-main">
       <header className="teacher-dashboard-bar"><span>{classroom.name}{(classroom.hasActivity || classroom.hasLiveShare) && <b className="teacher-status finished">Live now</b>}</span><div><button onClick={refresh} disabled={loading}>{loading ? "Refreshing…" : "Refresh"}</button><button onClick={onEnter}>Enter classroom <span aria-hidden="true">↗</span></button></div></header>
       <section className="teacher-page" aria-busy={loading}>
-        <div className="teacher-page-heading"><div><span className="teacher-eyebrow">{classroom.subject || "YOUR CLASS"} · {section === "Curriculum" ? `${totals?.modules ?? 0} MODULES` : "SAVED MODULE PROGRESS"}</span><h1 ref={heading} tabIndex={-1}>{title}</h1><p>{selectedStudent ? selectedStudent.email : section === "Curriculum" ? "Manage weekly modules and monitor class completion." : "Track how your students are moving through their modules."}</p></div>{section === "Curriculum" && !previewId && <button className="teacher-primary" onClick={() => uploadInput.current?.click()} disabled={busy || loading}>+ {busy ? "Uploading…" : "Add module"}</button>}</div>
+        <div className="teacher-page-heading"><div><span className="teacher-eyebrow">{classroom.subject || "YOUR CLASS"} · {section === "Curriculum" ? `${totals?.modules ?? 0} MODULES` : "SAVED MODULE PROGRESS"}</span><h1 ref={heading} tabIndex={-1}>{title}</h1><p>{selectedStudent ? selectedStudent.email : section === "Curriculum" ? "Manage shared subject modules and monitor this class’s completion." : "Track how your students are moving through their modules."}</p></div>{section === "Curriculum" && !previewId && <button className="teacher-primary" onClick={() => uploadInput.current?.click()} disabled={busy || loading || !sharingSubject}>+ {busy ? "Uploading…" : "Add module"}</button>}</div>
+        {section === "Curriculum" && !previewId && <ModuleSharing classroomId={classroom.id} onReady={setSharingSubject} onChanged={refresh} />}
         <input ref={uploadInput} type="file" accept=".json" aria-label="Upload module" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file); }} />
         {error && <div className="teacher-load-error" role="alert">{error} <button onClick={refresh} disabled={loading}>Try again</button></div>}
         {loading && !data && <p role="status">Loading class progress…</p>}
@@ -163,6 +172,6 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
       </section>
     </div>
     {webStudent && <TeacherWebProjects key={webStudent.id} classroomId={classroom.id} student={webStudent} onClose={() => setWebStudent(null)} />}
-    {deleteId && <DeleteModuleDialog title={data?.modules.find((module) => module.moduleId === deleteId)?.title ?? "this module"} busy={busy} error={error} dialogRef={deleteDialog} onCancel={closeDelete} onDelete={() => void remove()} />}
+    {deleteId && <DeleteModuleDialog subject={sharingSubject ?? null} title={data?.modules.find((module) => module.moduleId === deleteId)?.title ?? "this module"} busy={busy} error={error} dialogRef={deleteDialog} onCancel={closeDelete} onDelete={() => void remove()} />}
   </main>;
 }

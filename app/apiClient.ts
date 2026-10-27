@@ -1,3 +1,10 @@
+import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
+
+export class ApiError extends Error {
+  readonly moduleAccess?: ModuleAccessBlock;
+  constructor(message: string, moduleAccess?: ModuleAccessBlock) { super(message); this.moduleAccess = moduleAccess; }
+}
+
 // Shared browser-side fetch helper, used by both the main workspace (page.tsx) and the module
 // viewer, so there is one place that knows how CodeShare's API calls carry the session cookie.
 const DEPLOYED_API_URL = process.env.NEXT_PUBLIC_API_URL || "";
@@ -24,17 +31,20 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
       headers: { "Content-Type": "application/json", ...options.headers },
     });
   } catch (error) {
-    if (controller.signal.aborted && !options.signal?.aborted) throw new Error("Request timed out. Check your connection and try again.");
+    if (controller.signal.aborted && !options.signal?.aborted) throw new ApiError("Request timed out. Check your connection and try again.");
     throw error;
   } finally {
     clearTimeout(timeout);
   }
-  const body = response.status === 204 ? null : await response.json();
+  const body = response.status === 204 ? null : await response.json().catch(() => {
+    if (response.ok) throw new ApiError(`CodeShare returned an unreadable response (${response.status}). Please try again.`);
+    return null;
+  });
   if (typeof window !== "undefined") {
     if (response.ok && body?.session && path !== "/api/auth/activity") window.dispatchEvent(new CustomEvent("codeshare:session", { detail: body.session }));
     if (response.ok && path === "/api/auth/logout") window.dispatchEvent(new CustomEvent("codeshare:session", { detail: null }));
     if (response.status === 401 && !["/api/auth/login", "/api/auth/register"].includes(path)) window.dispatchEvent(new CustomEvent("codeshare:session-expired"));
   }
-  if (!response.ok) throw new Error(body?.error || "Request failed");
+  if (!response.ok) throw new ApiError(body?.error || `CodeShare could not complete the request (${response.status}). Please try again.`, body?.moduleAccess);
   return body as T;
 }

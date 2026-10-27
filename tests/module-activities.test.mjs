@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
-import { activityAccess, activityStateId, matchesActivityOutput, mergeProjectFiles } from "../backend/src/module-activities.ts";
+import { activityAccess, activityStateId, activityTask, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles } from "../backend/src/module-activities.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
@@ -58,11 +58,69 @@ test("module activities: matching text cannot pass a failed process; internal wh
   assert.equal(matchesActivityOutput({ success: true, output: "Capacity:25" }, "Capacity: 25"), false);
 });
 
+test("sample first: verification requires the declared result and unchanged sample, never completes an alteration", () => {
+  const step = { ...first, activity: { ...first.activity, id: "sample-check" } };
+  assert.equal(samplePending({ sampleFirst: true }, step, {}), true);
+  assert.equal(samplePending({ sampleFirst: true }, step, { [sampleStateId(step)]: "pass" }), false);
+  assert.equal(samplePending({ sampleFirst: true }, step, { [activityStateId(step)]: "pass" }), false, "existing task completion is retained without inventing sample evidence");
+  assert.equal(samplePending({}, step, {}), false, "older modules retain their workflow");
+  assert.equal(unchangedSample(first.files, first.files), true);
+  assert.equal(unchangedSample(first.files.map((f) => ({ ...f, content: f.content + " " })), first.files), false);
+  assert.equal(unchangedSample([{ ...first.files[0], path: "src/Main.java" }], first.files), true);
+  const intentional = { expectedOutput: "", expectedError: "java.util.ConcurrentModificationException" };
+  const error = 'Exception in thread "main" java.util.ConcurrentModificationException\n\tat different.JVM(Source.java:99)\n';
+  assert.equal(matchesSample({ success: false, output: error }, intentional), true);
+  assert.equal(matchesSample({ success: false, output: error.replace('Exception in thread "main" ', '') }, intentional), true, "browser printStackTrace omits the thread prefix");
+  assert.equal(matchesSample({ success: true, output: error }, intentional), false);
+  assert.equal(matchesSample({ success: false, output: error.replace("ConcurrentModificationException", "NullPointerException") }, intentional), false);
+  assert.equal(matchesSample({ success: false, output: first.expectedOutput }, first), false);
+});
+
+test("sample first: upload accepts opt-in and declared errors, rejects sample progress-key collisions", () => {
+  const content = structuredClone(fixture); content.sampleFirst = true;
+  content.lessons[0].blocks[0].activity.id = "baseline";
+  content.lessons[0].blocks[0].expectedError = "java.lang.IllegalStateException";
+  assert.equal(courseModule.safeParse(content).success, true);
+  const collision = structuredClone(content); collision.lessons[1].blocks[0].id = "sample:baseline";
+  assert.equal(courseModule.safeParse(collision).success, false);
+  content.lessons[0].blocks[0].expectedError = ".*";
+  assert.equal(courseModule.safeParse(content).success, false);
+});
+
 test("module activities: supporting classes survive and src aliases cannot duplicate Main.java (CKB-038)", () => {
   const files = mergeProjectFiles(fixture.starterFiles, first.files, [{ path: "src/Main.java", content: "student's existing Main" }]);
   assert.equal(files.length, 3);
   assert.equal(files.find((file) => file.path.endsWith("Main.java")).content, "student's existing Main");
   assert.ok(files.some((file) => file.path === "Vehicle.java"));
+});
+
+test("module tasks: explicit ids isolate completion and unlock one step at a time inside a part", () => {
+  const content = structuredClone(fixture);
+  const steps = content.lessons.map((lesson) => lesson.blocks[0]);
+  steps.forEach((step, index) => { step.activity.id = `alteration-${index}`; step.part = "Shared part"; });
+  const [one, two] = steps.map(activityStateId);
+  const old = { [steps[0].id]: "pass", [`${steps[0].id}:activity`]: "pass" };
+  assert.deepEqual(activityAccess(content, old).openStepIds, [one]);
+  assert.equal(activityAccess(content, old).parts[0].done, false);
+  assert.deepEqual(activityAccess(content, { ...old, [one]: "pass" }).openStepIds, [one, two]);
+  assert.equal(activityAccess(content, { [one]: "pass", [two]: "pass" }).performanceTaskOpen, true);
+  assert.equal(activityTask(steps[0]).expectedOutput, "Capacity: 25");
+  steps[0].stdin = "999\n"; steps[0].activity.stdin = "7\n";
+  assert.equal(activityTask(steps[0]).stdin, "7\n");
+  steps[0].activity.id = "revised-alteration";
+  assert.deepEqual(activityAccess(content, { [one]: "pass", [two]: "pass" }).openStepIds, [activityStateId(steps[0]), two]);
+  assert.equal(activityAccess(content, { [one]: "pass", [two]: "pass" }).performanceTaskOpen, false);
+});
+
+test("module tasks: upload rejects duplicate task ids and collisions with stored progress keys", () => {
+  const content = structuredClone(fixture);
+  content.lessons[0].blocks[0].activity.id = "alteration";
+  assert.equal(courseModule.safeParse(content).success, true);
+  for (const id of ["alteration", first.id, `task:alteration`]) {
+    const broken = structuredClone(content);
+    broken.lessons[1].blocks[0].activity.id = id;
+    assert.equal(courseModule.safeParse(broken).success, false);
+  }
 });
 
 async function withClass(action) {
@@ -80,7 +138,7 @@ async function withClass(action) {
       assert.equal(error, null); users.push(data.user);
       await admin.from("profiles").update({ role }).eq("id", data.user.id);
     }
-    const created = await admin.from("classrooms").insert({ name: "Module activity test", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
+    const created = await admin.from("classrooms").insert({ name: "Module activity test", module_subject: "java", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
     assert.equal(created.error, null); classroomId = created.data.id;
     assert.equal((await admin.from("classroom_members").insert(users.map((user) => ({ classroom_id: classroomId, user_id: user.id })))).error, null);
     const cookies = [];
@@ -111,6 +169,40 @@ async function withClass(action) {
   }
 }
 
+test("module tasks: real Java checks the alteration, redacts the next step and preserves rolling work", needsLocal, async () => {
+  await withClass(async ({ upload, request, prepare, run, admin, users, classroomId, cookies }) => {
+    const content = structuredClone(fixture);
+    content.lessons.forEach((lesson, index) => { lesson.blocks[0].activity.id = `task-${index}`; lesson.blocks[0].part = "Vehicle"; });
+    content.lessons[0].blocks[0].activity.files.push({ path: "TaskHint.java", content: "public class TaskHint {}" });
+    await upload(content);
+    let prepared = await prepare();
+    assert.ok(prepared.projectFiles.some((file) => file.path === "TaskHint.java"), "task supporting files are added without replacing current work");
+    await admin.from("module_progress").update({ step_states: { [first.id]: "pass", [`${first.id}:activity`]: "pass" } })
+      .eq("classroom_id", classroomId).eq("student_id", users[1].id).eq("module_id", fixture.id);
+    let view = await (await request()).json();
+    assert.equal(view.lessons[0].closed, false);
+    assert.equal(view.lessons[1].blocks[0].locked, true, "a shared part cannot bypass the next task");
+    assert.ok(!JSON.stringify(view).includes(second.activity.instruction));
+    assert.equal((await request("/progress/activity", { stepId: second.id })).status, 403);
+    let result = await (await run(prepared.projectFiles)).json();
+    assert.equal(result.passed, false, "unchanged sample output cannot pass the task");
+    const solution = prepared.projectFiles.map((file) => file.path === "Jeepney.java" ? { ...file, content: file.content.replace("return 20", "return 25") } : file);
+    result = await (await run(solution)).json();
+    assert.equal(result.passed, true);
+    assert.equal(result.progress.stepStates["task:task-0"], "pass");
+    assert.equal(result.progress.stepStates[first.id], "pass", "the sample record remains stored");
+    view = await (await request()).json();
+    assert.equal(view.lessons[1].blocks[0].locked, undefined);
+    assert.equal((await (await request("", undefined, cookies[2])).json()).lessons[1].blocks[0].locked, true);
+    prepared = await prepare(second.id);
+    assert.deepEqual(prepared.projectFiles, solution, "next task keeps the student's altered class");
+    const final = solution.map((file) => file.path === "Main.java" ? { ...file, content: 'public class Main { public static void main(String[] args) { Jeepney j = new Jeepney("NXA 123"); System.out.println(j.getPlate() + ": " + j.getCapacity()); } }' } : file);
+    result = await (await run(final, second.id)).json();
+    assert.equal(result.passed, true);
+    assert.ok((await (await request()).json()).performanceTask);
+  });
+});
+
 test("module activities: real multi-file Java result unlocks only that student, without teacher switches or liplets (CKB-038)", needsLocal, async () => {
   await withClass(async ({ request, prepare, run, cookies, call, classroomId }) => {
     let view = await (await request()).json();
@@ -133,7 +225,7 @@ test("module activities: real multi-file Java result unlocks only that student, 
     response = await run(solution);
     assert.equal(response.status, 200, await response.clone().text()); result = await response.json();
     assert.equal(result.passed, true); assert.equal(result.output.trim(), "Capacity: 20");
-    assert.equal(result.progress.percent, 25);
+    assert.equal(result.progress.percent, 33);
     assert.equal(result.progress.stepStates[firstStateId], "pass");
     assert.equal(result.progress.stepStates[fixture.lessons[0].exitSlip.id], undefined);
     view = await (await request()).json();
@@ -143,7 +235,7 @@ test("module activities: real multi-file Java result unlocks only that student, 
     assert.deepEqual(reopened.projectFiles, solution, "opening the next activity preserves the student's evolving project");
     const final = solution.map((file) => file.path.endsWith("Main.java") ? { ...file, content: 'public class Main { public static void main(String[] args) { for (int i = 3; i >= 1; i--) System.out.println(i); } }' } : file);
     result = await (await run(final, second.id)).json();
-    assert.equal(result.passed, true); assert.equal(result.progress.percent, 50);
+    assert.equal(result.passed, true); assert.equal(result.progress.percent, 67);
     assert.ok((await (await request()).json()).performanceTask);
   });
 });
@@ -152,11 +244,14 @@ test("module activities: compile errors and a crash after the right output canno
   await withClass(async ({ prepare, run, request }) => {
     const prepared = await prepare();
     const broken = prepared.projectFiles.filter((file) => file.path === "Main.java");
+    const savedBefore = (await request("/progress")).json();
     let response = await run(broken); let result = await response.json();
     assert.equal(result.success, false); assert.equal(result.passed, false); assert.match(result.output, /cannot find symbol/);
+    assert.deepEqual((await (await request("/progress")).json()).projectFiles, (await savedBefore).projectFiles, "failed run must not save its module code");
     const crash = [{ path: "Main.java", content: 'public class Main { public static void main(String[] args) { System.out.println("Capacity: 20"); throw new IllegalStateException("crash"); } }' }];
     response = await run(crash); result = await response.json();
     assert.equal(result.success, false); assert.equal(result.passed, false);
+    assert.deepEqual((await (await request("/progress")).json()).projectFiles, (await savedBefore).projectFiles, "crash must not save its module code");
     assert.equal((await (await request()).json()).lessons[1].closed, true);
   });
 });
@@ -164,13 +259,16 @@ test("module activities: compile errors and a crash after the right output canno
 test("module activities: prior project is copied only for its owner/class and later saves never replace it", needsLocal, async () => {
   await withClass(async ({ admin, users, classroomId, upload, prepare, request, cookies, call }) => {
     const previous = "previous-module";
+    await upload({ ...fixture, id: previous });
+    const priorPasses = { [firstStateId]: "pass", [secondStateId]: "pass" };
     const priorFiles = [{ path: "src/Main.java", content: "student's previous Main" }, { path: "Vehicle.java", content: "student's previous Vehicle" }];
-    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous, project_files: priorFiles })).error, null);
+    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous, step_states: priorPasses, project_files: priorFiles })).error, null);
     await upload({ ...fixture, previousModuleId: previous });
     let prepared = await prepare();
     assert.equal(prepared.projectFiles.find((file) => file.path.endsWith("Main.java")).content, priorFiles[0].content);
     assert.equal(prepared.projectFiles.find((file) => file.path === "Vehicle.java").content, priorFiles[1].content);
     assert.ok(prepared.projectFiles.some((file) => file.path === "Jeepney.java"));
+    await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[2].id, module_id: previous, step_states: priorPasses });
     const other = await prepare(first.id, cookies[2]);
     assert.ok(!JSON.stringify(other.projectFiles).includes("student's previous"));
     const otherModule = { ...fixture, id: "separate-module", previousModuleId: undefined }; await upload(otherModule);
@@ -213,10 +311,12 @@ test("module activities: JSON supplies fixed program input and demo execution ca
 test("weekly Java projects: personal drafts roll forward separately, preserve submissions and never advance module progress", needsLocal, async () => {
   await withClass(async ({ admin, users, classroomId, upload, prepare, request, cookies, call }) => {
     const previous = "previous-module";
+    await upload({ ...fixture, id: previous });
+    const priorPasses = { [firstStateId]: "pass", [secondStateId]: "pass" };
     const moduleFiles = [{ path: "Main.java", content: "previous module Main" }];
     const personalFiles = [{ path: "Main.java", content: "previous personal Main" }, { path: "Own.java", content: "previous personal class" }];
     const snapshot = { files: personalFiles, status: "pass", submittedAt: new Date().toISOString() };
-    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous,
+    assert.equal((await admin.from("module_progress").insert({ classroom_id: classroomId, student_id: users[1].id, module_id: previous, step_states: priorPasses,
       project_files: moduleFiles, performance_task: { own: snapshot } })).error, null);
     await upload({ ...fixture, previousModuleId: previous });
     const base = `/api/classrooms/${classroomId}/modules/${fixture.id}/progress`;
@@ -234,7 +334,7 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     assert.equal(view.performanceProjectFiles.find((file) => file.path.endsWith("Main.java")).content, "previous personal Main");
     assert.ok(view.performanceProjectFiles.some((file) => file.path === "Own.java"));
     assert.deepEqual(view.projectFiles, prepared.projectFiles);
-    assert.equal(view.percent, 50, "preparing a draft is not a submission");
+    assert.equal(view.percent, 67, "preparing a draft is not a submission");
     assert.equal(view.performanceTask.own, undefined);
     assert.equal((await personal({}, "POST", cookies[0])).status, 403);
     assert.equal((await personal({}, "POST", cookies[2])).status, 403);
@@ -249,11 +349,15 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     const executed = await call("/api/execute", { method: "POST", headers: { cookie: cookies[1] }, body: JSON.stringify({ files: ownFiles }) });
     const result = await executed.json(); assert.equal(result.success, true); assert.equal(result.output, "Personal OOP\n");
     const afterRun = await (await request("/progress")).json();
-    assert.deepEqual(afterRun.stepStates, passed); assert.equal(afterRun.percent, 50);
+    assert.deepEqual(afterRun.stepStates, passed); assert.equal(afterRun.percent, 67);
     assert.deepEqual(afterRun.performanceProjectFiles, ownFiles);
     assert.deepEqual(afterRun.projectFiles, prepared.projectFiles);
     assert.equal((await call(`${base}/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: personalFiles, status: "pass", updatedAt: beforeSave }) })).status, 409, "a stale tab cannot replace the submission");
-    const submitted = await call(`${base}/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: ownFiles, status: "pass" }) });
+    await delay(1550);
+    const personalRun = await call(`${base}/personal-run`, { method: "POST", headers: { cookie: cookies[1] }, body: JSON.stringify({ updatedAt: view.updatedAt }) });
+    assert.equal(personalRun.status, 200, await personalRun.clone().text());
+    view = (await personalRun.json()).progress;
+    const submitted = await call(`${base}/performance-task`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ variant: "own", files: ownFiles, status: "pass", updatedAt: view.updatedAt }) });
     assert.equal(submitted.status, 200);
     response = await personal({ files: [{ path: "Main.java", content: "later personal edit" }], updatedAt: (await submitted.json()).updatedAt }, "PUT");
     assert.equal(response.status, 200); view = await response.json();
@@ -269,13 +373,15 @@ test("weekly Java projects: personal drafts roll forward separately, preserve su
     await admin.from("module_progress").update({ step_states: passed }).eq("classroom_id", classroomId).eq("module_id", next.id).eq("student_id", users[1].id);
     response = await request("/progress/performance-project", {}, cookies[1], next.id);
     assert.equal(response.status, 200); view = await response.json();
-    assert.equal(view.performanceProjectFiles.find((file) => file.path === "Main.java").content, "later personal edit");
+    assert.deepEqual(view.performanceProjectFiles, ownFiles, "next week prefers the submitted personal version");
     // Same module id in a different class must never find this student's prior project.
     const otherClass = await admin.from("classrooms").insert({ name: "Other weekly class", join_code: randomUUID().slice(0, 8).toUpperCase(), teacher_id: users[0].id }).select("id").single();
     assert.equal(otherClass.error, null);
     try {
       await admin.from("classroom_members").insert({ classroom_id: otherClass.data.id, user_id: users[1].id });
       await admin.from("course_modules").insert({ classroom_id: otherClass.data.id, module_id: fixture.id, content: { ...fixture, previousModuleId: previous }, created_by: users[0].id });
+      await admin.from("course_modules").insert({ classroom_id: otherClass.data.id, module_id: previous, content: { ...fixture, id: previous }, created_by: users[0].id });
+      await admin.from("module_progress").insert({ classroom_id: otherClass.data.id, student_id: users[1].id, module_id: previous, step_states: priorPasses });
       await admin.from("module_progress").insert({ classroom_id: otherClass.data.id, student_id: users[1].id, module_id: fixture.id, step_states: passed });
       response = await call(`/api/classrooms/${otherClass.data.id}/modules/${fixture.id}/progress/performance-project`, { method: "POST", headers: { cookie: cookies[1] } });
       assert.equal(response.status, 200); view = await response.json();
@@ -294,5 +400,115 @@ test("module activities: offline ignores online runner address and refuses brows
       const progress = await prepare();
       assert.equal((await request("/progress/browser-result", { stepId: first.id, updatedAt: progress.updatedAt, success: true, output: first.expectedOutput })).status, 403);
     } finally { delete process.env.JAVA_RUNNER_URL; }
+  });
+});
+
+test("sample first: real Java verifies samples, completes alterations, restores step drafts and refuses stale tabs", needsLocal, async () => {
+  await withClass(async ({ upload, request, prepare, run, call, cookies, admin, users, classroomId }) => {
+    const content = structuredClone(fixture); content.sampleFirst = true;
+    content.lessons.forEach((lesson, i) => { lesson.blocks[0].activity.id = `sample-first-${i}`; });
+    const one = content.lessons[0].blocks[0], two = content.lessons[1].blocks[0];
+    await upload(content);
+    const backup = [{ path: "Main.java", content: "// existing student work before this update" }, { path: "Notes.java", content: "public class Notes {}" }];
+    await prepare();
+    await admin.from("module_progress").update({ project_files: backup, activity_projects: {}, performance_task: { own: { files: backup, status: "pass", submittedAt: new Date().toISOString() } } }).eq("classroom_id", classroomId).eq("student_id", users[1].id);
+    let p = await prepare();
+    assert.equal(p.projectFiles.find((f) => f.path === "Main.java").content, one.files[0].content);
+    assert.deepEqual(p.activityProjects.beforeSampleFiles, backup);
+    assert.ok(p.projectFiles.some((f) => f.path === "Notes.java"));
+    assert.equal((await request("/progress/activity", { stepId: two.id })).status, 403);
+    let r = await (await run(p.projectFiles, one.id, p.updatedAt)).json();
+    assert.equal(r.passed, true); assert.equal(r.check, "sample");
+    assert.equal(r.progress.stepStates[sampleStateId(one)], "pass");
+    assert.equal(r.progress.stepStates[activityStateId(one)], undefined); assert.equal(r.progress.percent, p.percent);
+    assert.equal((await request("/progress/activity", { stepId: two.id })).status, 403);
+    p = r.progress;
+    r = await (await run(p.projectFiles, one.id, p.updatedAt)).json();
+    assert.equal(r.passed, false); assert.equal(r.check, "task"); assert.equal(r.sampleMatched, true);
+    p = r.progress;
+    const altered = p.projectFiles.map((f) => f.path === "Jeepney.java" ? { ...f, content: f.content.replace("return 20", "return 25") } : f);
+    r = await (await run(altered, one.id, p.updatedAt)).json();
+    assert.equal(r.passed, true); assert.equal(r.progress.stepStates[activityStateId(one)], "pass");
+    const completedFiles = r.progress.projectFiles;
+    p = await prepare(two.id);
+    assert.equal(p.projectFiles.find((f) => f.path === "Main.java").content, two.files[0].content, "a new step automatically loads its sample");
+    assert.ok(p.projectFiles.find((f) => f.path === "Jeepney.java").content.includes("return 25"), "supporting classes roll forward");
+    assert.deepEqual(p.activityProjects.drafts[activityStateId(one)], completedFiles);
+    const stale = p;
+    let reopened = await prepare(one.id);
+    assert.deepEqual(reopened.projectFiles, completedFiles);
+    const save = (stepId, files, updatedAt) => call(`/api/classrooms/${classroomId}/modules/${fixture.id}/progress/project`, { method: "PUT", headers: { cookie: cookies[1] }, body: JSON.stringify({ stepId, files, updatedAt }) });
+    assert.equal((await save(two.id, stale.projectFiles, stale.updatedAt)).status, 409);
+    assert.equal((await save(two.id, stale.projectFiles, reopened.updatedAt)).status, 409, "a wrong step cannot use even the current version");
+    const bad = reopened.projectFiles.map((f) => f.path === "Main.java" ? { ...f, content: 'public class Main { public static void main(String[] a) { System.out.println("exploring"); } }' } : f);
+    r = await (await run(bad, one.id, reopened.updatedAt)).json();
+    assert.equal(r.passed, false); assert.equal(r.progress.stepStates[activityStateId(one)], "pass");
+    p = await prepare(two.id);
+    assert.deepEqual(p.projectFiles, stale.projectFiles);
+    reopened = await prepare(one.id); assert.deepEqual(reopened.projectFiles, completedFiles, "failed exploratory edits stay local and do not replace the completed server project");
+    assert.deepEqual(reopened.performanceTask.own.files, backup, "sample loading never changes personal submissions");
+    const other = await prepare(one.id, cookies[2]);
+    assert.equal(other.stepStates[activityStateId(one)], undefined); assert.equal(other.activityProjects.beforeSampleFiles, undefined);
+    const view = await (await request("/progress")).json();
+    assert.equal(view.stepStates[activityStateId(one)], "pass", "completion persists across a fresh read");
+  });
+});
+
+test("sample first: a declared runtime error verifies only the demonstration and existing completions survive opt-in", needsLocal, async () => {
+  await withClass(async ({ upload, prepare, run, admin, users, classroomId, cookies }) => {
+    const content = structuredClone(fixture); content.sampleFirst = true;
+    const one = content.lessons[0].blocks[0]; one.activity.id = "expected-error";
+    one.expectedError = "java.lang.IllegalStateException";
+    one.files = [{ path: "Main.java", content: 'public class Main { public static void main(String[] a) { throw new IllegalStateException("lesson example"); } }' }];
+    one.activity.expectedOutput = "fixed";
+    await upload(content);
+    let p = await prepare();
+    let r = await (await run(p.projectFiles, one.id, p.updatedAt)).json();
+    assert.equal(r.success, false); assert.equal(r.passed, true); assert.equal(r.check, "sample");
+    assert.equal(r.progress.stepStates[activityStateId(one)], undefined);
+    p = r.progress;
+    const files = p.projectFiles.map((f) => f.path === "Main.java" ? { ...f, content: 'public class Main { public static void main(String[] a) { System.out.println("fixed"); } }' } : f);
+    r = await (await run(files, one.id, p.updatedAt)).json();
+    assert.equal(r.passed, true); assert.equal(r.progress.stepStates[activityStateId(one)], "pass");
+    await prepare(one.id, cookies[2]);
+    await admin.from("module_progress").update({ project_files: files, activity_projects: {}, step_states: { [activityStateId(one)]: "pass" } }).eq("classroom_id", classroomId).eq("student_id", users[2].id);
+    p = await prepare(one.id, cookies[2]);
+    assert.deepEqual(p.projectFiles, files); assert.equal(samplePending(content, one, p.stepStates), false);
+    assert.equal(p.stepStates[sampleStateId(one)], undefined, "no fabricated sample pass for an existing completion");
+  });
+});
+
+test("personal offline runs: compile failure, crash and timeout cannot submit; handled exceptions can", needsLocal, async () => {
+  await withClass(async ({ admin, users, classroomId, prepare, call, request, cookies }) => {
+    await prepare();
+    await admin.from("module_progress").update({ step_states: { [first.id]: "pass", [second.id]: "pass" } }).eq("classroom_id", classroomId).eq("student_id", users[1].id);
+    const base = `/api/classrooms/${classroomId}/modules/${fixture.id}/progress`;
+    const post = (suffix, body, method = "POST") => call(`${base}/${suffix}`, { method, headers: { cookie: cookies[1] }, body: JSON.stringify(body) });
+    let view = await (await post("performance-project", {})).json();
+    const initial = await (await request("/progress")).json();
+    for (const [source, success] of [
+      ["not valid Java", false],
+      ['public class Main { public static void main(String[] a) { System.out.println("Looks correct"); throw new RuntimeException("failed"); } }', false],
+      ['public class Main { public static void main(String[] a) { while (true) {} } }', false],
+      ['public class Main { public static void main(String[] a) { try { throw new RuntimeException("handled"); } catch (RuntimeException e) { System.out.println("Coffee shop recovered"); } } }', true],
+    ]) {
+      view = await (await post("performance-project", { files: [{ path: "Main.java", content: source }], updatedAt: view.updatedAt }, "PUT")).json();
+      await delay(1550);
+      const response = await post("personal-run", { updatedAt: view.updatedAt });
+      assert.equal(response.status, 200, await response.clone().text());
+      const run = await response.json(); assert.equal(run.success, success); view = run.progress;
+      assert.equal(view.performanceTask.own, undefined);
+      assert.equal(view.percent, initial.percent);
+      const submitted = await post("performance-task", { variant: "own", status: "pass", files: view.performanceProjectFiles, updatedAt: view.updatedAt }, "PUT");
+      assert.equal(submitted.status, success ? 200 : 409, await submitted.clone().text());
+      if (success) view = await submitted.json();
+    }
+    assert.equal(view.percent, 100);
+    assert.equal(view.performanceTask.own.review, undefined);
+    assert.equal((await post("personal-result", { updatedAt: view.updatedAt, success: true })).status, 403, "offline refuses browser claims");
+    const before = await (await request("/progress")).json();
+    const teacherRun = await call("/api/execute", { method: "POST", headers: { cookie: cookies[0] }, body: JSON.stringify({ files: before.performanceTask.own.files }) });
+    assert.equal((await teacherRun.json()).success, true);
+    assert.deepEqual(await (await request("/progress")).json(), before, "teacher execution never changes the student record");
   });
 });

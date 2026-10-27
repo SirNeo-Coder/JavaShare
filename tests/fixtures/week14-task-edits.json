@@ -1,0 +1,89 @@
+{
+  "java-2-w14-d1-s1": [
+    {
+      "path": "Main.java",
+      "from": "fleet.remove(1);",
+      "to": "fleet.remove(3);"
+    },
+    {
+      "path": "Main.java",
+      "from": "\"No vehicle there: index 5 is unavailable.\"",
+      "to": "\"No vehicle at index 5.\""
+    }
+  ],
+  "java-2-w14-d1-s2": [
+    {
+      "path": "Main.java",
+      "from": "Lolo Pedro",
+      "to": "Lola Nena"
+    }
+  ],
+  "java-2-w14-d2-s3": [
+    {
+      "path": "Main.java",
+      "from": "registered.add(\"NXA 123\"));            // false: already there!",
+      "to": "registered.add(\"BUS 789\"));            // a different plate"
+    }
+  ],
+  "java-2-w14-d2-s4": [
+    {
+      "path": "Main.java",
+      "from": "\"HashSet: \" + hashStops",
+      "to": "\"HashSet: \" + new TreeSet<String>(hashStops)"
+    }
+  ],
+  "java-2-w14-d3-s5": [
+    {
+      "path": "Main.java",
+      "from": "findVehicle(byPlate, \"TRC 456\")",
+      "to": "findVehicle(byPlate, \"NXA 123\")"
+    }
+  ],
+  "java-2-w14-d3-s6": [
+    {
+      "path": "Main.java",
+      "from": "trips.get(\"Kuya Ben\") + 1",
+      "to": "trips.get(\"Kuya Ben\") + 2"
+    }
+  ],
+  "java-2-w14-d4-s7": [
+    {
+      "path": "Main.java",
+      "from": "quoteFare(5)",
+      "to": "quoteFare(6)"
+    },
+    {
+      "path": "Main.java",
+      "from": "Total fare for 5 km",
+      "to": "Total fare for 6 km"
+    }
+  ],
+  "java-2-w14-d4-s8": [
+    {
+      "path": "Main.java",
+      "from": "fleet.remove(v);",
+      "to": "System.out.println(\"Empty vehicle: \" + v.getPlateNumber());"
+    }
+  ],
+  "java-2-w14-d4-s9": [
+    {
+      "path": "Main.java",
+      "from": "v.getPassengers() == 0",
+      "to": "v.getPassengers() > 0"
+    }
+  ],
+  "java-2-w14-d4-s10": [
+    {
+      "path": "Main.java",
+      "from": "trips.put(\"Mang Ramon\", 5);",
+      "to": "trips.put(\"Mang Ramon\", 7);"
+    }
+  ],
+  "java-2-w14-d5-s11": [
+    {
+      "path": "Main.java",
+      "from": "stock.put(\"Bread\", 10);",
+      "to": "stock.put(\"Bread\", 12);"
+    }
+  ]
+}

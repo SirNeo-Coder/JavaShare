@@ -1,4 +1,280 @@
-> Current approved correction (2026-10-21): `codex/classroom-java-progress`, implementation
+> Module-loading repair recovered (2026-10-23), branch `codex/module-summary-repair`
+> based on saved origin/main fc0972c. CKB-067: module lists failed with 500 because
+> required `codeshare_module_summaries(uuid)` was absent, despite existing tables
+> and read grants. Teacher approved existing unchanged migration 20261022000200,
+> confirmed all four prerequisites and applied the transactional SQL package.
+> Teacher reports SQL succeeded and Module now loads. Assistant changed no hosted
+> services. Done: setup/prerequisite/transaction/readiness instructions; incident,
+> index, prompt map, operations and this handoff updated. Build:all passes; lint
+> passes with 0 errors/8 existing warnings; full suite 325/325, no skips; diff clean.
+> Sandbox/dependency failures and named final checks are recorded in
+> docs/verification/module-summary-repair.md. Repair documentation e1a5a16 is
+> committed/pushed; [PR #43](https://github.com/SirNeo-Coder/JavaShare/pull/43)
+> is open against main for review. No local implementation work remains.
+> Teacher confirms all five function/permission readiness values true. Next:
+> confirm both roles can open Module and a student's successful activity survives
+> reload; the teacher's all-true reply is recorded only as readiness evidence.
+> Hosted CPU recovery is separate and unverified. No app/test/config/migration
+> changes. Existing migration untouched; no new dependency or offline runtime change.
+
+> Active approved completion-only module saving (2026-10-22): teacher explicitly
+> Current module draft recovery (2026-10-23): teacher approved fixing the three review findings.
+> Branch `codex/module-draft-recovery`, isolated managed worktree, based on main `fc0972c`
+> after PR #41 merged. Expected-error sample verification survives reopening; changed/legacy
+> drafts retain readable code backups and lose obsolete evidence; pending sync no longer claims
+> completion. The module picker and editor refresh stale content before restoring current work.
+> CKB-067/068/069 record the defects. No schema or backend changes; personal projects remain separate.
+> Verification: 329/329 full suite, 7/7 actual production browser checks, 9/9 focused rule/render
+> checks after three deliberately failing mutations. Online runner/503 responses are controlled;
+> offline uses real laptop javac. Build:all passes; lint has 0 errors and 8 existing warnings;
+> offline launcher configuration check passes. Every named result, initial failures, and limits:
+> [module draft recovery verification](../verification/module-draft-recovery.md).
+> Implementation and verification are complete. Delivery: commit/push this branch and open its PR
+> against main, then record that PR here. Teacher review/rollout remain next. No assistant merge,
+> deployment or hosted settings/SQL. Hosted CPU, real CheerpJ and physical Wi-Fi are unverified.
+
+> Earlier completion-only module saving (2026-10-22): teacher explicitly
+> approved the combined plan: cache downloaded lessons/local unfinished drafts,
+> save online Module project code only after task success, and lighten server checks.
+> Branch codex/module-completion-saves starts at current main 23053f1; isolated
+> checkout /tmp/codeshare-api-errors reuses dependencies. Original checkout untouched.
+> Server step done: service-role-only lightweight metadata, selected-module read reuse,
+> read-only step preparation and one guarded/idempotent completion checkpoint. New
+> migration 20261022000200 applied locally only; teacher rollout/rollback guide is
+> docs/module-completion-setup.md. Old endpoints/teacher response shapes preserved.
+> Checks: build:all passes; focused existing module integration checks 67/67, extended
+> completion checks 7/7, no skips. Deliberate opening-write mutation fails the regression;
+> restored checks pass. CKB-065, backend KB and approved AGENTS rule updated.
+> In progress/next: device content/draft storage, local sample/task checking and
+> completion-only editor/caller integration, request-count/conflict/browser/offline
+> checks, full build/lint/suite, repeated Worker profile, final PR. No hosted CPU
+> recovery claim. Personal/submission/laptop paths must remain compatible. No merge,
+> deploy, hosted settings or hosted SQL. PR #39's error-message repair remains separate.
+
+> Latest clarified requirement (2026-10-22): teacher wants student Module project
+> code saved to the server only when the task completes successfully. Earlier
+> "local activities; sync later" direction is narrowed: task completion is the sync
+> point, rather than a generic later whole-module Sync progress workflow.
+> [Revised concrete proposal](../verification/local-module-practice-proposal.md)
+> is ready for explicit implementation approval. Online module drafts, sample
+> verification and unsuccessful runs stay local; one guarded completion checkpoint
+> saves exact successful code/progress, then unlocks the next step. Earlier completed
+> status must not make a later failed run overwrite successful code. Keep retry
+> evidence locally on failed sync and do not silently overwrite newer remote work.
+> Later locked steps remain server-withheld; downloading hidden future tasks is no
+> longer proposed. Essential sign-in/read requests remain. Include lightweight server
+> metadata/read reuse so the completion save does not reproduce CKB-065's CPU failure.
+> Expected scope: module browser/editor/callers/local draft helper, guarded server
+> checkpoint and one new migration; personal submissions/offline runner preserved.
+> CKB-065 and CKB-035 apply. No new app/schema/config/tests changed or run for this
+> proposal. Next: teacher approves/revises this plan under AGENTS.md. Branch
+> codex/api-service-errors / PR #39 still contains only the tested error-message repair
+> and investigation/proposal records; earlier error-message approval does not cover
+> this changed implementation. Original checkout/unrelated files remain untouched.
+
+> Approved service-error mitigation (2026-10-22): `codex/api-service-errors`, isolated
+> checkout `/tmp/codeshare-api-errors`, based on main `21766ba`. Teacher approved the
+> response-handling repair, regression proof, required checks and evidence-based 503
+> investigation after screenshots showed Module worksheet JSON parsing errors.
+> Done: the shared helper reports unreadable error responses with their HTTP status,
+> retains JSON/prerequisite details and normal session events, rejects malformed success
+> and does not retry writes. Protected HTML 401s now reach existing sign-in recovery.
+> Only app/apiClient.ts changes application behavior; callers needed no changes or cleanup.
+> Checks: offline launcher build (including build:all) passes; lint 0 errors/8 existing
+> warnings; full suite 311/311 with no skips; local production browser 4/4 including
+> unsaved-code preservation, retry, real laptop Java/sample completion and HTML 401 sign-out.
+> Original-helper regression proof: 6 fail/3 pass; restored helper 9/9. All names,
+> commands and limits: [verification](../verification/api-service-errors.md). CKB-064,
+> prompt map and frontend/workflow pages updated. Approval covers normal branch/PR delivery.
+> Diagnosis updated from teacher log: the module-project save was terminated by
+> Cloudflare for exceededCpu at 10 ms CPU / 404 ms total time (CKB-065). Earlier
+> health lookup used a misread hostname; corrected public health returns 200/connected.
+> This is not proof of module-save recovery. Account plan/effective CPU limit unknown;
+> teacher explicitly requires Free and requested CPU-reduction investigation.
+> Delivered: implementation `f256834` committed/pushed; [PR #39](https://github.com/SirNeo-Coder/JavaShare/pull/39)
+> is open against main and attached to the chat. GitHub connector PR creation returned
+> 403; existing gh login successfully created it. No merge or deployment.
+> Stay-free CPU investigation is complete: unchanged local Worker and direct-handler
+> control each ran 20-request phases with real Week 12–21 data. Full-library parsing
+> is a major measured cost; bypassing Next alone leaves most module cost. Candidate
+> metadata is 2,934 bytes versus 885,998 bytes full content, not a speed guarantee.
+> [Profile evidence and proposed next plan](../verification/free-worker-cpu-investigation.md).
+> Next: teacher review of #39 and explicit approval of metadata-only database reads
+> plus request-local module reuse. This requires one new migration and guarded server
+> changes; none is implemented/approved yet. Preserve access/version/progression rules.
+> No hosted CPU recovery claim. Temporary Worker/control/data/credentials are cleaned.
+> Physical Wi-Fi/disconnected operation and online CheerpJ were not rerun; local Java passed.
+> Original checkout and unrelated files remain untouched; temporary app/fixtures are cleaned.
+> Current CKB-063 repair — 2026-10-22
+>
+> Teacher approved correcting only the Week 18–21 predecessor references and preserving all
+> module/activity ids, lessons, code, outputs and student history. Branch:
+> `codex/curriculum-prerequisite-links`, based on main `21766ba` (shared-library PR #37 merged),
+> isolated checkout `/tmp/codeshare-curriculum-links`. The original checkout is untouched.
+>
+> Done: four `previousModuleId` corrections, actual Week 12–21 chain/access regression,
+> disposable browser uploads/completion setup, real ordered-unlock and exact saved-record
+> re-upload checks, teacher upload guide and CKB/index/workflow updates. App/server, prerequisite
+> rules, Java/Net MVC separation, schemas and migrations are unchanged. Every other JSON byte
+> and every other curriculum asset matches main.
+>
+> Verified: build and offline launcher build pass; lint 0 errors/8 existing warnings; full suite
+> 303/303, focused shared/prerequisite 26/26; real local curriculum browser 8/8, offline
+> prerequisites 5/5, subject sharing 7/7, no skips. Regression fails before correction and for
+> each independently restored bad link; corrected files pass again. Named checks and setup
+> failures: `docs/verification/curriculum-prerequisite-links.md`.
+>
+> Delivered: implementation `e162e87`, committed and pushed;
+> [PR #38](https://github.com/SirNeo-Coder/JavaShare/pull/38) targets main and is open for review.
+> No code work remains in progress. Teacher reports uploading corrected Weeks 18–21 with no
+> apparent problem (2026-10-22). This is teacher confirmation, not an independent hosted/student
+> check. Next: teacher reviews the PR; retain the existing ids and prerequisite requirements.
+> Teacher guide: `docs/curriculum-prerequisite-reupload.md`. Student drafts, completions and
+> submitted snapshots stay saved; unfinished earlier tasks still block later weeks.
+>
+> Open: independent hosted/student recovery checks, physical offline devices, online/visible GUI behavior and
+> existing curriculum runtime limits. Week 17 feedback timeout did not recur locally; its cause
+> remains unknown and feedback code was not changed. No merge, deployment or hosted change.
+> Earlier PR #37 notes below are historical; its CKB-063 repair proposal is superseded here.
+
+> PR #37 integration refresh (2026-10-22): branch `codex/subject-module-sharing`, based on
+> main `82cd333` after PRs #35/#36 merged. Resolved documentation/UI/server conflicts while
+> retaining subject sharing and prerequisite gates. The prerequisite lookup now uses the same
+> teacher/subject library as the catalog; student completion remains separate per class.
+> Build, backend build, offline launcher build pass; lint 0 errors/8 existing warnings; full
+> suite 302/302; focused 26/26; real local subject browser 7/7 and prerequisite browser 5/5.
+> Shared-chain regression failed before the fix and passed after. All curriculum assets match main.
+> EXTRA CURRICULUM BROWSER FAILED: preserved Week 18–21 links omit predecessor -module suffixes
+> (CKB-063); temporary diagnostic run 3 pass/3 fail, also an undiagnosed Week 17 feedback timeout.
+> No lesson rewrite or bypass. Evidence and every additional named check:
+> `docs/verification/subject-module-sharing.md`. This repair and record are committed/pushed to
+> existing PR #37. Teacher reports hosted SQL success; hosted app rollout remains unverified.
+> Next: verify GitHub conflicts/checks and teacher review/merge; separately approve a plan for
+> CKB-063 if desired. No assistant merge, deployment or hosted action. Older draft-PR notes below
+> are history; #35 and #36 have since been merged by the teacher.
+
+> PR #36 refresh after #35 merged (2026-10-22): six documentation conflicts repaired on
+> main `3a59e99`. Both prerequisite and curriculum notes are retained. CKB-060 remains
+> prerequisites; CKB-061 remains curriculum. All 51 curriculum/fixture/test files are unchanged
+> from the previous pushed PR. Application/config/package files exactly match current main.
+> Production build passed; lint 0 errors/8 existing warnings; full suite 293/293, no failures
+> or skips. Named checks and limits: `docs/verification/week15-week21-step-additions.md`.
+> Browser, offline launcher, document renders and deliberate-break proof were not repeated
+> for this refresh. PR #36 stays draft for teacher curriculum review; Ready for review is
+> a separate human decision. Repair and evidence are committed/pushed to the same PR; no
+> merge, deployment, hosted action or curriculum rewrite. Next: check GitHub’s conflict
+> status, then continue curriculum review and its documented runtime limits.
+
+> PR #35 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
+> `20a26fd`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
+> notes and the independent styles are preserved. Feature code/tests and curriculum files
+> were compared with the original PR and preserved byte-for-byte except inherited main editor
+> additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
+> subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 245/245,
+> no skips. All named checks and limits: `docs/verification/module-prerequisites.md`.
+
+> PR #36 conflict repair (2026-10-22): updated on main `c770731`; replayed feature head
+> `5959716`. The teacher requested repair of #35/#36/#37. Both sets of progress/problem/prompt
+> notes and the independent styles are preserved. Feature code/tests and curriculum files
+> were compared with the original PR and preserved byte-for-byte except inherited main editor
+> additions. Case ids are distinct: Java suggestions 059, prerequisites 060, curriculum 061,
+> subject sharing 062. Build passes; lint 0 errors/8 existing warnings; full suite 276/276,
+> no skips. All named checks and limits: `docs/verification/week15-week21-step-additions.md`.
+> Resolution is complete; this record is committed and pushed to the same PR with a lease
+> protecting its previously fetched head. No merge or deployment. #36 remains draft. Next:
+> teacher review; merging another PR may require another refresh of the remaining branches.
+
+> Three-PR conflict repair (2026-10-22): subject sharing PR #37 updated on main `c770731`;
+> replayed implementation `200065c`. Teacher requested fixing #35/#36/#37. Both note sets
+> are preserved. Case numbers are unique: main caret issue 059, prerequisites 060, curriculum
+> 061, subject sharing 062. The original feature code/config/tests were preserved; current
+> main’s editor changes and both sets of independent styles are retained.
+> Verified: production build, lint 0 errors/8 existing warnings, full suite 236/236 and actual
+> local production browser 7/7 with laptop Java; no failures/skips. Named results and limits:
+> `docs/verification/subject-module-sharing.md`. Other branches separately pass 245 (#35) and
+> 276 (#36) tests. #36 remains draft. The teacher reports the hosted library SQL succeeded;
+> hosted app rollout is still pending and has not been independently verified.
+> Resolution and this note are committed/pushed to the existing feature branch with a lease
+> against its previously fetched head. No merge/deployment. Next: verify GitHub’s conflict-free
+> status, teacher review/merge and app build, then choose class subjects/share saved uploads.
+> Merging another PR can require refreshing the remaining branches again.
+
+> Current approved subject sharing (2026-10-22): `codex/subject-module-sharing`, based on main
+> `9fba8a7`, isolated worktree `/home/ireneo/.codex/worktrees/subject-module-sharing/JavaShare`.
+> Approved: each class uses exactly one Java or Net MVC module set; upload/correct once per
+> teacher/subject, include later classes, retain class-separated student projects/progress/submissions.
+> Implemented: shared library and additive migration, required subject for new classes, existing
+> class subject selection, explicit sharing/replacement of backed-up uploads, subject-wide delete
+> warning, shared catalog/reader/dashboard/summary paths and per-class legacy availability.
+> Existing old uploads stay readable until subject choice; original rows and all student work
+> remain stored afterward. Subject choice is permanent through the app to protect work scope.
+> Local migration applied; hosted services unchanged. Setup: `docs/subject-module-sharing-setup.md`.
+> Verification complete: full suite 229/229, browser 7/7 (actual local production app and offline
+> laptop Java), final focused checks 10/10; no skips. Baseline CKB-010 progress 4/4; deliberately
+> removing the subject filter failed 4 checks, restoring it passed 8/8. Production and offline
+> launcher builds pass; lint 0 errors/8 existing warnings. Named results, corrected initial
+> fixture/browser-test failures and unverified areas: `docs/verification/subject-module-sharing.md`.
+> Delivered: implementation `6b996e1` is committed and pushed; [PR #37](https://github.com/SirNeo-Coder/JavaShare/pull/37)
+> targets main and is attached to this chat. No app work remains. This documentation update
+> records delivery and is committed/pushed separately. The temporary local test server is stopped;
+> disposable test users/classes were cleaned. Existing classroom processes were preserved.
+> Next: teacher reviews the PR, manually applies the hosted migration, rolls out the app and
+> selects subjects/shares old uploads. Hosted rollout, physical devices and disconnected Wi-Fi
+> remain unverified. Preserve the primary checkout’s ongoing Week 15–21 files, logs, CLI cache
+> and other unrelated work.
+
+> Java code suggestions (2026-10-21): branch `codex/java-code-suggestions`, based on current
+> main `9fba8a7` (merged drawer/module work retained). Teacher approved Java-first local
+> keywords, common statements and current-file names in classroom, module and personal editors.
+> Done: two typed characters open Java code suggestions; arrows select, Enter/click/tap insert,
+> Escape closes, Tab still indents and Ctrl+Enter still runs. Print/main caret positions and
+> indentation retained. Read-only, other languages, comments/strings, composing text and selected
+> text stay quiet; changed external code closes stale suggestions. No AI, type service, dependency,
+> server, schema, migration or hosted settings change. Plain teacher worksheet textareas unchanged.
+> Browser checks found and fixed a fast-typing caret race (CKB-059) in the shared selection timing.
+> Final evidence: 228/228 automated tests, 11/11 actual offline production browser checks,
+> 6/6 focused shared-editor browser checks; production frontend/backend/offline launcher builds
+> pass; lint 0 errors/8 existing warnings. Deliberately restoring delayed caret selection caused
+> the fast-typing and indentation checks to fail (3 pass/3 fail including parent); restored
+> source passes all 6. Both roles ran an accepted suggestion with actual laptop Java; module and
+> personal saves retain separate drafts and do not submit. Personal test access uses explicitly
+> seeded local fixture completion, and tests verify that suggestion editing never changes it.
+> [Every named test, commands, regression proof and limits](../verification/java-code-suggestions.md).
+> Implementation `5a8a3bf` is committed and pushed; [PR #34](https://github.com/SirNeo-Coder/JavaShare/pull/34)
+> is open against main and attached to this chat. No implementation work remains. Next: teacher
+> review and hosted rollout. Do not merge or deploy. Hosted online execution, physical
+> phones/input methods, screen-reader speech and two-device live editing were not retested.
+> No disposable suggestion accounts remain; our temporary verification server is stopped.
+> Unrelated logs, Supabase CLI cache, .claude and snippets are preserved.
+
+> Current approved drawer repair (2026-10-21): branch `codex/classroom-drawer-controls`, directly
+> based on main `9257ea7` (merged PR #31). Teacher approved one Module/Projects rail, reopening
+> the selected worksheet, hover opening and animated outside closing for Module, Projects and
+> Chat. The earlier CKB-053 repair was only on open PR #26 targeting the unmerged rolling-tasks
+> branch; it was never in main. This branch brings only the relevant repair onto current main.
+> Done: one fixed Module tab beside Projects (Students / projects for teachers), no moving
+> worksheet duplicate; hover does not steal focus or close on leaving; outside presses close
+> even pinned panels. Both slide directions, keyboard/Escape, touch taps, worksheet page and
+> unsaved editor/chat text are retained. Projects explicitly remains visible on phones. Opening
+> Projects closes the worksheet; Module reopens its retained visit. All modules/top-bar Modules
+> opens the catalog. Java execution/status/startup code is preserved. No server, schema, route,
+> dependency, hosted settings or migration changes.
+> Verification: final full suite 149/149; final actual offline production browser 17/17, both
+> roles, phone/desktop/enlarged UI, measured opening/closing motion and real laptop Java. Build,
+> offline launcher build and diff check pass; lint 0 errors/8 existing warnings. Deliberately
+> removing outside closing and restoring the duplicate Module tab caused 15 expected failures
+> (2 pass); restored build passes all 17. [All named tests, commands and limits](../verification/classroom-drawer-controls.md).
+> CKB-053, frontend/workflow pages and the prompt map are updated. Implementation `ed16d50`
+> is committed and pushed; [PR #32](https://github.com/SirNeo-Coder/JavaShare/pull/32) is open
+> against main and attached to this chat. No implementation work remains. Do not merge unrelated
+> PR #25/#26 or curriculum work. The current approval authorizes this repair and the
+> project's normal branch/PR delivery, not a merge. Next: teacher review and hosted rollout test.
+> Hosted rollout, physical devices and disconnected Wi-Fi remain unverified. Clicks inside the
+> separate web-preview frame do not reach the document outside-dismiss handler. Disposable local
+> fixtures are cleaned; only our temporary server is stopped. Existing servers and unrelated
+> logs, Supabase CLI cache, .claude and snippets are preserved.
+
+> Delivered regular Console correction (2026-10-21): `codex/classroom-java-progress`, implementation
 > `8ae4f1a`, integrated latest main `b3c74e0` (startup repair PR #30) in `398aa8c`. Teacher reported no animation in the regular Code editor; earlier coverage
 > only entered module/personal editors. Teacher approved reusing the existing status strip in
 > the regular teacher/student Console. Its Java-only running flag keeps the strip visible when
@@ -395,3 +671,141 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - `codeshare-knowledge-base`: knowledge base, stacked on (b)
   - `realtime-c1`: PR (c1), stacked on the knowledge base
   - `cloudflare-c2`: PR (c2), stacked on c1
+
+## Module resume and meaningful exercises — 2026-10-21
+
+- Approved by the teacher: reopen the next unfinished step, auto-load each complete sample,
+  restore previous step edits, keep personal work separate, and make Week 12/13 alterations
+  exercise lesson logic through changed output, using Week 14 as the reference.
+- Branch: `codex/module-resume-and-logic-tasks`, based on `codex/classroom-drawer-controls`.
+  Work is isolated in `/tmp/codeshare-module-resume`; primary checkout is preserved.
+- Done: prepared task/sample-first/Week 12–13 changes integrated with current Console/drawer
+  fixes; shared saved-progress resume; seven improved exercise requirements with new ids.
+  CKB-052/054 updated and CKB-058 added. Required history migration is the unchanged prepared
+  additive file. Hosted actions remain teacher-only.
+- Verified: production build, offline launcher and whitespace checks passed; lint zero errors/eight
+  existing warnings; full suite 221/221, actual offline/online resume browser 11/11, revised exercises
+  on browser Java 8 8/8. Both deliberate-break regressions failed and passed after restoration.
+  Final named checks and limits: `docs/verification/module-resume-and-logic-tasks.md`.
+- Delivered: implementation `ad7efe6`, pushed on `codex/module-resume-and-logic-tasks`;
+  [PR #33](https://github.com/SirNeo-Coder/JavaShare/pull/33) now targets main after PR #32 merged.
+  No code work remains in progress. Next: teacher review and documented migration/app/JSON rollout.
+  Do not merge or change hosted services. Temporary verification servers were stopped; the original
+  classroom and primary checkout remain intact. Continue from `docs/handoffs/rolling-module-tasks.md`.
+
+- History migration update (2026-10-21): teacher screenshots show **Success. No rows returned**
+  and the verification row `activity_projects | jsonb | NO` in the selected Supabase project.
+  No assistant hosted SQL was run; project identity was not independently verified.
+- Prerequisite update: teacher merged PR #32 as `e421fe0`; confirmed through GitHub metadata.
+  Retargeted PR #33 from the drawer branch to main; verified open/unmerged/mergeable.
+  Next: teacher reviews/merges #33 into main, completes app rollout, and uploads revised
+  Week 12/13/14 JSON. Hosted feature verification remains pending. No assistant merge/deploy.
+
+## Rolling module prerequisites — 2026-10-21
+
+- Teacher approved prerequisites first: every required module activity must pass across the
+  existing predecessor chain. Personal performance submissions and handwritten liplets remain
+  separate; project naming/identity changes remain deferred.
+- Branch `codex/module-prerequisites`, based on merged main `9fba8a7`. Work is isolated in the
+  attached managed worktree; original checkout and other-chat work are preserved.
+- Done: server enforcement at every module/project entry point; earliest-unfinished banner and
+  Continue action; live-class catch-up; missing/cyclic prerequisite messages; teacher previews;
+  preserved module/personal/earlier-week work, histories and submitted snapshots. No migration.
+- Evidence: production build and offline launcher build pass; lint zero errors/eight existing
+  warnings; full suite 238/238; real offline/online browser checks 10/10. Server-bypass regression
+  failed with the guard removed and passed after restoration. Full named checks and limits:
+  `docs/verification/module-prerequisites.md`.
+- Delivered: `20d5931` committed and pushed; [PR #35](https://github.com/SirNeo-Coder/JavaShare/pull/35)
+  targets main and is attached. Nothing remains in progress. Next: teacher review and rollout,
+  including confirming Week 13/14 uploads. Teacher reports PR #33 merged, history migration
+  verified, Cloudflare Ready and Week 12 uploaded. The old temporary resume checkout is gone.
+  Temporary verification servers were stopped and disposable browser classrooms removed.
+- Continue from `docs/handoffs/rolling-module-tasks.md`. Hosted services, physical disconnected
+  Wi-Fi devices, Windows and other browsers remain unverified. No assistant merge or hosted action.
+
+## Week 15 to 21 additive curriculum package 2026-10-22
+
+- Approved: add only required sample-first/task material and appendices; preserve original
+  lessons, code, outputs, ids, assessment and written Week 20. No runner changes or substitutions.
+- Branch: `codex/week15-week21-step-additions`, based on main `9fba8a7`.
+- Prepared: seven JSON/PDF/Word review packages, 33 tasks, required upload fields and weekly links.
+  Original supplied files and all original document pages remain unchanged.
+- Checked: build and offline build passed; lint zero errors/eight existing warnings; full suite
+  269/269; every sample/task ran on real Java; deliberately broken upload regression failed and
+  passed after restoration. Real local browser passed 6/6, including every code week opening. Delivery is tracked in
+  [the active rolling handoff](rolling-module-tasks.md).
+- Open: classroom file persistence, original thread-sample timing and visible/browser GUI support
+  remain separate decisions. Review copies are not a blanket classroom rollout approval.
+- Delivered implementation `614ae27`, committed and pushed; [draft PR #36](https://github.com/SirNeo-Coder/JavaShare/pull/36) targets main.
+  Next: teacher reviews the package and runtime limits; never merge or deploy as an assistant.
+  Files and limitations: [package index](../modules/week15-week21.md).
+
+## Course modules order — 2026-10-22
+
+- Teacher approved: unfinished weeks increase from Week 12 through Week 21; completed
+  modules move below them so the next unfinished week is first.
+- Branch: `codex/module-catalog-order`, isolated checkout `/tmp/codeshare-module-order`,
+  based on main `21766ba`. Original checkout and its existing changes are preserved.
+- Done: drawer uses existing saved 100% completion, then increasing week; weekly badges
+  remain visible. No saved-work, lock, execution, schema or configuration changes.
+- Verified: production build passes; lint 0 errors/8 existing warnings; full suite 306/306,
+  0 skips; local real-browser checks 4/4 including laptop Java completion and reload.
+  Restoring the old comparator failed three regressions; restoring the fix passed all four.
+- Initial build dependency-link failure and browser timing failures are recorded alongside
+  final named results in `docs/verification/module-catalog-order.md`. CKB-066 records the bug.
+- Delivered: implementation `9d17fe1` committed and pushed; [PR #40](https://github.com/SirNeo-Coder/JavaShare/pull/40)
+  is open against main. No implementation work remains in progress.
+- Next: teacher reviews/merges #40 and rolls out the app. Hosted ordering and real
+  classroom Wi-Fi remain unverified. No assistant merge, deployment or hosted setting changes.
+
+- PR #40 conflict update (2026-10-22): updated branch with main `ce73db0`, preserving
+  the completed CKB-063 curriculum correction and all module-ordering notes. Only three
+  documentation files conflicted; module-ordering code/tests and corrected JSON/tests
+  were verified unchanged. Build passed; lint 0 errors/8 existing warnings; 307/307 full
+  tests with no skips; real local browser 4/4. Resolution is committed and pushed on the
+  same branch for review. No implementation work remains; teacher review/merge/rollout
+  remain next. Named evidence is updated in `docs/verification/module-catalog-order.md`.
+
+## Module CPU reduction — 2026-10-22
+
+- Teacher approved keeping CodeShare on the free plan by caching module content and
+  unfinished module work on each student's device, then saving module code only after
+  a successful task. Personal performance-task saves remain unchanged.
+- Branch: `codex/module-completion-saves`, based on the guarded completion checkpoint
+  groundwork in `20dfbd9`. Work is isolated in `/tmp/codeshare-api-errors-recovery`.
+- Done: read-only module preparation, student/class-scoped device cache, local module
+  drafts and sample evidence, one validated online completion checkpoint, same-id retry
+  after sync failure, and updated filtered cache content in the successful response.
+  Offline still uses classroom-laptop Java; only successful module results are saved.
+- Verified: full suite 316/316 with no skips; lint 0 errors/8 existing warnings;
+  Next.js/backend and offline launcher builds pass; online production browser 9/9.
+  Regression mutation of the old pre-run save fails as expected and passes after restore.
+  Offline browser attempt was interrupted before reporting cases; see
+  `docs/verification/module-completion-saves.md` for exact evidence and limits.
+- Delivered: implementation `869333e` is committed and pushed; [PR #41](https://github.com/SirNeo-Coder/JavaShare/pull/41)
+  is open against main. Next: teacher reviews the branch and decides whether to deploy.
+  No hosted settings, database, or deployment were changed; free-plan CPU recovery and
+  physical classroom Wi-Fi remain unverified.
+
+## Personal performance-task workflow — 2026-10-23
+
+- Teacher approved the implementation plan in this chat: successful-run submission, frozen
+  per-module copies, submission progress independent of review, and teacher checklist review.
+- Branch: `codex/personal-performance-workflow`, based on main `7946f0b`. Preserves prerequisite
+  checks, shared subject modules, completion-only module saves and device draft recovery.
+- Done: Projects exposes personal Java work; current drafts remain intact; linked modules prefer
+  prior submitted personal files. Exact saved files must run successfully before submission.
+  Teacher Students → student → module → Review personal submission opens read-only frozen files
+  in the main editor with ordinary Java execution and the complete frozen checklist in Projects.
+  Resubmission resets that copy's review. Java 2 Week 20 remains paper work and is skipped during
+  personal carry-forward. No new migration or dependency.
+- Verified: 335/335 automated tests with actual local Supabase and Java; no skips. Offline
+  production browser 4/4; online production browser 5/5, including input, Stop and teacher runs.
+  Production and offline-launcher builds passed; lint zero errors/eight
+  existing warnings. Three deliberate-break regressions failed, then passed when restored.
+- Delivered: implementation `3a18c3e` and verification `24bd381` committed and pushed.
+  [PR #44](https://github.com/SirNeo-Coder/JavaShare/pull/44) is open against main. Named results,
+  earlier failures and limits are in `docs/verification/personal-performance-workflow.md`.
+- Problem record: CKB-070. Rules, workflow, route/storage/permission maps and prior case links updated.
+- Next: teacher reviews the PR and decides rollout. No merge, deploy, hosted settings or hosted
+  database changes. Windows and physical disconnected classroom Wi-Fi remain unverified.

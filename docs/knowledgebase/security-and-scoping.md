@@ -75,3 +75,30 @@ startup/compile stops after 120 seconds. Combined stdout/stderr is capped at 64 
 The teacher explicitly accepts browser evidence as falsifiable practice completion;
 the authenticated server retains class, part, live-week, version and exact-output checks.
 Offline rejects browser result reporting and never loads CheerpJ. See setup/verification.
+
+Module prerequisite access (2026-10-21): every module content/progress/project/save/run/result/
+submission path checks the student's class-scoped current activity passes across the complete
+predecessor chain. No browser pass flag or progress percentage can substitute. Missing uploads
+and cycles block access. Live class permits the active module's ancestors; teachers retain full
+previews. Catalog metadata contains only the blocked module's reason and prerequisite identity.
+
+## Shared subject modules (2026-10-22)
+
+Class membership is still checked before module reads. Assigned-class library queries always
+filter by that class’s `teacher_id` and `module_subject`; student claims never choose the owner
+or subject. Subject selection, saved-upload inspection/sharing, uploads and deletion require the
+class owner. New classes accept exactly Java or Net MVC. The app refuses subsequent subject
+changes and checks the matching course family on upload/import; database constraints also prevent
+a Java/.NET mismatch. Existing unassigned classes remain compatible for reads, but must choose
+a subject before new uploads. Replacement imports require the current shared `updated_at` to
+avoid overwriting a concurrent correction. All student progress queries retain their class key.
+
+Prerequisite links resolve inside that same teacher/subject library. Completion is still looked
+up by student and class; finishing a shared week in one class never opens it in another class.
+
+Personal task review/submission (2026-10-23): browser success remains explicitly accepted practice
+evidence, not a grade. Personal submission checks identity/class/module access, saved-version
+freshness and a server-computed file hash; offline refuses browser claims. Teacher checklist
+routes require class ownership and current student membership. A submission-specific id prevents
+old review ticks from overwriting a resubmission. Frozen teacher-run files never use student-save
+or completion routes. Existing class isolation, live restrictions and prerequisite checks remain.

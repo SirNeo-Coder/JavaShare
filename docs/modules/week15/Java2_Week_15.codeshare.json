@@ -1,0 +1,1157 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 15,
+  "id": "java-2-w15",
+  "title": "Self-Paced Module: Java File Handling",
+  "continues": "Week 14 — Collections Framework",
+  "starterFiles": [
+    {
+      "path": "Bus.java",
+      "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+    },
+    {
+      "path": "InvalidDistanceException.java",
+      "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Jeepney.java",
+      "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+    },
+    {
+      "path": "Main.java",
+      "content": "import java.util.Map;\nimport java.util.Set;\nimport java.util.TreeMap;\nimport java.util.TreeSet;\n\npublic class Main {\n    public static void main(String[] args) {\n        Set<String> stops = new TreeSet<>();\n        stops.add(\"Recto\");\n        stops.add(\"Monumento\");\n        stops.add(\"Divisoria\");\n        for (String stop : stops) {\n            System.out.println(\"Stop: \" + stop);\n        }\n\n        Map<String, Integer> trips = new TreeMap<>();\n        trips.put(\"Mang Ramon\", 5);\n        trips.put(\"Kuya Ben\", 9);\n        trips.put(\"Aling Rosa\", 3);\n\n        for (String driver : trips.keySet()) {\n            System.out.print(driver + \" \");          // keys\n        }\n        System.out.println();\n        int total = 0;\n        for (int count : trips.values()) {           // values\n            total = total + count;\n        }\n        System.out.println(\"Total trips: \" + total);\n        for (Map.Entry<String, Integer> e\n                : trips.entrySet()) {                // both\n            System.out.println(e.getKey() + \" -> \"\n                + e.getValue());\n        }\n    }\n}\n"
+    },
+    {
+      "path": "OverloadException.java",
+      "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Tricycle.java",
+      "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+    },
+    {
+      "path": "Vehicle.java",
+      "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+    },
+    {
+      "path": "VehicleNotFoundException.java",
+      "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "java-2-w15-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Files That Remember: Creating, Checking, and Deleting with the File Class",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain what a File object represents and distinguish between naming a file and creating it on the disk.",
+        "affective": "Value careful record keeping by checking what a method returns before assuming a file was created or deleted.",
+        "psychomotor": "Write and run a program that creates a file and a folder, lists the folder, and deletes a file, checking each returned value."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Where we left off:** your folder should already have `Vehicle.java`, `Jeepney.java`, `Tricycle.java`, `Bus.java`, `OverloadException.java`, `InvalidDistanceException.java`, and `VehicleNotFoundException.java`. None of them change this week. Save a copy of `Main.java` as `Main_week14.txt`.\n\n**The problem this week fixes:** last week your fleet lived in an `ArrayList`. When the program ended, the list disappeared. A program that must **remember** needs to save its data in a **file**.\n\n**No internet needed.** Keep every class in its own file, all in one folder. The text files you make this week go in the same folder. Compile with `javac *.java`, run with `java Main`."
+        },
+        {
+          "type": "definition",
+          "term": "File handling",
+          "markdown": "A program creating, reading, writing, and deleting files on the computer's disk, so data stays after the program ends. Java's tools for this are in the `java.io` package (io = input and output). A **text file** holds plain characters you can open in Notepad."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The barangay hall keeps records in a **filing cabinet**. Writing a label \"Fleet records\" on an index card does **not** put a folder in the cabinet: that is a `File` object. Someone still has to make the folder (**create**), look inside it (**read**), add pages (**write**), or throw it out (**delete**). The cabinet keeps the folder even after the clerk goes home, just like a file stays after your program ends."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Day",
+            "Java class",
+            "Its job"
+          ],
+          "rows": [
+            [
+              "Mon",
+              "File",
+              "names a file or folder; creates, checks, lists, and deletes it"
+            ],
+            [
+              "Tue",
+              "FileReader, BufferedReader",
+              "read a text file one character, or one whole line, at a time"
+            ],
+            [
+              "Wed",
+              "Scanner, StringReader",
+              "read words and numbers from a file; read a String as if it were a file"
+            ],
+            [
+              "Thu",
+              "FileWriter, BufferedWriter, StringWriter",
+              "write to a file (replace it, or add to the end); build text in memory"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d1-s1",
+          "number": 1,
+          "instruction": "Replace `Main.java` with this, then run it **once**. A File object is only a name, until you create it.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.File;\nimport java.io.IOException;\n\npublic class Main {\n    public static void main(String[] args) {\n        File report = new File(\"fleet.txt\");   // only a NAME so far, no file yet\n        System.out.println(\"File name: \" + report.getName());\n        System.out.println(\"Exists before? \" + report.exists());\n        try {\n            boolean made = report.createNewFile();   // now the real file is made\n            System.out.println(\"Created now? \" + made);\n        } catch (IOException e) {\n            System.out.println(\"Could not create: \" + e.getMessage());\n        }\n        System.out.println(\"Exists after? \" + report.exists());\n        System.out.println(\"Is a file? \" + report.isFile());\n        System.out.println(\"Size in bytes: \" + report.length());\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "File name: fleet.txt\nExists before? false\nCreated now? true\nExists after? true\nIs a file? true\nSize in bytes: 0",
+          "checkYourself": "Run Step 1 a **second** time. Predict first: what will `Exists before?` and `Created now?` say? (The file is already there, so `createNewFile()` refuses and returns **false**. It does not erase the file.)"
+        ,
+          "activity": {
+            "id": "java-2-w15-d1-s1-alter-v1",
+            "instruction": "Create fleet.txt twice in the same run. Immediately after printing Created now, call createNewFile() again and print \"Created again? \" followed by its boolean result. Start in a clean exercise folder.",
+            "files": [],
+            "expectedOutput": "File name: fleet.txt\nExists before? false\nCreated now? true\nCreated again? false\nExists after? true\nIs a file? true\nSize in bytes: 0",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Look closely:** `new File(\"fleet.txt\")` did not make a file: `exists()` said **false**. Only `createNewFile()` made the real (empty) file, so its size is **0 bytes**. Keep `fleet.txt`; you will fill it on Tuesday. `createNewFile()` can throw an `IOException`, a **checked** exception from Week 13, which is why it sits inside `try`."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "File method",
+            "What it does",
+            "Gives back"
+          ],
+          "rows": [
+            [
+              "exists()",
+              "checks if the file or folder is really on the disk",
+              "true / false"
+            ],
+            [
+              "createNewFile()",
+              "makes a new, empty file (only if it is not there yet)",
+              "true if made; false if it already existed"
+            ],
+            [
+              "mkdir()",
+              "makes a new folder",
+              "true if made"
+            ],
+            [
+              "isFile(), isDirectory()",
+              "is it a file? is it a folder?",
+              "true / false"
+            ],
+            [
+              "length(), getName()",
+              "size in bytes; the name only",
+              "a number; a String"
+            ],
+            [
+              "list()",
+              "the names of everything inside a folder",
+              "a String array"
+            ],
+            [
+              "delete()",
+              "deletes a file, or an empty folder",
+              "true if deleted"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Words to know this week.** **Path**: where a file is; a plain name like `fleet.txt` means \"in the folder where you run `java Main`.\" **Read**: bring data from a file into the program. **Write**: send data from the program into a file. **Overwrite**: erase the file and write it fresh. **Append**: add to the end and keep what was there. **Close**: tell Java you are done with a file, so everything is saved and the file is released."
+        },
+        {
+          "type": "text",
+          "markdown": "A `File` can also name a **folder** (also called a directory). `new File(folder, \"trips.txt\")` means \"trips.txt inside that folder.\""
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d1-s2",
+          "number": 2,
+          "instruction": "Replace `Main.java`. Folders, listing, and deleting.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.File;\nimport java.io.IOException;\nimport java.util.Arrays;\n\npublic class Main {\n    public static void main(String[] args) {\n        File folder = new File(\"records\");             // a folder is also a File\n        System.out.println(\"Folder made? \" + folder.mkdir());\n        System.out.println(\"Is a folder? \" + folder.isDirectory());\n\n        File trips = new File(folder, \"trips.txt\");    // records/trips.txt\n        File old = new File(folder, \"old_log.txt\");    // records/old_log.txt\n        try {\n            trips.createNewFile();\n            old.createNewFile();\n        } catch (IOException e) {\n            System.out.println(\"Could not create: \" + e.getMessage());\n        }\n\n        String[] names = folder.list();                // names inside the folder\n        Arrays.sort(names);                            // list() promises no order\n        System.out.println(\"Inside records: \" + Arrays.toString(names));\n\n        System.out.println(\"Delete old_log.txt? \" + old.delete());\n        System.out.println(\"Delete it again? \" + old.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());\n        System.out.println(\"Left inside: \" + Arrays.toString(folder.list()));\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Folder made? true\nIs a folder? true\nInside records: [old_log.txt, trips.txt]\nDelete old_log.txt? true\nDelete it again? false\nDelete the folder? false\nLeft inside: [trips.txt]",
+          "checkYourself": "Run Step 2 again. Now `Folder made?` says **false** (the folder already exists) and the list shows `old_log.txt` again, because `createNewFile()` made it again. Why does `Arrays.sort(names)` come before printing? (`list()` promises no order, so sorting makes everyone's output match.)"
+        ,
+          "activity": {
+            "id": "java-2-w15-d1-s2-alter-v1",
+            "instruction": "After deleting old_log.txt twice, delete trips.txt and print \"Delete trips.txt? \" plus the result. Then run the existing folder deletion and listing. Print an empty array if folder.list() is null because the folder was deleted. Start with a clean records folder.",
+            "files": [],
+            "expectedOutput": "Folder made? true\nIs a folder? true\nInside records: [old_log.txt, trips.txt]\nDelete old_log.txt? true\nDelete it again? false\nDelete trips.txt? true\nDelete the folder? true\nLeft inside: []",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Read it carefully:** the second `delete()` gave **false**: there was nothing left to delete. The folder also refused to be deleted: Java only deletes a folder when it is **empty**, and `trips.txt` is still inside. These methods **return false** instead of throwing an exception, so always check what they return."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w15-d1-slip",
+        "points": 15,
+        "afterStep": "java-2-w15-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a `File` object? Does `new File(\"fleet.txt\")` create the file on the disk? How do you know (Step 1)?"
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, `createNewFile()` gave **true** on the first run and **false** on the second. Why?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 2, `folder.delete()` gave **false**. Why? How is \"returning false\" different from throwing an exception like Week 13's `OverloadException`?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w15-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Line by Line: Reading Text Files with FileReader and BufferedReader",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe how FileReader and BufferedReader read a text file, and what readLine() returns at the end of a file.",
+        "affective": "Show patience and accuracy when typing data files, recognizing that one wrong character can stop a program.",
+        "psychomotor": "Type fleet.txt and write a program that loads it with BufferedReader into an ArrayList of Vehicle objects."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Reader",
+          "markdown": "An object that brings characters **from** a source into your program. `FileReader` reads a text file **one character at a time**. `BufferedReader` wraps around another reader and adds `readLine()`, which reads a **whole line** at once and gives `null` when there are no more lines."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The dispatcher reads the terminal logbook to the drivers. `FileReader` is like spelling it out letter by letter: \"N... X... A...\", correct but slow and tiring. `BufferedReader` is like reading one full line of the logbook at a time: \"Jeepney, NXA 123, Mang Ramon.\" When she reaches the last line, there is nothing more to read: that is `null`."
+        },
+        {
+          "type": "text",
+          "markdown": "**New: try-with-resources.** A file you open must be **closed** when you are done. If you write `try (FileReader reader = new FileReader(...)) { ... }`, Java closes it for you at the end, even if an exception happens."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d2-s3",
+          "number": 3,
+          "instruction": "**Step 3a:** open `fleet.txt` (made in Step 1) in **Notepad**. Type the four lines shown in `fleet.txt` **exactly**: commas, no spaces after commas. Save it.\n\n**Step 3:** replace `Main.java`. This reads the file one character at a time.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.FileReader;\nimport java.io.IOException;\n\npublic class Main {\n    public static void main(String[] args) {\n        String firstLine = \"\";\n        int commas = 0;\n        boolean firstDone = false;\n        try (FileReader reader = new FileReader(\"fleet.txt\")) {  // closes by itself\n            int ch = reader.read();          // ONE character, given as a number\n            while (ch != -1) {               // -1 means \"end of file\"\n                if (ch == '\\n') {\n                    firstDone = true;        // the first line has ended\n                } else if (ch == ',') {\n                    commas++;\n                }\n                if (!firstDone && ch != '\\r') {\n                    firstLine = firstLine + (char) ch;   // number back to a letter\n                }\n                ch = reader.read();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n        System.out.println(\"First line: \" + firstLine);\n        System.out.println(\"Commas in the file: \" + commas);\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "First line: Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nCommas in the file: 12"
+        ,
+          "activity": {
+            "id": "java-2-w15-d2-s3-alter-v1",
+            "instruction": "Keep fleet.txt unchanged. Count newline characters instead of commas. Rename the counter to newlines and its final printed label to \"Newline characters in the file: \". The supplied file ends with a newline.",
+            "files": [],
+            "expectedOutput": "First line: Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nNewline characters in the file: 4",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "`read()` gives each character as a **number** (its code), and **-1** at the end of the file. That is a lot of work just to get one line."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d2-s4",
+          "number": 4,
+          "instruction": "Replace `Main.java`. Each line of text becomes a real `Vehicle` object in last week's `ArrayList`.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.IOException;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    // turns ONE line of text into a Vehicle object\n    static Vehicle toVehicle(String line) {\n        String[] part = line.split(\",\");   // \"Bus,BUS 789,Aling Rosa,50\" -> 4 parts\n        if (part[0].equals(\"Jeepney\")) {\n            return new Jeepney(part[1], part[2], part[3]);\n        } else if (part[0].equals(\"Tricycle\")) {\n            return new Tricycle(part[1], part[2], part[3]);\n        } else {\n            return new Bus(part[1], part[2], Integer.parseInt(part[3]));\n        }\n    }\n\n    public static void main(String[] args) {\n        List<Vehicle> fleet = new ArrayList<>();\n        try (BufferedReader in = new BufferedReader(new FileReader(\"fleet.txt\"))) {\n            String line = in.readLine();       // a whole line, or null at the end\n            while (line != null) {\n                if (!line.trim().isEmpty()) {  // skip blank lines\n                    fleet.add(toVehicle(line));\n                }\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n        System.out.println(\"Loaded \" + fleet.size() + \" vehicles from fleet.txt\");\n        for (Vehicle v : fleet) {\n            v.showInfo();\n        }\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Loaded 4 vehicles from fleet.txt\nNXA 123 | Driver: Mang Ramon | Passengers: 0/20\nTRC 456 | Driver: Kuya Ben | Passengers: 0/4\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50\nNYB 321 | Driver: Mang Tonyo | Passengers: 0/20",
+          "checkYourself": "(1) Change `\"fleet.txt\"` to `\"flet.txt\"` and run. You get `Cannot read: flet.txt (No such file or directory)`; on Windows it ends *(The system cannot find the file specified)*. Change it back. (2) Add the line `Bus,BUS 000,Mang Jun,fifty` to `fleet.txt` and run. It crashes with a `NumberFormatException`. Remove the line. You will learn to handle that in your Performance Task."
+        ,
+          "activity": {
+            "id": "java-2-w15-d2-s4-alter-v1",
+            "instruction": "Load the unchanged four-line fleet file. Before adding a parsed vehicle to the list, include only Bus objects. The loaded count and printed list must reflect filtering, not edited labels.",
+            "files": [],
+            "expectedOutput": "Loaded 1 vehicles from fleet.txt\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "error",
+          "language": "java",
+          "markdown": "What Check yourself (2) produces: `Integer.parseInt()` got text that is not a number.",
+          "message": "Exception in thread \"main\" java.lang.NumberFormatException: For input string: \"fifty\""
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "FileReader alone",
+            "BufferedReader (around a FileReader)"
+          ],
+          "rows": [
+            [
+              "Reads",
+              "one character: read()",
+              "one whole line: readLine()"
+            ],
+            [
+              "End of file",
+              "returns -1",
+              "returns null"
+            ],
+            [
+              "Use it for",
+              "counting or checking single characters",
+              "data files with one record per line (most of the time)"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Look closely:** `toVehicle()` returns a `Jeepney`, a `Tricycle`, or a `Bus`, but its return type is `Vehicle`. That is **polymorphism** from the Four Pillars. `split(\",\")` cuts a line at every comma into an array; `Integer.parseInt(\"50\")` turns the text \"50\" into the number 50."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w15-d2-slip",
+        "points": 20,
+        "afterStep": "java-2-w15-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does `readLine()` give back, and what does it give back when the file has no more lines?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Why do we open the reader inside `try ( ... )` (try-with-resources)? What does Java do for us at the end?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Write the class or method that does each job: a) reads one character; b) reads one whole line; c) turns \"50\" into 50; d) cuts a line at every comma."
+          },
+          {
+            "id": "2.4",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 4, `toVehicle()` returns a Jeepney, Tricycle, or Bus, but its return type is `Vehicle`. Which Week 12 idea is this, and why is it useful here?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w15-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Count the Fares: Reading Files with Scanner and StringReader",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Compare reading a file with Scanner and with BufferedReader, and explain what StringReader is for.",
+        "affective": "Practice honesty with data by stopping safely at bad input instead of adding wrong numbers to a total.",
+        "psychomotor": "Write a program that totals fares from fares.txt with Scanner, and a method that reads from both a StringReader and a FileReader."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Scanner on a file",
+          "markdown": "You already know `Scanner` from reading the keyboard (`new Scanner(System.in)`). Give it a `File` instead, `new Scanner(new File(\"fares.txt\"))`, and it reads the file word by word and **number by number**. `hasNextDouble()` looks ahead and answers \"is the next word a number?\" without using it up."
+        },
+        {
+          "type": "analogy",
+          "markdown": "At the end of the day, the canteen cashier runs her finger along the price list and adds up only the **numbers**, skipping spaces and new lines. Before adding, she checks: \"Is this a number?\" If she hits a word like \"abc,\" she stops instead of adding nonsense. That cashier is `Scanner` with `hasNextDouble()`."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d3-s5",
+          "number": 5,
+          "instruction": "**Step 5a:** in Notepad, make a new file `fares.txt` in the same folder, with the two lines shown (sample fares, not real LTFRB rates).\n\n**Step 5:** replace `Main.java`.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.File;\nimport java.io.FileNotFoundException;\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        double total = 0;\n        int count = 0;\n        try (Scanner sc = new Scanner(new File(\"fares.txt\"))) {  // a FILE, not System.in\n            while (sc.hasNextDouble()) {          // is the next word a number?\n                total = total + sc.nextDouble();\n                count++;\n            }\n        } catch (FileNotFoundException e) {\n            System.out.println(\"Missing file: \" + e.getMessage());\n        }\n        System.out.println(\"Fares read: \" + count);\n        System.out.println(\"Total collected: P\" + total);\n        if (count > 0) {\n            System.out.printf(\"Average fare: P%.2f%n\", total / count);\n        }\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Fares read: 5\nTotal collected: P89.0\nAverage fare: P17.80",
+          "checkYourself": "Change `fares.txt` to `13.00 15.00 abc` on line 1 and run. Now `Fares read: 2`: `hasNextDouble()` said \"not a number\" at `abc`, so the loop stopped safely. If you call `nextDouble()` without asking first, it crashes with `InputMismatchException`. Put the file back."
+        ,
+          "activity": {
+            "id": "java-2-w15-d3-s5-alter-v1",
+            "instruction": "Keep fares.txt unchanged. Read each number, then count and add it only when the fare is at least P15.00. Compute the average from the accepted fares.",
+            "files": [],
+            "expectedOutput": "Fares read: 3\nTotal collected: P63.0\nAverage fare: P21.00",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "definition",
+          "term": "StringReader",
+          "markdown": "A reader whose source is a **String** in memory, not a file on disk. Because `FileReader` and `StringReader` are **both** kinds of `Reader`, one method can read from either."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Before reading the real class record, a teacher practises on a **photocopy** of two sample rows. Same reading method, safer source. `StringReader` is that photocopy: you can test your reading code without touching the real file."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d3-s6",
+          "number": 6,
+          "instruction": "Replace `Main.java`. StringReader: a String that acts like a file.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.IOException;\nimport java.io.Reader;\nimport java.io.StringReader;\n\npublic class Main {\n    // works with ANY Reader: a real file, or a String acting like a file\n    static int countVehicles(Reader source) throws IOException {\n        BufferedReader in = new BufferedReader(source);\n        int count = 0;\n        String line = in.readLine();\n        while (line != null) {\n            if (!line.trim().isEmpty()) {\n                count++;\n            }\n            line = in.readLine();\n        }\n        in.close();\n        return count;\n    }\n\n    public static void main(String[] args) {\n        String sample = \"Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\\n\"\n                      + \"Tricycle,TRC 456,Kuya Ben,Bagong Silang TODA\\n\";\n        try {\n            System.out.println(\"From a String: \" + countVehicles(new StringReader(sample)));\n            System.out.println(\"From fleet.txt: \" + countVehicles(new FileReader(\"fleet.txt\")));\n            System.out.println(\"From an empty String: \" + countVehicles(new StringReader(\"\")));\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "From a String: 2\nFrom fleet.txt: 4\nFrom an empty String: 0"
+        ,
+          "activity": {
+            "id": "java-2-w15-d3-s6-alter-v1",
+            "instruction": "Change countVehicles so it counts only nonblank lines beginning with \"Tricycle,\". Use the same String, file and empty-String inputs.",
+            "files": [],
+            "expectedOutput": "From a String: 1\nFrom fleet.txt: 1\nFrom an empty String: 0",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Look closely:** `countVehicles(Reader source)` accepts a `StringReader` **and** a `FileReader`. The parameter type is the parent class `Reader`: the same idea as a `Vehicle` variable holding a `Jeepney`."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "BufferedReader",
+            "Scanner",
+            "StringReader"
+          ],
+          "rows": [
+            [
+              "Reads from",
+              "any Reader (file, String)",
+              "keyboard, file, or String",
+              "a String in memory"
+            ],
+            [
+              "Best at",
+              "whole lines: one record per line",
+              "words and numbers: nextInt(), nextDouble()",
+              "testing reading code without a real file"
+            ]
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w15-d3-slip",
+        "points": 15,
+        "afterStep": "java-2-w15-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "How is `new Scanner(new File(\"fares.txt\"))` different from `new Scanner(System.in)`? What does `hasNextDouble()` do?"
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 5's Check yourself, a file with `abc` in it gave `Fares read: 2` instead of crashing. Why? What would `nextDouble()` alone have done?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 6, `countVehicles(Reader source)` accepted both a `StringReader` and a `FileReader`. Which OOP pillar from Week 12 makes this work? Why is a StringReader useful for testing?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w15-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Overwrite or Append? Writing Files with FileWriter, BufferedWriter, and StringWriter",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Differentiate overwriting from appending a file, and explain why every writer must be closed.",
+        "affective": "Show responsibility for other people's records by choosing append when history must be kept, and overwrite only when it may be replaced.",
+        "psychomotor": "Write programs that overwrite and append a log file, save and reload the fleet with BufferedWriter, and build a report with StringWriter."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Writer",
+          "markdown": "A writer sends characters **from** your program **to** a destination. `new FileWriter(\"trip_log.txt\")` **overwrites**: it erases the file and starts it fresh. `new FileWriter(\"trip_log.txt\", true)` **appends**: it keeps what is there and adds to the end. If the file does not exist yet, both make it."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The terminal has a **whiteboard** for \"Next jeepney to leave\": each new note erases the old one (**overwrite**). It also has a **logbook** where every departure is a new line under the last one (**append**). Choose the wrong one and either the logbook loses its history or the whiteboard fills up with old news."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d4-s7",
+          "number": 7,
+          "instruction": "Replace `Main.java`. `showFile()` prints a file so you can see inside it; you will reuse it.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\n\npublic class Main {\n    // prints every line of a file, so we can SEE what is inside\n    static void showFile(String name) {\n        System.out.println(\"--- \" + name + \" ---\");\n        try (BufferedReader in = new BufferedReader(new FileReader(name))) {\n            String line = in.readLine();\n            while (line != null) {\n                System.out.println(line);\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n    }\n\n    public static void main(String[] args) {\n        try (FileWriter out = new FileWriter(\"trip_log.txt\")) {   // OVERWRITE mode\n            out.write(\"NXA 123 left Monumento\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        try (FileWriter out = new FileWriter(\"trip_log.txt\")) {   // same file again\n            out.write(\"TRC 456 left Bagong Silang\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        showFile(\"trip_log.txt\");\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "--- trip_log.txt ---\nTRC 456 left Bagong Silang"
+        ,
+          "activity": {
+            "id": "java-2-w15-d4-s7-alter-v1",
+            "instruction": "Change only the second FileWriter to append mode. Keep both original write calls. The first trip must survive the second write.",
+            "files": [],
+            "expectedOutput": "--- trip_log.txt ---\nNXA 123 left Monumento\nTRC 456 left Bagong Silang",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Only one line!** The second `FileWriter` erased the NXA 123 line. That is overwrite mode."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d4-s8",
+          "number": 8,
+          "instruction": "Keep `showFile()` from Step 7. Replace only the `main` method (the whole file is shown here). Append mode: the logbook grows.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\n\npublic class Main {\n    // prints every line of a file, so we can SEE what is inside\n    static void showFile(String name) {\n        System.out.println(\"--- \" + name + \" ---\");\n        try (BufferedReader in = new BufferedReader(new FileReader(name))) {\n            String line = in.readLine();\n            while (line != null) {\n                System.out.println(line);\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n    }\n\n    public static void main(String[] args) {\n        try (FileWriter out = new FileWriter(\"trip_log.txt\", true)) {   // true = APPEND\n            out.write(\"BUS 789 left Caloocan\\n\");\n            out.write(\"NYB 321 left Sangandaan\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        showFile(\"trip_log.txt\");\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "--- trip_log.txt ---\nTRC 456 left Bagong Silang\nBUS 789 left Caloocan\nNYB 321 left Sangandaan",
+          "checkYourself": "Run Step 8 again. Predict: how many lines now? (Five: append never erases, so the two new lines are added again.)"
+        ,
+          "activity": {
+            "id": "java-2-w15-d4-s8-alter-v1",
+            "instruction": "Begin with the original Step 7 log containing the Tricycle line. Change Step 8 from append mode to overwrite mode. Keep its two write calls; the old Tricycle line must disappear.",
+            "files": [],
+            "expectedOutput": "--- trip_log.txt ---\nBUS 789 left Caloocan\nNYB 321 left Sangandaan",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "definition",
+          "term": "BufferedWriter",
+          "markdown": "Wraps around a `FileWriter` and collects text in memory, then writes it in big pieces, which is faster for many lines. `newLine()` ends a line the right way for each computer (Windows and Linux end lines differently). Its text reaches the file only when the writer is **closed**, so always use try-with-resources."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d4-s9",
+          "number": 9,
+          "instruction": "Replace `Main.java`. `toLine()` is the **reverse** of `toVehicle()`: it turns an object back into one line of text. Save the fleet, then load it back.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.BufferedReader;\nimport java.io.BufferedWriter;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    static Vehicle toVehicle(String line) {           // same as Step 4\n        String[] part = line.split(\",\");\n        if (part[0].equals(\"Jeepney\")) {\n            return new Jeepney(part[1], part[2], part[3]);\n        } else if (part[0].equals(\"Tricycle\")) {\n            return new Tricycle(part[1], part[2], part[3]);\n        } else {\n            return new Bus(part[1], part[2], Integer.parseInt(part[3]));\n        }\n    }\n\n    // the REVERSE of toVehicle: one Vehicle back into one line of text\n    static String toLine(Vehicle v) {\n        String middle = \",\" + v.getPlateNumber() + \",\" + v.getDriverName() + \",\";\n        if (v instanceof Jeepney) {\n            return \"Jeepney\" + middle + ((Jeepney) v).getRoute();\n        } else if (v instanceof Tricycle) {\n            return \"Tricycle\" + middle + ((Tricycle) v).getToda();\n        } else {\n            return \"Bus\" + middle + ((Bus) v).getSeats();\n        }\n    }\n\n    static List<Vehicle> load(String fileName) {\n        List<Vehicle> fleet = new ArrayList<>();\n        try (BufferedReader in = new BufferedReader(new FileReader(fileName))) {\n            String line = in.readLine();\n            while (line != null) {\n                if (!line.trim().isEmpty()) {\n                    fleet.add(toVehicle(line));\n                }\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read \" + fileName + \": \" + e.getMessage());\n        }\n        return fleet;\n    }\n\n    public static void main(String[] args) {\n        List<Vehicle> fleet = load(\"fleet.txt\");\n        System.out.println(\"Loaded from fleet.txt: \" + fleet.size());\n        fleet.add(new Tricycle(\"TRC 654\", \"Mang Lito\", \"Bagong Silang TODA\"));\n\n        String backup = \"fleet_backup.txt\";\n        try (BufferedWriter out = new BufferedWriter(new FileWriter(backup))) {\n            for (Vehicle v : fleet) {\n                out.write(toLine(v));\n                out.newLine();           // ends the line\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        System.out.println(\"Saved to \" + backup + \": \" + fleet.size());\n\n        List<Vehicle> again = load(backup);\n        System.out.println(\"Reloaded: \" + again.size());\n        again.get(again.size() - 1).showInfo();\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Loaded from fleet.txt: 4\nSaved to fleet_backup.txt: 5\nReloaded: 5\nTRC 654 | Driver: Mang Lito | Passengers: 0/4"
+        ,
+          "activity": {
+            "id": "java-2-w15-d4-s9-alter-v1",
+            "instruction": "Load the original four vehicles. Replace the extra Tricycle with new Bus(\"BUS 654\", \"Mang Lito\", 30). Save and reload exactly as before; the final object must have capacity 30.",
+            "files": [],
+            "expectedOutput": "Loaded from fleet.txt: 4\nSaved to fleet_backup.txt: 5\nReloaded: 5\nBUS 654 | Driver: Mang Lito | Passengers: 0/30",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Open `fleet_backup.txt` in Notepad: five lines, the new tricycle last. Close the program, run it tomorrow: the data is still there."
+        },
+        {
+          "type": "definition",
+          "term": "StringWriter",
+          "markdown": "A writer whose destination is a **String in memory**, not a file. You write into it piece by piece, then `toString()` gives you all the text at once: to show on screen, save to a file, or both."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The dispatcher drafts the daily report on **scratch paper** first, then reads it aloud and copies the same text into the record book. `StringWriter` is the scratch paper."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w15-d4-s10",
+          "number": 10,
+          "instruction": "Replace `Main.java`. It reads the backup from Step 9 and writes a report in memory first.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.io.BufferedReader;\nimport java.io.File;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\nimport java.io.StringWriter;\n\npublic class Main {\n    public static void main(String[] args) {\n        StringWriter report = new StringWriter();   // a \"file\" that lives in memory\n        report.write(\"DAILY FLEET REPORT\\n\");\n        int count = 0;\n        try (BufferedReader in = new BufferedReader(new FileReader(\"fleet_backup.txt\"))) {\n            String line = in.readLine();\n            while (line != null) {\n                String[] part = line.split(\",\");\n                count++;\n                report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n        report.write(\"Total vehicles: \" + count + \"\\n\");\n\n        String text = report.toString();     // everything written so far\n        System.out.print(text);              // 1) show it on screen\n        try (FileWriter out = new FileWriter(\"report.txt\")) {\n            out.write(text);                 // 2) save the SAME text\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        File saved = new File(\"report.txt\");\n        System.out.println(\"report.txt size: \" + saved.length() + \" bytes\");\n    }\n}\n"
+            }
+          ,
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "DAILY FLEET REPORT\n1. NXA 123 (Jeepney) - Mang Ramon\n2. TRC 456 (Tricycle) - Kuya Ben\n3. BUS 789 (Bus) - Aling Rosa\n4. NYB 321 (Jeepney) - Mang Tonyo\n5. TRC 654 (Tricycle) - Mang Lito\nTotal vehicles: 5\nreport.txt size: 202 bytes",
+          "checkYourself": "Open `report.txt` in Notepad. It holds exactly the lines you saw on screen, because both came from the same `text`. Add one more line with `report.write(\"Prepared by: (your name)\\n\");` before `toString()` and run again. Where does your name appear?"
+        ,
+          "activity": {
+            "id": "java-2-w15-d4-s10-alter-v1",
+            "instruction": "Use the original Step 9 backup with five vehicles. Build and save a report containing only Bus records. Skip other lines before increasing count; keep numbering consecutive.",
+            "files": [],
+            "expectedOutput": "DAILY FLEET REPORT\n1. BUS 789 (Bus) - Aling Rosa\nTotal vehicles: 1\nreport.txt size: 67 bytes",
+            "stdin": ""
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Check your folder after Step 10",
+            ""
+          ],
+          "rows": [
+            [
+              "Classes",
+              "Main.java + the 7 class files from last week"
+            ],
+            [
+              "Typed by you",
+              "fleet.txt, fares.txt"
+            ],
+            [
+              "Made by your programs",
+              "records/trips.txt, trip_log.txt, fleet_backup.txt, report.txt"
+            ]
+          ]
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "unreported exception IOException; must be caught or declared to be thrown",
+              "means": "createNewFile() or a writer can throw a checked exception.",
+              "fix": "Put the line inside try { } catch (IOException e) { }."
+            },
+            {
+              "see": "unreported exception FileNotFoundException; must be caught or declared to be thrown",
+              "means": "new FileReader(...) or new Scanner(new File(...)) outside a try.",
+              "fix": "Use try-with-resources with a catch."
+            },
+            {
+              "see": "cannot find symbol ... symbol: class File",
+              "means": "A missing import.",
+              "fix": "Add import java.io.File; (or the class named)."
+            },
+            {
+              "see": "fleet.txt (No such file or directory) — Windows: (The system cannot find the file specified)",
+              "means": "Wrong file name, or the file is in another folder.",
+              "fix": "Check the spelling and put the .txt file next to Main.java."
+            },
+            {
+              "see": "NumberFormatException: For input string: \"fifty\"",
+              "means": "Integer.parseInt() got text that is not a number.",
+              "fix": "Fix the line, or catch NumberFormatException and skip it."
+            },
+            {
+              "see": "ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3",
+              "means": "A line has fewer commas (parts) than part[3] needs.",
+              "fix": "Make every line complete, e.g. Jeepney,NXA 999,Mang Jun,Recto."
+            },
+            {
+              "see": "java.util.InputMismatchException",
+              "means": "nextDouble() met a word that is not a number.",
+              "fix": "Ask hasNextDouble() first (Step 5)."
+            },
+            {
+              "see": "No error, but the file is empty (0 bytes)",
+              "means": "The writer was never closed, so its text never reached the disk.",
+              "fix": "Open every writer in try-with-resources."
+            }
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w15-d4-slip",
+        "points": 15,
+        "afterStep": "java-2-w15-d4-s10",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is the difference between `new FileWriter(\"log.txt\")` and `new FileWriter(\"log.txt\", true)`?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, two lines were written but `trip_log.txt` showed only one. Why? Which line was lost?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "The Error Guide shows a file that stayed **empty** (0 bytes) with no error. What caused it, and how does try-with-resources prevent it?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w15-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "Programs That Remember: File Handling Performance Task and Presentation",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Justify the choice of reading and writing classes, and of overwrite or append, in their own file-based program.",
+        "affective": "Show respect for classmates' work by testing each other's programs fairly and giving helpful feedback during presentations.",
+        "psychomotor": "Build, test four ways, and present a program that loads, saves, appends to a log, and reports its own data without crashing."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "Today you finish and present the **Performance Task**: make your own program remember its data. Run it four ways before you present, then answer the Friday exit slip."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w15-d5-slip",
+        "points": 20,
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Name your data file and your log file. Write what one line of your data file looks like, and the method that turns it into an object."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "You used overwrite for one file and append for another. Defend both choices. What would go wrong if you swapped them?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school clinic wants a program that keeps (a) the list of learners with their LRN and section, and (b) a record of every visit, including the time. Which of this week's classes would you use for each, and would each file overwrite or append? Why?"
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your program last week, which forgot everything when it ended, with this week's. What can it do now that it could not do before? What part was hardest?"
+          }
+        ]
+      ,
+        "afterStep": "java-2-w15-d5"
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w15-pt",
+    "title": "Performance Task: Make Your Program Remember",
+    "markdown": "Open your own program from last week's Performance Task (your sari-sari store, pets, gadgets, school personnel, or shapes theme). Make it **save** its data to a text file and **load** it back the next time it runs. Start on Thursday after the Thursday exit slip; finish and present on Friday.\n\n**Reuse this week's code.** Your `toObject` works like `toVehicle()` (Step 4). Your `toLine` works like `toLine()` (Step 9). Use `showFile()` (Step 7) to check what your files hold.\n\n**A good order for main:** 1) check and load the data file, 2) make the changes, 3) append to the log, 4) save the data file, 5) build and save the report.\n\n**Example (sari-sari store), first run with the given stock.txt:**\n\n- Skipped bad line: Rice (kg),fifty\n- Stock saved: {Bread=8, Softdrink=24}\n\n**Testing tip:** run your program at least four ways: (1) normally; (2) a second time: the log must grow, the data must not double; (3) with the data file renamed: a polite \"no data\" message; (4) with a bad line added: that line is skipped. Every run must end normally, never with an `Exception in thread \"main\"` report.\n\n**Plan before you type** (show your teacher): for your data file, log file, and report file, write the file name, what one line looks like, and whether it is overwritten or appended, and why.",
+    "checklist": [
+      "A data file with one object per line (at least 4 lines, at least 2 subclasses)",
+      "exists() checks the data file first; if it is missing, say so politely",
+      "Load with BufferedReader + readLine() into your List",
+      "A toObject / toLine pair: text to object, object to text",
+      "Save the List back with BufferedWriter and newLine() (overwrite)",
+      "Append one line to a log file each run: new FileWriter(name, true)",
+      "Build a short report with StringWriter; show it and save it",
+      "A bad line is skipped with a message (NumberFormatException), never a crash",
+      "Every reader and writer is inside try-with-resources",
+      "Make a temporary file, then delete() it and print the result",
+      "A comment on each part, e.g. // APPEND: keep old log lines"
+    ],
+    "exampleFiles": [
+      {
+        "path": "Main.java",
+        "content": "import java.io.BufferedReader;\nimport java.io.BufferedWriter;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\nimport java.util.Map;\nimport java.util.TreeMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Map<String, Integer> stock = new TreeMap<>();\n        String file = \"stock.txt\";\n        try (BufferedReader in = new BufferedReader(new FileReader(file))) {\n            String line = in.readLine();\n            while (line != null) {\n                String[] p = line.split(\",\");\n                try {\n                    stock.put(p[0], Integer.parseInt(p[1]));\n                } catch (NumberFormatException e) {\n                    System.out.println(\"Skipped bad line: \" + line);\n                }\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"No stock yet: \" + e.getMessage());\n        }\n        // Ana buys 2 Bread\n        stock.put(\"Bread\", stock.getOrDefault(\"Bread\", 0) - 2);\n        // APPEND: the sales log keeps every old line\n        try (FileWriter log = new FileWriter(\"sales_log.txt\", true)) {\n            log.write(\"Ana bought 2 Bread\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Log failed: \" + e.getMessage());\n        }\n        // OVERWRITE: stock.txt always holds today's numbers\n        try (BufferedWriter out = new BufferedWriter(new FileWriter(file))) {\n            for (Map.Entry<String, Integer> e : stock.entrySet()) {\n                out.write(e.getKey() + \",\" + e.getValue());\n                out.newLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Save failed: \" + e.getMessage());\n        }\n        System.out.println(\"Stock saved: \" + stock);\n    }\n}\n"
+      },
+      {
+        "path": "stock.txt",
+        "content": "Bread,10\nSoftdrink,24\nRice (kg),fifty\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main {\n    public static void main(String[] args) {\n        // Continue your own performance-task project; follow the original module requirements.\n    }\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce your theme and your files: data, log, report. (30 sec)",
+      "Run it: show the data loading and the report. (1 min)",
+      "Prove it live: run again and open the log in Notepad; rename the data file; add a bad line. (2 min)",
+      "Point to the code for load, save, and append, and say why. (1 min)",
+      "Answer questions. (30 sec)"
+    ],
+    "questionsToPrepare": [
+      "Why overwrite for the data file but append for the log?",
+      "What does your program do if the data file is missing?",
+      "What does try-with-resources do for you?",
+      "When would Scanner be better than BufferedReader?",
+      "Why does your toObject method return the parent class?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Load: at least 4 objects from 2+ subclasses load from the data file with BufferedReader; text becomes objects.",
+        "points": 8
+      },
+      {
+        "criterion": "Save: the List is saved back with BufferedWriter and newLine(); running twice does not double the data.",
+        "points": 8
+      },
+      {
+        "criterion": "Log + report: the log grows by appending; a StringWriter report is shown and saved.",
+        "points": 8
+      },
+      {
+        "criterion": "File class: exists() is checked before loading; a temporary file is created and deleted.",
+        "points": 6
+      },
+      {
+        "criterion": "Error handling: missing file and bad line give friendly messages; try-with-resources everywhere; no crash.",
+        "points": 10
+      },
+      {
+        "criterion": "Presentation and Q&A: proves each part live; explains overwrite vs. append and every choice with own code.",
+        "points": 10
+      }
+    ],
+    "totalPoints": 50
+  }
+,
+  "previousModuleId": "java-2-w14",
+  "sampleFirst": true
+}
