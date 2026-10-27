@@ -87,6 +87,10 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
       await projects.screenshot({ path: `/tmp/codeshare-personal-${mode}-checklist.png` });
       await projects.getByRole("button", { name: "Personal performance-task project", exact: true }).click();
       await page.waitForFunction((value) => document.querySelector('textarea[aria-label="Java source code editor"]')?.value === value, main);
+      const consoleSteps = page.locator(".module-activity-details").getByRole("region", { name: "Performance task steps" });
+      await consoleSteps.waitFor();
+      assert.deepEqual(await consoleSteps.locator("li").allTextContents(), fixture.performanceTask.steps);
+      await page.locator(".module-activity-details").screenshot({ path: `/tmp/codeshare-personal-${mode}-console-steps.png` });
     });
     await t.test("Save work is blue when saved, green for a few edits, red at 10+ changed lines; Run code says Saving your project…", async () => {
       const colour = async (name) => {

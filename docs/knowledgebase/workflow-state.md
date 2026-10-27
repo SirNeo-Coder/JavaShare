@@ -449,7 +449,8 @@ device shows them unticked. Teacher review ticks remain teacher-only.
 
 Performance task steps (2026-10-27): when a module's JSON has `performanceTask.steps`, Projects
 shows a numbered **How to build it, step by step** guide above the Performance task checklist, and
-the module's Performance task page shows it above the checklist. Steps are read-only text and name
+the module's Performance task page shows it above the checklist. The personal project's Console shows
+it under **Your performance task**, above Program input (not in the module project or teacher review). Steps are read-only text and name
 which **Code from this module** sample to copy (for example **Step 4 · Main.java**). Weeks 12–19 and
 21 carry steps; Week 20 stays a paper proposal. Already-uploaded modules show steps only after the
 teacher re-uploads the updated JSON (same ids, progress kept). No server, progress or grading change.
