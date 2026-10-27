@@ -902,6 +902,18 @@
     "id": "java-2-w13-performance",
     "title": "Make your own Week 12 program crash-proof",
     "markdown": "Open your own Week 12 performance-task theme. Keep its parent and children and add exception handling. Include a checked custom exception, an unchecked custom exception, a throwing setter, safe Scanner input, multiple catches and finally. Test good input, letters, a negative value and a value that is too large. Explain what each catch does. The store example is a reference, not an instruction to replace your existing theme. Submit this version explicitly after testing; personal runs never complete module activities.",
+    "steps": [
+      "In Projects, click **Personal performance-task project**. Your own Week 12 program opens. Keep your theme, parent and children.",
+      "On paper, plan one checked exception (a problem the caller must handle) and one unchecked exception (bad data) for your theme. Show your teacher.",
+      "Add a file for each exception. Copy **Step 9 · OverloadException.java** (checked, `extends Exception`) and **Step 9 · InvalidDistanceException.java** (unchecked, `extends RuntimeException`), paste them and rename them for your theme. Keep `super(message)`.",
+      "Change your validating setter to `throw new IllegalArgumentException(...)` instead of printing a message, like **Step 7 · Vehicle.java**.",
+      "Add a method that declares `throws` your checked exception and throws it when something goes wrong, like `board()` in **Step 11 · Vehicle.java**.",
+      "In `main`, read a number with Scanner and catch `NumberFormatException` with a friendly message, like **Step 6 · Main.java**. Type your answers in Console.",
+      "Use one `try` with two or more `catch` blocks and a `finally` block, like **Step 12 · Main.java**. **Run code**.",
+      "Test four ways: good input, letters, a negative value, and a value that is too large. Every run must end with a friendly message, never a crash.",
+      "Add comments that label the important parts.",
+      "Tick each item in the **Performance task checklist**, then click **Submit this version**."
+    ],
     "checklist": [
       "Continue your own Week 12 theme, not the Vehicle module",
       "One checked and one unchecked custom exception, each using super(message)",

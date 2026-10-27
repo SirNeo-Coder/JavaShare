@@ -1080,6 +1080,20 @@
     "id": "java-2-w15-pt",
     "title": "Performance Task: Make Your Program Remember",
     "markdown": "Open your own program from last week's Performance Task (your sari-sari store, pets, gadgets, school personnel, or shapes theme). Make it **save** its data to a text file and **load** it back the next time it runs. Start on Thursday after the Thursday exit slip; finish and present on Friday.\n\n**Reuse this week's code.** Your `toObject` works like `toVehicle()` (Step 4). Your `toLine` works like `toLine()` (Step 9). Use `showFile()` (Step 7) to check what your files hold.\n\n**A good order for main:** 1) check and load the data file, 2) make the changes, 3) append to the log, 4) save the data file, 5) build and save the report.\n\n**Example (sari-sari store), first run with the given stock.txt:**\n\n- Skipped bad line: Rice (kg),fifty\n- Stock saved: {Bread=8, Softdrink=24}\n\n**Testing tip:** run your program at least four ways: (1) normally; (2) a second time: the log must grow, the data must not double; (3) with the data file renamed: a polite \"no data\" message; (4) with a bad line added: that line is skipped. Every run must end normally, never with an `Exception in thread \"main\"` report.\n\n**Plan before you type** (show your teacher): for your data file, log file, and report file, write the file name, what one line looks like, and whether it is overwritten or appended, and why.",
+    "steps": [
+      "In Projects, click **Personal performance-task project**. Your own program from last week opens.",
+      "On paper, plan your data, log and report files: the file name, what one line looks like, and whether it is overwritten or appended, and why. Show your teacher.",
+      "Make the data file with one object per line: at least 4 lines, from at least 2 subclasses.",
+      "In `main`, check the data file with `exists()` first and print a polite message if it is missing, like **Step 1 · Main.java**. **Run code**.",
+      "Copy **Step 4 · Main.java**, keep only its `toVehicle()` method, and paste it into your file. Rename it `toObject` and change it to build your own objects. Load the file with `BufferedReader` and `readLine()` into your List.",
+      "Skip a bad line with a message by catching `NumberFormatException`, like **Sample code · Main.java**. Add one bad line to your data file and **Run code**.",
+      "Copy `toLine()` from **Step 9 · Main.java** and change it for your class. Save the List back with `BufferedWriter` and `newLine()`. Run twice: the data must not double.",
+      "Append one line to a log file on each run with `new FileWriter(name, true)`, like **Step 8 · Main.java**. Run twice: the log grows.",
+      "Build a short report with `StringWriter`, then show it and save it, like **Step 10 · Main.java**. Copy `showFile()` from **Step 7 · Main.java** to check what your files hold.",
+      "Make a temporary file, then `delete()` it and print the result, like **Step 2 · Main.java**. Check that every reader and writer is inside try-with-resources.",
+      "Add a comment on each part, for example `// APPEND: keep old log lines`.",
+      "Test four ways: normally; a second time; with the data file renamed; with a bad line added. Then tick each item in the **Performance task checklist** and click **Submit this version**."
+    ],
     "checklist": [
       "A data file with one object per line (at least 4 lines, at least 2 subclasses)",
       "exists() checks the data file first; if it is missing, say so politely",

@@ -11,6 +11,7 @@ const local = Object.fromEntries(raw.split("\n").map((l) => l.match(/^([A-Z_]+)=
 assert.ok(["localhost", "127.0.0.1"].includes(new URL(local.API_URL).hostname));
 const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
+fixture.performanceTask.steps = ["Plan your own theme", "Copy code from this module and change it", "Run code, tick the checklist, then Submit this version"];
 const mode = process.env.PERSONAL_BROWSER_MODE || "offline";
 const baseURL = mode === "online" ? "http://localhost:3033" : "http://localhost:3032";
 const main = 'public class Main { public static void main(String[] a) { System.out.println("Coffee shop"); } }';
@@ -73,10 +74,16 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
       await projects.getByRole("button", { name: "Choose module" }).click();
       await page.locator("#classroom-modules .module-catalog-card").filter({ hasText: fixture.title }).getByRole("button").first().click();
       await page.locator("#classroom-worksheet").waitFor();
+      const worksheetSteps = page.locator("#classroom-worksheet").getByRole("region", { name: "Performance task steps" });
+      await worksheetSteps.waitFor();
+      assert.deepEqual(await worksheetSteps.locator("li").allTextContents(), fixture.performanceTask.steps);
+      await page.locator("#classroom-worksheet").screenshot({ path: `/tmp/codeshare-personal-${mode}-worksheet-steps.png` });
       await page.getByRole("button", { name: "Projects", exact: true }).hover();
       assert.equal(await list().getByRole("checkbox", { name: fixture.performanceTask.checklist[0] }).isChecked(), true);
       assert.equal(await list().getByRole("checkbox", { name: fixture.performanceTask.checklist[1] }).isChecked(), false);
       assert.deepEqual(await read(), before);
+      assert.deepEqual(await projects.getByRole("region", { name: "Performance task steps" }).locator("li").allTextContents(), fixture.performanceTask.steps);
+      assert.equal(await projects.locator('[aria-label="Performance task steps"] ~ [aria-label="Performance task checklist"]').count(), 1, "steps sit above the checklist");
       await projects.screenshot({ path: `/tmp/codeshare-personal-${mode}-checklist.png` });
       await projects.getByRole("button", { name: "Personal performance-task project", exact: true }).click();
       await page.waitForFunction((value) => document.querySelector('textarea[aria-label="Java source code editor"]')?.value === value, main);

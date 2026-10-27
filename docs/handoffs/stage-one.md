@@ -1,3 +1,25 @@
+> Performance task steps (2026-10-27): teacher asked for a step-by-step procedure students can
+> follow to meet the performance-task requirements, including when to use the new Copy code, and
+> approved: an optional `performanceTask.steps` list in each weekly JSON, shown as a numbered
+> **How to build it, step by step** guide above the Performance task checklist in Projects and on
+> the module's Performance task page. First delivered as PR #54 stacked on
+> `feature/personal-copy-module-code`; the copy-code PR #52 reached main first, so #54 merged into
+> that feature branch, not main. Re-delivered on branch `feature/personal-task-steps-main` (the same
+> commit cherry-picked onto origin/main `06b6400`, worktree `../JavaShare-task-steps`). Changes: schema field (`backend/src/course-module-schema.ts`),
+> `PerformanceTaskSteps` in `app/ModuleViewer.tsx`, one line in `app/page.tsx`; steps drafted for
+> Weeks 12–19 and 21 from each week's own task text and checklist (Week 20 stays paper). No server
+> route, database, progress or grading change. Teacher must re-upload the updated weekly JSON files
+> for steps to appear (same ids, progress kept); assistants never upload to hosted services.
+> Verification: full suite 363/363; new `tests/performance-task-steps.test.mjs` (12 tests: schema keeps
+> steps, list renders, every named sample matches a real Copy code label in each week) caught three
+> wrong labels while drafting; schema, render and label breaks each shown failing, passing restored;
+> offline production browser test 6/6 (local Supabase, laptop Java) with new steps checks in Projects
+> and the worksheet, shown failing with the Projects list removed and passing restored; real Week 12
+> content checked in Projects on screen; `build:all` passes; lint 0 errors, 8 existing warnings.
+> Not checked: online CheerpJ mode, hosted site, phones, dark theme. Open choice: teacher was asked
+> whether to also show the steps in the Console's **Your performance task** box. Next: teacher merges
+> the re-delivered PR into main and re-uploads the weekly JSON files.
+
 > Teacher live help (2026-10-27): teacher approved seeing and editing what a selected student is
 > working on. Selecting a student in **Students / projects** shows their open Module project or
 > Personal performance-task project live (heading "Live: <name> · Module project/Personal project
