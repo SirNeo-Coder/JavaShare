@@ -8,7 +8,8 @@
 > Verification: 346/346 full suite; offline production browser test 5/5 (local Supabase, laptop
 > Java) including the new tick-survives-reload step; unit test shown failing with tick restore
 > broken, passing restored; `build:all` passes; lint 0 errors, 8 existing warnings. Online browser
-> mode not run (no runner on 3033/3034; the panel code is the same online). Next: PR for review.
+> mode not run (no runner on 3033/3034; the panel code is the same online). Pushed;
+> [PR #50](https://github.com/SirNeo-Coder/JavaShare/pull/50) is open against main. Next: teacher review.
 
 > Java member suggestions (2026-10-27): teacher approved extending the existing Java code
 > suggestions (merged PR #34, 2026-10-21) to also suggest a variable's declared class's own
