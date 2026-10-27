@@ -98,6 +98,12 @@ What teachers and students can do today. Keep this page current when their use o
   program input and does not check a module target. **Submit this version** saves a separate
   own-version snapshot. Later draft edits do not change that submission. Existing sample and
   own submission records, completion totals and assessment are preserved; output is not a grade.
+- In the personal project, the Console's **Code from this module** fold-out lists the module code the
+  student can already see: each unlocked lesson step's sample and the performance task's **Sample code**
+  (locked steps stay hidden). **Copy code** copies only the code, never a filename or a new file; the
+  student pastes it into their own file with Ctrl+V and changes it. Nothing saves until **Save work** or
+  **Run code**. On plain-http classroom pages (offline) it uses the browser's older copy command.
+  Module project and teacher review do not show it. (2026-10-27)
 - Opening another project/module/class or signing out saves the active project first; save
   failures stop the transition. New saves/submissions reject stale tabs. Reload before saving
   can still lose unsaved edits. The personal draft is `performance_task.project.files`, separate

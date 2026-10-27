@@ -58,6 +58,27 @@ export function changedLines(saved: ModuleFile[], current: ModuleFile[]) {
   return Math.max(before.length - kept, after.length - kept);
 }
 
+// Module code the student can already see (unlocked lesson samples, then the performance task's Sample code),
+// offered for copying into the personal project. Only the code is copied; the student's own filenames stay.
+export function moduleCode(module: CourseModule) {
+  const seen = new Set<string>();
+  return [
+    ...(module?.lessons ?? []).flatMap((lesson) => lesson.blocks)
+      .filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked)
+      .flatMap((step) => step.files.map((file) => ({ label: `Step ${step.number} · ${file.path}`, content: file.content }))),
+    ...(module?.performanceTask?.exampleFiles ?? []).map((file) => ({ label: `Sample code · ${file.path}`, content: file.content })),
+  ].filter(({ content }) => !seen.has(content) && Boolean(seen.add(content)));
+}
+
+// Offline classroom pages are plain http, where browsers turn off navigator.clipboard; use the older copy command there.
+export async function copyText(text: string) {
+  if (window.isSecureContext && navigator.clipboard) return navigator.clipboard.writeText(text);
+  const area = document.createElement("textarea");
+  area.value = text; area.style.position = "fixed"; area.style.opacity = "0";
+  document.body.append(area); area.select();
+  try { if (!document.execCommand("copy")) throw new Error("Copy failed"); } finally { area.remove(); }
+}
+
 export function JavaRunProgress({ message, waiting = false }: { message: string | null; waiting?: boolean }) {
   if (!message) return null;
   return <div className="java-run-progress" role="status" aria-live="polite">
@@ -77,6 +98,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [path, setPath] = useState(files.find((file) => /(?:^|\/)Main\.java$/.test(file.path))?.path ?? files[0]?.path ?? "");
   const [newPath, setNewPath] = useState("");
   const [addingFile, setAddingFile] = useState(false);
+  const [copied, setCopied] = useState<number | null>(null);
+  const codeToCopy = personal && !review ? moduleCode(activity.module) : [];
   const [busy, setBusy] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -320,6 +343,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {checkInput && <><b>Program input for this check</b><pre>{checkInput}</pre></>}
           {!personal && activity.progress.activityProjects?.beforeSampleFiles && <details className="module-before-sample"><summary>Work saved before sample loading</summary>{activity.progress.activityProjects.beforeSampleFiles.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</details>}
           {!personal && Boolean(backups?.length) && <details className="module-before-sample"><summary>Work saved before lesson changes</summary><p>Your earlier code is kept below. Run the current sample first, then copy any changes you still need.</p>{backups?.map((backup, index) => <div key={index}><b>Backup {index + 1}</b>{backup.files.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</div>)}</details>}
+          {Boolean(codeToCopy.length) && <details className="module-before-sample"><summary>Code from this module</summary><p>Copy code copies only the code, not the file name. Paste it into your own file with Ctrl+V, then change it for your project.</p>
+            {codeToCopy.map((code, index) => <div key={index}><b>{code.label}</b> <button type="button" onClick={() => void copyText(code.content).then(() => { setCopied(index); setError(""); }, () => setError("Could not copy. Select the code and press Ctrl+C instead."))}>{copied === index ? "Copied" : "Copy code"}</button><pre>{code.content}</pre></div>)}
+          </details>}
           {addingFile && <form onSubmit={addFile}><label>Java filename<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder="Helper.java" /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
