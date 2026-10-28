@@ -21,7 +21,7 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 1 — daily module steps pass | **Done, merged** | [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59), merge `93ab62f` on main |
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
-| Slice 2 — personal performance-task project for web | **Next** — not started | see "Slice 2 needs" |
+| Slice 2 — personal performance-task project for web | **Next** — proposed 2026-10-29, waiting for approval | see "Slice 2 needs" |
 | Slice 3 — page-element and media checks | Not started | see "Slice 3 notes" |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -170,6 +170,11 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
 - Week 1: all 8 expected outputs need a line break after `Visible page text:` (JSON and the
   printed PDF `DotNet1_HTML_Foundations_Module.pdf`).
 - Weeks 2–3: re-upload after deploying so `webChecks`/`mediaChecks` are kept (see "Status").
+- Weeks 1–3 have no `previousModuleId`, so each week's personal project starts from that week's
+  own starter instead of carrying the student's previous week forward (and no week requires the
+  one before). Add the links if carry-forward is wanted.
+- Week 3's personal checklist asks students to store pictures, sound and video in the project;
+  projects hold text files only until Slice 3 decides where media files live.
 - After the revision, re-run every step's sample through `tests/web-module-steps.browser.mjs`
   and report one line per step.
 
@@ -237,3 +242,6 @@ last, written from "Revision notes".
 - 2026-10-29 — Teacher decided the module file revision (JSON, DLL, printed module) waits
   until Slices 2–3 are built, so it covers everything learned. Week 1 fix moved to "Revision
   notes"; Slice 2 is next.
+- 2026-10-29 — Slice 2 investigated and proposed (see the chat proposal; files: routes,
+  repository, `StudentModuleActivity`, `page.tsx`, tests). Two module-file findings added to
+  "Revision notes". Waiting for approval.
