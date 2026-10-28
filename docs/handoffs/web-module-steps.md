@@ -12,7 +12,7 @@ Last updated: 2026-10-29.
 Net MVC classes use weekly modules whose steps are web pages (HTML, CSS, JavaScript) instead of
 Java. Students must be able to work through them like Java modules: open a step, run it, pass,
 unlock the next part, see the percentage move, and resume where they stopped. The work is split
-into three slices, plus the teacher's own revision of the module files.
+into three slices, then the teacher's own revision of the module files.
 
 ## Status
 
@@ -21,9 +21,9 @@ into three slices, plus the teacher's own revision of the module files.
 | Slice 1 — daily module steps pass | **Done, merged** | [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59), merge `93ab62f` on main |
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
-| Teacher's Weeks 1–3 file revision | **Next** — proposed 2026-10-29, waiting for approval | teacher's files (see "Teacher's files") |
-| Slice 2 — personal performance-task project for web | Not started | see "Slice 2 needs" |
+| Slice 2 — personal performance-task project for web | **Next** — not started | see "Slice 2 needs" |
 | Slice 3 — page-element and media checks | Not started | see "Slice 3 notes" |
+| Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
 Weeks 2–3 so their `webChecks`/`mediaChecks` are kept (uploads before PR #59 dropped them; same
@@ -67,6 +67,14 @@ Approved later the same day:
   the teacher's **View web projects** viewer). CKB-022 is resolved for module steps only; the
   student's own **New web project** preview is unchanged.
 - **Rule 5's reason** is written in AGENTS.md: offline classroom mode has no internet.
+
+Approved 2026-10-29:
+
+- **The weekly module file revision is done separately, after this feature is fully built**
+  (Slices 1–3). Why (teacher): so everything learned while building it, including things not
+  yet seen, goes into one revision of the module JSON, the DLL (daily lesson log) and the
+  printed module, instead of revising them now and again later. Until then, do not edit the
+  teacher's files; Week 1 keeps failing for the known reason below, and that is expected.
 
 ## How Slice 1 works (map)
 
@@ -115,7 +123,8 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
 
 - **Week 1, all 8 steps: fail.** Every step writes `Visible page text: <text>` on one line; the
   agreed rule puts a line break after `Visible page text:`. That is the only difference; with it
-  added, every step passes. This is what the teacher's revision prompt should fix.
+  added, every step passes. The printed Week 1 module PDF uses the same one-line form. Fix both
+  in the deferred revision (see "Revision notes").
 - **Week 2, all 7 steps: pass.**
 - **Week 3 Step 1: pass.** Steps 2–7: teacher-checked (`Media checks:`).
 - Weeks 1–3 have no `sampleFirst`, no `activity.id`, no `previousModuleId` and no JavaScript steps.
@@ -152,6 +161,17 @@ Today the personal project is Java-only end to end:
   ask the teacher before building.
 - Add each check as one more line in `WebCheckList`; teacher-checked steps could then become
   automatic.
+
+## Revision notes (for the deferred module revision)
+
+Collect here anything the module JSON, DLL or printed module must change because of this
+feature. Add to it during Slices 2–3; the revision prompt is written from this list at the end.
+
+- Week 1: all 8 expected outputs need a line break after `Visible page text:` (JSON and the
+  printed PDF `DotNet1_HTML_Foundations_Module.pdf`).
+- Weeks 2–3: re-upload after deploying so `webChecks`/`mediaChecks` are kept (see "Status").
+- After the revision, re-run every step's sample through `tests/web-module-steps.browser.mjs`
+  and report one line per step.
 
 ## Testing recipe (local only)
 
@@ -199,9 +219,9 @@ Today the personal project is Java-only end to end:
 
 ## Next step
 
-The teacher's Weeks 1–3 revision prompt: at minimum add the line break after
-`Visible page text:` in all 8 Week 1 expected outputs, then re-run every step's sample through
-`tests/web-module-steps.browser.mjs` and report one line per step. After that, Slice 2.
+Slice 2 (personal performance-task project for web; see "Slice 2 needs"): propose it to the
+teacher following AGENTS.md and wait for approval. Then Slice 3. The module file revision comes
+last, written from "Revision notes".
 
 ## Update log
 
@@ -214,3 +234,6 @@ The teacher's Weeks 1–3 revision prompt: at minimum add the line break after
   `stage-one.md` conflict with main was resolved by the teacher's merge `d41f819` (both entries kept). Week 1
   re-checked: all 8 expected outputs still use `Visible page text: <text>` on one line. Weeks 1–3
   revision proposed to the teacher; waiting for approval.
+- 2026-10-29 — Teacher decided the module file revision (JSON, DLL, printed module) waits
+  until Slices 2–3 are built, so it covers everything learned. Week 1 fix moved to "Revision
+  notes"; Slice 2 is next.
