@@ -51,6 +51,13 @@ and percentages, without student source files or raw progress maps. Reads do not
 - Linked project CSS and JS are inlined; `</script` and `</style` inside them are escaped so student code cannot break out of its tag.
 - Console messages come back with `postMessage`. The parent accepts only messages whose source is the current preview frame.
 - Teacher review uses `buildTeacherPreview` (`app/teacherWebPreview.ts`) to prepend a Content Security Policy before student code, on the same source line. It blocks network resources, forms, and base URLs while permitting inline project scripts/styles and `eval`/`Function` (CKB-027: the policy's `script-src` must stay as permissive about in-browser script execution as the student's own unrestricted preview - only network access is meant to differ). Parent message handling checks the current iframe, accepted console kinds, text type, and caps output. **Run preview** is explicit, and **Refresh** removes the prior frame. The existing student renderer is unchanged. **Open issue CKB-022:** that older path permits network requests; the sandbox alone does not block them. This was reproduced against a local counter, and is not repaired by the teacher-only wrapper.
+- Module web steps (2026-10-28, `app/WebStepRun.tsx`) reuse this preview. After the page loads and
+  draws, the frame posts `{ codeshare: "page", title, text }`; uncaught errors carry `uncaught: true`.
+  The parent accepts these only from its own current frame. Student code can forge them, so they are
+  practice evidence only; the server still checks expected output, step access and saved versions.
+  CKB-022 (network requests allowed) applies to module web steps too.
+- Teacher **Mark done** (`markSupabaseTeacherCheckedStep`) checks class ownership, current student
+  membership and that the step is a media step before writing a pass.
 - Known limit: an endless loop in student JavaScript can freeze that student's tab.
 
 ## Java runner

@@ -1,0 +1,273 @@
+// Real local production browser checks for web module steps (Slice 1), with the teacher's own
+// Net MVC Week 1-3 files. Offline settings: local Supabase and laptop Java; no hosted data.
+// Env: WEB_STEPS_BASE_URL (default http://localhost:3042), DOTNET_WEEKS_DIR (folder holding the
+// teacher's DotNet1_Week_0N.codeshare.json files), CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { randomUUID } from "node:crypto";
+import { createClient } from "@supabase/supabase-js";
+import { activityStateId } from "../backend/src/module-activities.ts";
+const { chromium } = await import(process.env.CODESHARE_PLAYWRIGHT_MODULE || "playwright");
+const config = execFileSync("npx", ["--no-install", "supabase", "status", "-o", "env"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+const local = Object.fromEntries(config.split("\n").map((line) => line.match(/^([A-Z_]+)="?([^"\n]*)"?$/)).filter(Boolean).map((m) => [m[1], m[2]]));
+assert.ok(["localhost", "127.0.0.1"].includes(new URL(local.API_URL).hostname));
+const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+const folder = process.env.DOTNET_WEEKS_DIR || "/home/ireneo/Documents/Java 2026/Net Files";
+const paths = ["DotNet1_Week_01.codeshare.json", "Week_02/DotNet1_Week_02.codeshare.json", "Week_03/DotNet1_Week_03.codeshare.json"].map((name) => join(folder, name));
+const weeks = paths.every(existsSync) ? paths.map((path) => JSON.parse(readFileSync(path, "utf8"))) : null;
+const stepsOf = (module) => module.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
+
+test("web module steps offline: uploads keep checks, teacher preview checks every sample, a student completes Week 2", { skip: !weeks && `teacher files not found in ${folder}` }, async (t) => {
+  const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+  const baseURL = process.env.WEB_STEPS_BASE_URL || "http://localhost:3042";
+  const users = []; let classroomId;
+  try {
+    const password = randomUUID();
+    for (const role of ["teacher", "student"]) {
+      const { data, error } = await admin.auth.admin.createUser({ email: `web-steps-${randomUUID()}@example.test`, password, email_confirm: true, user_metadata: { name: `Web ${role}` } });
+      assert.equal(error, null); users.push(data.user);
+      assert.equal((await admin.from("profiles").update({ role }).eq("id", data.user.id)).error, null);
+    }
+    const teacher = await browser.newContext({ baseURL, viewport: { width: 1500, height: 1050 } });
+    assert.equal((await teacher.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
+    const created = await teacher.request.post("/api/classes", { data: { subject: "Net MVC", name: "Web steps verification" } });
+    assert.equal(created.status(), 201); classroomId = (await created.json()).id;
+    assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);
+    const errors = [];
+
+    await t.test("upload keeps webChecks, mediaChecks and includeMediaOutput", async () => {
+      for (const week of weeks) assert.equal((await teacher.request.post(`/api/classrooms/${classroomId}/modules`, { data: week })).status(), 201, week.id);
+      for (const week of weeks.slice(1)) {
+        const saved = stepsOf(await (await teacher.request.get(`/api/classrooms/${classroomId}/modules/${week.id}`)).json());
+        for (const [index, step] of stepsOf(week).entries()) {
+          for (const field of ["webChecks", "mediaChecks", "includeMediaOutput"]) assert.deepEqual(saved[index][field], step[field], `${step.id} ${field}`);
+        }
+      }
+      assert.ok(stepsOf(weeks[2]).some((step) => step.mediaChecks), "Week 3 has a mediaChecks step to keep");
+    });
+
+    await t.test("teacher preview runs every step's own sample through the web check", async () => {
+      const page = await teacher.newPage(); page.setDefaultTimeout(20000); page.on("pageerror", (e) => errors.push(e.message));
+      await page.goto("/");
+      await page.getByRole("button", { name: /Open class/ }).click();
+      const curriculum = page.getByRole("navigation", { name: "Teacher class navigation" }).getByRole("button", { name: /Curriculum/ });
+      await curriculum.click();
+      const report = [];
+      for (const week of weeks) {
+        await page.locator(".teacher-module-card", { hasText: week.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: /View module details/ }).click();
+        const views = page.locator(".module-step");
+        await views.first().waitFor();
+        for (const [index, step] of stepsOf(week).entries()) {
+          const view = views.nth(index);
+          await view.getByRole("button", { name: "Run", exact: true }).click();
+          const checks = view.locator(".web-checks");
+          await checks.waitFor();
+          const media = /(?:^|\n)Media checks:/.test(step.expectedOutput);
+          if (media) { assert.match(await checks.textContent(), /Checked by your teacher for now/); report.push(`${step.id}: teacher-checked (expected output has Media checks)`); continue; }
+          const passed = await checks.locator("li.passed").count() === 1;
+          const yours = passed ? "" : await checks.getByLabel("Your output").textContent();
+          const alert = await checks.getByRole("alert").count() ? await checks.getByRole("alert").textContent() : "";
+          // Week 1 was written with the page text on the title's next line; say when that is the only difference.
+          const lineBreakOnly = !passed && !alert && step.expectedOutput.replace(/\nVisible page text: /, "\nVisible page text:\n") === yours;
+          report.push(`${step.id}: ${passed ? "pass" : `fail — ${alert || firstDifference(step.expectedOutput, yours)}${lineBreakOnly ? " (only difference: no line break after \"Visible page text:\")" : ""}`}`);
+        }
+        await page.getByRole("button", { name: /Close|Back/ }).first().click().catch(() => page.goBack());
+        await curriculum.click();
+      }
+      console.log(`Per-step sample results:\n${report.join("\n")}`);
+      t.diagnostic(report.join(" | "));
+    });
+
+    const student = await browser.newContext({ baseURL, viewport: { width: 1500, height: 1050 } });
+    assert.equal((await student.request.post("/api/auth/login", { data: { email: users[1].email, password } })).status(), 200);
+    const page = await student.newPage(); page.setDefaultTimeout(20000); page.on("pageerror", (e) => errors.push(e.message));
+    const worksheet = page.locator("#classroom-worksheet");
+    // A Net MVC class's own web project also has an HTML editor; use the module project's.
+    const editor = page.locator(".student-module-project").getByRole("textbox", { name: "HTML source code editor", exact: true });
+    const checks = page.locator(".student-module-project .web-checks");
+    const progress = async (week) => (await student.request.get(`/api/classrooms/${classroomId}/modules/${week.id}/progress`)).json();
+    const openWorksheet = async () => {
+      await page.mouse.move(1100, 20); await page.getByRole("button", { name: "Module", exact: true }).hover();
+      await page.waitForFunction(() => document.getElementById("classroom-worksheet")?.dataset.open === "true");
+    };
+    const openCatalog = async (week) => {
+      await page.goto("/"); await page.locator(".classroom-workspace").waitFor();
+      await page.getByRole("button", { name: "Module", exact: true }).hover();
+      await page.locator("#classroom-modules .module-catalog-card").filter({ hasText: week.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button").first().click();
+      await worksheet.locator("article:not([hidden])").waitFor();
+      await editorReady(); // choosing a module opens its next unfinished step in the editor
+    };
+    const currentTab = () => worksheet.locator('.worksheet-tabs [aria-current="page"]').textContent();
+    // Opening a step remounts the module editor; wait for the old one to go and the new one to finish restoring.
+    const editorReady = async (old) => {
+      if (old) await page.waitForFunction((element) => !element.isConnected, old);
+      await page.waitForFunction(() => { const box = document.querySelector('.student-module-project .editor-card textarea'); return box && !box.readOnly; });
+    };
+    const openStep = async (step) => {
+      const old = await editor.elementHandle();
+      await openWorksheet();
+      await worksheet.getByRole("button", { name: new RegExp(`Step ${step.number}$`) }).click();
+      await worksheet.locator("article:not([hidden])").getByRole("button", { name: "Work in code editor", exact: true }).click();
+      await editorReady(old);
+    };
+    // Each run replaces the preview frame; wait for the new one, then for Run code to come back.
+    const run = async () => {
+      const frame = page.locator(".student-module-project .module-web-preview iframe");
+      const old = await frame.count() ? await frame.elementHandle() : null;
+      await page.getByRole("button", { name: /Run code/ }).click();
+      if (old) await page.waitForFunction((element) => !element.isConnected, old);
+      else await frame.waitFor({ state: "attached" });
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      await checks.waitFor();
+    };
+    const week2 = weeks[1], steps2 = stepsOf(week2);
+
+    await t.test("Week 2 Step 1: mismatch and uncaught error show a cross with Required and Your output, then the sample passes", async () => {
+      await openCatalog(week2);
+      assert.match(await currentTab(), /Step 1$/);
+      await page.waitForFunction((value) => document.querySelector('.student-module-project .editor-card textarea')?.value === value, steps2[0].files[0].content);
+      assert.equal(await page.locator(".student-module-project .file-tab.active").textContent(), "index.html");
+      assert.equal(await page.getByLabel("Program input").count(), 0, "web steps have no Program input");
+      const sample = steps2[0].files[0].content;
+      await editor.fill(sample.replace("Welcome to our school canteen portfolio.", "Welcome to the canteen."));
+      await run();
+      assert.equal(await checks.locator("li.failed").textContent(), "✗ Page text matches");
+      assert.equal(await checks.getByLabel("Your output").textContent(), "Tab title: School Canteen Portfolio\nVisible page text:\nWelcome to the canteen.");
+      assert.match(await checks.textContent(), /Required output/);
+      assert.match(await page.locator(".module-run-feedback").textContent(), /Not completed/);
+      await editor.fill(sample.replace("</body>", "<script>missingFunction()</script></body>"));
+      await run();
+      assert.equal(await checks.locator("li.failed").count(), 1);
+      assert.match(await checks.getByRole("alert").textContent(), /Uncaught error: .*missingFunction/);
+      assert.notEqual((await progress(week2)).stepStates[steps2[0].id], "pass");
+      await editor.fill(sample);
+      await run();
+      assert.equal(await checks.locator("li.passed").textContent(), "✓ Page text matches");
+      await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
+      const saved = await progress(week2);
+      assert.equal(saved.stepStates[activityStateId(steps2[0])], "pass");
+      assert.equal(saved.percent, Math.round(100 / (steps2.length + 1)));
+    });
+
+    await t.test("Week 2: each next step opens, passes offline, the next part opens and the percentage moves", async () => {
+      for (const step of steps2.slice(1, 3)) {
+        await openStep(step);
+        await editor.fill(step.files[0].content);
+        await run();
+        assert.equal(await checks.locator("li.passed").count(), 1, step.id);
+        await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
+        assert.equal((await progress(week2)).stepStates[step.id], "pass");
+      }
+      assert.equal((await progress(week2)).percent, Math.round(300 / (steps2.length + 1)));
+      await openWorksheet();
+      assert.equal(await worksheet.locator(".worksheet-parts button.part-done").count(), 2, "Monday and Tuesday parts done, Wednesday open");
+    });
+
+    await t.test("Week 2: reload resumes at the next unfinished step, from the worksheet and the Module project button", async () => {
+      await openCatalog(week2);
+      assert.match(await currentTab(), /Step 4$/);
+      await page.getByRole("button", { name: "Projects", exact: true }).click();
+      await page.getByRole("button", { name: "Module project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      await page.waitForFunction((value) => document.querySelector(".module-activity-details pre")?.textContent === value, steps2[3].expectedOutput);
+      await page.waitForFunction(() => { const box = document.querySelector('.student-module-project .editor-card textarea'); return box && !box.readOnly; });
+      for (const step of steps2.slice(3)) {
+        if (step !== steps2[3]) await openStep(step);
+        await editor.fill(step.files[0].content);
+        await run();
+        assert.equal(await checks.locator("li.passed").count(), 1, step.id);
+        await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
+      }
+      const saved = await progress(week2);
+      assert.ok(steps2.every((step) => saved.stepStates[step.id] === "pass"));
+      assert.equal(saved.percent, Math.round(100 * steps2.length / (steps2.length + 1)), "the performance task (Slice 2) is the remaining share");
+      await page.screenshot({ path: "/tmp/codeshare-web-steps-student.png" });
+    });
+
+    await t.test("a preview that starts below the screen edge still reads the drawn page text, not the raw source", async () => {
+      await page.setViewportSize({ width: 1500, height: 520 });
+      try {
+        await run();
+        assert.equal(await checks.locator("li.passed").textContent(), "✓ Page text matches");
+      } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
+    });
+
+    await t.test("teacher dashboard shows the web student's percentage and marks a media step done", async () => {
+      const week3 = weeks[2], steps3 = stepsOf(week3);
+      await openCatalog(week3);
+      await run();
+      await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
+      await openStep(steps3[1]);
+      assert.match(await worksheet.locator("article:not([hidden])").textContent(), /Checked by your teacher for now/);
+      await run();
+      assert.match(await checks.textContent(), /Checked by your teacher for now/);
+      assert.notEqual((await progress(week3)).stepStates[steps3[1].id], "pass");
+      const refused = await student.request.post(`/api/classrooms/${classroomId}/modules/${week3.id}/progress/complete`, { data: {
+        stepId: steps3[1].id, updatedAt: (await progress(week3)).updatedAt, moduleVersion: new Date().toISOString(), completionId: randomUUID(),
+        files: steps3[1].files, success: true, output: steps3[1].expectedOutput } });
+      assert.equal(refused.status(), 400, "a media step cannot be completed from the browser");
+
+      const dashboard = await teacher.newPage(); dashboard.setDefaultTimeout(20000); dashboard.on("pageerror", (e) => errors.push(e.message));
+      await dashboard.goto("/");
+      await dashboard.getByRole("button", { name: /Open class/ }).click();
+      await dashboard.getByRole("button", { name: /^Students/ }).click();
+      const percent2 = Math.round(100 * steps2.length / (steps2.length + 1));
+      await dashboard.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      const card2 = dashboard.locator(".teacher-module-card", { hasText: "Canteen Descriptions" });
+      assert.match(await card2.textContent(), new RegExp(`${percent2}%`));
+      const card3 = dashboard.locator(".teacher-module-card", { hasText: "Local Canteen Media" });
+      await card3.locator(".teacher-checked-steps").getByRole("button", { name: "Mark done" }).first().click();
+      await card3.getByText("Done ✓").first().waitFor();
+      assert.equal((await progress(week3)).stepStates[steps3[1].id], "pass");
+      assert.equal(await card3.getByRole("button", { name: "Mark done" }).count(), steps3.length - 2);
+      await dashboard.screenshot({ path: "/tmp/codeshare-web-steps-teacher.png", fullPage: true });
+      await openCatalog(week3);
+      assert.match(await currentTab(), /Step 3$/, "the student resumes after the teacher-marked step");
+    });
+
+    await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
+      const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
+      const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],
+        exitSlip: { id: `${id}-slip`, points: 1, afterStep: block.id, questions: [{ id: "1.1", kind: "Define", points: 1, prompt: "What is the console?" }] } });
+      const consoleWeek = { format: "codeshare-module", version: 1, course: "dotnet-1", week: 9, id: "web-console-check", title: "Console check", lessons: [
+        lessonOf("web-console-d1", 1, step("web-console-s1", 1, "console.log(\"Total: \" + (2 + 3));\nconsole.info(\"Done\");\nalert(\"not part of the output\");", "Total: 5\nDone")),
+        lessonOf("web-console-d2", 2, step("web-console-s2", 2, "console.log(\"before\");\nmissingFunction();", "before")),
+      ] };
+      assert.equal((await teacher.request.post(`/api/classrooms/${classroomId}/modules`, { data: consoleWeek })).status(), 201);
+      const preview = await teacher.newPage(); preview.setDefaultTimeout(20000);
+      await preview.goto("/");
+      await preview.getByRole("button", { name: /Open class/ }).click();
+      await preview.getByRole("navigation", { name: "Teacher class navigation" }).getByRole("button", { name: /Curriculum/ }).click();
+      await preview.locator(".teacher-module-card", { hasText: "Console check" }).getByRole("button", { name: /View module details/ }).click();
+      const views = preview.locator(".module-step");
+      await views.nth(0).getByRole("button", { name: "Run", exact: true }).click();
+      assert.equal(await views.nth(0).locator(".web-checks li").textContent(), "✓ Console output matches");
+      await views.nth(1).getByRole("button", { name: "Run", exact: true }).click();
+      assert.equal(await views.nth(1).locator(".web-checks li").textContent(), "✗ Console output matches");
+      assert.match(await views.nth(1).locator(".web-checks").getByRole("alert").textContent(), /Uncaught error: .*missingFunction/);
+      assert.equal(await views.nth(1).locator(".web-checks").getByLabel("Your output").textContent(), "before");
+      await openCatalog(consoleWeek);
+      await run();
+      assert.equal(await checks.locator("li.passed").textContent(), "✓ Console output matches");
+      await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
+      assert.equal((await progress(consoleWeek)).stepStates["web-console-s1"], "pass");
+    });
+
+    // The deliberate missingFunction() run is a student page error, not a CodeShare error.
+    assert.deepEqual(errors.filter((message) => !/missingFunction/.test(message)), []);
+  } finally {
+    await browser.close();
+    if (classroomId) await admin.from("classrooms").delete().eq("id", classroomId);
+    for (const user of users) await admin.auth.admin.deleteUser(user.id);
+  }
+});
+
+function firstDifference(expected, actual) {
+  const want = expected.replace(/\r\n/g, "\n").split("\n"), got = actual.split("\n");
+  const line = want.findIndex((text, index) => text !== got[index]);
+  const at = line === -1 ? want.length : line;
+  return `line ${at + 1}: required ${JSON.stringify(want[at] ?? "(end)")}, page gave ${JSON.stringify(got[at] ?? "(end)")}`;
+}

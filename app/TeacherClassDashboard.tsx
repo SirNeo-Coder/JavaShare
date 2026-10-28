@@ -125,6 +125,14 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
           <h3>{module.title}</h3><p className="teacher-course-name">{module.course.replaceAll("-", " ")}</p>
           <div className="teacher-module-facts"><span><b>{module.lessons}</b>Lessons</span><span><b>{module.steps}</b>Practice steps</span><span><b>{forStudent ? forStudent.modules.find((item) => item.moduleId === module.moduleId)?.submissions ?? 0 : module.submissions}</b>Task submissions</span></div>
           <Meter percent={percent} label={forStudent ? "Saved completion" : "Average student completion"} />
+          {forStudent && Boolean(forStudent.modules.find((item) => item.moduleId === module.moduleId)?.teacherChecks.length) && <div className="teacher-checked-steps"><b>Checked by you</b><small>Pictures, sound or video steps pass when you mark them done.</small>
+            {forStudent.modules.find((item) => item.moduleId === module.moduleId)!.teacherChecks.map((check) => <span key={check.stepId}>Step {check.number} {check.done ? <i>Done ✓</i> : <button disabled={busy} onClick={async () => {
+              setBusy(true); setError("");
+              try { await api(`/api/classes/${classroom.id}/students/${forStudent.id}/modules/${encodeURIComponent(module.moduleId)}/teacher-check`, { method: "PUT", body: JSON.stringify({ stepId: check.stepId }) }); refresh(); }
+              catch (markError) { setError(markError instanceof Error ? markError.message : "Could not mark the step done"); }
+              finally { setBusy(false); }
+            }}>Mark done</button>}</span>)}
+          </div>}
           {forStudent && forStudent.modules.find((item) => item.moduleId === module.moduleId)?.personalSubmitted && <button className="teacher-card-action" disabled={busy} onClick={async () => {
             setBusy(true); setError("");
             try { await onReviewPersonal?.(forStudent.id, forStudent.name, module.moduleId); }

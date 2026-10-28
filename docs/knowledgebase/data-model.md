@@ -31,6 +31,7 @@ and `beforeSampleFiles` (the pre-update working copy). `project_files` remains t
 project so existing weekly carry-forward readers keep working. Saves update the active draft and
 working copy together under the existing `updated_at` comparison. `step_states` also accepts
 `sample:<activity.id>` for sample verification; only the existing task key completes an alteration.
+Since 2026-10-28 a teacher's **Mark done** on a media web step writes that step's normal pass key.
 The column is introduced by `20261021000100_module_activity_projects.sql`; older readers ignore it.
 
 ## Subject library addition (2026-10-22)

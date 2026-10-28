@@ -64,8 +64,20 @@ export function findActivity(module: CourseModule, stepId: string) {
   return module.lessons.flatMap((lesson) => lesson.blocks).find((block): block is ActivityStep => block.type === "step" && block.id === stepId);
 }
 
-// Java strips src/ before compiling; treat those two paths as the same source file.
-export function sourcePath(path: string) { return path.replace(/\\/g, "/").replace(/^src\//, ""); }
+// Java strips src/ before compiling; treat those two paths as the same source file. Web files keep src/.
+export function sourcePath(path: string) { return path.replace(/\\/g, "/").replace(/^src\/(?=.*\.java$)/, ""); }
+
+// A web step is decided by its files' endings, not a module field (teacher, 2026-10-28).
+export function webStep(step: { files?: ModuleFile[] }) {
+  return Boolean(step.files?.length) && step.files!.every((file) => /\.(?:html|css|js)$/.test(file.path));
+}
+
+export function checkableStep(step: { language: string; files: ModuleFile[] }) { return step.language === "java" || webStep(step); }
+
+// Output naming pictures, sound or video cannot be checked automatically yet; the teacher marks it done.
+export function teacherCheckedStep(step: { expectedOutput: string; activity?: { id?: string; expectedOutput: string } }) {
+  return [step.expectedOutput, step.activity?.id ? step.activity.expectedOutput : ""].some((text) => /(?:^|\n)Media checks:/.test(text));
+}
 
 export function mergeProjectFiles(...groups: ModuleFile[][]) {
   const files = new Map<string, ModuleFile>();
@@ -79,8 +91,8 @@ export function matchesActivityOutput(result: { success: boolean; output: string
   return result.success && text(result.output) === text(expected);
 }
 
-export function matchesSample(result: { success: boolean; output: string }, step: { expectedOutput: string; expectedError?: string }) {
-  if (!step.expectedError) return matchesActivityOutput(result, step.expectedOutput);
+export function matchesSample(result: { success: boolean; output: string }, step: { expectedOutput: string; expectedError?: string; files?: ModuleFile[] }) {
+  if (!step.expectedError || webStep(step)) return matchesActivityOutput(result, step.expectedOutput);
   // Match the declared exception, never JVM-specific stack frames or an unrelated failed run.
   const firstLine = result.output.split(/\r?\n/, 1)[0].replace(/^Exception in thread "[^"]+" /, "");
   return !result.success && (firstLine === step.expectedError || firstLine.startsWith(`${step.expectedError}: `));

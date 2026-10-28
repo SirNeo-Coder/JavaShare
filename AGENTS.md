@@ -247,3 +247,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   never saved to the server by this feature.
 - Selecting a group lets the teacher type in the group's shared code while a member is online;
   members' Save work keeps it. The teacher never auto-saves into group files.
+
+## Web module steps (agreed 2026-10-28)
+
+- A step whose files are all `.html`, `.css` or `.js` is a web step; no new module field.
+  Correct output: `.html` run file → tab title plus visible page text (blank lines removed);
+  `.js` run file → console lines. Same comparison as Java; an uncaught error fails the run.
+- Web steps always run in the student's browser, online and offline. Their result is accepted
+  as practice evidence offline too, checked against server-owned expected output and the saved
+  version; never a bare pass flag. Java offline still uses the laptop runner.
+- Steps whose expected output has `Media checks:` show "Checked by your teacher for now"; the
+  teacher marks them done from the student's module card. `webChecks`/`mediaChecks`/
+  `includeMediaOutput` are stored but not checked until a later slice. New web project stays
+  separate from modules.
