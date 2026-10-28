@@ -155,6 +155,15 @@ The browser switches to this path in the completion-only feature; offline/person
 paths retain their existing endpoints. Teacher applies hosted SQL before rollout:
 [setup](../module-completion-setup.md). Hosted CPU recovery is not yet verified.
 
+Web module steps (2026-10-28): `POST .../progress/complete` also accepts web files (`.html`,
+`.css`, `.js`, plus module `.txt` reference files) for a web step, offline and without
+`JAVA_RUNNER_URL`; Java files keep the existing offline/runner refusals before parsing. The
+repository requires the step's own kind of files and refuses `Media checks:` steps.
+`PUT /api/classes/:classroomId/students/:studentId/modules/:moduleId/teacher-check` `{ stepId }`
+(teacher of that class, current student) marks a media step passed. `GET /api/classes/:id/module-progress`
+adds `teacherChecks` per student module. `.../progress/run` and `.../progress/browser-result`
+remain Java-only (web never runs on the server; the browser-result route has no app caller).
+
 Personal performance workflow (2026-10-23): `POST .../progress/personal-run` invalidates earlier
 run evidence and uses saved personal files; offline executes laptop Java, online returns the
 saved version for browser execution. `POST .../progress/personal-result` accepts browser success

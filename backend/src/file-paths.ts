@@ -4,6 +4,8 @@ export const JAVA_PATH = /^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/;
 export const JAVA_PATH_MAX_LENGTH = 160;
 // Letters, digits, _ and - in each folder/name part, so ".." and hidden files are impossible.
 const WEB_PATH = /^(?:[\w-]+\/)*[\w-]+(?:\.[\w-]+)*\.(?:html|css|js)$/;
+// Web module projects may also keep plain-text reference files from the module (teacher, 2026-10-28).
+const MODULE_TEXT_PATH = /^(?:[\w-]+\/)*[\w-]+(?:\.[\w-]+)*\.txt$/;
 
 export function fileLanguage(path: string) {
   if (path.endsWith(".html")) return "html";
@@ -17,4 +19,8 @@ export function projectPathError(projectLanguage: string | null | undefined, pat
     return WEB_PATH.test(path) ? null : "Use a web filename ending in .html, .css, or .js, for example about.html";
   }
   return JAVA_PATH.test(path) ? null : "Use a valid Java filename, for example src/Helper.java";
+}
+
+export function moduleWebPathError(path: string) {
+  return MODULE_TEXT_PATH.test(path) ? null : projectPathError("web", path);
 }

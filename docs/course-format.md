@@ -44,7 +44,7 @@ One file per teaching week, named `<Course>_Week_NN.codeshare.json` (for example
 | `"analogy"` | `markdown` |
 | `"note"` | `markdown` (used for "Check yourself" and tips) |
 | `"table"` | `columns` (string[]), `rows` (string[][]) |
-| `"step"` | `id` (e.g. `"java-2-w15-d1-s1"`), `number`, `instruction` (markdown), `language` (`"java"` \| `"html"` \| `"css"` \| `"javascript"` \| `"csharp"`), `files` (File[] — the files the student puts in or replaces), `run` (optional: the file to run, e.g. `"Main.java"` or `"index.html"`), `expectedOutput` (the **real** output, exactly as produced), `checkYourself` (optional markdown), `activity` (optional — see below), `part` (optional string — see "Parts" below) |
+| `"step"` | `id` (e.g. `"java-2-w15-d1-s1"`), `number`, `instruction` (markdown), `language` (`"java"` \| `"html"` \| `"css"` \| `"javascript"` \| `"csharp"`), `files` (File[] — the files the student puts in or replaces), `run` (optional: the file to run, e.g. `"Main.java"` or `"index.html"`), `expectedOutput` (the **real** output, exactly as produced), `checkYourself` (optional markdown), `activity` (optional — see below), `part` (optional string — see "Parts" below), `webChecks`, `mediaChecks`, `includeMediaOutput` (optional, web steps — see "Web module steps" below) |
 | `"error"` | `language`, `markdown` (what causes it), `message` (the **real** error text) |
 | `"errorGuide"` | `rows`: `[{ "see": "...", "means": "...", "fix": "..." }]` |
 
@@ -107,8 +107,8 @@ its supplied starter files. Preceding weeks and submitted snapshots are never ov
 The first part opens automatically. Every sample step in a part must pass before the next part
 opens; named parts may span lessons. Compile and run successfully with exact expected output:
 normalize CRLF and ignore one final println newline, but never trim spaces or extra blank lines.
-Offline execution results come from the laptop. Online browser-reported success/output is approved practice evidence, checked against server-owned expected output and the saved version; direct browser pass flags are refused. Earlier passes survive
-later failed practice runs. Automatic checking supports Java only.
+Offline Java execution results come from the laptop. Online browser-reported success/output is approved practice evidence, checked against server-owned expected output and the saved version; direct browser pass flags are refused. Earlier passes survive
+later failed practice runs. Automatic checking supports Java and web pages (see "Web module steps").
 
 Liplets are handwritten, assessed by the teacher, and never gate progress. The existing completion
 percentage counts passed sample steps plus the two performance-task submission records, equally.
@@ -209,3 +209,38 @@ not implement runtime file access. Reading/presentation-only lessons may use the
 exitSlip.afterStep descriptive anchor; it is not a code-completion or handwritten-liplet gate.
 Week 20 has no invented executable steps. See the linked package's file, timing and GUI limits
 before classroom rollout. The schema, application and original files are unchanged.
+
+## Web module steps (approved 2026-10-28)
+
+A step whose `files` all end in `.html`, `.css` or `.js` is a web step; `.java` files make a Java step.
+There is no separate module field. Web steps use the same parts, `sampleFirst`, `activity.id` and
+`task:<id>` rules as Java. The page runs in the student's own browser, in the existing sandboxed
+preview (no `allow-same-origin`), online **and offline**: the browser's result is approved practice
+evidence, checked by the server against its own expected output and the saved version. A bare
+"passed" flag is never accepted. Java steps keep their existing runners.
+
+- **What is compared.** When `run` names an `.html` file (default `index.html`), the output is
+  `"Tab title: " + document.title + "\nVisible page text:\n" + body.innerText` trimmed, with every
+  run of two or more line breaks replaced by one. When `run` names a `.js` file, the script runs on
+  an empty page and the output is its `console.log/info/warn/error` lines joined with line breaks
+  (`alert` is not included). Comparison is the Java rule: Windows line endings and one final line
+  break are ignored; spaces and other blank lines count.
+- **Successful run.** The page must raise no uncaught error (including an unhandled promise
+  rejection). `expectedError` and Program input do not apply to web steps.
+- **Result.** A checklist with one line per check (**Page text matches** or **Console output
+  matches**), ticked or crossed; a cross shows **Required output** and **Your output** side by side.
+- **No internet.** The page runs under the same no-internet rule as the teacher viewer, like the
+  course-building checker: links, scripts, pictures, fonts and `fetch` to other sites do not load.
+  Pictures and fonts can only be embedded in the file (`data:`).
+- **Project files.** Web paths keep their folders (`src/app.js` is not merged with `app.js`). Module
+  `.txt` starter files are kept in the student's module project as reference files only.
+- **Pictures, sound and video.** A step whose expected output contains a `Media checks:` section
+  cannot be checked automatically yet. Students see **Checked by your teacher for now**; the teacher
+  opens **Students → student → module** and presses **Mark done** under **Checked by you**, which
+  records the same pass as an automatic check. `includeMediaOutput: true` without such a section is
+  checked automatically.
+- **Stored, not checked yet.** `webChecks: [{ "selector", "count"?, "attribute"?, "value"?, "style"? }]`,
+  `mediaChecks: [{ "src", "state": "loaded" | "broken" }]` and `includeMediaOutput` (boolean) are kept
+  on upload so a later slice can check them. CodeShare does not check them now.
+- **Week 1 note.** `DotNet1_Week_01.codeshare.json` writes `Visible page text: <text>` on one line, so
+  its steps do not match the agreed rule until that file is revised. Weeks 2–3 already match.

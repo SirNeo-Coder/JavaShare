@@ -1,10 +1,10 @@
 import { paperPerformanceTask, personalProjectFiles, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
-import { activityStateId, activityTask, activityAccess, checkModuleRun, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, teacherCheckedStep, webStep, type ActivityStep, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, projectPathError } from "./file-paths.ts";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, projectPathError } from "./file-paths.ts";
 
 export type SupabaseSessionUser = {
   id: string;
@@ -1482,6 +1482,17 @@ export async function saveSupabasePersonalReview(user: SupabaseSessionUser, clas
   return saved.performance_task.own!.review!;
 }
 
+// Steps whose output depends on pictures, sound or video pass when the teacher marks them done.
+export async function markSupabaseTeacherCheckedStep(user: SupabaseSessionUser, classroomId: string, studentId: string, moduleId: string, stepId: string) {
+  await teacherStudentWorkspace(user, classroomId, studentId);
+  const { content } = await loadCourseModuleRow(classroomId, moduleId);
+  const step = findActivity(content, stepId);
+  if (!step || !teacherCheckedStep(step)) throw new SupabaseRepositoryError(404, "This step is checked automatically, not by the teacher");
+  const saved = await updateModuleProgressWithMerge({ ...user, id: studentId }, classroomId, moduleId,
+    (row) => ({ step_states: { ...row.step_states, [activityStateId(step)]: "pass" } }), "Could not mark the step done");
+  return { stepStates: saved.step_states, percent: moduleCompletionPercent(content, saved) };
+}
+
 async function requireModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, stepId: string) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module projects");
   await requireClassroomMember(user, classroomId);
@@ -1590,7 +1601,10 @@ export type ModuleCheckpoint = {
 
 export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, checkpoint: ModuleCheckpoint) {
   const { content, step, progress, moduleVersion } = await requireModuleActivity(user, classroomId, moduleId, checkpoint.stepId);
-  if (step.language !== "java") throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java only");
+  if (!checkableStep(step)) throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java and web pages only");
+  if (teacherCheckedStep(step)) throw new SupabaseRepositoryError(400, "Your teacher checks this step for now");
+  // The route lets web files through without the online Java runner, so they must belong to a web step.
+  if (webStep(step) !== checkpoint.files.every((file) => !moduleWebPathError(file.path))) throw new SupabaseRepositoryError(400, "These files do not belong to this step");
   if (moduleVersion !== checkpoint.moduleVersion) throw new SupabaseRepositoryError(409, "This module changed. Reopen it before saving completion; your device draft is kept.");
   if (!matchesActivityOutput(checkpoint, activityTask(step).expectedOutput)) throw new SupabaseRepositoryError(400, "This task has not completed successfully");
   if (samplePending(content, step, progress.step_states) && (!checkpoint.sample || !matchesSample(checkpoint.sample, step) || !unchangedSample(checkpoint.sample.files, step.files))) {
@@ -1747,6 +1761,8 @@ export async function getSupabaseTeacherClassProgress(user: SupabaseSessionUser,
         moduleId: module_id,
         percent: moduleCompletionPercent(content, progress),
         personalSubmitted: Boolean(progress.performance_task.own),
+        teacherChecks: content.lessons.flatMap((lesson) => lesson.blocks.filter((block): block is ActivityStep => block.type === "step" && teacherCheckedStep(block)))
+          .map((step) => ({ stepId: step.id, number: step.number, done: progress.step_states[activityStateId(step)] === "pass" })),
         submissions: content.performanceTask ? Number(Boolean(progress.performance_task.sample)) + Number(Boolean(progress.performance_task.own)) : 0,
       };
     });

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import ModuleViewer, { type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { moduleResumeStep } from "./moduleParts";
+import { checkableStep } from "../backend/src/module-activities";
 import { api, ApiError } from "./apiClient";
 import ModuleAccessNotice from "./ModuleAccessNotice";
 import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
@@ -44,12 +45,14 @@ export default function ModuleWorkspace({ classroomId, studentId, role, browserO
           moduleRequest,
           api<Progress>(`/api/classrooms/${classroomId}/modules/${id}/progress?includeModuleVersion=1`),
         ]);
-        const currentModule = loadedModule.moduleVersion === progress.moduleVersion ? loadedModule : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${id}`);
+        // A teacher's Mark done changes progress without this device; refetch so its newly opened steps unlock.
+        const staleLocks = cached?.value === loadedModule && cached.savedAt < Date.parse(progress.updatedAt);
+        const currentModule = loadedModule.moduleVersion === progress.moduleVersion && !staleLocks ? loadedModule : await api<CourseModule>(`/api/classrooms/${classroomId}/modules/${id}`);
         if (key && currentModule !== loadedModule) await writeDeviceRecord(key, { value: currentModule, savedAt: Date.now() }).catch(() => undefined);
         onSelectModule?.(currentModule);
-        const steps = currentModule.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
+        const steps = currentModule.lessons.flatMap((lesson) => lesson.blocks).filter((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && checkableStep(block as StepBlock));
         const step = moduleResumeStep(currentModule, progress.stepStates) ?? steps.at(-1);
-        if (step?.language === "java") await onStartActivity(currentModule, step);
+        if (step && checkableStep(step)) await onStartActivity(currentModule, step);
       }
       setSelection((current) => ({ id, visit: (current?.visit ?? 0) + 1 })); setOpen(true); setHoverPreview(false); onBrowserChange(false);
     } catch (loadError) {

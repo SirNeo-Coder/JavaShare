@@ -14,20 +14,23 @@ export type PreviewFile = { path: string; content: string };
 export type LineOrigin = { file: string; line: number };
 export type Preview = { html: string; lineMap: LineOrigin[]; warnings: string[] };
 export type ConsoleKind = "log" | "info" | "warn" | "error" | "alert";
-export type ConsoleMessage = { codeshare: "console"; kind: ConsoleKind; text: string; line: number | null };
+export type ConsoleMessage = { codeshare: "console"; kind: ConsoleKind; text: string; line: number | null; uncaught?: true };
+// Sent once the page has loaded, so a module step can compare the page with its expected output.
+export type PageMessage = { codeshare: "page"; title: string; text: string };
 
 const normalize = (path: string) => path.trim().replace(/^\.?\//, "");
 const isExternal = (path: string) => /^(?:[a-z]+:)?\/\//i.test(path) || /^(?:data|blob):/i.test(path);
 
 // Runs inside the sandbox. Sends console output and errors to CodeShare with the document line
 // they came from; the parent turns that line back into "script.js line 4" using lineMap.
+// The page text waits for the frame to draw: before its first layout, innerText falls back to raw source text.
 function captureScript(ownLine: number) {
-  return `<script>(()=>{const own=${ownLine};const post=(kind,text,line)=>parent.postMessage({codeshare:"console",kind,text:String(text).slice(0,2000),line},"*");const fmt=(v)=>{if(typeof v==="string")return v;if(v instanceof Error)return v.name+": "+v.message;try{const s=JSON.stringify(v);return s===undefined?String(v):s}catch{return String(v)}};const caller=()=>{for(const m of String(new Error().stack||"").matchAll(/srcdoc:(\\d+):\\d+/g)){if(+m[1]!==own)return +m[1]}return null};for(const kind of ["log","info","warn","error"]){const original=console[kind].bind(console);console[kind]=(...args)=>{post(kind,args.map(fmt).join(" "),caller());original(...args)}}window.alert=(message)=>post("alert",fmt(message),caller());addEventListener("error",(event)=>post("error",event.message,event.lineno||null));addEventListener("unhandledrejection",(event)=>post("error","Uncaught (in promise) "+fmt(event.reason),null));})();</script>`;
+  return `<script>(()=>{const own=${ownLine};const post=(kind,text,line,uncaught)=>parent.postMessage({codeshare:"console",kind,text:String(text).slice(0,2000),line,...(uncaught?{uncaught:true}:{})},"*");const fmt=(v)=>{if(typeof v==="string")return v;if(v instanceof Error)return v.name+": "+v.message;try{const s=JSON.stringify(v);return s===undefined?String(v):s}catch{return String(v)}};const caller=()=>{for(const m of String(new Error().stack||"").matchAll(/srcdoc:(\\d+):\\d+/g)){if(+m[1]!==own)return +m[1]}return null};for(const kind of ["log","info","warn","error"]){const original=console[kind].bind(console);console[kind]=(...args)=>{post(kind,args.map(fmt).join(" "),caller());original(...args)}}window.alert=(message)=>post("alert",fmt(message),caller());addEventListener("error",(event)=>post("error",event.message,event.lineno||null,true));addEventListener("unhandledrejection",(event)=>post("error","Uncaught (in promise) "+fmt(event.reason),null,true));addEventListener("load",()=>requestAnimationFrame(()=>requestAnimationFrame(()=>parent.postMessage({codeshare:"page",title:document.title,text:String(document.body?document.body.innerText:"").slice(0,60000)},"*"))));})();</script>`;
 }
 
-export function buildPreview(files: PreviewFile[]): Preview {
+export function buildPreview(files: PreviewFile[], entryPath = "index.html"): Preview {
   const byPath = new Map(files.map((file) => [normalize(file.path), file]));
-  const entry = byPath.get("index.html") ?? files.find((file) => file.path.endsWith(".html"));
+  const entry = byPath.get(normalize(entryPath)) ?? byPath.get("index.html") ?? files.find((file) => file.path.endsWith(".html"));
   if (!entry) return { html: "", lineMap: [], warnings: ["Add an index.html file to see your page."] };
 
   const lineMap: LineOrigin[] = [];
@@ -91,4 +94,16 @@ export function buildPreview(files: PreviewFile[]): Preview {
 
 export function originOf(preview: Preview, line: number | null) {
   return line ? preview.lineMap[line - 1] ?? null : null;
+}
+
+// The module checker's page text: tab title, then the visible text with blank lines removed (teacher, 2026-10-28).
+export function webPageOutput(page: { title: string; text: string }) {
+  return `Tab title: ${page.title}\nVisible page text:\n${page.text.trim().replace(/\n{2,}/g, "\n")}`;
+}
+
+// What a web module step compares: console lines when the run file is .js, otherwise the page text.
+// Any uncaught error, or a page that never finished, makes the run unsuccessful.
+export function webRunResult(mode: "page" | "console", run: { lines: string[]; errors: string[]; page?: { title: string; text: string } }) {
+  const error = run.errors.length ? `Uncaught error: ${run.errors[0]}` : run.page ? undefined : "The page did not finish loading within 5 seconds. Keep the page preview on screen and run again.";
+  return { mode, success: !error, output: mode === "console" ? run.lines.join("\n") : run.page ? webPageOutput(run.page) : "", ...(error ? { error } : {}) };
 }

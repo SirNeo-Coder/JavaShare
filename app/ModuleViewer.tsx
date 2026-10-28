@@ -10,7 +10,8 @@ import { runJava } from "./javaExecution";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
 import { paperPerformanceTask } from "../backend/src/personal-performance";
-import { activityStateId } from "../backend/src/module-activities";
+import { activityStateId, checkableStep, teacherCheckedStep, webStep } from "../backend/src/module-activities";
+import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import ModuleCatalogCard from "./ModuleCatalogCard";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
@@ -52,6 +53,7 @@ export type StepBlock = {
   instruction: string;
   language: string;
   files: ModuleFile[];
+  run?: string;
   expectedOutput: string;
   expectedError?: string;
   stdin?: string;
@@ -200,9 +202,12 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
   const [files, setFiles] = useState(step.files);
   const [output, setOutput] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const web = webStep(step), teacherChecked = web && teacherCheckedStep(step);
+  const webPage = useWebPageRun();
+  const [webResult, setWebResult] = useState<WebRunResult | null>(null);
   const run = async () => {
     setBusy(true);
-    try { if (role === "student") await onStart?.(); else setOutput(await runFiles(files, step.stdin ?? "")); }
+    try { if (role === "student") await onStart?.(); else if (web) setWebResult(await webPage.run(files, step.run)); else setOutput(await runFiles(files, step.stdin ?? "")); }
     catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
     finally { setBusy(false); }
   };
@@ -217,9 +222,10 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     {task && <div className="paper-instructions"><b>Your task</b><Markdown markdown={task.instruction} /><b>Expected task output</b><pre className="printed-output">{task.expectedOutput}</pre></div>}
     {role === "student" && <div className="paper-instructions">
       <p>{task && sampleFirst ? "Work in code editor loads this step's sample on first opening. Run the sample unchanged to verify it, then make the changes in Your task and Run code again. A matching task run completes this step and unlocks the next activity. Reopening a started step restores your saved edits." : task ? "Continue in your saved module project. Make the changes in Your task, then Run code. Successful execution matching Expected task output completes this task and unlocks the next step." : "Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step."}</p>
-      {step.language === "java" ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java only.</p>}
+      {teacherChecked && <p><b>Checked by your teacher for now.</b> Your teacher marks this step done after looking at your page.</p>}
+      {checkableStep(step) ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java and web pages only.</p>}
     </div>}
-    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{step.language === "java" && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
+    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{web && <><WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} />{webPage.view && <div className="module-web-preview">{webPage.view}</div>}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;
