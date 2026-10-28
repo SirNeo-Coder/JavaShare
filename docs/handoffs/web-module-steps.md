@@ -19,8 +19,9 @@ into three slices, plus the teacher's own revision of the module files.
 | Item | State | Where |
 | --- | --- | --- |
 | Slice 1 — daily module steps pass | **Done, merged** | [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59), merge `93ab62f` on main |
-| Side fix — stale Java sample-first browser test (CKB-077) | PR open, conflicts with main resolved 2026-10-29 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), branch `claude/sample-first-test-refresh` |
-| Teacher's Weeks 1–3 file revision | **Next** — not started | teacher's files (see "Teacher's files") |
+| Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
+| This rolling handoff | PR open; main merged in 2026-10-29 (both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
+| Teacher's Weeks 1–3 file revision | **Next** — proposed 2026-10-29, waiting for approval | teacher's files (see "Teacher's files") |
 | Slice 2 — personal performance-task project for web | Not started | see "Slice 2 needs" |
 | Slice 3 — page-element and media checks | Not started | see "Slice 3 notes" |
 
@@ -193,7 +194,7 @@ Today the personal project is Java-only end to end:
 - **Mark done** has no undo (teacher chose to leave it out for Slice 1).
 - `.txt` reference files are highlighted as Java in the editor.
 - CKB-022 remains open for the student's own **New web project** preview.
-- PR #60's open question (a second device may show the next part locked for up to five minutes)
+- PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
   is probably covered by CKB-076's refetch rule; not tested with two devices.
 
 ## Next step
@@ -209,3 +210,7 @@ The teacher's Weeks 1–3 revision prompt: at minimum add the line break after
 - 2026-10-29 — PR #59 merged (`93ab62f`). PR #60 conflicts with main resolved (both document
   entries kept); its refreshed test passed 5/5 offline on the combined code, suite 386/386. This
   rolling handoff created.
+- 2026-10-29 — Status checked against GitHub: PR #60 merged (`79c14b5`); PR #61 had a
+  `stage-one.md` conflict with main, resolved by merging main and keeping both entries. Week 1
+  re-checked: all 8 expected outputs still use `Visible page text: <text>` on one line. Weeks 1–3
+  revision proposed to the teacher; waiting for approval.
