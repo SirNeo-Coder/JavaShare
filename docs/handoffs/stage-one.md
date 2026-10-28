@@ -1,3 +1,7 @@
+> Net MVC web module steps have their own rolling handoff from 2026-10-29:
+> [web-module-steps.md](web-module-steps.md). Update that file, not this one, for Slices 2–3 and
+> the Weeks 1–3 revision.
+
 > Web module steps, Slice 1 of 3 (2026-10-28): HTML/CSS/JavaScript module steps can now pass.
 > Branch `feature/web-module-steps`, based on main `aadda3a`. Teacher decisions were in the prompt;
 > the teacher approved the recommended answers: walk a student through Week 2 (Week 1's expected
