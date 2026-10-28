@@ -8,6 +8,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
+import { createServer } from "node:http";
 import { createClient } from "@supabase/supabase-js";
 import { activityStateId } from "../backend/src/module-activities.ts";
 const { chromium } = await import(process.env.CODESHARE_PLAYWRIGHT_MODULE || "playwright");
@@ -254,6 +255,28 @@ test("web module steps offline: uploads keep checks, teacher preview checks ever
       assert.equal(await checks.locator("li.passed").textContent(), "✓ Console output matches");
       await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
       assert.equal((await progress(consoleWeek)).stepStates["web-console-s1"], "pass");
+    });
+
+    await t.test("a module page loads nothing from outside CodeShare (rule 5): stylesheet, picture and fetch are blocked", async () => {
+      // A local request counter stands in for an internet site; nothing leaves this computer.
+      const requests = [];
+      const counter = createServer((request, response) => { requests.push(request.url); response.end(""); });
+      await new Promise((resolve) => counter.listen(0, "127.0.0.1", resolve));
+      const outside = `http://127.0.0.1:${counter.address().port}`;
+      try {
+        const html = `<!doctype html>\n<html>\n<head>\n  <title>Offline page</title>\n  <link rel="stylesheet" href="${outside}/style.css">\n</head>\n<body>\n  <h1>Offline page</h1>\n  <img src="${outside}/picture.png" alt="">\n  <script>fetch("${outside}/data").catch(() => {});</script>\n</body>\n</html>\n`;
+        const networkWeek = { format: "codeshare-module", version: 1, course: "dotnet-1", week: 10, id: "web-network-check", title: "Network check", lessons: [{
+          id: "web-network-d1", order: 1, dayLabel: "DAY 1", title: "No internet", hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" },
+          blocks: [{ type: "step", id: "web-network-s1", number: 1, instruction: "Run the page.", language: "html", run: "index.html", files: [{ path: "index.html", content: html }], expectedOutput: "Tab title: Offline page\nVisible page text:\nOffline page" }],
+          exitSlip: { id: "web-network-slip", points: 1, afterStep: "web-network-s1", questions: [{ id: "1.1", kind: "Define", points: 1, prompt: "What is offline?" }] } }] };
+        assert.equal((await teacher.request.post(`/api/classrooms/${classroomId}/modules`, { data: networkWeek })).status(), 201);
+        await openCatalog(networkWeek);
+        await run();
+        assert.equal(await checks.locator("li.passed").textContent(), "✓ Page text matches");
+        await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
+        await page.waitForTimeout(500); // give any late request time to arrive
+        assert.deepEqual(requests, [], "no request reached the outside site");
+      } finally { await new Promise((resolve) => counter.close(resolve)); }
     });
 
     // The deliberate missingFunction() run is a student page error, not a CodeShare error.

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { matchesActivityOutput } from "../backend/src/module-activities";
-import { buildPreview, webRunResult, type ConsoleMessage, type PageMessage, type PreviewFile } from "./webPreview";
+import { webRunResult, type ConsoleMessage, type PageMessage, type PreviewFile } from "./webPreview";
+import { buildTeacherPreview } from "./teacherWebPreview";
 
 export type WebRunResult = ReturnType<typeof webRunResult>;
 
@@ -32,9 +33,10 @@ export function useWebPageRun() {
   // A .js run file compares console lines on an empty page; anything else compares the page text.
   const run = (files: PreviewFile[], runPath = "index.html") => new Promise<WebRunResult>((resolve) => {
     const mode = runPath.endsWith(".js") ? "console" : "page";
+    // The no-internet policy matches the course-building checker, which also blocks the internet.
     const preview = mode === "console"
-      ? buildPreview([...files, { path: WRAPPER, content: `<!doctype html><html><head></head><body><script src="${runPath.replace(/[^\w./-]/g, "")}"></script></body></html>` }], WRAPPER)
-      : buildPreview(files, runPath);
+      ? buildTeacherPreview([...files, { path: WRAPPER, content: `<!doctype html><html><head></head><body><script src="${runPath.replace(/[^\w./-]/g, "")}"></script></body></html>` }], WRAPPER)
+      : buildTeacherPreview(files, runPath);
     if (!preview.html) { resolve({ mode, success: false, output: "", error: preview.warnings[0] }); return; }
     const timer = setTimeout(() => pending.current?.finish(), 5000);
     pending.current = { lines: [], errors: [], finish: (page) => {

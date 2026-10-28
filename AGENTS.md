@@ -51,7 +51,7 @@ Lookup order: problem index -> matched case -> feature index -> relevant page ->
 2. **The secret Supabase service-role key stays on the server only.** Never put it in browser code or in a `NEXT_PUBLIC_` variable. On Cloudflare it is a Cloudflare secret.
 3. **New migrations only.** Never edit or delete an existing file in `supabase/migrations/`.
 4. **Never touch live services.** Never run `supabase db push`. Never change settings in the hosted Supabase project, Cloudflare, Vercel, or Render. Prepare the files and give the teacher step-by-step instructions.
-5. **Nothing loaded from the internet** (no CDN links) in the app or in the student web preview. One agreed exception (2026-10-17): online only, the in-browser Java runner CheerpJ may be loaded from CheerpJ's own site when Java is run, with the CheerpJ logo shown where Java runs (their free Community Licence requires it). Offline mode never loads it; it uses the laptop's `javac`.
+5. **Nothing loaded from the internet** (no CDN links) in the app or in the student web preview. Why (teacher, 2026-10-28): offline classroom mode has no internet, so anything fetched from the internet would fail in class. One agreed exception (2026-10-17): online only, the in-browser Java runner CheerpJ may be loaded from CheerpJ's own site when Java is run, with the CheerpJ logo shown where Java runs (their free Community Licence requires it). Offline mode never loads it; it uses the laptop's `javac`.
 6. **Don't rename existing data.** Tables, columns, the `javashare_session` cookie, `javashare-*` browser settings, and the Supabase `project_id` keep their old names (see README, "Names kept from JavaShare").
 7. **Never claim something works unless it was run.** Say plainly what could not be tested.
 8. Before each pull request, run `npm run build:all`, `npm run lint`, and `npm test`, and test the feature yourself.
@@ -250,7 +250,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Web module steps (agreed 2026-10-28)
 
-- A step whose files are all `.html`, `.css` or `.js` is a web step; no new module field.
+- A step whose files are all `.html`, `.css` or `.js` is a web step; no new module field. Its page
+  runs in the no-internet preview (`buildTeacherPreview`), as rule 5 and the course checker require.
   Correct output: `.html` run file → tab title plus visible page text (blank lines removed);
   `.js` run file → console lines. Same comparison as Java; an uncaught error fails the run.
 - Web steps always run in the student's browser, online and offline. Their result is accepted

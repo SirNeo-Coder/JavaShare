@@ -55,7 +55,9 @@ and percentages, without student source files or raw progress maps. Reads do not
   draws, the frame posts `{ codeshare: "page", title, text }`; uncaught errors carry `uncaught: true`.
   The parent accepts these only from its own current frame. Student code can forge them, so they are
   practice evidence only; the server still checks expected output, step access and saved versions.
-  CKB-022 (network requests allowed) applies to module web steps too.
+  Module web steps build with `buildTeacherPreview`, so the same no-internet policy as the teacher
+  viewer applies (rule 5; proven with a local request counter). CKB-022 stays open for the
+  student's own **New web project** preview.
 - Teacher **Mark done** (`markSupabaseTeacherCheckedStep`) checks class ownership, current student
   membership and that the step is a media step before writing a pass.
 - Known limit: an endless loop in student JavaScript can freeze that student's tab.

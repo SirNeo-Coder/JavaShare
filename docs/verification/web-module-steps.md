@@ -19,7 +19,7 @@ The browser test reads the teacher's files from `DOTNET_WEEKS_DIR` (default
 
 ## Results
 
-- `npm test`: 385 tests, 385 pass, 0 fail, 0 skipped.
+- `npm test`: 386 tests, 386 pass, 0 fail, 0 skipped.
 - `npm run lint`: 0 errors, 8 warnings (the same 8 as before this change).
 - `npm run build:all`: passes.
 
@@ -31,6 +31,7 @@ Rule checks (no app, no database):
 - ✔ web check rule: an uncaught error or a page that never finished makes the run unsuccessful
 - ✔ web check rule: a .js run file compares the console lines, joined with line breaks
 - ✔ web preview: the sandbox reports page text after drawing, flags uncaught errors, and opens the run file
+- ✔ module web steps use the no-internet preview and still open the step's run file
 - ✔ web steps: decided by file endings, with no Java-only path handling
 - ✔ module upload keeps webChecks, mediaChecks and includeMediaOutput and rejects an unknown media state
 
@@ -47,7 +48,7 @@ Real server routes, offline settings, local Supabase:
   - ✔ Java steps keep their rules: offline browser results are refused and web files cannot complete them
   - ✔ teacher class progress shows the web percentage and the media step as done
 
-### `tests/web-module-steps.browser.mjs` (real app in Chromium, teacher's Week 1–3 files) — 9/9
+### `tests/web-module-steps.browser.mjs` (real app in Chromium, teacher's Week 1–3 files) — 10/10
 
 - ✔ upload keeps webChecks, mediaChecks and includeMediaOutput
 - ✔ teacher preview runs every step's own sample through the web check
@@ -57,6 +58,7 @@ Real server routes, offline settings, local Supabase:
 - ✔ a preview that starts below the screen edge still reads the drawn page text, not the raw source
 - ✔ teacher dashboard shows the web student's percentage and marks a media step done
 - ✔ a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it
+- ✔ a module page loads nothing from outside CodeShare (rule 5): stylesheet, picture and fetch are blocked
 
 ### Per-step results, each step's own sample files (teacher preview, Chromium)
 
@@ -89,6 +91,7 @@ showed Week 2 at 88%, overall 38%. Screenshots: `/tmp/codeshare-web-steps-studen
 | Uncaught errors ignored | 2 rule tests fail | 16/16 |
 | Web `src/` merged like Java | 1 rule test fails | 16/16 |
 | Module cache refetch after teacher Mark done removed (CKB-076), rebuilt | browser subtest fails 6/6 runs | 9/9 |
+| Module runs use the old internet-allowed preview (CKB-022), rebuilt | network subtest fails: counter received `/style.css`, `/picture.png`, `/data` | 10/10, counter empty; Weeks 2–3 results unchanged |
 | Page text read on load + timer again (CKB-075), rebuilt | Week 2 steps still passed 6/6 runs: **no test reliably catches this** | — |
 
 ## Not tested

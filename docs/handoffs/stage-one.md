@@ -8,9 +8,11 @@
 > accepted offline for web only; Java unchanged); checklist with Required/Your output; schema keeps
 > `webChecks`/`mediaChecks`/`includeMediaOutput` (stored, not checked); teacher **Mark done** route
 > and dashboard list; module cache refetch after a teacher's progress write (CKB-076); page text
-> read only after the frame draws (CKB-075). AGENTS.md rule "Web module steps" added. No migration.
-> Verification: `docs/verification/web-module-steps.md` (385/385 suite, lint 0 errors/8 old
-> warnings, build passes, offline browser 9/9 with the teacher's Weeks 1–3; Week 1 fails only on the
+> read only after the frame draws (CKB-075). Follow-up approved the same day: module web steps run in
+> the no-internet preview (`buildTeacherPreview`, rule 5; CKB-022 resolved for modules only), and the
+> reason for rule 5 is now written in AGENTS.md. AGENTS.md rule "Web module steps" added. No migration.
+> Verification: `docs/verification/web-module-steps.md` (386/386 suite, lint 0 errors/8 old
+> warnings, build passes, offline browser 10/10 with the teacher's Weeks 1–3; Week 1 fails only on the
 > line break, Week 2 and Week 3 Step 1 pass, Week 3 Steps 2–7 teacher-checked).
 > Not checked: online/hosted, non-Chromium browsers, phones, `sampleFirst` web steps with real files.
 > **Next — Slice 2 (personal performance-task project for web) needs:** the personal routes are Java
@@ -20,7 +22,7 @@
 > (`StudentModuleActivity`, `personal` branch) still uses Java file rules, Program input, Rename to a
 > Java name and the Java console; Projects shows "Weekly Java projects" with a "J" icon. Until Slice 2,
 > a web module tops out at steps ÷ (steps + 1), e.g. 88% for Week 2. Also open: Week 1 JSON revision
-> (teacher's next prompt), CKB-022 network access in the preview (now also for module steps), `.txt`
+> (teacher's next prompt), CKB-022 network access in the **New web project** preview, `.txt`
 > files highlighted as Java. Slice 3: check `webChecks`/`mediaChecks`. Delivered: `e97cce7` pushed;
 > [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59) open against main. Next: teacher review.
 

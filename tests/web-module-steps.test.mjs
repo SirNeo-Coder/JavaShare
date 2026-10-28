@@ -2,12 +2,14 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
 import { buildPreview, webPageOutput, webRunResult } from "../app/webPreview.ts";
 import { checkableStep, matchesActivityOutput, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webStep } from "../backend/src/module-activities.ts";
 import { moduleWebPathError } from "../backend/src/file-paths.ts";
+import { buildTeacherPreview } from "../app/teacherWebPreview.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 const { WebCheckList } = tsxRequire("../app/WebStepRun.tsx", import.meta.url);
 const { default: StudentModuleActivity } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
@@ -75,6 +77,13 @@ test("web preview: the sandbox reports page text after drawing, flags uncaught e
   assert.match(preview.html, /requestAnimationFrame\(\(\)=>requestAnimationFrame\(\(\)=>parent\.postMessage\(\{codeshare:"page",title:document\.title,text:/);
   assert.match(preview.html, /addEventListener\("error",\(event\)=>post\("error",event\.message,event\.lineno\|\|null,true\)\)/);
   assert.match(buildPreview([{ path: "index.html", content: page("Home", "") }], "missing.html").html, /<title>Home<\/title>/);
+});
+
+test("module web steps use the no-internet preview and still open the step's run file", () => {
+  const preview = buildTeacherPreview([{ path: "index.html", content: page("Home", "") }, { path: "about.html", content: page("About", "") }], "about.html");
+  assert.match(preview.html, /^<!doctype html>\n?<meta http-equiv="Content-Security-Policy" content="default-src 'none';/);
+  assert.match(preview.html, /<title>About<\/title>/);
+  assert.match(readFileSync(new URL("../app/WebStepRun.tsx", import.meta.url), "utf8"), /: buildTeacherPreview\(files, runPath\)/, "module runs use the no-internet preview");
 });
 
 test("web steps: decided by file endings, with no Java-only path handling", () => {
