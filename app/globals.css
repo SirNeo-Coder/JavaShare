@@ -624,6 +624,18 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .module-run-feedback.passed { border-color:#387d65; background:#153e32; color:#d7ffeb; }
 .module-run-feedback.retry { border-color:#ad7930; background:#463313; color:#ffe9b8; }
 .module-before-sample { margin-top:12px; font-size:12px; }
+/* Web module steps: one line per check, the differences side by side, then the sandboxed page. */
+.web-checks { flex:none; padding:10px 16px; font-size:13px; }
+.web-checks ul { margin:0; padding:0; list-style:none; }
+.web-checks li.passed span { color:#3aa57c; }
+.web-checks li.failed span { color:#d9534f; }
+.web-checks p { margin:6px 0 0; }
+.web-check-compare { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+.web-check-compare pre { margin:4px 0 0; padding:8px; max-height:220px; overflow:auto; white-space:pre-wrap; font-size:12px; border:1px solid var(--line); border-radius:6px; }
+.module-web-preview { flex:1 1 260px; min-height:260px; display:grid; }
+.module-web-preview iframe { width:100%; height:100%; min-height:260px; border:0; background:#fff; }
+.teacher-checked-steps { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; font-size:12px; }
+.teacher-checked-steps small { flex-basis:100%; }
 .module-before-sample summary { cursor:pointer; }
 .module-activity-console .console>b { display:block; margin-bottom:10px; font:700 13px/1.5 var(--font-geist),sans-serif; }
 

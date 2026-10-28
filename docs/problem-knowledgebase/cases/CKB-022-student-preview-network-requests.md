@@ -1,6 +1,6 @@
 # CKB-022 — Existing student web preview permits network requests
 
-- Status: investigating
+- Status: investigating for New web project; resolved for module web steps (2026-10-28)
 - First recorded: 2026-10-18
 - Last verified: 2026-10-18
 - Area: app/webPreview.ts, app/page.tsx student iframe
@@ -50,3 +50,9 @@ working sandbox parent-access check does not establish that network access is bl
 
 - 2026-10-18 — Reproduced locally during the approved teacher viewer's compatibility checks.
   Recorded without changing the separately existing student renderer. No hosted service changed.
+- 2026-10-28 — Teacher approved the no-internet policy for module web steps (Slice 1, CKB-074):
+  `useWebPageRun` (`app/WebStepRun.tsx`) builds with `buildTeacherPreview`. Proof:
+  `tests/web-module-steps.browser.mjs` "a module page loads nothing from outside CodeShare (rule 5):
+  stylesheet, picture and fetch are blocked" — a local request counter received
+  `/style.css`, `/picture.png`, `/data` with the old renderer and nothing with the fix. The student's
+  own **New web project** preview (`app/page.tsx`) still uses `buildPreview` and remains open.

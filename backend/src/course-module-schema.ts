@@ -39,6 +39,13 @@ const block = z.discriminatedUnion("type", [
     // follows the discussion, not the day. Optional and omitted by every module uploaded before
     // this field existed; the viewer falls back to one part per lesson when a step has no part.
     part: z.string().trim().min(1).max(200).optional(),
+    // Web page and media checks are stored now so uploads keep them; CodeShare does not check them yet.
+    webChecks: z.array(z.object({
+      selector: z.string().trim().min(1).max(500), count: z.number().int().nonnegative().optional(),
+      attribute: z.string().max(200).optional(), value: z.string().max(5000).optional(), style: z.string().max(200).optional(),
+    })).max(100).optional(),
+    mediaChecks: z.array(z.object({ src: z.string().trim().min(1).max(500), state: z.enum(["loaded", "broken"]) })).max(100).optional(),
+    includeMediaOutput: z.boolean().optional(),
   }),
   z.object({ type: z.literal("error"), language, markdown: z.string().max(5000), message: z.string().max(5000) }),
   z.object({

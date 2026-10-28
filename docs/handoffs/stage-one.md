@@ -1,3 +1,31 @@
+> Web module steps, Slice 1 of 3 (2026-10-28): HTML/CSS/JavaScript module steps can now pass.
+> Branch `feature/web-module-steps`, based on main `aadda3a`. Teacher decisions were in the prompt;
+> the teacher approved the recommended answers: walk a student through Week 2 (Week 1's expected
+> outputs use the old same-line `Visible page text: X` format), teacher **Mark done** for steps whose
+> expected output has `Media checks:`, keep module `.txt` files as reference files, and compare
+> console lines only when `run` is a `.js` file. Done: web steps (decided by file endings) run in the
+> sandboxed preview online and offline and complete via `POST .../progress/complete` (browser result
+> accepted offline for web only; Java unchanged); checklist with Required/Your output; schema keeps
+> `webChecks`/`mediaChecks`/`includeMediaOutput` (stored, not checked); teacher **Mark done** route
+> and dashboard list; module cache refetch after a teacher's progress write (CKB-076); page text
+> read only after the frame draws (CKB-075). Follow-up approved the same day: module web steps run in
+> the no-internet preview (`buildTeacherPreview`, rule 5; CKB-022 resolved for modules only), and the
+> reason for rule 5 is now written in AGENTS.md. AGENTS.md rule "Web module steps" added. No migration.
+> Verification: `docs/verification/web-module-steps.md` (386/386 suite, lint 0 errors/8 old
+> warnings, build passes, offline browser 10/10 with the teacher's Weeks 1–3; Week 1 fails only on the
+> line break, Week 2 and Week 3 Step 1 pass, Week 3 Steps 2–7 teacher-checked).
+> Not checked: online/hosted, non-Chromium browsers, phones, `sampleFirst` web steps with real files.
+> **Next — Slice 2 (personal performance-task project for web) needs:** the personal routes are Java
+> only (`PUT .../performance-project` uses `javaFiles`; `personal-run` executes Java; `personal-result`
+> only accepts online browser Java); submission requires a successful run of the exact saved files,
+> so web needs browser page evidence accepted offline like Slice 1; the personal editor
+> (`StudentModuleActivity`, `personal` branch) still uses Java file rules, Program input, Rename to a
+> Java name and the Java console; Projects shows "Weekly Java projects" with a "J" icon. Until Slice 2,
+> a web module tops out at steps ÷ (steps + 1), e.g. 88% for Week 2. Also open: Week 1 JSON revision
+> (teacher's next prompt), CKB-022 network access in the **New web project** preview, `.txt`
+> files highlighted as Java. Slice 3: check `webChecks`/`mediaChecks`. Delivered: `e97cce7` pushed;
+> [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59) open against main. Next: teacher review.
+
 > Copy code on each step (2026-10-27): the teacher felt the Console's **Code from this module** list
 > was the wrong place and approved putting copy buttons on the steps, with the recommended option:
 > hide the Console list for modules that have steps, keep it for modules without. Branch

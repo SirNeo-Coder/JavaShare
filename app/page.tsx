@@ -14,7 +14,7 @@ import useOutsideDismiss from "./useOutsideDismiss";
 import ModuleWorkspace from "./ModuleWorkspace";
 import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
-import { activityStateId, activityTask } from "../backend/src/module-activities";
+import { activityStateId, activityTask, checkableStep } from "../backend/src/module-activities";
 import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import { PerformanceTaskSteps, type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
@@ -2242,8 +2242,8 @@ export default function Home() {
                   api<CourseModule>(`/api/classrooms/${classroomId}/modules/${weeklyModule.id}`),
                   api<Progress>(`/api/classrooms/${classroomId}/modules/${weeklyModule.id}/progress`),
                 ]);
-                const step = moduleResumeStep(module, progress.stepStates) ?? module.lessons.flatMap((lesson) => lesson.blocks).findLast((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && (block as StepBlock).language === "java");
-                if (step?.language === "java") await startModuleActivity(module, step);
+                const step = moduleResumeStep(module, progress.stepStates) ?? module.lessons.flatMap((lesson) => lesson.blocks).findLast((block): block is StepBlock => block.type === "step" && !(block as StepBlock).locked && checkableStep(block as StepBlock));
+                if (step && checkableStep(step)) await startModuleActivity(module, step);
               }
               catch (error) { showModuleAccessError(error); notify(error instanceof Error ? error.message : "Could not open module project"); }
             }}><span className="team-icon">J</span><span className="team-copy"><b>Module project</b></span></button></div>
