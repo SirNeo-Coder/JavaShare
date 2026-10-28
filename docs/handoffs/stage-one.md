@@ -1,6 +1,17 @@
 > Net MVC web module steps have their own rolling handoff from 2026-10-29:
 > [web-module-steps.md](web-module-steps.md). Update that file, not this one, for Slices 2–3 and
 > the Weeks 1–3 revision.
+> Sample-first browser test refresh (2026-10-28): teacher reported
+> `tests/module-sample-first.browser.mjs` failing offline before any step and approved a test-only
+> fix. Branch `claude/sample-first-test-refresh`, based on origin/main `aadda3a`. The app was
+> right; the test was stale in five places (CKB-077): Week 14 now needs Week 13 (test removes the
+> link from its uploaded copy), steps open with a GET, the worksheet resumes at the next part, the
+> device keeps a five-minute lesson copy after a direct database write, and online sample checks
+> stay on the device. Online failed the same way. Verification: unchanged script failed both
+> modes; refreshed script offline 5/5 and online 5/5; `build:all` passes; lint 0 errors, 8 existing
+> warnings; `npm test` 369/369. No app, server, schema or data change. Open question for the
+> teacher (not tested): a second device may show a just-completed step's next part locked for up
+> to five minutes. Next: teacher reviews and merges the PR.
 
 > Web module steps, Slice 1 of 3 (2026-10-28): HTML/CSS/JavaScript module steps can now pass.
 > Branch `feature/web-module-steps`, based on main `aadda3a`. Teacher decisions were in the prompt;
@@ -28,7 +39,7 @@
 > a web module tops out at steps ÷ (steps + 1), e.g. 88% for Week 2. Also open: Week 1 JSON revision
 > (teacher's next prompt), CKB-022 network access in the **New web project** preview, `.txt`
 > files highlighted as Java. Slice 3: check `webChecks`/`mediaChecks`. Delivered: `e97cce7` pushed;
-> [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59) open against main. Next: teacher review.
+> [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59) merged into main (`93ab62f`). Next: Week 1 JSON revision, then Slice 2.
 
 > Copy code on each step (2026-10-27): the teacher felt the Console's **Code from this module** list
 > was the wrong place and approved putting copy buttons on the steps, with the recommended option:
