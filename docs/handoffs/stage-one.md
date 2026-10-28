@@ -1,3 +1,6 @@
+> Net MVC web module steps have their own rolling handoff from 2026-10-29:
+> [web-module-steps.md](web-module-steps.md). Update that file, not this one, for Slices 2–3 and
+> the Weeks 1–3 revision.
 > Sample-first browser test refresh (2026-10-28): teacher reported
 > `tests/module-sample-first.browser.mjs` failing offline before any step and approved a test-only
 > fix. Branch `claude/sample-first-test-refresh`, based on origin/main `aadda3a`. The app was
