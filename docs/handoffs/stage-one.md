@@ -21,7 +21,8 @@
 > Java name and the Java console; Projects shows "Weekly Java projects" with a "J" icon. Until Slice 2,
 > a web module tops out at steps ÷ (steps + 1), e.g. 88% for Week 2. Also open: Week 1 JSON revision
 > (teacher's next prompt), CKB-022 network access in the preview (now also for module steps), `.txt`
-> files highlighted as Java. Slice 3: check `webChecks`/`mediaChecks`. Next: teacher review of the PR.
+> files highlighted as Java. Slice 3: check `webChecks`/`mediaChecks`. Delivered: `e97cce7` pushed;
+> [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59) open against main. Next: teacher review.
 
 > Copy code on each step (2026-10-27): the teacher felt the Console's **Code from this module** list
 > was the wrong place and approved putting copy buttons on the steps, with the recommended option:
