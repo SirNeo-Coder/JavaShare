@@ -1,3 +1,15 @@
+> Sample-first browser test refresh (2026-10-28): teacher reported
+> `tests/module-sample-first.browser.mjs` failing offline before any step and approved a test-only
+> fix. Branch `claude/sample-first-test-refresh`, based on origin/main `aadda3a`. The app was
+> right; the test was stale in five places (CKB-077): Week 14 now needs Week 13 (test removes the
+> link from its uploaded copy), steps open with a GET, the worksheet resumes at the next part, the
+> device keeps a five-minute lesson copy after a direct database write, and online sample checks
+> stay on the device. Online failed the same way. Verification: unchanged script failed both
+> modes; refreshed script offline 5/5 and online 5/5; `build:all` passes; lint 0 errors, 8 existing
+> warnings; `npm test` 369/369. No app, server, schema or data change. Open question for the
+> teacher (not tested): a second device may show a just-completed step's next part locked for up
+> to five minutes. Next: teacher reviews and merges the PR.
+
 > Copy code on each step (2026-10-27): the teacher felt the Console's **Code from this module** list
 > was the wrong place and approved putting copy buttons on the steps, with the recommended option:
 > hide the Console list for modules that have steps, keep it for modules without. Branch

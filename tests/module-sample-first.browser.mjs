@@ -13,6 +13,7 @@ assert.ok(["localhost", "127.0.0.1"].includes(new URL(local.API_URL).hostname));
 const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 const content = JSON.parse(readFileSync(new URL("../docs/modules/week14/Java2_Week_14.codeshare.json", import.meta.url)));
 const edits = JSON.parse(readFileSync(new URL("./fixtures/week14-task-edits.json", import.meta.url)));
+delete content.previousModuleId;
 const steps = content.lessons.flatMap((l) => l.blocks).filter((b) => b.type === "step");
 const first = steps[0], second = steps[1];
 const alter = (step) => edits[step.id].reduce((source, edit) => edit.path === "Main.java" ? source.replace(edit.from, edit.to) : source, step.files.find((f) => f.path === "Main.java").content);
@@ -52,7 +53,7 @@ for (const mode of (process.env.SAMPLE_BROWSER_MODE ? [process.env.SAMPLE_BROWSE
         await page.mouse.move(1100, 20);
         await page.getByRole("button", { name: "Module", exact: true }).hover();
         await worksheet.getByRole("button", { name: new RegExp(`Step ${step.number}$`) }).click();
-        const opening = page.waitForResponse((response) => response.url().endsWith("/progress/activity") && response.request().method() === "POST");
+        const opening = page.waitForResponse((response) => response.url().includes("/progress/activity?stepId=") && response.request().method() === "GET");
         await worksheet.getByRole("button", { name: "Work in code editor", exact: true }).click();
         assert.equal((await opening).status(), 200);
         await page.locator(".student-module-project").waitFor();
@@ -71,7 +72,7 @@ for (const mode of (process.env.SAMPLE_BROWSER_MODE ? [process.env.SAMPLE_BROWSE
         assert.equal(await editor.inputValue(), first.files[0].content); assert.equal(await editor.getAttribute("readonly"), "");
         await run("Sample verified"); assert.equal(await editor.getAttribute("readonly"), null);
         const p = await (await context.request.get(progressPath)).json();
-        assert.equal(p.stepStates[sampleStateId(first)], "pass"); assert.equal(p.stepStates[activityStateId(first)], undefined);
+        assert.equal(p.stepStates[sampleStateId(first)], mode === "offline" ? "pass" : undefined); assert.equal(p.stepStates[activityStateId(first)], undefined);
         const locked = await context.request.post(`${progressPath}/activity`, { data: { stepId: second.id } }); assert.equal(locked.status(), 403);
       });
       await t.test("shows visible old-sample and mismatch banners, then saves completion immediately", async () => {
@@ -86,6 +87,7 @@ for (const mode of (process.env.SAMPLE_BROWSER_MODE ? [process.env.SAMPLE_BROWSE
         await openStep(second); assert.equal(await editor.inputValue(), second.files[0].content);
         await run("Sample verified"); await editor.fill(alter(second)); await run("Completed — next activity unlocked");
         await page.reload(); await page.locator(".classroom-workspace").waitFor(); await openModule();
+        await worksheet.getByRole("button", { name: /Beyond Arrays/ }).click();
         await openStep(first, alter(first)); assert.equal(await editor.inputValue(), alter(first));
         assert.match(await feedback.textContent(), /Completed — your progress is saved/);
         await editor.fill(first.files[0].content); await run("Still showing sample output");
@@ -96,12 +98,14 @@ for (const mode of (process.env.SAMPLE_BROWSER_MODE ? [process.env.SAMPLE_BROWSE
         const p = await (await context.request.get(progressPath)).json();
         const states = { ...p.stepStates }; for (const step of steps.slice(0, 7)) states[activityStateId(step)] = "pass";
         assert.equal((await admin.from("module_progress").update({ step_states: states }).eq("classroom_id", classroomId).eq("student_id", users[1].id)).error, null);
+        // The direct database write bypasses the app, so drop this device's five-minute lesson copy.
+        await page.evaluate((key) => new Promise((resolve, reject) => { const open = indexedDB.open("codeshare-module-device-v1"); open.onerror = reject; open.onsuccess = () => { const tx = open.result.transaction("records", "readwrite"); tx.objectStore("records").delete(key); tx.oncomplete = resolve; tx.onerror = reject; }; }), `content:${users[1].id}:${classroomId}:${content.id}:`);
         await page.reload(); await page.locator(".classroom-workspace").waitFor(); await openModule();
         // Wednesday/Thursday parts become visible after the fixture's prerequisite setup.
         await worksheet.getByRole("button", { name: /One at a Time/ }).click();
         await openStep(steps[7]); await run("Expected error observed");
         const now = await (await context.request.get(progressPath)).json();
-        assert.equal(now.stepStates[sampleStateId(steps[7])], "pass"); assert.equal(now.stepStates[activityStateId(steps[7])], undefined);
+        assert.equal(now.stepStates[sampleStateId(steps[7])], mode === "offline" ? "pass" : undefined); assert.equal(now.stepStates[activityStateId(steps[7])], undefined);
       });
       if (mode === "offline") assert.equal(await page.locator('.student-module-project img[alt="CheerpJ"]').count(), 0);
       else assert.equal(await page.locator('.student-module-project img[alt="CheerpJ"]').count(), 1);

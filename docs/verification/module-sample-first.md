@@ -2,6 +2,18 @@
 
 Verified 2026-10-21 on branch `codex/module-sample-first`, based on `codex/earlet-hover-dismiss` (PR #26, stacked on PR #25). No hosted SQL, deployment, merge, or settings changes.
 
+## Re-verification 2026-10-28 (CKB-077)
+
+The browser script had gone stale against later approved changes (Week 14's Week 13 prerequisite,
+read-only step opening, resume at the next part, the five-minute device lesson copy, device-only
+online sample checks). Test-only refresh on branch `claude/sample-first-test-refresh`, based on
+main `aadda3a`; no app change.
+
+- FAIL before — unchanged script, offline and online: worksheet never opened (prerequisite notice).
+- PASS after — `node --test --test-reporter=spec tests/module-sample-first.browser.mjs`: offline 5/5
+  and online 5/5 (four steps plus parent each), local production 3022/3020, runner 3021, local Supabase.
+- PASS — `npm run build:all`; `npm run lint` 0 errors, 8 existing warnings; `npm test` 369/369.
+
 ## Final gate
 
 - PASS — `npm run build:all` (production app and backend).
