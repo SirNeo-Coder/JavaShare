@@ -103,3 +103,55 @@ showed Week 2 at 88%, overall 38%. Screenshots: `/tmp/codeshare-web-steps-studen
 - Phones, dark theme, a second physical device, real classroom Wi-Fi.
 - `sampleFirst` and `activity.id` web steps with real files (none in Weeks 1–3); covered only by the
   shared Java code path and the rule tests.
+
+# Slice 2 — web personal performance-task project (2026-10-29)
+
+Branch `feature/web-personal-project`. Offline-settings production build (local Supabase, laptop
+Java, no online runner) on ports 3042 (web, live help) and 3032 (Java personal, live help), started
+from `.claude/launch.json`. `npm run classroom:offline` itself was not launched.
+
+## Commands
+
+- `npm run build:all` — passes.
+- `npx eslint . --ignore-pattern .next --ignore-pattern backend/dist --ignore-pattern .claude` —
+  0 errors, 8 warnings (all existing).
+- `npm test` — 391 tests, 391 pass, 0 fail, 0 skipped.
+- `node --test --test-reporter=spec tests/web-module-steps.test.mjs` — 22/22.
+- `node --test --test-reporter=spec tests/<name>.browser.mjs` for `web-module-steps` (11/11),
+  `teacher-live-help` (7/7), `personal-performance` (6/6, offline).
+
+## New checks
+
+`tests/web-module-steps.test.mjs` (rule tests and real server routes, offline settings):
+
+- ✔ personal project: web when the performance task starts from web files, otherwise Java
+- ✔ personal web project editor: HTML editor and page preview, web file names, no Program input or Java console
+- ✔ web personal project opens from its index.html starter, keeps web and .txt files, refuses Java files
+- ✔ offline, a web page run counts only for the exact saved files with page text; then Submit this version reaches 100%
+- ✔ Java personal projects keep their rules: web files and web page results are refused
+
+`tests/web-module-steps.browser.mjs` (real app, Chromium, teacher's Week 2 file):
+
+- ✔ Week 2 personal performance-task project (Slice 2): HTML editor and page preview, run, submit,
+  100%; the teacher reviews the frozen page. Covers **Weekly web projects** with **W** icons, no
+  Program input, an uncaught error blocking **Submit this version**, an edit after a run blocking it,
+  **Submitted** and 100%, teacher live help showing **Web page** (CKB-078), and the teacher's
+  read-only **Review personal submission → Run code** leaving progress unchanged.
+
+## Break-and-restore proofs
+
+| Break | Result broken | Restored |
+| --- | --- | --- |
+| Opening the personal project uses the Java-only file rule again | 2 route subtests fail | 22/22 |
+| Run result no longer checks the files equal the saved project | "exact saved files" subtest fails | 22/22 |
+| Screen treats the personal project as Java | editor render test fails | 22/22 |
+| Live help label and editor fixed to Java (CKB-078), rebuilt | browser subtest fails (`'Java'` vs `'Web page'`) | 11/11 |
+
+## Not tested
+
+- Online mode (local `JAVA_RUNNER_URL` or hosted). The web evidence route has no online/offline
+  branch, but no run used online settings.
+- Firefox, Safari, phones, a second device, real classroom Wi-Fi.
+- Personal web projects carrying forward through `previousModuleId` (Weeks 1–3 have none); covered
+  only by the shared code path and `tests/personal-performance.test.mjs`.
+- Pictures, sound or video in a personal project (Slice 3).

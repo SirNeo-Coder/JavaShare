@@ -21,8 +21,8 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 1 — daily module steps pass | **Done, merged** | [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59), merge `93ab62f` on main |
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
-| Slice 2 — personal performance-task project for web | **Next** — proposed 2026-10-29, waiting for approval | see "Slice 2 needs" |
-| Slice 3 — page-element and media checks | Not started | see "Slice 3 notes" |
+| Slice 2 — personal performance-task project for web | **Built, PR open** (approved 2026-10-29) | branch `feature/web-personal-project`; see "How Slice 2 works" |
+| Slice 3 — page-element and media checks | **Next** — not started | see "Slice 3 notes" |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -70,6 +70,11 @@ Approved later the same day:
 
 Approved 2026-10-29:
 
+- **Slice 2 plan approved with the recommended choices:** a web personal project is decided by the
+  performance task's starter file endings; browser run evidence (files, success, page text) is
+  accepted online and offline for the exact saved files; **Projects** says **Weekly web projects**
+  with **W** icons for web modules (Java wording unchanged); **Add file** / **Rename file** in a web
+  personal project also allow `.txt` backups. Teacher live help label/colouring fixed (CKB-078).
 - **The weekly module file revision is done separately, after this feature is fully built**
   (Slices 1–3). Why (teacher): so everything learned while building it, including things not
   yet seen, goes into one revision of the module JSON, the DLL (daily lesson log) and the
@@ -129,25 +134,25 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
 - **Week 3 Step 1: pass.** Steps 2–7: teacher-checked (`Media checks:`).
 - Weeks 1–3 have no `sampleFirst`, no `activity.id`, no `previousModuleId` and no JavaScript steps.
 
-## Slice 2 needs (personal performance-task project for web)
+## How Slice 2 works (map)
 
-Today the personal project is Java-only end to end:
-
-- Routes (`backend/src/routes.ts`): `POST/PUT .../progress/performance-project` (PUT uses
-  `javaFiles`), `POST .../progress/personal-run` (executes laptop Java offline),
-  `POST .../progress/personal-result` (accepts only online browser Java), `PUT .../progress/
-  performance-task` (submission).
-- Repository: `prepareSupabasePerformanceProject` / `saveSupabasePerformanceProject` refuse
-  non-Java paths; `beginSupabasePersonalRun` / `recordSupabasePersonalRun` store `successfulRun`
-  (hash of the exact saved files); `setSupabaseModulePerformanceTask` requires that hash for `own`.
-- Web needs browser page evidence accepted offline as in Slice 1 (decision 3), with the same
-  "exact saved files ran successfully" rule. Personal output has no target (no expected output).
-- Screen: `StudentModuleActivity` `personal` branch still uses Java file rules, Rename to a Java
-  name, Program input and the Java console; Projects shows "Weekly Java projects" with a "J" icon
-  (`app/page.tsx`).
-- Starters: Weeks 1–3 `performanceTask.starterFiles` are `index.html`.
-- Until Slice 2, a web module stops at steps ÷ (steps + 1) (88% for Week 2), because the
-  personal submission is the last share of the percentage.
+- `backend/src/module-activities.ts` — `webPerformanceTask(module)`: web when every performance task
+  starter file is `.html/.css/.js` (Weeks 1–3: `index.html`).
+- `backend/src/routes.ts` — `allWebFiles` (shared with `/complete`); `PUT .../performance-project`
+  takes `webModuleFiles` for web; `POST .../personal-result` takes optional `files` + `output` (web
+  evidence) online and offline; without files it keeps the online-only Java rule.
+- `backend/src/supabase-repository.ts` — `personalPathError(web, path)` in open/save (web + `.txt`
+  vs Java); `beginSupabasePersonalRun` refuses web ("Web pages run in your browser");
+  `recordSupabasePersonalRun(…, page?)` needs page evidence for web (and refuses it for Java), files
+  must hash-equal the saved project, a success must report `Tab title: …`. Submission
+  (`setSupabaseModulePerformanceTask`) unchanged: needs `successfulRun` of the exact saved files.
+- `app/StudentModuleActivity.tsx` — `web` for personal projects; run = save → `useWebPageRun` →
+  `personal-result`; review run shows the frozen page; no Program input; web names in Add/Rename
+  (`moduleWebPathError`, `.txt` allowed for personal); uncaught error shown as an alert, no checklist
+  (no target output).
+- `app/page.tsx` — **Weekly web projects** / **W** icons, "Your own web project…", "Web files are in
+  the editor tabs."; teacher live help label and editor language from `fileLanguage(path)` (CKB-078).
+- Evidence: `docs/verification/web-module-steps.md`, section "Slice 2". No migration.
 
 ## Slice 3 notes (webChecks and mediaChecks)
 
@@ -217,16 +222,24 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
 - Only Chromium was tested; Firefox/Safari may split `innerText` lines differently.
 - Online/hosted mode, phones, dark theme, two devices and real classroom Wi-Fi are untested.
 - **Mark done** has no undo (teacher chose to leave it out for Slice 1).
-- `.txt` reference files are highlighted as Java in the editor.
+- `.txt` reference files are highlighted as Java in the editor and live help.
+- Teacher's worksheet **Personal performance-task project** slot (`ModuleViewer` `PerformanceTaskSlot`)
+  shows **Run** only for `.java` files, so web example/starter files have no Run there (unchanged).
+- The Net MVC student **Projects** text before choosing a module still says "open its Java projects"
+  (no module chosen yet, so the subject is not known there).
+- The class workspace note "Java files are in the editor tabs." still says Java for web **module
+  steps** (Slice 1 screen; Slice 2 changed it only for personal/review web projects).
+- Slice 2 was not run in online settings.
 - CKB-022 remains open for the student's own **New web project** preview.
 - PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
   is probably covered by CKB-076's refetch rule; not tested with two devices.
 
 ## Next step
 
-Slice 2 (personal performance-task project for web; see "Slice 2 needs"): propose it to the
-teacher following AGENTS.md and wait for approval. Then Slice 3. The module file revision comes
-last, written from "Revision notes".
+1. Teacher reviews and merges the Slice 2 pull request (branch `feature/web-personal-project`).
+2. Slice 3 (`webChecks`, `mediaChecks`; see "Slice 3 notes"): first ask the teacher where media
+   files live and how the no-internet preview gets them, then propose following AGENTS.md.
+3. Last: the module file revision, written from "Revision notes".
 
 ## Update log
 
@@ -245,3 +258,8 @@ last, written from "Revision notes".
 - 2026-10-29 — Slice 2 investigated and proposed (see the chat proposal; files: routes,
   repository, `StudentModuleActivity`, `page.tsx`, tests). Two module-file findings added to
   "Revision notes". Waiting for approval.
+- 2026-10-29 — Slice 2 built on `feature/web-personal-project` (approved with recommended choices):
+  web personal project opens, saves, runs in the browser preview online and offline, submits to
+  100%; teacher review runs the frozen page; live help label fixed (CKB-078). Real-route 22/22,
+  offline browser 11/11, Java personal 6/6, live help 7/7, suite 391/391, lint 0 errors; four
+  break-and-restore proofs. Not run in online settings.

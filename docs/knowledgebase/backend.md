@@ -169,6 +169,10 @@ run evidence and uses saved personal files; offline executes laptop Java, online
 saved version for browser execution. `POST .../progress/personal-result` accepts browser success
 only in online browser mode and rejects stale versions. Existing `PUT .../performance-task`
 requires matching saved files and successful-run evidence for `own`; client pass flags alone fail.
+Web personal projects (2026-10-29; performance task starter files all `.html/.css/.js`): `POST/PUT
+.../performance-project` keep web and `.txt` files, `personal-run` refuses them, and `personal-result`
+takes `{ updatedAt, success, files, output }` online and offline; the files must equal the saved
+project and a success must report page text (`Tab title: ...`). Java projects refuse web evidence.
 
 Teacher-only `GET /api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-submission`
 loads the frozen copy and preserves a legacy checklist on first review. `PUT` at the corresponding

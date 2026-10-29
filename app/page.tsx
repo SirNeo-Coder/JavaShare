@@ -14,7 +14,8 @@ import useOutsideDismiss from "./useOutsideDismiss";
 import ModuleWorkspace from "./ModuleWorkspace";
 import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
-import { activityStateId, activityTask, checkableStep } from "../backend/src/module-activities";
+import { activityStateId, activityTask, checkableStep, webPerformanceTask } from "../backend/src/module-activities";
+import { fileLanguage } from "../backend/src/file-paths";
 import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import { PerformanceTaskSteps, type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
@@ -2234,7 +2235,7 @@ export default function Home() {
           />
           {currentModuleProject?.kind === "review" && <PersonalSubmissionChecklist key={currentModuleProject.review!.submissionId} activity={currentModuleProject} />}
           {user.role === "student" && !weeklyModule && <div className="team-list"><b>Personal performance-task project</b><p>Choose your module to open its Java projects.</p><button type="button" onClick={() => { setProjectsOpen(false); setModulesOpen(true); }}>Choose module</button></div>}
-          {weeklyModule && <div className="team-list" aria-label="Weekly Java projects">
+          {weeklyModule && <div className="team-list" aria-label={`Weekly ${webPerformanceTask(weeklyModule) ? "web" : "Java"} projects`}>
             <b>{weeklyModule.title}</b>
             <div className={`team-card ${currentModuleProject?.kind === "module" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Module project" onClick={async () => {
               try {
@@ -2246,11 +2247,11 @@ export default function Home() {
                 if (step && checkableStep(step)) await startModuleActivity(module, step);
               }
               catch (error) { showModuleAccessError(error); notify(error instanceof Error ? error.message : "Could not open module project"); }
-            }}><span className="team-icon">J</span><span className="team-copy"><b>Module project</b></span></button></div>
+            }}><span className="team-icon">{webPerformanceTask(weeklyModule) ? "W" : "J"}</span><span className="team-copy"><b>Module project</b></span></button></div>
             {paperPerformanceTask(weeklyModule) ? <p>Week 20 proposal: submit on paper to your teacher.</p> : <div className={`team-card ${currentModuleProject?.kind === "performance" ? "active" : ""}`}><button type="button" className="team-select" aria-label="Personal performance-task project" onClick={async () => {
               try { await startModuleActivity(weeklyModule); }
               catch (error) { notify(error instanceof Error ? error.message : "Could not open personal project"); }
-            }}><span className="team-icon">J</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>}
+            }}><span className="team-icon">{webPerformanceTask(weeklyModule) ? "W" : "J"}</span><span className="team-copy"><b>Personal performance-task project</b></span></button></div>}
             <PerformanceTaskSteps steps={weeklyModule.performanceTask?.steps} module={weeklyModule} />
             {weeklyModule.performanceTask?.checklist.length ? <PersonalTaskChecklist key={weeklyModule.id} items={weeklyModule.performanceTask.checklist} storageKey={`codeshare-task-checklist:${user.id}:${classroomId}:${weeklyModule.id}`} /> : null}
           </div>}
@@ -2407,8 +2408,8 @@ export default function Home() {
           {currentModuleProject ? <div className="assignment-block">
             <span className="eyebrow">{currentModuleProject.kind === "performance" ? "PERSONAL PERFORMANCE TASK" : "MODULE PROJECT"}</span>
             <h3>{currentModuleProject.moduleTitle}</h3>
-            <p>{currentModuleProject.kind === "review" ? "Frozen submitted files. Teacher runs never change student progress." : currentModuleProject.kind === "performance" ? "Your own Java project, continued from the previous week. Saving and running do not submit it." : "Use the module sample code and match its expected output to progress."}</p>
-            <p>Java files are in the editor tabs.</p>
+            <p>{currentModuleProject.kind === "review" ? "Frozen submitted files. Teacher runs never change student progress." : currentModuleProject.kind === "performance" ? `Your own ${webPerformanceTask(currentModuleProject.module) ? "web" : "Java"} project, continued from the previous week. Saving and running do not submit it.` : "Use the module sample code and match its expected output to progress."}</p>
+            <p>{currentModuleProject.kind !== "module" && webPerformanceTask(currentModuleProject.module) ? "Web" : "Java"} files are in the editor tabs.</p>
           </div> : <div className="assignment-block">
             <span className="eyebrow">CURRENT ASSIGNMENT</span>
             <h3>{team.project?.title}</h3>
@@ -2580,9 +2581,9 @@ export default function Home() {
             } : undefined}
           /> : <><div className="content-grid">
             {studentLiveView ? <section className="editor-card student-module-project" aria-label="Student live project">
-              <div className="workspace-card-heading"><b>Live: {studentLiveView.studentName} · {studentLiveView.kind === "performance" ? "Personal project" : "Module project"} · {studentLiveView.moduleTitle}</b><span>Java</span></div>
+              <div className="workspace-card-heading"><b>Live: {studentLiveView.studentName} · {studentLiveView.kind === "performance" ? "Personal project" : "Module project"} · {studentLiveView.moduleTitle}</b><span>{fileLanguage(studentLiveView.path) === "java" ? "Java" : "Web page"}</span></div>
               <div className="file-tabs"><button type="button" className="file-tab active">{studentLiveView.path}</button></div>
-              <CodeEditor value={studentLiveView.content} onChange={editModuleLive} onCursorChange={moveModuleCursor} remoteCursors={moduleCursors} readOnly={!studentLiveView.editable} language="java" />
+              <CodeEditor value={studentLiveView.content} onChange={editModuleLive} onCursorChange={moveModuleCursor} remoteCursors={moduleCursors} readOnly={!studentLiveView.editable} language={fileLanguage(studentLiveView.path)} />
               <div className="editor-status"><span>{studentLiveView.path}</span><span>{studentLiveView.editable ? "Your changes appear on the student's screen. Their Save work or a successful run keeps them." : "Read-only until the student runs the unchanged sample."}</span></div>
             </section> : <section className="editor-card">
               <div className="workspace-card-heading"><b><span aria-hidden="true">⌘</span> Code editor</b><span>{languageLabel(activeFile?.language || "java")}</span></div>

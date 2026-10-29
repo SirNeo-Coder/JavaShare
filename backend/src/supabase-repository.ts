@@ -1,7 +1,7 @@
 import { paperPerformanceTask, personalProjectFiles, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
-import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, teacherCheckedStep, webStep, type ActivityStep, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, teacherCheckedStep, webPerformanceTask, webStep, type ActivityStep, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, projectPathError } from "./file-paths.ts";
@@ -1392,8 +1392,14 @@ async function requirePerformanceProject(user: SupabaseSessionUser, classroomId:
   return { content: courseRow.content, progress };
 }
 
+// Web personal projects keep web and .txt files; Java ones keep Java files (teacher, 2026-10-29).
+function personalPathError(web: boolean, path: string) {
+  return web ? Boolean(moduleWebPathError(path)) : path.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(path);
+}
+
 export async function prepareSupabasePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   const { content, progress } = await requirePerformanceProject(user, classroomId, moduleId);
+  const web = webPerformanceTask(content);
   let previous: ModuleProgressRow["performance_task"] | undefined;
   if (!progress.performance_task.project && !progress.performance_task.own) {
     let previousId = content.previousModuleId;
@@ -1412,7 +1418,7 @@ export async function prepareSupabasePerformanceProject(user: SupabaseSessionUse
   }
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     const files = personalProjectFiles(content.performanceTask!.starterFiles, previous, row.performance_task);
-    if (files.length > 50 || files.some((file) => file.path.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(file.path))) throw new SupabaseRepositoryError(400, "This performance task needs at most 50 valid Java files");
+    if (files.length > 50 || files.some((file) => personalPathError(web, file.path))) throw new SupabaseRepositoryError(400, `This performance task needs at most 50 valid ${web ? "web" : "Java"} files`);
     return { performance_task: { ...row.performance_task, project: { ...row.performance_task.project, files } } };
   }, "Could not open your personal project");
   return moduleProgressView(saved, content);
@@ -1420,6 +1426,7 @@ export async function prepareSupabasePerformanceProject(user: SupabaseSessionUse
 
 export async function saveSupabasePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string, files: ModuleFile[], updatedAt: string) {
   const { content } = await requirePerformanceProject(user, classroomId, moduleId);
+  if (files.some((file) => personalPathError(webPerformanceTask(content), file.path))) throw new SupabaseRepositoryError(400, "These files do not belong to this personal project");
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "This personal project changed in another tab. Reopen it before saving");
     return { performance_task: { ...row.performance_task, project: { files } } };
@@ -1434,6 +1441,7 @@ function personalFilesHash(files: ModuleFile[]) {
 export async function beginSupabasePersonalRun(user: SupabaseSessionUser, classroomId: string, moduleId: string, updatedAt: string) {
   const { content } = await requirePerformanceProject(user, classroomId, moduleId);
   if (paperPerformanceTask(content)) throw new SupabaseRepositoryError(400, "This proposal is submitted on paper");
+  if (webPerformanceTask(content)) throw new SupabaseRepositoryError(400, "Web pages run in your browser, not the Java runner");
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     if (row.updated_at !== updatedAt || !row.performance_task.project) throw new SupabaseRepositoryError(409, "Save and reopen the current personal project before running");
     return { performance_task: { ...row.performance_task, project: { files: row.performance_task.project.files } } };
@@ -1441,11 +1449,17 @@ export async function beginSupabasePersonalRun(user: SupabaseSessionUser, classr
   return moduleProgressView(saved, content);
 }
 
-export async function recordSupabasePersonalRun(user: SupabaseSessionUser, classroomId: string, moduleId: string, updatedAt: string, success: boolean) {
+// A web page's evidence is the exact files it ran plus its page text; never a bare success flag.
+export async function recordSupabasePersonalRun(user: SupabaseSessionUser, classroomId: string, moduleId: string, updatedAt: string, success: boolean,
+  page?: { files: ModuleFile[]; output: string }) {
   const { content } = await requirePerformanceProject(user, classroomId, moduleId);
+  if (webPerformanceTask(content) !== Boolean(page)) throw new SupabaseRepositoryError(400, page ? "These files do not belong to this personal project" : "Run your web page again to send its result");
+  if (page && success && !page.output.startsWith("Tab title: ")) throw new SupabaseRepositoryError(400, "A successful page run reports its page text");
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     const project = row.performance_task.project;
-    if (row.updated_at !== updatedAt || !project) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
+    if (row.updated_at !== updatedAt || !project || (page && personalFilesHash(page.files) !== personalFilesHash(project.files))) {
+      throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
+    }
     return { performance_task: { ...row.performance_task, project: { files: project.files, ...(success ? { successfulRun: personalFilesHash(project.files) } : {}) } } };
   }, "Could not save the personal run result");
   return moduleProgressView(saved, content);

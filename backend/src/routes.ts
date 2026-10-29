@@ -620,6 +620,8 @@ const javaFiles = z.array(z.object({ path: javaPath, content: z.string().max(200
   .refine((files) => new Set(files.map((file) => sourcePath(file.path))).size === files.length, "Each Java source file must have a different path");
 const webModuleFiles = z.array(z.object({ path: z.string().trim().min(1).max(200).refine((value) => !moduleWebPathError(value)), content: z.string().max(200000) })).min(1).max(50)
   .refine((files) => new Set(files.map((file) => file.path)).size === files.length, "Each file must have a different path");
+// Web files are decided by their endings (teacher, 2026-10-28); the repository checks they suit the step or project.
+const allWebFiles = (files: unknown) => Array.isArray(files) && files.length > 0 && files.every((file) => typeof file?.path === "string" && !moduleWebPathError(file.path));
 
 type JudgeResult = { compile_output?: string; stderr?: string; stdout?: string; message?: string; status?: { id?: number; description?: string } };
 
@@ -685,7 +687,8 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-pr
 
 app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-project", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    const { files, updatedAt } = z.object({ files: javaFiles, updatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
+    const web = allWebFiles((req.body as { files?: unknown })?.files);
+    const { files, updatedAt } = z.object({ files: web ? webModuleFiles : javaFiles, updatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
     return res.json(await saveSupabasePerformanceProject(req.user!, String(req.params.classroomId), String(req.params.moduleId), files, updatedAt));
   } catch (error) { next(error); }
 });
@@ -700,8 +703,7 @@ app.get("/api/classrooms/:classroomId/modules/:moduleId/progress/activity", requ
 app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     // Web pages always run in the student's browser, so their results are accepted offline too (teacher, 2026-10-28).
-    const files: unknown = (req.body as { files?: unknown })?.files;
-    const web = Array.isArray(files) && files.length > 0 && files.every((file) => typeof file?.path === "string" && !moduleWebPathError(file.path));
+    const web = allWebFiles((req.body as { files?: unknown })?.files);
     if (!web && localJavaEnabled) throw new SupabaseRepositoryError(403, "Offline progress must use the classroom Java runner");
     if (!web && !process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(503, "Online Java is not configured");
     const evidence = z.object({ files: web ? webModuleFiles : javaFiles, success: z.boolean(), output: z.string().max(70000) });
@@ -724,9 +726,11 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/personal-run",
 
 app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/personal-result", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
-    if (localJavaEnabled || !process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(403, "Browser run results are only accepted in online browser mode");
-    const { updatedAt, success } = z.object({ updatedAt: z.string().datetime({ offset: true }), success: z.boolean() }).parse(req.body);
-    return res.json(await recordSupabasePersonalRun(req.user!, String(req.params.classroomId), String(req.params.moduleId), updatedAt, success));
+    // A web page reports the files it ran and its page text, online and offline (teacher, 2026-10-29).
+    const { updatedAt, success, files, output = "" } = z.object({ updatedAt: z.string().datetime({ offset: true }), success: z.boolean(),
+      files: webModuleFiles.optional(), output: z.string().max(70000).optional() }).parse(req.body);
+    if (!files && (localJavaEnabled || !process.env.JAVA_RUNNER_URL)) throw new SupabaseRepositoryError(403, "Browser run results are only accepted in online browser mode");
+    return res.json(await recordSupabasePersonalRun(req.user!, String(req.params.classroomId), String(req.params.moduleId), updatedAt, success, files && { files, output }));
   } catch (error) { next(error); }
 });
 

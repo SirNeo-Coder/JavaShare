@@ -7,7 +7,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
 import { buildPreview, webPageOutput, webRunResult } from "../app/webPreview.ts";
-import { checkableStep, matchesActivityOutput, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webStep } from "../backend/src/module-activities.ts";
+import { checkableStep, matchesActivityOutput, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
 import { moduleWebPathError } from "../backend/src/file-paths.ts";
 import { buildTeacherPreview } from "../app/teacherWebPreview.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
@@ -141,6 +141,45 @@ test("module editor for a web step: HTML editor on index.html, page preview inst
   assert.doesNotMatch(html, /Program input|Program output|CheerpJ/);
 });
 
+// One web or Java step, then a personal performance task starting from starterFiles.
+const personalFixture = (id, step, starterFiles) => ({
+  format: "codeshare-module", version: 1, course: "dotnet-1", week: 2, id, title: "Personal project fixture", starterFiles: [],
+  lessons: [lesson(`${id}-d1`, 1, [{ type: "step", id: `${id}-s1`, number: 1, ...step }])],
+  performanceTask: { id: `${id}-pt`, title: "Your own page", markdown: "Build your own page.", checklist: ["Give the page a title"], exampleFiles: starterFiles, starterFiles,
+    presentationOutline: [], questionsToPrepare: [], rubric: [{ criterion: "Page", points: 10 }], totalPoints: 10 },
+});
+const webPersonalStep = { instruction: "Run the page.", language: "html", run: "index.html", files: [{ path: "index.html", content: page("Canteen", "<p>Menu</p>") }], expectedOutput: "Tab title: Canteen\nVisible page text:\nMenu" };
+const javaPersonalStep = { instruction: "Run it.", language: "java", files: [{ path: "Main.java", content: "public class Main { public static void main(String[] a) { System.out.println(1); } }" }], expectedOutput: "1" };
+
+test("personal project: web when the performance task starts from web files, otherwise Java", () => {
+  assert.equal(webPerformanceTask(personalFixture("a", webPersonalStep, [{ path: "index.html", content: "" }])), true);
+  assert.equal(webPerformanceTask(personalFixture("b", javaPersonalStep, [{ path: "Main.java", content: "" }])), false);
+  assert.equal(webPerformanceTask({}), false, "no performance task is not a web project");
+});
+
+test("personal web project editor: HTML editor and page preview, web file names, no Program input or Java console", () => {
+  const content = personalFixture("pui", webPersonalStep, [{ path: "index.html", content: page("Mine", "<p>Hi</p>") }]);
+  const files = [{ path: "index.html", content: page("Mine", "<p>Hi</p>") }, { path: "backup.txt", content: "old" }];
+  const render = (kind, extra = {}) => renderToStaticMarkup(createElement(StudentModuleActivity, {
+    activity: { kind, module: content, classroomId: "class", moduleId: content.id, moduleTitle: "Canteen", stepId: "", stateId: "", studentId: "student", instruction: "Build your own page.", expectedOutput: "", stdin: "",
+      progress: { performanceProjectFiles: files, projectFiles: [], performanceTask: {}, stepStates: {}, updatedAt: "", percent: 50 }, ...extra },
+    ref: { current: null }, onChecked() {}, onClose() {},
+  }));
+  const html = render("performance");
+  assert.match(html, /HTML source code editor/);
+  assert.match(html, /file-tab active">index\.html/);
+  assert.match(html, /<span>Web page<\/span>/);
+  assert.match(html, /aria-label="Add personal web file"/);
+  assert.match(html, /Press <b>Run code<\/b> to see your page here/);
+  assert.match(html, /Run the current files successfully before submitting\./);
+  assert.match(html, /Submit this version/);
+  assert.doesNotMatch(html, /Program input|Program output|CheerpJ|Required output/);
+  const review = render("review", { review: { studentId: "student", studentName: "Ana", submissionId: "x", submission: { files, status: "pass", submittedAt: "" } } });
+  assert.match(review, /Submitted personal project — read-only/);
+  assert.match(review, /Press <b>Run code<\/b> to see your page here/);
+  assert.doesNotMatch(review, /Program input|CheerpJ|Submit this version/);
+});
+
 let local;
 try {
   const raw = execFileSync("npx", ["--no-install", "supabase", "status", "-o", "env"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
@@ -220,6 +259,68 @@ test("web steps offline (real routes): web completions are accepted, media steps
       const java = await complete(s4, { files: s4.files, output: "1" });
       assert.equal(java.status, 403); assert.match(await java.text(), /Offline progress must use the classroom Java runner/);
       assert.equal((await complete(s4, { files: [{ path: "index.html", content: "" }], output: "1" })).status, 400);
+    });
+
+    // Personal performance-task projects: a web one and a Java one in the same class.
+    const webP = personalFixture(`wp-${randomUUID().slice(0, 8)}`, webPersonalStep, [{ path: "index.html", content: page("My page", "<p>Hello</p>") }]);
+    const javaP = personalFixture(`jp-${randomUUID().slice(0, 8)}`, javaPersonalStep, [{ path: "Main.java", content: "public class Main { public static void main(String[] a) {} }" }]);
+    for (const upload of [webP, javaP]) assert.equal((await call(`/api/classrooms/${classroomId}/modules`, cookies[0], "POST", upload)).status, 201);
+    const personal = (target, route, method = "POST", body) => call(`/api/classrooms/${classroomId}/modules/${target.id}/progress/${route}`, cookies[1], method, body);
+    const webPage = (files, view, changes = {}) => personal(webP, "personal-result", "POST", { updatedAt: view.updatedAt, success: true, files, output: "Tab title: My page\nVisible page text:\nHello", ...changes });
+    const submit = (target, view) => personal(target, "performance-task", "PUT", { variant: "own", files: view.performanceProjectFiles, status: "pass", updatedAt: view.updatedAt });
+
+    await t.test("web personal project opens from its index.html starter, keeps web and .txt files, refuses Java files", async () => {
+      const progress = await (await call(`/api/classrooms/${classroomId}/modules/${webP.id}/progress/activity?stepId=${webP.id}-s1`, cookies[1])).json();
+      const done = await personal(webP, "complete", "POST", { stepId: `${webP.id}-s1`, updatedAt: progress.updatedAt, moduleVersion: progress.moduleVersion, completionId: randomUUID(),
+        files: progress.projectFiles, success: true, output: webPersonalStep.expectedOutput });
+      assert.equal(done.status, 200, await done.clone().text());
+      const opened = await personal(webP, "performance-project");
+      assert.equal(opened.status, 200, await opened.clone().text());
+      const view = await opened.json();
+      assert.deepEqual(view.performanceProjectFiles, webP.performanceTask.starterFiles);
+      assert.equal(view.percent, 50);
+      const saved = await personal(webP, "performance-project", "PUT", { files: [...view.performanceProjectFiles, { path: "backup.txt", content: "Week 1" }], updatedAt: view.updatedAt });
+      assert.equal(saved.status, 200, await saved.clone().text());
+      assert.deepEqual((await saved.json()).performanceProjectFiles.map((file) => file.path), ["index.html", "backup.txt"]);
+      const java = await personal(webP, "performance-project", "PUT", { files: javaP.performanceTask.starterFiles, updatedAt: view.updatedAt });
+      assert.equal(java.status, 400); assert.match(await java.text(), /do not belong to this personal project/);
+    });
+
+    await t.test("offline, a web page run counts only for the exact saved files with page text; then Submit this version reaches 100%", async () => {
+      let view = await (await personal(webP, "performance-project")).json();
+      const files = view.performanceProjectFiles;
+      const laptop = await personal(webP, "personal-run", "POST", { updatedAt: view.updatedAt });
+      assert.equal(laptop.status, 400); assert.match(await laptop.text(), /Web pages run in your browser/);
+      assert.equal((await personal(webP, "personal-result", "POST", { updatedAt: view.updatedAt, success: true })).status, 403, "a bare success flag is refused offline");
+      assert.equal((await webPage([{ path: "index.html", content: "changed" }, files[1]], view)).status, 409, "files that differ from the saved project are refused");
+      assert.equal((await webPage(files, view, { output: "" })).status, 400, "a successful run must report its page text");
+      const failed = await webPage(files, view, { success: false, output: "" });
+      assert.equal(failed.status, 200, await failed.clone().text());
+      view = await failed.json();
+      assert.equal((await submit(webP, view)).status, 409, "an unsuccessful run cannot be submitted");
+      const ran = await webPage(files, view);
+      assert.equal(ran.status, 200, await ran.clone().text());
+      view = await ran.json();
+      const submitted = await submit(webP, view);
+      assert.equal(submitted.status, 200, await submitted.clone().text());
+      const result = await submitted.json();
+      assert.equal(result.performanceTask.own.status, "pass");
+      assert.deepEqual(result.performanceTask.own.files, files);
+      assert.equal(result.percent, 100);
+    });
+
+    await t.test("Java personal projects keep their rules: web files and web page results are refused", async () => {
+      await call(`/api/classrooms/${classroomId}/modules/${javaP.id}/progress`, cookies[1]);
+      assert.equal((await admin.from("module_progress").update({ step_states: { [`${javaP.id}-s1`]: "pass" } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", javaP.id)).error, null);
+      const opened = await personal(javaP, "performance-project");
+      assert.equal(opened.status, 200, await opened.clone().text());
+      const view = await opened.json();
+      assert.deepEqual(view.performanceProjectFiles.map((file) => file.path), ["Main.java"]);
+      assert.equal((await personal(javaP, "performance-project", "PUT", { files: webP.performanceTask.starterFiles, updatedAt: view.updatedAt })).status, 400);
+      const page = await personal(javaP, "personal-result", "POST", { updatedAt: view.updatedAt, success: true, files: webP.performanceTask.starterFiles, output: "Tab title: x" });
+      assert.equal(page.status, 400); assert.match(await page.text(), /do not belong to this personal project/);
+      assert.equal((await personal(javaP, "personal-result", "POST", { updatedAt: view.updatedAt, success: true })).status, 403, "offline still refuses browser Java claims");
     });
 
     await t.test("teacher class progress shows the web percentage and the media step as done", async () => {

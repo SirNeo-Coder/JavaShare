@@ -72,6 +72,11 @@ export function webStep(step: { files?: ModuleFile[] }) {
   return Boolean(step.files?.length) && step.files!.every((file) => /\.(?:html|css|js)$/.test(file.path));
 }
 
+// The personal project is a web project when its performance task starts from web files.
+export function webPerformanceTask(module?: { performanceTask?: { starterFiles: ModuleFile[] } }) {
+  return webStep({ files: module?.performanceTask?.starterFiles });
+}
+
 export function checkableStep(step: { language: string; files: ModuleFile[] }) { return step.language === "java" || webStep(step); }
 
 // Output naming pictures, sound or video cannot be checked automatically yet; the teacher marks it done.
