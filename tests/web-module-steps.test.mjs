@@ -7,7 +7,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
 import { buildPreview, embedMedia, webPageOutput, webRunResult } from "../app/webPreview.ts";
-import { checkModuleRun, checkableStep, matchesActivityOutput, mediaCheckLines, mediaLinesPass, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
+import { activityStateId, checkModuleRun, checkableStep, sampleStateId, matchesActivityOutput, mediaCheckLines, mediaLinesPass, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
 import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
 import { MEDIA_LIMIT, mediaPathType, moduleWebPathError } from "../backend/src/file-paths.ts";
 import { buildTeacherPreview } from "../app/teacherWebPreview.ts";
@@ -150,6 +150,28 @@ const personalFixture = (id, step, starterFiles) => ({
   performanceTask: { id: `${id}-pt`, title: "Your own page", markdown: "Build your own page.", checklist: ["Give the page a title"], exampleFiles: starterFiles, starterFiles,
     presentationOutline: [], questionsToPrepare: [], rubric: [{ criterion: "Page", points: 10 }], totalPoints: 10 },
 });
+// Net MVC weeks in the Java student workflow (teacher, 2026-10-29): sampleFirst, one alteration task per
+// step, the next week linked with previousModuleId. A page step (with a page check) and a console step.
+const sampleFirstWeek = (id, previousModuleId) => ({
+  format: "codeshare-module", version: 1, course: "dotnet-1", week: previousModuleId ? 2 : 1, id, title: `Sample-first ${id}`, sampleFirst: true,
+  ...(previousModuleId ? { previousModuleId } : {}), starterFiles: [],
+  lessons: [
+    lesson(`${id}-d1`, 1, [{ type: "step", id: `${id}-d1-s1`, number: 1, instruction: "Run the food list.", language: "html", run: "index.html",
+      files: [{ path: "index.html", content: page("Canteen", "<h1>Canteen</h1>\n<ul><li>Pandesal</li></ul>") }],
+      expectedOutput: "Tab title: Canteen\nVisible page text:\nCanteen\nPandesal", webChecks: [{ selector: "ul > li", count: 1 }],
+      activity: { id: `${id}-d1-s1-alter-v1`, instruction: "Add Banana as a second food item.", expectedOutput: "Tab title: Canteen\nVisible page text:\nCanteen\nPandesal\nBanana" } }]),
+    lesson(`${id}-d2`, 2, [{ type: "step", id: `${id}-d2-s2`, number: 2, instruction: "Run the total.", language: "javascript", run: "app.js",
+      files: [{ path: "app.js", content: "console.log(\"Total: \" + (2 + 3));" }], expectedOutput: "Total: 5",
+      activity: { id: `${id}-d2-s2-alter-v1`, instruction: "Add a 4-peso item to the total.", expectedOutput: "Total: 9" } }]),
+  ],
+  performanceTask: { id: `${id}-pt`, title: "Your own page", markdown: "Build your own page.", checklist: ["Give the page a title"],
+    exampleFiles: [{ path: "index.html", content: page("Mine", "<p>Mine</p>") }], starterFiles: [{ path: "index.html", content: page("Mine", "<p>Mine</p>") }],
+    presentationOutline: [], questionsToPrepare: [], rubric: [{ criterion: "Page", points: 10 }], totalPoints: 10 },
+});
+// The task answers, kept outside the module like the teacher's solutions/ folders.
+const sampleFirstAnswer = (step) => step.run === "app.js" ? [{ path: "app.js", content: "console.log(\"Total: \" + (2 + 3 + 4));" }]
+  : [{ path: "index.html", content: step.files[0].content.replace("<li>Pandesal</li>", "<li>Pandesal</li><li>Banana</li>") }];
+
 const webPersonalStep = { instruction: "Run the page.", language: "html", run: "index.html", files: [{ path: "index.html", content: page("Canteen", "<p>Menu</p>") }], expectedOutput: "Tab title: Canteen\nVisible page text:\nMenu" };
 const javaPersonalStep = { instruction: "Run it.", language: "java", files: [{ path: "Main.java", content: "public class Main { public static void main(String[] a) { System.out.println(1); } }" }], expectedOutput: "1" };
 
@@ -542,6 +564,40 @@ test("web steps offline (real routes): web completions are accepted, media steps
         assert.equal(studentKeys().length, 10, "a refused upload leaves no copy behind");
         assert.equal((await mediaRoute(webP, "/images/p0.png", cookies[1], "PUT", png)).status, 200, "replacing a file is allowed when full");
       } finally { delete globalThis[contextKey]; }
+    });
+
+    await t.test("sample first (Java workflow) for web steps: a task completes only after its unchanged sample, page checks belong to the sample, the next week waits", async () => {
+      const weekA = sampleFirstWeek(`sfa-${randomUUID().slice(0, 8)}`), weekB = sampleFirstWeek(`sfb-${randomUUID().slice(0, 8)}`, weekA.id);
+      for (const week of [weekA, weekB]) assert.equal((await call(`/api/classrooms/${classroomId}/modules`, cookies[0], "POST", week)).status, 201);
+      const [a1, a2] = weekA.lessons.map((item) => item.blocks[0]);
+      const route = (week, path) => `/api/classrooms/${classroomId}/modules/${week.id}/progress${path}`;
+      const finish = async (step, changes = {}) => {
+        const opened = await call(route(weekA, `/activity?stepId=${step.id}`), cookies[1]);
+        assert.equal(opened.status, 200, await opened.clone().text());
+        const view = await opened.json();
+        const answer = mergeProjectFiles(view.projectFiles, sampleFirstAnswer(step));
+        return call(route(weekA, "/complete"), cookies[1], "POST", { stepId: step.id, updatedAt: view.updatedAt, moduleVersion: view.moduleVersion, completionId: randomUUID(),
+          files: answer, success: true, output: step.activity.expectedOutput, checks: passingChecks(step).map(() => ({ count: 2 })),
+          sample: { files: mergeProjectFiles(view.projectFiles, step.files), success: true, output: step.expectedOutput, checks: passingChecks(step) }, ...changes });
+      };
+      const refused = async (response, message) => { assert.equal(response.status, 400); assert.match(await response.text(), message); };
+      assert.equal((await call(route(weekA, `/activity?stepId=${a2.id}`), cookies[1])).status, 403, "the second step waits for the first task");
+      await refused(await finish(a1, { sample: undefined }), /Run the supplied sample unchanged/);
+      await refused(await finish(a1, { sample: { files: sampleFirstAnswer(a1), success: true, output: a1.expectedOutput, checks: passingChecks(a1) } }), /Run the supplied sample unchanged/);
+      await refused(await finish(a1, { sample: { files: a1.files, success: true, output: a1.expectedOutput, checks: [{ count: 0 }] } }), /Run the supplied sample unchanged/);
+      await refused(await finish(a1, { output: a1.expectedOutput }), /has not completed successfully/);
+      const blocked = await call(route(weekB, ""), cookies[1]);
+      assert.equal(blocked.status, 403, "the next week waits for this one"); assert.match(await blocked.text(), /Week 1/);
+      const done = await finish(a1);
+      assert.equal(done.status, 200, await done.clone().text());
+      const states = (await done.json()).progress.stepStates;
+      assert.equal(states[activityStateId(a1)], "pass"); assert.equal(states[sampleStateId(a1)], "pass", "the page with two items completed the task though the sample's page check counts one");
+      const consoleDone = await finish(a2);
+      assert.equal(consoleDone.status, 200, await consoleDone.clone().text());
+      assert.equal((await consoleDone.json()).progress.stepStates[activityStateId(a2)], "pass");
+      const opened = await call(route(weekB, `/activity?stepId=${weekB.lessons[0].blocks[0].id}`), cookies[1]);
+      assert.equal(opened.status, 200, await opened.clone().text());
+      assert.deepEqual((await opened.json()).projectFiles.find((file) => file.path === "app.js")?.content, sampleFirstAnswer(a2)[0].content, "the module project carries forward from the previous week");
     });
 
     await t.test("teacher class progress shows the web percentage and the media step as done", async () => {

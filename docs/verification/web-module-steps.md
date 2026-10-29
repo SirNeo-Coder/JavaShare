@@ -342,3 +342,46 @@ bucket, folder `students/`).
 - Firefox, Safari, phones; a real student's phone photos (names with spaces are refused with a message).
 - Offline media: offline shows "only available online" (route test only; not checked on screen).
 - Carry-forward between real weeks: Weeks 1–3 have no `previousModuleId` (unit test only).
+
+# Web steps in the Java workflow: sample first, alteration tasks, linked weeks (2026-10-29)
+
+Branch `feature/web-sample-first` (main merged in, including PR #70's run box). Approved: prove and fix
+sample-first and alteration tasks for web steps; small bugs fixed here with a CKB record each.
+
+## Commands and results
+
+- `npx tsc --noEmit`, `npm run build:all`, `npx opennextjs-cloudflare build` — pass. `npm run lint` — 0 errors.
+- `npm test` — 409 tests, 409 pass, 0 fail, 0 skipped.
+- `node --test --test-reporter=spec tests/web-module-steps.test.mjs` — new route subtest ✔ "sample first
+  (Java workflow) for web steps: a task completes only after its unchanged sample, page checks belong to
+  the sample, the next week waits" (task refused without the sample, with a changed sample, with a sample
+  failing its page check, or with sample output; the next step and next week locked; tasks pass by output
+  only; the module project carries forward).
+- `tests/web-sample-first.browser.mjs` (two linked practice weeks) — 5/5 on Cloudflare's runtime (8787,
+  local Supabase and R2) and 5/5 offline (3042):
+  - ✔ a page step opens its sample read-only; the unchanged run verifies it with its page check; the task completes it
+  - ✔ the console step loads its own sample, verifies it, then completes its task
+  - ✔ after a reload, a finished step reopens with the student's completed work and keeps its completion
+  - ✔ the personal project is submitted; the next week opens and carries both projects forward
+- `tests/web-module-steps.browser.mjs` on the teacher's **revised** Weeks 1–3 (sample-first, 22 tasks, answers
+  in `solutions/`):
+  - Cloudflare runtime: 9 pass, 5 skipped (old-format-only), 0 fail, two runs. ✔ "sample-first weeks (Java
+    workflow): every step of Weeks 1–3 verifies its unchanged sample, then completes its task with the
+    answer in solutions/" — all 22 steps "sample verified, task completed", media steps included.
+  - Offline: 7 pass, 7 skipped (old-format-only, and two that need R2), 0 fail. Weeks 1–2 and Week 3 Step 1
+    "sample verified, task completed"; Week 3 Steps 2–7 "teacher-checked (no media storage), marked done".
+  - Teacher preview: every step's own sample passes, Week 1 included (its line break is fixed).
+- Before the revision landed, the same test passed on the teacher's old-format files (13 pass, 1 skipped;
+  one later run hit the CKB-080 flake) and on a scratch sample-first copy (9 pass, 5 skipped).
+
+## Found and fixed
+
+- CKB-083: after **Sample verified**, the result list re-judged the sample run against the task (✗ Page
+  text matches, page checks gone). Broken: the first fixture subtest fails with exactly that cross;
+  restored: 5/5.
+
+## Not tested
+
+- The Java personal-project browser test (`tests/personal-performance.browser.mjs`) was not re-run on this
+  branch (this change touches only the web result list); PR #70 ran it.
+- Hosted site, Firefox, Safari, phones. The DLL and printed modules (the revision chat checks those).
