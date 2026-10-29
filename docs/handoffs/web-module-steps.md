@@ -188,6 +188,29 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
 - After the revision, re-run every step's sample through `tests/web-module-steps.browser.mjs`
   and report one line per step.
 
+## Hosted check after deploy (teacher)
+
+Assistants never deploy or change hosted settings. After merging PR #62, when Cloudflare has built
+`main` (see `docs/cloudflare-setup.md`):
+
+1. Sign in on the hosted site as the teacher. Open the Net MVC class → **Curriculum** and upload
+   `DotNet1_Week_02.codeshare.json` and `DotNet1_Week_03.codeshare.json` again (same ids, student
+   progress kept; this keeps their `webChecks`/`mediaChecks`).
+2. **View module details** on Week 2 and press **Run** on each step: every step shows
+   **✓ Page text matches**. Week 1 still shows crosses; that is expected until the deferred module
+   revision.
+3. With a test student account (not a real student): Week 2 Step 1 → **Work in code editor** →
+   **▶ Run code** → **Completed**. Optional, longer: finish all 7 steps, then **Projects** shows
+   **Weekly web projects** → **Personal performance-task project** → **▶ Run code** → **Run succeeded —
+   ready to submit this version.** → **Submit this version** → **Submitted**, 100%.
+4. As the teacher: **Students** → the test student → Week 2 shows the same percentage; if submitted,
+   **Review personal submission** → **▶ Run code** shows the page.
+5. In Cloudflare, **codeshare** → **Logs** (**Observability**): look for `exceededCpu` or 503 on
+   `progress/complete`, `progress/performance-project`, `progress/personal-result` or
+   `progress/performance-task`. If any appear, keep one cleaned example per route (status, outcome,
+   CPU and total time; no cookies, keys or student information) and give it to the assistant
+   (CKB-065 steps).
+
 ## Testing recipe (local only)
 
 - Local Supabase in Docker must be running (`npx supabase status`).
@@ -197,8 +220,13 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   `npx supabase status -o env` (`API_URL`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `JWT_SECRET`), any local
   `JWT_SECRET`, `LOCAL_JAVA_EXECUTION=true`, `CODESHARE_LAPTOP=true`, empty `JAVA_RUNNER_URL`.
   In Claude Code start it through `.claude/launch.json` (`preview_start`), not a shell command.
+- Online settings: same server with `LOCAL_JAVA_EXECUTION=false`, no `CODESHARE_LAPTOP`,
+  `JAVA_RUNNER_URL=http://localhost:3034` (port 3043 used). Cloudflare's runtime: `npx
+  opennextjs-cloudflare build`, then `npx opennextjs-cloudflare preview` (port 8787; settings from
+  the git-ignored `.dev.vars`, which points at local Supabase and has `JAVA_RUNNER_URL`). The
+  Cloudflare build rewrites `.next`; stop other local servers first and rebuild before reusing them.
 - Ports the browser tests expect: `tests/web-module-steps.browser.mjs` → `WEB_STEPS_BASE_URL`
-  (default `http://localhost:3042`); `module-resume` / `module-sample-first` offline → 3022.
+  (default `http://localhost:3042`; works with 3043 and 8787 too); `module-resume` / `module-sample-first` offline → 3022.
 - Browser tests need `CODESHARE_PLAYWRIGHT_MODULE` (on this laptop
   `/home/ireneo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs`)
   and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`
@@ -234,18 +262,22 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   (no module chosen yet, so the subject is not known there).
 - The class workspace note "Java files are in the editor tabs." still says Java for web **module
   steps** (Slice 1 screen; Slice 2 changed it only for personal/review web projects).
-- Slices 1–2 passed in online settings on `next start` (11/11, 2026-10-29); not yet on Cloudflare's
-  runtime (`cf:preview`) or the hosted site.
+- Slices 1–2 passed in online settings on `next start` and on Cloudflare's runtime on this laptop
+  (each 11/11, 2026-10-29); not checked on the hosted site, and the hosted 10 ms CPU limit (CKB-065)
+  is unproven for the web routes.
 - CKB-022 remains open for the student's own **New web project** preview.
 - PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
   is probably covered by CKB-076's refetch rule; not tested with two devices.
 
 ## Next step
 
-1. Teacher reviews and merges [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62) (Slice 2, branch `feature/web-personal-project`).
-2. Slice 3 (`webChecks`, `mediaChecks`; see "Slice 3 notes"): first ask the teacher where media
+1. Teacher reviews and merges [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62) (Slice 2,
+   branch `feature/web-personal-project`), then runs "Hosted check after deploy".
+2. If the hosted check shows `exceededCpu` or a failure: new diagnosis from the cleaned log.
+3. Slice 3 (`webChecks`, `mediaChecks`; see "Slice 3 notes"): first ask the teacher where media
    files live and how the no-internet preview gets them, then propose following AGENTS.md.
-3. Last: the module file revision, written from "Revision notes".
+4. Separate later tasks: offline work for web steps, then the module file revision ("Revision
+   notes").
 
 ## Update log
 
@@ -274,3 +306,7 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   (rule 1 still holds). Checking Slices 1–2 in online settings next.
 - 2026-10-29 — Online settings check (port 3043, browser mode confirmed): web steps browser test
   11/11. Next: propose a Cloudflare-runtime check and the teacher's hosted checklist.
+- 2026-10-29 — Approved: Cloudflare-runtime check. `.dev.vars` got `JAVA_RUNNER_URL` (local, not
+  committed); `cf:preview` on 8787 with local Supabase, browser mode confirmed; web steps browser
+  test 11/11, runtime log clean. Test names made mode-neutral. "Hosted check after deploy"
+  checklist written. CPU limit on the hosted free plan still unproven.

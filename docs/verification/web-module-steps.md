@@ -149,7 +149,7 @@ from `.claude/launch.json`. `npm run classroom:offline` itself was not launched.
 
 ## Not tested
 
-- The hosted site and Cloudflare's runtime (see "Online settings" below for what was run).
+- The hosted site (see "Online settings" and "Cloudflare runtime" below for what was run).
 - Firefox, Safari, phones, a second device, real classroom Wi-Fi.
 - Personal web projects carrying forward through `previousModuleId` (Weeks 1–3 have none); covered
   only by the shared code path and `tests/personal-performance.test.mjs`.
@@ -164,4 +164,18 @@ offline server on 3042 answered `{"mode":"local"}`).
 `WEB_STEPS_BASE_URL=http://localhost:3043 node --test --test-reporter=spec tests/web-module-steps.browser.mjs`
 — 11/11, including Week 2 steps, the Slice 2 personal project (run, submit, 100%, live help, teacher
 review), the `.js` step and the rule 5 no-internet check. Per-step sample results matched the
-offline run. Not run: Cloudflare's own runtime (`npm run cf:preview`) and the hosted site.
+offline run.
+
+## Cloudflare runtime (2026-10-29)
+
+`npx opennextjs-cloudflare build`, then `opennextjs-cloudflare preview` (Cloudflare's own runtime on
+this laptop, port 8787) with the git-ignored `.dev.vars`: local Supabase (`127.0.0.1:54321`) plus
+`JAVA_RUNNER_URL=http://localhost:3034`, added with the teacher's approval. `/api/health` reported
+`supabase-local`; `/api/java-runner` answered `{"mode":"browser"}`.
+
+`WEB_STEPS_BASE_URL=http://localhost:8787 node --test --test-reporter=spec tests/web-module-steps.browser.mjs`
+— 11/11 (test names now say "web module steps: …", no longer "offline"). The runtime log had no
+errors; every web route answered 200 except the intended 400 refusal of a media step
+(`progress/complete`, `performance-project`, `personal-result`, `performance-task` included).
+Logged times are total request times on this laptop, not CPU time: this does **not** show the hosted
+free plan's 10 ms CPU limit (CKB-065) is met. Only the hosted Worker logs can.
