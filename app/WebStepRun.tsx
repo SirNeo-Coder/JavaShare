@@ -51,7 +51,9 @@ export function useWebPageRun() {
   });
 
   // Keep the new page on screen: a frame that never draws cannot report its page text.
-  const view = page ? <iframe key={page.run} ref={(element) => { frame.current = element; element?.scrollIntoView({ block: "nearest" }); }} title="Web page preview" sandbox="allow-scripts" srcDoc={page.html} /> : null;
+  // allow="autoplay": Chrome refuses even muted sound in a sandboxed frame without it, so the media test
+  // could never hear audio play (CKB-079). The frame stays sandboxed without allow-same-origin.
+  const view = page ? <iframe key={page.run} ref={(element) => { frame.current = element; element?.scrollIntoView({ block: "nearest" }); }} title="Web page preview" sandbox="allow-scripts" allow="autoplay" srcDoc={page.html} /> : null;
   return { run, view };
 }
 

@@ -99,7 +99,37 @@ The Cloudflare changes are on the branch `cloudflare-c2` (pull request c2). Beca
 
 ---
 
+## Module media files: the R2 bucket (do this BEFORE merging Slice 3b)
+
+Slice 3b keeps each module's pictures, sound and video in Cloudflare R2, one shared copy per module
+(teacher, 2026-10-29). `wrangler.jsonc` names the bucket, so **Cloudflare's build fails until the
+bucket exists**. Assistants never create it.
+
+**Check the cost first.** Cloudflare's R2 guide says turning R2 on means completing a **checkout that
+adds an R2 subscription** to the account. Use within the free amounts (below) costs nothing; use beyond
+them is billed monthly, and the checkout may ask for a payment card. CodeShare must stay free: if
+Cloudflare asks for anything you are not willing to give, **stop and do not merge Slice 3b**; media
+steps then stay **Mark done** as before.
+
+1. In the Cloudflare dashboard, open **Storage & databases → R2 → Overview** (from Cloudflare's guide;
+   the labels may differ slightly).
+2. If R2 is not turned on yet, Cloudflare shows its checkout. Read it (see "Check the cost first").
+3. Choose **Create bucket**. Name it exactly `codeshare-module-media`. Keep the default location and
+   the **Standard** storage class (the free amounts apply only to Standard). Do not make it public.
+4. Merge the Slice 3b pull request. Cloudflare connects the bucket to CodeShare by itself (the
+   `r2_buckets` entry in `wrangler.jsonc`); there is no secret to add.
+5. Check it on the hosted site: Curriculum → Week 3 → **View module details** → **Media files** →
+   **Add media files** (choose `snacks.svg`, `counter.svg`, `chime.wav`, `canteen.webm` from
+   `Week_03/project_end`). The four files are listed. **Run** on Week 3 Steps 2–7 shows ticks for the
+   page text, page checks and each picture, sound and video.
+6. In **codeshare → Logs**, look for `exceededCpu` or errors on `.../media/...` and
+   `progress/complete` (CKB-065 steps).
+
 ## Free plan limits (as of October 2026)
+
+- **R2 (module media):** 10 GB of storage, 1 million uploads/changes and 10 million downloads a month,
+  and no charge for data sent (Cloudflare's R2 pricing page, 2026-10-29). Each file a student
+  downloads is also one CodeShare request; each device keeps a module's files after the first download.
 
 - **Cloudflare Workers Free:** 100,000 requests a day, and the packed app must be under 3 MB compressed. CodeShare's is about 1.2 MB.
 - **Pictures, styles and scripts** are served as static files and don't count towards the request limit.

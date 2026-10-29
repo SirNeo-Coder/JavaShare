@@ -249,8 +249,19 @@ evidence, checked by the server against its own expected output and the saved ve
   was found. The step's own sample must pass every check as well as the output; alteration tasks
   (`activity.id`) are not held to them. The page reports what it found and the server compares it
   with the stored checks. Steps already completed stay completed.
-- **Stored, not checked yet.** `mediaChecks: [{ "src", "state": "loaded" | "broken" }]` and
-  `includeMediaOutput` (boolean) are kept on upload so a later slice can check them.
+- **Pictures, sound and video (2026-10-29).** A step whose expected output contains `Media checks:`
+  is a media step. Its files live outside the JSON: the teacher adds them once per module under
+  **View module details → Media files** (Cloudflare R2, one shared copy for the teacher's classes in
+  that subject; `images/`, `audio/` or `video/` by type, 5 MB each, names of letters, numbers, `-`
+  and `_`). Until a module has media files, and always offline, its media steps show **Checked by
+  your teacher for now** and the teacher presses **Mark done**. With media files, CodeShare puts
+  each file the HTML names (`src` on `img`, `audio`, `video`, `source`) into the page, then tests
+  every picture, sound and video like the course-building checker: pictures must decode; sound and
+  video must load and play (muted). Each gives a line `<src>: image decoded` / `image failed to
+  decode` / `playback advanced` / `playback failed`; `includeMediaOutput: true` appends them after
+  `Media checks:`. `mediaChecks: [{ "src", "state": "loaded" | "broken" }]`: every element must load
+  unless listed `broken`, and every listed `src` must be on the page. Not covered: sound or video
+  made by JavaScript, pictures from CSS `url()`.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has

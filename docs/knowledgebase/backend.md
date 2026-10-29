@@ -162,6 +162,13 @@ repository requires the step's own kind of files and refuses `Media checks:` ste
 2026-10-29 the evidence (and `sample`) may carry `checks` — what the page found for each
 `webChecks` entry (`{ count, attribute?, style? }` or null); for a step's own sample the repository
 refuses the completion unless `webChecksPass(step.webChecks, checks)` (`module-activities.ts`).
+Module media (2026-10-29): `GET /api/classrooms/:classroomId/modules/:moduleId/media` lists and
+`GET .../media/:folder/:name` streams a file (class member with module access, or the class teacher);
+`PUT`/`DELETE /api/classes/:classroomId/modules/:moduleId/media/:folder/:name` (class teacher; raw
+body up to 5 MB, `router.ts`) upload/remove. Files live in the R2 binding `MODULE_MEDIA` (key
+`<teacher>/<subject>/<module>/<path>`, via `getCloudflareContext`); without it (offline, `next
+start`, Render) the routes answer 503. A media step (`Media checks:`) completes only when the module
+has media files and the evidence `media` lines pass `mediaLinesPass(step.mediaChecks, media)`.
 `PUT /api/classes/:classroomId/students/:studentId/modules/:moduleId/teacher-check` `{ stepId }`
 (teacher of that class, current student) marks a media step passed. `GET /api/classes/:id/module-progress`
 adds `teacherChecks` per student module. `.../progress/run` and `.../progress/browser-result`

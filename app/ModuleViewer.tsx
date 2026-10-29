@@ -345,7 +345,8 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   // whether they exist, which decides "Checked by your teacher for now".
   const mediaModule = module.lessons.some((lesson) => lesson.blocks.some((block) => isStepBlock(block) && webStep(block) && teacherCheckedStep(block)));
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
-  const [teacherMedia, setTeacherMedia] = useState<Record<string, string>>({});
+  // The teacher's loaded files belong to one list; a Run never uses files loaded for an older list.
+  const [teacherMedia, setTeacherMedia] = useState<{ files: MediaFile[]; data: Record<string, string> }>({ files: [], data: {} });
   useEffect(() => {
     if (!mediaModule) return;
     let active = true;
@@ -355,10 +356,10 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   useEffect(() => {
     if (role !== "teacher") return;
     let active = true;
-    void loadModuleMedia(classroomId, module.id, mediaFiles).then((files) => { if (active) setTeacherMedia(files); }, () => undefined);
+    void loadModuleMedia(classroomId, module.id, mediaFiles).then((data) => { if (active) setTeacherMedia({ files: mediaFiles, data }); }, () => undefined);
     return () => { active = false; };
   }, [classroomId, module.id, mediaFiles, role]);
-  const media = role === "teacher" ? teacherMedia : Object.fromEntries(mediaFiles.map((file) => [file.path, ""]));
+  const media = role === "teacher" ? teacherMedia.files === mediaFiles ? teacherMedia.data : {} : Object.fromEntries(mediaFiles.map((file) => [file.path, ""]));
   const [lessonPage, setLessonPage] = useState(0);
   const [paperPage, setPaperPage] = useState<number | null>(null);
 
