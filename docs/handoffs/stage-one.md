@@ -999,7 +999,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 
 - Branch `feature/run-box-save-dialogs` (from main after PR #67). Teacher approved the plan, with the
   regular Code editor included and module project checks kept uncancellable.
-- Done (CKB-080):
+- Done (CKB-081):
   - **Run code** opens a floating **RUN CODE** box in the module project, the personal project and the
     regular Code editor.
   - Online Java in the student's browser (personal project, regular Code editor) cancels on a click
@@ -1015,12 +1015,15 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
     `.claude/worktrees` and fails there.
   - Real browser: `java-run-progress` 9/9 offline and 10/10 online; `personal-performance` 6/6 offline
     and 7/7 online; live help 7/7; copy code 2/2; draft recovery 7/7; web steps 11 pass, 1 skipped.
-  - Mutation proof is recorded in CKB-080.
+  - Mutation proof is recorded in CKB-081.
 - Not verified:
   - `npm run classroom:offline` itself: port 3000 was already in use. The same offline settings ran
     on 3032 and 3042.
   - Physical classroom Wi-Fi; Windows.
-  - `java-suggestions` module/personal check: it is stale and fails for an earlier reason (see CKB-080).
+  - `java-suggestions` module/personal check: it is stale and fails for an earlier reason (see CKB-081).
+- Merged `main` (PRs #68, #69) to clear the docs conflicts. CKB-080 was already taken on main, so this
+  case is now **CKB-081**. After the merge: `npm test` 408/408; `java-run-progress` 19/19 (both modes);
+  `personal-performance` 6/6 offline; web steps 11 pass, 2 skipped (no R2 storage locally).
 - Next: teacher reviews the PR.
 
 ## Java suggestions browser test refresh — 2026-10-29
