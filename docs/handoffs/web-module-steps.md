@@ -29,6 +29,7 @@ into three slices, then the teacher's own revision of the module files.
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Next — handed to a separate chat** (teacher, 2026-10-29); not started | teacher's files; follow "Net MVC weekly modules: required format and workflow" |
+| App task — sample-first and alteration tasks for web steps (Java workflow) | **In progress** on `feature/web-sample-first` (approved 2026-10-29): route proof passes; browser runs not done yet | `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -579,3 +580,12 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — Teacher chose the Java student workflow for Net MVC weeks (sample first, one meaningful
   task per step, weeks linked). AGENTS.md rule added; format section and revision notes updated; task
   answers live in `solutions/`. App task for sample-first web steps proposed; revision prompt rewritten.
+
+- 2026-10-29 — App task approved (fix small bugs inside it, each with a CKB record; ask before anything that
+  changes how students work). On `feature/web-sample-first`: route subtest "sample first (Java workflow)
+  for web steps…" passes (rule/route 33/33, suite 404/404): a task needs its unchanged sample (with its
+  page checks), tasks are checked by output only, the next step and the next week wait, the module project
+  carries forward. New `tests/web-sample-first.browser.mjs` (fixture weeks) and a sample-first branch in
+  `tests/web-module-steps.browser.mjs` (walks every step of Weeks 1–3 with answers from `solutions/`;
+  legacy-only subtests skip for sample-first weeks) are written but NOT run yet: no free browser-pane
+  server slot. A scratch sample-first copy of Weeks 1–3 is ready to exercise the new branch.
