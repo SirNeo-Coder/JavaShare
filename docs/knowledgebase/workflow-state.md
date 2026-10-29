@@ -123,6 +123,12 @@ What teachers and students can do today. Keep this page current when their use o
   percentage move as for Java. Steps whose expected output lists **Media checks** show **Checked by
   your teacher for now**; the teacher presses **Mark done** under **Checked by you** on the student's
   module card (**Students → student**).
+- **Net MVC weeks in the Java workflow (2026-10-29):** a web step opens with its sample read-only and
+  **First, run the sample unchanged.**; **▶ Run code** shows **Sample verified — now complete Your task.**
+  with the sample's ticks; the student makes the change in **Your task** and runs again for **Completed —
+  next activity unlocked.** The next week opens only after the previous week's tasks; the module and
+  personal projects carry forward. Offline it is the same, except media steps wait for the teacher's
+  **Mark done** (the student sees it after reopening the module).
 - **Web personal performance-task project (2026-10-29):** when a module's performance task starts
   from web files, **Projects** shows **Weekly web projects** (icons **W**) and **Personal
   performance-task project** opens the HTML editor with the page preview, web names in **＋** and

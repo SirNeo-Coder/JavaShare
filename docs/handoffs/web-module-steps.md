@@ -28,8 +28,8 @@ into three slices, then the teacher's own revision of the module files.
 | Students' own pictures, sound and video in personal web projects | **Done, merged** 2026-10-29 (online; 5 MB each, at most 10, carries forward). Cloudflare build check passed; hosted check not yet done | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), merge `fc9a946` on main; see "How student media works" |
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
-| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Next — handed to a separate chat** (teacher, 2026-10-29); not started | teacher's files; follow "Net MVC weekly modules: required format and workflow" |
-| App task — sample-first and alteration tasks for web steps (Java workflow) | **In progress** on `feature/web-sample-first` (approved 2026-10-29): route proof passes; browser runs not done yet | `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
+| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **In the separate chat.** Seen 2026-10-29 21:27: the three JSON files are sample-first (8 + 7 + 7 tasks), linked 2 → 1 and 3 → 2, with `solutions/` and `before_revision/`; in CodeShare every step passes (see "Update log"). That chat reports its own DLL/module results | teacher's files; follow "Net MVC weekly modules: required format and workflow" |
+| App task — sample-first and alteration tasks for web steps (Java workflow) | **Built, PR open** 2026-10-29: works online and offline; fixed CKB-083 | branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -427,6 +427,10 @@ built `main` (see `docs/cloudflare-setup.md`):
   and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`
   (`/home/ireneo/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome`). The web steps test
   reads the teacher's files from `DOTNET_WEEKS_DIR` and skips if they are missing.
+- Sample-first weeks: `tests/web-sample-first.browser.mjs` (two linked practice weeks; no teacher files
+  needed) and the sample-first branch of `tests/web-module-steps.browser.mjs`, which walks every step of
+  the teacher's Weeks 1–3 with the answers in each week's `solutions/<step id>/` (skips, naming the
+  steps, if an answer is missing). Old-format-only subtests skip when the weeks are sample-first.
 - Commands: `npm test`, `npm run lint`, `npm run build:all`,
   `node --test --test-reporter=spec tests/web-module-steps.browser.mjs`.
 - Rebuild and restart the server after every app change; `next start` serves the old build.
@@ -444,6 +448,14 @@ built `main` (see `docs/cloudflare-setup.md`):
 - Another session's worktree under `.claude/worktrees/` makes plain `npm run lint` report its
   files; check this project with `npx eslint . --ignore-pattern .next --ignore-pattern backend/dist
   --ignore-pattern .claude`.
+
+- The browser pane allows 5 preview servers per folder; another chat's leftover servers block new ones
+  (ask the teacher to have them stopped).
+- After the teacher presses **Mark done**, the student's open page shows the next step only after
+  reopening the module (tests reload the module there).
+- A **Run** pressed before this device has loaded the module's media runs without them (CKB-080, student
+  side too); tests wait for the media to load first.
+- The worksheet drawer can cover the editor's file tabs; tests click the tab directly.
 
 ## Known limits and open questions
 
@@ -470,21 +482,14 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **App task: sample-first and alteration tasks for web steps** — proposed 2026-10-29, waiting for the
-   teacher's approval. Proves in a real browser (online and offline) that a web step runs its sample
-   first, then its task, unlocks the next step, resumes after reload, and that `previousModuleId` carries
-   web projects forward and locks the next week; fixes what fails. Also makes
-   `tests/web-module-steps.browser.mjs` finish sample-first weeks with the answers in `solutions/`.
-2. **Revise Weeks 1–3 in a separate chat** (prompt given to the teacher 2026-10-29), to the format
-   section and "Revision notes". Its CodeShare check needs step 1 merged first.
-3. **Hosted check of student media (teacher)**, PR #68: as a test student, Week 3 personal project →
-   **Media files** → **Add media files** (two pictures, a sound, a video) → **▶ Run code** shows them →
-   **Submit this version**; as the teacher, **Review personal submission → ▶ Run code** shows them;
-   Cloudflare **Logs**: any `exceededCpu` on `.../performance-project/media/...`.
-4. **CKB-080** — ask the teacher whether to fix it (proposed: clear a media step's shown result when its
-   media finish loading). Not approved yet.
-5. Then **Weeks 4–20**, one week per round, same section. **Offline web steps/media** stays a separate
-   task (needed before media weeks are taught offline).
+1. **Teacher reviews and merges the app task PR** (`feature/web-sample-first`): sample-first web steps
+   proven online and offline, CKB-083 fixed, tests walk the teacher's revised Weeks 1–3.
+2. **The revision chat finishes Weeks 1–3** (DLL, printed modules, its own docs PR). After both PRs are
+   merged and deployed: re-upload Weeks 1–3 under **Curriculum**; Week 3 → **Media files** if needed.
+3. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
+4. **CKB-080** — ask the teacher whether to fix it (teacher and student screens). Not approved yet.
+5. Then **Weeks 4–20**, one week per round, same format section. **Offline web steps/media** stays a
+   separate task (needed before media weeks are taught offline).
 
 ## Update log
 
@@ -589,3 +594,11 @@ built `main` (see `docs/cloudflare-setup.md`):
   `tests/web-module-steps.browser.mjs` (walks every step of Weeks 1–3 with answers from `solutions/`;
   legacy-only subtests skip for sample-first weeks) are written but NOT run yet: no free browser-pane
   server slot. A scratch sample-first copy of Weeks 1–3 is ready to exercise the new branch.
+- 2026-10-29 — App task built on `feature/web-sample-first` (merged main with PR #70's run box). Found and
+  fixed CKB-083 (result list re-judged a verified sample against the task); break-and-restore shown on
+  Cloudflare's runtime. `tests/web-sample-first.browser.mjs` 5/5 online (8787) and offline (3042). The
+  teacher's Weeks 1–3 were revised by the other chat meanwhile (21:27); `tests/web-module-steps.browser.mjs`
+  on those real files: online 9 pass, 5 skipped (old format), 0 fail, twice — all 22 steps "sample
+  verified, task completed"; offline 7 pass, 7 skipped, 0 fail — Weeks 1–2 and Week 3 Step 1 completed,
+  Week 3 media steps teacher-checked and marked done. Before the revision, the same test on the old files
+  passed 13 + 1 skipped, and on a scratch sample-first copy 9 + 5 skipped. Suite 409/409, lint 0 errors.

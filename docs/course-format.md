@@ -269,5 +269,13 @@ evidence, checked by the server against its own expected output and the saved ve
   no expected output. The browser sends the files it ran and the page text; the server accepts this
   online and offline only for the exact saved files, and **Submit this version** still needs that
   successful run. Java performance tasks are unchanged.
+- **Sample first and alteration tasks (Java workflow, 2026-10-29).** Net MVC weeks use
+  `"sampleFirst": true`, an `activity` with its own `id` (`<step id>-alter-v1`) on every step, and
+  `previousModuleId`, like the Java weeks. A web step's sample opens read-only; its unchanged run must
+  give the step's `expectedOutput` and pass its `webChecks` (and media lines on a media step) to show
+  **Sample verified**. The task is then checked by `activity.expectedOutput` only (plus media lines on a
+  media step); `webChecks` do not apply to it, so a task must change the visible page text or the
+  console lines. Task answers are not in the file: the teacher keeps them in
+  `<week folder>/solutions/<step id>/`, and `tests/web-module-steps.browser.mjs` runs them.
 - **Week 1 note.** `DotNet1_Week_01.codeshare.json` writes `Visible page text: <text>` on one line, so
   its steps do not match the agreed rule until that file is revised. Weeks 2–3 already match.
