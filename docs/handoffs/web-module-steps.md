@@ -73,6 +73,8 @@ Approved later the same day:
 
 Approved 2026-10-29:
 
+- **Students' own pictures, sound and video in personal projects are a separate later task**
+  (teacher, 2026-10-29), like the offline work. Slice 3b covers only the teacher's module media.
 - **Slice 3a approved with the recommended choice:** `webChecks` apply to the step's own sample
   (and legacy steps whose sample is the task), never to alteration tasks (`activity.id`). The page
   reports what each check found; the server compares with its stored checks.
@@ -351,3 +353,7 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — Slice 3a delivered as [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64) against main.
 - 2026-10-29 — PR #64 merged (`0dcdd6a`). Slice 3b started on `feature/web-media`: asked the teacher
   where media files live.
+- 2026-10-29 — Teacher: student media in personal projects is a separate later task. On module media
+  the teacher recalled an earlier decision ("auto duplicated for each student and in Cloudflare"); no
+  record of it was found in the repository, AGENTS.md, the handoffs or the teacher's course files
+  (`DotNet1_Handover.md` lists binary-media support as not done). Asked the teacher to confirm.
