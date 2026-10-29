@@ -24,7 +24,7 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
-| Slice 3b — pictures, sound, video (`mediaChecks`) | **Next** — media-files decision asked 2026-10-29 | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | **Next** — R2 + one shared copy decided; plan proposed 2026-10-29, waiting for approval | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -73,6 +73,10 @@ Approved later the same day:
 
 Approved 2026-10-29:
 
+- **Module media files live in Cloudflare R2, one shared copy per module** (teacher, 2026-10-29).
+  The teacher uploads them once per module (shared by their classes in that subject); students'
+  projects read that copy. Assistants prepare `wrangler.jsonc` and instructions; the teacher
+  creates the bucket. Offline has no Cloudflare, so offline media waits for the offline task.
 - **Students' own pictures, sound and video in personal projects are a separate later task**
   (teacher, 2026-10-29), like the offline work. Slice 3b covers only the teacher's module media.
 - **Slice 3a approved with the recommended choice:** `webChecks` apply to the step's own sample
@@ -357,3 +361,4 @@ built `main` (see `docs/cloudflare-setup.md`):
   the teacher recalled an earlier decision ("auto duplicated for each student and in Cloudflare"); no
   record of it was found in the repository, AGENTS.md, the handoffs or the teacher's course files
   (`DotNet1_Handover.md` lists binary-media support as not done). Asked the teacher to confirm.
+- 2026-10-29 — Teacher chose Cloudflare R2 and one shared copy per module. Slice 3b plan proposed.
