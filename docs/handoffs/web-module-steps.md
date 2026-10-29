@@ -99,6 +99,10 @@ Approved 2026-10-29:
   personal project also allow `.txt` backups. Teacher live help label/colouring fixed (CKB-078).
 - **Revise Weeks 1–3 now, in a separate chat, before any new week** (teacher, 2026-10-29, after
   Slices 1–3 and student media were merged). Weeks 4–20 then follow the format section below.
+- **Net MVC weeks follow the Java student workflow** (teacher, 2026-10-29, recommended option):
+  `sampleFirst`, one meaningful alteration task (`activity.id`) per step, `previousModuleId` linking
+  each week to the one before. First an app task proves (and fixes if needed) sample-first and
+  alteration tasks for web steps in a real browser; Weeks 1–3 are then revised to this format.
 - **The weekly module file revision is done separately, after this feature is fully built**
   (Slices 1–3). Why (teacher): so everything learned while building it, including things not
   yet seen, goes into one revision of the module JSON, the DLL (daily lesson log) and the
@@ -261,6 +265,9 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
 Collect here anything the module JSON, DLL or printed module must change because of this
 feature. Add to it during Slices 2–3; the revision prompt is written from this list at the end.
 
+- Weeks 1–3 to the Java student workflow (see the format section): `sampleFirst`, one meaningful
+  task per step with its answer files in `solutions/`, `previousModuleId` (Week 2 → 1, Week 3 → 2);
+  each printed step gets a **Your task** box with its expected output, like the Java modules.
 - Week 1: all 8 expected outputs need a line break after `Visible page text:` (JSON and the
   printed PDF `DotNet1_HTML_Foundations_Module.pdf`).
 - Weeks 2–3: re-upload after deploying so `webChecks`/`mediaChecks` are kept (see "Status").
@@ -332,11 +339,19 @@ task `dotnet-1-wNN-pt`.
   `video/`, at most 5 MB each). Offline, media steps need the teacher's **Mark done**.
 - Performance task: `starterFiles` all web files gives a web personal project. Students may add their
   own pictures, sound and video there online (5 MB each, at most 10, safe names); not offline yet.
-- Weeks 1–3 use plain sample steps (no `activity.id`, no `sampleFirst`). CodeShare's rules accept
-  alteration tasks for web steps, but they are not tested in a browser; ask the teacher before using
-  them, and test them.
-- `previousModuleId` (pending teacher decision): carries the module and personal projects forward
-  from the previous week, and also requires finishing every step of the previous week first.
+- **Student workflow, like Java** (teacher, 2026-10-29): the module has `"sampleFirst": true`; every
+  step has an `activity` with a new stable `id` (pattern `dotnet-1-wNN-dD-sS-alter-v1`, as in the Java weeks; a changed task gets `-v2`), an `instruction`
+  (one small change that exercises the lesson: add a list item, a table row, a heading, a media
+  description, a console line — never only renaming a label), and the complete changed
+  `expectedOutput`. The student runs the unchanged sample first (**Sample verified**), then makes the
+  change; a matching run gives **Completed** and opens the next step. Task runs are checked by output
+  only (page checks apply to the sample), so the change must show in the page text or console lines.
+  On a media step the task output keeps its `Media checks:` lines.
+- **Task answers**: keep each task's answer files in `<week folder>/solutions/<step id>/` (never in the
+  JSON; students must not see them). Every task `expectedOutput` comes from running those files.
+- **`previousModuleId`**: every week except Week 1 names the week before (`dotnet-1-w01` …). The module
+  and personal projects carry forward, and a student must finish every task of the previous week
+  before the next week opens.
 - The printed module and the JSON must say the same thing, with identical code and outputs.
 
 **What the page preview can and cannot do** (check before writing a week; if a week needs something
@@ -454,16 +469,20 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Revise Weeks 1–3 in a separate chat** (prompt given to the teacher 2026-10-29). It follows
-   "Net MVC weekly modules: required format and workflow" and "Revision notes", asks the teacher
-   about `previousModuleId` first, and keeps this handoff current.
-2. **Hosted check of student media (teacher)**, PR #68: as a test student, Week 3 personal project →
+1. **App task: sample-first and alteration tasks for web steps** — proposed 2026-10-29, waiting for the
+   teacher's approval. Proves in a real browser (online and offline) that a web step runs its sample
+   first, then its task, unlocks the next step, resumes after reload, and that `previousModuleId` carries
+   web projects forward and locks the next week; fixes what fails. Also makes
+   `tests/web-module-steps.browser.mjs` finish sample-first weeks with the answers in `solutions/`.
+2. **Revise Weeks 1–3 in a separate chat** (prompt given to the teacher 2026-10-29), to the format
+   section and "Revision notes". Its CodeShare check needs step 1 merged first.
+3. **Hosted check of student media (teacher)**, PR #68: as a test student, Week 3 personal project →
    **Media files** → **Add media files** (two pictures, a sound, a video) → **▶ Run code** shows them →
    **Submit this version**; as the teacher, **Review personal submission → ▶ Run code** shows them;
    Cloudflare **Logs**: any `exceededCpu` on `.../performance-project/media/...`.
-3. **CKB-080** — ask the teacher whether to fix it (proposed: clear a media step's shown result when its
+4. **CKB-080** — ask the teacher whether to fix it (proposed: clear a media step's shown result when its
    media finish loading). Not approved yet.
-4. Then **Weeks 4–20**, one week per round, same section. **Offline web steps/media** stays a separate
+5. Then **Weeks 4–20**, one week per round, same section. **Offline web steps/media** stays a separate
    task (needed before media weeks are taught offline).
 
 ## Update log
@@ -557,3 +576,6 @@ built `main` (see `docs/cloudflare-setup.md`):
   the same format. Added "Net MVC weekly modules: required format and workflow" (authorities, fixed
   facts, files, IDs, JSON rules, preview limits, per-week steps) and three revision notes. Prompt for
   the revision chat written.
+- 2026-10-29 — Teacher chose the Java student workflow for Net MVC weeks (sample first, one meaningful
+  task per step, weeks linked). AGENTS.md rule added; format section and revision notes updated; task
+  answers live in `solutions/`. App task for sample-first web steps proposed; revision prompt rewritten.
