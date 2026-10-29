@@ -104,6 +104,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [path, setPath] = useState(firstPath(files, web, step?.run));
   const [newPath, setNewPath] = useState("");
   const [addingFile, setAddingFile] = useState(false);
+  const [fileError, setFileError] = useState("");
   const [copied, setCopied] = useState<number | null>(null);
   // Modules with steps offer their copyable samples on the steps themselves instead.
   const codeToCopy = personal && !review && !activity.module?.performanceTask?.steps?.length ? moduleCode(activity.module) : [];
@@ -321,24 +322,25 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     changeFiles(files.map((file) => file.path === path ? { ...file, path: entered } : file)); setPath(entered);
   };
 
+  const closeAddFile = () => { setAddingFile(false); setFileError(""); };
   const addFile = (event: React.FormEvent) => {
     event.preventDefault();
     const entered = newPath.trim().replace(/\\/g, "/");
     if (web) {
       // Personal web projects may also keep .txt backups (teacher, 2026-10-29).
       if (files.length >= 50 || (personal ? moduleWebPathError(entered) : projectPathError("web", entered)) || files.some((file) => file.path === entered)) {
-        setError(`Choose a unique web filename ending in .html, .css${personal ? ", .js or .txt" : " or .js"}, such as about.html (up to 50 files).`); return;
+        setFileError(`Choose a unique web filename ending in .html, .css${personal ? ", .js or .txt" : " or .js"}, such as about.html (up to 50 files).`); return;
       }
       changeFiles([...files, { path: entered, content: "" }]);
-      setPath(entered); setNewPath(""); setAddingFile(false); setError(""); return;
+      setPath(entered); setNewPath(""); setAddingFile(false); setFileError(""); setError(""); return;
     }
     if (files.length >= 50 || entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered) || files.some((file) => sourcePath(file.path) === sourcePath(entered))) {
-      setError("Choose a unique Java filename, such as Helper.java (up to 50 files)."); return;
+      setFileError("Choose a unique Java filename, such as Helper.java (up to 50 files)."); return;
     }
     const name = entered.split("/").at(-1)!.slice(0, -5);
     const packageName = sourcePath(entered).split("/").slice(0, -1).join(".");
     changeFiles([...files, { path: entered, content: `${packageName ? `package ${packageName};\n\n` : ""}public class ${name} {\n\n}\n` }]);
-    setPath(entered); setNewPath(""); setAddingFile(false); setError("");
+    setPath(entered); setNewPath(""); setAddingFile(false); setFileError(""); setError("");
   };
 
   return <>
@@ -349,7 +351,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="workspace-card-heading"><b>{review ? "Submitted personal project — read-only" : personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>{web ? "Web page" : "Java"}</span></div>
         <div className="file-tabs" aria-label={personal ? "Personal project files" : "Module project files"}>
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
-          {!review && <button type="button" className="add-file" aria-label={`Add ${personal ? "personal" : "module"} ${web ? "web" : "Java"} file`} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>}
+          {!review && <button type="button" className="add-file" aria-label={`Add ${personal ? "personal" : "module"} ${web ? "web" : "Java"} file`} disabled={busy || pendingSample} onClick={() => setAddingFile(true)}>＋</button>}
         </div>
         <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language={web ? fileLanguage(path) : "java"} readOnly={review || busy || pendingSample || !deviceReady} files={files.map((file) => file.content)} remoteCursors={live?.cursors} onCursorChange={live?.onCursor} onChange={(content) => { changeFiles(files.map((file) => file.path === path ? { ...file, content } : file)); live?.onEdit(path, content); }} />
         <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
@@ -374,7 +376,6 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {Boolean(codeToCopy.length) && <details className="module-before-sample"><summary>Code from this module</summary><p>Copy code copies only the code, not the file name. Paste it into your own file with Ctrl+V, then change it for your project.</p>
             {codeToCopy.map((code, index) => <div key={index}><b>{code.label}</b> <button type="button" onClick={() => void copyText(code.content).then(() => { setCopied(index); setError(""); }, () => setError("Could not copy. Select the code and press Ctrl+C instead."))}>{copied === index ? "Copied" : "Copy code"}</button><pre>{code.content}</pre></div>)}
           </details>}
-          {addingFile && <form onSubmit={addFile}><label>{web ? "Web filename" : "Java filename"}<input autoFocus value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder={web ? "about.html" : "Helper.java"} /></label><button disabled={busy}>Add file</button></form>}
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
         {personal && !review && <p role="status">{successfulFiles === JSON.stringify(files) ? "Run succeeded — ready to submit this version." : "Run the current files successfully before submitting."} Submission records progress, not a grade or teacher approval.</p>}
@@ -399,5 +400,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
       <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button>}</div>
     </footer>
+    {addingFile && <div className="activity-overlay file-dialog-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeAddFile(); }}>
+      <form className="file-dialog" onSubmit={addFile} onKeyDown={(event) => { if (event.key === "Escape") closeAddFile(); }}>
+        <header><span className="java-icon">{web ? "W" : "J"}</span><div><span className="eyebrow">{web ? "WEB PAGE FILE" : "JAVA SOURCE FILE"}</span><h2>Create a new file</h2><p>{web ? "Add another page, stylesheet, or script." : "Add another class to this project."}</p></div><button type="button" onClick={closeAddFile} aria-label="Close">×</button></header>
+        <label>File path<input autoFocus required spellCheck={false} value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder={web ? "about.html" : "Helper.java"} /></label>
+        <small className={fileError ? "module-error" : undefined} role={fileError ? "alert" : undefined}>{fileError || (web ? <>Use a unique filename, for example <b>about.html</b>.</> : <>Use a unique Java filename, for example <b>Helper.java</b>.</>)}</small>
+        <footer><button type="button" onClick={closeAddFile}>Cancel</button><button className="create-file-button" disabled={busy || !newPath.trim()}>Create file</button></footer>
+      </form>
+    </div>}
   </>;
 }

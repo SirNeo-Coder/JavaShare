@@ -30,3 +30,11 @@ test("module activity screen: main Java editor has project tabs, sample output, 
   assert.match(html, /Save work/);
   assert.doesNotMatch(html, /Mark done|Mark exit slip done|Open to students/);
 });
+
+test("module activity screen: ＋ opens the floating Create a new file window, not an inline Console form", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const source = await readFile(new URL("../app/StudentModuleActivity.tsx", import.meta.url), "utf8");
+  assert.match(source, /className="activity-overlay file-dialog-overlay"/);
+  assert.match(source, /<h2>Create a new file<\/h2>/);
+  assert.doesNotMatch(source, /"Java filename"|"Web filename"|>Add file</);
+});
