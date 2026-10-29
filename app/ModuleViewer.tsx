@@ -235,9 +235,9 @@ export function ModuleMediaFiles<T>({ base, files, note, onChange }: { base: str
   </section>;
 }
 
-function StepView({ step, status, role, printed = false, sampleFirst = false, onStart, media = {} }: {
+function StepView({ step, status, role, printed = false, sampleFirst = false, onStart, media = {}, mediaLoading = false }: {
   step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; sampleFirst?: boolean; onStart?: () => Promise<void>;
-  media?: Record<string, string>;
+  media?: Record<string, string>; mediaLoading?: boolean;
 }) {
   const [files, setFiles] = useState(step.files);
   const [output, setOutput] = useState<string | null>(null);
@@ -267,7 +267,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
       {teacherChecked && <p><b>Checked by your teacher for now.</b> Your teacher marks this step done after looking at your page.</p>}
       {checkableStep(step) ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java and web pages only.</p>}
     </div>}
-    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{web && <><WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} webChecks={step.webChecks} mediaChecks={mediaRun ? step.mediaChecks ?? [] : undefined} />{webPage.view && <div className="module-web-preview">{webPage.view}</div>}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
+    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy || (mediaLoading && teacherCheckedStep(step))} onClick={() => void run()}>{mediaLoading && teacherCheckedStep(step) ? "Loading media…" : "Run"}</button>}{web && <><WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} webChecks={step.webChecks} mediaChecks={mediaRun ? step.mediaChecks ?? [] : undefined} />{webPage.view && <div className="module-web-preview">{webPage.view}</div>}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;
@@ -356,10 +356,13 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   useEffect(() => {
     if (role !== "teacher") return;
     let active = true;
-    void loadModuleMedia(classroomId, module.id, mediaFiles).then((data) => { if (active) setTeacherMedia({ files: mediaFiles, data }); }, () => undefined);
+    void loadModuleMedia(classroomId, module.id, mediaFiles).then((data) => { if (active) setTeacherMedia({ files: mediaFiles, data }); },
+      () => { if (active) setTeacherMedia({ files: mediaFiles, data: {} }); });
     return () => { active = false; };
   }, [classroomId, module.id, mediaFiles, role]);
   const media = role === "teacher" ? teacherMedia.files === mediaFiles ? teacherMedia.data : {} : Object.fromEntries(mediaFiles.map((file) => [file.path, ""]));
+  // The teacher's Run on a media step waits until the current files are loaded (CKB-080).
+  const mediaLoading = role === "teacher" && mediaModule && teacherMedia.files !== mediaFiles;
   const [lessonPage, setLessonPage] = useState(0);
   const [paperPage, setPaperPage] = useState<number | null>(null);
 
@@ -412,7 +415,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
               {!page.part.blocks.some(isStepBlock) && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}
             </>}
           </>}
-          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed sampleFirst={module.sampleFirst} media={media} step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={() => onStartActivity?.(module, page.step!) ?? Promise.resolve()} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
+          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed sampleFirst={module.sampleFirst} media={media} mediaLoading={mediaLoading} step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={() => onStartActivity?.(module, page.step!) ?? Promise.resolve()} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
         </article>)}
         {hasTask && <article className="worksheet-paper" hidden={currentPage !== pages.length} aria-label="Performance task">
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
@@ -457,6 +460,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
               <StepView
                 sampleFirst={module.sampleFirst}
                 media={media}
+                mediaLoading={mediaLoading}
                 key={block.id}
                 step={block}
                 status={progress.stepStates[activityStateId(block)]}
