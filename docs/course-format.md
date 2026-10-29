@@ -277,5 +277,3 @@ evidence, checked by the server against its own expected output and the saved ve
   media step); `webChecks` do not apply to it, so a task must change the visible page text or the
   console lines. Task answers are not in the file: the teacher keeps them in
   `<week folder>/solutions/<step id>/`, and `tests/web-module-steps.browser.mjs` runs them.
-- **Week 1 note.** `DotNet1_Week_01.codeshare.json` writes `Visible page text: <text>` on one line, so
-  its steps do not match the agreed rule until that file is revised. Weeks 2–3 already match.
