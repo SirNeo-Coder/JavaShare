@@ -33,8 +33,8 @@ const IMAGE_LIMIT = 2 * 1024 * 1024;
 // Java step files that add up past the default cap - only that one route gets the larger limit.
 const MODULE_UPLOAD_JSON_LIMIT = 2 * 1024 * 1024;
 const MODULE_UPLOAD_PATTERN = /^\/api\/classrooms\/[^/]+\/modules$/;
-// Module media uploads: pictures, sound and video up to MEDIA_LIMIT (teacher, 2026-10-29).
-const MEDIA_UPLOAD_PATTERN = /^\/api\/classes\/[^/]+\/modules\/[^/]+\/media\//;
+// Module and personal-project media uploads: pictures, sound and video up to MEDIA_LIMIT (teacher, 2026-10-29).
+const MEDIA_UPLOAD_PATTERN = /^\/api\/(?:classes\/[^/]+\/modules\/[^/]+\/media|classrooms\/[^/]+\/modules\/[^/]+\/progress\/performance-project\/media)\//;
 
 export class HttpError extends Error {
   readonly status: number;
@@ -96,7 +96,8 @@ export function createRouter<R extends ApiRequest = ApiRequest>(onError: ErrorHa
     const res: ApiResponse = {
       status(code) { status = code; return res; },
       json(value) { headers.set("Content-Type", "application/json"); body = JSON.stringify(value); sent = true; },
-      send(value, contentType) { headers.set("Content-Type", contentType); body = value; sent = true; },
+      // Uploaded files (a student's SVG too) never run as a page if opened directly.
+      send(value, contentType) { headers.set("Content-Type", contentType); headers.set("X-Content-Type-Options", "nosniff"); headers.set("Content-Security-Policy", "sandbox; default-src 'none'"); body = value; sent = true; },
       end() { sent = true; },
       cookie(name, value, options) { headers.append("Set-Cookie", serializeCookie(name, value, options)); },
       clearCookie(name, options) { headers.append("Set-Cookie", serializeCookie(name, "", { path: options.path, maxAge: 0 })); },

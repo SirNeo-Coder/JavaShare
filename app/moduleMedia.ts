@@ -1,5 +1,6 @@
 import { api, getApiUrl } from "./apiClient";
 import { readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
+import type { PersonalMedia } from "../backend/src/personal-performance";
 
 // A module's media files: one shared copy in Cloudflare R2 (teacher, 2026-10-29). Offline there is no
 // media storage, so the list is empty and media steps stay teacher-checked.
@@ -31,4 +32,20 @@ export async function loadModuleMedia(classroomId: string, moduleId: string, fil
   }
   if (cacheKey) await writeDeviceRecord(cacheKey, next).catch(() => undefined);
   return Object.fromEntries(Object.entries(next).map(([path, file]) => [path, file.data]));
+}
+
+// A student's own media in a web personal project. Each upload is a new copy with its own id, so this tab
+// keeps what it downloaded; nothing is kept on the device (students' own pictures, shared computers).
+const personalCopies = new Map<string, string>();
+export async function loadPersonalMedia(classroomId: string, studentId: string, media: PersonalMedia[]) {
+  const loaded: Record<string, string> = {};
+  for (const { path, id } of media) {
+    if (!personalCopies.has(id)) {
+      const response = await fetch(`${getApiUrl()}/api/classrooms/${classroomId}/students/${studentId}/personal-media/${id}`, { credentials: "include" });
+      if (!response.ok) throw new Error(`Could not load ${path}`);
+      personalCopies.set(id, await dataUrl(await response.blob()));
+    }
+    loaded[path] = personalCopies.get(id)!;
+  }
+  return loaded;
 }

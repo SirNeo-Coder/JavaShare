@@ -270,3 +270,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - A performance task whose starter files are all web files gives a web personal project (agreed
   2026-10-29): browser preview online and offline, web and `.txt` files, no Program input. Submit
   still needs a successful run of the exact saved files; success means no uncaught error.
+- Students' own pictures, sound and video in a web personal project (agreed 2026-10-29): online only,
+  same R2 bucket, the student's own folder, 5 MB each, at most 10 per project. Each upload is a new
+  copy, so a frozen submission keeps its media; adding or removing media needs a new run before
+  submitting. Only the student and their class teacher read them; they are not kept on the device.
+  Media carries forward to the next week with the personal files. Unused copies are deleted.
