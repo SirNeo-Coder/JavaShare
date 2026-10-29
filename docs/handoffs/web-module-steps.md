@@ -29,7 +29,7 @@ into three slices, then the teacher's own revision of the module files.
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **In the separate chat.** Seen 2026-10-29 21:27: the three JSON files are sample-first (8 + 7 + 7 tasks), linked 2 → 1 and 3 → 2, with `solutions/` and `before_revision/`; in CodeShare every step passes (see "Update log"). That chat reports its own DLL/module results | teacher's files; follow "Net MVC weekly modules: required format and workflow" |
-| App task — sample-first and alteration tasks for web steps (Java workflow) | **Built, PR open** 2026-10-29: works online and offline; fixed CKB-083 | branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
+| App task — sample-first and alteration tasks for web steps (Java workflow) | **Built, PR open** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -602,3 +602,4 @@ built `main` (see `docs/cloudflare-setup.md`):
   verified, task completed"; offline 7 pass, 7 skipped, 0 fail — Weeks 1–2 and Week 3 Step 1 completed,
   Week 3 media steps teacher-checked and marked done. Before the revision, the same test on the old files
   passed 13 + 1 skipped, and on a scratch sample-first copy 9 + 5 skipped. Suite 409/409, lint 0 errors.
+- 2026-10-29 — App task delivered as [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72) against main.
