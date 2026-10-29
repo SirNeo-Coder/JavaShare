@@ -282,7 +282,8 @@ What changed in the teacher's folder:
 - Printed modules: practice-task pages built from the JSON (`source/p9.html`, `p10.html`, `tasks.css`) by
   `revision_tools/build_tasks.py`; Week 1 pp. 1–6 patched by `revision_tools/patch_week1.py` (Weeks 1–2 module
   page HTML no longer exists; the patch is pixel-identical outside the changed lines).
-- DLLs: one **Sample, then your task:** paragraph per day in Student Activity; still 6 pages.
+- DLLs: one **Sample, then your task:** paragraph per day in Student Activity; the red "ADJUST THIS…" line
+  removed from Learning Resources and moved into the playbook (teacher, 2026-10-29); still 6 pages.
 - Answers in `<week folder>/solutions/<step id>/`; originals in `before_revision/`; handover and course map
   updated; `bash revision_tools/run_checks.sh` re-runs every check.
 
@@ -405,7 +406,8 @@ it cannot do, stop and propose an app change for approval first):
    whose answers change the files (playbook §0.2), then propose and wait for the teacher's approval.
 2. Build `project_start/` from the previous `project_end/`, then the week's project changes.
 3. DLL from the previous week's DLL (playbook §3): five verified references per day (open every
-   link), reflections blank, no previous-week text left.
+   link), reflections blank, no previous-week text left, and no red "ADJUST THIS ACCORDING TO YOUR
+   AVAILABLE MATERIALS" line (teacher, 2026-10-29: the reminder lives in the playbook, §1, not in the DLL).
 4. Module (playbook §4): run every printed example; render and inspect all 8 pages.
 5. JSON last. Check it with the teacher's `check_codeshare.py --run --media-root project_end` and
    `check_web_steps.cjs`, then with CodeShare's `tests/web-module-steps.browser.mjs` on Cloudflare's
@@ -619,3 +621,6 @@ built `main` (see `docs/cloudflare-setup.md`):
   sample-first with 22 tasks and linked weeks, task pages after page 8, Week 1 line break, DLL lines. Teacher's
   checkers: samples and all 22 answers pass, unchanged samples fail 22/22. Found CKB-084. CodeShare browser
   check waits for PR #72. Week 1 note removed from `docs/course-format.md`. Delivered as [PR #74](https://github.com/SirNeo-Coder/JavaShare/pull/74).
+- 2026-10-29 — Teacher: remove the red "ADJUST THIS ACCORDING TO YOUR AVAILABLE MATERIALS" line from the DLL and
+  keep it in the playbook instead. Done for Weeks 1–3 (only that line removed; still 6 pages); playbook §1–§3
+  updated (backup in `before_revision/`); format section updated.
