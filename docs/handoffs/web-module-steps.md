@@ -21,7 +21,7 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 1 — daily module steps pass | **Done, merged** | [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59), merge `93ab62f` on main |
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
-| Slice 2 — personal performance-task project for web | **Built, PR open** (approved 2026-10-29) | branch `feature/web-personal-project`; see "How Slice 2 works" |
+| Slice 2 — personal performance-task project for web | **Built, PR open** (approved 2026-10-29) | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), branch `feature/web-personal-project`; see "How Slice 2 works" |
 | Slice 3 — page-element and media checks | **Next** — not started | see "Slice 3 notes" |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -236,7 +236,7 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
 
 ## Next step
 
-1. Teacher reviews and merges the Slice 2 pull request (branch `feature/web-personal-project`).
+1. Teacher reviews and merges [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62) (Slice 2, branch `feature/web-personal-project`).
 2. Slice 3 (`webChecks`, `mediaChecks`; see "Slice 3 notes"): first ask the teacher where media
    files live and how the no-internet preview gets them, then propose following AGENTS.md.
 3. Last: the module file revision, written from "Revision notes".
@@ -263,3 +263,4 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   100%; teacher review runs the frozen page; live help label fixed (CKB-078). Real-route 22/22,
   offline browser 11/11, Java personal 6/6, live help 7/7, suite 391/391, lint 0 errors; four
   break-and-restore proofs. Not run in online settings.
+- 2026-10-29 — Slice 2 delivered as [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62) against main.
