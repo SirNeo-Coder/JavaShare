@@ -7,7 +7,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
 import { buildPreview, webPageOutput, webRunResult } from "../app/webPreview.ts";
-import { checkableStep, matchesActivityOutput, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
+import { checkModuleRun, checkableStep, matchesActivityOutput, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
+import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
 import { moduleWebPathError } from "../backend/src/file-paths.ts";
 import { buildTeacherPreview } from "../app/teacherWebPreview.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
@@ -40,7 +41,7 @@ test("web check rule: page text is the tab title then the visible text with blan
   const output = webPageOutput({ title: "School Canteen", text: "\n School Canteen\n\nWelcome\n\n\nFood choices\nPandesal\n" });
   assert.equal(output, "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome\nFood choices\nPandesal");
   const result = webRunResult("page", { lines: ["ignored console line"], errors: [], page: { title: "School Canteen", text: "School Canteen\n\nWelcome" } });
-  assert.deepEqual(result, { mode: "page", success: true, output: "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome" });
+  assert.deepEqual(result, { mode: "page", success: true, output: "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome", checks: [] });
   assert.equal(matchesActivityOutput(result, "Tab title: School Canteen\r\nVisible page text:\r\nSchool Canteen\r\nWelcome\r\n"), true, "Windows line endings and one final line break are ignored");
 });
 
@@ -64,7 +65,7 @@ test("web check rule: an uncaught error or a page that never finished makes the 
 
 test("web check rule: a .js run file compares the console lines, joined with line breaks", () => {
   const result = webRunResult("console", { lines: ["Total: 5", "Done"], errors: [], page: { title: "", text: "" } });
-  assert.deepEqual(result, { mode: "console", success: true, output: "Total: 5\nDone" });
+  assert.deepEqual(result, { mode: "console", success: true, output: "Total: 5\nDone", checks: [] });
   assert.equal(matchesActivityOutput(result, "Total: 5\nDone\n"), true);
   assert.equal(matchesActivityOutput(result, "Total: 5"), false);
   const thrown = webRunResult("console", { lines: ["Total: 5"], errors: ["boom"], page: { title: "", text: "" } });
@@ -83,7 +84,7 @@ test("module web steps use the no-internet preview and still open the step's run
   const preview = buildTeacherPreview([{ path: "index.html", content: page("Home", "") }, { path: "about.html", content: page("About", "") }], "about.html");
   assert.match(preview.html, /^<!doctype html>\n?<meta http-equiv="Content-Security-Policy" content="default-src 'none';/);
   assert.match(preview.html, /<title>About<\/title>/);
-  assert.match(readFileSync(new URL("../app/WebStepRun.tsx", import.meta.url), "utf8"), /: buildTeacherPreview\(files, runPath\)/, "module runs use the no-internet preview");
+  assert.match(readFileSync(new URL("../app/WebStepRun.tsx", import.meta.url), "utf8"), /: buildTeacherPreview\(files, runPath, checks\)/, "module runs use the no-internet preview");
 });
 
 test("web steps: decided by file endings, with no Java-only path handling", () => {
@@ -180,6 +181,45 @@ test("personal web project editor: HTML editor and page preview, web file names,
   assert.doesNotMatch(review, /Program input|CheerpJ|Submit this version/);
 });
 
+// What a page that passes a step's own checks reports, as the browser sends it.
+const passingChecks = (step) => (step.webChecks ?? []).map((check) => ({ count: check.count ?? 1, ...(check.attribute ? { attribute: check.value } : {}), ...(check.style ? { style: check.value } : {}) }));
+
+test("page-element checks: one line per check, read like the teacher's checker", () => {
+  const checks = [{ selector: "h1", count: 1 }, { selector: "html", attribute: "lang", value: "en" }, { selector: "ol", style: "list-style-type", value: "upper-alpha" }, { selector: "p" }];
+  assert.deepEqual(webCheckLines(checks, [{ count: 1 }, { count: 1, attribute: "en" }, { count: 1, style: "upper-alpha" }, { count: 3 }]), [
+    { label: "Page has 1 h1", passed: true, found: "" },
+    { label: "html has lang=\"en\"", passed: true, found: "" },
+    { label: "ol has list-style-type: upper-alpha", passed: true, found: "" },
+  ], "a check with nothing to compare adds no line, like the checker");
+  const failed = webCheckLines(checks, [{ count: 2 }, { count: 1, attribute: "fil" }, { count: 1, style: "decimal" }]);
+  assert.deepEqual(failed.map((line) => [line.passed, line.found]), [[false, "2"], [false, "fil"], [false, "decimal"]]);
+  assert.deepEqual(webCheckLines([{ selector: "ol", attribute: "start", value: "2" }], [{ count: 0, attribute: null }]), [{ label: "ol has start=\"2\"", passed: false, found: "nothing" }], "a missing element fails");
+  assert.equal(webChecksPass([{ selector: "h1", count: 1 }], [null]), false, "a selector the page could not use fails");
+  assert.equal(webChecksPass([{ selector: "h1", count: 1 }], undefined), false, "no report fails");
+  assert.equal(webChecksPass(undefined, undefined), true, "steps without checks are unchanged");
+  assert.equal(webChecksPass([{ selector: "html", attribute: "lang" }], [{ count: 1 }]), false, "an attribute check without a value never passes, like the checker");
+});
+
+test("page-element checks apply to the step's own sample, not to an alteration task", () => {
+  const step = { id: "s", instruction: "", files: [{ path: "index.html", content: "x" }], expectedOutput: "out", webChecks: [{ selector: "h1", count: 1 }] };
+  const run = (checks) => ({ success: true, output: "out", checks });
+  assert.equal(checkModuleRun({}, step, {}, step.files, run([{ count: 1 }])).passed, true);
+  assert.equal(checkModuleRun({}, step, {}, step.files, run([{ count: 0 }])).passed, false, "the page text matches but a page check fails");
+  const task = { ...step, activity: { id: "t", instruction: "", files: step.files, expectedOutput: "changed" } };
+  assert.equal(checkModuleRun({ sampleFirst: true }, task, {}, step.files, run([{ count: 0 }])).sampleMatched, false, "sample verification needs the checks");
+  assert.equal(checkModuleRun({ sampleFirst: true }, task, { "sample:t": "pass" }, step.files, { success: true, output: "changed", checks: [{ count: 0 }] }).passed, true, "the alteration task is not held to the sample's checks");
+  const draft = { files: step.files, moduleVersion: "v", stateId: "task:t", sample: { files: step.files, success: true, output: "out", checks: [{ count: 0 }] } };
+  assert.equal(restoreModuleDraft(draft, { files: step.files, moduleVersion: "v", stateId: "task:t" }, step, true).sample, undefined, "a saved sample that failed its checks is not restored as verified");
+});
+
+test("the preview carries the step's checks into the page safely and reports them with the page text", () => {
+  const html = buildTeacherPreview([{ path: "index.html", content: page("Home", "<h1>Hi</h1>") }], "index.html", [{ selector: "h1", count: 1 }, { selector: "</script><b>", count: 0 }]).html;
+  assert.match(html, /const checks=\[\{"selector":"h1","count":1\},\{"selector":"\\u003c\/script>\\u003cb>","count":0\}\]/);
+  assert.match(html, /checks:checks\.map\(probe\)/);
+  assert.equal(html.split("</script>").length, 2, "a selector cannot close the capture script");
+  assert.equal(webRunResult("page", { lines: [], errors: [], page: { title: "Home", text: "Hi", checks: [{ count: 1 }] } }).checks.length, 1);
+});
+
 let local;
 try {
   const raw = execFileSync("npx", ["--no-install", "supabase", "status", "-o", "env"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
@@ -214,7 +254,7 @@ test("web steps offline (real routes): web completions are accepted, media steps
     const complete = async (step, changes = {}) => {
       const progress = await open(step);
       return call(`${base}/progress/complete`, cookies[1], "POST", { stepId: step.id, updatedAt: progress.updatedAt, moduleVersion: progress.moduleVersion,
-        completionId: randomUUID(), files: progress.projectFiles, success: true, output: step.expectedOutput, ...changes });
+        completionId: randomUUID(), files: progress.projectFiles, success: true, output: step.expectedOutput, checks: passingChecks(step), ...changes });
     };
 
     await t.test("upload stores the new fields; the student's web project keeps the .txt reference file", async () => {
@@ -229,6 +269,9 @@ test("web steps offline (real routes): web completions are accepted, media steps
       assert.equal((await complete(s1, { output: "Tab title: Canteen\nVisible page text:\nCanteen" })).status, 400);
       assert.equal((await complete(s1, { success: false })).status, 400);
       assert.equal((await complete(s1, { files: [{ path: "index.html", content: "" }, { path: "Main.java", content: "" }] })).status, 403, "mixed Java and web files take the Java rule and are refused offline");
+      const pageChecks = await complete(s1, { checks: [{ count: 1 }, { count: 1, attribute: null }] });
+      assert.equal(pageChecks.status, 400, "a failed page-element check is refused"); assert.match(await pageChecks.text(), /page checks/);
+      assert.equal((await complete(s1, { checks: undefined })).status, 400, "page-element checks need the page's report");
       const response = await complete(s1);
       assert.equal(response.status, 200, await response.clone().text());
       const result = await response.json();

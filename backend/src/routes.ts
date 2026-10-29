@@ -706,7 +706,8 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", req
     const web = allWebFiles((req.body as { files?: unknown })?.files);
     if (!web && localJavaEnabled) throw new SupabaseRepositoryError(403, "Offline progress must use the classroom Java runner");
     if (!web && !process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(503, "Online Java is not configured");
-    const evidence = z.object({ files: web ? webModuleFiles : javaFiles, success: z.boolean(), output: z.string().max(70000) });
+    const checks = z.array(z.object({ count: z.number().int().nonnegative(), attribute: z.string().max(5000).nullable().optional(), style: z.string().max(5000).nullable().optional() }).nullable()).max(100);
+    const evidence = z.object({ files: web ? webModuleFiles : javaFiles, success: z.boolean(), output: z.string().max(70000), checks: checks.optional() });
     const checkpoint = evidence.extend({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }),
       moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional() }).parse(req.body);
     return res.json(await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint));

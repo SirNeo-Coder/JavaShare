@@ -258,7 +258,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   as practice evidence offline too, checked against server-owned expected output and the saved
   version; never a bare pass flag. Java offline still uses the laptop runner.
 - Steps whose expected output has `Media checks:` show "Checked by your teacher for now"; the
-  teacher marks them done from the student's module card. `webChecks`/`mediaChecks`/
+  teacher marks them done from the student's module card. `webChecks` are checked (agreed
+  2026-10-29): the page reports what each check found, the server compares with its own checks,
+  and they apply to the step's own sample only, not alteration tasks. `mediaChecks`/
   `includeMediaOutput` are stored but not checked until a later slice. New web project stays
   separate from modules.
 - A performance task whose starter files are all web files gives a web personal project (agreed

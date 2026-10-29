@@ -10,7 +10,7 @@ import { runJava } from "./javaExecution";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
 import { paperPerformanceTask } from "../backend/src/personal-performance";
-import { activityStateId, checkableStep, teacherCheckedStep, webStep } from "../backend/src/module-activities";
+import { activityStateId, checkableStep, teacherCheckedStep, webStep, type WebCheck } from "../backend/src/module-activities";
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import ModuleCatalogCard from "./ModuleCatalogCard";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
@@ -58,6 +58,7 @@ export type StepBlock = {
   expectedError?: string;
   stdin?: string;
   checkYourself?: string;
+  webChecks?: WebCheck[];
 };
 type OtherBlock = { type: string; markdown?: string; term?: string; columns?: string[]; rows?: string[][] | { see: string; means: string; fix: string }[]; message?: string };
 export type Block = StepBlock | OtherBlock;
@@ -207,7 +208,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
   const run = async () => {
     setBusy(true);
-    try { if (role === "student") await onStart?.(); else if (web) setWebResult(await webPage.run(files, step.run)); else setOutput(await runFiles(files, step.stdin ?? "")); }
+    try { if (role === "student") await onStart?.(); else if (web) setWebResult(await webPage.run(files, step.run, step.webChecks)); else setOutput(await runFiles(files, step.stdin ?? "")); }
     catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
     finally { setBusy(false); }
   };
@@ -225,7 +226,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
       {teacherChecked && <p><b>Checked by your teacher for now.</b> Your teacher marks this step done after looking at your page.</p>}
       {checkableStep(step) ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java and web pages only.</p>}
     </div>}
-    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{web && <><WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} />{webPage.view && <div className="module-web-preview">{webPage.view}</div>}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
+    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy} onClick={() => void run()}>Run</button>}{web && <><WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} webChecks={step.webChecks} />{webPage.view && <div className="module-web-preview">{webPage.view}</div>}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;

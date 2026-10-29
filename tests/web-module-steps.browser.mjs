@@ -69,12 +69,16 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
           await checks.waitFor();
           const media = /(?:^|\n)Media checks:/.test(step.expectedOutput);
           if (media) { assert.match(await checks.textContent(), /Checked by your teacher for now/); report.push(`${step.id}: teacher-checked (expected output has Media checks)`); continue; }
-          const passed = await checks.locator("li.passed").count() === 1;
-          const yours = passed ? "" : await checks.getByLabel("Your output").textContent();
+          const failed = (await checks.locator("li.failed").allTextContents()).map((line) => line.replace(/^✗ /, ""));
+          const textFailed = failed.some((line) => /^(?:Page text|Console output) matches$/.test(line));
+          const pageCheckFails = failed.filter((line) => !/^(?:Page text|Console output) matches$/.test(line));
+          const yours = textFailed ? await checks.getByLabel("Your output").textContent() : "";
           const alert = await checks.getByRole("alert").count() ? await checks.getByRole("alert").textContent() : "";
           // Week 1 was written with the page text on the title's next line; say when that is the only difference.
-          const lineBreakOnly = !passed && !alert && step.expectedOutput.replace(/\nVisible page text: /, "\nVisible page text:\n") === yours;
-          report.push(`${step.id}: ${passed ? "pass" : `fail — ${alert || firstDifference(step.expectedOutput, yours)}${lineBreakOnly ? " (only difference: no line break after \"Visible page text:\")" : ""}`}`);
+          const lineBreakOnly = textFailed && !alert && step.expectedOutput.replace(/\nVisible page text: /, "\nVisible page text:\n") === yours;
+          const textReason = textFailed ? `${alert || firstDifference(step.expectedOutput, yours)}${lineBreakOnly ? " (only difference: no line break after \"Visible page text:\")" : ""}` : "";
+          const pageChecks = await checks.locator("li").count() - 1;
+          report.push(`${step.id}: ${failed.length ? `fail — ${[textReason, ...pageCheckFails].filter(Boolean).join("; ")}` : `pass (page text + ${pageChecks} page checks)`}`);
         }
         await page.getByRole("button", { name: /Close|Back/ }).first().click().catch(() => page.goBack());
         await curriculum.click();
@@ -127,7 +131,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
     };
     const week2 = weeks[1], steps2 = stepsOf(week2);
 
-    await t.test("Week 2 Step 1: mismatch and uncaught error show a cross with Required and Your output, then the sample passes", async () => {
+    await t.test("Week 2 Step 1: mismatch and uncaught error show a cross with Required and Your output, a failed page check shows what was found, then the sample passes", async () => {
       await openCatalog(week2);
       assert.match(await currentTab(), /Step 1$/);
       await page.waitForFunction((value) => document.querySelector('.student-module-project .editor-card textarea')?.value === value, steps2[0].files[0].content);
@@ -145,9 +149,18 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.equal(await checks.locator("li.failed").count(), 1);
       assert.match(await checks.getByRole("alert").textContent(), /Uncaught error: .*missingFunction/);
       assert.notEqual((await progress(week2)).stepStates[steps2[0].id], "pass");
-      await editor.fill(sample);
+      // Same page text, but the html lang check fails: a cross with what was found, and no completion.
+      await editor.fill(sample.replace('<html lang="en">', '<html lang="fil">'));
       await run();
       assert.equal(await checks.locator("li.passed").textContent(), "✓ Page text matches");
+      assert.equal(await checks.locator("li.failed").textContent(), '✗ html has lang="en" — found fil');
+      assert.equal(await checks.getByLabel("Your output").count(), 0, "matching page text shows no output comparison");
+      assert.match(await page.locator(".module-run-feedback").textContent(), /Not completed/);
+      assert.notEqual((await progress(week2)).stepStates[steps2[0].id], "pass");
+      await editor.fill(sample);
+      await run();
+      assert.equal(await checks.locator("li.failed").count(), 0);
+      assert.deepEqual(await checks.locator("li.passed").allTextContents(), ["✓ Page text matches", '✓ html has lang="en"']);
       await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
       const saved = await progress(week2);
       assert.equal(saved.stepStates[activityStateId(steps2[0])], "pass");
@@ -159,7 +172,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         await openStep(step);
         await editor.fill(step.files[0].content);
         await run();
-        assert.equal(await checks.locator("li.passed").count(), 1, step.id);
+        assert.equal(await checks.locator("li.failed").count(), 0, step.id);
         await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
         assert.equal((await progress(week2)).stepStates[step.id], "pass");
       }
@@ -180,7 +193,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         if (step !== steps2[3]) await openStep(step);
         await editor.fill(step.files[0].content);
         await run();
-        assert.equal(await checks.locator("li.passed").count(), 1, step.id);
+        assert.equal(await checks.locator("li.failed").count(), 0, step.id);
         await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
       }
       const saved = await progress(week2);
@@ -193,7 +206,8 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.setViewportSize({ width: 1500, height: 520 });
       try {
         await run();
-        assert.equal(await checks.locator("li.passed").textContent(), "✓ Page text matches");
+        assert.equal(await checks.locator("li.failed").count(), 0);
+        assert.equal(await checks.locator("li.passed").first().textContent(), "✓ Page text matches");
       } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
     });
 

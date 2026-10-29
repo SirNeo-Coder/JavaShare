@@ -239,9 +239,18 @@ evidence, checked by the server against its own expected output and the saved ve
   opens **Students → student → module** and presses **Mark done** under **Checked by you**, which
   records the same pass as an automatic check. `includeMediaOutput: true` without such a section is
   checked automatically.
-- **Stored, not checked yet.** `webChecks: [{ "selector", "count"?, "attribute"?, "value"?, "style"? }]`,
-  `mediaChecks: [{ "src", "state": "loaded" | "broken" }]` and `includeMediaOutput` (boolean) are kept
-  on upload so a later slice can check them. CodeShare does not check them now.
+- **Page-element checks (2026-10-29).** `webChecks: [{ "selector", "count"?, "attribute"?, "value"?,
+  "style"? }]` are checked like the teacher's course-building checker: `count` is the number of
+  elements matching the CSS `selector`; `attribute` + `value` is the first match's attribute;
+  `style` + `value` is the first match's computed style (`getComputedStyle`). A missing element, an
+  unusable selector, or an `attribute`/`style` without `value` fails; a check with none of
+  `count`/`attribute`/`style` is ignored. Each check adds one checklist line (for example
+  **Page has 1 h1**, **html has lang="en"**, **ol has list-style-type: decimal**); a cross shows what
+  was found. The step's own sample must pass every check as well as the output; alteration tasks
+  (`activity.id`) are not held to them. The page reports what it found and the server compares it
+  with the stored checks. Steps already completed stay completed.
+- **Stored, not checked yet.** `mediaChecks: [{ "src", "state": "loaded" | "broken" }]` and
+  `includeMediaOutput` (boolean) are kept on upload so a later slice can check them.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
