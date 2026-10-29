@@ -119,7 +119,8 @@ What teachers and students can do today. Keep this page current when their use o
   classes in that subject; **Remove** deletes one. Once a module has media files, its media steps
   are checked automatically with one checklist line per picture, sound or video; before that, and
   offline, they stay **Checked by your teacher for now** with **Mark done**. Each device keeps the
-  files after the first download. Parts, the next week and the
+  files after the first download. On a media step, **Run** (teacher) and **▶ Run code** (student) say
+  **Loading media…** until the files are loaded (CKB-080). Parts, the next week and the
   percentage move as for Java. Steps whose expected output lists **Media checks** show **Checked by
   your teacher for now**; the teacher presses **Mark done** under **Checked by you** on the student's
   module card (**Students → student**).

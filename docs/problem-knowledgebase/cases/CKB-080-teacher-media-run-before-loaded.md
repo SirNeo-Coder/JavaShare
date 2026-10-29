@@ -1,8 +1,8 @@
 # CKB-080 — Teacher's Run on a media step right after opening or uploading shows a cross
 
-- Status: open — diagnosed, not fixed (outside the approved student-media task; fix proposed to the teacher)
+- Status: resolved (Cloudflare runtime, repeated runs; offline unchanged)
 - First recorded: 2026-10-29
-- Last verified: 2026-10-29 (on `main` at `7644cf2`, Cloudflare runtime on this laptop)
+- Last verified: 2026-10-29 (fix on `fix/media-run-before-loaded`, Cloudflare runtime on this laptop)
 - Area: `app/ModuleViewer.tsx` `StepView` (teacher **Run** in **View module details**), module media loading
 - Search terms: Week 3 Step 2 fails then passes, Page text matches cross on media step, Media checks missing from Your output, flaky Week 3 media browser test, Run right after Add media files
 
@@ -29,14 +29,21 @@ media files**, so it sometimes hits this window; a teacher pressing **Run** quic
 
 ## Durable solution
 
-Not built yet. Proposed: in `StepView`, clear the shown result when the loaded media change (or keep
-**Run** disabled while the teacher's media are loading), so a run without media is never shown as the
-media step's result.
+**Run** cannot start on a media step until this device has the module's media (teacher approved
+2026-10-29). Student: `StudentModuleActivity` keeps **▶ Run code** off, labelled **Loading media…**,
+until the media list and files have loaded (or failed, offline), and `run()` refuses while loading.
+Teacher: `ModuleContent` passes `mediaLoading` (loaded files belong to an older list) to `StepView`, whose
+**Run** on a media step shows **Loading media…** and stays off; a failed load counts as "no media", so the
+step falls back to **Checked by your teacher for now** instead of waiting forever.
 
 ## Regression proof
 
-None yet. The browser subtest above is the catching test (intermittent); a fix should make it pass
-repeatedly (for example 10 runs in a row).
+- `tests/web-module-steps.browser.mjs` on the teacher's revised Weeks 1–3 (Cloudflare runtime, local R2).
+  The student walk no longer waits for the media itself; the teacher preview presses **Run** at once.
+- Without the fix: 3 of 3 runs failed — the student walk stopped at Week 3 Step 2 every time, and the
+  teacher preview showed `✗ Page text matches` on Step 2 in 1 of 3. On `main` before: 3 of 6 and 1 of 10.
+- With the fix: 6 of 6 runs passed (9 pass, 5 skipped, 0 fail), and once more after restoring it.
+- Offline (no media storage): 7 pass, 7 skipped, 0 fail; media steps still fall back to **Mark done**.
 
 ## Recurrence triage
 

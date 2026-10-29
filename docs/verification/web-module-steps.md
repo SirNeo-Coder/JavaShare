@@ -385,3 +385,18 @@ sample-first and alteration tasks for web steps; small bugs fixed here with a CK
 - The Java personal-project browser test (`tests/personal-performance.browser.mjs`) was not re-run on this
   branch (this change touches only the web result list); PR #70 ran it.
 - Hosted site, Firefox, Safari, phones. The DLL and printed modules (the revision chat checks those).
+
+# CKB-080 fix: Run waits for a media step's media (2026-10-29)
+
+Branch `fix/media-run-before-loaded`. Student **▶ Run code** and the teacher's **Run** on a media step say
+**Loading media…** and stay off until this device has the module's media.
+
+- `npm test` 409/409; `npm run lint` 0 errors; `npm run build:all` and the Cloudflare build pass.
+- `tests/web-module-steps.browser.mjs` on the teacher's revised Weeks 1–3, Cloudflare runtime (8787, local
+  R2); the student walk no longer waits for the media itself:
+  - without the fix: 3 runs, 3 failed (student walk stopped at Week 3 Step 2 each time; teacher preview
+    `✗ Page text matches` on Step 2 once);
+  - with the fix: 6 runs, 6 passed (9 pass, 5 skipped, 0 fail), and 1 more after restoring it.
+- `tests/web-sample-first.browser.mjs`: 5/5 on the Cloudflare runtime and 5/5 offline.
+- Offline settings (3042): Weeks 1–3 7 pass, 7 skipped, 0 fail; media steps fall back to **Mark done**.
+- Not tested: hosted site, slow networks (Run just stays on **Loading media…** longer), Firefox/Safari.
