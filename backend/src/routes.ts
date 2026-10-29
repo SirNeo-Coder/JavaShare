@@ -37,6 +37,10 @@ import {
   getSupabasePersonalSubmission,
   saveSupabasePersonalReview,
   markSupabaseTeacherCheckedStep,
+  listSupabaseModuleMedia,
+  readSupabaseModuleMedia,
+  putSupabaseModuleMedia,
+  deleteSupabaseModuleMedia,
   runSupabaseModuleActivity,
   recordSupabaseModuleActivityResult,
   getSupabaseStudentWebProject,
@@ -707,7 +711,8 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", req
     if (!web && localJavaEnabled) throw new SupabaseRepositoryError(403, "Offline progress must use the classroom Java runner");
     if (!web && !process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(503, "Online Java is not configured");
     const checks = z.array(z.object({ count: z.number().int().nonnegative(), attribute: z.string().max(5000).nullable().optional(), style: z.string().max(5000).nullable().optional() }).nullable()).max(100);
-    const evidence = z.object({ files: web ? webModuleFiles : javaFiles, success: z.boolean(), output: z.string().max(70000), checks: checks.optional() });
+    const evidence = z.object({ files: web ? webModuleFiles : javaFiles, success: z.boolean(), output: z.string().max(70000), checks: checks.optional(),
+      media: z.array(z.string().max(1000)).max(100).optional() });
     const checkpoint = evidence.extend({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }),
       moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional() }).parse(req.body);
     return res.json(await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint));
@@ -737,6 +742,33 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/personal-resul
 
 app.get("/api/classes/:classroomId/students/:studentId/modules/:moduleId/personal-submission", requireAuth, async (req: AuthedRequest, res, next) => {
   try { return res.json(await getSupabasePersonalSubmission(req.user!, String(req.params.classroomId), String(req.params.studentId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+// Module media files in Cloudflare R2: one shared copy per module (teacher, 2026-10-29). Students
+// and the teacher read; only the class's teacher uploads or removes.
+const mediaParams = (req: AuthedRequest) => [String(req.params.classroomId), String(req.params.moduleId), `${req.params.folder}/${req.params.name}`] as const;
+app.get("/api/classrooms/:classroomId/modules/:moduleId/media", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await listSupabaseModuleMedia(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/modules/:moduleId/media/:folder/:name", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const file = await readSupabaseModuleMedia(req.user!, ...mediaParams(req));
+    return res.send(file.body, file.contentType);
+  } catch (error) { next(error); }
+});
+
+app.put("/api/classes/:classroomId/modules/:moduleId/media/:folder/:name", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: "Choose a picture, sound or video file" });
+    return res.json(await putSupabaseModuleMedia(req.user!, ...mediaParams(req), req.body));
+  } catch (error) { next(error); }
+});
+
+app.delete("/api/classes/:classroomId/modules/:moduleId/media/:folder/:name", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await deleteSupabaseModuleMedia(req.user!, ...mediaParams(req))); }
   catch (error) { next(error); }
 });
 

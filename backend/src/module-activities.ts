@@ -79,7 +79,8 @@ export function webPerformanceTask(module?: { performanceTask?: { starterFiles: 
 
 export function checkableStep(step: { language: string; files: ModuleFile[] }) { return step.language === "java" || webStep(step); }
 
-// Output naming pictures, sound or video cannot be checked automatically yet; the teacher marks it done.
+// A media step: its expected output names pictures, sound or video. The teacher marks it done until the
+// module's media files are uploaded to Cloudflare R2; then it is checked automatically (Slice 3b).
 export function teacherCheckedStep(step: { expectedOutput: string; activity?: { id?: string; expectedOutput: string } }) {
   return [step.expectedOutput, step.activity?.id ? step.activity.expectedOutput : ""].some((text) => /(?:^|\n)Media checks:/.test(text));
 }
@@ -127,14 +128,28 @@ export function webCheckLines(checks: WebCheck[] = [], seen: WebCheckSeen[] = []
 }
 export const webChecksPass = (checks?: WebCheck[], seen?: WebCheckSeen[]) => webCheckLines(checks, seen).every((line) => line.passed);
 
+export type MediaCheck = { src: string; state: "loaded" | "broken" };
+// The checker's media rule: every picture, sound or video on the page loads unless mediaChecks says it is
+// broken, and every listed one is on the page. Lines read "<src>: image decoded" and so on.
+export function mediaCheckLines(checks: MediaCheck[] = [], lines: string[] = []) {
+  const seen = lines.map((line) => ({ label: line, src: line.slice(0, line.lastIndexOf(": ")), loaded: /: (?:image decoded|playback advanced)$/.test(line) }));
+  return [
+    ...seen.map((item) => ({ label: item.label, passed: item.loaded !== checks.some((check) => check.src === item.src && check.state === "broken"), found: "" })),
+    ...checks.filter((check) => !seen.some((item) => item.src === check.src)).map((check) => ({ label: `${check.src} on the page`, passed: false, found: "nothing" })),
+  ];
+}
+export const mediaLinesPass = (checks?: MediaCheck[], lines?: string[]) => mediaCheckLines(checks, lines).every((line) => line.passed);
+
 export function checkModuleRun(module: { sampleFirst?: boolean },
-  step: Pick<ActivityStep, "id" | "activity" | "instruction" | "files" | "expectedOutput" | "expectedError" | "stdin" | "webChecks">,
-  states: Record<string, string>, files: ModuleFile[], result: { success: boolean; output: string; checks?: WebCheckSeen[] }) {
+  step: Pick<ActivityStep, "id" | "activity" | "instruction" | "files" | "expectedOutput" | "expectedError" | "stdin" | "webChecks" | "mediaChecks">,
+  states: Record<string, string>, files: ModuleFile[], result: { success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[] }) {
   const check = samplePending(module, step, states) ? "sample" as const : "task" as const;
   // Page-element checks belong to the step's own sample, never to an alteration task.
   const pageChecks = webChecksPass(step.webChecks, result.checks);
-  const sampleMatched = matchesSample(result, step) && pageChecks;
+  // Media steps (Media checks: in the expected output) also follow the media rule.
+  const media = !teacherCheckedStep(step) || mediaLinesPass(step.mediaChecks, result.media);
+  const sampleMatched = matchesSample(result, step) && pageChecks && media;
   const passed = check === "sample" ? sampleMatched && unchangedSample(files, step.files)
-    : matchesActivityOutput(result, activityTask(step).expectedOutput) && (Boolean(step.activity?.id) || pageChecks);
+    : matchesActivityOutput(result, activityTask(step).expectedOutput) && (Boolean(step.activity?.id) || pageChecks) && media;
   return { check, sampleMatched, passed };
 }

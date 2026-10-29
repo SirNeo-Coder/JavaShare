@@ -229,3 +229,61 @@ when the report omitted the field; the rule now requires `value` (the checker al
 - The hosted site (teacher's check after deploy).
 - Firefox, Safari, phones: computed styles may be reported differently.
 - `sampleFirst` + `activity.id` web steps with real files (none exist); covered by rule tests only.
+
+# Slice 3b — module pictures, sound and video in Cloudflare R2 (2026-10-29)
+
+Branch `feature/web-media`. Approved: R2, one shared copy per module, 5 MB per file, media kept on
+each device after the first download, media steps teacher-checked until the module has media.
+
+## Commands and results
+
+- `npm run build:all` — passes; `npx opennextjs-cloudflare build` — passes.
+- Lint — 0 errors, 8 existing warnings. `npm test` — 400 tests, 400 pass, 0 fail, 0 skipped.
+- `node --test --test-reporter=spec tests/web-module-steps.test.mjs` — 31/31. New:
+  - ✔ media files: only images/, audio/ or video/ with a picture, sound or video ending, 5 MB each
+  - ✔ media rule: like the teacher's checker, every picture, sound or video loads unless mediaChecks says broken
+  - ✔ module media goes into the page as data: URLs, keeps the written path, and leaves missing files to fail
+  - ✔ offline (no media storage), media files are unavailable and media steps stay teacher-checked
+  - ✔ online, only the class's teacher uploads or removes media; the class reads one shared copy
+  - ✔ online with media uploaded, a media step completes only with matching media lines
+  (route tests use a stand-in bucket on the global OpenNext reads; real R2 is the browser run below)
+- `tests/web-module-steps.browser.mjs`:
+  - Cloudflare runtime (`opennextjs-cloudflare preview`, port 8787, wrangler's local R2, local
+    Supabase): **12/12**, server log clean. ✔ Week 3 media (Slice 3b, Cloudflare R2): the teacher
+    uploads the four files from `Week_03/project_end` through **Add media files**; every Week 3 media
+    step's own sample passes; the student completes Step 3 with ✓ lines for both pictures, the sound
+    and the video.
+  - offline settings (3042) and online settings without R2 (3043): 11 pass, media subtest skipped
+    ("no media storage"), media steps stay teacher-checked.
+
+## Week 3 media steps with the teacher's media files (teacher preview, Cloudflare runtime)
+
+- Step 2: pass (page text + page checks + 3 media lines)
+- Steps 3, 4, 6, 7: pass (page text + page checks + 4 media lines)
+- Step 5: pass — `images/snack.svg: image failed to decode`, `audio/chime-missing.wav` and
+  `video/canteen-missing.webm: playback failed` as the JSON expects.
+
+## Found and fixed during testing
+
+- CKB-079: sound never played in the sandboxed preview (Chrome autoplay rule); fixed with
+  `allow="autoplay"` on the frame. Shown failing before the fix (Steps 2–4, 6, 7 crossed).
+- The teacher view used media loaded for an older file list right after uploading (Step 2 ran
+  without the sound and video); a Run now uses only media loaded for the current list. Shown failing
+  before the fix.
+
+## Break-and-restore proofs
+
+| Break | Result broken | Restored |
+| --- | --- | --- |
+| Server ignores the reported media lines | route subtest fails | 31/31 |
+| Media steps automatic without uploaded media | 5 route subtests fail | 31/31 |
+| Media rule ignores `broken` | rule test and route subtest fail | 31/31 |
+| Media not put into the page | embedding test fails | 31/31 |
+| Preview frame without `allow="autoplay"` (before the fix, Cloudflare runtime) | 5 Week 3 media steps cross | 12/12 |
+
+## Not tested
+
+- The hosted site and a real R2 bucket (the teacher creates it; see `docs/cloudflare-setup.md`).
+- The R2 checkout's payment requirement (only Cloudflare's guide was read).
+- Firefox, Safari, phones, real classroom speakers. Playback is tested muted.
+- Hosted CPU use of the media routes (CKB-065); the files stream from R2 without processing.

@@ -2,7 +2,7 @@ import { matchesSample, unchangedSample, webChecksPass, type ModuleFile, type We
 
 export type ModuleDeviceDraft = {
   files: ModuleFile[]; moduleVersion?: string; stateId?: string;
-  sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[] };
+  sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[] };
   pending?: Record<string, unknown>;
   backups?: { files: ModuleFile[]; moduleVersion?: string; stateId?: string }[];
 };
@@ -51,7 +51,7 @@ export async function writeDeviceRecord(key: string, value: unknown) {
   });
 }
 
-export function moduleRecordKey(kind: "content" | "activity", userId: string, classroomId: string, moduleId: string, stepId = "") {
+export function moduleRecordKey(kind: "content" | "activity" | "media", userId: string, classroomId: string, moduleId: string, stepId = "") {
   return [kind, userId, classroomId, moduleId, stepId].join(":");
 }
 

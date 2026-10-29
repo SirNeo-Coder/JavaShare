@@ -11,6 +11,7 @@ import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, proj
 import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
+import { listModuleMedia, loadModuleMedia } from "./moduleMedia";
 
 export type StudentActivity = {
   kind: "module" | "performance" | "review";
@@ -82,7 +83,20 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const step = activity.module?.lessons?.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === activity.stepId);
   // Web steps and web personal projects run in the student's own browser preview, online and offline; Java keeps its runners.
   const web = personal ? webPerformanceTask(activity.module) : Boolean(step && webStep(step));
-  const teacherChecked = web && Boolean(step && teacherCheckedStep(step));
+  // A media step is checked automatically once its module's media files are uploaded; until then, or
+  // offline, the teacher marks it done (teacher, 2026-10-29). This device keeps the files after downloading.
+  const mediaStep = web && Boolean(step && teacherCheckedStep(step));
+  const [media, setMedia] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!mediaStep) return;
+    let active = true;
+    listModuleMedia(activity.classroomId, activity.moduleId)
+      .then((files) => loadModuleMedia(activity.classroomId, activity.moduleId, files, moduleRecordKey("media", activity.studentId, activity.classroomId, activity.moduleId)))
+      .then((files) => { if (active) setMedia(files); }, () => undefined);
+    return () => { active = false; };
+  }, [mediaStep, activity.classroomId, activity.moduleId, activity.studentId]);
+  const hasMedia = Object.keys(media).length > 0;
+  const teacherChecked = mediaStep && !hasMedia;
   const webPage = useWebPageRun();
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
   const [files, setFiles] = useState<ModuleFile[]>(personal ? activity.progress.performanceProjectFiles : activity.progress.projectFiles);
@@ -226,20 +240,22 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : result.check === "sample" && result.passed ? "Sample verified" : "Try again");
           if (result.passed) onChecked();
         } else {
-          const result = runner ? await runJava(files, checkInput, runner) : await webPage.run(files, step!.run, step!.webChecks);
-          const pageChecks = runner ? undefined : (result as WebRunResult).checks;
+          const result = runner ? await runJava(files, checkInput, runner)
+            : await webPage.run(files, step!.run, step!.webChecks, hasMedia ? { files: media, include: Boolean(step!.includeMediaOutput) } : undefined);
+          const page = runner ? undefined : result as WebRunResult;
+          const pageReport = page ? { checks: page.checks, media: page.media } : {};
           if (!runner) setWebResult(result as WebRunResult);
           if (teacherChecked) { setStatus("Checked by your teacher for now"); return; }
           const check = checkModuleRun(activity.module, { ...step!, activity: step!.activity ? { ...step!.activity, stdin: step!.activity.stdin ?? "" } : undefined } as Parameters<typeof checkModuleRun>[1], stepStates, files, result);
           setOutput(result.output); setLastCheck({ ...check, success: result.success, syncPending: check.check === "task" && check.passed });
           if (check.check === "sample" && check.passed) {
-            draftRef.current.sample = { files, success: result.success, output: result.output, ...(pageChecks ? { checks: pageChecks } : {}) };
+            draftRef.current.sample = { files, success: result.success, output: result.output, ...pageReport };
             setStepStates((current) => ({ ...current, [sampleStateId(step!)]: "pass" }));
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setStatus("Sample verified on this device");
           } else if (check.check === "task" && check.passed) {
             const pending = { stepId: activity.stepId, updatedAt: progress.current.updatedAt, moduleVersion: progress.current.moduleVersion, completionId: crypto.randomUUID(), files, success: true, output: result.output,
-              ...(pageChecks ? { checks: pageChecks } : {}), ...(draftRef.current.sample ? { sample: draftRef.current.sample } : {}) };
+              ...pageReport, ...(draftRef.current.sample ? { sample: draftRef.current.sample } : {}) };
             draftRef.current.pending = pending;
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setRunMessage("Syncing your completed task…");
@@ -367,7 +383,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           <JavaRunProgress message={runMessage} />
           {personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
             : <WebCheckList result={webResult} expected={pendingSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
-              webChecks={pendingSample || !step?.activity?.id ? step?.webChecks : undefined} />}
+              webChecks={pendingSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />}
           <div className="module-web-preview">{webPage.view ?? <p className="web-preview-empty"><span>Press <b>Run code</b> to see your page here.</span></p>}</div>
         </> : <>
           <JavaRunnerBrand />

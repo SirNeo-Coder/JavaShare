@@ -23,8 +23,8 @@ into three slices, then the teacher's own revision of the module files.
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
-| Slice 3a — page-element checks (`webChecks`) | **Built, PR open** (approved 2026-10-29) | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), branch `feature/web-checks`; see "How Slice 3a works" |
-| Slice 3b — pictures, sound, video (`mediaChecks`) | Not started; needs the teacher's media-files decision | see "Slice 3 notes" | see "Slice 3 notes" |
+| Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | **Built, PR open** (approved 2026-10-29: R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). **Teacher must create the R2 bucket before merging** | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), branch `feature/web-media`; see "How Slice 3b works" | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -73,6 +73,12 @@ Approved later the same day:
 
 Approved 2026-10-29:
 
+- **Module media files live in Cloudflare R2, one shared copy per module** (teacher, 2026-10-29).
+  The teacher uploads them once per module (shared by their classes in that subject); students'
+  projects read that copy. Assistants prepare `wrangler.jsonc` and instructions; the teacher
+  creates the bucket. Offline has no Cloudflare, so offline media waits for the offline task.
+- **Students' own pictures, sound and video in personal projects are a separate later task**
+  (teacher, 2026-10-29), like the offline work. Slice 3b covers only the teacher's module media.
 - **Slice 3a approved with the recommended choice:** `webChecks` apply to the step's own sample
   (and legacy steps whose sample is the task), never to alteration tasks (`activity.id`). The page
   reports what each check found; the server compares with its stored checks.
@@ -182,6 +188,25 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   `backend/src/supabase-repository.ts` — refuses "This page does not pass its page checks yet".
 - Evidence: `docs/verification/web-module-steps.md`, section "Slice 3a". No migration.
 
+## How Slice 3b works (map)
+
+- `wrangler.jsonc` — R2 binding `MODULE_MEDIA` → bucket `codeshare-module-media` (teacher creates it;
+  `docs/cloudflare-setup.md`, "Module media files").
+- `backend/src/file-paths.ts` — `mediaPathType` (images/|audio/|video/ + safe name + ending → type),
+  `MEDIA_LIMIT` 5 MB. `backend/src/router.ts` — raw media body on the media upload route, `res.send`.
+- `backend/src/supabase-repository.ts` — `mediaBucket()` (`getCloudflareContext`, null offline),
+  key `<teacher>/<subject>/<module>/<path>`, list/read/put/delete, `moduleHasMedia`; completion of a
+  media step needs uploaded media and `mediaLinesPass`. `backend/src/routes.ts` — the four routes.
+- `backend/src/module-activities.ts` — `mediaCheckLines`, `mediaLinesPass`; `checkModuleRun`
+  applies them to media steps (`teacherCheckedStep` = `Media checks:` in the expected output).
+- `app/webPreview.ts` — `embedMedia` (data: URLs, `data-codeshare-src`), in-frame media test
+  (decode; muted play), `webRunResult(…, includeMedia)`. `app/teacherWebPreview.ts` —
+  `media-src data:`. `app/WebStepRun.tsx` — media lines; frame `allow="autoplay"` (CKB-079).
+- `app/moduleMedia.ts` — `listModuleMedia`, `loadModuleMedia` (device cache by etag).
+- `app/StudentModuleActivity.tsx` — loads media for media steps; teacher-checked until loaded.
+  `app/ModuleViewer.tsx` — **Media files** section (`ModuleMediaFiles`), teacher Run with media.
+- Evidence: `docs/verification/web-module-steps.md`, section "Slice 3b". No Supabase migration.
+
 ## Slice 3 notes (webChecks and mediaChecks)
 
 - The teacher's checker defines the semantics (`check_web_steps.cjs`): `count` on a selector,
@@ -194,6 +219,11 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   ask the teacher before building.
 - `webChecks` are done (Slice 3a). Week 3 Steps 2–7 also have 6 `webChecks` each; they stay
   unused while those steps are teacher-checked, and apply once 3b makes them automatic.
+- Week 3 needs four media files shared by Steps 2–7: `images/snacks.svg`, `images/counter.svg`,
+  `audio/chime.wav`, `video/canteen.webm` (about 190 KB, in the teacher's `Week_03/project_end`).
+  Step 5 points at missing files on purpose (`images/snack.svg`, `audio/chime-missing.wav`,
+  `video/canteen-missing.webm`) and expects them to fail. The JSON names the files but does not
+  contain them.
 - 3b: add each media result as a line in `WebCheckList` (the checker's media rule: every
   `img`/`audio`/`video` must load unless `mediaChecks` lists it `broken`), and decide where media
   files live first. The preview policy blocks audio/video today (`default-src 'none'`).
@@ -297,12 +327,12 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. Teacher reviews and merges [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64) (Slice 3a, branch `feature/web-checks`), then re-runs Week 2 in
-   **View module details** on the hosted site (each step now lists its page checks).
-2. Slice 3b (media): ask the teacher where media files live and how the no-internet preview gets
-   them, then propose following AGENTS.md.
-3. Separate later tasks: offline work for web steps, then the module file revision ("Revision
-   notes").
+1. Teacher reads "Module media files: the R2 bucket" in `docs/cloudflare-setup.md`. R2 needs a
+   Cloudflare checkout that may ask for a payment card; CodeShare must stay free. If the teacher
+   goes ahead: create bucket `codeshare-module-media` FIRST, then merge [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), then the
+   hosted check in that section. If not: do not merge; media steps stay **Mark done**.
+2. Separate later tasks: offline work for web steps (including offline media), students' own media
+   in personal projects, then the module file revision ("Revision notes").
 
 ## Update log
 
@@ -344,3 +374,32 @@ built `main` (see `docs/cloudflare-setup.md`):
   checklist lines, server comparison. Rule/route 25/25; browser 11/11 online, Cloudflare runtime and
   offline; suite 394/394; five break-and-restore proofs. Week 2 and Week 3 Step 1 samples pass.
 - 2026-10-29 — Slice 3a delivered as [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64) against main.
+- 2026-10-29 — PR #64 merged (`0dcdd6a`). Slice 3b started on `feature/web-media`: asked the teacher
+  where media files live.
+- 2026-10-29 — Teacher: student media in personal projects is a separate later task. On module media
+  the teacher recalled an earlier decision ("auto duplicated for each student and in Cloudflare"); no
+  record of it was found in the repository, AGENTS.md, the handoffs or the teacher's course files
+  (`DotNet1_Handover.md` lists binary-media support as not done). Asked the teacher to confirm.
+- 2026-10-29 — Teacher chose Cloudflare R2 and one shared copy per module. Slice 3b plan proposed.
+- 2026-10-29 — Slice 3b approved (5 MB per file, media cached on each device, media steps teacher-checked
+  until uploaded). Work in progress committed on `feature/web-media` (usage limit reached):
+  done — `wrangler.jsonc` R2 binding `MODULE_MEDIA`/`codeshare-module-media`; `file-paths.ts`
+  `mediaPathType`/`MEDIA_LIMIT`; `router.ts` binary upload/`res.send`; repository R2 functions
+  (`mediaBucket` via `getCloudflareContext`, list/read/put/delete, `moduleHasMedia`) and media rule in
+  `completeSupabaseModuleActivity`; routes `GET/PUT/DELETE .../media/:folder/:name`, `GET .../media`;
+  `module-activities.ts` `mediaCheckLines`/`mediaLinesPass` in `checkModuleRun`; `webPreview.ts`
+  `embedMedia` + in-frame media test + `Media checks:` output; CSP `media-src data:`; `WebStepRun`
+  media lines; `app/moduleMedia.ts` loader with device cache; student screen and teacher **Media files**
+  section in `ModuleViewer`. `tests/web-module-steps.test.mjs` 31/31 (stand-in bucket on the OpenNext
+  global). Typecheck and lint clean. A Week 3 media browser subtest is written but NOT run.
+  LEFT: `npm run build:all`; Cloudflare build + `opennextjs-cloudflare preview` and the browser test on
+  8787 (real local R2); offline safety-net browser run on 3042; full `npm test`; break-and-restore
+  proofs; docs (`docs/cloudflare-setup.md`: create bucket `codeshare-module-media` BEFORE merging, or
+  the deploy fails; course format, workflow page, AGENTS line, verification, CKB if a bug is found);
+  then PR. Not deployable until the teacher creates the bucket.
+- 2026-10-29 — Slice 3b finished on `feature/web-media`: browser 12/12 on Cloudflare runtime with
+  local R2 (Week 3 Steps 2–7 pass with the teacher's files; student completes Step 3); offline 11 +
+  media skipped; rule/route 31/31; suite 400/400; four break-and-restore proofs. Found and fixed
+  CKB-079 (sound blocked in the sandboxed frame) and a teacher-view stale-media race. Bucket setup
+  steps written; R2's checkout may ask for a card (teacher decides before merging).
+- 2026-10-29 — Slice 3b delivered as [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65); bucket must exist before merging.

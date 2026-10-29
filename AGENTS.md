@@ -260,9 +260,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Steps whose expected output has `Media checks:` show "Checked by your teacher for now"; the
   teacher marks them done from the student's module card. `webChecks` are checked (agreed
   2026-10-29): the page reports what each check found, the server compares with its own checks,
-  and they apply to the step's own sample only, not alteration tasks. `mediaChecks`/
-  `includeMediaOutput` are stored but not checked until a later slice. New web project stays
+  and they apply to the step's own sample only, not alteration tasks. New web project stays
   separate from modules.
+- Module media (agreed 2026-10-29): pictures, sound and video live in Cloudflare R2, one shared
+  copy per teacher, subject and module, 5 MB per file, uploaded by the teacher; devices keep them
+  after the first download. Media steps are checked automatically (checker's media rule,
+  `mediaChecks`, `includeMediaOutput`) only once the module has media files; otherwise, and
+  offline, the teacher marks them done. Assistants never create the bucket.
 - A performance task whose starter files are all web files gives a web personal project (agreed
   2026-10-29): browser preview online and offline, web and `.txt` files, no Program input. Submit
   still needs a successful run of the exact saved files; success means no uncaught error.

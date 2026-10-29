@@ -2,6 +2,7 @@
 // handlers run inside Next.js (offline laptop and Cloudflare) and behind the old Express
 // server on Render (backend/src/server.ts). Supports only what CodeShare's routes use.
 import { Buffer } from "node:buffer";
+import { MEDIA_LIMIT } from "./file-paths.ts";
 
 export type ApiRequest = {
   method: string;
@@ -16,6 +17,8 @@ type CookieOptions = { httpOnly?: boolean; secure?: boolean; sameSite?: "lax" | 
 export type ApiResponse = {
   status(code: number): ApiResponse;
   json(body: unknown): void;
+  // A file's bytes (module media), sent as they come from storage.
+  send(body: BodyInit, contentType: string): void;
   end(): void;
   cookie(name: string, value: string, options: CookieOptions): void;
   clearCookie(name: string, options: { path?: string }): void;
@@ -30,6 +33,8 @@ const IMAGE_LIMIT = 2 * 1024 * 1024;
 // Java step files that add up past the default cap - only that one route gets the larger limit.
 const MODULE_UPLOAD_JSON_LIMIT = 2 * 1024 * 1024;
 const MODULE_UPLOAD_PATTERN = /^\/api\/classrooms\/[^/]+\/modules$/;
+// Module media uploads: pictures, sound and video up to MEDIA_LIMIT (teacher, 2026-10-29).
+const MEDIA_UPLOAD_PATTERN = /^\/api\/classes\/[^/]+\/modules\/[^/]+\/media\//;
 
 export class HttpError extends Error {
   readonly status: number;
@@ -56,11 +61,15 @@ function parseCookies(header: string | null) {
   return cookies;
 }
 
-async function readBody(request: Request, jsonLimit: number) {
+async function readBody(request: Request, jsonLimit: number, media: boolean) {
   if (request.method === "GET" || request.method === "HEAD") return undefined;
   const type = (request.headers.get("content-type") || "").split(";")[0].trim();
   const bytes = new Uint8Array(await request.arrayBuffer());
   if (!bytes.length) return undefined;
+  if (media && /^(?:image|audio|video)\//.test(type)) {
+    if (bytes.length > MEDIA_LIMIT) throw new HttpError(413, "Media files must be 5 MB or smaller");
+    return Buffer.from(bytes);
+  }
   if (type.startsWith("image/")) {
     if (bytes.length > IMAGE_LIMIT) throw new HttpError(413, "Images must be 2 MB or smaller");
     return Buffer.from(bytes);
@@ -81,12 +90,13 @@ export function createRouter<R extends ApiRequest = ApiRequest>(onError: ErrorHa
 
   async function handle(request: Request): Promise<Response> {
     let status = 200;
-    let body: string | null = null;
+    let body: BodyInit | null = null;
     const headers = new Headers();
     let sent = false;
     const res: ApiResponse = {
       status(code) { status = code; return res; },
       json(value) { headers.set("Content-Type", "application/json"); body = JSON.stringify(value); sent = true; },
+      send(value, contentType) { headers.set("Content-Type", contentType); body = value; sent = true; },
       end() { sent = true; },
       cookie(name, value, options) { headers.append("Set-Cookie", serializeCookie(name, value, options)); },
       clearCookie(name, options) { headers.append("Set-Cookie", serializeCookie(name, "", { path: options.path, maxAge: 0 })); },
@@ -103,7 +113,8 @@ export function createRouter<R extends ApiRequest = ApiRequest>(onError: ErrorHa
         query: Object.fromEntries(url.searchParams),
         headers: request.headers,
         cookies: parseCookies(request.headers.get("cookie")),
-        body: await readBody(request, request.method === "POST" && MODULE_UPLOAD_PATTERN.test(url.pathname) ? MODULE_UPLOAD_JSON_LIMIT : JSON_LIMIT),
+        body: await readBody(request, request.method === "POST" && MODULE_UPLOAD_PATTERN.test(url.pathname) ? MODULE_UPLOAD_JSON_LIMIT : JSON_LIMIT,
+          request.method === "PUT" && MEDIA_UPLOAD_PATTERN.test(url.pathname)),
       };
       // Express semantics: a handler either responds, or calls next() to pass on, or next(error).
       for (const handler of route.handlers) {
