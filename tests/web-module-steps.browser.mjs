@@ -1,5 +1,6 @@
-// Real local production browser checks for web module steps (Slice 1), with the teacher's own
-// Net MVC Week 1-3 files. Offline settings: local Supabase and laptop Java; no hosted data.
+// Real local production browser checks for web module steps (Slices 1-2), with the teacher's own
+// Net MVC Week 1-3 files. Local Supabase only, no hosted data; the server may use offline settings
+// (laptop Java), online settings (browser Java) or Cloudflare's runtime (npm run cf:preview).
 // Env: WEB_STEPS_BASE_URL (default http://localhost:3042), DOTNET_WEEKS_DIR (folder holding the
 // teacher's DotNet1_Week_0N.codeshare.json files), CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
 import assert from "node:assert/strict";
@@ -21,7 +22,7 @@ const paths = ["DotNet1_Week_01.codeshare.json", "Week_02/DotNet1_Week_02.codesh
 const weeks = paths.every(existsSync) ? paths.map((path) => JSON.parse(readFileSync(path, "utf8"))) : null;
 const stepsOf = (module) => module.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
 
-test("web module steps offline: uploads keep checks, teacher preview checks every sample, a student completes Week 2", { skip: !weeks && `teacher files not found in ${folder}` }, async (t) => {
+test("web module steps: uploads keep checks, teacher preview checks every sample, a student completes Week 2", { skip: !weeks && `teacher files not found in ${folder}` }, async (t) => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.WEB_STEPS_BASE_URL || "http://localhost:3042";
   const users = []; let classroomId;
@@ -153,7 +154,7 @@ test("web module steps offline: uploads keep checks, teacher preview checks ever
       assert.equal(saved.percent, Math.round(100 / (steps2.length + 1)));
     });
 
-    await t.test("Week 2: each next step opens, passes offline, the next part opens and the percentage moves", async () => {
+    await t.test("Week 2: each next step opens, passes, the next part opens and the percentage moves", async () => {
       for (const step of steps2.slice(1, 3)) {
         await openStep(step);
         await editor.fill(step.files[0].content);
