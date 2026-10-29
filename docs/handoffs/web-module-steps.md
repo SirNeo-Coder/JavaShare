@@ -20,12 +20,13 @@ into three slices, then the teacher's own revision of the module files.
 | --- | --- | --- |
 | Slice 1 — daily module steps pass | **Done, merged** | [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59), merge `93ab62f` on main |
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
-| This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
+| This rolling handoff | **Merged** (PR #61, then kept current through each later PR) | `docs/handoffs/web-module-steps.md` on main |
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
-| Slice 3b — pictures, sound, video (`mediaChecks`) | **Built, PR open** (approved 2026-10-29: R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). **Teacher must create the R2 bucket before merging** | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), branch `feature/web-media`; see "How Slice 3b works" | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
-| Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check and R2 bucket not yet confirmed | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
+| Students' own pictures, sound and video in personal web projects | **Deferred** to a separate task (teacher, 2026-10-29) | see "Revision notes" (Week 3 checklist) |
+| Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -215,10 +216,10 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   `\nMedia checks:\n<src>: image decoded|image failed to decode|playback advanced|playback failed`.
 - Media files are binaries kept outside the JSON. The preview is a `srcdoc` frame, so relative
   URLs like `images/snack.svg` cannot load, and the no-internet policy allows only `data:`/`blob:`
-  pictures. Slice 3 needs a decision on where media files live and how the preview gets them;
-  ask the teacher before building.
-- `webChecks` are done (Slice 3a). Week 3 Steps 2–7 also have 6 `webChecks` each; they stay
-  unused while those steps are teacher-checked, and apply once 3b makes them automatic.
+  pictures. Decided in Slice 3b: Cloudflare R2, one shared copy per module, embedded in the
+  preview as `data:` URLs.
+- `webChecks` are done (Slice 3a). Week 3 Steps 2–7 also have 6 `webChecks` each; since Slice 3b
+  they apply once the module's media files are uploaded (until then the steps stay teacher-checked).
 - Week 3 needs four media files shared by Steps 2–7: `images/snacks.svg`, `images/counter.svg`,
   `audio/chime.wav`, `video/canteen.webm` (about 190 KB, in the teacher's `Week_03/project_end`).
   Step 5 points at missing files on purpose (`images/snack.svg`, `audio/chime-missing.wav`,
@@ -226,7 +227,7 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   contain them.
 - 3b: add each media result as a line in `WebCheckList` (the checker's media rule: every
   `img`/`audio`/`video` must load unless `mediaChecks` lists it `broken`), and decide where media
-  files live first. The preview policy blocks audio/video today (`default-src 'none'`).
+  files live first. Done in 3b; the preview policy now allows `media-src data:`.
 
 ## Revision notes (for the deferred module revision)
 
@@ -240,7 +241,7 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   own starter instead of carrying the student's previous week forward (and no week requires the
   one before). Add the links if carry-forward is wanted.
 - Week 3's personal checklist asks students to store pictures, sound and video in the project;
-  projects hold text files only until Slice 3 decides where media files live.
+  personal projects still hold text files only (students' own media is a deferred task).
 - After the revision, re-run every step's sample through `tests/web-module-steps.browser.mjs`
   and report one line per step.
 
@@ -319,7 +320,7 @@ built `main` (see `docs/cloudflare-setup.md`):
 - The class workspace note "Java files are in the editor tabs." still says Java for web **module
   steps** (Slice 1 screen; Slice 2 changed it only for personal/review web projects).
 - Slices 1–2 passed in online settings on `next start` and on Cloudflare's runtime on this laptop
-  (each 11/11, 2026-10-29); not checked on the hosted site, and the hosted 10 ms CPU limit (CKB-065)
+  (each 11/11, 2026-10-29); the teacher reports the hosted check done, but the hosted 10 ms CPU limit (CKB-065)
   is unproven for the web routes.
 - CKB-022 remains open for the student's own **New web project** preview.
 - PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
@@ -327,12 +328,17 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. Teacher reads "Module media files: the R2 bucket" in `docs/cloudflare-setup.md`. R2 needs a
-   Cloudflare checkout that may ask for a payment card; CodeShare must stay free. If the teacher
-   goes ahead: create bucket `codeshare-module-media` FIRST, then merge [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), then the
-   hosted check in that section. If not: do not merge; media steps stay **Mark done**.
-2. Separate later tasks: offline work for web steps (including offline media), students' own media
-   in personal projects, then the module file revision ("Revision notes").
+1. **Confirm the Slice 3b hosted check with the teacher** (`docs/cloudflare-setup.md`, "Module media
+   files: the R2 bucket"): was bucket `codeshare-module-media` created before PR #65 merged (if not,
+   Cloudflare's build fails and the site keeps the old version); did the R2 checkout ask for a card;
+   do Week 3 Steps 2–7 tick every line after **Add media files**; any `exceededCpu` in **Logs**? A
+   failure here is a new diagnosis before anything else.
+2. Then the three deferred tasks, each proposed and approved separately (AGENTS.md):
+   - **Students' own pictures, sound and video in personal web projects** (online; Week 3's personal
+     checklist asks for them; reuse Slice 3b's R2 path, per-student storage instead of one copy).
+   - **Offline work for web steps**, including where media lives offline (no R2 on the laptop).
+   - **Module file revision** (JSON, DLL, printed module) — last, written from "Revision notes".
+   Recommended order: student media first (online first), then offline, then the revision. Ask.
 
 ## Update log
 
@@ -403,3 +409,7 @@ built `main` (see `docs/cloudflare-setup.md`):
   CKB-079 (sound blocked in the sandboxed frame) and a teacher-view stale-media race. Bucket setup
   steps written; R2's checkout may ask for a card (teacher decides before merging).
 - 2026-10-29 — Slice 3b delivered as [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65); bucket must exist before merging.
+- 2026-10-29 — PR #65 merged (`26875dc`). Slices 1–3 are on main. Hosted check of Slice 3b and the R2
+  bucket not yet confirmed. Next: confirm, then the deferred tasks (see "Next step").
+- 2026-10-29 — Status re-checked against GitHub: PRs #59–#65 merged, #66 (docs) open. Stale Slice 3
+  notes, revision note and hosted-check limit line corrected. Asked the teacher for the Slice 3b hosted check.
