@@ -28,7 +28,8 @@ into three slices, then the teacher's own revision of the module files.
 | Students' own pictures, sound and video in personal web projects | **Done, merged** 2026-10-29 (online; 5 MB each, at most 10, carries forward). Cloudflare build check passed; hosted check not yet done | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), merge `fc9a946` on main; see "How student media works" |
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
-| Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
+| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Next — handed to a separate chat** (teacher, 2026-10-29); not started | teacher's files; follow "Net MVC weekly modules: required format and workflow" |
+| New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
 Weeks 2–3 so their `webChecks`/`mediaChecks` are kept (uploads before PR #59 dropped them; same
@@ -96,6 +97,8 @@ Approved 2026-10-29:
   accepted online and offline for the exact saved files; **Projects** says **Weekly web projects**
   with **W** icons for web modules (Java wording unchanged); **Add file** / **Rename file** in a web
   personal project also allow `.txt` backups. Teacher live help label/colouring fixed (CKB-078).
+- **Revise Weeks 1–3 now, in a separate chat, before any new week** (teacher, 2026-10-29, after
+  Slices 1–3 and student media were merged). Weeks 4–20 then follow the format section below.
 - **The weekly module file revision is done separately, after this feature is fully built**
   (Slices 1–3). Why (teacher): so everything learned while building it, including things not
   yet seen, goes into one revision of the module JSON, the DLL (daily lesson log) and the
@@ -266,8 +269,103 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   one before). Add the links if carry-forward is wanted.
 - Week 3's personal checklist asks students to store pictures, sound and video in the project;
   online they now can (**Media files** in the personal project); offline still text only.
+- Week 3 module text and JSON (personal task): tell students their own media file names may use
+  only letters, numbers, `-` and `_` (no spaces), at most 5 MB each and 10 per project, added under
+  **Media files**, online only for now. Media steps are checked automatically online once the teacher
+  has added the module's media files; offline the teacher presses **Mark done**.
+- `DotNet1_Handover.md` and the course map's "Checks and decisions to retain" still say CodeShare
+  import, offline preview and binary media are unverified; update them to what is now verified
+  (web steps online and offline; media online only) and what is not (offline media).
+- After the revision, remove the "Week 1 note" from `docs/course-format.md` ("Web module steps").
 - After the revision, re-run every step's sample through `tests/web-module-steps.browser.mjs`
   and report one line per step.
+
+## Net MVC weekly modules: required format and workflow
+
+Every Net MVC week (the Weeks 1–3 revision and new Weeks 4–20) follows this. The detailed JSON rules
+are in `docs/course-format.md` ("Web module steps"); if this list and that page disagree, the code
+wins, then fix both.
+
+**Authorities, in the teacher's folder** `/home/ireneo/Documents/Java 2026/Net Files/` (not in git;
+never edit without the teacher's approval):
+
+- `Computer-Programming-.NET-Technology.pdf` — the only source of competencies and standards.
+- `DotNet1_Course_Map.md` — each week's topic, competencies, day-by-day plan, project addition and
+  Friday task. The day split and hours are already approved there; do not ask again.
+- `ILAW_DLL_and_Module_Playbook.md` — DLL and 8-page module format (§3, §4), references rule (§2.1),
+  final checklist (§7), CodeShare copy (§8). Its Java content and commands do not apply.
+- `DotNet1_Handover.md` — state of the course, IDs, teacher facts; update it after each week.
+
+**Fixed facts:** Ireneo D. Seraspe Jr., Cielito Zamora Senior High School, .NET 1, Term 3,
+SY 2026–2027; dates, grade and sections stay blank. Two hours Monday–Friday. Monday opens the whole
+topic; Friday is performance task and presentation only. One running project, the School Canteen Web
+Portfolio, continues every week (all prices and people fictional). No internet, CDN, account or
+download in class. No C#, ASP.NET or databases.
+
+**Files per week** (Week 1 sits in the folder root; later weeks in `Week_NN/`):
+`DotNet1_ILAW_Week_NN.docx` (DLL), `DotNet1_<Topic>_Module.pdf` (8 pages, 8.5 × 13 in = 612 × 936 pt;
+print pp. 1–6 double-sided long-edge, pp. 7–8 single-sided), `DotNet1_Week_NN.codeshare.json` (made
+last, from the final module), `project_start/` (= last week's `project_end/`), `project_end/`,
+`source/` (module page HTML), the checkers, `Verification.md`. The root `project/` matches the latest
+`project_end/`. Before changing an existing file, copy it to `<week folder>/before_revision/`.
+
+**IDs** (never change one already used): course `dotnet-1`; module `dotnet-1-wNN`; lessons
+`dotnet-1-wNN-dD`; steps `dotnet-1-wNN-dD-sS` (S counts across the week); slips `dotnet-1-wNN-dD-slip`;
+task `dotnet-1-wNN-pt`.
+
+**CodeShare JSON rules for a web week:**
+
+- Every step's `files` are `.html`, `.css` or `.js` (folders allowed; names use letters, numbers, `-`,
+  `_`). Module `.txt` starter files are reference only. `run` is `index.html` (page text) or a `.js`
+  file (console lines).
+- Page-text `expectedOutput` is exactly `Tab title: <title>`, a line break, `Visible page text:`, a
+  line break, then the page's visible text with blank lines removed. Spaces count. Take it from a real
+  run (the teacher's `check_web_steps.cjs` or CodeShare), never type it by hand: CSS changes visible
+  text (`display: none` hides it, `text-transform` changes its letters).
+- A `.js` step's `expectedOutput` is its `console.log` lines. Any uncaught error fails a run;
+  `expectedError` and Program input do not apply to web steps.
+- `webChecks` (`count`, `attribute` + `value`, `style` + `value`) check the step's own sample. Use them
+  for what page text cannot show (structure, attributes, computed styles).
+- Media steps: the expected output has a `Media checks:` section; `includeMediaOutput: true`;
+  `mediaChecks` lists files that are meant to be broken. The JSON names the files but does not contain
+  them; the teacher adds them under **View module details → Media files** (`images/`, `audio/`,
+  `video/`, at most 5 MB each). Offline, media steps need the teacher's **Mark done**.
+- Performance task: `starterFiles` all web files gives a web personal project. Students may add their
+  own pictures, sound and video there online (5 MB each, at most 10, safe names); not offline yet.
+- Weeks 1–3 use plain sample steps (no `activity.id`, no `sampleFirst`). CodeShare's rules accept
+  alteration tasks for web steps, but they are not tested in a browser; ask the teacher before using
+  them, and test them.
+- `previousModuleId` (pending teacher decision): carries the module and personal projects forward
+  from the previous week, and also requires finishing every step of the previous week first.
+- The printed module and the JSON must say the same thing, with identical code and outputs.
+
+**What the page preview can and cannot do** (check before writing a week; if a week needs something
+it cannot do, stop and propose an app change for approval first):
+
+- Can: one page with its local `.css` and `.js` files (linked with `<link rel="stylesheet">` and
+  `<script src>`), console output, uploaded pictures, sound and video in `img`/`audio`/`video`/`source`.
+- Cannot yet: open another `.html` page of the project through a link, show a local page in an
+  `iframe` (Week 5), load pictures or fonts named in CSS `url()` (backgrounds, `@font-face`), send a
+  form anywhere (Week 6 can show a form; submitting it is untested and has nowhere to go), anything
+  from the internet. Only Chromium
+  was tested.
+
+**Each week, in order:**
+
+1. Read the authorities, the previous week's `Verification.md` and this section. Ask only questions
+   whose answers change the files (playbook §0.2), then propose and wait for the teacher's approval.
+2. Build `project_start/` from the previous `project_end/`, then the week's project changes.
+3. DLL from the previous week's DLL (playbook §3): five verified references per day (open every
+   link), reflections blank, no previous-week text left.
+4. Module (playbook §4): run every printed example; render and inspect all 8 pages.
+5. JSON last. Check it with the teacher's `check_codeshare.py --run --media-root project_end` and
+   `check_web_steps.cjs`, then with CodeShare's `tests/web-module-steps.browser.mjs` on Cloudflare's
+   runtime (8787) and offline settings (3042), one line per step. That test reads only Weeks 1–3
+   today; extending it to a new week is a test change that needs approval.
+6. Write `Verification.md`; update `DotNet1_Handover.md`, the root `project/`, this handoff;
+   commit and push the repository docs on a new branch with a PR.
+7. Teacher: upload the JSON under **Curriculum** (same ids keep student progress); for a media
+   week, add its files under **Media files**.
 
 ## Hosted check after deploy (teacher)
 
@@ -356,15 +454,17 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Hosted check of student media (teacher)** — PR #68 is merged. Nothing to create on Cloudflare:
-   the same bucket is used. Once Cloudflare has built `main`: as a test student,
-   Week 3 personal project → **Media files** → **Add media files** (two pictures, a sound, a video) →
-   **▶ Run code** shows them → **Submit this version**; as the teacher, **Review personal submission →
-   ▶ Run code** shows them; Cloudflare **Logs**: any `exceededCpu` on `.../performance-project/media/...`.
-2. **CKB-080** — ask the teacher whether to fix it (proposed: clear a media step's shown result when its
-   media finish loading, so a run without media is never shown). Not approved yet.
-3. Then **offline work for web steps**, including where media lives offline (no R2 on the laptop).
-4. Last, the **module file revision** (JSON, DLL, printed module), written from "Revision notes".
+1. **Revise Weeks 1–3 in a separate chat** (prompt given to the teacher 2026-10-29). It follows
+   "Net MVC weekly modules: required format and workflow" and "Revision notes", asks the teacher
+   about `previousModuleId` first, and keeps this handoff current.
+2. **Hosted check of student media (teacher)**, PR #68: as a test student, Week 3 personal project →
+   **Media files** → **Add media files** (two pictures, a sound, a video) → **▶ Run code** shows them →
+   **Submit this version**; as the teacher, **Review personal submission → ▶ Run code** shows them;
+   Cloudflare **Logs**: any `exceededCpu` on `.../performance-project/media/...`.
+3. **CKB-080** — ask the teacher whether to fix it (proposed: clear a media step's shown result when its
+   media finish loading). Not approved yet.
+4. Then **Weeks 4–20**, one week per round, same section. **Offline web steps/media** stays a separate
+   task (needed before media weeks are taught offline).
 
 ## Update log
 
@@ -453,3 +553,7 @@ built `main` (see `docs/cloudflare-setup.md`):
   `tests/personal-performance.browser.mjs` on the final code (port 3032 was busy). Another session
   has an uncommitted, different `CKB-080-save-submit-run-no-feedback.md`; CKB-080 is already taken on
   main, so that one needs the next free number.
+- 2026-10-29 — Teacher asked to revise Weeks 1–3 in a separate chat, then build the remaining weeks in
+  the same format. Added "Net MVC weekly modules: required format and workflow" (authorities, fixed
+  facts, files, IDs, JSON rules, preview limits, per-week steps) and three revision notes. Prompt for
+  the revision chat written.
