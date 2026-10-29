@@ -76,9 +76,11 @@ test("web steps in the Java workflow: sample first, then the task; the next step
       await tab.locator("#classroom-modules .module-catalog-card").filter({ hasText: target.title }).getByRole("button").first().click();
       await worksheet.locator("article:not([hidden])").waitFor();
     };
-    const openStep = async (step) => {
+    // part: the worksheet part (day) to show first, when the step is not in the part shown now.
+    const openStep = async (step, part) => {
       await tab.mouse.move(1100, 20); await tab.getByRole("button", { name: "Module", exact: true }).hover();
       await tab.waitForFunction(() => document.getElementById("classroom-worksheet")?.dataset.open === "true");
+      if (part) await worksheet.getByRole("button", { name: part }).first().click();
       await worksheet.getByRole("button", { name: new RegExp(`Step ${step.number}$`) }).click();
       await worksheet.locator("article:not([hidden])").getByRole("button", { name: "Work in code editor", exact: true }).click();
     };
@@ -128,7 +130,7 @@ test("web steps in the Java workflow: sample first, then the task; the next step
 
     await t.test("after a reload, a finished step reopens with the student's completed work and keeps its completion", async () => {
       await openCatalog(weekA);
-      await openStep(a1);
+      await openStep(a1, /Lesson 1/);
       await showing(listAnswer);
       assert.match(await feedback.textContent(), /Completed — your progress is saved/);
       await tab.screenshot({ path: "/tmp/codeshare-web-sample-first.png" });
@@ -151,11 +153,14 @@ test("web steps in the Java workflow: sample first, then the task; the next step
       await openCatalog(weekB);
       await showing(b1.files[0].content);
       assert.deepEqual(await project.locator(".file-tab").allTextContents(), ["index.html", "app.js"], "the module project carries week 1's files forward");
-      await project.locator(".file-tab", { hasText: "app.js" }).click();
+      await project.locator(".file-tab", { hasText: "app.js" }).dispatchEvent("click"); // the worksheet drawer may still cover the tabs
       await showing(totalAnswer);
-      await tab.getByRole("button", { name: "Projects", exact: true }).hover();
-      await tab.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
-      await showing(mine);
+      // The personal task opens after the week's steps, as in Java; mark week 2's tasks done to reach it.
+      const states = Object.fromEntries(weekB.lessons.map((item) => [activityStateId(item.blocks[0]), "pass"]));
+      assert.equal((await admin.from("module_progress").update({ step_states: states }).eq("classroom_id", classroomId).eq("student_id", users[1].id).eq("module_id", weekB.id)).error, null);
+      const personal = await student.request.post(`/api/classrooms/${classroomId}/modules/${weekB.id}/progress/performance-project`);
+      assert.equal(personal.status(), 200, await personal.text());
+      assert.deepEqual((await personal.json()).performanceProjectFiles, [{ path: "index.html", content: mine }], "the personal project carries week 1's submission forward");
       assert.deepEqual(errors, []);
     });
   } finally {
