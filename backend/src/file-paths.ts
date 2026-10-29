@@ -24,3 +24,13 @@ export function projectPathError(projectLanguage: string | null | undefined, pat
 export function moduleWebPathError(path: string) {
   return MODULE_TEXT_PATH.test(path) ? null : projectPathError("web", path);
 }
+
+// Module media files (Cloudflare R2, one shared copy per module; teacher, 2026-10-29): images/, audio/
+// or video/ plus one safe name. The type comes from the ending, never from the uploader.
+export const MEDIA_LIMIT = 5 * 1024 * 1024;
+const MEDIA_TYPES: Record<string, string> = { svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp",
+  wav: "audio/wav", mp3: "audio/mpeg", ogg: "audio/ogg", webm: "video/webm", mp4: "video/mp4" };
+export function mediaPathType(path: string) {
+  const ending = path.match(/^(?:images|audio|video)\/[\w-]+(?:\.[\w-]+)*\.([a-z0-9]+)$/i)?.[1];
+  return ending ? MEDIA_TYPES[ending.toLowerCase()] ?? null : null;
+}

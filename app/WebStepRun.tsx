@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { matchesActivityOutput, webCheckLines, type WebCheck } from "../backend/src/module-activities";
-import { webRunResult, type ConsoleMessage, type PageMessage, type PreviewFile } from "./webPreview";
+import { matchesActivityOutput, mediaCheckLines, webCheckLines, type MediaCheck, type WebCheck } from "../backend/src/module-activities";
+import { embedMedia, webRunResult, type ConsoleMessage, type PageMessage, type PreviewFile } from "./webPreview";
 import { buildTeacherPreview } from "./teacherWebPreview";
 
 export type WebRunResult = ReturnType<typeof webRunResult>;
@@ -31,19 +31,21 @@ export function useWebPageRun() {
   }, []);
 
   // A .js run file compares console lines on an empty page; anything else compares the page text.
-  const run = (files: PreviewFile[], runPath = "index.html", checks: WebCheck[] = []) => new Promise<WebRunResult>((resolve) => {
+  // media: a media step's module media files (path -> data: URL) and its includeMediaOutput.
+  const run = (files: PreviewFile[], runPath = "index.html", checks: WebCheck[] = [], media?: { files: Record<string, string>; include: boolean }) => new Promise<WebRunResult>((resolve) => {
     const mode = runPath.endsWith(".js") ? "console" : "page";
+    if (media) files = embedMedia(files, media.files);
     // The no-internet policy matches the course-building checker, which also blocks the internet.
     const preview = mode === "console"
-      ? buildTeacherPreview([...files, { path: WRAPPER, content: `<!doctype html><html><head></head><body><script src="${runPath.replace(/[^\w./-]/g, "")}"></script></body></html>` }], WRAPPER, checks)
-      : buildTeacherPreview(files, runPath, checks);
-    if (!preview.html) { resolve({ mode, success: false, output: "", checks: [], error: preview.warnings[0] }); return; }
+      ? buildTeacherPreview([...files, { path: WRAPPER, content: `<!doctype html><html><head></head><body><script src="${runPath.replace(/[^\w./-]/g, "")}"></script></body></html>` }], WRAPPER, checks, Boolean(media))
+      : buildTeacherPreview(files, runPath, checks, Boolean(media));
+    if (!preview.html) { resolve({ mode, success: false, output: "", checks: [], media: [], error: preview.warnings[0] }); return; }
     const timer = setTimeout(() => pending.current?.finish(), 5000);
     pending.current = { lines: [], errors: [], finish: (page) => {
       clearTimeout(timer);
       const { lines, errors } = pending.current!;
       pending.current = null;
-      resolve(webRunResult(mode, { lines, errors, page }));
+      resolve(webRunResult(mode, { lines, errors, page }, media?.include));
     } };
     setPage((current) => ({ html: preview.html, run: (current?.run ?? 0) + 1 }));
   });
@@ -53,12 +55,14 @@ export function useWebPageRun() {
   return { run, view };
 }
 
-// One line per check: the output, then each page-element check (media checks come later).
-export function WebCheckList({ result, expected, teacherChecked = false, webChecks }: { result: WebRunResult | null; expected: string; teacherChecked?: boolean; webChecks?: WebCheck[] }) {
+// One line per check: the output, each page-element check, then each picture, sound or video on a media step.
+export function WebCheckList({ result, expected, teacherChecked = false, webChecks, mediaChecks }: {
+  result: WebRunResult | null; expected: string; teacherChecked?: boolean; webChecks?: WebCheck[]; mediaChecks?: MediaCheck[];
+}) {
   if (teacherChecked) return <div className="web-checks" role="status"><p>Checked by your teacher for now</p></div>;
   if (!result) return null;
   const outputPassed = matchesActivityOutput(result, expected);
-  const checks = [{ label: result.mode === "console" ? "Console output matches" : "Page text matches", passed: outputPassed, found: "" }, ...webCheckLines(webChecks, result.checks)];
+  const checks = [{ label: result.mode === "console" ? "Console output matches" : "Page text matches", passed: outputPassed, found: "" }, ...webCheckLines(webChecks, result.checks), ...(mediaChecks ? mediaCheckLines(mediaChecks, result.media) : [])];
   return <div className="web-checks" role="status">
     <ul>{checks.map((check, index) => <li key={index} className={check.passed ? "passed" : "failed"}><span aria-hidden="true">{check.passed ? "✓" : "✗"}</span> {check.label}{check.found && ` — found ${check.found}`}</li>)}</ul>
     {result.error && <p role="alert">{result.error}</p>}

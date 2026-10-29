@@ -24,7 +24,7 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
-| Slice 3b — pictures, sound, video (`mediaChecks`) | **Next** — R2 + one shared copy decided; plan proposed 2026-10-29, waiting for approval | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | **In progress** (approved 2026-10-29: R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload) — code written, NOT finished | branch `feature/web-media` | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -362,3 +362,19 @@ built `main` (see `docs/cloudflare-setup.md`):
   record of it was found in the repository, AGENTS.md, the handoffs or the teacher's course files
   (`DotNet1_Handover.md` lists binary-media support as not done). Asked the teacher to confirm.
 - 2026-10-29 — Teacher chose Cloudflare R2 and one shared copy per module. Slice 3b plan proposed.
+- 2026-10-29 — Slice 3b approved (5 MB per file, media cached on each device, media steps teacher-checked
+  until uploaded). Work in progress committed on `feature/web-media` (usage limit reached):
+  done — `wrangler.jsonc` R2 binding `MODULE_MEDIA`/`codeshare-module-media`; `file-paths.ts`
+  `mediaPathType`/`MEDIA_LIMIT`; `router.ts` binary upload/`res.send`; repository R2 functions
+  (`mediaBucket` via `getCloudflareContext`, list/read/put/delete, `moduleHasMedia`) and media rule in
+  `completeSupabaseModuleActivity`; routes `GET/PUT/DELETE .../media/:folder/:name`, `GET .../media`;
+  `module-activities.ts` `mediaCheckLines`/`mediaLinesPass` in `checkModuleRun`; `webPreview.ts`
+  `embedMedia` + in-frame media test + `Media checks:` output; CSP `media-src data:`; `WebStepRun`
+  media lines; `app/moduleMedia.ts` loader with device cache; student screen and teacher **Media files**
+  section in `ModuleViewer`. `tests/web-module-steps.test.mjs` 31/31 (stand-in bucket on the OpenNext
+  global). Typecheck and lint clean. A Week 3 media browser subtest is written but NOT run.
+  LEFT: `npm run build:all`; Cloudflare build + `opennextjs-cloudflare preview` and the browser test on
+  8787 (real local R2); offline safety-net browser run on 3042; full `npm test`; break-and-restore
+  proofs; docs (`docs/cloudflare-setup.md`: create bucket `codeshare-module-media` BEFORE merging, or
+  the deploy fails; course format, workflow page, AGENTS line, verification, CKB if a bug is found);
+  then PR. Not deployable until the teacher creates the bucket.

@@ -6,10 +6,10 @@ import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
-import { buildPreview, webPageOutput, webRunResult } from "../app/webPreview.ts";
-import { checkModuleRun, checkableStep, matchesActivityOutput, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
+import { buildPreview, embedMedia, webPageOutput, webRunResult } from "../app/webPreview.ts";
+import { checkModuleRun, checkableStep, matchesActivityOutput, mediaCheckLines, mediaLinesPass, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
 import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
-import { moduleWebPathError } from "../backend/src/file-paths.ts";
+import { MEDIA_LIMIT, mediaPathType, moduleWebPathError } from "../backend/src/file-paths.ts";
 import { buildTeacherPreview } from "../app/teacherWebPreview.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 const { WebCheckList } = tsxRequire("../app/WebStepRun.tsx", import.meta.url);
@@ -41,7 +41,7 @@ test("web check rule: page text is the tab title then the visible text with blan
   const output = webPageOutput({ title: "School Canteen", text: "\n School Canteen\n\nWelcome\n\n\nFood choices\nPandesal\n" });
   assert.equal(output, "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome\nFood choices\nPandesal");
   const result = webRunResult("page", { lines: ["ignored console line"], errors: [], page: { title: "School Canteen", text: "School Canteen\n\nWelcome" } });
-  assert.deepEqual(result, { mode: "page", success: true, output: "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome", checks: [] });
+  assert.deepEqual(result, { mode: "page", success: true, output: "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome", checks: [], media: [] });
   assert.equal(matchesActivityOutput(result, "Tab title: School Canteen\r\nVisible page text:\r\nSchool Canteen\r\nWelcome\r\n"), true, "Windows line endings and one final line break are ignored");
 });
 
@@ -65,7 +65,7 @@ test("web check rule: an uncaught error or a page that never finished makes the 
 
 test("web check rule: a .js run file compares the console lines, joined with line breaks", () => {
   const result = webRunResult("console", { lines: ["Total: 5", "Done"], errors: [], page: { title: "", text: "" } });
-  assert.deepEqual(result, { mode: "console", success: true, output: "Total: 5\nDone", checks: [] });
+  assert.deepEqual(result, { mode: "console", success: true, output: "Total: 5\nDone", checks: [], media: [] });
   assert.equal(matchesActivityOutput(result, "Total: 5\nDone\n"), true);
   assert.equal(matchesActivityOutput(result, "Total: 5"), false);
   const thrown = webRunResult("console", { lines: ["Total: 5"], errors: ["boom"], page: { title: "", text: "" } });
@@ -75,7 +75,8 @@ test("web check rule: a .js run file compares the console lines, joined with lin
 test("web preview: the sandbox reports page text after drawing, flags uncaught errors, and opens the run file", () => {
   const preview = buildPreview([{ path: "index.html", content: page("Home", "<p>Home</p>") }, { path: "about.html", content: page("About", "<p>About</p>") }], "about.html");
   assert.match(preview.html, /<title>About<\/title>/);
-  assert.match(preview.html, /requestAnimationFrame\(\(\)=>requestAnimationFrame\(\(\)=>parent\.postMessage\(\{codeshare:"page",title:document\.title,text:/);
+  assert.match(preview.html, /requestAnimationFrame\(\(\)=>requestAnimationFrame\(async\(\)=>\{const media=testMedia\?await Promise\.all\(\[\.\.\.document\.querySelectorAll\("img,audio,video"\)\]\.map\(mediaLine\)\):\[\];parent\.postMessage\(\{codeshare:"page",title:document\.title,text:/);
+  assert.match(preview.html, /const testMedia=false;/, "only module media steps test pictures, sound and video");
   assert.match(preview.html, /addEventListener\("error",\(event\)=>post\("error",event\.message,event\.lineno\|\|null,true\)\)/);
   assert.match(buildPreview([{ path: "index.html", content: page("Home", "") }], "missing.html").html, /<title>Home<\/title>/);
 });
@@ -84,7 +85,7 @@ test("module web steps use the no-internet preview and still open the step's run
   const preview = buildTeacherPreview([{ path: "index.html", content: page("Home", "") }, { path: "about.html", content: page("About", "") }], "about.html");
   assert.match(preview.html, /^<!doctype html>\n?<meta http-equiv="Content-Security-Policy" content="default-src 'none';/);
   assert.match(preview.html, /<title>About<\/title>/);
-  assert.match(readFileSync(new URL("../app/WebStepRun.tsx", import.meta.url), "utf8"), /: buildTeacherPreview\(files, runPath, checks\)/, "module runs use the no-internet preview");
+  assert.match(readFileSync(new URL("../app/WebStepRun.tsx", import.meta.url), "utf8"), /: buildTeacherPreview\(files, runPath, checks, Boolean\(media\)\)/, "module runs use the no-internet preview");
 });
 
 test("web steps: decided by file endings, with no Java-only path handling", () => {
@@ -218,6 +219,46 @@ test("the preview carries the step's checks into the page safely and reports the
   assert.match(html, /checks:checks\.map\(probe\)/);
   assert.equal(html.split("</script>").length, 2, "a selector cannot close the capture script");
   assert.equal(webRunResult("page", { lines: [], errors: [], page: { title: "Home", text: "Hi", checks: [{ count: 1 }] } }).checks.length, 1);
+});
+
+// Week 3 Step 5: two files are missing on purpose and must fail; the counter picture must load.
+const week3Step5 = { expectedOutput: "Tab title: Canteen\nVisible page text:\nMenu\nMedia checks:\nimages/snack.svg: image failed to decode\nimages/counter.svg: image decoded\naudio/chime-missing.wav: playback failed",
+  mediaChecks: [{ src: "images/snack.svg", state: "broken" }, { src: "audio/chime-missing.wav", state: "broken" }] };
+const step5Lines = ["images/snack.svg: image failed to decode", "images/counter.svg: image decoded", "audio/chime-missing.wav: playback failed"];
+
+test("media files: only images/, audio/ or video/ with a picture, sound or video ending, 5 MB each", () => {
+  assert.equal(mediaPathType("images/snacks.svg"), "image/svg+xml");
+  assert.equal(mediaPathType("audio/chime.wav"), "audio/wav");
+  assert.equal(mediaPathType("video/canteen.webm"), "video/webm");
+  for (const path of ["snacks.svg", "images/../secret.svg", "images/a b.png", "docs/a.svg", "images/a.html", "images/sub/a.svg"]) assert.equal(mediaPathType(path), null, path);
+  assert.equal(MEDIA_LIMIT, 5 * 1024 * 1024);
+});
+
+test("media rule: like the teacher's checker, every picture, sound or video loads unless mediaChecks says broken", () => {
+  assert.equal(mediaLinesPass(week3Step5.mediaChecks, step5Lines), true, "Week 3 Step 5's deliberate failures pass");
+  assert.equal(mediaLinesPass(week3Step5.mediaChecks, ["images/snack.svg: image decoded", ...step5Lines.slice(1)]), false, "a file listed as broken must not load");
+  assert.equal(mediaLinesPass([], ["images/counter.svg: image failed to decode"]), false, "an unlisted file must load");
+  assert.equal(mediaLinesPass(week3Step5.mediaChecks, step5Lines.slice(1)), false, "a listed file must be on the page");
+  assert.deepEqual(mediaCheckLines(week3Step5.mediaChecks, step5Lines.slice(1)).at(-1), { label: "images/snack.svg on the page", passed: false, found: "nothing" });
+  assert.equal(mediaLinesPass(undefined, undefined), true);
+  const step = { id: "m", instruction: "", files: [{ path: "index.html", content: "x" }], ...week3Step5 };
+  const result = (media) => webRunResult("page", { lines: [], errors: [], page: { title: "Canteen", text: "Menu", media } }, true);
+  assert.equal(result(step5Lines).output, week3Step5.expectedOutput, "includeMediaOutput appends the media lines");
+  assert.equal(webRunResult("page", { lines: [], errors: [], page: { title: "Canteen", text: "Menu", media: step5Lines } }).output, "Tab title: Canteen\nVisible page text:\nMenu", "without includeMediaOutput the lines stay out of the output");
+  assert.equal(checkModuleRun({}, step, {}, step.files, result(step5Lines)).passed, true);
+  const wrong = { ...result(step5Lines), media: ["images/snack.svg: image decoded", ...step5Lines.slice(1)] };
+  assert.equal(checkModuleRun({}, step, {}, step.files, wrong).passed, false, "matching text with a wrong media state fails");
+});
+
+test("module media goes into the page as data: URLs, keeps the written path, and leaves missing files to fail", () => {
+  const html = "<body>\n<img src=\"images/snacks.svg\"\nalt=\"Snacks\">\n<img src='images/snack.svg'>\n<audio controls src=\"./audio/chime.wav\"></audio>\n<p>src=\"images/snacks.svg\"</p></body>";
+  const [page, style] = embedMedia([{ path: "index.html", content: html }, { path: "site.css", content: "img{src:'images/snacks.svg'}" }], { "images/snacks.svg": "data:image/svg+xml;base64,AA==", "audio/chime.wav": "data:audio/wav;base64,BB==" });
+  assert.equal(page.content, "<body>\n<img src=\"data:image/svg+xml;base64,AA==\" data-codeshare-src=\"images/snacks.svg\"\nalt=\"Snacks\">\n<img src='images/snack.svg'>\n<audio controls src=\"data:audio/wav;base64,BB==\" data-codeshare-src=\"./audio/chime.wav\"></audio>\n<p>src=\"images/snacks.svg\"</p></body>");
+  assert.equal(page.content.split("\n").length, html.split("\n").length, "line numbers stay the same");
+  assert.equal(style.content, "img{src:'images/snacks.svg'}", "only HTML tags change");
+  const preview = buildTeacherPreview([page], "index.html", [], true).html;
+  assert.match(preview, /media-src data:;/, "the no-internet preview allows sound and video only from the page itself");
+  assert.match(preview, /const testMedia=true;/);
 });
 
 let local;
@@ -364,6 +405,74 @@ test("web steps offline (real routes): web completions are accepted, media steps
       const page = await personal(javaP, "personal-result", "POST", { updatedAt: view.updatedAt, success: true, files: webP.performanceTask.starterFiles, output: "Tab title: x" });
       assert.equal(page.status, 400); assert.match(await page.text(), /do not belong to this personal project/);
       assert.equal((await personal(javaP, "personal-result", "POST", { updatedAt: view.updatedAt, success: true })).status, 403, "offline still refuses browser Java claims");
+    });
+
+    // Module media: OpenNext keeps Cloudflare's bindings on this global; a stand-in bucket plays R2 here.
+    const mediaModule = { format: "codeshare-module", version: 1, course: "dotnet-1", week: 3, id: `wm-${randomUUID().slice(0, 8)}`, title: "Media fixture", starterFiles: [],
+      lessons: [lesson(`wm-d1-${randomUUID().slice(0, 4)}`, 1, [{ type: "step", id: `wm-s1-${randomUUID().slice(0, 4)}`, number: 1, instruction: "Repair the pictures.", language: "html", run: "index.html",
+        files: [{ path: "index.html", content: page("Canteen", "<p>Menu</p><img src=\"images/snack.svg\"><img src=\"images/counter.svg\"><audio src=\"audio/chime-missing.wav\"></audio>") }],
+        includeMediaOutput: true, ...week3Step5 }])] };
+    const [mediaStep] = mediaModule.lessons[0].blocks;
+    assert.equal((await call(`/api/classrooms/${classroomId}/modules`, cookies[0], "POST", mediaModule)).status, 201);
+    const mediaUrl = (path = "") => `/api/classes/${classroomId}/modules/${mediaModule.id}/media${path}`;
+    const readUrl = (path = "") => `/api/classrooms/${classroomId}/modules/${mediaModule.id}/media${path}`;
+    const upload = (cookie, path, bytes, type = "image/svg+xml") => handleApi(new Request(`http://localhost:3000${mediaUrl(path)}`, { method: "PUT", headers: { "content-type": type, cookie }, body: bytes }));
+    const completeMedia = async (changes = {}) => {
+      const progress = await (await call(`/api/classrooms/${classroomId}/modules/${mediaModule.id}/progress/activity?stepId=${mediaStep.id}`, cookies[1])).json();
+      return call(`/api/classrooms/${classroomId}/modules/${mediaModule.id}/progress/complete`, cookies[1], "POST", { stepId: mediaStep.id, updatedAt: progress.updatedAt, moduleVersion: progress.moduleVersion,
+        completionId: randomUUID(), files: progress.projectFiles, success: true, output: mediaStep.expectedOutput, media: step5Lines, ...changes });
+    };
+    const contextKey = Symbol.for("__cloudflare-context__");
+    const objects = new Map();
+    const bucket = {
+      async list({ prefix, limit = 1000 }) { return { objects: [...objects].filter(([key]) => key.startsWith(prefix)).slice(0, limit).map(([key, value]) => ({ key, size: value.bytes.length, etag: value.etag })) }; },
+      async get(key) { const value = objects.get(key); return value ? { body: new Blob([value.bytes]).stream() } : null; },
+      async put(key, bytes, options) { objects.set(key, { bytes: new Uint8Array(bytes), etag: randomUUID(), type: options.httpMetadata.contentType }); },
+      async delete(key) { objects.delete(key); },
+    };
+
+    await t.test("offline (no media storage), media files are unavailable and media steps stay teacher-checked", async () => {
+      assert.equal((await call(readUrl(), cookies[1])).status, 503);
+      const refused = await completeMedia();
+      assert.equal(refused.status, 400); assert.match(await refused.text(), /Your teacher checks this step/);
+    });
+
+    await t.test("online, only the class's teacher uploads or removes media; the class reads one shared copy", async () => {
+      globalThis[contextKey] = { env: { MODULE_MEDIA: bucket } };
+      try {
+        const svg = new TextEncoder().encode("<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'/>");
+        assert.deepEqual(await (await call(readUrl(), cookies[1])).json(), { files: [] });
+        assert.equal((await completeMedia()).status, 400, "no media uploaded yet: still teacher-checked");
+        assert.equal((await upload(cookies[1], "/images/counter.svg", svg)).status, 403, "students cannot upload");
+        assert.equal((await upload(cookies[2], "/images/counter.svg", svg)).status, 403, "another teacher's class is refused");
+        assert.equal((await upload(cookies[0], "/images/counter.html", svg)).status, 400, "only picture, sound or video names");
+        assert.equal((await upload(cookies[0], "/images/big.png", new Uint8Array(MEDIA_LIMIT + 1), "image/png")).status, 413, "5 MB at most");
+        const uploaded = await upload(cookies[0], "/images/counter.svg", svg);
+        assert.equal(uploaded.status, 200, await uploaded.clone().text());
+        assert.deepEqual((await uploaded.json()).files.map((file) => file.path), ["images/counter.svg"]);
+        const listed = await (await call(readUrl(), cookies[1])).json();
+        assert.deepEqual(listed.files.map((file) => [file.path, file.size]), [["images/counter.svg", svg.length]]);
+        const file = await call(readUrl("/images/counter.svg"), cookies[1]);
+        assert.equal(file.status, 200); assert.equal(file.headers.get("content-type"), "image/svg+xml");
+        assert.deepEqual(new Uint8Array(await file.arrayBuffer()), svg);
+        assert.equal((await call(readUrl("/images/counter.svg"), cookies[2])).status, 403, "another teacher cannot read this class's media");
+        assert.equal([...objects.keys()].length, 1, "one shared copy, not one per student");
+        assert.match([...objects.keys()][0], new RegExp(`^${users[0].id}/net-mvc/${mediaModule.id}/images/counter\\.svg$`));
+      } finally { delete globalThis[contextKey]; }
+    });
+
+    await t.test("online with media uploaded, a media step completes only with matching media lines", async () => {
+      globalThis[contextKey] = { env: { MODULE_MEDIA: bucket } };
+      try {
+        const wrong = await completeMedia({ media: ["images/snack.svg: image decoded", ...step5Lines.slice(1)] });
+        assert.equal(wrong.status, 400); assert.match(await wrong.text(), /pictures, sound or video do not match/);
+        assert.equal((await completeMedia({ media: undefined })).status, 400, "the page must report its media");
+        const done = await completeMedia();
+        assert.equal(done.status, 200, await done.clone().text());
+        assert.equal((await done.json()).progress.stepStates[mediaStep.id], "pass");
+        const removed = await call(mediaUrl("/images/counter.svg"), cookies[0], "DELETE");
+        assert.deepEqual((await removed.json()).files, []);
+      } finally { delete globalThis[contextKey]; }
     });
 
     await t.test("teacher class progress shows the web percentage and the media step as done", async () => {

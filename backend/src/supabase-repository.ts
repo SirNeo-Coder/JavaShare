@@ -1,10 +1,10 @@
 import { paperPerformanceTask, personalProjectFiles, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
-import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, projectPathError } from "./file-paths.ts";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
 
 export type SupabaseSessionUser = {
   id: string;
@@ -1609,21 +1609,24 @@ export async function recordSupabaseModuleActivityResult(
 
 export type ModuleCheckpoint = {
   stepId: string; updatedAt: string; moduleVersion: string; completionId: string;
-  files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[];
-  sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[] };
+  files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[];
+  sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[] };
 };
 
 export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, checkpoint: ModuleCheckpoint) {
   const { content, step, progress, moduleVersion } = await requireModuleActivity(user, classroomId, moduleId, checkpoint.stepId);
   if (!checkableStep(step)) throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java and web pages only");
-  if (teacherCheckedStep(step)) throw new SupabaseRepositoryError(400, "Your teacher checks this step for now");
+  // A media step is checked automatically once its module's media files are uploaded (teacher, 2026-10-29).
+  const mediaStep = teacherCheckedStep(step);
+  if (mediaStep && !(await moduleHasMedia(classroomId, moduleId))) throw new SupabaseRepositoryError(400, "Your teacher checks this step for now");
+  if (mediaStep && !mediaLinesPass(step.mediaChecks, checkpoint.media)) throw new SupabaseRepositoryError(400, "The pictures, sound or video do not match yet");
   // The route lets web files through without the online Java runner, so they must belong to a web step.
   if (webStep(step) !== checkpoint.files.every((file) => !moduleWebPathError(file.path))) throw new SupabaseRepositoryError(400, "These files do not belong to this step");
   if (moduleVersion !== checkpoint.moduleVersion) throw new SupabaseRepositoryError(409, "This module changed. Reopen it before saving completion; your device draft is kept.");
   if (!matchesActivityOutput(checkpoint, activityTask(step).expectedOutput)) throw new SupabaseRepositoryError(400, "This task has not completed successfully");
   // Page-element checks belong to the step's own sample (teacher, 2026-10-29); the server compares what the page reported.
   if (!step.activity?.id && !webChecksPass(step.webChecks, checkpoint.checks)) throw new SupabaseRepositoryError(400, "This page does not pass its page checks yet");
-  if (samplePending(content, step, progress.step_states) && (!checkpoint.sample || !matchesSample(checkpoint.sample, step) || !webChecksPass(step.webChecks, checkpoint.sample.checks) || !unchangedSample(checkpoint.sample.files, step.files))) {
+  if (samplePending(content, step, progress.step_states) && (!checkpoint.sample || !matchesSample(checkpoint.sample, step) || !webChecksPass(step.webChecks, checkpoint.sample.checks) || (mediaStep && !mediaLinesPass(step.mediaChecks, checkpoint.sample.media)) || !unchangedSample(checkpoint.sample.files, step.files))) {
     throw new SupabaseRepositoryError(400, "Run the supplied sample unchanged before completing this task");
   }
   const key = activityStateId(step);
@@ -1852,6 +1855,73 @@ async function loadModuleSummaries(classroomId: string): Promise<ModuleSummaryRo
   const { data, error } = await getSupabaseAdmin().rpc("codeshare_module_summaries", { p_classroom_id: classroomId });
   fail(error, "Could not read module summaries. Ask your teacher to apply the module summary migration.");
   return data as ModuleSummaryRow[];
+}
+
+// Module media files live in Cloudflare R2, one shared copy per teacher, subject and module (teacher,
+// 2026-10-29). OpenNext supplies the bucket on Cloudflare; offline and on Render there is none.
+type MediaObject = { key: string; size: number; etag: string };
+type MediaBucket = {
+  list(options: { prefix: string; limit?: number }): Promise<{ objects: MediaObject[] }>;
+  get(key: string): Promise<{ body: ReadableStream } | null>;
+  put(key: string, value: ArrayBuffer | Uint8Array, options: { httpMetadata: { contentType: string } }): Promise<unknown>;
+  delete(key: string): Promise<void>;
+};
+async function mediaBucket() {
+  try {
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    return (getCloudflareContext().env as unknown as { MODULE_MEDIA?: MediaBucket }).MODULE_MEDIA ?? null;
+  } catch { return null; }
+}
+async function requireMediaBucket() {
+  const bucket = await mediaBucket();
+  if (!bucket) throw new SupabaseRepositoryError(503, "Module media files are only available online");
+  return bucket;
+}
+const mediaPrefix = (classroom: Pick<ClassroomRow, "teacher_id" | "module_subject">, moduleId: string) => `${classroom.teacher_id}/${classroom.module_subject}/${moduleId}/`;
+async function moduleMediaPrefix(classroomId: string, moduleId: string) {
+  const classroom = await moduleClassroom(classroomId);
+  if (!classroom.module_subject) throw new SupabaseRepositoryError(400, "Choose this class's subject before adding media files");
+  return mediaPrefix(classroom, moduleId);
+}
+async function moduleHasMedia(classroomId: string, moduleId: string) {
+  const bucket = await mediaBucket();
+  if (!bucket) return false;
+  const classroom = await moduleClassroom(classroomId);
+  return Boolean(classroom.module_subject) && (await bucket.list({ prefix: mediaPrefix(classroom, moduleId), limit: 1 })).objects.length > 0;
+}
+function mediaPath(path: string) {
+  if (!mediaPathType(path)) throw new SupabaseRepositoryError(400, "Use images/, audio/ or video/ and a picture, sound or video file name");
+  return path;
+}
+
+export async function listSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  await requireClassroomMember(user, classroomId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
+  const bucket = await requireMediaBucket();
+  const prefix = await moduleMediaPrefix(classroomId, moduleId);
+  const { objects } = await bucket.list({ prefix });
+  return { files: objects.map((object) => ({ path: object.key.slice(prefix.length), size: object.size, etag: object.etag })) };
+}
+
+export async function readSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string, path: string) {
+  await requireClassroomMember(user, classroomId);
+  await enforceStudentModuleAccess(user, classroomId, moduleId);
+  const object = await (await requireMediaBucket()).get(await moduleMediaPrefix(classroomId, moduleId) + mediaPath(path));
+  if (!object) throw new SupabaseRepositoryError(404, "Media file not found");
+  return { body: object.body, contentType: mediaPathType(path)! };
+}
+
+export async function putSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string, path: string, bytes: Uint8Array) {
+  await teacherClassroom(user, classroomId);
+  await loadCourseModuleRow(classroomId, moduleId);
+  await (await requireMediaBucket()).put(await moduleMediaPrefix(classroomId, moduleId) + mediaPath(path), bytes, { httpMetadata: { contentType: mediaPathType(path)! } });
+  return listSupabaseModuleMedia(user, classroomId, moduleId);
+}
+
+export async function deleteSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string, path: string) {
+  await teacherClassroom(user, classroomId);
+  await (await requireMediaBucket()).delete(await moduleMediaPrefix(classroomId, moduleId) + mediaPath(path));
+  return listSupabaseModuleMedia(user, classroomId, moduleId);
 }
 
 async function moduleClassroom(classroomId: string) {

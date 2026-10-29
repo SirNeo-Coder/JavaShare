@@ -11,5 +11,8 @@
   "observability": { "enabled": true },
   // Keep settings added in the Cloudflare dashboard when a new version is deployed.
   "keep_vars": true,
-  "vars": { "DATABASE_MODE": "supabase-online" }
+  "vars": { "DATABASE_MODE": "supabase-online" },
+  // Module media files (pictures, sound, video): one shared copy per module (teacher, 2026-10-29).
+  // The teacher creates this bucket in Cloudflare before this is deployed (docs/cloudflare-setup.md).
+  "r2_buckets": [{ "binding": "MODULE_MEDIA", "bucket_name": "codeshare-module-media" }]
 }
