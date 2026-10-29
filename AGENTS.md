@@ -261,3 +261,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   teacher marks them done from the student's module card. `webChecks`/`mediaChecks`/
   `includeMediaOutput` are stored but not checked until a later slice. New web project stays
   separate from modules.
+- A performance task whose starter files are all web files gives a web personal project (agreed
+  2026-10-29): browser preview online and offline, web and `.txt` files, no Program input. Submit
+  still needs a successful run of the exact saved files; success means no uncaught error.

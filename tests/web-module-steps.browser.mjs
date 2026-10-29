@@ -229,6 +229,85 @@ test("web module steps offline: uploads keep checks, teacher preview checks ever
       assert.match(await currentTab(), /Step 3$/, "the student resumes after the teacher-marked step");
     });
 
+    await t.test("Week 2 personal performance-task project (Slice 2): HTML editor and page preview, run, submit, 100%; the teacher reviews the frozen page", async () => {
+      const submit = page.getByRole("button", { name: "Submit this version", exact: true });
+      const ready = page.getByText("Run succeeded — ready to submit this version.", { exact: false });
+      const frame = page.locator(".student-module-project .module-web-preview iframe");
+      const runPage = async () => {
+        const old = await frame.count() ? await frame.elementHandle() : null;
+        await page.getByRole("button", { name: /Run code/ }).click();
+        if (old) await page.waitForFunction((element) => !element.isConnected, old); else await frame.waitFor({ state: "attached" });
+        await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      };
+      const starter = week2.performanceTask.starterFiles[0].content;
+      assert.match(starter, /<\/body>/);
+      const mine = starter.replace("</body>", "<p>My stall sells turon.</p></body>");
+      await openCatalog(week2);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      const projects = page.locator("#classroom-projects");
+      assert.deepEqual(await projects.locator('[aria-label="Weekly web projects"] .team-icon').allTextContents(), ["W", "W"]);
+      await projects.getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      await page.waitForFunction((value) => document.querySelector('.student-module-project .editor-card textarea')?.value === value, starter);
+      assert.match(await page.locator(".student-module-project .workspace-card-heading").first().textContent(), /Personal project.*Web page/);
+      assert.match(await page.locator(".assignment-block").textContent(), /Your own web project, continued from the previous week/);
+      assert.equal(await page.getByLabel("Program input").count(), 0, "web pages have no Program input");
+      assert.equal(await submit.isDisabled(), true);
+      await editor.fill(mine.replace("</body>", "<script>missingFunction()</script></body>"));
+      await runPage();
+      assert.match(await page.locator(".student-module-project").getByRole("alert").first().textContent(), /Uncaught error: .*missingFunction/);
+      assert.equal(await submit.isDisabled(), true, "a page with an uncaught error cannot be submitted");
+      await editor.fill(mine);
+      await runPage();
+      await ready.waitFor();
+      assert.equal(await submit.isEnabled(), true);
+      assert.ok((await progress(week2)).performanceTask.project.successfulRun, "the server recorded the successful run of the saved files");
+      await editor.fill(`${mine}\n<!-- changed -->`);
+      assert.equal(await submit.isDisabled(), true, "an edit after the run needs a new run");
+      await runPage();
+      await ready.waitFor();
+      await submit.click();
+      await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      const saved = await progress(week2);
+      assert.equal(saved.percent, 100);
+      assert.equal(saved.performanceTask.own.files[0].content, `${mine}\n<!-- changed -->`);
+      await page.screenshot({ path: "/tmp/codeshare-web-personal-student.png" });
+
+      // Teacher live help on a web file says Web page and uses the HTML editor (CKB-078).
+      const live = await teacher.newPage(); live.setDefaultTimeout(20000); live.on("pageerror", (e) => errors.push(e.message));
+      await live.goto("/");
+      await live.getByRole("button", { name: /Open class/ }).click();
+      await live.getByRole("button", { name: "Enter classroom" }).click();
+      await live.locator(".classroom-workspace").waitFor();
+      await live.getByRole("button", { name: "Students / projects", exact: true }).hover();
+      await live.locator(".team-select").filter({ hasText: "Web student" }).click();
+      const helping = live.getByRole("region", { name: "Student live project" });
+      await helping.getByText(`Live: Web student · Personal project · ${week2.title}`).waitFor();
+      assert.equal(await helping.locator(".workspace-card-heading span").textContent(), "Web page");
+      await helping.getByRole("textbox", { name: "HTML source code editor", exact: true }).waitFor();
+      await live.close();
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      assert.match(await review.locator(".teacher-module-card", { hasText: "Canteen Descriptions" }).textContent(), /100%/);
+      await review.getByRole("button", { name: "Review personal submission" }).click();
+      const frozen = review.locator(".student-module-project").getByRole("textbox", { name: "HTML source code editor", exact: true });
+      await frozen.waitFor(); assert.equal(await frozen.getAttribute("readonly"), "");
+      assert.match(await frozen.inputValue(), /turon/);
+      assert.equal(await review.getByRole("button", { name: "Save work", exact: true }).count(), 0);
+      assert.equal(await review.getByLabel("Program input").count(), 0);
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      await review.locator(".student-module-project .module-web-preview iframe").waitFor({ state: "attached" });
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week2), saved, "teacher runs never change the student's progress");
+      await review.screenshot({ path: "/tmp/codeshare-web-personal-review.png", fullPage: true });
+      await review.close();
+    });
+
     await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
       const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
       const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],

@@ -95,7 +95,15 @@ What teachers and students can do today. Keep this page current when their use o
   **Required output** and **Your output** side by side on a cross. Parts, the next week and the
   percentage move as for Java. Steps whose expected output lists **Media checks** show **Checked by
   your teacher for now**; the teacher presses **Mark done** under **Checked by you** on the student's
-  module card (**Students → student**). The personal performance-task project for web is not built yet.
+  module card (**Students → student**).
+- **Web personal performance-task project (2026-10-29):** when a module's performance task starts
+  from web files, **Projects** shows **Weekly web projects** (icons **W**) and **Personal
+  performance-task project** opens the HTML editor with the page preview, web names in **＋** and
+  **Rename file** (`.txt` backups allowed) and no **Program input**. **Run code** saves, shows the
+  page and, when it loads without an uncaught error, says **Run succeeded — ready to submit this
+  version.**; **Submit this version** then records Submitted and the last share of the percentage,
+  online and offline. The teacher's **Review personal submission → Run code** shows the frozen page
+  without changing progress. Teacher live help shows **Web page** and web colouring for web files.
 - `previousModuleId` links the preceding week. Module files copy only the previous module project;
   personal files copy only the previous personal working project (or its submitted own version
   for older records). Supporting starter classes are added. Sample-first steps load their own supplied sources on

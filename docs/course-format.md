@@ -242,5 +242,12 @@ evidence, checked by the server against its own expected output and the saved ve
 - **Stored, not checked yet.** `webChecks: [{ "selector", "count"?, "attribute"?, "value"?, "style"? }]`,
   `mediaChecks: [{ "src", "state": "loaded" | "broken" }]` and `includeMediaOutput` (boolean) are kept
   on upload so a later slice can check them. CodeShare does not check them now.
+- **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
+  path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
+  `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
+  no Program input. A run succeeds when the page finishes loading with no uncaught error; there is
+  no expected output. The browser sends the files it ran and the page text; the server accepts this
+  online and offline only for the exact saved files, and **Submit this version** still needs that
+  successful run. Java performance tasks are unchanged.
 - **Week 1 note.** `DotNet1_Week_01.codeshare.json` writes `Visible page text: <text>` on one line, so
   its steps do not match the agreed rule until that file is revised. Weeks 2–3 already match.

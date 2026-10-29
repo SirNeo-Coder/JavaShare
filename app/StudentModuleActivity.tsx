@@ -7,8 +7,8 @@ import { runJava, getJavaRunner } from "./javaExecution";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, projectPathError } from "../backend/src/file-paths";
-import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webStep } from "../backend/src/module-activities";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
+import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 
@@ -80,8 +80,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const personal = activity.kind !== "module";
   const task = !personal && activity.stateId.startsWith("task:");
   const step = activity.module?.lessons?.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === activity.stepId);
-  // Web steps run in the student's own browser preview, online and offline; Java keeps its runners.
-  const web = !personal && Boolean(step && webStep(step));
+  // Web steps and web personal projects run in the student's own browser preview, online and offline; Java keeps its runners.
+  const web = personal ? webPerformanceTask(activity.module) : Boolean(step && webStep(step));
   const teacherChecked = web && Boolean(step && teacherCheckedStep(step));
   const webPage = useWebPageRun();
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
@@ -190,6 +190,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     setLastCheck(null); setSuccessfulFiles(null); setWebResult(null);
     setRunMessage(personal ? "Saving your project…" : "Saving your code on this device…");
     try {
+      if (review && web) { setRunMessage("Running the page…"); setWebResult(await webPage.run(files)); return; }
       if (review) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, stdin, () => setStdin("")); return; }
       if (!personal) await saveDeviceDraft();
       else {
@@ -197,7 +198,12 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         setSavedFiles(JSON.stringify(files));
       }
       setRunMessage(web ? "Running your page…" : "Java is loading or running… Please wait.");
-      if (personal) {
+      if (personal && web) {
+        const result = await webPage.run(files);
+        setWebResult(result);
+        progress.current = await api<Progress>(`${base}/personal-result`, { method: "POST", body: JSON.stringify({ updatedAt: progress.current.updatedAt, success: result.success, files, output: result.output }) });
+        if (result.success) setSuccessfulFiles(JSON.stringify(files));
+      } else if (personal) {
         const started = await api<{ progress: Progress; success?: boolean; output?: string }>(`${base}/personal-run`, {
           method: "POST", body: JSON.stringify({ updatedAt: progress.current.updatedAt, stdin }),
         });
@@ -288,10 +294,11 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
 
   const changeFiles = (next: ModuleFile[]) => { setFiles(next); setSuccessfulFiles(null); };
   const renameFile = () => {
-    const entered = window.prompt("New Java file path", path)?.trim().replace(/\\/g, "/");
+    const entered = window.prompt(web ? "New file path" : "New Java file path", path)?.trim().replace(/\\/g, "/");
     if (!entered || entered === path) return;
-    if (entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered) || files.some((file) => file.path !== path && sourcePath(file.path) === sourcePath(entered))) {
-      setError("Choose a unique Java filename."); return;
+    if (web ? moduleWebPathError(entered) || files.some((file) => file.path === entered)
+      : entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered) || files.some((file) => file.path !== path && sourcePath(file.path) === sourcePath(entered))) {
+      setError(web ? "Choose a unique filename ending in .html, .css, .js or .txt." : "Choose a unique Java filename."); return;
     }
     changeFiles(files.map((file) => file.path === path ? { ...file, path: entered } : file)); setPath(entered);
   };
@@ -300,8 +307,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     event.preventDefault();
     const entered = newPath.trim().replace(/\\/g, "/");
     if (web) {
-      if (files.length >= 50 || projectPathError("web", entered) || files.some((file) => file.path === entered)) {
-        setError("Choose a unique web filename ending in .html, .css or .js, such as about.html (up to 50 files)."); return;
+      // Personal web projects may also keep .txt backups (teacher, 2026-10-29).
+      if (files.length >= 50 || (personal ? moduleWebPathError(entered) : projectPathError("web", entered)) || files.some((file) => file.path === entered)) {
+        setError(`Choose a unique web filename ending in .html, .css${personal ? ", .js or .txt" : " or .js"}, such as about.html (up to 50 files).`); return;
       }
       changeFiles([...files, { path: entered, content: "" }]);
       setPath(entered); setNewPath(""); setAddingFile(false); setError(""); return;
@@ -323,7 +331,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="workspace-card-heading"><b>{review ? "Submitted personal project — read-only" : personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>{web ? "Web page" : "Java"}</span></div>
         <div className="file-tabs" aria-label={personal ? "Personal project files" : "Module project files"}>
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
-          {!review && <button type="button" className="add-file" aria-label={personal ? "Add personal Java file" : web ? "Add module web file" : "Add module Java file"} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>}
+          {!review && <button type="button" className="add-file" aria-label={`Add ${personal ? "personal" : "module"} ${web ? "web" : "Java"} file`} disabled={busy || pendingSample} onClick={() => setAddingFile(!addingFile)}>＋</button>}
         </div>
         <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language={web ? fileLanguage(path) : "java"} readOnly={review || busy || pendingSample || !deviceReady} files={files.map((file) => file.content)} remoteCursors={live?.cursors} onCursorChange={live?.onCursor} onChange={(content) => { changeFiles(files.map((file) => file.path === path ? { ...file, content } : file)); live?.onEdit(path, content); }} />
         <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
@@ -337,7 +345,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
           {personal && !review && <PerformanceTaskSteps steps={activity.module?.performanceTask?.steps} module={activity.module} />}
-          {personal ? <label>Program input<textarea aria-label="Program input" value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
+          {personal && web ? null : personal ? <label>Program input<textarea aria-label="Program input" value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");
             }
@@ -355,7 +363,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         {!personal && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} expectedError={web ? undefined : step?.expectedError} />}
         {web ? <>
           <JavaRunProgress message={runMessage} />
-          <WebCheckList result={webResult} expected={pendingSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked} />
+          {personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
+            : <WebCheckList result={webResult} expected={pendingSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked} />}
           <div className="module-web-preview">{webPage.view ?? <p className="web-preview-empty"><span>Press <b>Run code</b> to see your page here.</span></p>}</div>
         </> : <>
           <JavaRunnerBrand />
