@@ -9,12 +9,12 @@ const { RunBox, NoticeBox } = tsxRequire("../app/StudentModuleActivity.tsx", imp
 const runBox = (message, onCancel) => renderToStaticMarkup(createElement(RunBox, { message, onCancel }));
 const noticeBox = (notice) => renderToStaticMarkup(createElement(NoticeBox, { notice, onClose() {} }));
 
-test("run box (CKB-080): hidden when nothing is running", () => {
+test("run box (CKB-081): hidden when nothing is running", () => {
   assert.equal(runBox(null), "");
   assert.equal(runBox(null, () => {}), "");
 });
 
-test("run box (CKB-080): a run that cannot be stopped says to wait and offers no cancel", () => {
+test("run box (CKB-081): a run that cannot be stopped says to wait and offers no cancel", () => {
   const html = runBox("Java is loading or running… Please wait.");
   assert.match(html, /role="dialog" aria-modal="true"/);
   assert.ok(html.includes("<h2 id=\"run-box-title\">Java is loading or running… Please wait.</h2>"));
@@ -22,13 +22,13 @@ test("run box (CKB-080): a run that cannot be stopped says to wait and offers no
   assert.doesNotMatch(html, /Click outside/);
 });
 
-test("run box (CKB-080): a run that can be stopped says clicking outside or Esc cancels", () => {
+test("run box (CKB-081): a run that can be stopped says clicking outside or Esc cancels", () => {
   const html = runBox("Java is loading or running… Please wait.", () => {});
   assert.match(html, /Click outside this box or press Esc to cancel\./);
   assert.doesNotMatch(html, /this box closes when your code has run/);
 });
 
-test("notice box (CKB-080): Save work and Submit this version confirmations, and failures", () => {
+test("notice box (CKB-081): Save work and Submit this version confirmations, and failures", () => {
   assert.equal(noticeBox(null), "");
   const saved = noticeBox({ title: "Work saved", text: "Your project is saved to CodeShare." });
   assert.match(saved, /role="alertdialog"/);
@@ -41,7 +41,7 @@ test("notice box (CKB-080): Save work and Submit this version confirmations, and
   assert.match(failed, /Network down/);
 });
 
-test("run box and notices (CKB-080): both editors show the run box; Save work and Submit confirm", async () => {
+test("run box and notices (CKB-081): both editors show the run box; Save work and Submit confirm", async () => {
   const moduleEditor = await readFile(new URL("../app/StudentModuleActivity.tsx", import.meta.url), "utf8");
   const regular = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   // Module/personal: closes once Java runs; only an in-browser run (javaConsole.active) can be cancelled.

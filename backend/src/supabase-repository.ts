@@ -1,4 +1,4 @@
-import { paperPerformanceTask, personalProjectFiles, type PersonalSubmission } from "./personal-performance.ts";
+import { paperPerformanceTask, personalProjectFiles, type PersonalMedia, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
 import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
@@ -1230,7 +1230,7 @@ type ModulePerformanceEntry = PersonalSubmission;
 type ModuleProgressRow = {
   student_id: string; classroom_id: string; module_id: string;
   step_states: Record<string, ModuleStepStatus>;
-  performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>> & { project?: { files: ModuleFile[]; successfulRun?: string } };
+  performance_task: Partial<Record<ModulePerformanceVariant, ModulePerformanceEntry>> & { project?: { files: ModuleFile[]; media?: PersonalMedia[]; successfulRun?: string } };
   project_files: Array<{ path: string; content: string }>;
   activity_projects?: ActivityProjects;
   updated_at: string;
@@ -1359,6 +1359,7 @@ export async function setSupabaseModulePerformanceTask(
   if (paperPerformanceTask(courseRow.content)) throw new SupabaseRepositoryError(400, "Submit this proposal on paper to your teacher");
   const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
   if (!activityAccess(courseRow.content, progress.step_states).performanceTaskOpen) throw new SupabaseRepositoryError(403, "Complete the module activities before the performance task");
+  let replacedMedia: string[] = [];
   const data = await updateModuleProgressWithMerge(
     user, classroomId, moduleId,
     (row) => {
@@ -1368,13 +1369,15 @@ export async function setSupabaseModulePerformanceTask(
         if (!updatedAt || !project?.successfulRun || project.successfulRun !== personalFilesHash(project.files) || personalFilesHash(files) !== project.successfulRun) {
           throw new SupabaseRepositoryError(409, "Run the current personal files successfully before submitting");
         }
-        return { performance_task: { ...row.performance_task, own: { id: randomBytes(16).toString("hex"), files: project.files,
+        replacedMedia = row.performance_task.own?.media?.map((item) => item.id) ?? [];
+        return { performance_task: { ...row.performance_task, own: { id: randomBytes(16).toString("hex"), files: project.files, media: project.media,
           status: "pass", submittedAt: new Date().toISOString(), checklist: [...courseRow.content.performanceTask!.checklist] } } };
       }
       return { performance_task: { ...row.performance_task, [variant]: { files, status, submittedAt: new Date().toISOString() } } };
     },
     "Could not save performance task submission",
   );
+  await dropUnusedStudentMedia(classroomId, user.id, replacedMedia);
   return moduleProgressView(data, courseRow.content);
 }
 
@@ -1417,9 +1420,9 @@ export async function prepareSupabasePerformanceProject(user: SupabaseSessionUse
     }
   }
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
-    const files = personalProjectFiles(content.performanceTask!.starterFiles, previous, row.performance_task);
+    const { files, media } = personalProjectFiles(content.performanceTask!.starterFiles, previous, row.performance_task);
     if (files.length > 50 || files.some((file) => personalPathError(web, file.path))) throw new SupabaseRepositoryError(400, `This performance task needs at most 50 valid ${web ? "web" : "Java"} files`);
-    return { performance_task: { ...row.performance_task, project: { ...row.performance_task.project, files } } };
+    return { performance_task: { ...row.performance_task, project: { ...row.performance_task.project, files, media } } };
   }, "Could not open your personal project");
   return moduleProgressView(saved, content);
 }
@@ -1429,7 +1432,7 @@ export async function saveSupabasePerformanceProject(user: SupabaseSessionUser, 
   if (files.some((file) => personalPathError(webPerformanceTask(content), file.path))) throw new SupabaseRepositoryError(400, "These files do not belong to this personal project");
   const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "This personal project changed in another tab. Reopen it before saving");
-    return { performance_task: { ...row.performance_task, project: { files } } };
+    return { performance_task: { ...row.performance_task, project: { files, media: row.performance_task.project?.media } } };
   }, "Could not save your personal project");
   return moduleProgressView(saved, content);
 }
@@ -1460,7 +1463,7 @@ export async function recordSupabasePersonalRun(user: SupabaseSessionUser, class
     if (row.updated_at !== updatedAt || !project || (page && personalFilesHash(page.files) !== personalFilesHash(project.files))) {
       throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
     }
-    return { performance_task: { ...row.performance_task, project: { files: project.files, ...(success ? { successfulRun: personalFilesHash(project.files) } : {}) } } };
+    return { performance_task: { ...row.performance_task, project: { files: project.files, media: project.media, ...(success ? { successfulRun: personalFilesHash(project.files) } : {}) } } };
   }, "Could not save the personal run result");
   return moduleProgressView(saved, content);
 }
@@ -1862,7 +1865,7 @@ async function loadModuleSummaries(classroomId: string): Promise<ModuleSummaryRo
 type MediaObject = { key: string; size: number; etag: string };
 type MediaBucket = {
   list(options: { prefix: string; limit?: number }): Promise<{ objects: MediaObject[] }>;
-  get(key: string): Promise<{ body: ReadableStream } | null>;
+  get(key: string): Promise<{ body: ReadableStream; httpMetadata?: { contentType?: string } } | null>;
   put(key: string, value: ArrayBuffer | Uint8Array, options: { httpMetadata: { contentType: string } }): Promise<unknown>;
   delete(key: string): Promise<void>;
 };
@@ -1874,7 +1877,7 @@ async function mediaBucket() {
 }
 async function requireMediaBucket() {
   const bucket = await mediaBucket();
-  if (!bucket) throw new SupabaseRepositoryError(503, "Module media files are only available online");
+  if (!bucket) throw new SupabaseRepositoryError(503, "Pictures, sound and video files are only available online");
   return bucket;
 }
 const mediaPrefix = (classroom: Pick<ClassroomRow, "teacher_id" | "module_subject">, moduleId: string) => `${classroom.teacher_id}/${classroom.module_subject}/${moduleId}/`;
@@ -1922,6 +1925,73 @@ export async function deleteSupabaseModuleMedia(user: SupabaseSessionUser, class
   await teacherClassroom(user, classroomId);
   await (await requireMediaBucket()).delete(await moduleMediaPrefix(classroomId, moduleId) + mediaPath(path));
   return listSupabaseModuleMedia(user, classroomId, moduleId);
+}
+
+// Students' own media in web personal projects (teacher, 2026-10-29): same bucket, one folder per student
+// and class, a new copy per upload. The project's media list is changed only by these functions, and each
+// change drops the earlier successful run, so Submit this version needs a run with the current media.
+const PERSONAL_MEDIA_MAX = 10;
+const studentMediaKey = (classroomId: string, studentId: string, id: string) => `students/${classroomId}/${studentId}/${id}`;
+
+async function requirePersonalWebProject(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  const { content } = await requirePerformanceProject(user, classroomId, moduleId);
+  if (!webPerformanceTask(content)) throw new SupabaseRepositoryError(400, "Media files belong to web personal projects");
+  return { content, bucket: await requireMediaBucket() };
+}
+
+export async function putSupabasePersonalMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string, path: string, bytes: Uint8Array) {
+  const contentType = mediaPathType(mediaPath(path))!;
+  const { content, bucket } = await requirePersonalWebProject(user, classroomId, moduleId);
+  const id = randomBytes(16).toString("hex");
+  await bucket.put(studentMediaKey(classroomId, user.id, id), bytes, { httpMetadata: { contentType } });
+  let replaced: string[] = [];
+  const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
+    const project = row.performance_task.project;
+    if (!project) throw new SupabaseRepositoryError(409, "Open your personal project before adding media files");
+    const kept = (project.media ?? []).filter((item) => item.path !== path);
+    if (kept.length >= PERSONAL_MEDIA_MAX) throw new SupabaseRepositoryError(400, `A personal project holds at most ${PERSONAL_MEDIA_MAX} media files`);
+    replaced = (project.media ?? []).filter((item) => item.path === path).map((item) => item.id);
+    return { performance_task: { ...row.performance_task, project: { files: project.files, media: [...kept, { path, id, size: bytes.length }] } } };
+  }, "Could not add the media file").catch(async (error) => {
+    await bucket.delete(studentMediaKey(classroomId, user.id, id));
+    throw error;
+  });
+  await dropUnusedStudentMedia(classroomId, user.id, replaced);
+  return moduleProgressView(saved, content);
+}
+
+export async function deleteSupabasePersonalMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string, path: string) {
+  const { content } = await requirePersonalWebProject(user, classroomId, moduleId);
+  let removed: string[] = [];
+  const saved = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
+    const project = row.performance_task.project;
+    removed = (project?.media ?? []).filter((item) => item.path === path).map((item) => item.id);
+    if (!project || !removed.length) throw new SupabaseRepositoryError(404, "Media file not found");
+    return { performance_task: { ...row.performance_task, project: { files: project.files, media: project.media!.filter((item) => item.path !== path) } } };
+  }, "Could not remove the media file");
+  await dropUnusedStudentMedia(classroomId, user.id, removed);
+  return moduleProgressView(saved, content);
+}
+
+// The student themself, or their class's teacher (for Review personal submission).
+export async function readSupabasePersonalMedia(user: SupabaseSessionUser, classroomId: string, studentId: string, id: string) {
+  if (user.role === "student" && user.id === studentId) await requireClassroomMember(user, classroomId);
+  else await teacherStudentWorkspace(user, classroomId, studentId);
+  if (!/^[0-9a-f]{32}$/.test(id)) throw new SupabaseRepositoryError(404, "Media file not found");
+  const object = await (await requireMediaBucket()).get(studentMediaKey(classroomId, studentId, id));
+  if (!object) throw new SupabaseRepositoryError(404, "Media file not found");
+  return { body: object.body, contentType: object.httpMetadata?.contentType ?? "application/octet-stream" };
+}
+
+// A copy goes only when no project or submission of this student in this class still uses it
+// (media carries forward to later weeks with the personal files).
+async function dropUnusedStudentMedia(classroomId: string, studentId: string, ids: string[]) {
+  const bucket = ids.length ? await mediaBucket() : null;
+  if (!bucket) return;
+  const { data, error } = await getSupabaseAdmin().from("module_progress").select("performance_task").eq("student_id", studentId).eq("classroom_id", classroomId);
+  fail(error, "Could not check media files in use");
+  const used = JSON.stringify(data);
+  for (const id of ids) if (!used.includes(id)) await bucket.delete(studentMediaKey(classroomId, studentId, id));
 }
 
 async function moduleClassroom(classroomId: string) {

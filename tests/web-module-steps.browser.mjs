@@ -377,6 +377,84 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
+    await t.test("Week 3 personal project: the student adds their own pictures, sound and video; Run shows them; Submit freezes them; the teacher's review shows them", async (st) => {
+      const week3 = weeks[2], steps3 = stepsOf(week3);
+      if ((await student.request.get(`/api/classrooms/${classroomId}/modules/${week3.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server"); return; }
+      const mediaRoot = join(folder, "Week_03", "project_end");
+      // Week 3's starter page already uses these four files; the student adds three, then the fourth.
+      const own = ["images/snacks.svg", "audio/chime.wav", "video/canteen.webm", "images/counter.svg"];
+      if (!own.every((path) => existsSync(join(mediaRoot, path)))) { st.skip(`media files not found in ${mediaRoot}`); return; }
+      // The module steps are checked elsewhere; mark them done so the personal task opens.
+      const states = (await progress(week3)).stepStates;
+      assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps3.map((step) => [activityStateId(step), "pass"])) } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week3.id)).error, null);
+      const submit = page.getByRole("button", { name: "Submit this version", exact: true });
+      const ready = page.getByText("Run succeeded — ready to submit this version.", { exact: false });
+      const frame = page.locator(".student-module-project .module-web-preview iframe");
+      const runPage = async () => {
+        const old = await frame.count() ? await frame.elementHandle() : null;
+        await page.getByRole("button", { name: /Run code/ }).click();
+        if (old) await page.waitForFunction((element) => !element.isConnected, old); else await frame.waitFor({ state: "attached" });
+        await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      };
+      // What the preview shows: whether each picture, sound and video came with the page (data:), and whether pictures draw.
+      const shownMedia = async (where) => {
+        const inside = await (await where.locator(".student-module-project .module-web-preview iframe").elementHandle()).contentFrame();
+        await inside.waitForFunction(() => document.querySelector("img")?.complete && document.querySelector("video")?.readyState >= 2 && document.querySelector("audio")?.readyState >= 2);
+        await inside.evaluate(() => document.querySelector("img").scrollIntoView());
+        return inside.evaluate(() => [...document.querySelectorAll("img,audio,video")].map((element) => `${element.getAttribute("data-codeshare-src") ?? element.getAttribute("src")}: ${element.src.startsWith("data:") ? "from the page" : "not found"}${element.tagName === "IMG" ? `, ${element.naturalWidth > 0 ? "drawn" : "broken"}` : ""}`));
+      };
+      const starter = week3.performanceTask.starterFiles[0].content;
+      const mine = starter.replace("Describe your own silent video here.", "Our canteen at lunch time.");
+      assert.notEqual(mine, starter);
+      await openCatalog(week3);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, starter);
+      const box = page.locator(".student-module-project").getByRole("region", { name: "Media files" });
+      await box.getByText("No media files yet.").waitFor();
+      await box.getByLabel("Add media files").setInputFiles(own.slice(0, 3).map((path) => join(mediaRoot, path)));
+      await box.getByText("video/canteen.webm").waitFor();
+      assert.deepEqual((await box.locator("li").allTextContents()).map((line) => line.split(" · ")[0]), own.slice(0, 3));
+      await editor.fill(mine);
+      await runPage();
+      await ready.waitFor();
+      assert.deepEqual(await shownMedia(page), ["images/snacks.svg: from the page, drawn", "images/counter.svg: not found, broken", "audio/chime.wav: from the page", "video/canteen.webm: from the page"]);
+      await box.getByLabel("Add media files").setInputFiles(join(mediaRoot, own[3]));
+      await box.getByText("images/counter.svg").waitFor();
+      await page.getByText("Run the current files successfully before submitting.", { exact: false }).waitFor();
+      assert.equal(await submit.isDisabled(), true, "adding a media file needs a new run before submitting");
+      await runPage();
+      await ready.waitFor();
+      const allShown = ["images/snacks.svg: from the page, drawn", "images/counter.svg: from the page, drawn", "audio/chime.wav: from the page", "video/canteen.webm: from the page"];
+      assert.deepEqual(await shownMedia(page), allShown);
+      await submit.click();
+      await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      const saved = await progress(week3);
+      assert.deepEqual(saved.performanceTask.own.media.map((item) => item.path), own);
+      assert.equal(saved.percent, 100);
+      await box.scrollIntoViewIfNeeded();
+      await box.screenshot({ path: "/tmp/codeshare-web-student-media-box.png" });
+      await page.locator(".student-module-project .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media.png" });
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      await review.locator(".teacher-module-card", { hasText: "Local Canteen Media" }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".student-module-project").getByRole("textbox", { name: "HTML source code editor", exact: true }).waitFor();
+      assert.equal(await review.locator(".student-module-project").getByRole("region", { name: "Media files" }).count(), 0, "the review cannot add or remove media");
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      assert.deepEqual(await shownMedia(review), allShown, "the review shows the student's submitted media");
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week3), saved, "teacher runs never change the student's progress");
+      await review.locator(".student-module-project .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media-review.png" });
+      await review.close();
+    });
+
     await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
       const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
       const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],

@@ -108,7 +108,7 @@ export type Progress = {
   // Covers both step blocks and a lesson's exitSlip, keyed by whichever's own "id" - one flag
   // per module couldn't tell lessons apart (CKB-007).
   stepStates: Record<string, StepStatus>;
-  performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>>;
+  performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>> & { project?: { media?: import("../backend/src/personal-performance").PersonalMedia[] } };
 };
 
 type Props = { studentId?: string; onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
@@ -201,12 +201,12 @@ export function ModulePaperBlock({ block }: { block: OtherBlock }) {
   </div>;
 }
 
-// The teacher's media files for a module: one shared copy in Cloudflare R2 for every class in this
-// subject. Each file goes in images/, audio/ or video/ by its type (teacher, 2026-10-29).
-function ModuleMediaFiles({ classroomId, moduleId, files, onChange }: { classroomId: string; moduleId: string; files: MediaFile[]; onChange: (files: MediaFile[]) => void }) {
+// The teacher's module media (one shared copy in Cloudflare R2 for every class in this subject), and a
+// student's own media in a web personal project. Each file goes in images/, audio/ or video/ by its type
+// (teacher, 2026-10-29). base: the upload route; onChange gets each upload's or removal's reply.
+export function ModuleMediaFiles<T>({ base, files, note, onChange }: { base: string; files: Array<{ path: string; size: number }>; note: string; onChange: (result: T) => void }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const base = `/api/classes/${classroomId}/modules/${moduleId}/media`;
   const upload = async (chosen: FileList | null) => {
     setBusy(true); setMessage("");
     try {
@@ -215,20 +215,20 @@ function ModuleMediaFiles({ classroomId, moduleId, files, onChange }: { classroo
         const type = mediaPathType(path);
         if (!type) throw new Error(`${file.name}: use a picture, sound or video file whose name has only letters, numbers, - and _`);
         if (file.size > MEDIA_LIMIT) throw new Error(`${file.name} is larger than 5 MB`);
-        onChange((await api<{ files: MediaFile[] }>(`${base}/${path}`, { method: "PUT", body: file, headers: { "Content-Type": type } })).files);
+        onChange(await api<T>(`${base}/${path}`, { method: "PUT", body: file, headers: { "Content-Type": type } }));
       }
     } catch (uploadError) { setMessage(uploadError instanceof Error ? uploadError.message : "Could not upload"); }
     finally { setBusy(false); }
   };
   const remove = async (path: string) => {
     setBusy(true); setMessage("");
-    try { onChange((await api<{ files: MediaFile[] }>(`${base}/${path}`, { method: "DELETE" })).files); }
+    try { onChange(await api<T>(`${base}/${path}`, { method: "DELETE" })); }
     catch (removeError) { setMessage(removeError instanceof Error ? removeError.message : "Could not remove"); }
     finally { setBusy(false); }
   };
   return <section className="module-media-files" aria-label="Media files">
     <b>Media files</b>
-    <p>Pictures, sound and video for this module&apos;s media steps, shared by your classes in this subject (5 MB each). Until you add them, those steps say &quot;Checked by your teacher for now&quot;. Online only.</p>
+    <p>{note}</p>
     {files.length ? <ul>{files.map((file) => <li key={file.path}>{file.path} · {Math.ceil(file.size / 1024)} KB <button type="button" disabled={busy} onClick={() => void remove(file.path)}>Remove</button></li>)}</ul> : <p>No media files yet.</p>}
     <label>Add media files <input type="file" multiple accept="image/*,audio/*,video/*" disabled={busy} onChange={(event) => { void upload(event.target.files); event.target.value = ""; }} /></label>
     {message && <p role="alert">{message}</p>}
@@ -433,7 +433,8 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   return (
     <div className="module-content">
       {role === "teacher" && <p className="module-preview-note">Teacher preview — students unlock parts by completing their activities. Running sample code does not save student progress.</p>}
-      {role === "teacher" && mediaModule && <ModuleMediaFiles classroomId={classroomId} moduleId={module.id} files={mediaFiles} onChange={setMediaFiles} />}
+      {role === "teacher" && mediaModule && <ModuleMediaFiles<{ files: MediaFile[] }> base={`/api/classes/${classroomId}/modules/${module.id}/media`} files={mediaFiles} onChange={(result) => setMediaFiles(result.files)}
+        note={'Pictures, sound and video for this module\'s media steps, shared by your classes in this subject (5 MB each). Until you add them, those steps say "Checked by your teacher for now". Online only.'} />}
       {role === "student" && (
         <div className="activity-progress module-goal-meter">
           <div><span>Module progress</span><b>{progress.percent}%</b></div>

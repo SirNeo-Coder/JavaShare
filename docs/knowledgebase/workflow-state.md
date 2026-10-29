@@ -53,7 +53,7 @@ What teachers and students can do today. Keep this page current when their use o
   does not change sample completion, personal submission or offline input-before-Run behavior.
 - The text is announced for accessibility. Reduced motion keeps the indicator visible without spinning.
 
-## Run box and save/submit confirmations (2026-10-29, CKB-080)
+## Run box and save/submit confirmations (2026-10-29, CKB-081)
 
 - **Run code** (module project, personal project and the regular Code editor, Ctrl+Enter too) opens a
   floating **RUN CODE** box with a spinner and the current message while the code saves and compiles.
@@ -131,6 +131,13 @@ What teachers and students can do today. Keep this page current when their use o
   version.**; **Submit this version** then records Submitted and the last share of the percentage,
   online and offline. The teacher's **Review personal submission → Run code** shows the frozen page
   without changing progress. Teacher live help shows **Web page** and web colouring for web files.
+- **Students' own media in web personal projects (2026-10-29, online):** the Console of a web
+  **Personal performance-task project** has **Media files** → **Add media files** (pictures, sound,
+  video; 5 MB each, up to 10) and **Remove**. Each file is listed with the path to use in the page,
+  e.g. `images/photo.png`; **Run code** shows them in the page. Adding or removing one clears **Run
+  succeeded**, so the student runs again before **Submit this version**; the submission keeps the
+  media it was submitted with, and **Review personal submission → Run code** shows them to the
+  teacher. Offline, adding media says it is only available online.
 - `previousModuleId` links the preceding week. Module files copy only the previous module project;
   personal files copy only the previous personal working project (or its submitted own version
   for older records). Supporting starter classes are added. Sample-first steps load their own supplied sources on

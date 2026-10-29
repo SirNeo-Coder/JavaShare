@@ -41,6 +41,9 @@ import {
   readSupabaseModuleMedia,
   putSupabaseModuleMedia,
   deleteSupabaseModuleMedia,
+  putSupabasePersonalMedia,
+  deleteSupabasePersonalMedia,
+  readSupabasePersonalMedia,
   runSupabaseModuleActivity,
   recordSupabaseModuleActivityResult,
   getSupabaseStudentWebProject,
@@ -770,6 +773,27 @@ app.put("/api/classes/:classroomId/modules/:moduleId/media/:folder/:name", requi
 app.delete("/api/classes/:classroomId/modules/:moduleId/media/:folder/:name", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
   try { return res.json(await deleteSupabaseModuleMedia(req.user!, ...mediaParams(req))); }
   catch (error) { next(error); }
+});
+
+// Students' own media in web personal projects (teacher, 2026-10-29). Read by the student and their class teacher.
+const personalMedia = (req: AuthedRequest) => [String(req.params.classroomId), String(req.params.moduleId), `${req.params.folder}/${req.params.name}`] as const;
+app.put("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-project/media/:folder/:name", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: "Choose a picture, sound or video file" });
+    return res.json(await putSupabasePersonalMedia(req.user!, ...personalMedia(req), req.body));
+  } catch (error) { next(error); }
+});
+
+app.delete("/api/classrooms/:classroomId/modules/:moduleId/progress/performance-project/media/:folder/:name", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await deleteSupabasePersonalMedia(req.user!, ...personalMedia(req))); }
+  catch (error) { next(error); }
+});
+
+app.get("/api/classrooms/:classroomId/students/:studentId/personal-media/:id", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const file = await readSupabasePersonalMedia(req.user!, String(req.params.classroomId), String(req.params.studentId), String(req.params.id));
+    return res.send(file.body, file.contentType);
+  } catch (error) { next(error); }
 });
 
 app.put("/api/classes/:classroomId/students/:studentId/modules/:moduleId/teacher-check", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {

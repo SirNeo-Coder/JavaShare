@@ -57,7 +57,7 @@ output text. Input waiting replaces its loading/running wording; success, failur
 it. Only the output pre is marked busy, leaving the status outside that accessibility boundary.
 Web previews, saved-work lists and plain Save work do not show Java progress.
 
-`RunBox` and `NoticeBox` (exported from `StudentModuleActivity.tsx`, CKB-080) reuse the
+`RunBox` and `NoticeBox` (exported from `StudentModuleActivity.tsx`, CKB-081) reuse the
 `confirm-overlay`/`confirm-card` styles. `RunBox` shows while a run message is set and
 `useJavaConsole().running` is false (that flag turns on at the runner's "Running Java" stage);
 it gets `onCancel` only while `useJavaConsole().active` (an in-browser run that `stop()` can abort).

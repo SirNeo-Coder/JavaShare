@@ -125,11 +125,15 @@ steps then stay **Mark done** as before.
 6. In **codeshare → Logs**, look for `exceededCpu` or errors on `.../media/...` and
    `progress/complete` (CKB-065 steps).
 
+Students' own pictures, sound and video in web personal projects (2026-10-29) use the same bucket
+(folder `students/`). There is nothing new to create or set.
+
 ## Free plan limits (as of October 2026)
 
 - **R2 (module media):** 10 GB of storage, 1 million uploads/changes and 10 million downloads a month,
   and no charge for data sent (Cloudflare's R2 pricing page, 2026-10-29). Each file a student
   downloads is also one CodeShare request; each device keeps a module's files after the first download.
+  Students' own media counts towards the same amounts (5 MB per file, at most 10 per personal project).
 
 - **Cloudflare Workers Free:** 100,000 requests a day, and the packed app must be under 3 MB compressed. CodeShare's is about 1.2 MB.
 - **Pictures, styles and scripts** are served as static files and don't count towards the request limit.

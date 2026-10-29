@@ -174,6 +174,16 @@ has media files and the evidence `media` lines pass `mediaLinesPass(step.mediaCh
 adds `teacherChecks` per student module. `.../progress/run` and `.../progress/browser-result`
 remain Java-only (web never runs on the server; the browser-result route has no app caller).
 
+Students' own media in web personal projects (2026-10-29): `PUT`/`DELETE /api/classrooms/:classroomId/
+modules/:moduleId/progress/performance-project/media/:folder/:name` (the student; raw body up to 5 MB,
+at most 10 per project) store a new copy under `students/<class>/<student>/<id>` in the same R2 bucket
+and change `performance_task.project.media` `[{ path, id, size }]` (returned inside
+`performanceTask`), dropping the earlier successful run. Submitting copies the list into
+`own.media`. `GET /api/classrooms/:classroomId/students/:studentId/personal-media/:id` streams a copy to
+that student or their class teacher. A replaced or removed copy is deleted when no project or
+submission of that student in that class still names it. Every media file response carries
+`X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`.
+
 Personal performance workflow (2026-10-23): `POST .../progress/personal-run` invalidates earlier
 run evidence and uses saved personal files; offline executes laptop Java, online returns the
 saved version for browser execution. `POST .../progress/personal-result` accepts browser success
