@@ -729,6 +729,10 @@ Sources list of every reference as clickable links. Then the Week 5 prompt.
   Week 3 media steps teacher-checked and marked done. Before the revision, the same test on the old files
   passed 13 + 1 skipped, and on a scratch sample-first copy 9 + 5 skipped. Suite 409/409, lint 0 errors.
 - 2026-10-29 — App task delivered as [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72) against main.
+- 2026-10-29 — PR #72 merged (`cedeb99`), after PR #71 (`e876f59`). Removed a stale duplicate CKB-080 row
+  from `problem-index.md` (the run-box case, renumbered CKB-081 in PR #70, came back through a merge with a
+  dead link). Both lists conflict whenever two open PRs each add a row at the bottom: merge main in and
+  keep both rows.
 - 2026-10-29 — Weeks 1–3 revised in the teacher's folder (approved; see "Weeks 1–3 revision (done)"): JSON
   sample-first with 22 tasks and linked weeks, task pages after page 8, Week 1 line break, DLL lines. Teacher's
   checkers: samples and all 22 answers pass, unchanged samples fail 22/22. Found CKB-084. CodeShare browser
