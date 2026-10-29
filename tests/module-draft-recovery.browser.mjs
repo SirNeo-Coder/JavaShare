@@ -72,7 +72,10 @@ for (const mode of ["online", "offline"]) test(`module draft recovery ${mode}`, 
         read.onsuccess = () => { resolve(read.result); db.close(); }; read.onerror = () => reject(read.error); };
       request.onerror = () => reject(request.error);
     }), deviceKey);
-    const save = async () => { await page.getByRole("button", { name: "Save work", exact: true }).click(); await page.waitForFunction(() => !document.querySelector('.actionbar button:last-child')?.disabled); };
+    const save = async () => {
+      await page.getByRole("button", { name: "Save work", exact: true }).click(); await page.waitForFunction(() => !document.querySelector('.actionbar button:last-child')?.disabled);
+      await page.getByRole("alertdialog", { name: "Work saved" }).getByRole("button", { name: "OK" }).click();
+    };
 
     await t.test("expected-error verification and unfinished code survive reopening", async () => {
       await open(); await run();

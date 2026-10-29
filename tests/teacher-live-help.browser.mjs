@@ -105,6 +105,7 @@ test("teacher live help: watch and edit a student's projects only while selected
     await t.test("switching to the module project switches the teacher's view", async () => {
       await student.getByRole("button", { name: "Save work", exact: true }).click();
       await student.getByText("Your project is saved", { exact: true }).waitFor();
+      await student.getByRole("alertdialog", { name: "Work saved" }).getByRole("button", { name: "OK" }).click();
       await student.getByRole("button", { name: "Projects", exact: true }).hover();
       await student.locator("#classroom-projects").getByRole("button", { name: "Module project", exact: true }).click();
       await teacherPage.getByText(`Live: Live student · Module project · ${fixture.title}`).waitFor();

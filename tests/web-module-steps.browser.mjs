@@ -404,6 +404,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await ready.waitFor();
       await submit.click();
       await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
       const saved = await progress(week2);
       assert.equal(saved.percent, 100);
       assert.equal(saved.performanceTask.own.files[0].content, `${mine}\n<!-- changed -->`);
