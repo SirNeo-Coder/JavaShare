@@ -179,3 +179,53 @@ errors; every web route answered 200 except the intended 400 refusal of a media 
 (`progress/complete`, `performance-project`, `personal-result`, `performance-task` included).
 Logged times are total request times on this laptop, not CPU time: this does **not** show the hosted
 free plan's 10 ms CPU limit (CKB-065) is met. Only the hosted Worker logs can.
+
+# Slice 3a — page-element checks (`webChecks`) (2026-10-29)
+
+Branch `feature/web-checks`. Approved with the recommended choice: checks apply to the step's own
+sample only. Online first (teacher, 2026-10-29); offline ran only as the existing safety net.
+
+## Commands and results
+
+- `npm run build:all` — passes. Lint (`npx eslint . --ignore-pattern .next --ignore-pattern
+  backend/dist --ignore-pattern .claude --ignore-pattern .open-next`) — 0 errors, 8 existing warnings.
+- `npm test` — 394 tests, 394 pass, 0 fail, 0 skipped.
+- `node --test --test-reporter=spec tests/web-module-steps.test.mjs` — 25/25. New:
+  - ✔ page-element checks: one line per check, read like the teacher's checker
+  - ✔ page-element checks apply to the step's own sample, not to an alteration task
+  - ✔ the preview carries the step's checks into the page safely and reports them with the page text
+  - ✔ offline, a wrong page or an uncaught error is refused and a matching page completes the step
+    (now also: a failed page check and a missing page report are refused)
+- `tests/web-module-steps.browser.mjs` (real app, Chromium, teacher's Weeks 1–3):
+  - online settings (port 3043, browser mode): 11/11
+  - Cloudflare runtime (`opennextjs-cloudflare preview`, port 8787, local Supabase): 11/11, log clean
+  - offline settings (port 3042, safety net): 11/11
+  - ✔ Week 2 Step 1: … a failed page check shows what was found, then the sample passes —
+    `lang="fil"` keeps the page text (✓ Page text matches) but shows ✗ html has lang="en" — found fil,
+    no output comparison, Not completed, no pass saved.
+
+## Per-step results with each step's own sample (teacher preview, online and Cloudflare runtime)
+
+- Week 1, 8 steps: fail on the page text (known same-line format; deferred revision). No `webChecks`.
+- Week 2: Step 1 pass (page text + 1 page check); Steps 2–7 pass (page text + 6 page checks each).
+- Week 3: Step 1 pass (page text + 6 page checks); Steps 2–7 teacher-checked (`Media checks:`), so
+  their 36 page checks wait for Slice 3b.
+
+## Break-and-restore proofs
+
+| Break | Result broken | Restored |
+| --- | --- | --- |
+| Server stops comparing page checks | route subtest fails (failed page check accepted) | 25/25 |
+| `checkModuleRun` ignores page checks for the step's own sample | rule test fails | 25/25 |
+| Attribute check compares nothing | rule test and route subtest fail | 25/25 |
+| Page stops reporting its checks (unit) | preview test fails | 25/25 |
+| Page stops reporting its checks, rebuilt, online server | every checked step crosses ("found nothing"); 7 browser tests fail | 11/11 |
+
+Found while writing the tests, before delivery: an `attribute`/`style` check without `value` passed
+when the report omitted the field; the rule now requires `value` (the checker always fails it).
+
+## Not tested
+
+- The hosted site (teacher's check after deploy).
+- Firefox, Safari, phones: computed styles may be reported differently.
+- `sampleFirst` + `activity.id` web steps with real files (none exist); covered by rule tests only.

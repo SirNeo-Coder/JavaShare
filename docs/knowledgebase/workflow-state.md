@@ -92,7 +92,10 @@ What teachers and students can do today. Keep this page current when their use o
   same **Module project** with the HTML/CSS/JavaScript editor, `index.html` first, and the sandboxed
   page preview in place of the Java console. **Run code** checks the page in the student's browser,
   online and offline, and shows a checklist (**Page text matches** / **Console output matches**) with
-  **Required output** and **Your output** side by side on a cross. Parts, the next week and the
+  **Required output** and **Your output** side by side on a cross. Since 2026-10-29 each
+  `webChecks` entry adds a line (**Page has 1 h1**, **html has lang="en"**, …) with what was found on a
+  cross; the step completes only when every line is ticked (also on the teacher's **Run** in
+  **View module details**). Parts, the next week and the
   percentage move as for Java. Steps whose expected output lists **Media checks** show **Checked by
   your teacher for now**; the teacher presses **Mark done** under **Checked by you** on the student's
   module card (**Students → student**).

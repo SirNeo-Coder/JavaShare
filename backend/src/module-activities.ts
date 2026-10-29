@@ -107,12 +107,34 @@ export function unchangedSample(files: ModuleFile[], sample: ModuleFile[]) {
   return sample.every((file) => files.some((saved) => sourcePath(saved.path) === sourcePath(file.path) && saved.content === file.content));
 }
 
+export type WebCheck = { selector: string; count?: number; attribute?: string; value?: string; style?: string };
+// What the page reported for one check; null when the selector could not be used.
+export type WebCheckSeen = { count: number; attribute?: string | null; style?: string | null } | null;
+
+// One line per page-element check, read like the teacher's course-building checker: count of
+// matches, then the first match's attribute or computed style (teacher, 2026-10-29).
+export function webCheckLines(checks: WebCheck[] = [], seen: WebCheckSeen[] = []) {
+  return checks.flatMap((check, index) => {
+    const got = seen[index];
+    const parts = [
+      ...(check.count === undefined ? [] : [{ label: `Page has ${check.count} ${check.selector}`, passed: got?.count === check.count, found: String(got?.count ?? 0) }]),
+      ...(check.attribute ? [{ label: `${check.selector} has ${check.attribute}="${check.value ?? ""}"`, passed: Boolean(got) && check.value !== undefined && got!.attribute === check.value, found: got?.attribute ?? "nothing" }] : []),
+      ...(check.style ? [{ label: `${check.selector} has ${check.style}: ${check.value ?? ""}`, passed: Boolean(got) && check.value !== undefined && got!.style === check.value, found: got?.style ?? "nothing" }] : []),
+    ];
+    const passed = parts.every((part) => part.passed);
+    return parts.length ? [{ label: parts.map((part) => part.label).join("; "), passed, found: parts.filter((part) => !part.passed).map((part) => part.found).join("; ") }] : [];
+  });
+}
+export const webChecksPass = (checks?: WebCheck[], seen?: WebCheckSeen[]) => webCheckLines(checks, seen).every((line) => line.passed);
+
 export function checkModuleRun(module: { sampleFirst?: boolean },
-  step: Pick<ActivityStep, "id" | "activity" | "instruction" | "files" | "expectedOutput" | "expectedError" | "stdin">,
-  states: Record<string, string>, files: ModuleFile[], result: { success: boolean; output: string }) {
+  step: Pick<ActivityStep, "id" | "activity" | "instruction" | "files" | "expectedOutput" | "expectedError" | "stdin" | "webChecks">,
+  states: Record<string, string>, files: ModuleFile[], result: { success: boolean; output: string; checks?: WebCheckSeen[] }) {
   const check = samplePending(module, step, states) ? "sample" as const : "task" as const;
-  const sampleMatched = matchesSample(result, step);
+  // Page-element checks belong to the step's own sample, never to an alteration task.
+  const pageChecks = webChecksPass(step.webChecks, result.checks);
+  const sampleMatched = matchesSample(result, step) && pageChecks;
   const passed = check === "sample" ? sampleMatched && unchangedSample(files, step.files)
-    : matchesActivityOutput(result, activityTask(step).expectedOutput);
+    : matchesActivityOutput(result, activityTask(step).expectedOutput) && (Boolean(step.activity?.id) || pageChecks);
   return { check, sampleMatched, passed };
 }

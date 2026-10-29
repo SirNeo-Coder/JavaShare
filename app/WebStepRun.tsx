@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { matchesActivityOutput } from "../backend/src/module-activities";
+import { matchesActivityOutput, webCheckLines, type WebCheck } from "../backend/src/module-activities";
 import { webRunResult, type ConsoleMessage, type PageMessage, type PreviewFile } from "./webPreview";
 import { buildTeacherPreview } from "./teacherWebPreview";
 
@@ -31,13 +31,13 @@ export function useWebPageRun() {
   }, []);
 
   // A .js run file compares console lines on an empty page; anything else compares the page text.
-  const run = (files: PreviewFile[], runPath = "index.html") => new Promise<WebRunResult>((resolve) => {
+  const run = (files: PreviewFile[], runPath = "index.html", checks: WebCheck[] = []) => new Promise<WebRunResult>((resolve) => {
     const mode = runPath.endsWith(".js") ? "console" : "page";
     // The no-internet policy matches the course-building checker, which also blocks the internet.
     const preview = mode === "console"
-      ? buildTeacherPreview([...files, { path: WRAPPER, content: `<!doctype html><html><head></head><body><script src="${runPath.replace(/[^\w./-]/g, "")}"></script></body></html>` }], WRAPPER)
-      : buildTeacherPreview(files, runPath);
-    if (!preview.html) { resolve({ mode, success: false, output: "", error: preview.warnings[0] }); return; }
+      ? buildTeacherPreview([...files, { path: WRAPPER, content: `<!doctype html><html><head></head><body><script src="${runPath.replace(/[^\w./-]/g, "")}"></script></body></html>` }], WRAPPER, checks)
+      : buildTeacherPreview(files, runPath, checks);
+    if (!preview.html) { resolve({ mode, success: false, output: "", checks: [], error: preview.warnings[0] }); return; }
     const timer = setTimeout(() => pending.current?.finish(), 5000);
     pending.current = { lines: [], errors: [], finish: (page) => {
       clearTimeout(timer);
@@ -53,15 +53,16 @@ export function useWebPageRun() {
   return { run, view };
 }
 
-// One line per check, so later checks (page elements, media) add lines without a redesign.
-export function WebCheckList({ result, expected, teacherChecked = false }: { result: WebRunResult | null; expected: string; teacherChecked?: boolean }) {
+// One line per check: the output, then each page-element check (media checks come later).
+export function WebCheckList({ result, expected, teacherChecked = false, webChecks }: { result: WebRunResult | null; expected: string; teacherChecked?: boolean; webChecks?: WebCheck[] }) {
   if (teacherChecked) return <div className="web-checks" role="status"><p>Checked by your teacher for now</p></div>;
   if (!result) return null;
-  const checks = [{ label: result.mode === "console" ? "Console output matches" : "Page text matches", passed: matchesActivityOutput(result, expected) }];
+  const outputPassed = matchesActivityOutput(result, expected);
+  const checks = [{ label: result.mode === "console" ? "Console output matches" : "Page text matches", passed: outputPassed, found: "" }, ...webCheckLines(webChecks, result.checks)];
   return <div className="web-checks" role="status">
-    <ul>{checks.map((check) => <li key={check.label} className={check.passed ? "passed" : "failed"}><span aria-hidden="true">{check.passed ? "✓" : "✗"}</span> {check.label}</li>)}</ul>
+    <ul>{checks.map((check, index) => <li key={index} className={check.passed ? "passed" : "failed"}><span aria-hidden="true">{check.passed ? "✓" : "✗"}</span> {check.label}{check.found && ` — found ${check.found}`}</li>)}</ul>
     {result.error && <p role="alert">{result.error}</p>}
-    {checks.some((check) => !check.passed) && <div className="web-check-compare">
+    {!outputPassed && <div className="web-check-compare">
       <div><b>Required output</b><pre>{expected}</pre></div>
       <div><b>Your output</b><pre aria-label="Your output">{result.output}</pre></div>
     </div>}

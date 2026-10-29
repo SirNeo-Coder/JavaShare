@@ -1,17 +1,17 @@
-import { matchesSample, unchangedSample, type ModuleFile } from "../backend/src/module-activities.ts";
+import { matchesSample, unchangedSample, webChecksPass, type ModuleFile, type WebCheck, type WebCheckSeen } from "../backend/src/module-activities.ts";
 
 export type ModuleDeviceDraft = {
   files: ModuleFile[]; moduleVersion?: string; stateId?: string;
-  sample?: { files: ModuleFile[]; success: boolean; output: string };
+  sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[] };
   pending?: Record<string, unknown>;
   backups?: { files: ModuleFile[]; moduleVersion?: string; stateId?: string }[];
 };
 
 export function restoreModuleDraft(draft: ModuleDeviceDraft | null, current: Pick<ModuleDeviceDraft, "files" | "moduleVersion" | "stateId">,
-  step: { files: ModuleFile[]; expectedOutput: string; expectedError?: string }, needsSample: boolean): ModuleDeviceDraft {
+  step: { files: ModuleFile[]; expectedOutput: string; expectedError?: string; webChecks?: WebCheck[] }, needsSample: boolean): ModuleDeviceDraft {
   if (!draft) return current;
   const sameActivity = Boolean(current.moduleVersion) && draft.moduleVersion === current.moduleVersion && draft.stateId === current.stateId;
-  const sample = sameActivity && draft.sample && matchesSample(draft.sample, step) && unchangedSample(draft.sample.files, step.files) ? draft.sample : undefined;
+  const sample = sameActivity && draft.sample && matchesSample(draft.sample, step) && webChecksPass(step.webChecks, draft.sample.checks) && unchangedSample(draft.sample.files, step.files) ? draft.sample : undefined;
   if (!sameActivity || (needsSample && !sample && !unchangedSample(draft.files, step.files))) {
     return { ...current, backups: [...(draft.backups ?? []), { files: draft.files, moduleVersion: draft.moduleVersion, stateId: draft.stateId }] };
   }

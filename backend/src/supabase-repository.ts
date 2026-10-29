@@ -1,7 +1,7 @@
 import { paperPerformanceTask, personalProjectFiles, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
-import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, teacherCheckedStep, webPerformanceTask, webStep, type ActivityStep, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, projectPathError } from "./file-paths.ts";
@@ -1609,8 +1609,8 @@ export async function recordSupabaseModuleActivityResult(
 
 export type ModuleCheckpoint = {
   stepId: string; updatedAt: string; moduleVersion: string; completionId: string;
-  files: ModuleFile[]; success: boolean; output: string;
-  sample?: { files: ModuleFile[]; success: boolean; output: string };
+  files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[];
+  sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[] };
 };
 
 export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, checkpoint: ModuleCheckpoint) {
@@ -1621,7 +1621,9 @@ export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, 
   if (webStep(step) !== checkpoint.files.every((file) => !moduleWebPathError(file.path))) throw new SupabaseRepositoryError(400, "These files do not belong to this step");
   if (moduleVersion !== checkpoint.moduleVersion) throw new SupabaseRepositoryError(409, "This module changed. Reopen it before saving completion; your device draft is kept.");
   if (!matchesActivityOutput(checkpoint, activityTask(step).expectedOutput)) throw new SupabaseRepositoryError(400, "This task has not completed successfully");
-  if (samplePending(content, step, progress.step_states) && (!checkpoint.sample || !matchesSample(checkpoint.sample, step) || !unchangedSample(checkpoint.sample.files, step.files))) {
+  // Page-element checks belong to the step's own sample (teacher, 2026-10-29); the server compares what the page reported.
+  if (!step.activity?.id && !webChecksPass(step.webChecks, checkpoint.checks)) throw new SupabaseRepositoryError(400, "This page does not pass its page checks yet");
+  if (samplePending(content, step, progress.step_states) && (!checkpoint.sample || !matchesSample(checkpoint.sample, step) || !webChecksPass(step.webChecks, checkpoint.sample.checks) || !unchangedSample(checkpoint.sample.files, step.files))) {
     throw new SupabaseRepositoryError(400, "Run the supplied sample unchanged before completing this task");
   }
   const key = activityStateId(step);

@@ -226,18 +226,20 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : result.check === "sample" && result.passed ? "Sample verified" : "Try again");
           if (result.passed) onChecked();
         } else {
-          const result = runner ? await runJava(files, checkInput, runner) : await webPage.run(files, step!.run);
+          const result = runner ? await runJava(files, checkInput, runner) : await webPage.run(files, step!.run, step!.webChecks);
+          const pageChecks = runner ? undefined : (result as WebRunResult).checks;
           if (!runner) setWebResult(result as WebRunResult);
           if (teacherChecked) { setStatus("Checked by your teacher for now"); return; }
           const check = checkModuleRun(activity.module, { ...step!, activity: step!.activity ? { ...step!.activity, stdin: step!.activity.stdin ?? "" } : undefined } as Parameters<typeof checkModuleRun>[1], stepStates, files, result);
           setOutput(result.output); setLastCheck({ ...check, success: result.success, syncPending: check.check === "task" && check.passed });
           if (check.check === "sample" && check.passed) {
-            draftRef.current.sample = { files, success: result.success, output: result.output };
+            draftRef.current.sample = { files, success: result.success, output: result.output, ...(pageChecks ? { checks: pageChecks } : {}) };
             setStepStates((current) => ({ ...current, [sampleStateId(step!)]: "pass" }));
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setStatus("Sample verified on this device");
           } else if (check.check === "task" && check.passed) {
-            const pending = { stepId: activity.stepId, updatedAt: progress.current.updatedAt, moduleVersion: progress.current.moduleVersion, completionId: crypto.randomUUID(), files, success: true, output: result.output, ...(draftRef.current.sample ? { sample: draftRef.current.sample } : {}) };
+            const pending = { stepId: activity.stepId, updatedAt: progress.current.updatedAt, moduleVersion: progress.current.moduleVersion, completionId: crypto.randomUUID(), files, success: true, output: result.output,
+              ...(pageChecks ? { checks: pageChecks } : {}), ...(draftRef.current.sample ? { sample: draftRef.current.sample } : {}) };
             draftRef.current.pending = pending;
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setRunMessage("Syncing your completed task…");
@@ -364,7 +366,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         {web ? <>
           <JavaRunProgress message={runMessage} />
           {personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
-            : <WebCheckList result={webResult} expected={pendingSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked} />}
+            : <WebCheckList result={webResult} expected={pendingSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
+              webChecks={pendingSample || !step?.activity?.id ? step?.webChecks : undefined} />}
           <div className="module-web-preview">{webPage.view ?? <p className="web-preview-empty"><span>Press <b>Run code</b> to see your page here.</span></p>}</div>
         </> : <>
           <JavaRunnerBrand />

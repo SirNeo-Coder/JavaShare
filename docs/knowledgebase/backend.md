@@ -158,7 +158,10 @@ paths retain their existing endpoints. Teacher applies hosted SQL before rollout
 Web module steps (2026-10-28): `POST .../progress/complete` also accepts web files (`.html`,
 `.css`, `.js`, plus module `.txt` reference files) for a web step, offline and without
 `JAVA_RUNNER_URL`; Java files keep the existing offline/runner refusals before parsing. The
-repository requires the step's own kind of files and refuses `Media checks:` steps.
+repository requires the step's own kind of files and refuses `Media checks:` steps. Since
+2026-10-29 the evidence (and `sample`) may carry `checks` — what the page found for each
+`webChecks` entry (`{ count, attribute?, style? }` or null); for a step's own sample the repository
+refuses the completion unless `webChecksPass(step.webChecks, checks)` (`module-activities.ts`).
 `PUT /api/classes/:classroomId/students/:studentId/modules/:moduleId/teacher-check` `{ stepId }`
 (teacher of that class, current student) marks a media step passed. `GET /api/classes/:id/module-progress`
 adds `teacherChecks` per student module. `.../progress/run` and `.../progress/browser-result`

@@ -22,8 +22,8 @@ into three slices, then the teacher's own revision of the module files.
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
-| Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 (details being confirmed) | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
-| Slice 3a — page-element checks (`webChecks`) | **Next** — proposed 2026-10-29, waiting for approval | branch `feature/web-checks` |
+| Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
+| Slice 3a — page-element checks (`webChecks`) | **Built, PR open** (approved 2026-10-29) | branch `feature/web-checks`; see "How Slice 3a works" |
 | Slice 3b — pictures, sound, video (`mediaChecks`) | Not started; needs the teacher's media-files decision | see "Slice 3 notes" | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
@@ -73,6 +73,9 @@ Approved later the same day:
 
 Approved 2026-10-29:
 
+- **Slice 3a approved with the recommended choice:** `webChecks` apply to the step's own sample
+  (and legacy steps whose sample is the task), never to alteration tasks (`activity.id`). The page
+  reports what each check found; the server compares with its stored checks.
 - **Focus on the online version for now; offline work is a separate later task** (teacher,
   2026-10-29), like the module file revision. Offline-only building and offline testing beyond
   the existing tests wait for that task. AGENTS.md rule 1 still holds: offline must not break, so
@@ -161,6 +164,24 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   the editor tabs."; teacher live help label and editor language from `fileLanguage(path)` (CKB-078).
 - Evidence: `docs/verification/web-module-steps.md`, section "Slice 2". No migration.
 
+## How Slice 3a works (map)
+
+- `backend/src/module-activities.ts` — `WebCheck`, `WebCheckSeen`, `webCheckLines(checks, seen)`
+  (one line per check; count / first match's attribute / computed style; `value` required),
+  `webChecksPass`; `checkModuleRun` applies them to the step's own sample only.
+- `app/webPreview.ts` — `buildPreview(files, entry, checks)`: the one-line capture script embeds
+  the checks (`<` escaped) and adds `checks: checks.map(probe)` to the page message; `webRunResult`
+  returns `checks`. `app/teacherWebPreview.ts` passes `checks` through.
+- `app/WebStepRun.tsx` — `useWebPageRun().run(files, runPath, checks)`; `WebCheckList` takes
+  `webChecks`, adds a line per check with "— found …" on a cross; Required/Your output only when
+  the output line fails.
+- `app/StudentModuleActivity.tsx` / `app/ModuleViewer.tsx` — pass `step.webChecks`; completion
+  evidence and saved sample carry `checks`. `app/moduleDeviceStore.ts` — a restored sample must
+  also pass its checks.
+- `backend/src/routes.ts` — `progress/complete` evidence accepts optional `checks`;
+  `backend/src/supabase-repository.ts` — refuses "This page does not pass its page checks yet".
+- Evidence: `docs/verification/web-module-steps.md`, section "Slice 3a". No migration.
+
 ## Slice 3 notes (webChecks and mediaChecks)
 
 - The teacher's checker defines the semantics (`check_web_steps.cjs`): `count` on a selector,
@@ -171,8 +192,11 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   URLs like `images/snack.svg` cannot load, and the no-internet policy allows only `data:`/`blob:`
   pictures. Slice 3 needs a decision on where media files live and how the preview gets them;
   ask the teacher before building.
-- Add each check as one more line in `WebCheckList`; teacher-checked steps could then become
-  automatic.
+- `webChecks` are done (Slice 3a). Week 3 Steps 2–7 also have 6 `webChecks` each; they stay
+  unused while those steps are teacher-checked, and apply once 3b makes them automatic.
+- 3b: add each media result as a line in `WebCheckList` (the checker's media rule: every
+  `img`/`audio`/`video` must load unless `mediaChecks` lists it `broken`), and decide where media
+  files live first. The preview policy blocks audio/video today (`default-src 'none'`).
 
 ## Revision notes (for the deferred module revision)
 
@@ -273,10 +297,11 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. Teacher confirms the hosted check details (all Week 2 steps ticked; no `exceededCpu` in Logs).
-2. Slice 3a (`webChecks`) — proposed; build after approval.
-3. Slice 3b (media) — ask where media files live before proposing.
-4. Separate later tasks: offline work for web steps, then the module file revision ("Revision
+1. Teacher reviews and merges the Slice 3a PR (branch `feature/web-checks`), then re-runs Week 2 in
+   **View module details** on the hosted site (each step now lists its page checks).
+2. Slice 3b (media): ask the teacher where media files live and how the no-internet preview gets
+   them, then propose following AGENTS.md.
+3. Separate later tasks: offline work for web steps, then the module file revision ("Revision
    notes").
 
 ## Update log
@@ -315,3 +340,6 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — Online check delivered as [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63); build, lint (0 errors) and suite 391/391 on that branch.
 - 2026-10-29 — PR #63 merged (`d0ee2cf`); teacher reports the hosted check done. Slice 3 split into
   3a (`webChecks`, no media needed) and 3b (media, needs a storage decision); 3a proposed.
+- 2026-10-29 — Slice 3a built on `feature/web-checks`: page-element checks in the page report,
+  checklist lines, server comparison. Rule/route 25/25; browser 11/11 online, Cloudflare runtime and
+  offline; suite 394/394; five break-and-restore proofs. Week 2 and Week 3 Step 1 samples pass.
