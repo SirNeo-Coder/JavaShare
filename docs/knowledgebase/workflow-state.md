@@ -76,7 +76,8 @@ What teachers and students can do today. Keep this page current when their use o
 ## Weekly Java projects (approved workflow change, 2026-10-20)
 
 - Each student has a **Module project** and a **Personal performance-task project** for every
-  module in each class. Both use the main Java editor, supporting class tabs, Add file,
+  module in each class. Both use the main Java editor, supporting class tabs, Add file
+  (**＋** opens the floating **Create a new file** window, as in other projects),
   **Save work** and **Run code**. The Projects drawer offers both for the selected module;
   the worksheet's **Work in code editor** and **Work on performance task** open the same projects.
 - Legacy modules check the printed sample. Modules with explicit `activity.id` instead verify

@@ -980,3 +980,17 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Problem record: CKB-070. Rules, workflow, route/storage/permission maps and prior case links updated.
 - Next: teacher reviews the PR and decides rollout. No merge, deploy, hosted settings or hosted
   database changes. Windows and physical disconnected classroom Wi-Fi remain unverified.
+
+## Module project Add file window — 2026-10-29
+
+- Branch `feature/module-add-file-modal` (rebased on main after PR #65). Teacher approved the plan.
+- Done: in the Module project and Personal performance-task project, **＋** now opens the floating
+  **Create a new file** window (same look as the normal project) instead of the **Java filename**
+  line in the Console. Esc, ×, **Cancel** or clicking outside closes it; a bad or duplicate name
+  shows its message inside the window. Name checks and new-file contents are unchanged.
+- Tested: `npm test` 401/401, `npm run build:all`, lint 0 errors in the project folders. New source
+  check fails on the old inline form and passes on the fix. On screen (local dev, throwaway accounts,
+  since removed): Module project duplicate `Main.java` refused, `Helper.java` added, Esc and
+  outside-click close; Personal project added `shapes/Circle.java` with its package line.
+- Not tested on screen: the web-project wording of the window; offline mode (screen-only change).
+- Next: teacher reviews the PR.
