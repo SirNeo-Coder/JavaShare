@@ -29,7 +29,7 @@ into three slices, then the teacher's own revision of the module files.
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **In the separate chat.** Seen 2026-10-29 21:27: the three JSON files are sample-first (8 + 7 + 7 tasks), linked 2 → 1 and 3 → 2, with `solutions/` and `before_revision/`; in CodeShare every step passes (see "Update log"). That chat reports its own DLL/module results | teacher's files; follow "Net MVC weekly modules: required format and workflow" |
-| App task — sample-first and alteration tasks for web steps (Java workflow) | **Built, PR open** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
+| App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), merge `cedeb99` on main; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -482,13 +482,11 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Teacher reviews and merges the app task PR** (`feature/web-sample-first`): sample-first web steps
-   proven online and offline, CKB-083 fixed, tests walk the teacher's revised Weeks 1–3.
-2. **The revision chat finishes Weeks 1–3** (DLL, printed modules, its own docs PR). After both PRs are
+1. **The revision chat finishes Weeks 1–3** (DLL, printed modules, its own docs PR). After both PRs are
    merged and deployed: re-upload Weeks 1–3 under **Curriculum**; Week 3 → **Media files** if needed.
-3. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
-4. **CKB-080** — ask the teacher whether to fix it (teacher and student screens). Not approved yet.
-5. Then **Weeks 4–20**, one week per round, same format section. **Offline web steps/media** stays a
+2. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
+3. **CKB-080** — ask the teacher whether to fix it (teacher and student screens). Not approved yet.
+4. Then **Weeks 4–20**, one week per round, same format section. **Offline web steps/media** stays a
    separate task (needed before media weeks are taught offline).
 
 ## Update log
@@ -603,3 +601,7 @@ built `main` (see `docs/cloudflare-setup.md`):
   Week 3 media steps teacher-checked and marked done. Before the revision, the same test on the old files
   passed 13 + 1 skipped, and on a scratch sample-first copy 9 + 5 skipped. Suite 409/409, lint 0 errors.
 - 2026-10-29 — App task delivered as [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72) against main.
+- 2026-10-29 — PR #72 merged (`cedeb99`), after PR #71 (`e876f59`). Removed a stale duplicate CKB-080 row
+  from `problem-index.md` (the run-box case, renumbered CKB-081 in PR #70, came back through a merge with a
+  dead link). Both lists conflict whenever two open PRs each add a row at the bottom: merge main in and
+  keep both rows.
