@@ -23,7 +23,7 @@ into three slices, then the teacher's own revision of the module files.
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
-| Slice 3a — page-element checks (`webChecks`) | **Built, PR open** (approved 2026-10-29) | branch `feature/web-checks`; see "How Slice 3a works" |
+| Slice 3a — page-element checks (`webChecks`) | **Built, PR open** (approved 2026-10-29) | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), branch `feature/web-checks`; see "How Slice 3a works" |
 | Slice 3b — pictures, sound, video (`mediaChecks`) | Not started; needs the teacher's media-files decision | see "Slice 3 notes" | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
@@ -297,7 +297,7 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. Teacher reviews and merges the Slice 3a PR (branch `feature/web-checks`), then re-runs Week 2 in
+1. Teacher reviews and merges [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64) (Slice 3a, branch `feature/web-checks`), then re-runs Week 2 in
    **View module details** on the hosted site (each step now lists its page checks).
 2. Slice 3b (media): ask the teacher where media files live and how the no-internet preview gets
    them, then propose following AGENTS.md.
@@ -343,3 +343,4 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — Slice 3a built on `feature/web-checks`: page-element checks in the page report,
   checklist lines, server comparison. Rule/route 25/25; browser 11/11 online, Cloudflare runtime and
   offline; suite 394/394; five break-and-restore proofs. Week 2 and Week 3 Step 1 samples pass.
+- 2026-10-29 — Slice 3a delivered as [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64) against main.
