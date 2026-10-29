@@ -68,6 +68,47 @@ export function JavaRunProgress({ message, waiting = false }: { message: string 
   </div>;
 }
 
+// Dialogs take keyboard focus while open and hand it back when they close (CKB-040).
+function useDialogFocus<T extends HTMLElement>(open: boolean) {
+  const target = useRef<T>(null);
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    target.current?.focus();
+    return () => previous?.focus();
+  }, [open]);
+  return target;
+}
+
+// Floating box while code saves, compiles and runs (CKB-080). Clicking outside or Esc cancels
+// only when the run can really be stopped (online Java in this browser); otherwise it stays until done.
+export function RunBox({ message, onCancel }: { message: string | null; onCancel?: () => void }) {
+  const box = useDialogFocus<HTMLElement>(Boolean(message));
+  if (!message) return null;
+  return <div className="confirm-overlay" onMouseDown={(event) => { if (onCancel && event.target === event.currentTarget) onCancel(); }}>
+    <section ref={box} tabIndex={-1} className="confirm-card run-box" role="dialog" aria-modal="true" aria-labelledby="run-box-title" aria-describedby="run-box-hint"
+      onKeyDown={(event) => { if (onCancel && event.key === "Escape") onCancel(); }}>
+      <span className="java-run-spinner" aria-hidden="true" />
+      <div className="confirm-copy"><span className="eyebrow">RUN CODE</span><h2 id="run-box-title">{message}</h2>
+        <p id="run-box-hint">{onCancel ? "Click outside this box or press Esc to cancel." : "Please wait — this box closes when your code has run."}</p></div>
+    </section>
+  </div>;
+}
+
+export type Notice = { title: string; text: string; failed?: boolean };
+// Confirms Save work and Submit this version, or says why they failed (CKB-080).
+export function NoticeBox({ notice, onClose }: { notice: Notice | null; onClose: () => void }) {
+  const ok = useDialogFocus<HTMLButtonElement>(Boolean(notice));
+  if (!notice) return null;
+  return <div className="confirm-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <section className="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-text" onKeyDown={(event) => { if (event.key === "Escape") onClose(); }}>
+      <span className={`confirm-icon ${notice.failed ? "danger" : "done"}`} aria-hidden="true">{notice.failed ? "!" : "✓"}</span>
+      <div className="confirm-copy"><h2 id="notice-title">{notice.title}</h2><p id="notice-text">{notice.text}</p></div>
+      <div className="confirm-actions"><button type="button" ref={ok} onClick={onClose}>OK</button></div>
+    </section>
+  </div>;
+}
+
 // Web steps open their run page (index.html) first; Java opens Main.java first.
 function firstPath(list: ModuleFile[], web: boolean, run = "index.html") {
   return (web ? list.find((file) => file.path === run) ?? list.find((file) => file.path.endsWith(".html"))
@@ -111,6 +152,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [busy, setBusy] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState<Notice | null>(null);
   const [output, setOutput] = useState("Ready — edit your project, then press Run code.");
   const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
   const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
@@ -182,6 +224,17 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       }
       else await saveDeviceDraft();
     } finally { busyRef.current = false; setBusy(false); }
+  };
+  const saveWork = async () => {
+    const changed = dirty;
+    try {
+      await save();
+      setNotice(!personal ? { title: "Work saved", text: "Saved on this device. Your code is sent to CodeShare when you complete the task." }
+        : changed ? { title: "Work saved", text: "Your project is saved to CodeShare." } : { title: "Already saved", text: "Nothing changed since your last save." });
+    } catch (saveError) {
+      const message = saveError instanceof Error ? saveError.message : "Could not save";
+      setError(message); setNotice({ title: "Could not save", text: message, failed: true });
+    }
   };
   const editable = !review && deviceReady && !pendingSample;
   // A teacher's edit lands like the student's own typing: unsaved until Save work or a run keeps it.
@@ -307,7 +360,11 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         method: "PUT", body: JSON.stringify({ variant: "own", files, status: "pass", updatedAt: progress.current.updatedAt }),
       });
       setStatus("Submitted"); onChecked();
-    } catch (submitError) { setError(submitError instanceof Error ? submitError.message : "Could not submit your project"); }
+      setNotice({ title: "Version submitted", text: "Your teacher can now review this version. Submission records progress, not a grade or teacher approval." });
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : "Could not submit your project";
+      setError(message); setNotice({ title: "Could not submit", text: message, failed: true });
+    }
     finally { busyRef.current = false; setBusy(false); }
   };
 
@@ -398,8 +455,10 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void save().catch((saveError) => setError(saveError instanceof Error ? saveError.message : "Could not save"))}>Save work</button>}</div>
+      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
     </footer>
+    <RunBox message={javaConsole.running ? null : runMessage} onCancel={javaConsole.active ? () => { javaConsole.stop(); setRunMessage(null); } : undefined} />
+    <NoticeBox notice={notice} onClose={() => setNotice(null)} />
     {addingFile && <div className="activity-overlay file-dialog-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeAddFile(); }}>
       <form className="file-dialog" onSubmit={addFile} onKeyDown={(event) => { if (event.key === "Escape") closeAddFile(); }}>
         <header><span className="java-icon">{web ? "W" : "J"}</span><div><span className="eyebrow">{web ? "WEB PAGE FILE" : "JAVA SOURCE FILE"}</span><h2>Create a new file</h2><p>{web ? "Add another page, stylesheet, or script." : "Add another class to this project."}</p></div><button type="button" onClick={closeAddFile} aria-label="Close">×</button></header>

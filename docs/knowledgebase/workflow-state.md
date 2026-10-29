@@ -53,6 +53,23 @@ What teachers and students can do today. Keep this page current when their use o
   does not change sample completion, personal submission or offline input-before-Run behavior.
 - The text is announced for accessibility. Reduced motion keeps the indicator visible without spinning.
 
+## Run box and save/submit confirmations (2026-10-29, CKB-080)
+
+- **Run code** (module project, personal project and the regular Code editor, Ctrl+Enter too) opens a
+  floating **RUN CODE** box with a spinner and the current message while the code saves and compiles.
+- Online Java in the student's own browser (personal project, regular Code editor) can be cancelled:
+  the box says **Click outside this box or press Esc to cancel.** and doing so stops the run
+  (**Execution stopped.**). The box closes by itself as soon as the program starts running, so
+  **Program input** and **Stop** stay usable.
+- Module project checks online, everything offline (laptop `javac`) and web steps cannot be cancelled:
+  the box says **Please wait — this box closes when your code has run.** and stays until the result.
+  The regular Code editor's web projects run instantly and show no box.
+- **Save work** opens a box: **Work saved** (personal: *Your project is saved to CodeShare.*; module:
+  *Saved on this device. Your code is sent to CodeShare when you complete the task.*), **Already saved**
+  when nothing changed, or **Could not save** with the reason.
+- **Submit this version** opens **Version submitted** or **Could not submit**. While it is switched off
+  (no successful run of the current files) it now looks greyed out. Boxes close with OK, Esc or a click outside.
+
 ## Accounts
 
 - The first account ever registered becomes the teacher and gets a starter class (code `JAVA101`) plus the "Teacher Demo Workspace" with "Live Lesson Code". Every later account is a student.

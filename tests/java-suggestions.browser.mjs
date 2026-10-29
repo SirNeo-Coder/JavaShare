@@ -112,6 +112,7 @@ test('Java suggestions: real classroom, module and personal editors', async t =>
       await student.getByRole('option',{name:'System.out.println(…)',exact:true}).click();
       assert.equal(await editor.inputValue(),'System.out.println();');
       await Promise.all([student.waitForResponse(response=>response.request().method()==='PUT' && response.url().includes('/progress/')),student.getByRole('button',{name:'Save work',exact:true}).click()]);
+      await student.getByRole('alertdialog',{name:'Work saved'}).getByRole('button',{name:'OK'}).click();
       const path=`/api/classrooms/${classroomId}/modules/${fixture.id}/progress`;
       const saved=await (await contexts[1].request.get(path)).json();
       assert.equal(saved.projectFiles[0].content,'System.out.println();'); assert.deepEqual(saved.stepStates,{});
@@ -127,6 +128,7 @@ test('Java suggestions: real classroom, module and personal editors', async t =>
       await student.getByRole('option',{name:'main',exact:true}).click();
       assert.match(await editor.inputValue(),/^public static void main/);
       await Promise.all([student.waitForResponse(response=>response.request().method()==='PUT' && response.url().includes('/progress/')),student.getByRole('button',{name:'Save work',exact:true}).click()]);
+      await student.getByRole('alertdialog',{name:'Work saved'}).getByRole('button',{name:'OK'}).click();
       const personal=await (await contexts[1].request.get(path)).json();
       assert.ok(personal.performanceProjectFiles.length, 'personal draft saved');
       assert.ok(personal.projectFiles.length, 'module draft preserved');

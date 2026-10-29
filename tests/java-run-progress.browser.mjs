@@ -52,12 +52,15 @@ for (const mode of ["offline", "online"]) {
       const indicator = page.locator(".java-run-progress");
       const consoleOutput = page.getByLabel("Program output", { exact: true });
       const runButton = () => page.getByRole("button", { name: /Run code/ });
+      const runBox = page.locator(".run-box");
+      const outside = () => page.mouse.click(5, 5);
       const idle = () => page.waitForFunction(() => !document.querySelector(".java-run-progress") && !document.querySelector('.student-module-project [aria-label="Java source code editor"]')?.readOnly);
       const hold = async (pattern) => {
         let release, reached;
         const wait = new Promise((resolve) => { release = resolve; });
         const seen = new Promise((resolve) => { reached = resolve; });
-        await page.route(pattern, async (route) => { reached(); await wait; await route.continue(); }, { times: 1 });
+        // A cancelled run removes its runner frame, so its held request may be gone by release.
+        await page.route(pattern, async (route) => { reached(); await wait; await route.continue().catch(() => undefined); }, { times: 1 });
         gates.push(release); return { release, seen };
       };
 
@@ -69,6 +72,9 @@ for (const mode of ["offline", "online"]) {
         assert.match(await indicator.textContent(), /Saving your code on this device|Java is loading or running/);
         await config.seen;
         assert.match(await indicator.textContent(), /Java is loading or running/);
+        assert.match(await runBox.textContent(), /Java is loading or running/, "Run code shows the floating run box");
+        assert.match(await runBox.textContent(), /Please wait — this box closes when your code has run/, "a module check run cannot be cancelled");
+        await outside(); assert.equal(await runBox.count(), 1, "clicking outside must not close an uncancellable run box");
         assert.equal(await page.locator(".console[aria-busy='true']").count(), 1);
         assert.equal(await indicator.locator(".java-run-spinner").evaluate((el) => getComputedStyle(el).animationName), "java-run-spin");
         await page.screenshot({ path: `/tmp/java-progress-${mode}-loading.png`, fullPage: true });
@@ -80,6 +86,7 @@ for (const mode of ["offline", "online"]) {
         result.release();
         const checkedResponse = await checked;
         assert.equal(checkedResponse.status(), 200);
+        await runBox.waitFor({ state: "detached" });
         assert.ok((await checkedResponse.json()).module?.performanceTask, "successful module completion returns the newly unlocked task in the same response");
         await idle();
         assert.match(await consoleOutput.textContent(), /Java status check/);
@@ -120,13 +127,18 @@ for (const mode of ["offline", "online"]) {
         const saving = await hold("**/progress/performance-project");
         await page.getByRole("button", { name: "Save work", exact: true }).click(); await saving.seen;
         assert.equal(await indicator.count(), 0);
+        assert.equal(await runBox.count(), 0, "saving alone never shows the run box");
         saving.release(); await idle();
+        const notice = page.getByRole("alertdialog", { name: "Work saved" });
+        assert.match(await notice.textContent(), /Your project is saved to CodeShare\./);
+        await notice.getByRole("button", { name: "OK" }).click(); await notice.waitFor({ state: "detached" });
       });
 
       if (mode === "online") {
         await t.test("personal Java shows input waiting, resumes on Enter, and clears after Stop", async () => {
           await runButton().click();
           await indicator.filter({ hasText: "Waiting for your input" }).waitFor();
+          assert.equal(await runBox.count(), 0, "the run box closes once Java runs so Program input can be used");
           assert.equal(await page.locator(".console[aria-busy='false']").count(), 1);
           const input = page.getByRole("textbox", { name: "Program input" });
           await input.fill("Ada"); await input.press("Enter"); await idle();
@@ -135,12 +147,29 @@ for (const mode of ["offline", "online"]) {
           await page.getByRole("button", { name: "Stop", exact: true }).click(); await idle();
           assert.match(await consoleOutput.textContent(), /Execution stopped/);
         });
+
+        await t.test("personal Java: clicking outside the run box cancels compiling", async () => {
+          const startup = await hold("http://localhost:3031/");
+          await runButton().click(); await startup.seen;
+          await runBox.filter({ hasText: "Click outside this box or press Esc to cancel." }).waitFor();
+          await delay(400); await page.screenshot({ path: `/tmp/run-box-${mode}-personal-cancellable.png` });
+          await outside(); await runBox.waitFor({ state: "detached" });
+          startup.release(); await idle();
+          assert.match(await consoleOutput.textContent(), /Execution stopped/);
+        });
       } else {
         await t.test("offline personal Java retains input-before-Run and clears progress after real javac", async () => {
           await delay(1600);
           await page.getByRole("textbox", { name: "Program input" }).fill("Ada");
-          const executed = page.waitForResponse((response) => response.url().endsWith("/api/execute"));
-          await runButton().click(); assert.equal((await executed).status(), 200); await idle();
+          // Offline personal runs compile and run on the laptop inside personal-run (no /api/execute).
+          const laptop = await hold("**/progress/personal-run");
+          const executed = page.waitForResponse((response) => response.url().endsWith("/progress/personal-run"));
+          await runButton().click(); await laptop.seen;
+          assert.match(await runBox.textContent(), /Please wait — this box closes when your code has run/, "laptop Java cannot be cancelled");
+          await delay(400); await page.screenshot({ path: `/tmp/run-box-${mode}-personal-wait.png` });
+          await outside(); assert.equal(await runBox.count(), 1, "clicking outside must not close the offline run box");
+          laptop.release(); assert.equal((await executed).status(), 200); await idle();
+          assert.equal(await runBox.count(), 0);
           assert.match(await consoleOutput.textContent(), /Hello Ada/);
         });
       }
@@ -168,6 +197,9 @@ for (const mode of ["offline", "online"]) {
             await runButton().click(); await startup.seen;
             assert.ok(await regularIndicator.isVisible(), "the regular Code editor must render the status strip");
             assert.match(await regularIndicator.textContent(), /Java is loading or running/);
+            assert.match(await runBox.textContent(), mode === "online" ? /Click outside this box or press Esc to cancel/ : /Please wait — this box closes/, "the regular Code editor shows the run box too");
+            await delay(400); await page.screenshot({ path: `/tmp/run-box-${mode}-regular-${role}.png` });
+            if (mode === "offline") { await outside(); assert.equal(await runBox.count(), 1); }
             if (mode === "online") assert.match(await regularOutput.textContent(), /Opening Java runner/, "keep the newer startup-stage feedback alongside the indicator");
             const spinner = regularIndicator.locator(".java-run-spinner");
             const firstTransform = await spinner.evaluate((el) => getComputedStyle(el).transform);
@@ -178,6 +210,7 @@ for (const mode of ["offline", "online"]) {
             await page.emulateMedia({ reducedMotion: "reduce" });
             assert.equal(await spinner.evaluate((el) => getComputedStyle(el).animationName), "none");
             startup.release(); await finished();
+            assert.equal(await runBox.count(), 0);
             assert.match(await regularOutput.textContent(), new RegExp(`Regular ${role} output`));
           } finally { startup.release(); }
         });
@@ -196,6 +229,12 @@ for (const mode of ["offline", "online"]) {
           if (mode === "online") {
             await runButton().click(); await regularIndicator.filter({ hasText: "Waiting for your input" }).waitFor({ timeout: 30000 });
             await page.getByRole("button", { name: "Stop", exact: true }).click(); await finished();
+            assert.match(await regularOutput.textContent(), /Execution stopped/);
+            const startup = await hold("http://localhost:3031/");
+            await runButton().click(); await startup.seen;
+            await runBox.filter({ hasText: "Click outside this box or press Esc to cancel." }).waitFor();
+            await page.keyboard.press("Escape"); await runBox.waitFor({ state: "detached" });
+            startup.release(); await finished();
             assert.match(await regularOutput.textContent(), /Execution stopped/);
           }
           await cooldown(); await editor.fill("public class Main { invalid java }");
