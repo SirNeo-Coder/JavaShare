@@ -234,7 +234,8 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   (no module chosen yet, so the subject is not known there).
 - The class workspace note "Java files are in the editor tabs." still says Java for web **module
   steps** (Slice 1 screen; Slice 2 changed it only for personal/review web projects).
-- Slice 2 was not run in online settings.
+- Slices 1–2 passed in online settings on `next start` (11/11, 2026-10-29); not yet on Cloudflare's
+  runtime (`cf:preview`) or the hosted site.
 - CKB-022 remains open for the student's own **New web project** preview.
 - PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
   is probably covered by CKB-076's refetch rule; not tested with two devices.
@@ -271,3 +272,5 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
 - 2026-10-29 — Slice 2 delivered as [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62) against main.
 - 2026-10-29 — Teacher: focus on the online version; offline work becomes a separate later task
   (rule 1 still holds). Checking Slices 1–2 in online settings next.
+- 2026-10-29 — Online settings check (port 3043, browser mode confirmed): web steps browser test
+  11/11. Next: propose a Cloudflare-runtime check and the teacher's hosted checklist.

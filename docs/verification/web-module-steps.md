@@ -149,9 +149,19 @@ from `.claude/launch.json`. `npm run classroom:offline` itself was not launched.
 
 ## Not tested
 
-- Online mode (local `JAVA_RUNNER_URL` or hosted). The web evidence route has no online/offline
-  branch, but no run used online settings.
+- The hosted site and Cloudflare's runtime (see "Online settings" below for what was run).
 - Firefox, Safari, phones, a second device, real classroom Wi-Fi.
 - Personal web projects carrying forward through `previousModuleId` (Weeks 1–3 have none); covered
   only by the shared code path and `tests/personal-performance.test.mjs`.
 - Pictures, sound or video in a personal project (Slice 3).
+
+## Online settings (2026-10-29)
+
+Same build, production server on port 3043 with online settings: local Supabase, no laptop Java,
+`JAVA_RUNNER_URL=http://localhost:3034` (`/api/java-runner` answered `{"mode":"browser"}`; the
+offline server on 3042 answered `{"mode":"local"}`).
+
+`WEB_STEPS_BASE_URL=http://localhost:3043 node --test --test-reporter=spec tests/web-module-steps.browser.mjs`
+— 11/11, including Week 2 steps, the Slice 2 personal project (run, submit, 100%, live help, teacher
+review), the `.js` step and the rule 5 no-internet check. Per-step sample results matched the
+offline run. Not run: Cloudflare's own runtime (`npm run cf:preview`) and the hosted site.
