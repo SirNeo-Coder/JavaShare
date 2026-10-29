@@ -21,8 +21,9 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 1 — daily module steps pass | **Done, merged** | [PR #59](https://github.com/SirNeo-Coder/JavaShare/pull/59), merge `93ab62f` on main |
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
-| Slice 2 — personal performance-task project for web | **Built, PR open** (approved 2026-10-29) | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), branch `feature/web-personal-project`; see "How Slice 2 works" |
-| Slice 3 — page-element and media checks | **Next** — not started | see "Slice 3 notes" |
+| Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
+| Online check of Slices 1–2 | Laptop checks done (online settings and Cloudflare runtime, 11/11 each); **hosted check by the teacher is next** | branch `docs/web-steps-online-check`; see "Hosted check after deploy" |
+| Slice 3 — page-element and media checks | Not started | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -190,8 +191,8 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
 
 ## Hosted check after deploy (teacher)
 
-Assistants never deploy or change hosted settings. After merging PR #62, when Cloudflare has built
-`main` (see `docs/cloudflare-setup.md`):
+Assistants never deploy or change hosted settings. PR #62 is merged into `main`; once Cloudflare has
+built `main` (see `docs/cloudflare-setup.md`):
 
 1. Sign in on the hosted site as the teacher. Open the Net MVC class → **Curriculum** and upload
    `DotNet1_Week_02.codeshare.json` and `DotNet1_Week_03.codeshare.json` again (same ids, student
@@ -271,8 +272,8 @@ Assistants never deploy or change hosted settings. After merging PR #62, when Cl
 
 ## Next step
 
-1. Teacher reviews and merges [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62) (Slice 2,
-   branch `feature/web-personal-project`), then runs "Hosted check after deploy".
+1. Teacher merges the online-check docs PR (branch `docs/web-steps-online-check`) and runs "Hosted
+   check after deploy" (Slice 2 is already on `main`).
 2. If the hosted check shows `exceededCpu` or a failure: new diagnosis from the cleaned log.
 3. Slice 3 (`webChecks`, `mediaChecks`; see "Slice 3 notes"): first ask the teacher where media
    files live and how the no-internet preview gets them, then propose following AGENTS.md.
@@ -310,3 +311,5 @@ Assistants never deploy or change hosted settings. After merging PR #62, when Cl
   committed); `cf:preview` on 8787 with local Supabase, browser mode confirmed; web steps browser
   test 11/11, runtime log clean. Test names made mode-neutral. "Hosted check after deploy"
   checklist written. CPU limit on the hosted free plan still unproven.
+- 2026-10-29 — PR #62 was merged (`744cbb5`) before the online-check commits; those three commits
+  moved to branch `docs/web-steps-online-check` for their own PR.
