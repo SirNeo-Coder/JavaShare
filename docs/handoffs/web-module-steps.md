@@ -216,10 +216,10 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   `\nMedia checks:\n<src>: image decoded|image failed to decode|playback advanced|playback failed`.
 - Media files are binaries kept outside the JSON. The preview is a `srcdoc` frame, so relative
   URLs like `images/snack.svg` cannot load, and the no-internet policy allows only `data:`/`blob:`
-  pictures. Slice 3 needs a decision on where media files live and how the preview gets them;
-  ask the teacher before building.
-- `webChecks` are done (Slice 3a). Week 3 Steps 2–7 also have 6 `webChecks` each; they stay
-  unused while those steps are teacher-checked, and apply once 3b makes them automatic.
+  pictures. Decided in Slice 3b: Cloudflare R2, one shared copy per module, embedded in the
+  preview as `data:` URLs.
+- `webChecks` are done (Slice 3a). Week 3 Steps 2–7 also have 6 `webChecks` each; since Slice 3b
+  they apply once the module's media files are uploaded (until then the steps stay teacher-checked).
 - Week 3 needs four media files shared by Steps 2–7: `images/snacks.svg`, `images/counter.svg`,
   `audio/chime.wav`, `video/canteen.webm` (about 190 KB, in the teacher's `Week_03/project_end`).
   Step 5 points at missing files on purpose (`images/snack.svg`, `audio/chime-missing.wav`,
@@ -227,7 +227,7 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   contain them.
 - 3b: add each media result as a line in `WebCheckList` (the checker's media rule: every
   `img`/`audio`/`video` must load unless `mediaChecks` lists it `broken`), and decide where media
-  files live first. The preview policy blocks audio/video today (`default-src 'none'`).
+  files live first. Done in 3b; the preview policy now allows `media-src data:`.
 
 ## Revision notes (for the deferred module revision)
 
@@ -241,7 +241,7 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   own starter instead of carrying the student's previous week forward (and no week requires the
   one before). Add the links if carry-forward is wanted.
 - Week 3's personal checklist asks students to store pictures, sound and video in the project;
-  projects hold text files only until Slice 3 decides where media files live.
+  personal projects still hold text files only (students' own media is a deferred task).
 - After the revision, re-run every step's sample through `tests/web-module-steps.browser.mjs`
   and report one line per step.
 
@@ -320,7 +320,7 @@ built `main` (see `docs/cloudflare-setup.md`):
 - The class workspace note "Java files are in the editor tabs." still says Java for web **module
   steps** (Slice 1 screen; Slice 2 changed it only for personal/review web projects).
 - Slices 1–2 passed in online settings on `next start` and on Cloudflare's runtime on this laptop
-  (each 11/11, 2026-10-29); not checked on the hosted site, and the hosted 10 ms CPU limit (CKB-065)
+  (each 11/11, 2026-10-29); the teacher reports the hosted check done, but the hosted 10 ms CPU limit (CKB-065)
   is unproven for the web routes.
 - CKB-022 remains open for the student's own **New web project** preview.
 - PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
@@ -411,3 +411,5 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — Slice 3b delivered as [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65); bucket must exist before merging.
 - 2026-10-29 — PR #65 merged (`26875dc`). Slices 1–3 are on main. Hosted check of Slice 3b and the R2
   bucket not yet confirmed. Next: confirm, then the deferred tasks (see "Next step").
+- 2026-10-29 — Status re-checked against GitHub: PRs #59–#65 merged, #66 (docs) open. Stale Slice 3
+  notes, revision note and hosted-check limit line corrected. Asked the teacher for the Slice 3b hosted check.
