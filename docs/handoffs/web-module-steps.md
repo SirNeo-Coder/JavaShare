@@ -26,7 +26,7 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
 | Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check passed (teacher, 2026-10-29: bucket created before merging, no card asked, Week 3 Steps 2–7 tick every line, no `exceededCpu`) | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
 | Students' own pictures, sound and video in personal web projects | **Done, merged** 2026-10-29 (online; 5 MB each, at most 10, carries forward). Cloudflare build check passed; hosted check not yet done | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), merge `fc9a946` on main; see "How student media works" |
-| CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
+| CKB-080 — Run on a media step before the media load shows a cross (teacher and student) | **Fixed, PR open** 2026-10-29: **Run** waits (**Loading media…**) | [PR #75](https://github.com/SirNeo-Coder/JavaShare/pull/75), branch `fix/media-run-before-loaded`; `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Done in the teacher's files** 2026-10-29: sample first, 22 tasks, weeks linked, task pages after page 8, DLL lines; teacher's checkers pass. CodeShare browser check **waits for the app task PR #72** | teacher's folder (`before_revision/`, `solutions/`, `revision_tools/`, each week's Verification); [PR #74](https://github.com/SirNeo-Coder/JavaShare/pull/74) (`docs/net-weeks-1-3-revision`); see "Weeks 1–3 revision (done)" |
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
@@ -489,8 +489,8 @@ built `main` (see `docs/cloudflare-setup.md`):
   (ask the teacher to have them stopped).
 - After the teacher presses **Mark done**, the student's open page shows the next step only after
   reopening the module (tests reload the module there).
-- A **Run** pressed before this device has loaded the module's media runs without them (CKB-080, student
-  side too); tests wait for the media to load first.
+- Since CKB-080's fix, **Run** on a media step stays off (**Loading media…**) until the media are loaded;
+  tests just wait for **Run** to come on.
 - The worksheet drawer can cover the editor's file tabs; tests click the tab directly.
 
 ## Known limits and open questions
@@ -512,7 +512,7 @@ built `main` (see `docs/cloudflare-setup.md`):
   (each 11/11, 2026-10-29); the teacher reports the hosted checks done, with no `exceededCpu`
   in Cloudflare Logs after the Slice 3b check (2026-10-29).
 - CKB-022 remains open for the student's own **New web project** preview.
-- CKB-080 (open): the teacher's **Run** on a media step pressed before the media finish loading shows a
+- CKB-080 (fixed on `fix/media-run-before-loaded`): the teacher's **Run** on a media step pressed before the media finish loading showed a
   cross; the Week 3 media browser subtest fails about 1 run in 2 because of it (also on `main`).
 - Student media: a phone photo name with spaces is refused (letters, numbers, `-`, `_` only); the
   student must rename it. Not checked on screen offline. Hosted CPU of the upload route unproven.
@@ -521,6 +521,12 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
+1. **The revision chat finishes Weeks 1–3** (DLL, printed modules, its own docs PR). After both PRs are
+   merged and deployed: re-upload Weeks 1–3 under **Curriculum**; Week 3 → **Media files** if needed.
+2. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
+3. **CKB-080** — fixed (approved 2026-10-29); teacher reviews and merges its PR.
+4. Then **Weeks 4–20**, one week per round, same format section. **Offline web steps/media** stays a
+   separate task (needed before media weeks are taught offline).
 1. **App task: sample-first and alteration tasks for web steps** — done, merged ([PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72)).
 2. **Weeks 1–3 revision** — done in the teacher's files (see "Weeks 1–3 revision (done)"). Left: run
    `node --test --test-reporter=spec tests/web-module-steps.browser.mjs` on Cloudflare's runtime (8787) and the
@@ -733,6 +739,10 @@ Sources list of every reference as clickable links. Then the Week 5 prompt.
   from `problem-index.md` (the run-box case, renumbered CKB-081 in PR #70, came back through a merge with a
   dead link). Both lists conflict whenever two open PRs each add a row at the bottom: merge main in and
   keep both rows.
+- 2026-10-29 — CKB-080 fix approved and built on `fix/media-run-before-loaded`: **Run** on a media step waits
+  until this device has the media (student and teacher). Cloudflare runtime: unfixed 3/3 failed, fixed 6/6
+  passed (+1 after restore); practice weeks 5/5; offline 7 + 7 skipped and 5/5; suite 409/409, lint 0 errors.
+- 2026-10-29 — CKB-080 fix delivered as [PR #75](https://github.com/SirNeo-Coder/JavaShare/pull/75) against main.
 - 2026-10-29 — Weeks 1–3 revised in the teacher's folder (approved; see "Weeks 1–3 revision (done)"): JSON
   sample-first with 22 tasks and linked weeks, task pages after page 8, Week 1 line break, DLL lines. Teacher's
   checkers: samples and all 22 answers pass, unchanged samples fail 22/22. Found CKB-084. CodeShare browser

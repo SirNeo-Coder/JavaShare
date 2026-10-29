@@ -319,7 +319,6 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       const why = async (expected) => [...(await checks.locator("li.failed").allTextContents()),
         ...(await checks.getByLabel("Your output").count() ? [firstDifference(expected, await checks.getByLabel("Your output").textContent())] : [])].join("; ");
       const lines = [];
-      const mediaStorage = (await teacher.request.get(`/api/classrooms/${classroomId}/modules/${weeks[2].id}/media`)).status() !== 503;
       try {
         for (const week of weeks) {
           let reopen = true;
@@ -329,8 +328,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
             reopen = false;
             const sample = step.files.find((file) => file.path === (step.run ?? "index.html")) ?? step.files[0];
             await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, sample.content);
-            // With media storage, wait until this device has loaded the module's media; a Run before that runs without them (CKB-080).
-            if (mediaStorage) await page.waitForFunction(() => !/Checked by your teacher/.test(document.querySelector(".student-module-project .web-checks")?.textContent ?? ""));
+            // No wait for the media here: Run code stays off until this device has them (CKB-080).
             // CKB-075: the very first sample also runs with the preview starting below the screen edge.
             if (!lines.length) await page.setViewportSize({ width: 1500, height: 520 });
             try { await run(); } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }

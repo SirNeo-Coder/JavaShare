@@ -128,12 +128,15 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   // offline, the teacher marks it done (teacher, 2026-10-29). This device keeps the files after downloading.
   const mediaStep = web && Boolean(step && teacherCheckedStep(step));
   const [media, setMedia] = useState<Record<string, string>>({});
+  // Run waits until this device has the media, so a run never starts without them (CKB-080).
+  const [mediaLoading, setMediaLoading] = useState(mediaStep);
   useEffect(() => {
     if (!mediaStep) return;
     let active = true;
     listModuleMedia(activity.classroomId, activity.moduleId)
       .then((files) => loadModuleMedia(activity.classroomId, activity.moduleId, files, moduleRecordKey("media", activity.studentId, activity.classroomId, activity.moduleId)))
-      .then((files) => { if (active) setMedia(files); }, () => undefined);
+      .then((files) => { if (active) setMedia(files); }, () => undefined)
+      .finally(() => { if (active) setMediaLoading(false); });
     return () => { active = false; };
   }, [mediaStep, activity.classroomId, activity.moduleId, activity.studentId]);
   const hasMedia = Object.keys(media).length > 0;
@@ -259,7 +262,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   }, [review, live, path, editable, files]);
 
   const run = async () => {
-    if (busyRef.current || !deviceReady) return;
+    if (busyRef.current || !deviceReady || mediaLoading) return;
     busyRef.current = true; setBusy(true); setError("");
     setLastCheck(null); setSuccessfulFiles(null); setWebResult(null);
     setRunMessage(personal ? "Saving your project…" : "Saving your code on this device…");
@@ -464,7 +467,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
+      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || mediaLoading || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : mediaLoading ? "Loading media…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
     </footer>
     <RunBox message={javaConsole.running ? null : runMessage} onCancel={javaConsole.active ? () => { javaConsole.stop(); setRunMessage(null); } : undefined} />
     <NoticeBox notice={notice} onClose={() => setNotice(null)} />
