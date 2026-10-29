@@ -25,7 +25,7 @@ into three slices, then the teacher's own revision of the module files.
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
 | Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check passed (teacher, 2026-10-29: bucket created before merging, no card asked, Week 3 Steps 2–7 tick every line, no `exceededCpu`) | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
-| Students' own pictures, sound and video in personal web projects | **Built, PR open** 2026-10-29 (online; 5 MB each, at most 10, carries forward) | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), branch `feature/web-student-media`; see "How student media works" |
+| Students' own pictures, sound and video in personal web projects | **Done, merged** 2026-10-29 (online; 5 MB each, at most 10, carries forward). Cloudflare build check passed; hosted check not yet done | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), merge `fc9a946` on main; see "How student media works" |
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
@@ -356,8 +356,8 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Teacher reviews and merges the student media PR** (branch `feature/web-student-media`). Nothing to
-   create on Cloudflare: the same bucket is used. After deploying, hosted check: as a test student,
+1. **Hosted check of student media (teacher)** — PR #68 is merged. Nothing to create on Cloudflare:
+   the same bucket is used. Once Cloudflare has built `main`: as a test student,
    Week 3 personal project → **Media files** → **Add media files** (two pictures, a sound, a video) →
    **▶ Run code** shows them → **Submit this version**; as the teacher, **Review personal submission →
    ▶ Run code** shows them; Cloudflare **Logs**: any `exceededCpu` on `.../performance-project/media/...`.
@@ -448,3 +448,8 @@ built `main` (see `docs/cloudflare-setup.md`):
   eight break-and-restore proofs. Found CKB-080 (existing on `main`, flaky Week 3 media subtest);
   recorded, fix proposed, not built.
 - 2026-10-29 — Student media delivered as [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68) against main.
+- 2026-10-29 — PR #68 merged (`fc9a946`); Cloudflare's "Workers Builds: codeshare" check passed.
+  Still open: the teacher's hosted check (Next step 1), the CKB-080 decision, and a re-run of
+  `tests/personal-performance.browser.mjs` on the final code (port 3032 was busy). Another session
+  has an uncommitted, different `CKB-080-save-submit-run-no-feedback.md`; CKB-080 is already taken on
+  main, so that one needs the next free number.
