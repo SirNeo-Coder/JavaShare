@@ -14,6 +14,11 @@ then 1 of 10): Week 3 Step 2 shows **✗ Page text matches**, its page checks ti
 media lines. **Your output** stops after the page text; the required `Media checks:` lines are
 missing. Pressing **Run** again passes.
 
+Also seen on the student screen (2026-10-29, sample-first test): pressing **▶ Run code** on a media
+step before this device has loaded the module's media runs the page without them; the step first says
+"Checked by your teacher for now", then the result list shows that run once the media arrive. The
+browser tests wait until the media are loaded before running (same as a student pressing **Run** again).
+
 ## Root cause
 
 `StepView` decides at the moment **Run** is pressed whether the module's media files are loaded

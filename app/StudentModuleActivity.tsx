@@ -164,6 +164,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
   const pendingSample = !personal && Boolean(step && samplePending(activity.module, step, stepStates));
   const completed = !personal && stepStates[activity.stateId] === "pass";
+  // The web result list judges a run by what it was checked as: a verified sample stays ticked against the
+  // sample, not re-judged against the task that opens right after it (CKB-083).
+  const shownAsSample = lastCheck ? lastCheck.check === "sample" : pendingSample;
   const checkInput = pendingSample ? step?.stdin ?? "" : activity.stdin;
   const [successfulFiles, setSuccessfulFiles] = useState<string | null>(null);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
@@ -446,8 +449,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         {web ? <>
           <JavaRunProgress message={runMessage} />
           {personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
-            : <WebCheckList result={webResult} expected={pendingSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
-              webChecks={pendingSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />}
+            : <WebCheckList result={webResult} expected={shownAsSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
+              webChecks={shownAsSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />}
           <div className="module-web-preview">{webPage.view ?? <p className="web-preview-empty"><span>Press <b>Run code</b> to see your page here.</span></p>}</div>
         </> : <>
           <JavaRunnerBrand />

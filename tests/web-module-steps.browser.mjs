@@ -6,8 +6,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import { createClient } from "@supabase/supabase-js";
@@ -21,6 +21,16 @@ const folder = process.env.DOTNET_WEEKS_DIR || "/home/ireneo/Documents/Java 2026
 const paths = ["DotNet1_Week_01.codeshare.json", "Week_02/DotNet1_Week_02.codeshare.json", "Week_03/DotNet1_Week_03.codeshare.json"].map((name) => join(folder, name));
 const weeks = paths.every(existsSync) ? paths.map((path) => JSON.parse(readFileSync(path, "utf8"))) : null;
 const stepsOf = (module) => module.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
+// Weeks in the Java student workflow (teacher, 2026-10-29): run the sample first, then the task. The task
+// answers stay in <week folder>/solutions/<step id>/, never in the JSON.
+const revised = Boolean(weeks?.some((week) => week.sampleFirst));
+assert.ok(!weeks || weeks.every((week) => Boolean(week.sampleFirst) === revised), "Weeks 1–3 must all use the same format (all sample-first or none)");
+const legacyOnly = revised && "the teacher's weeks are sample-first; the next-to-last student subtest walks every step";
+const answerFiles = (week, step) => {
+  const dir = join(dirname(paths[weeks.indexOf(week)]), "solutions", step.id);
+  return existsSync(dir) ? readdirSync(dir, { recursive: true, withFileTypes: true }).filter((entry) => entry.isFile())
+    .map((entry) => ({ path: relative(dir, join(entry.parentPath, entry.name)).replaceAll("\\", "/"), content: readFileSync(join(entry.parentPath, entry.name), "utf8") })) : null;
+};
 
 test("web module steps: uploads keep checks, teacher preview checks every sample, a student completes Week 2", { skip: !weeks && `teacher files not found in ${folder}` }, async (t) => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
@@ -107,10 +117,12 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await editorReady(); // choosing a module opens its next unfinished step in the editor
     };
     const currentTab = () => worksheet.locator('.worksheet-tabs [aria-current="page"]').textContent();
-    // Opening a step remounts the module editor; wait for the old one to go and the new one to finish restoring.
+    // Opening a step remounts the module editor; wait for the old one to go and the new one to finish restoring
+    // (Run code comes on then; a sample-first step stays read-only until its sample runs).
     const editorReady = async (old) => {
       if (old) await page.waitForFunction((element) => !element.isConnected, old);
-      await page.waitForFunction(() => { const box = document.querySelector('.student-module-project .editor-card textarea'); return box && !box.readOnly; });
+      await page.waitForFunction(() => document.querySelector(".student-module-project .editor-card textarea")
+        && [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
     };
     const openStep = async (step) => {
       const old = await editor.elementHandle();
@@ -131,7 +143,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
     };
     const week2 = weeks[1], steps2 = stepsOf(week2);
 
-    await t.test("Week 2 Step 1: mismatch and uncaught error show a cross with Required and Your output, a failed page check shows what was found, then the sample passes", async () => {
+    await t.test("Week 2 Step 1: mismatch and uncaught error show a cross with Required and Your output, a failed page check shows what was found, then the sample passes", { skip: legacyOnly }, async () => {
       await openCatalog(week2);
       assert.match(await currentTab(), /Step 1$/);
       await page.waitForFunction((value) => document.querySelector('.student-module-project .editor-card textarea')?.value === value, steps2[0].files[0].content);
@@ -167,7 +179,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.equal(saved.percent, Math.round(100 / (steps2.length + 1)));
     });
 
-    await t.test("Week 2: each next step opens, passes, the next part opens and the percentage moves", async () => {
+    await t.test("Week 2: each next step opens, passes, the next part opens and the percentage moves", { skip: legacyOnly }, async () => {
       for (const step of steps2.slice(1, 3)) {
         await openStep(step);
         await editor.fill(step.files[0].content);
@@ -181,7 +193,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.equal(await worksheet.locator(".worksheet-parts button.part-done").count(), 2, "Monday and Tuesday parts done, Wednesday open");
     });
 
-    await t.test("Week 2: reload resumes at the next unfinished step, from the worksheet and the Module project button", async () => {
+    await t.test("Week 2: reload resumes at the next unfinished step, from the worksheet and the Module project button", { skip: legacyOnly }, async () => {
       await openCatalog(week2);
       assert.match(await currentTab(), /Step 4$/);
       await page.getByRole("button", { name: "Projects", exact: true }).click();
@@ -202,7 +214,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.screenshot({ path: "/tmp/codeshare-web-steps-student.png" });
     });
 
-    await t.test("a preview that starts below the screen edge still reads the drawn page text, not the raw source", async () => {
+    await t.test("a preview that starts below the screen edge still reads the drawn page text, not the raw source", { skip: legacyOnly }, async () => {
       await page.setViewportSize({ width: 1500, height: 520 });
       try {
         await run();
@@ -211,7 +223,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
     });
 
-    await t.test("teacher dashboard shows the web student's percentage and marks a media step done", async () => {
+    await t.test("teacher dashboard shows the web student's percentage and marks a media step done", { skip: legacyOnly }, async () => {
       const week3 = weeks[2], steps3 = stepsOf(week3);
       await openCatalog(week3);
       await run();
@@ -283,6 +295,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await details.screenshot({ path: "/tmp/codeshare-web-media-teacher.png", fullPage: true });
       await details.close();
 
+      if (revised) return; // sample-first weeks: the next subtest walks every step, media steps included
       // The student resumes at Step 3 (Step 2 was marked done above); it is now checked automatically.
       await openCatalog(week3);
       assert.match(await currentTab(), /Step 3$/);
@@ -295,6 +308,61 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
       assert.equal((await progress(week3)).stepStates[steps3[2].id], "pass");
       await page.screenshot({ path: "/tmp/codeshare-web-media-student.png" });
+    });
+
+    await t.test("sample-first weeks (Java workflow): every step of Weeks 1–3 verifies its unchanged sample, then completes its task with the answer in solutions/", { skip: !revised && "the teacher's weeks are not sample-first yet" }, async (st) => {
+      const missing = weeks.flatMap((week) => stepsOf(week).filter((step) => !answerFiles(week, step)).map((step) => step.id));
+      if (missing.length) { st.skip(`no task answer in solutions/ for ${missing.join(", ")}`); return; }
+      const textarea = page.locator(".student-module-project .editor-card textarea");
+      const feedback = page.locator(".module-run-feedback");
+      const banner = (pattern) => page.waitForFunction((source) => new RegExp(source).test(document.querySelector(".module-run-feedback")?.textContent ?? ""), pattern.source);
+      const why = async (expected) => [...(await checks.locator("li.failed").allTextContents()),
+        ...(await checks.getByLabel("Your output").count() ? [firstDifference(expected, await checks.getByLabel("Your output").textContent())] : [])].join("; ");
+      const lines = [];
+      const mediaStorage = (await teacher.request.get(`/api/classrooms/${classroomId}/modules/${weeks[2].id}/media`)).status() !== 503;
+      try {
+        for (const week of weeks) {
+          let reopen = true;
+          for (const step of stepsOf(week)) {
+            // The next week opens only after this one; after the teacher's Mark done the student reopens the module to see it.
+            if (reopen) await openCatalog(week); else await openStep(step);
+            reopen = false;
+            const sample = step.files.find((file) => file.path === (step.run ?? "index.html")) ?? step.files[0];
+            await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, sample.content);
+            // With media storage, wait until this device has loaded the module's media; a Run before that runs without them (CKB-080).
+            if (mediaStorage) await page.waitForFunction(() => !/Checked by your teacher/.test(document.querySelector(".student-module-project .web-checks")?.textContent ?? ""));
+            // CKB-075: the very first sample also runs with the preview starting below the screen edge.
+            if (!lines.length) await page.setViewportSize({ width: 1500, height: 520 });
+            try { await run(); } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
+            if (/Checked by your teacher for now/.test(await checks.textContent())) {
+              // No media storage on this server (offline): the teacher marks the media step done.
+              assert.equal((await teacher.request.put(`/api/classes/${classroomId}/students/${users[1].id}/modules/${week.id}/teacher-check`, { data: { stepId: step.id } })).status(), 200);
+              lines.push(`${step.id}: teacher-checked (no media storage on this server), marked done`); reopen = true; continue;
+            }
+            await banner(/Sample verified|Sample not verified/);
+            if (!/Sample verified/.test(await feedback.textContent())) { lines.push(`${step.id}: sample NOT verified — ${await why(step.expectedOutput)}`); break; }
+            await page.waitForFunction(() => !document.querySelector(".student-module-project .editor-card textarea")?.readOnly);
+            for (const file of answerFiles(week, step)) {
+              const fileTab = page.locator(".student-module-project .file-tabs").getByRole("button", { name: file.path, exact: true });
+              assert.equal(await fileTab.count(), 1, `${step.id}: answer file ${file.path} is not in the student's project`);
+              await fileTab.dispatchEvent("click"); // the worksheet drawer may still cover the tabs
+              await page.waitForFunction((path) => document.querySelector(".student-module-project .file-tab.active")?.textContent === path, file.path);
+              await textarea.fill(file.content);
+            }
+            await run();
+            await banner(/Completed — next activity unlocked|Not completed|Still showing sample output/);
+            const done = /Completed — next activity unlocked/.test(await feedback.textContent()) && (await progress(week)).stepStates[activityStateId(step)] === "pass";
+            lines.push(`${step.id}: ${done ? "sample verified, task completed" : `task NOT completed — ${await why(step.activity.expectedOutput)}`}`);
+            if (!done) break;
+          }
+          if (lines.at(-1) && !/completed|marked done/.test(lines.at(-1))) break;
+        }
+      } finally {
+        console.log(`Sample-first steps with the teacher's answers:\n${lines.join("\n")}`);
+        t.diagnostic(lines.join(" | "));
+      }
+      assert.equal(lines.length, weeks.reduce((total, week) => total + stepsOf(week).length, 0), lines.join("\n"));
+      assert.ok(lines.every((line) => /task completed|marked done/.test(line)), lines.join("\n"));
     });
 
     await t.test("Week 2 personal performance-task project (Slice 2): HTML editor and page preview, run, submit, 100%; the teacher reviews the frozen page", async () => {
@@ -411,7 +479,9 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.getByRole("button", { name: "Projects", exact: true }).hover();
       await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
       await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
-      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, starter);
+      // Linked weeks (sample-first format) carry the Week 2 submission forward; unlinked weeks start from Week 3's starter.
+      const opening = week3.previousModuleId ? (await progress(weeks[1])).performanceTask.own.files.find((file) => file.path === "index.html").content : starter;
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, opening);
       const box = page.locator(".student-module-project").getByRole("region", { name: "Media files" });
       await box.getByText("No media files yet.").waitFor();
       await box.getByLabel("Add media files").setInputFiles(own.slice(0, 3).map((path) => join(mediaRoot, path)));

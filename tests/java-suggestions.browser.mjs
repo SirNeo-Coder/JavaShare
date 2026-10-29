@@ -111,11 +111,22 @@ test('Java suggestions: real classroom, module and personal editors', async t =>
       await editor.fill(''); await editor.pressSequentially('Sys');
       await student.getByRole('option',{name:'System.out.println(…)',exact:true}).click();
       assert.equal(await editor.inputValue(),'System.out.println();');
-      await Promise.all([student.waitForResponse(response=>response.request().method()==='PUT' && response.url().includes('/progress/')),student.getByRole('button',{name:'Save work',exact:true}).click()]);
-      await student.getByRole('alertdialog',{name:'Work saved'}).getByRole('button',{name:'OK'}).click();
+      // Completion-only saving: module Save work keeps unfinished code on this device, not the server (CKB-082).
+      await student.getByRole('button',{name:'Save work',exact:true}).click();
+      const savedDialog=student.getByRole('alertdialog',{name:'Work saved'});
+      assert.match(await savedDialog.textContent(),/Saved on this device/);
+      await savedDialog.getByRole('button',{name:'OK'}).click();
+      const deviceKey=['activity',users[1].id,classroomId,fixture.id,'java-2-w99-test-d1-s1'].join(':');
+      const deviceDraft=()=>student.evaluate(key=>new Promise((resolve,reject)=>{
+        const request=indexedDB.open('codeshare-module-device-v1',1);
+        request.onsuccess=()=>{const db=request.result; const read=db.transaction('records').objectStore('records').get(key);
+          read.onsuccess=()=>{resolve(read.result); db.close();}; read.onerror=()=>reject(read.error);};
+        request.onerror=()=>reject(request.error);
+      }),deviceKey);
+      assert.equal((await deviceDraft()).files[0].content,'System.out.println();');
       const path=`/api/classrooms/${classroomId}/modules/${fixture.id}/progress`;
       const saved=await (await contexts[1].request.get(path)).json();
-      assert.equal(saved.projectFiles[0].content,'System.out.println();'); assert.deepEqual(saved.stepStates,{});
+      assert.ok(!saved.projectFiles.some(file=>file.content==='System.out.println();'),'unfinished module code stays off the server'); assert.deepEqual(saved.stepStates,{});
       // Only test setup: open personal work by seeding completed fixture lessons in local Supabase.
       const completed=Object.fromEntries(fixture.lessons.flatMap(lesson=>lesson.blocks).filter(block=>block.type==='step').map(step=>[step.id,'pass']));
       assert.equal((await admin.from('module_progress').update({step_states:completed}).eq('student_id',users[1].id).eq('classroom_id',classroomId).eq('module_id',fixture.id)).error,null);
@@ -131,9 +142,8 @@ test('Java suggestions: real classroom, module and personal editors', async t =>
       await student.getByRole('alertdialog',{name:'Work saved'}).getByRole('button',{name:'OK'}).click();
       const personal=await (await contexts[1].request.get(path)).json();
       assert.ok(personal.performanceProjectFiles.length, 'personal draft saved');
-      assert.ok(personal.projectFiles.length, 'module draft preserved');
       assert.match(personal.performanceProjectFiles[0].content,/public static void main/);
-      assert.equal(personal.projectFiles[0].content,'System.out.println();');
+      assert.equal((await deviceDraft()).files[0].content,'System.out.println();','module draft preserved on this device');
       assert.equal(personal.performanceTask.own,undefined); assert.deepEqual(personal.stepStates,completed);
       await student.screenshot({path:'/tmp/suggestions-personal.png'});
     });
