@@ -24,7 +24,7 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
-| Slice 3b — pictures, sound, video (`mediaChecks`) | **Built, PR open** (approved 2026-10-29: R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). **Teacher must create the R2 bucket before merging** | branch `feature/web-media`; see "How Slice 3b works" | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | **Built, PR open** (approved 2026-10-29: R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). **Teacher must create the R2 bucket before merging** | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), branch `feature/web-media`; see "How Slice 3b works" | branch `feature/web-media`; see "Slice 3 notes" | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -329,7 +329,7 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 1. Teacher reads "Module media files: the R2 bucket" in `docs/cloudflare-setup.md`. R2 needs a
    Cloudflare checkout that may ask for a payment card; CodeShare must stay free. If the teacher
-   goes ahead: create bucket `codeshare-module-media` FIRST, then merge the Slice 3b PR, then the
+   goes ahead: create bucket `codeshare-module-media` FIRST, then merge [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), then the
    hosted check in that section. If not: do not merge; media steps stay **Mark done**.
 2. Separate later tasks: offline work for web steps (including offline media), students' own media
    in personal projects, then the module file revision ("Revision notes").
@@ -402,3 +402,4 @@ built `main` (see `docs/cloudflare-setup.md`):
   media skipped; rule/route 31/31; suite 400/400; four break-and-restore proofs. Found and fixed
   CKB-079 (sound blocked in the sandboxed frame) and a teacher-view stale-media race. Bucket setup
   steps written; R2's checkout may ask for a card (teacher decides before merging).
+- 2026-10-29 — Slice 3b delivered as [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65); bucket must exist before merging.
