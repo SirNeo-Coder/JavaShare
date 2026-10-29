@@ -24,8 +24,8 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
-| Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check and R2 bucket not yet confirmed | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
-| Students' own pictures, sound and video in personal web projects | **Deferred** to a separate task (teacher, 2026-10-29) | see "Revision notes" (Week 3 checklist) |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check passed (teacher, 2026-10-29: bucket created before merging, no card asked, Week 3 Steps 2–7 tick every line, no `exceededCpu`) | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
+| Students' own pictures, sound and video in personal web projects | **Proposed, waiting for approval** (2026-10-29) | branch `feature/web-student-media`; see "Next step" |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -320,25 +320,25 @@ built `main` (see `docs/cloudflare-setup.md`):
 - The class workspace note "Java files are in the editor tabs." still says Java for web **module
   steps** (Slice 1 screen; Slice 2 changed it only for personal/review web projects).
 - Slices 1–2 passed in online settings on `next start` and on Cloudflare's runtime on this laptop
-  (each 11/11, 2026-10-29); the teacher reports the hosted check done, but the hosted 10 ms CPU limit (CKB-065)
-  is unproven for the web routes.
+  (each 11/11, 2026-10-29); the teacher reports the hosted checks done, with no `exceededCpu`
+  in Cloudflare Logs after the Slice 3b check (2026-10-29).
 - CKB-022 remains open for the student's own **New web project** preview.
 - PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
   is probably covered by CKB-076's refetch rule; not tested with two devices.
 
 ## Next step
 
-1. **Confirm the Slice 3b hosted check with the teacher** (`docs/cloudflare-setup.md`, "Module media
-   files: the R2 bucket"): was bucket `codeshare-module-media` created before PR #65 merged (if not,
-   Cloudflare's build fails and the site keeps the old version); did the R2 checkout ask for a card;
-   do Week 3 Steps 2–7 tick every line after **Add media files**; any `exceededCpu` in **Logs**? A
-   failure here is a new diagnosis before anything else.
-2. Then the three deferred tasks, each proposed and approved separately (AGENTS.md):
-   - **Students' own pictures, sound and video in personal web projects** (online; Week 3's personal
-     checklist asks for them; reuse Slice 3b's R2 path, per-student storage instead of one copy).
-   - **Offline work for web steps**, including where media lives offline (no R2 on the laptop).
-   - **Module file revision** (JSON, DLL, printed module) — last, written from "Revision notes".
-   Recommended order: student media first (online first), then offline, then the revision. Ask.
+1. **Students' own pictures, sound and video in personal web projects** — proposed 2026-10-29 on
+   `feature/web-student-media`, waiting for the teacher's approval. Proposal in short: same R2 bucket,
+   key `students/<class>/<student>/<random id>`, every upload a new copy; the personal project keeps
+   a server-owned list `media: [{ path, key, size }]` beside its files; Run embeds them like module
+   media; a run's success and **Submit this version** cover the media list too; the frozen
+   submission keeps its copies; a copy is deleted once no project or submission of that student
+   refers to it; one read route for the student and their class teacher; online only.
+   Open choices asked: limits (5 MB each, at most 10 per project recommended); carry media forward
+   with the personal files (recommended yes).
+2. Then **offline work for web steps**, including where media lives offline (no R2 on the laptop).
+3. Last, the **module file revision** (JSON, DLL, printed module), written from "Revision notes".
 
 ## Update log
 
@@ -413,3 +413,6 @@ built `main` (see `docs/cloudflare-setup.md`):
   bucket not yet confirmed. Next: confirm, then the deferred tasks (see "Next step").
 - 2026-10-29 — Status re-checked against GitHub: PRs #59–#65 merged, #66 (docs) open. Stale Slice 3
   notes, revision note and hosted-check limit line corrected. Asked the teacher for the Slice 3b hosted check.
+- 2026-10-29 — Teacher confirmed the Slice 3b hosted check: bucket created before merging, no card asked,
+  Week 3 Steps 2–7 tick every line after **Add media files**, no `exceededCpu`. PR #66 merged. Student media
+  investigated and proposed on `feature/web-student-media`; waiting for approval.
