@@ -1022,3 +1022,22 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   - Physical classroom Wi-Fi; Windows.
   - `java-suggestions` module/personal check: it is stale and fails for an earlier reason (see CKB-080).
 - Next: teacher reviews the PR.
+
+## Java suggestions browser test refresh — 2026-10-29
+
+- Branch `claude/java-suggestions-device-save`, built on PR #70's branch
+  (`feature/run-box-save-dialogs`, `47e0339`) because the test clicks PR #70's **Work saved** box.
+  Its PR targets main and includes PR #70's commit until #70 merges.
+- Teacher approved a test-only fix (CKB-082). The app was right: since completion-only saving
+  (2026-10-22), Module project **Save work** keeps code on the device only. The subtest "student:
+  module and personal projects both accept suggestions without submitting" now checks the device
+  draft and the "Saved on this device" box, checks the server does not hold the unfinished module
+  code, and keeps the server check for the personal project.
+- Case number: CKB-082. Main already has CKB-080 (`teacher-media-run-before-loaded`) and PR #70
+  also adds a CKB-080, so PR #70 is in conflict with main; the teacher agreed PR #70's case becomes
+  CKB-081 when that conflict is fixed (not done here).
+- Tested: `java-suggestions.browser.mjs` 11/11 offline on 3032; unchanged test failed (9 pass,
+  2 fail); with a simulated server save of the module code the new check fails, restored passes.
+- Not tested: online mode (the test is written for the offline laptop runner); an app-side break.
+- Next: teacher reviews; retarget is not needed (PR is against main), but resolve PR #70's conflict
+  first.
