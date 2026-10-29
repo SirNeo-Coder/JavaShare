@@ -10,11 +10,13 @@ export function useJavaConsole(onOutput: (output: string) => void, projectId?: s
   const pending = useRef<((line: string) => void) | null>(null);
   const [active, setActive] = useState(false);
   const [waiting, setWaiting] = useState(false);
+  // True once compiling is done and the program itself runs (the run box closes then).
+  const [running, setRunning] = useState(false);
   useEffect(() => {
     return () => {
       const previous = controller.current;
       controller.current = null; pending.current = null;
-      previous?.abort(); setActive(false); setWaiting(false);
+      previous?.abort(); setActive(false); setWaiting(false); setRunning(false);
     };
   }, [projectId]);
 
@@ -27,12 +29,15 @@ export function useJavaConsole(onOutput: (output: string) => void, projectId?: s
       let result: JavaResult;
       if (config.mode !== "browser") result = await runJava(files, stdin, config);
       else {
-        setActive(true); setWaiting(false); onOutput(""); onInteractiveStart?.();
+        setActive(true); setWaiting(false); setRunning(false); onOutput(""); onInteractiveStart?.();
         const initial = stdin && !stdin.endsWith("\n") ? `${stdin}\n` : stdin;
         result = await runJava(files, initial, config, {
           signal: current.signal,
           onOutput: (text) => { if (controller.current === current) onOutput(text); },
-          onStatus: (stage) => { if (controller.current === current) onOutput(`${stage}…`); },
+          onStatus: (stage) => {
+            if (controller.current !== current) return;
+            onOutput(`${stage}…`); if (stage === "Running Java") setRunning(true);
+          },
           onInput: (send) => {
             if (controller.current !== current) return;
             pending.current = send; setWaiting(!!send);
@@ -43,11 +48,11 @@ export function useJavaConsole(onOutput: (output: string) => void, projectId?: s
       return result;
     } finally {
       if (controller.current === current) {
-        controller.current = null; pending.current = null; setWaiting(false); setActive(false);
+        controller.current = null; pending.current = null; setWaiting(false); setActive(false); setRunning(false);
       }
     }
   };
   const send = (line: string) => { pending.current?.(line); };
   const stop = () => { controller.current?.abort(); };
-  return { run, send, stop, active, waiting };
+  return { run, send, stop, active, waiting, running };
 }

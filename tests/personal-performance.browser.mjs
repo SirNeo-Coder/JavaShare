@@ -57,6 +57,7 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
       await page.waitForFunction((value) => document.querySelector('textarea[aria-label="Java source code editor"]')?.value === value, main);
       assert.equal(await editor.inputValue(), main);
       assert.equal(await submit.isDisabled(), true);
+      assert.equal(await submit.evaluate((button) => getComputedStyle(button).opacity), "0.5", "a switched-off Submit this version must look switched off");
       await page.getByRole("button", { name: "Projects", exact: true }).hover();
       await projects.getByRole("button", { name: "Personal performance-task project", exact: true }).click();
       await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
@@ -101,6 +102,13 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
       await editor.fill(`${main}\n// one change`); await colour("editing");
       await editor.fill(`${main}\n${Array.from({ length: 10 }, (_, i) => `// change ${i}`).join("\n")}`); await colour("many-changes");
       await page.getByRole("button", { name: "Save work", exact: true }).click(); await colour("saved");
+      const notice = page.getByRole("alertdialog", { name: "Work saved" });
+      assert.match(await notice.textContent(), /Your project is saved to CodeShare\./);
+      await notice.getByRole("button", { name: "OK" }).click(); await notice.waitFor({ state: "detached" });
+      await page.getByRole("button", { name: "Save work", exact: true }).click();
+      const unchanged = page.getByRole("alertdialog", { name: "Already saved" });
+      assert.match(await unchanged.textContent(), /Nothing changed since your last save\./);
+      await page.mouse.click(5, 5); await unchanged.waitFor({ state: "detached" });
       assert.match((await read()).performanceProjectFiles[0].content, /change 9/);
       await editor.fill(main); await colour("many-changes");
       await page.route("**/progress/performance-project", async (route) => { await new Promise((done) => setTimeout(done, 1500)); await route.continue(); });
@@ -135,10 +143,14 @@ test(`personal ${mode} screens: successful submission, separate draft, frozen te
       await editor.fill(`${main}\n// changed`); assert.equal(await submit.isDisabled(), true);
       await run(); assert.equal(await submit.isEnabled(), true);
       await submit.click(); await page.getByText("Submitted", { exact: true }).first().waitFor();
+      const submittedNotice = page.getByRole("alertdialog", { name: "Version submitted" });
+      assert.match(await submittedNotice.textContent(), /Your teacher can now review this version/);
+      await page.keyboard.press("Escape"); await submittedNotice.waitFor({ state: "detached" });
       const submitted = await read(); assert.equal(submitted.percent, 100); assert.equal(submitted.performanceTask.own.review, undefined);
       assert.equal(submitted.projectFiles.find((file) => /(?:^|\/)Main.java$/.test(file.path)).content, "// MODULE TRACK");
       await editor.fill(main.replace("Coffee shop", "Later draft")); await page.getByRole("button", { name: "Save work", exact: true }).click();
       await page.getByText("Your project is saved", { exact: true }).waitFor();
+      await page.getByRole("alertdialog", { name: "Work saved" }).getByRole("button", { name: "OK" }).click();
       assert.match((await read()).performanceTask.own.files[0].content, /Coffee shop/);
     });
     const teacherPage = await teacher.newPage(); teacherPage.setDefaultTimeout(20000); teacherPage.on("pageerror", e => errors.push(e.message));

@@ -994,3 +994,34 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   outside-click close; Personal project added `shapes/Circle.java` with its package line.
 - Not tested on screen: the web-project wording of the window; offline mode (screen-only change).
 - Next: teacher reviews the PR.
+
+## Run box and Save/Submit confirmations — 2026-10-29
+
+- Branch `feature/run-box-save-dialogs` (from main after PR #67). Teacher approved the plan, with the
+  regular Code editor included and module project checks kept uncancellable.
+- Done (CKB-081):
+  - **Run code** opens a floating **RUN CODE** box in the module project, the personal project and the
+    regular Code editor.
+  - Online Java in the student's browser (personal project, regular Code editor) cancels on a click
+    outside the box or Esc. The box closes when the program starts running, so Program input and
+    Stop stay usable.
+  - Offline, module checks and web steps cannot be cancelled: the box waits until the result.
+  - **Save work** shows **Work saved** / **Already saved** / **Could not save**.
+  - **Submit this version** shows **Version submitted** / **Could not submit**, and looks greyed out
+    while switched off.
+- Tested:
+  - `npm test` 406/406; `npm run build:all`.
+  - Lint 0 errors in `app`, `tests`, `backend`. `npm run lint` also scans the untracked
+    `.claude/worktrees` and fails there.
+  - Real browser: `java-run-progress` 9/9 offline and 10/10 online; `personal-performance` 6/6 offline
+    and 7/7 online; live help 7/7; copy code 2/2; draft recovery 7/7; web steps 11 pass, 1 skipped.
+  - Mutation proof is recorded in CKB-081.
+- Not verified:
+  - `npm run classroom:offline` itself: port 3000 was already in use. The same offline settings ran
+    on 3032 and 3042.
+  - Physical classroom Wi-Fi; Windows.
+  - `java-suggestions` module/personal check: it is stale and fails for an earlier reason (see CKB-081).
+- Merged `main` (PRs #68, #69) to clear the docs conflicts. CKB-080 was already taken on main, so this
+  case is now **CKB-081**. After the merge: `npm test` 408/408; `java-run-progress` 19/19 (both modes);
+  `personal-performance` 6/6 offline; web steps 11 pass, 2 skipped (no R2 storage locally).
+- Next: teacher reviews the PR.

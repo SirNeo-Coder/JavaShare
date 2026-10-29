@@ -16,7 +16,7 @@ import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
 import { activityStateId, activityTask, checkableStep, webPerformanceTask } from "../backend/src/module-activities";
 import { fileLanguage } from "../backend/src/file-paths";
-import StudentModuleActivity, { JavaRunProgress, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
+import StudentModuleActivity, { JavaRunProgress, RunBox, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import { PerformanceTaskSteps, type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
 import ModuleAccessNotice from "./ModuleAccessNotice";
@@ -2942,7 +2942,8 @@ export default function Home() {
                 </button>
               )}
             </div>
-          </footer></>}
+          </footer>
+          <RunBox message={running && !javaConsole.running ? "Java is loading or running… Please wait." : null} onCancel={javaConsole.active ? javaConsole.stop : undefined} /></>}
         </section>
         {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} studentId={user.id} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onSelectModule={(module) => setWeeklySelection({ studentId: user.id, classroomId, module })} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
         <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} autoFocus={!chatHoverPreview} onClose={() => { setChatOpen(false); setChatHoverPreview(false); }}>
