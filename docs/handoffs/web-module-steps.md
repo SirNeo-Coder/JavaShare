@@ -28,7 +28,7 @@ into three slices, then the teacher's own revision of the module files.
 | Students' own pictures, sound and video in personal web projects | **Done, merged** 2026-10-29 (online; 5 MB each, at most 10, carries forward). Cloudflare build check passed; hosted check not yet done | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), merge `fc9a946` on main; see "How student media works" |
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
-| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Done in the teacher's files** 2026-10-29: sample first, 22 tasks, weeks linked, task pages after page 8, DLL lines; teacher's checkers pass. CodeShare browser check **waits for the app task PR #72** | teacher's folder (`before_revision/`, `solutions/`, `revision_tools/`, each week's Verification); this branch `docs/net-weeks-1-3-revision`; see "Weeks 1–3 revision (done)" |
+| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Done in the teacher's files** 2026-10-29: sample first, 22 tasks, weeks linked, task pages after page 8, DLL lines; teacher's checkers pass. CodeShare browser check **waits for the app task PR #72** | teacher's folder (`before_revision/`, `solutions/`, `revision_tools/`, each week's Verification); [PR #74](https://github.com/SirNeo-Coder/JavaShare/pull/74) (`docs/net-weeks-1-3-revision`); see "Weeks 1–3 revision (done)" |
 | New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -618,4 +618,4 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — Weeks 1–3 revised in the teacher's folder (approved; see "Weeks 1–3 revision (done)"): JSON
   sample-first with 22 tasks and linked weeks, task pages after page 8, Week 1 line break, DLL lines. Teacher's
   checkers: samples and all 22 answers pass, unchanged samples fail 22/22. Found CKB-084. CodeShare browser
-  check waits for PR #72. Week 1 note removed from `docs/course-format.md`.
+  check waits for PR #72. Week 1 note removed from `docs/course-format.md`. Delivered as [PR #74](https://github.com/SirNeo-Coder/JavaShare/pull/74).
