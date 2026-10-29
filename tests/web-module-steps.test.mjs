@@ -164,7 +164,7 @@ test("personal web project editor: HTML editor and page preview, web file names,
   const files = [{ path: "index.html", content: page("Mine", "<p>Hi</p>") }, { path: "backup.txt", content: "old" }];
   const render = (kind, extra = {}) => renderToStaticMarkup(createElement(StudentModuleActivity, {
     activity: { kind, module: content, classroomId: "class", moduleId: content.id, moduleTitle: "Canteen", stepId: "", stateId: "", studentId: "student", instruction: "Build your own page.", expectedOutput: "", stdin: "",
-      progress: { performanceProjectFiles: files, projectFiles: [], performanceTask: {}, stepStates: {}, updatedAt: "", percent: 50 }, ...extra },
+      progress: { performanceProjectFiles: files, projectFiles: [], performanceTask: { project: { media: [{ path: "images/photo.png", id: "a".repeat(32), size: 2048 }] } }, stepStates: {}, updatedAt: "", percent: 50 }, ...extra },
     ref: { current: null }, onChecked() {}, onClose() {},
   }));
   const html = render("performance");
@@ -176,10 +176,14 @@ test("personal web project editor: HTML editor and page preview, web file names,
   assert.match(html, /Run the current files successfully before submitting\./);
   assert.match(html, /Submit this version/);
   assert.doesNotMatch(html, /Program input|Program output|CheerpJ|Required output/);
+  assert.match(html, /aria-label="Media files"/, "the student's own pictures, sound and video");
+  assert.match(html, /Your own pictures, sound and video for this project \(5 MB each, up to 10\)/);
+  assert.match(html, /images\/photo\.png · 2 KB/);
+  assert.match(html, /Add media files/);
   const review = render("review", { review: { studentId: "student", studentName: "Ana", submissionId: "x", submission: { files, status: "pass", submittedAt: "" } } });
   assert.match(review, /Submitted personal project — read-only/);
   assert.match(review, /Press <b>Run code<\/b> to see your page here/);
-  assert.doesNotMatch(review, /Program input|CheerpJ|Submit this version/);
+  assert.doesNotMatch(review, /Program input|CheerpJ|Submit this version|Add media files/);
 });
 
 // What a page that passes a step's own checks reports, as the browser sends it.
@@ -279,7 +283,7 @@ test("web steps offline (real routes): web completions are accepted, media steps
   const [s1, s2, s3, s4] = content.lessons.map((item) => item.blocks[0]);
   let classroomId;
   try {
-    for (const role of ["teacher", "student", "teacher"]) {
+    for (const role of ["teacher", "student", "teacher", "student"]) {
       const { data, error } = await admin.auth.admin.createUser({ email: `web-${randomUUID()}@example.test`, password, email_confirm: true, user_metadata: { name: `Web ${role}` } });
       assert.equal(error, null); users.push(data.user);
       assert.equal((await admin.from("profiles").update({ role }).eq("id", data.user.id)).error, null);
@@ -426,7 +430,7 @@ test("web steps offline (real routes): web completions are accepted, media steps
     const objects = new Map();
     const bucket = {
       async list({ prefix, limit = 1000 }) { return { objects: [...objects].filter(([key]) => key.startsWith(prefix)).slice(0, limit).map(([key, value]) => ({ key, size: value.bytes.length, etag: value.etag })) }; },
-      async get(key) { const value = objects.get(key); return value ? { body: new Blob([value.bytes]).stream() } : null; },
+      async get(key) { const value = objects.get(key); return value ? { body: new Blob([value.bytes]).stream(), httpMetadata: { contentType: value.type } } : null; },
       async put(key, bytes, options) { objects.set(key, { bytes: new Uint8Array(bytes), etag: randomUUID(), type: options.httpMetadata.contentType }); },
       async delete(key) { objects.delete(key); },
     };
@@ -472,6 +476,71 @@ test("web steps offline (real routes): web completions are accepted, media steps
         assert.equal((await done.json()).progress.stepStates[mediaStep.id], "pass");
         const removed = await call(mediaUrl("/images/counter.svg"), cookies[0], "DELETE");
         assert.deepEqual((await removed.json()).files, []);
+      } finally { delete globalThis[contextKey]; }
+    });
+
+    await t.test("students' own media in a web personal project: own folder, new copy per upload, run and submit cover it, unused copies go", async () => {
+      const mediaRoute = (target, path, cookie = cookies[1], method = "PUT", bytes, type = "image/png") => handleApi(new Request(`http://localhost:3000/api/classrooms/${classroomId}/modules/${target.id}/progress/performance-project/media${path}`,
+        { method, headers: { "content-type": type, cookie }, ...(bytes ? { body: bytes } : {}) }));
+      const read = (id, cookie = cookies[1], student = users[1].id) => call(`/api/classrooms/${classroomId}/students/${student}/personal-media/${id}`, cookie);
+      const png = new Uint8Array([137, 80, 78, 71, 1, 2, 3]);
+      const studentKeys = () => [...objects.keys()].filter((key) => key.startsWith(`students/${classroomId}/${users[1].id}/`));
+      assert.equal((await mediaRoute(webP, "/images/photo.png", cookies[1], "PUT", png)).status, 503, "offline there is no media storage");
+      globalThis[contextKey] = { env: { MODULE_MEDIA: bucket } };
+      try {
+        assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[3].id })).error, null);
+        assert.equal((await mediaRoute(javaP, "/images/photo.png", cookies[1], "PUT", png)).status, 400, "Java personal projects hold no media");
+        assert.equal((await mediaRoute(webP, "/images/photo.html", cookies[1], "PUT", png)).status, 400, "only picture, sound or video names");
+        assert.equal((await mediaRoute(webP, "/images/big.png", cookies[1], "PUT", new Uint8Array(MEDIA_LIMIT + 1))).status, 413, "5 MB at most");
+        assert.equal((await mediaRoute(webP, "/images/photo.png", cookies[0], "PUT", png)).status, 403, "a teacher has no personal project to add to");
+        let view = await (await personal(webP, "performance-project")).json();
+        assert.equal(view.performanceTask.own.status, "pass", "submitted earlier without media");
+        const added = await mediaRoute(webP, "/images/photo.png", cookies[1], "PUT", png);
+        assert.equal(added.status, 200, await added.clone().text());
+        view = await added.json();
+        const [first] = view.performanceTask.project.media;
+        assert.deepEqual([first.path, first.size], ["images/photo.png", png.length]);
+        assert.deepEqual(studentKeys(), [`students/${classroomId}/${users[1].id}/${first.id}`], "the student's own folder, not the module's shared copy");
+        assert.equal((await submit(webP, view)).status, 409, "adding media undoes the earlier successful run");
+        view = await (await personal(webP, "performance-project", "PUT", { files: view.performanceProjectFiles, updatedAt: view.updatedAt })).json();
+        assert.deepEqual(view.performanceTask.project.media, [first], "Save work keeps the media list");
+
+        const file = await read(first.id);
+        assert.equal(file.status, 200);
+        assert.equal(file.headers.get("content-type"), "image/png");
+        assert.equal(file.headers.get("x-content-type-options"), "nosniff");
+        assert.match(file.headers.get("content-security-policy"), /sandbox/, "never runs as a page if opened directly");
+        assert.deepEqual(new Uint8Array(await file.arrayBuffer()), png);
+        assert.equal((await read(first.id, cookies[0])).status, 200, "the class's teacher reads it for Review personal submission");
+        assert.equal((await read(first.id, cookies[2])).status, 403, "another class's teacher is refused");
+        assert.equal((await read(first.id, cookies[3])).status, 403, "another student in the class is refused");
+        assert.equal((await read(first.id, cookies[3], users[3].id)).status, 404, "an id is only found in its own student's folder");
+        assert.equal((await read("../x")).status, 404);
+
+        view = await (await webPage(view.performanceProjectFiles, view)).json();
+        const submitted = await submit(webP, view);
+        assert.equal(submitted.status, 200, await submitted.clone().text());
+        assert.deepEqual((await submitted.json()).performanceTask.own.media, [first], "the frozen submission keeps its media");
+
+        view = await (await mediaRoute(webP, "/images/photo.png", cookies[1], "PUT", new Uint8Array([9, 9]))).json();
+        const [second] = view.performanceTask.project.media;
+        assert.notEqual(second.id, first.id, "replacing a file makes a new copy");
+        assert.equal(studentKeys().length, 2, "the submitted copy is kept");
+        const removed = await mediaRoute(webP, "/images/photo.png", cookies[1], "DELETE");
+        assert.equal(removed.status, 200, await removed.clone().text());
+        view = await removed.json();
+        assert.deepEqual(view.performanceTask.project.media, []);
+        assert.deepEqual(studentKeys(), [`students/${classroomId}/${users[1].id}/${first.id}`], "an unused copy is deleted, the submitted one stays");
+        assert.equal((await mediaRoute(webP, "/images/photo.png", cookies[1], "DELETE")).status, 404);
+        view = await (await webPage(view.performanceProjectFiles, view)).json();
+        assert.equal((await submit(webP, view)).status, 200);
+        assert.deepEqual(studentKeys(), [], "resubmitting without media deletes the old submitted copy");
+
+        for (let index = 0; index < 10; index++) view = await (await mediaRoute(webP, `/images/p${index}.png`, cookies[1], "PUT", png)).json();
+        const full = await mediaRoute(webP, "/images/extra.png", cookies[1], "PUT", png);
+        assert.equal(full.status, 400); assert.match(await full.text(), /at most 10 media files/);
+        assert.equal(studentKeys().length, 10, "a refused upload leaves no copy behind");
+        assert.equal((await mediaRoute(webP, "/images/p0.png", cookies[1], "PUT", png)).status, 200, "replacing a file is allowed when full");
       } finally { delete globalThis[contextKey]; }
     });
 

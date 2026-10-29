@@ -287,3 +287,58 @@ each device after the first download, media steps teacher-checked until the modu
 - The R2 checkout's payment requirement (only Cloudflare's guide was read).
 - Firefox, Safari, phones, real classroom speakers. Playback is tested muted.
 - Hosted CPU use of the media routes (CKB-065); the files stream from R2 without processing.
+
+# Students' own pictures, sound and video in web personal projects (2026-10-29)
+
+Branch `feature/web-student-media`. Approved with the recommended choices: 5 MB per file, at most 10
+per personal project, media carries forward with the personal files. Online only (Cloudflare R2, same
+bucket, folder `students/`).
+
+## Commands and results
+
+- `npm run build:all` — passes; `npx opennextjs-cloudflare build` — passes; `npx tsc --noEmit` — passes.
+- `npm run lint` — 0 errors, 8 existing warnings. `npm test` — 403 tests, 403 pass, 0 fail, 0 skipped.
+- `node --test --test-reporter=spec tests/web-module-steps.test.mjs tests/personal-performance.test.mjs` —
+  35/35. New or changed:
+  - ✔ personal continuation: a web project's own media carries forward with the files it came with
+  - ✔ personal web project editor: … (now also: **Media files** box with the note, a listed file
+    `images/photo.png · 2 KB` and **Add media files**; the teacher's review has no **Add media files**)
+  - ✔ students' own media in a web personal project: own folder, new copy per upload, run and submit
+    cover it, unused copies go (offline 503; Java project, wrong name, over 5 MB and a teacher refused;
+    upload clears the earlier run; **Save work** keeps the list; the student and their class teacher
+    read a copy, another class's teacher and another student are refused; safety headers; the frozen
+    submission keeps its media; a replaced copy is kept while the submission uses it, then deleted;
+    at most 10, a refused upload leaves no copy) (route tests use a stand-in bucket)
+- `tests/web-module-steps.browser.mjs`:
+  - Cloudflare runtime (`opennextjs-cloudflare preview`, port 8787, wrangler's local R2, local
+    Supabase): 13/13 on most runs. ✔ Week 3 personal project: the student adds their own pictures,
+    sound and video; Run shows them; Submit freezes them; the teacher's review shows them. Week 3's
+    starter page already uses the four files: with three uploaded, the preview shows
+    `images/counter.svg: not found, broken`; after adding it, all four come with the page and both
+    pictures draw; **Submit this version** is disabled until a new run; the review shows the same media.
+    The Slice 3b subtest "Week 3 media" fails intermittently (CKB-080, existing on `main`, not caused
+    by this change: 3 of 6 runs on unmodified `main` failed the same way).
+  - Offline settings (3042): 11 pass, 2 skipped (both need R2), 0 fail.
+- `tests/personal-performance.browser.mjs` (Java personal project, offline, 3032): 6/6 — run on the
+  code one small change before the final version (the screen then read the media list from a separate
+  reply field); not re-run on the final code because port 3032 was taken by another session.
+
+## Break-and-restore proofs
+
+| Break | Result broken | Restored |
+| --- | --- | --- |
+| An upload keeps the earlier successful run | route subtest fails (`200 !== 409`) | 32/32 |
+| The submission does not keep its media | route subtest fails | 32/32 |
+| Any class member may read a student's media | route subtest fails (`200 !== 403`) | 32/32 |
+| Cleanup deletes a copy the submission still uses | route subtest fails (`1 !== 2`) | 32/32 |
+| **Save work** drops the media list | route subtest fails | 32/32 |
+| Media does not carry forward with the files | unit test fails | 3/3 |
+| Media responses without the sandbox header | route subtest fails | 32/32 |
+| **Run code** does not put the student's media into the page (Cloudflare runtime) | Week 3 personal browser subtest fails | 13/13 |
+
+## Not tested
+
+- The hosted site (no deploy by assistants); hosted CPU use of the upload route (CKB-065).
+- Firefox, Safari, phones; a real student's phone photos (names with spaces are refused with a message).
+- Offline media: offline shows "only available online" (route test only; not checked on screen).
+- Carry-forward between real weeks: Weeks 1–3 have no `previousModuleId` (unit test only).

@@ -6,12 +6,12 @@ import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
-import { PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
+import { ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
 import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
-import { listModuleMedia, loadModuleMedia } from "./moduleMedia";
+import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
 
 export type StudentActivity = {
   kind: "module" | "performance" | "review";
@@ -97,6 +97,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   }, [mediaStep, activity.classroomId, activity.moduleId, activity.studentId]);
   const hasMedia = Object.keys(media).length > 0;
   const teacherChecked = mediaStep && !hasMedia;
+  // A web personal project's own pictures, sound and video (online only); a review shows the submitted copies.
+  const [personalMedia, setPersonalMedia] = useState(review ? activity.review?.submission.media ?? [] : personal ? activity.progress.performanceTask.project?.media ?? [] : []);
+  const personalPage = async () => personalMedia.length ? { files: await loadPersonalMedia(activity.classroomId, activity.studentId, personalMedia), include: false } : undefined;
   const webPage = useWebPageRun();
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
   const [files, setFiles] = useState<ModuleFile[]>(personal ? activity.progress.performanceProjectFiles : activity.progress.projectFiles);
@@ -205,7 +208,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     setLastCheck(null); setSuccessfulFiles(null); setWebResult(null);
     setRunMessage(personal ? "Saving your project…" : "Saving your code on this device…");
     try {
-      if (review && web) { setRunMessage("Running the page…"); setWebResult(await webPage.run(files)); return; }
+      if (review && web) { setRunMessage("Running the page…"); setWebResult(await webPage.run(files, "index.html", [], await personalPage())); return; }
       if (review) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, stdin, () => setStdin("")); return; }
       if (!personal) await saveDeviceDraft();
       else {
@@ -214,7 +217,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       }
       setRunMessage(web ? "Running your page…" : "Java is loading or running… Please wait.");
       if (personal && web) {
-        const result = await webPage.run(files);
+        const result = await webPage.run(files, "index.html", [], await personalPage());
         setWebResult(result);
         progress.current = await api<Progress>(`${base}/personal-result`, { method: "POST", body: JSON.stringify({ updatedAt: progress.current.updatedAt, success: result.success, files, output: result.output }) });
         if (result.success) setSuccessfulFiles(JSON.stringify(files));
@@ -365,6 +368,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
           {personal && !review && <PerformanceTaskSteps steps={activity.module?.performanceTask?.steps} module={activity.module} />}
+          {personal && web && !review && <ModuleMediaFiles<Progress> base={`${projectPath}/media`} files={personalMedia}
+            note="Your own pictures, sound and video for this project (5 MB each, up to 10). Use the path shown, for example images/photo.png, in your page. Online only."
+            onChange={(next) => { progress.current = next; setPersonalMedia(next.performanceTask.project?.media ?? []); setSuccessfulFiles(null); }} />}
           {personal && web ? null : personal ? <label>Program input<textarea aria-label="Program input" value={stdin} disabled={busy && !javaConsole.waiting} placeholder={javaConsole.waiting ? "Type your answer and press Enter…" : "Optional input before running"} onChange={(event) => setStdin(event.target.value)} onKeyDown={(event) => {
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");

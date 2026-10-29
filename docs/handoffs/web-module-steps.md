@@ -24,8 +24,9 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
 | Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
-| Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check and R2 bucket not yet confirmed | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
-| Students' own pictures, sound and video in personal web projects | **Deferred** to a separate task (teacher, 2026-10-29) | see "Revision notes" (Week 3 checklist) |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check passed (teacher, 2026-10-29: bucket created before merging, no card asked, Week 3 Steps 2–7 tick every line, no `exceededCpu`) | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
+| Students' own pictures, sound and video in personal web projects | **Built, PR open** 2026-10-29 (online; 5 MB each, at most 10, carries forward) | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), branch `feature/web-student-media`; see "How student media works" |
+| CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -80,6 +81,9 @@ Approved 2026-10-29:
   creates the bucket. Offline has no Cloudflare, so offline media waits for the offline task.
 - **Students' own pictures, sound and video in personal projects are a separate later task**
   (teacher, 2026-10-29), like the offline work. Slice 3b covers only the teacher's module media.
+- **Student media plan approved with the recommended choices** (teacher, 2026-10-29): online only,
+  same R2 bucket, the student's own folder; 5 MB per file, **at most 10 per personal project**; media
+  **carries forward** to the next week with the personal files.
 - **Slice 3a approved with the recommended choice:** `webChecks` apply to the step's own sample
   (and legacy steps whose sample is the task), never to alteration tasks (`activity.id`). The page
   reports what each check found; the server compares with its stored checks.
@@ -208,6 +212,26 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   `app/ModuleViewer.tsx` — **Media files** section (`ModuleMediaFiles`), teacher Run with media.
 - Evidence: `docs/verification/web-module-steps.md`, section "Slice 3b". No Supabase migration.
 
+## How student media works (map)
+
+- `backend/src/personal-performance.ts` — `PersonalMedia { path, id, size }`; `own.media`;
+  `personalProjectFiles` returns `{ files, media }` from the same source (carry-forward).
+- `backend/src/supabase-repository.ts` — `performance_task.project.media`; `putSupabasePersonalMedia`
+  (new copy `students/<class>/<student>/<id>`, at most 10, refused upload deletes its copy),
+  `deleteSupabasePersonalMedia`, `readSupabasePersonalMedia` (the student or their class teacher),
+  `dropUnusedStudentMedia` (deletes a replaced/removed/resubmitted copy only when no project or
+  submission of that student in that class names it). Each media change drops `successfulRun`;
+  `saveSupabasePerformanceProject` and `recordSupabasePersonalRun` keep the list; submission copies it
+  into `own.media`. Offline message: "Pictures, sound and video files are only available online".
+- `backend/src/routes.ts` — `PUT`/`DELETE .../progress/performance-project/media/:folder/:name`,
+  `GET /api/classrooms/:classroomId/students/:studentId/personal-media/:id`. `backend/src/router.ts` —
+  raw body for the new upload path; every `send` adds `nosniff` and `Content-Security-Policy: sandbox`.
+- `app/ModuleViewer.tsx` — `ModuleMediaFiles` now shared (`base`, `note`, `onChange` gets the reply).
+- `app/moduleMedia.ts` — `loadPersonalMedia`: kept in the open tab only, never on the device.
+- `app/StudentModuleActivity.tsx` — **Media files** box in a web personal project (not in review);
+  student and review runs embed the media like module media. No migration.
+- Evidence: `docs/verification/web-module-steps.md`, section "Students' own pictures, sound and video".
+
 ## Slice 3 notes (webChecks and mediaChecks)
 
 - The teacher's checker defines the semantics (`check_web_steps.cjs`): `count` on a selector,
@@ -241,7 +265,7 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   own starter instead of carrying the student's previous week forward (and no week requires the
   one before). Add the links if carry-forward is wanted.
 - Week 3's personal checklist asks students to store pictures, sound and video in the project;
-  personal projects still hold text files only (students' own media is a deferred task).
+  online they now can (**Media files** in the personal project); offline still text only.
 - After the revision, re-run every step's sample through `tests/web-module-steps.browser.mjs`
   and report one line per step.
 
@@ -320,25 +344,27 @@ built `main` (see `docs/cloudflare-setup.md`):
 - The class workspace note "Java files are in the editor tabs." still says Java for web **module
   steps** (Slice 1 screen; Slice 2 changed it only for personal/review web projects).
 - Slices 1–2 passed in online settings on `next start` and on Cloudflare's runtime on this laptop
-  (each 11/11, 2026-10-29); the teacher reports the hosted check done, but the hosted 10 ms CPU limit (CKB-065)
-  is unproven for the web routes.
+  (each 11/11, 2026-10-29); the teacher reports the hosted checks done, with no `exceededCpu`
+  in Cloudflare Logs after the Slice 3b check (2026-10-29).
 - CKB-022 remains open for the student's own **New web project** preview.
+- CKB-080 (open): the teacher's **Run** on a media step pressed before the media finish loading shows a
+  cross; the Week 3 media browser subtest fails about 1 run in 2 because of it (also on `main`).
+- Student media: a phone photo name with spaces is refused (letters, numbers, `-`, `_` only); the
+  student must rename it. Not checked on screen offline. Hosted CPU of the upload route unproven.
 - PR #60's (merged) open question (a second device may show the next part locked for up to five minutes)
   is probably covered by CKB-076's refetch rule; not tested with two devices.
 
 ## Next step
 
-1. **Confirm the Slice 3b hosted check with the teacher** (`docs/cloudflare-setup.md`, "Module media
-   files: the R2 bucket"): was bucket `codeshare-module-media` created before PR #65 merged (if not,
-   Cloudflare's build fails and the site keeps the old version); did the R2 checkout ask for a card;
-   do Week 3 Steps 2–7 tick every line after **Add media files**; any `exceededCpu` in **Logs**? A
-   failure here is a new diagnosis before anything else.
-2. Then the three deferred tasks, each proposed and approved separately (AGENTS.md):
-   - **Students' own pictures, sound and video in personal web projects** (online; Week 3's personal
-     checklist asks for them; reuse Slice 3b's R2 path, per-student storage instead of one copy).
-   - **Offline work for web steps**, including where media lives offline (no R2 on the laptop).
-   - **Module file revision** (JSON, DLL, printed module) — last, written from "Revision notes".
-   Recommended order: student media first (online first), then offline, then the revision. Ask.
+1. **Teacher reviews and merges the student media PR** (branch `feature/web-student-media`). Nothing to
+   create on Cloudflare: the same bucket is used. After deploying, hosted check: as a test student,
+   Week 3 personal project → **Media files** → **Add media files** (two pictures, a sound, a video) →
+   **▶ Run code** shows them → **Submit this version**; as the teacher, **Review personal submission →
+   ▶ Run code** shows them; Cloudflare **Logs**: any `exceededCpu` on `.../performance-project/media/...`.
+2. **CKB-080** — ask the teacher whether to fix it (proposed: clear a media step's shown result when its
+   media finish loading, so a run without media is never shown). Not approved yet.
+3. Then **offline work for web steps**, including where media lives offline (no R2 on the laptop).
+4. Last, the **module file revision** (JSON, DLL, printed module), written from "Revision notes".
 
 ## Update log
 
@@ -413,3 +439,12 @@ built `main` (see `docs/cloudflare-setup.md`):
   bucket not yet confirmed. Next: confirm, then the deferred tasks (see "Next step").
 - 2026-10-29 — Status re-checked against GitHub: PRs #59–#65 merged, #66 (docs) open. Stale Slice 3
   notes, revision note and hosted-check limit line corrected. Asked the teacher for the Slice 3b hosted check.
+- 2026-10-29 — Teacher confirmed the Slice 3b hosted check: bucket created before merging, no card asked,
+  Week 3 Steps 2–7 tick every line after **Add media files**, no `exceededCpu`. PR #66 merged. Student media
+  investigated and proposed on `feature/web-student-media`; waiting for approval.
+- 2026-10-29 — Student media approved (recommended choices) and built on `feature/web-student-media`:
+  rule/route 35/35, Cloudflare runtime browser 13/13 (new Week 3 personal subtest), offline 11 + 2
+  skipped, Java personal offline 6/6 (one small change before final), suite 403/403, lint 0 errors;
+  eight break-and-restore proofs. Found CKB-080 (existing on `main`, flaky Week 3 media subtest);
+  recorded, fix proposed, not built.
+- 2026-10-29 — Student media delivered as [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68) against main.
