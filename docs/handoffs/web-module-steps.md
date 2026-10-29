@@ -28,7 +28,7 @@ into three slices, then the teacher's own revision of the module files.
 | Students' own pictures, sound and video in personal web projects | **Done, merged** 2026-10-29 (online; 5 MB each, at most 10, carries forward). Cloudflare build check passed; hosted check not yet done | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), merge `fc9a946` on main; see "How student media works" |
 | CKB-080 — teacher's Run on a media step before media load shows a cross (existing Slice 3b bug) | **Open**, diagnosed, fix proposed (not approved yet) | `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
-| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Next — handed to a separate chat** (teacher, 2026-10-29); not started | teacher's files; follow "Net MVC weekly modules: required format and workflow" |
+| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Done in the teacher's files** 2026-10-29: sample first, 22 tasks, weeks linked, task pages after page 8, DLL lines; teacher's checkers pass. CodeShare browser check **waits for the app task PR #72** | teacher's folder (`before_revision/`, `solutions/`, `revision_tools/`, each week's Verification); this branch `docs/net-weeks-1-3-revision`; see "Weeks 1–3 revision (done)" |
 | New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -260,7 +260,39 @@ Results with each step's own sample files (Slice 1, Chromium, no-internet previe
   `img`/`audio`/`video` must load unless `mediaChecks` lists it `broken`), and decide where media
   files live first. Done in 3b; the preview policy now allows `media-src data:`.
 
+## Weeks 1–3 revision (done 2026-10-29)
+
+Teacher's files only; no app code changed. Approved by the teacher (2026-10-29), besides the format section:
+
+- **Task pages after page 8** instead of squeezing Your task boxes into 8 pages (Week 3's full outputs need
+  about two more pages). Pages 1–8 stay as they were (Week 1 pages 1–6 patched for the line break); task
+  pages print double-sided, long edge. Week 1 has 9 pages, Weeks 2–3 have 10.
+- Week 1 Step 2's task changes both the title and the body; Week 2 Step 5's task (Water into its own `li`
+  plus Rice cake) is accepted although only Rice cake shows in the output; Week 3 Step 1's task has no
+  media (stays checked automatically offline); Week 3 Step 5's task **diagnoses** instead of repairing (CKB-084).
+- No student takes .NET yet (offered next year), so new task ids reset nobody; the teacher uploads Weeks 1–3
+  only after every slice of the workflow is finished.
+
+What changed in the teacher's folder:
+
+- JSON (all three weeks): `"sampleFirst": true`; `activity` on every step (`<step id>-alter-v1`, instruction,
+  `"files": []`, expected output from a real run); `previousModuleId` Week 2 → `dotnet-1-w01`, Week 3 →
+  `dotnet-1-w02`. Week 1's 8 sample outputs got the line break (CKB-074). Week 3's personal task text has the
+  student media rules. CodeShare's upload schema (`course-module-schema.ts`) accepts all three.
+- Printed modules: practice-task pages built from the JSON (`source/p9.html`, `p10.html`, `tasks.css`) by
+  `revision_tools/build_tasks.py`; Week 1 pp. 1–6 patched by `revision_tools/patch_week1.py` (Weeks 1–2 module
+  page HTML no longer exists; the patch is pixel-identical outside the changed lines).
+- DLLs: one **Sample, then your task:** paragraph per day in Student Activity; still 6 pages.
+- Answers in `<week folder>/solutions/<step id>/`; originals in `before_revision/`; handover and course map
+  updated; `bash revision_tools/run_checks.sh` re-runs every check.
+
+Evidence: the teacher's `check_codeshare.py --run` passes all samples and all 22 answers; each unchanged
+sample fails its task output (22/22), and the old one-line Week 1 outputs fail (8/8); checker suites 7 + 10 + 7
+pass; printed boxes match the JSON. Not done here: `tests/web-module-steps.browser.mjs` (needs PR #72 merged).
+
 ## Revision notes (for the deferred module revision)
+
+Done in the Weeks 1–3 revision (above), except the CodeShare re-run (needs PR #72) and the teacher's re-upload.
 
 Collect here anything the module JSON, DLL or printed module must change because of this
 feature. Add to it during Slices 2–3; the revision prompt is written from this list at the end.
@@ -310,8 +342,9 @@ Portfolio, continues every week (all prices and people fictional). No internet, 
 download in class. No C#, ASP.NET or databases.
 
 **Files per week** (Week 1 sits in the folder root; later weeks in `Week_NN/`):
-`DotNet1_ILAW_Week_NN.docx` (DLL), `DotNet1_<Topic>_Module.pdf` (8 pages, 8.5 × 13 in = 612 × 936 pt;
-print pp. 1–6 double-sided long-edge, pp. 7–8 single-sided), `DotNet1_Week_NN.codeshare.json` (made
+`DotNet1_ILAW_Week_NN.docx` (DLL), `DotNet1_<Topic>_Module.pdf` (8 lesson pages plus practice-task pages after
+page 8, 8.5 × 13 in = 612 × 936 pt; print pp. 1–6 double-sided long-edge, pp. 7–8 single-sided, task pages
+double-sided long-edge; build the task pages with `revision_tools/build_tasks.py`), `DotNet1_Week_NN.codeshare.json` (made
 last, from the final module), `project_start/` (= last week's `project_end/`), `project_end/`,
 `source/` (module page HTML), the checkers, `Verification.md`. The root `project/` matches the latest
 `project_end/`. Before changing an existing file, copy it to `<week folder>/before_revision/`.
@@ -346,7 +379,8 @@ task `dotnet-1-wNN-pt`.
   `expectedOutput`. The student runs the unchanged sample first (**Sample verified**), then makes the
   change; a matching run gives **Completed** and opens the next step. Task runs are checked by output
   only (page checks apply to the sample), so the change must show in the page text or console lines.
-  On a media step the task output keeps its `Media checks:` lines.
+  On a media step the task output keeps its `Media checks:` lines, and a task must not repair or remove a
+  file listed in its step's `mediaChecks` (they apply to the task too; CKB-084).
 - **Task answers**: keep each task's answer files in `<week folder>/solutions/<step id>/` (never in the
   JSON; students must not see them). Every task `expectedOutput` comes from running those files.
 - **`previousModuleId`**: every week except Week 1 names the week before (`dotnet-1-w01` …). The module
@@ -446,6 +480,9 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Known limits and open questions
 
+- CKB-084 (open, design limit): a step's `mediaChecks` also apply to its task, so a task cannot repair a
+  file its sample shows broken. Worked around in Week 3 Step 5's content.
+
 - Only Chromium was tested; Firefox/Safari may split `innerText` lines differently.
 - Online/hosted mode, phones, dark theme, two devices and real classroom Wi-Fi are untested.
 - **Mark done** has no undo (teacher chose to leave it out for Slice 1).
@@ -469,13 +506,12 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **App task: sample-first and alteration tasks for web steps** — proposed 2026-10-29, waiting for the
-   teacher's approval. Proves in a real browser (online and offline) that a web step runs its sample
-   first, then its task, unlocks the next step, resumes after reload, and that `previousModuleId` carries
-   web projects forward and locks the next week; fixes what fails. Also makes
-   `tests/web-module-steps.browser.mjs` finish sample-first weeks with the answers in `solutions/`.
-2. **Revise Weeks 1–3 in a separate chat** (prompt given to the teacher 2026-10-29), to the format
-   section and "Revision notes". Its CodeShare check needs step 1 merged first.
+1. **App task: sample-first and alteration tasks for web steps** — built, [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72)
+   open (`feature/web-sample-first`); the teacher reviews and merges it.
+2. **Weeks 1–3 revision** — done in the teacher's files (see "Weeks 1–3 revision (done)"). Left: once PR #72 is
+   merged, run `node --test --test-reporter=spec tests/web-module-steps.browser.mjs` on Cloudflare's runtime
+   (8787) and the offline-settings server (3042), one line per step; then the teacher re-uploads Weeks 1–3
+   (Curriculum; Week 3 → View module details → Media files if needed) after every slice is finished.
 3. **Hosted check of student media (teacher)**, PR #68: as a test student, Week 3 personal project →
    **Media files** → **Add media files** (two pictures, a sound, a video) → **▶ Run code** shows them →
    **Submit this version**; as the teacher, **Review personal submission → ▶ Run code** shows them;
@@ -579,3 +615,7 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — Teacher chose the Java student workflow for Net MVC weeks (sample first, one meaningful
   task per step, weeks linked). AGENTS.md rule added; format section and revision notes updated; task
   answers live in `solutions/`. App task for sample-first web steps proposed; revision prompt rewritten.
+- 2026-10-29 — Weeks 1–3 revised in the teacher's folder (approved; see "Weeks 1–3 revision (done)"): JSON
+  sample-first with 22 tasks and linked weeks, task pages after page 8, Week 1 line break, DLL lines. Teacher's
+  checkers: samples and all 22 answers pass, unchanged samples fail 22/22. Found CKB-084. CodeShare browser
+  check waits for PR #72. Week 1 note removed from `docs/course-format.md`.

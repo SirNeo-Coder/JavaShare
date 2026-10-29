@@ -49,11 +49,16 @@ The upload schema (zod) strips unknown step fields, so the web/media check field
 ## Recurrence triage
 
 If a web step shows a cross, compare **Required output** with **Your output** first: Week 1's files
-put the page text on the title line (`Visible page text: ...`), which the agreed rule never produces.
+before 2026-10-29 put the page text on the title line (`Visible page text: ...`), which the agreed rule
+never produces; the revised Week 1 file and printed module have the line break (re-upload if an old copy is in use).
 A step that shows "Checked by your teacher for now" waits for the teacher, not a bug. Indented raw
 source text in **Your output** is CKB-075. A student still locked after **Mark done** is CKB-076.
 
 ## History
+
+- 2026-10-29 — Teacher's Week 1 files revised (JSON and printed module, pp. 1–6): all 8 expected outputs
+  now have a line break after `Visible page text:`, taken from real runs; the teacher's checker fails
+  the old one-line outputs and passes the new ones (`Week_01_Verification.md` in the teacher's folder).
 
 - 2026-10-28 — Slice 1 of 3 (daily web module steps). Teacher decisions in the prompt; recommended
   answers approved for the walk-through week, media steps, `.txt` files and `.js` run files.

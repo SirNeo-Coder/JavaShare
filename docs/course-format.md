@@ -269,5 +269,3 @@ evidence, checked by the server against its own expected output and the saved ve
   no expected output. The browser sends the files it ran and the page text; the server accepts this
   online and offline only for the exact saved files, and **Submit this version** still needs that
   successful run. Java performance tasks are unchanged.
-- **Week 1 note.** `DotNet1_Week_01.codeshare.json` writes `Visible page text: <text>` on one line, so
-  its steps do not match the agreed rule until that file is revised. Weeks 2–3 already match.
