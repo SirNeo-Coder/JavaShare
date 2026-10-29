@@ -23,6 +23,7 @@ into three slices, then the teacher's own revision of the module files.
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
 | Slice 2 — personal performance-task project for web | **Built, PR open** (approved 2026-10-29) | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), branch `feature/web-personal-project`; see "How Slice 2 works" |
 | Slice 3 — page-element and media checks | **Next** — not started | see "Slice 3 notes" |
+| Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -70,6 +71,10 @@ Approved later the same day:
 
 Approved 2026-10-29:
 
+- **Focus on the online version for now; offline work is a separate later task** (teacher,
+  2026-10-29), like the module file revision. Offline-only building and offline testing beyond
+  the existing tests wait for that task. AGENTS.md rule 1 still holds: offline must not break, so
+  the existing offline tests keep running as a safety net.
 - **Slice 2 plan approved with the recommended choices:** a web personal project is decided by the
   performance task's starter file endings; browser run evidence (files, success, page text) is
   accepted online and offline for the exact saved files; **Projects** says **Weekly web projects**
@@ -264,3 +269,5 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
   offline browser 11/11, Java personal 6/6, live help 7/7, suite 391/391, lint 0 errors; four
   break-and-restore proofs. Not run in online settings.
 - 2026-10-29 — Slice 2 delivered as [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62) against main.
+- 2026-10-29 — Teacher: focus on the online version; offline work becomes a separate later task
+  (rule 1 still holds). Checking Slices 1–2 in online settings next.
