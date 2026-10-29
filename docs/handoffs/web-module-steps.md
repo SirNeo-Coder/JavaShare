@@ -22,8 +22,9 @@ into three slices, then the teacher's own revision of the module files.
 | Side fix — stale Java sample-first browser test (CKB-077) | **Done, merged** 2026-10-28 | [PR #60](https://github.com/SirNeo-Coder/JavaShare/pull/60), merge `79c14b5` on main |
 | This rolling handoff | PR open; main merged in by the teacher 2026-10-29 (`d41f819`, both `stage-one.md` entries kept) | [PR #61](https://github.com/SirNeo-Coder/JavaShare/pull/61), branch `docs/web-steps-handoff` |
 | Slice 2 — personal performance-task project for web | **Done, merged** 2026-10-29 | [PR #62](https://github.com/SirNeo-Coder/JavaShare/pull/62), merge `744cbb5` on main; see "How Slice 2 works" |
-| Online check of Slices 1–2 | Laptop checks done (online settings and Cloudflare runtime, 11/11 each); **hosted check by the teacher is next** | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), branch `docs/web-steps-online-check`; see "Hosted check after deploy" |
-| Slice 3 — page-element and media checks | Not started | see "Slice 3 notes" |
+| Online check of Slices 1–2 | **Done**: laptop 11/11 (online settings, Cloudflare runtime); teacher reports the hosted check done 2026-10-29 (details being confirmed) | [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63), merge `d0ee2cf` on main |
+| Slice 3a — page-element checks (`webChecks`) | **Next** — proposed 2026-10-29, waiting for approval | branch `feature/web-checks` |
+| Slice 3b — pictures, sound, video (`mediaChecks`) | Not started; needs the teacher's media-files decision | see "Slice 3 notes" | see "Slice 3 notes" |
 | Offline work for web steps (beyond keeping existing offline tests passing) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision (JSON, DLL, printed module) | **Deferred** until Slices 2–3 are done (teacher, 2026-10-29) | teacher's files (see "Teacher's files") |
 
@@ -272,11 +273,9 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. Teacher merges [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63) (online-check docs, branch `docs/web-steps-online-check`) and runs "Hosted
-   check after deploy" (Slice 2 is already on `main`).
-2. If the hosted check shows `exceededCpu` or a failure: new diagnosis from the cleaned log.
-3. Slice 3 (`webChecks`, `mediaChecks`; see "Slice 3 notes"): first ask the teacher where media
-   files live and how the no-internet preview gets them, then propose following AGENTS.md.
+1. Teacher confirms the hosted check details (all Week 2 steps ticked; no `exceededCpu` in Logs).
+2. Slice 3a (`webChecks`) — proposed; build after approval.
+3. Slice 3b (media) — ask where media files live before proposing.
 4. Separate later tasks: offline work for web steps, then the module file revision ("Revision
    notes").
 
@@ -314,3 +313,5 @@ built `main` (see `docs/cloudflare-setup.md`):
 - 2026-10-29 — PR #62 was merged (`744cbb5`) before the online-check commits; those three commits
   moved to branch `docs/web-steps-online-check` for their own PR.
 - 2026-10-29 — Online check delivered as [PR #63](https://github.com/SirNeo-Coder/JavaShare/pull/63); build, lint (0 errors) and suite 391/391 on that branch.
+- 2026-10-29 — PR #63 merged (`d0ee2cf`); teacher reports the hosted check done. Slice 3 split into
+  3a (`webChecks`, no media needed) and 3b (media, needs a storage decision); 3a proposed.
