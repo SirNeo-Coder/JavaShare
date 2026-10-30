@@ -409,6 +409,11 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     setPath(entered); setNewPath(""); setAddingFile(false); setFileError(""); setError("");
   };
 
+  // Shown in the floating page window while it is open, otherwise in the side panel.
+  const webResults = personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
+    : <WebCheckList result={webResult} expected={shownAsSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
+      webChecks={shownAsSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />;
+
   return <>
     <div className="content-grid student-module-project" onKeyDown={(event) => {
       if (event.ctrlKey && event.key === "Enter" && !javaConsole.waiting) { event.preventDefault(); void run(); }
@@ -451,10 +456,10 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         {!personal && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} expectedError={web ? undefined : step?.expectedError} />}
         {web ? <>
           <JavaRunProgress message={runMessage} />
-          {personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
-            : <WebCheckList result={webResult} expected={shownAsSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
-              webChecks={shownAsSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />}
-          <div className="module-web-preview">{webPage.view ?? <p className="web-preview-empty"><span>Press <b>Run code</b> to see your page here.</span></p>}</div>
+          {!webPage.opened && webResults}
+          {webPage.show ? <button type="button" className="show-page-button" onClick={webPage.show}>Show page</button>
+            : !webPage.opened && <p className="web-preview-empty"><span>Press <b>Run code</b> to see your page.</span></p>}
+          {webPage.pageWindow(webResults)}
         </> : <>
           <JavaRunnerBrand />
           <JavaRunProgress message={runMessage} waiting={javaConsole.waiting} />

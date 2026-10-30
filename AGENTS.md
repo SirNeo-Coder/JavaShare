@@ -274,7 +274,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   alteration task (`activity.id`) per step, and `previousModuleId` linking each week to the one
   before (projects carry forward; the previous week must be finished first). Task runs are checked
   by their output only, so every task must change the visible page text or console lines. Task
-  answer files stay in the teacher's week folder, never in the JSON. Weeks 1–3 are revised to this.
+  answer files stay in the teacher's week folder, never in the JSON.
+- Net MVC course (agreed 2026-10-30): ten weeks from the teacher's `DotNet1_Course_Map.md`, all about
+  resumes. Module samples build a resume for a made-up student, Juan Dela Cruz; each student builds
+  their own resume as the personal performance task (no home address, phone, birth date or ID
+  numbers). All student work is done inside CodeShare, like Java: never tell students to use VS
+  Code, open files in Chrome, or keep local folders. The old Weeks 1–3 materials are not used.
+- Page window (agreed 2026-10-30): **Run code** on a web step or web personal project shows the page in
+  a floating window with its checks; it closes (Close, Esc, a click beside it) only after the run is
+  checked, and **Show page** reopens it. Links and frames open the project's own `.html` pages there,
+  never the internet; checks still use the step's run file only. Teacher previews use the same window.
 - Students' own pictures, sound and video in a web personal project (agreed 2026-10-29): online only,
   same R2 bucket, the student's own folder, 5 MB each, at most 10 per project. Each upload is a new
   copy, so a frozen submission keeps its media; adding or removing media needs a new run before

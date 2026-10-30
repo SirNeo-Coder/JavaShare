@@ -59,6 +59,12 @@ and percentages, without student source files or raw progress maps. Reads do not
   Module web steps build with `buildTeacherPreview`, so the same no-internet policy as the teacher
   viewer applies (rule 5; proven with a local request counter). CKB-022 stays open for the
   student's own **New web project** preview.
+- Project pages in module previews (2026-10-30, CKB-086): `buildTeacherPreview(..., projectPages)` adds
+  a link listener that posts `{ codeshare: "open", from, href }` instead of leaving the frame; the
+  parent accepts it only from its own frame and only between runs, and shows a project `.html` file
+  (`projectPath`), never an address outside the project. A project `<iframe src>` becomes `srcdoc` of
+  that page's preview with the same policy; framed pages pass link clicks up through their parent and
+  do not expand frames again. The frame stays sandboxed without `allow-same-origin`.
 - Teacher **Mark done** (`markSupabaseTeacherCheckedStep`) checks class ownership, current student
   membership and that the step is a media step before writing a pass.
 - Known limit: an endless loop in student JavaScript can freeze that student's tab.

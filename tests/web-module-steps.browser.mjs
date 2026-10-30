@@ -32,6 +32,16 @@ const answerFiles = (week, step) => {
     .map((entry) => ({ path: relative(dir, join(entry.parentPath, entry.name)).replaceAll("\\", "/"), content: readFileSync(join(entry.parentPath, entry.name), "utf8") })) : null;
 };
 
+// Run opens the floating page window (2026-10-30). Wait until the run has been checked (Close comes on;
+// a RUN CODE box still on top makes the click wait), then close it so the checks show beside the code again.
+const closePageWindow = async (where) => {
+  const close = where.locator(".page-window").getByRole("button", { name: "Close", exact: true });
+  await close.waitFor();
+  await where.waitForFunction(() => document.querySelector(".page-window header button")?.disabled === false);
+  await close.click();
+  await where.locator(".page-window").waitFor({ state: "detached" });
+};
+
 test("web module steps: uploads keep checks, teacher preview checks every sample, a student completes Week 2", { skip: !weeks && `teacher files not found in ${folder}` }, async (t) => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.WEB_STEPS_BASE_URL || "http://localhost:3042";
@@ -75,6 +85,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         for (const [index, step] of stepsOf(week).entries()) {
           const view = views.nth(index);
           await view.getByRole("button", { name: "Run", exact: true }).click();
+          await closePageWindow(page);
           const checks = view.locator(".web-checks");
           await checks.waitFor();
           const media = /(?:^|\n)Media checks:/.test(step.expectedOutput);
@@ -131,13 +142,10 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await worksheet.locator("article:not([hidden])").getByRole("button", { name: "Work in code editor", exact: true }).click();
       await editorReady(old);
     };
-    // Each run replaces the preview frame; wait for the new one, then for Run code to come back.
+    // Each run opens the page window; close it once checked, then wait for Run code to come back.
     const run = async () => {
-      const frame = page.locator(".student-module-project .module-web-preview iframe");
-      const old = await frame.count() ? await frame.elementHandle() : null;
       await page.getByRole("button", { name: /Run code/ }).click();
-      if (old) await page.waitForFunction((element) => !element.isConnected, old);
-      else await frame.waitFor({ state: "attached" });
+      await closePageWindow(page);
       await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       await checks.waitFor();
     };
@@ -280,6 +288,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         const view = views.nth(index), checks = view.locator(".web-checks");
         for (let attempt = 0; attempt < 20; attempt++) {
           await view.getByRole("button", { name: "Run", exact: true }).click();
+          await closePageWindow(details);
           await checks.waitFor();
           await details.waitForFunction((element) => /✓|✗|Checked by your teacher/.test(element.textContent), await checks.elementHandle());
           if (!/Checked by your teacher/.test(await checks.textContent())) break;
@@ -366,11 +375,9 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
     await t.test("Week 2 personal performance-task project (Slice 2): HTML editor and page preview, run, submit, 100%; the teacher reviews the frozen page", async () => {
       const submit = page.getByRole("button", { name: "Submit this version", exact: true });
       const ready = page.getByText("Run succeeded — ready to submit this version.", { exact: false });
-      const frame = page.locator(".student-module-project .module-web-preview iframe");
       const runPage = async () => {
-        const old = await frame.count() ? await frame.elementHandle() : null;
         await page.getByRole("button", { name: /Run code/ }).click();
-        if (old) await page.waitForFunction((element) => !element.isConnected, old); else await frame.waitFor({ state: "attached" });
+        await closePageWindow(page);
         await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       };
       const starter = week2.performanceTask.starterFiles[0].content;
@@ -436,7 +443,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.equal(await review.getByLabel("Program input").count(), 0);
       await review.mouse.click(1200, 400);
       await review.getByRole("button", { name: /Run code/ }).click();
-      await review.locator(".student-module-project .module-web-preview iframe").waitFor({ state: "attached" });
+      await review.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
       await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       assert.deepEqual(await progress(week2), saved, "teacher runs never change the student's progress");
       await review.screenshot({ path: "/tmp/codeshare-web-personal-review.png", fullPage: true });
@@ -456,16 +463,16 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week3.id)).error, null);
       const submit = page.getByRole("button", { name: "Submit this version", exact: true });
       const ready = page.getByText("Run succeeded — ready to submit this version.", { exact: false });
-      const frame = page.locator(".student-module-project .module-web-preview iframe");
+      // The page window stays open after a run so its media can be inspected; it is closed before the next run.
       const runPage = async () => {
-        const old = await frame.count() ? await frame.elementHandle() : null;
+        if (await page.locator(".page-window").count()) await closePageWindow(page);
         await page.getByRole("button", { name: /Run code/ }).click();
-        if (old) await page.waitForFunction((element) => !element.isConnected, old); else await frame.waitFor({ state: "attached" });
+        await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
         await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       };
       // What the preview shows: whether each picture, sound and video came with the page (data:), and whether pictures draw.
       const shownMedia = async (where) => {
-        const inside = await (await where.locator(".student-module-project .module-web-preview iframe").elementHandle()).contentFrame();
+        const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
         await inside.waitForFunction(() => document.querySelector("img")?.complete && document.querySelector("video")?.readyState >= 2 && document.querySelector("audio")?.readyState >= 2);
         await inside.evaluate(() => document.querySelector("img").scrollIntoView());
         return inside.evaluate(() => [...document.querySelectorAll("img,audio,video")].map((element) => `${element.getAttribute("data-codeshare-src") ?? element.getAttribute("src")}: ${element.src.startsWith("data:") ? "from the page" : "not found"}${element.tagName === "IMG" ? `, ${element.naturalWidth > 0 ? "drawn" : "broken"}` : ""}`));
@@ -497,6 +504,8 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await ready.waitFor();
       const allShown = ["images/snacks.svg: from the page, drawn", "images/counter.svg: from the page, drawn", "audio/chime.wav: from the page", "video/canteen.webm: from the page"];
       assert.deepEqual(await shownMedia(page), allShown);
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media.png" });
+      await closePageWindow(page);
       await submit.click();
       await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
       const saved = await progress(week3);
@@ -504,7 +513,6 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.equal(saved.percent, 100);
       await box.scrollIntoViewIfNeeded();
       await box.screenshot({ path: "/tmp/codeshare-web-student-media-box.png" });
-      await page.locator(".student-module-project .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media.png" });
 
       const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
       await review.goto("/");
@@ -519,7 +527,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.deepEqual(await shownMedia(review), allShown, "the review shows the student's submitted media");
       await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       assert.deepEqual(await progress(week3), saved, "teacher runs never change the student's progress");
-      await review.locator(".student-module-project .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media-review.png" });
+      await review.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media-review.png" });
       await review.close();
     });
 
@@ -539,8 +547,10 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await preview.locator(".teacher-module-card", { hasText: "Console check" }).getByRole("button", { name: /View module details/ }).click();
       const views = preview.locator(".module-step");
       await views.nth(0).getByRole("button", { name: "Run", exact: true }).click();
+      await closePageWindow(preview);
       assert.equal(await views.nth(0).locator(".web-checks li").textContent(), "✓ Console output matches");
       await views.nth(1).getByRole("button", { name: "Run", exact: true }).click();
+      await closePageWindow(preview);
       assert.equal(await views.nth(1).locator(".web-checks li").textContent(), "✗ Console output matches");
       assert.match(await views.nth(1).locator(".web-checks").getByRole("alert").textContent(), /Uncaught error: .*missingFunction/);
       assert.equal(await views.nth(1).locator(".web-checks").getByLabel("Your output").textContent(), "before");

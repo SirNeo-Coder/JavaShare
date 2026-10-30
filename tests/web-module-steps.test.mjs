@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
-import { buildPreview, embedMedia, webPageOutput, webRunResult } from "../app/webPreview.ts";
+import { buildPreview, embedMedia, projectPath, webPageOutput, webRunResult } from "../app/webPreview.ts";
 import { activityStateId, checkModuleRun, checkableStep, sampleStateId, matchesActivityOutput, mediaCheckLines, mediaLinesPass, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
 import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
 import { MEDIA_LIMIT, mediaPathType, moduleWebPathError } from "../backend/src/file-paths.ts";
@@ -85,7 +85,42 @@ test("module web steps use the no-internet preview and still open the step's run
   const preview = buildTeacherPreview([{ path: "index.html", content: page("Home", "") }, { path: "about.html", content: page("About", "") }], "about.html");
   assert.match(preview.html, /^<!doctype html>\n?<meta http-equiv="Content-Security-Policy" content="default-src 'none';/);
   assert.match(preview.html, /<title>About<\/title>/);
-  assert.match(readFileSync(new URL("../app/WebStepRun.tsx", import.meta.url), "utf8"), /: buildTeacherPreview\(files, runPath, checks, Boolean\(media\)\)/, "module runs use the no-internet preview");
+  assert.match(readFileSync(new URL("../app/WebStepRun.tsx", import.meta.url), "utf8"), /: buildTeacherPreview\(files, runPath, checks, Boolean\(media\), true\)/, "module runs use the no-internet preview with project pages");
+});
+
+// Floating page window (teacher, 2026-10-30): links and frames open the project's own pages.
+test("project pages: link and frame addresses resolve inside the project; the internet and mailto: stay outside", () => {
+  assert.equal(projectPath("index.html", "about.html"), "about.html");
+  assert.equal(projectPath("index.html", "./about.html#top"), "about.html");
+  assert.equal(projectPath("pages/about.html", "contact.html?x=1"), "pages/contact.html");
+  assert.equal(projectPath("pages/about.html", "../index.html"), "index.html");
+  assert.equal(projectPath("pages/about.html", "/index.html"), "index.html");
+  for (const outside of ["https://example.com/", "//example.com/a.html", "mailto:me@example.com", "data:text/html,hi"]) assert.equal(projectPath("index.html", outside), null, outside);
+});
+
+test("module previews send link clicks to CodeShare and show project pages in frames; the New web project preview is unchanged", () => {
+  const files = [
+    { path: "index.html", content: page("Home", '<a href="about.html">About</a>\n<iframe src="about.html" title="About frame"></iframe>\n<iframe src="missing.html"></iframe>\n<iframe src="https://example.com/"></iframe>\n<script>boom()</script>') },
+    { path: "about.html", content: page("About", '<h1>About "me" & you</h1>\n<iframe src="index.html"></iframe>') },
+  ];
+  const plain = buildPreview(files);
+  assert.doesNotMatch(plain.html, /codeshare:"open"/, "the New web project preview keeps ordinary links");
+  assert.match(plain.html, /<iframe src="about.html" title="About frame"><\/iframe>/);
+  const withPages = buildTeacherPreview(files, "index.html", [], false, true);
+  assert.match(withPages.html, /const from="index\.html";addEventListener\("click"/);
+  assert.match(withPages.html, /parent\.postMessage\(\{codeshare:"open",from,href\},"\*"\)/);
+  const framed = withPages.html.match(/<iframe srcdoc="([^"]*)" title="About frame">/);
+  assert.ok(framed, "the project page is shown through srcdoc");
+  assert.match(framed[1], /<title>About<\/title>/);
+  assert.match(framed[1], /About &quot;me&quot; &amp; you/, "the framed page is escaped inside the attribute");
+  assert.match(framed[1], /const from=&quot;about\.html&quot;/, "links inside a framed page reach CodeShare too");
+  assert.doesNotMatch(framed[1], /\n/, "the framed page stays on one line");
+  assert.equal((withPages.html.match(/srcdoc=/g) ?? []).length, 1, "a framed page does not show frames again, so pages framing each other cannot loop");
+  assert.equal(withPages.html.split("\n").length, buildTeacherPreview(files).html.split("\n").length, "line numbers still match the student's files");
+  assert.match(withPages.html, /<iframe src="missing.html"><\/iframe>/);
+  assert.match(withPages.html, /<iframe src="https:\/\/example.com\/"><\/iframe>/, "internet frames stay blocked by the no-internet policy");
+  assert.deepEqual(withPages.warnings, ["index.html shows missing.html in a frame, but this project has no page with that name."]);
+  assert.deepEqual(withPages.lineMap, buildTeacherPreview(files).lineMap);
 });
 
 test("web steps: decided by file endings, with no Java-only path handling", () => {
@@ -139,7 +174,7 @@ test("module editor for a web step: HTML editor on index.html, page preview inst
   assert.match(html, /HTML source code editor/);
   assert.match(html, /file-tab active">index\.html/);
   assert.match(html, /<span>Web page<\/span>/);
-  assert.match(html, /Press <b>Run code<\/b> to see your page here/);
+  assert.match(html, /Press <b>Run code<\/b> to see your page\./);
   assert.doesNotMatch(html, /Program input|Program output|CheerpJ/);
 });
 
@@ -194,7 +229,7 @@ test("personal web project editor: HTML editor and page preview, web file names,
   assert.match(html, /file-tab active">index\.html/);
   assert.match(html, /<span>Web page<\/span>/);
   assert.match(html, /aria-label="Add personal web file"/);
-  assert.match(html, /Press <b>Run code<\/b> to see your page here/);
+  assert.match(html, /Press <b>Run code<\/b> to see your page\./);
   assert.match(html, /Run the current files successfully before submitting\./);
   assert.match(html, /Submit this version/);
   assert.doesNotMatch(html, /Program input|Program output|CheerpJ|Required output/);
@@ -204,7 +239,7 @@ test("personal web project editor: HTML editor and page preview, web file names,
   assert.match(html, /Add media files/);
   const review = render("review", { review: { studentId: "student", studentName: "Ana", submissionId: "x", submission: { files, status: "pass", submittedAt: "" } } });
   assert.match(review, /Submitted personal project — read-only/);
-  assert.match(review, /Press <b>Run code<\/b> to see your page here/);
+  assert.match(review, /Press <b>Run code<\/b> to see your page\./);
   assert.doesNotMatch(review, /Program input|CheerpJ|Submit this version|Add media files/);
 });
 

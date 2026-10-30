@@ -40,6 +40,33 @@ const [a1, a2] = weekA.lessons.map((item) => item.blocks[0]);
 const listAnswer = a1.files[0].content.replace("<li>Pandesal</li>", "<li>Pandesal</li><li>Banana</li>");
 const totalAnswer = "console.log(\"Total: \" + (2 + 3 + 4));";
 
+// Run opens the floating page window (2026-10-30). Wait until the run has been checked (Close comes on;
+// a RUN CODE box still on top makes the click wait), then close it so the checks show beside the code again.
+const closePageWindow = async (where) => {
+  const close = where.locator(".page-window").getByRole("button", { name: "Close", exact: true });
+  await close.waitFor();
+  await where.waitForFunction(() => document.querySelector(".page-window header button")?.disabled === false);
+  await close.click();
+  await where.locator(".page-window").waitFor({ state: "detached" });
+};
+// A step whose index.html links to its own pages, shows one in a frame, and links to a missing page and the internet.
+const pagesWeek = {
+  format: "codeshare-module", version: 1, course: "dotnet-1", week: 3, id: `wsf-pages-${randomUUID().slice(0, 8)}`, title: "Linked resume pages", starterFiles: [],
+  lessons: [
+    lesson("wsf-pages-d1", 1, [{ type: "step", id: "wsf-pages-s1", number: 1, instruction: "Open the linked pages.", language: "html", run: "index.html",
+      files: [
+        { path: "index.html", content: page("Home", '<h1>Juan Dela Cruz</h1>\n<p><a href="about.html">About</a></p>\n<p><a href="missing.html">Missing</a></p>\n<p><a href="https://example.com/">Internet</a></p>\n<iframe src="about.html" title="About frame"></iframe>') },
+        { path: "about.html", content: page("About", '<h1>About Juan</h1>\n<p><a href="contact.html">Contact</a></p>') },
+        { path: "contact.html", content: page("Contact", '<h1>Contact Juan</h1>\n<p><a href="index.html">Home</a></p>') },
+      ],
+      expectedOutput: "Tab title: Home\nVisible page text:\nJuan Dela Cruz\nAbout\nMissing\nInternet" }]),
+    // window.parent is replaceable, so this page's report never reaches CodeShare: the run waits its full 5 seconds.
+    lesson("wsf-pages-d2", 2, [{ type: "step", id: "wsf-pages-s2", number: 2, instruction: "A slow page.", language: "html", run: "index.html",
+      files: [{ path: "index.html", content: page("Slow", "<script>window.parent = { postMessage() {} };</script>\n<p>Slow</p>") }],
+      expectedOutput: "Tab title: Slow\nVisible page text:\nSlow" }]),
+  ],
+};
+
 test("web steps in the Java workflow: sample first, then the task; the next step and week open; reload resumes; projects carry forward", async (t) => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.WEB_STEPS_BASE_URL || "http://localhost:3042";
@@ -84,12 +111,10 @@ test("web steps in the Java workflow: sample first, then the task; the next step
       await worksheet.getByRole("button", { name: new RegExp(`Step ${step.number}$`) }).click();
       await worksheet.locator("article:not([hidden])").getByRole("button", { name: "Work in code editor", exact: true }).click();
     };
-    // Each run replaces the preview frame; wait for the new one, then for the banner to say `message`.
+    // Each run opens the page window; close it once checked, then wait for the banner to say `message`.
     const run = async (message) => {
-      const frame = project.locator(".module-web-preview iframe");
-      const old = await frame.count() ? await frame.elementHandle() : null;
       await tab.getByRole("button", { name: /Run code/ }).click();
-      if (old) await tab.waitForFunction((element) => !element.isConnected, old); else await frame.waitFor({ state: "attached" });
+      await closePageWindow(tab);
       await tab.waitForFunction((message) => document.querySelector(".module-run-feedback")?.textContent.includes(message), message);
     };
 
@@ -145,6 +170,7 @@ test("web steps in the Java workflow: sample first, then the task; the next step
       await editor.fill(mine);
       await tab.getByRole("button", { name: /Run code/ }).click();
       await tab.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
+      await closePageWindow(tab);
       await tab.getByRole("button", { name: "Submit this version", exact: true }).click();
       await tab.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
       assert.equal((await progress(weekA)).percent, 100);
@@ -162,6 +188,100 @@ test("web steps in the Java workflow: sample first, then the task; the next step
       assert.equal(personal.status(), 200, await personal.text());
       assert.deepEqual((await personal.json()).performanceProjectFiles, [{ path: "index.html", content: mine }], "the personal project carries week 1's submission forward");
       assert.deepEqual(errors, []);
+    });
+
+    await t.test("the page window: links and frames open the project's own pages, nothing comes from the internet, and it stays until the run is checked", async () => {
+      assert.equal((await teacher.request.post(`/api/classrooms/${classroomId}/modules`, { data: pagesWeek })).status(), 201);
+      const view = await teacher.newPage(); view.setDefaultTimeout(20000);
+      const pageErrors = []; view.on("pageerror", (e) => pageErrors.push(e.message));
+      const requests = []; view.on("request", (request) => requests.push(request.url()));
+      await view.goto("/");
+      await view.getByRole("button", { name: /Open class/ }).click();
+      await view.getByRole("navigation", { name: "Teacher class navigation" }).getByRole("button", { name: /Curriculum/ }).click();
+      await view.locator(".teacher-module-card", { hasText: "Linked resume pages" }).getByRole("button", { name: /View module details/ }).click();
+      const steps = view.locator(".module-step");
+      await steps.nth(0).getByRole("button", { name: "Run", exact: true }).click();
+      const pageWindow = view.locator(".page-window"), heading = pageWindow.locator("h2"), note = pageWindow.locator(".page-window-note");
+      const inside = view.frameLocator(".page-window .module-web-preview iframe");
+      // CodeShare zooms the page (body zoom), which throws off Playwright's mouse inside frames; links are followed
+      // with the keyboard instead: focus, then Enter, which the page sees as a click.
+      const follow = async (name) => { await inside.getByRole("link", { name, exact: true }).focus(); await view.keyboard.press("Enter"); };
+      await view.waitForFunction(() => document.querySelector(".page-window header button")?.disabled === false);
+      assert.equal(await heading.textContent(), "index.html");
+      assert.deepEqual(await pageWindow.locator(".web-checks li").allTextContents(), ["✓ Page text matches"], "the window shows the run's checks");
+      // Playwright cannot reach a frame inside the sandboxed page, so the framed page is reloaded and its own report read.
+      const outer = await (await view.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+      const framedText = await outer.evaluate(() => new Promise((resolve) => {
+        addEventListener("message", (event) => { if (event.data?.codeshare === "page") resolve(event.data.text); });
+        const frame = document.querySelector('iframe[title="About frame"]'); frame.srcdoc = frame.srcdoc;
+      }));
+      assert.match(framedText, /^About Juan\s+Contact$/, "a frame shows the project's own page");
+
+      await follow("About");
+      await view.waitForFunction(() => document.querySelector(".page-window h2")?.textContent === "about.html");
+      assert.equal(await inside.locator("h1").textContent(), "About Juan");
+      assert.deepEqual(await pageWindow.locator(".web-checks li").allTextContents(), ["✓ Page text matches"], "looking at another page never changes the result");
+      await follow("Contact");
+      await view.waitForFunction(() => document.querySelector(".page-window h2")?.textContent === "contact.html");
+      await follow("Home");
+      await view.waitForFunction(() => document.querySelector(".page-window h2")?.textContent === "index.html");
+      // A link inside the framed page: Tab from the last link of the page moves into the frame's Contact link.
+      await inside.getByRole("link", { name: "Internet", exact: true }).focus();
+      await view.keyboard.press("Tab");
+      await view.keyboard.press("Enter");
+      await view.waitForFunction(() => document.querySelector(".page-window h2")?.textContent === "contact.html", null, { timeout: 5000 });
+      await follow("Home");
+      await view.waitForFunction(() => document.querySelector(".page-window h2")?.textContent === "index.html");
+
+      await follow("Missing");
+      assert.equal(await note.textContent(), "This project has no page named missing.html.");
+      assert.equal(await heading.textContent(), "index.html");
+      await follow("Internet");
+      await view.waitForFunction(() => /outside this project/.test(document.querySelector(".page-window-note")?.textContent ?? ""));
+      assert.equal(await note.textContent(), "Links outside this project do not open in CodeShare.");
+      assert.equal(await inside.locator("h1").textContent(), "Juan Dela Cruz", "the page stays where it was");
+      assert.deepEqual(requests.filter((url) => /example\.com/.test(url)), [], "nothing is requested from the internet");
+      await view.screenshot({ path: "/tmp/codeshare-page-window.png" });
+
+      // Esc closes the window when CodeShare has the keyboard; inside the page, the student's page gets the key.
+      await pageWindow.getByRole("button", { name: "Close", exact: true }).focus();
+      await view.keyboard.press("Escape");
+      await pageWindow.waitFor({ state: "detached" });
+      assert.deepEqual(await steps.nth(0).locator(".web-checks li").allTextContents(), ["✓ Page text matches"], "closed, the checks show beside the step");
+      await steps.nth(0).getByRole("button", { name: "Show page", exact: true }).click();
+      await pageWindow.waitFor();
+      await pageWindow.getByRole("button", { name: "Close", exact: true }).click();
+      await pageWindow.waitFor({ state: "detached" });
+
+      await steps.nth(1).getByRole("button", { name: "Run", exact: true }).click();
+      await pageWindow.waitFor();
+      assert.equal(await pageWindow.getByRole("button", { name: "Close", exact: true }).isDisabled(), true, "Close waits for the run to be checked");
+      await view.keyboard.press("Escape");
+      await view.mouse.click(5, 5);
+      assert.equal(await pageWindow.count(), 1, "Esc and a click beside the window wait for the run too");
+      await closePageWindow(view);
+
+      // In the classroom the teacher's worksheet is a drawer that closes on clicks outside it; the window sits on
+      // the page body above it, so using the window must leave the drawer open.
+      await view.goto("/");
+      await view.getByRole("button", { name: "Open class", exact: true }).click();
+      await view.getByRole("button", { name: "Enter classroom" }).click();
+      await view.locator(".classroom-workspace").waitFor();
+      await view.getByRole("button", { name: "Module", exact: true }).hover();
+      await view.locator("#classroom-modules .module-catalog-card").filter({ hasText: "Linked resume pages" }).getByRole("button").first().click();
+      const worksheet = view.locator("#classroom-worksheet");
+      await worksheet.locator("article:not([hidden])").waitFor();
+      await worksheet.getByRole("button", { name: /Step 1$/ }).click();
+      const sample = worksheet.locator("article:not([hidden]) details").filter({ hasText: "Preview sample code" }).first();
+      if (await sample.getAttribute("open") === null) await sample.locator("summary").click();
+      await sample.getByRole("button", { name: "Run", exact: true }).click();
+      await view.waitForFunction(() => document.querySelector(".page-window header button")?.disabled === false);
+      await pageWindow.locator(".page-window-results").click();
+      assert.equal(await worksheet.getAttribute("data-open"), "true", "a click in the window keeps the worksheet open");
+      await closePageWindow(view);
+      assert.equal(await worksheet.getAttribute("data-open"), "true", "closing the window keeps the worksheet open");
+      assert.deepEqual(pageErrors, []);
+      await view.close();
     });
   } finally {
     await browser.close();

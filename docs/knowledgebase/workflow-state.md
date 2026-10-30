@@ -114,6 +114,12 @@ What teachers and students can do today. Keep this page current when their use o
   `webChecks` entry adds a line (**Page has 1 h1**, **html has lang="en"**, …) with what was found on a
   cross; the step completes only when every line is ticked (also on the teacher's **Run** in
   **View module details**).
+- **Page window (2026-10-30, CKB-086):** **▶ Run code** on a web step or web personal project (and the
+  teacher's **Run** in **View module details**, worksheet and **Review personal submission**) opens a
+  floating **YOUR PAGE** window with the page and its checks. **Close**, Esc or a click beside it close
+  it once the run is checked; **Show page** opens it again. Links to the project's own pages and
+  frames of them work inside the window; a missing page says **This project has no page named …**, an
+  internet link says **Links outside this project do not open in CodeShare.** Checks use the run file.
 - **Module media (2026-10-29, online):** in **View module details**, **Media files** → **Add media
   files** stores a module's pictures, sound and video once (Cloudflare R2), shared by the teacher's
   classes in that subject; **Remove** deletes one. Once a module has media files, its media steps
