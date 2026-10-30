@@ -319,7 +319,7 @@
           "type": "step",
           "id": "java-2-w15-d2-s3",
           "number": 3,
-          "instruction": "**Step 3a:** open `fleet.txt` (made in Step 1) in **Notepad**. Type the four lines shown in `fleet.txt` **exactly**: commas, no spaces after commas. Save it.\n\n**Step 3:** replace `Main.java`. This reads the file one character at a time.",
+          "instruction": "**Step 3a:** open the `fleet.txt` tab. CodeShare supplies the four fleet lines, typed exactly: commas, no spaces after commas. Leave it unchanged.\n\n**Step 3:** replace `Main.java`. This reads the file one character at a time.",
           "language": "java",
           "files": [
             {
@@ -353,6 +353,10 @@
             {
               "path": "VehicleNotFoundException.java",
               "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "fleet.txt",
+              "content": "Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nTricycle,TRC 456,Kuya Ben,Bagong Silang TODA\nBus,BUS 789,Aling Rosa,50\nJeepney,NYB 321,Mang Tonyo,Sangandaan-Recto\n"
             }
           ],
           "run": "Main.java",
@@ -409,6 +413,10 @@
             {
               "path": "VehicleNotFoundException.java",
               "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "fleet.txt",
+              "content": "Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nTricycle,TRC 456,Kuya Ben,Bagong Silang TODA\nBus,BUS 789,Aling Rosa,50\nJeepney,NYB 321,Mang Tonyo,Sangandaan-Recto\n"
             }
           ],
           "run": "Main.java",
@@ -516,7 +524,7 @@
           "type": "step",
           "id": "java-2-w15-d3-s5",
           "number": 5,
-          "instruction": "**Step 5a:** in Notepad, make a new file `fares.txt` in the same folder, with the two lines shown (sample fares, not real LTFRB rates).\n\n**Step 5:** replace `Main.java`.",
+          "instruction": "**Step 5a:** open the `fares.txt` tab. CodeShare supplies its two lines of sample fares (not real LTFRB rates). Leave it unchanged.\n\n**Step 5:** replace `Main.java`.",
           "language": "java",
           "files": [
             {
@@ -550,6 +558,10 @@
             {
               "path": "VehicleNotFoundException.java",
               "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "fares.txt",
+              "content": "13.00 15.00 20.50\n27.50 13.00\n"
             }
           ],
           "run": "Main.java",
@@ -612,6 +624,10 @@
             {
               "path": "VehicleNotFoundException.java",
               "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "fleet.txt",
+              "content": "Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nTricycle,TRC 456,Kuya Ben,Bagong Silang TODA\nBus,BUS 789,Aling Rosa,50\nJeepney,NYB 321,Mang Tonyo,Sangandaan-Recto\n"
             }
           ],
           "run": "Main.java",
@@ -795,6 +811,10 @@
             {
               "path": "VehicleNotFoundException.java",
               "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "trip_log.txt",
+              "content": "TRC 456 left Bagong Silang\n"
             }
           ],
           "run": "Main.java",
@@ -853,6 +873,10 @@
             {
               "path": "VehicleNotFoundException.java",
               "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "fleet.txt",
+              "content": "Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nTricycle,TRC 456,Kuya Ben,Bagong Silang TODA\nBus,BUS 789,Aling Rosa,50\nJeepney,NYB 321,Mang Tonyo,Sangandaan-Recto\n"
             }
           ],
           "run": "Main.java",
@@ -918,6 +942,10 @@
             {
               "path": "VehicleNotFoundException.java",
               "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "fleet_backup.txt",
+              "content": "Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nTricycle,TRC 456,Kuya Ben,Bagong Silang TODA\nBus,BUS 789,Aling Rosa,50\nJeepney,NYB 321,Mang Tonyo,Sangandaan-Recto\nTricycle,TRC 654,Mang Lito,Bagong Silang TODA\n"
             }
           ],
           "run": "Main.java",

@@ -1,7 +1,7 @@
 // Validates a module upload against docs/course-format.md so a malformed file is rejected with
 // a plain-English error instead of corrupting a class. Keep this in sync with that doc.
 import { z } from "zod";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "./file-paths.ts";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, javaProjectPath } from "./file-paths.ts";
 
 const file = z.object({ path: z.string().trim().min(1).max(200), content: z.string().max(200000) });
 
@@ -124,12 +124,13 @@ export const courseModule = z.object({
     // most JAVA_PATH_MAX_LENGTH characters (routes.ts). A java step's files, and any .java
     // performance-task file (both always sent to /api/execute - app/ModuleViewer.tsx), must pass
     // that same rule or the step becomes permanently unrunnable with no warning at upload time.
+    // A java step may also supply .txt data files its program reads (javaProjectPath).
     const javaFiles = [
       ...module.starterFiles.filter((file) => file.path.endsWith(".java")),
-      ...module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? [])] : []))),
       ...(module.performanceTask ? [...module.performanceTask.exampleFiles, ...module.performanceTask.starterFiles].filter((file) => file.path.endsWith(".java")) : []),
     ];
-    return javaFiles.every((file) => file.path.length <= JAVA_PATH_MAX_LENGTH && JAVA_PATH.test(file.path));
-  }, { message: `A java step's file path (or a .java performance-task file) must be a valid Java filename of at most ${JAVA_PATH_MAX_LENGTH} characters, e.g. "src/Main.java" - no spaces or punctuation besides "/" and "_"` });
+    const stepFiles = module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? [])] : [])));
+    return javaFiles.every((file) => file.path.length <= JAVA_PATH_MAX_LENGTH && JAVA_PATH.test(file.path)) && stepFiles.every((file) => javaProjectPath(file.path));
+  }, { message: `A java step's file path (or a .java performance-task file) must be a valid Java filename of at most ${JAVA_PATH_MAX_LENGTH} characters, e.g. "src/Main.java" - no spaces or punctuation besides "/" and "_"; a java step may also supply .txt data files such as fleet.txt` });
 
 export type CourseModule = z.infer<typeof courseModule>;

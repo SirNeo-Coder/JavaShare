@@ -36,6 +36,11 @@
 
 | interactive online Java, Scanner waits, answer after Run, live Console output, Stop | existing Java mode and module-result routes unchanged | useJavaConsole.ts, javaExecution.ts, page.tsx, StudentModuleActivity.tsx; runner.js and vendor/java/CodeShareJava.java | tests/browser-java-client.test.mjs and browser-java-runtime.test.mjs; CKB-049; docs/handoffs/online-java-interactive-input.md |
 
+Java data files (`.txt` a program reads, e.g. Week 15 `fleet.txt`): `javaProjectPath` in
+`backend/src/file-paths.ts` (upload schema, `routes.ts` `javaPath`, step opening, `javaExecution.ts`);
+`runner.js` passes them on; `CodeShareJava.java` writes them at the program's relative path;
+`java-runner.ts` compiles only `.java`. CKB-088; `tests/java-data-files.test.mjs`.
+
 Online Java loading timeout / whole-file compiler downloads: `runner.js` loads the
 binary compiler/helper into `/str/`; `javaExecution.ts` authenticates stage messages
 and names the last stage on timeout; `useJavaConsole.ts` shows loading feedback.

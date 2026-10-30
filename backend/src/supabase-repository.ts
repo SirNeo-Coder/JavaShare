@@ -4,7 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
 
 export type SupabaseSessionUser = {
   id: string;
@@ -1548,7 +1548,7 @@ export async function prepareSupabaseModuleActivity(user: SupabaseSessionUser, c
       drafts[key] = project;
       projects = { activeKey: key, drafts, ...(beforeSampleFiles ? { beforeSampleFiles } : {}) };
     }
-    if (project.length > 50 || (step.language === "java" && project.some((file) => file.path.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(file.path)))) throw new SupabaseRepositoryError(400, "This activity needs a project of at most 50 valid Java files");
+    if (project.length > 50 || (step.language === "java" && project.some((file) => !javaProjectPath(file.path)))) throw new SupabaseRepositoryError(400, "This activity needs a project of at most 50 valid Java files");
     return { project_files: project, ...(sampleFirst ? { activity_projects: projects } : {}) };
   };
   const saved = persist ? await updateModuleProgressWithMerge(user, classroomId, moduleId, prepare, "Could not open the module project")

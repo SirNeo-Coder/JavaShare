@@ -56,7 +56,8 @@ export async function executeLocallyResult(files: ExecutableJavaFile[], stdin: s
       await mkdir(join(destination, ".."), { recursive: true });
       await writeFile(destination, file.content, "utf8");
     }
-    const sourcePaths = files.map((file) => file.path.replace(/\\/g, "/").replace(/^src\//, ""));
+    // .txt data files are written beside the sources for the program to read, not compiled.
+    const sourcePaths = files.filter((file) => file.path.endsWith(".java")).map((file) => file.path.replace(/\\/g, "/").replace(/^src\//, ""));
     const compiled = await runLimitedProcess("javac", ["-encoding", "UTF-8", "-d", directory, ...sourcePaths], directory, "", 10000);
     if (compiled.outputLimited) return failed("Compilation stopped: output exceeded 64 KB.");
     if (compiled.timedOut) return failed("Compilation stopped after 10 seconds.");
