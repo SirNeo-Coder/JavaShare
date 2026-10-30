@@ -24,13 +24,13 @@ function openLink(page: ShownPage, from: string, href: string): ShownPage {
 // Runs a web module step in the sandboxed preview (no allow-same-origin) and shows the page in a floating
 // window (2026-10-30). The page reports its text and console lines by postMessage; only messages from this
 // hook's own frame are accepted. Links and frames open the project's own pages, never the internet.
-export function useWebPageRun() {
+// busy: the screen's own run flag, true until its check, device save and completion sync finish.
+export function useWebPageRun(busy: boolean) {
   const frame = useRef<HTMLIFrameElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const [page, setPage] = useState<ShownPage | null>(null);
   const [open, setOpen] = useState(false);
-  const [running, setRunning] = useState(false);
   const pending = useRef<{ lines: string[]; errors: string[]; finish: (loaded?: PageMessage) => void } | null>(null);
 
   useEffect(() => {
@@ -67,16 +67,15 @@ export function useWebPageRun() {
       clearTimeout(timer);
       const { lines, errors } = pending.current!;
       pending.current = null;
-      setRunning(false);
       resolve(webRunResult(mode, { lines, errors, page }, media?.include));
     } };
     setPage((current) => ({ html: preview.html, run: (current?.run ?? 0) + 1, path: runPath, files }));
-    setOpen(true); setRunning(true);
+    setOpen(true);
   });
 
-  // The window closes with Close, Esc or a click beside it, but only once the run has been checked.
+  // The window closes with Close, Esc or a click beside it, but only once the run has been checked and synced.
   // Close gets focus a frame later, after the RUN CODE box has handed focus back.
-  const shown = Boolean(page && open && !running);
+  const shown = Boolean(page && open && !busy);
   useEffect(() => {
     if (!shown) return;
     const focus = requestAnimationFrame(() => closeButton.current?.focus());
@@ -89,10 +88,10 @@ export function useWebPageRun() {
   // Keep the page on screen while it runs: a frame that never draws cannot report its page text (CKB-075).
   // allow="autoplay": Chrome refuses even muted sound in a sandboxed frame without it, so the media test
   // could never hear audio play (CKB-079). The frame stays sandboxed without allow-same-origin.
-  const pageWindow = (results: ReactNode) => page && open ? createPortal(<div className="page-window-overlay" onMouseDown={(event) => { if (!running && event.target === event.currentTarget) setOpen(false); }}>
+  const pageWindow = (results: ReactNode) => page && open ? createPortal(<div className="page-window-overlay" onMouseDown={(event) => { if (!busy && event.target === event.currentTarget) setOpen(false); }}>
     <section className="page-window" role="dialog" aria-modal="true" aria-labelledby={titleId}>
       <header><div><span className="eyebrow">YOUR PAGE</span><h2 id={titleId}>{page.path}</h2></div>
-        <button ref={closeButton} type="button" disabled={running} onClick={() => setOpen(false)}>Close</button></header>
+        <button ref={closeButton} type="button" disabled={busy} onClick={() => setOpen(false)}>Close</button></header>
       {page.note && <p className="page-window-note" role="status">{page.note}</p>}
       <div className="module-web-preview"><iframe key={page.run} ref={frame} title="Web page preview" sandbox="allow-scripts" allow="autoplay" srcDoc={page.html} /></div>
       {results && <div className="page-window-results">{results}</div>}

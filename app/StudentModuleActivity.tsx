@@ -144,7 +144,6 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   // A web personal project's own pictures, sound and video (online only); a review shows the submitted copies.
   const [personalMedia, setPersonalMedia] = useState(review ? activity.review?.submission.media ?? [] : personal ? activity.progress.performanceTask.project?.media ?? [] : []);
   const personalPage = async () => personalMedia.length ? { files: await loadPersonalMedia(activity.classroomId, activity.studentId, personalMedia), include: false } : undefined;
-  const webPage = useWebPageRun();
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
   const [files, setFiles] = useState<ModuleFile[]>(personal ? activity.progress.performanceProjectFiles : activity.progress.projectFiles);
   const [stdin, setStdin] = useState("");
@@ -156,6 +155,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   // Modules with steps offer their copyable samples on the steps themselves instead.
   const codeToCopy = personal && !review && !activity.module?.performanceTask?.steps?.length ? moduleCode(activity.module) : [];
   const [busy, setBusy] = useState(false);
+  const webPage = useWebPageRun(busy);
   const [runMessage, setRunMessage] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState<Notice | null>(null);

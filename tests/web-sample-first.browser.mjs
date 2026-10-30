@@ -134,7 +134,19 @@ test("web steps in the Java workflow: sample first, then the task; the next step
       assert.deepEqual(await checks.locator("li").allTextContents(), ["✗ Page text matches"], "a task is checked by its output only");
       assert.match(await checks.getByLabel("Your output").textContent(), /Mango/);
       await editor.fill(listAnswer);
-      await run("Completed — next activity unlocked");
+      // The window stays until the completion is synced too: hold that request; Close, Esc and a click beside it wait.
+      let release, syncing; const held = new Promise((resolve) => { release = resolve; }), sent = new Promise((resolve) => { syncing = resolve; });
+      await tab.route("**/progress/complete", async (route) => { syncing(); await held; await route.continue(); });
+      await tab.getByRole("button", { name: /Run code/ }).click();
+      await sent;
+      const pageWindow = tab.locator(".page-window");
+      assert.equal(await pageWindow.getByRole("button", { name: "Close", exact: true }).isDisabled(), true, "Close waits for the completion to sync");
+      await tab.keyboard.press("Escape");
+      await tab.mouse.click(5, 5);
+      assert.equal(await pageWindow.count(), 1, "Esc and a click beside the window wait for the sync too");
+      release(); // later completions pass straight through
+      await closePageWindow(tab);
+      await tab.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed — next activity unlocked"));
       const saved = await progress(weekA);
       assert.equal(saved.stepStates[activityStateId(a1)], "pass"); assert.equal(saved.stepStates[sampleStateId(a1)], "pass");
       const blocked = await student.request.get(`/api/classrooms/${classroomId}/modules/${weekB.id}/progress`);

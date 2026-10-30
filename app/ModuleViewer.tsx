@@ -245,7 +245,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
   // Media steps are checked automatically once the module's media files are uploaded (teacher, 2026-10-29).
   const web = webStep(step), hasMedia = Object.keys(media).length > 0, teacherChecked = web && teacherCheckedStep(step) && !hasMedia;
   const mediaRun = web && teacherCheckedStep(step) && hasMedia ? { files: media, include: Boolean(step.includeMediaOutput) } : undefined;
-  const webPage = useWebPageRun();
+  const webPage = useWebPageRun(busy);
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
   const run = async () => {
     setBusy(true);

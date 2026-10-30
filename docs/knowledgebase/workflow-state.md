@@ -117,7 +117,7 @@ What teachers and students can do today. Keep this page current when their use o
 - **Page window (2026-10-30, CKB-086):** **▶ Run code** on a web step or web personal project (and the
   teacher's **Run** in **View module details**, worksheet and **Review personal submission**) opens a
   floating **YOUR PAGE** window with the page and its checks. **Close**, Esc or a click beside it close
-  it once the run is checked; **Show page** opens it again. Links to the project's own pages and
+  it once the run is checked and a completed task is saved to CodeShare (CKB-087); **Show page** opens it again. Links to the project's own pages and
   frames of them work inside the window; a missing page says **This project has no page named …**, an
   internet link says **Links outside this project do not open in CodeShare.** Checks use the run file.
 - **Module media (2026-10-29, online):** in **View module details**, **Media files** → **Add media
