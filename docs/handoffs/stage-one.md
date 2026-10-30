@@ -1064,6 +1064,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   `fleet.txt` tab, sample verified, task completed and saved with `fleet.txt` (disposable data deleted).
 - Open: CKB-089 — CheerpJ ignores append mode, so Step 8's sample (and the personal task's append
   example) fail online. Needs a teacher decision. Not run: the hosted site; the Week 12–15 prerequisite chain.
+- Commit `89aafc1`, PR #78 (https://github.com/SirNeo-Coder/JavaShare/pull/78).
 - Next: teacher reviews the PR, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`
   A re-upload changes the module version, so an unverified step reloads its sample with the new
   file and keeps the student's earlier device draft as a backup (`restoreModuleDraft`; read in code,
