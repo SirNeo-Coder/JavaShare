@@ -31,6 +31,7 @@ into three slices, then the teacher's own revision of the module files.
 | Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Retired** 2026-10-30: the teacher replaced the 20-week canteen map with a 10-week resume map; the old Weeks 1–3 materials are not used (CKB-085) | teacher's files |
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
+| Page window stays until a completed task is synced (CKB-087, review finding on PR #76) | **Built** 2026-10-30, PR open; unit 411/411, web browser tests pass offline (3042); Cloudflare runtime not run | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77), branch `fix/page-window-close-during-sync`, commit `cf54e6f` |
 | Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Not started**; the rolling weekly prompt must be rewritten for the new map first | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -780,3 +781,6 @@ I must check, and a Sources list of every reference as clickable links. Then the
 - 2026-10-30 — Rolling weekly prompt rewritten for the 10-week resume map, starting at Week 1 (teacher approved):
   new weeks in `Resume/Week_NN/`, IDs `dotnet-1-rNN` (old `dotnet-1-w01`…`w03` never reused), CodeShare-only
   wording check, made-up media for Juan. Format section (files, IDs) updated to match.
+- 2026-10-30 — PR #76 merged. Review finding approved and fixed (CKB-087) on `fix/page-window-close-during-sync`: the
+  page window's Close, Esc and click-beside stay off until the screen's whole run finishes, including the check and
+  the completion sync. Next: teacher reviews the PR.
