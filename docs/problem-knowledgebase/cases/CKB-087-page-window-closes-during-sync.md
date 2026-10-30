@@ -35,7 +35,7 @@ the guard lifted too early. The browser test only checked Close during the page 
   server on 3042.
 - Shown failing with the old guard ("Close waits for the completion to sync", `false !== true`); passed
   again once restored.
-- Commit: on branch `fix/page-window-close-during-sync`.
+- Commit: `cf54e6f` on branch `fix/page-window-close-during-sync` ([PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77)).
 
 ## Recurrence triage
 
