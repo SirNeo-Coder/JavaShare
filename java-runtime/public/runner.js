@@ -24,7 +24,7 @@
     window.addEventListener("message", receiveInput);
     try {
       if (typeof interactive !== "boolean" || !Array.isArray(files) || !files.length || files.length > 50 || typeof stdin !== "string" || stdin.length > 10000 || typeof mainClass !== "string" ||
-          files.some((file) => typeof file.path !== "string" || !/^(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java$/.test(file.path) || typeof file.content !== "string" || file.content.length > 200000)) throw new Error("Invalid Java project");
+          files.some((file) => typeof file.path !== "string" || !/^(?:(?:[A-Za-z_$][\w$]*\/)*[A-Za-z_$][\w$]*\.java|(?:[\w-]+\/)*[\w-]+(?:\.[\w-]+)*\.txt)$/.test(file.path) || typeof file.content !== "string" || file.content.length > 200000)) throw new Error("Invalid Java project");
       status("Loading Java 8");
       await new Promise((resolve, reject) => {
         const script = document.createElement("script");

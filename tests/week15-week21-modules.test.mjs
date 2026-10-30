@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -73,7 +73,8 @@ for (const content of modules) {
         assert.notEqual(step.expectedOutput, step.activity.expectedOutput);
         assert.ok(edits[step.id].length > 0);
         assert.ok(step.files.some((file) => file.path === "Main.java"));
-        assert.ok(step.files.every((file) => file.path.endsWith(".java")));
+        // Week 15 steps supply the .txt data files their programs read (CKB-088).
+        assert.ok(step.files.every((file) => file.path.endsWith(".java") || (content.week === 15 && file.path.endsWith(".txt"))));
         delete step.activity;
         step.files = before.originalStepFiles[step.id].map((path) => {
           const file = step.files.find((file) => file.path === path) ?? before.relocated.find((entry) => entry.step === step.id && entry.file.path === path)?.file;
@@ -92,7 +93,8 @@ for (const content of modules) {
     if (before.addedStarter) delete restored.performanceTask.starterFiles;
     if (before.addedExample) delete restored.performanceTask.exampleFiles;
     assert.equal(digest(restored), before.original, "original code, instructions, outputs, ids and assessments must remain unchanged");
-    assert.equal(courseModule.safeParse(restored).success, content.week === 18, "the six original upload failures remain reproducible before the additions");
+    // Week 19's original failed only for its .txt step file, which java steps may now supply (CKB-088).
+    assert.equal(courseModule.safeParse(restored).success, [18, 19].includes(content.week), "the five other original upload failures remain reproducible before the additions");
     if (content.week === 20) {
       assert.deepEqual(steps(content), []);
       assert.equal(parsed.sampleFirst, undefined);
@@ -120,35 +122,33 @@ test("Weeks 15–21: old samples and headless messages cannot pass new tasks or 
   }
 });
 
-// These trusted curriculum sources run in disposable folders, not through the classroom file block.
-async function desktopRun(folder, files) {
-  for (const file of files) await writeFile(join(folder, file.path), file.content);
-  await exec("javac", ["-encoding", "UTF-8", "-d", folder, ...files.map((file) => join(folder, file.path))], { timeout: 15000 });
-  const { stdout, stderr } = await exec("java", ["-Djava.awt.headless=true", "-cp", folder, "Main"], { cwd: folder, timeout: 5000, env: { ...process.env, LC_ALL: "C.UTF-8" } });
-  assert.equal(stderr, "");
-  return { success: true, output: stdout };
+// CodeShare runs each step alone: a fresh, empty folder holding only that step's own files, through
+// the same bridge the browser runs (CKB-088). A shared desktop folder hid missing data files.
+const bridge = new URL("../java-runtime/public/codeshare-runner.jar", import.meta.url).pathname;
+async function freshRun(files, check) {
+  const folder = await mkdtemp(join(tmpdir(), "codeshare-w15-"));
+  try {
+    for (const [index, file] of files.entries()) await writeFile(join(folder, `codeshare-${index}`), file.content);
+    const { stdout } = await exec("java", ["-cp", bridge, "CodeShareJava", files.map((file) => file.path).join("\n"), "Main", "", join(folder, "run-step"), folder], { cwd: folder, timeout: 15000, env: { ...process.env, LC_ALL: "C.UTF-8" } });
+    const result = JSON.parse(stdout);
+    await check?.(folder, result);
+    return result;
+  } finally { await rm(folder, { recursive: true, force: true }); }
 }
 
-test("Week 15: original disk samples and each independent alteration match real Java output", async (t) => {
-  const content = modules[0], folder = await mkdtemp(join(tmpdir(), "codeshare-w15-"));
-  try {
-    for (const step of steps(content)) {
-      await t.test(`Week 15 Step ${step.number}: disk sample and alteration`, async () => {
-        for (const asset of originals[15].relocated.filter((entry) => entry.step === step.id)) await writeFile(join(folder, asset.file.path), asset.file.content);
-        const taskFolder = await mkdtemp(join(tmpdir(), "codeshare-w15-task-"));
-        try {
-          await cp(folder, taskFolder, { recursive: true });
-          const baseline = await desktopRun(folder, step.files);
-          assert.equal(matchesSample(baseline, step), true, baseline.output);
-          const changed = await desktopRun(taskFolder, alter(step));
-          assert.equal(matchesActivityOutput(changed, step.activity.expectedOutput), true, changed.output);
-          assert.equal(matchesActivityOutput({ ...changed, success: false }, step.activity.expectedOutput), false);
-          if (step.number === 9) assert.match(await readFile(join(taskFolder, "fleet_backup.txt"), "utf8"), /Bus,BUS 654,Mang Lito,30/);
-          if (step.number === 10) assert.equal(await readFile(join(taskFolder, "report.txt"), "utf8"), changed.output.slice(0, changed.output.lastIndexOf("report.txt size:")));
-        } finally { await rm(taskFolder, { recursive: true, force: true }); }
+test("Week 15: each sample and alteration runs alone from its own step files, as CodeShare runs it (CKB-088)", async (t) => {
+  for (const step of steps(modules[0])) {
+    await t.test(`Week 15 Step ${step.number}: sample and alteration`, async () => {
+      const baseline = await freshRun(step.files);
+      assert.equal(matchesSample(baseline, step), true, baseline.output);
+      const changed = await freshRun(alter(step), async (folder, result) => {
+        if (step.number === 9) assert.match(await readFile(join(folder, "fleet_backup.txt"), "utf8"), /Bus,BUS 654,Mang Lito,30/);
+        if (step.number === 10) assert.equal(await readFile(join(folder, "report.txt"), "utf8"), result.output.slice(0, result.output.lastIndexOf("report.txt size:")));
       });
-    }
-  } finally { await rm(folder, { recursive: true, force: true }); }
+      assert.equal(matchesActivityOutput(changed, step.activity.expectedOutput), true, changed.output);
+      assert.equal(matchesActivityOutput({ ...changed, success: false }, step.activity.expectedOutput), false);
+    });
+  }
 });
 
 for (const content of modules.filter((content) => content.week !== 15 && content.week !== 20)) {
@@ -169,7 +169,7 @@ for (const content of modules.filter((content) => content.week !== 15 && content
   });
 }
 
-test("Week 15: classroom file access stays blocked while desktop exercises remain explicitly separate", async () => {
+// Week 15 runs online only for now: the laptop runner still refuses file access (teacher, 2026-10-30).
+test("Week 15: the laptop runner still blocks file access", async () => {
   await assert.rejects(executeLocallyResult(steps(modules[0])[0].files, ""), /blocks file, network, process, and system-control APIs/);
-  assert.match(originals[15].notice, /do not treat this JSON as classroom-ready/);
 });

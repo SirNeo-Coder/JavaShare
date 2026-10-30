@@ -1,5 +1,5 @@
 import { api } from "./apiClient";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH } from "../backend/src/file-paths";
+import { javaProjectPath } from "../backend/src/file-paths";
 import { sourcePath, type ModuleFile } from "../backend/src/module-activities";
 
 export type JavaResult = { mode: string; success: boolean; output: string };
@@ -32,7 +32,7 @@ export async function runJava(files: ModuleFile[], stdin: string, runner?: JavaR
   if (config.mode !== "browser") return api<JavaResult>("/api/execute", { method: "POST", body: JSON.stringify({ files, stdin }) });
   const url = runnerAddress(config.url ?? "", window.location.origin);
   const paths = files.map((file) => sourcePath(file.path));
-  if (!files.length || files.length > 50 || stdin.length > 10000 || paths.some((path) => path.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(path)) || new Set(paths).size !== paths.length || files.some((file) => file.content.length > 200000)) throw new Error("Choose up to 50 valid Java files and at most 10,000 characters of input.");
+  if (!files.length || files.length > 50 || stdin.length > 10000 || paths.some((path) => !javaProjectPath(path)) || new Set(paths).size !== paths.length || files.some((file) => file.content.length > 200000)) throw new Error("Choose up to 50 valid Java files and at most 10,000 characters of input.");
   const main = files.find((file) => /(?:^|\/)Main\.java$/.test(file.path));
   if (!main) return { mode: "browser", success: false, output: "Run failed: this project needs a Main.java file containing public static void main(String[] args)." };
   const packageName = main.content.match(/^\s*package\s+([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*;/m)?.[1];

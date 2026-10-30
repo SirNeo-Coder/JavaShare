@@ -1044,3 +1044,28 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Not tested: online mode (the test is written for the offline laptop runner); an app-side break.
 - Next: teacher reviews; retarget is not needed (PR is against main), but resolve PR #70's conflict
   first.
+
+## Week 15 data files — 2026-10-30
+
+- Branch `fix/week15-data-files` (from `main` after PR #77 merged). Teacher approved the plan and
+  "online only for now" (offline laptop runner keeps blocking `java.io`).
+- Problem (CKB-088): Week 15 samples read `fleet.txt`/`fares.txt`/files from earlier steps, but each
+  CodeShare run starts empty and Java runs refused `.txt` files; the data had been moved out of the
+  steps. Student saw `Cannot read: fleet.txt (No such file or directory)` on Step 3.
+- Done: `javaProjectPath` (`backend/src/file-paths.ts`) lets Java projects carry safe `.txt` files
+  in upload, routes, step opening, `runJava`, `runner.js` and the bridge (`CodeShareJava.java`,
+  JAR rebuilt); laptop runner compiles only `.java`. Week 15 Steps 3, 4, 5, 6, 8, 9, 10 supply their
+  files; Steps 3a/5a text changed; activity ids unchanged (requirements unchanged). Editor shows
+  `.txt` tabs as plain text.
+- Tested: `tests/java-data-files.test.mjs` (6, incl. local Supabase routes),
+  `tests/week15-week21-modules.test.mjs` (each step alone through the bridge),
+  `tests/browser-java-client.test.mjs` (new CKB-088 test); each shown failing with `main`'s code.
+  Live real CheerpJ 4.3: 9/10 Week 15 samples match. Real app in local online mode: Step 3 shows the
+  `fleet.txt` tab, sample verified, task completed and saved with `fleet.txt` (disposable data deleted).
+- Open: CKB-089 — CheerpJ ignores append mode, so Step 8's sample (and the personal task's append
+  example) fail online. Needs a teacher decision. Not run: the hosted site; the Week 12–15 prerequisite chain.
+- Next: teacher reviews the PR, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`
+  A re-upload changes the module version, so an unverified step reloads its sample with the new
+  file and keeps the student's earlier device draft as a backup (`restoreModuleDraft`; read in code,
+  not run). No student can have passed Steps 3–10 online before this fix.
+

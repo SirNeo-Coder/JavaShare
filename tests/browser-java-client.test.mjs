@@ -47,6 +47,24 @@ test("browser Java: authenticates frame messages, sends every source/input/packa
   } finally { globalThis.window = originalWindow; globalThis.document = originalDocument; }
 });
 
+test("browser Java: sends a step's .txt data file with its sources and refuses unsafe names (CKB-088)", async () => {
+  const originalWindow = globalThis.window, originalDocument = globalThis.document;
+  const listeners = new Set();
+  let frame, sent;
+  globalThis.window = { location: { origin: "https://class.example.test" }, addEventListener: (_, fn) => listeners.add(fn), removeEventListener: (_, fn) => listeners.delete(fn) };
+  globalThis.document = { createElement: () => (frame = { sandbox: { add() {} }, contentWindow: { postMessage(data) { sent = data; } }, remove() {} }),
+    body: { append() { for (const listener of [...listeners]) listener({ data: { type: "codeshare-java-ready" }, source: frame.contentWindow, origin: "https://java.example.test" }); } } };
+  try {
+    const fleet = { path: "fleet.txt", content: "Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\n" };
+    const running = runJava([files[0], fleet], "", browser);
+    await Promise.resolve();
+    assert.deepEqual(sent.files.map((file) => file.path), ["Main.java", "fleet.txt"]);
+    for (const listener of [...listeners]) listener({ data: { type: "codeshare-java-result", id: sent.id, success: true, output: "ok\n" }, source: frame.contentWindow, origin: "https://java.example.test" });
+    assert.equal((await running).success, true);
+    await assert.rejects(runJava([files[0], { ...fleet, path: "../fleet.txt" }], "", browser));
+  } finally { globalThis.window = originalWindow; globalThis.document = originalDocument; }
+});
+
 test("browser Java: offline uses only the existing authenticated laptop endpoint", async (t) => {
   const calls = [];
   t.mock.method(globalThis, "fetch", async (url, options) => { calls.push({ url, options }); return Response.json({ mode: "local", success: true, output: "laptop" }); });
