@@ -27,7 +27,7 @@ The page runs from `srcdoc` in a sandboxed frame, so a relative link pointed at 
 - `tests/web-module-steps.test.mjs`: "project pages: link and frame addresses resolve inside the project; the internet and mailto: stay outside"; "module previews send link clicks to CodeShare and show project pages in frames; the New web project preview is unchanged".
 - `tests/web-sample-first.browser.mjs`: "the page window: links and frames open the project's own pages, nothing comes from the internet, and it stays until the run is checked" (offline settings 3042 and Cloudflare runtime 8787).
 - Shown failing: with the link listener switched off, the unit test and the browser test (following About never shows about.html) failed; without the drawer guard the browser test failed at "a click in the window keeps the worksheet open". Both passed again once restored.
-- Commit: branch `feature/web-page-window`.
+- Commit: `f2bb36f` on branch `feature/web-page-window` ([PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76)).
 
 ## Recurrence triage
 

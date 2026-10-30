@@ -30,7 +30,7 @@ into three slices, then the teacher's own revision of the module files.
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
 | Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Retired** 2026-10-30: the teacher replaced the 20-week canteen map with a 10-week resume map; the old Weeks 1–3 materials are not used (CKB-085) | teacher's files |
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
-| Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | branch `feature/web-page-window` |
+| Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
 | Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Not started**; the rolling weekly prompt must be rewritten for the new map first | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
