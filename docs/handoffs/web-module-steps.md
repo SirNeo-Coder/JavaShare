@@ -5,7 +5,7 @@ notes"). Another coding assistant must be able to continue from this file alone.
 `AGENTS.md` first; its "Web module steps (agreed 2026-10-28)" rule is the short version of the
 decisions below.
 
-Last updated: 2026-10-29.
+Last updated: 2026-10-30.
 
 ## Goal
 
@@ -26,11 +26,12 @@ into three slices, then the teacher's own revision of the module files.
 | Slice 3a — page-element checks (`webChecks`) | **Done, merged** 2026-10-29 | [PR #64](https://github.com/SirNeo-Coder/JavaShare/pull/64), merge `0dcdd6a` on main; see "How Slice 3a works" |
 | Slice 3b — pictures, sound, video (`mediaChecks`) | **Done, merged** 2026-10-29 (R2, one shared copy, 5 MB per file, device cache, teacher-checked until upload). Hosted check passed (teacher, 2026-10-29: bucket created before merging, no card asked, Week 3 Steps 2–7 tick every line, no `exceededCpu`) | [PR #65](https://github.com/SirNeo-Coder/JavaShare/pull/65), merge `26875dc` on main; see "How Slice 3b works" |
 | Students' own pictures, sound and video in personal web projects | **Done, merged** 2026-10-29 (online; 5 MB each, at most 10, carries forward). Cloudflare build check passed; hosted check not yet done | [PR #68](https://github.com/SirNeo-Coder/JavaShare/pull/68), merge `fc9a946` on main; see "How student media works" |
-| CKB-080 — Run on a media step before the media load shows a cross (teacher and student) | **Fixed, PR open** 2026-10-29: **Run** waits (**Loading media…**) | [PR #75](https://github.com/SirNeo-Coder/JavaShare/pull/75), branch `fix/media-run-before-loaded`; `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
+| CKB-080 — Run on a media step before the media load shows a cross (teacher and student) | **Fixed, merged** 2026-10-29: **Run** waits (**Loading media…**) | [PR #75](https://github.com/SirNeo-Coder/JavaShare/pull/75), branch `fix/media-run-before-loaded`; `docs/problem-knowledgebase/cases/CKB-080-teacher-media-run-before-loaded.md` |
 | Offline work for web steps, including offline media (offline has no Cloudflare R2) | **Deferred** to a separate task (teacher, 2026-10-29) | — |
-| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Done in the teacher's files** 2026-10-29: sample first, 22 tasks, weeks linked, task pages after page 8, DLL lines; teacher's checkers pass. CodeShare browser check **waits for the app task PR #72** | teacher's folder (`before_revision/`, `solutions/`, `revision_tools/`, each week's Verification); [PR #74](https://github.com/SirNeo-Coder/JavaShare/pull/74) (`docs/net-weeks-1-3-revision`); see "Weeks 1–3 revision (done)" |
+| Teacher's module revision, Weeks 1–3 (JSON, DLL, printed module) | **Retired** 2026-10-30: the teacher replaced the 20-week canteen map with a 10-week resume map; the old Weeks 1–3 materials are not used (CKB-085) | teacher's files |
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
-| New weeks 4–20 (JSON, DLL, printed module) | **Not started**; one week per round after the Weeks 1–3 revision | same section |
+| Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | branch `feature/web-page-window` |
+| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Not started**; the rolling weekly prompt must be rewritten for the new map first | same section |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
 Weeks 2–3 so their `webChecks`/`mediaChecks` are kept (uploads before PR #59 dropped them; same
@@ -323,7 +324,7 @@ feature. Add to it during Slices 2–3; the revision prompt is written from this
 
 ## Net MVC weekly modules: required format and workflow
 
-Every Net MVC week (the Weeks 1–3 revision and new Weeks 4–20) follows this. The detailed JSON rules
+Every Net MVC week (Weeks 1–10 of the teacher's 10-week resume map, 2026-10-30) follows this. The detailed JSON rules
 are in `docs/course-format.md` ("Web module steps"); if this list and that page disagree, the code
 wins, then fix both.
 
@@ -339,8 +340,10 @@ never edit without the teacher's approval):
 
 **Fixed facts:** Ireneo D. Seraspe Jr., Cielito Zamora Senior High School, .NET 1, Term 3,
 SY 2026–2027; dates, grade and sections stay blank. Two hours Monday–Friday. Monday opens the whole
-topic; Friday is performance task and presentation only. One running project, the School Canteen Web
-Portfolio, continues every week (all prices and people fictional). No internet, CDN, account or
+topic; Friday is performance task and presentation only. Ten weeks, all about resumes (teacher,
+2026-10-30): module samples build a resume for the made-up Juan Dela Cruz; each student builds their
+own resume as the personal performance task (safe details only). All student work is done inside
+CodeShare: never VS Code, Chrome file opening or local folders (CKB-085). No internet, CDN, account or
 download in class. No C#, ASP.NET or databases.
 
 **Files per week** (Week 1 sits in the folder root; later weeks in `Week_NN/`):
@@ -394,12 +397,12 @@ task `dotnet-1-wNN-pt`.
 it cannot do, stop and propose an app change for approval first):
 
 - Can: one page with its local `.css` and `.js` files (linked with `<link rel="stylesheet">` and
-  `<script src>`), console output, uploaded pictures, sound and video in `img`/`audio`/`video`/`source`.
-- Cannot yet: open another `.html` page of the project through a link, show a local page in an
-  `iframe` (Week 5), load pictures or fonts named in CSS `url()` (backgrounds, `@font-face`), send a
-  form anywhere (Week 6 can show a form; submitting it is untested and has nowhere to go), anything
-  from the internet. Only Chromium
-  was tested.
+  `<script src>`), console output, uploaded pictures, sound and video in `img`/`audio`/`video`/`source`;
+  since 2026-10-30 (CKB-086) links to the project's other `.html` pages (shown in the same page window)
+  and `<iframe src="page.html">` of a project page. Checks still read the step's run file only.
+- Cannot yet: load pictures or fonts named in CSS `url()` (backgrounds, `@font-face`), send a form
+  anywhere (a form can be shown and typed in; Week 3's contact form "sends nowhere"), a frame inside a
+  framed page, anything from the internet. Only Chromium was tested.
 
 **Each week, in order:**
 
@@ -521,24 +524,21 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **The revision chat finishes Weeks 1–3** (DLL, printed modules, its own docs PR). After both PRs are
-   merged and deployed: re-upload Weeks 1–3 under **Curriculum**; Week 3 → **Media files** if needed.
-2. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
-3. **CKB-080** — fixed (approved 2026-10-29); teacher reviews and merges its PR.
-4. Then **Weeks 4–20**, one week per round, same format section. **Offline web steps/media** stays a
-   separate task (needed before media weeks are taught offline).
-1. **App task: sample-first and alteration tasks for web steps** — done, merged ([PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72)).
-2. **Weeks 1–3 revision** — done in the teacher's files (see "Weeks 1–3 revision (done)"). Left: run
-   `node --test --test-reporter=spec tests/web-module-steps.browser.mjs` on Cloudflare's runtime (8787) and the
-   offline-settings server (3042) on the merged code, one line per step; then the teacher re-uploads Weeks 1–3
-   (Curriculum; Week 3 → View module details → Media files if needed) after every slice is finished.
-3. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
-4. **CKB-080** — ask the teacher whether to fix it (teacher and student screens). Not approved yet.
-5. Then **Weeks 4–20**, one week per chat, with the rolling prompt below ("Rolling weekly prompt"); each week's
-   chat writes the next week's prompt there. **Offline web steps/media** stays a separate task (needed before
-   media weeks are taught offline).
+1. **Teacher reviews and merges the page-window PR** (`feature/web-page-window`), then deploys and
+   follows its pull request's test steps on the hosted site.
+2. **Rewrite the rolling weekly prompt** (below) for the 10-week resume map, starting at Week 1. The
+   teacher is sharing their own weekly-materials prompt to merge into it (teacher, 2026-10-30).
+   `DotNet1_Handover.md` in the teacher's folder still describes the old 20-week plan; update it with
+   the first new week.
+3. Then **Weeks 1–10**, one week per chat. Week 3 (links, frames, forms) can use the page window.
+   Weeks 9–10 are built as planned; the teacher checks them in CodeShare when reached.
+4. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
+5. **Offline web steps/media** stays a separate task (needed before media weeks are taught offline).
 
 ## Rolling weekly prompt
+
+**Outdated (2026-10-30):** written for the old 20-week canteen map. Rewrite it for the 10-week resume
+map (Week 1) before use; see "Next step" 2.
 
 The teacher pastes this into a new chat for the next week. Each week's chat replaces it with the next week's
 prompt as its last step (teacher, 2026-10-29). Current: **Week 4**.
@@ -753,3 +753,8 @@ Sources list of every reference as clickable links. Then the Week 5 prompt.
 - 2026-10-29 — PR #72 merged; main merged into this branch (conflicts resolved, both entries kept). Teacher: make
   the weekly prompt rolling. Added "Rolling weekly prompt" with the Week 4 prompt; each week's chat replaces it
   with the next week's as its last step.
+- 2026-10-30 — Teacher: Net MVC work is done inside CodeShare only (CKB-085); the course is now 10 weeks about
+  resumes (`DotNet1_Course_Map.md` rewritten, 20-week map kept in `before_revision/`); the old Weeks 1–3
+  materials are retired. Approved and built the page window (CKB-086) on `feature/web-page-window`: Run shows
+  the page in a floating window with its checks; links and project frames open the project's own pages; same
+  window in the teacher's previews. Rolling weekly prompt marked outdated.

@@ -254,6 +254,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     finally { setBusy(false); }
   };
   const task = step.activity?.id ? step.activity : null;
+  const webChecks = <WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} webChecks={step.webChecks} mediaChecks={mediaRun ? step.mediaChecks ?? [] : undefined} />;
   if (step.locked) return <p className="module-preview-note">Complete the previous activity to unlock this step.</p>;
   return <div className="module-step">
     <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Completed" : "Try again"}</span>}</div>
@@ -267,7 +268,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
       {teacherChecked && <p><b>Checked by your teacher for now.</b> Your teacher marks this step done after looking at your page.</p>}
       {checkableStep(step) ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java and web pages only.</p>}
     </div>}
-    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy || (mediaLoading && teacherCheckedStep(step))} onClick={() => void run()}>{mediaLoading && teacherCheckedStep(step) ? "Loading media…" : "Run"}</button>}{web && <><WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} webChecks={step.webChecks} mediaChecks={mediaRun ? step.mediaChecks ?? [] : undefined} />{webPage.view && <div className="module-web-preview">{webPage.view}</div>}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
+    {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy || (mediaLoading && teacherCheckedStep(step))} onClick={() => void run()}>{mediaLoading && teacherCheckedStep(step) ? "Loading media…" : "Run"}</button>}{web && <>{!webPage.opened && webChecks}{webPage.show && <button type="button" className="show-page-button" onClick={webPage.show}>Show page</button>}{webPage.pageWindow(webChecks)}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;
