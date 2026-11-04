@@ -212,7 +212,8 @@ folder holding only the step's own files, so every step supplies each data file 
 an earlier step made. The file appears as a tab in the student's editor; Run code puts it where
 `new FileReader("fleet.txt")` looks and does not compile it. Names use letters, digits, `_`, `-`
 and `/` folders only. Offline, the laptop runner still blocks programs that use `java.io`, so these
-steps run online only for now. CheerpJ ignores append mode (CKB-089).
+steps run online only for now. CheerpJ ignores append mode (CKB-089), so module code must not
+use it: Week 15 adds to a file by reading the old lines and writing them back before the new ones.
 
 Reading/presentation-only lessons may use their existing lesson id as the required
 exitSlip.afterStep descriptive anchor; it is not a code-completion or handwritten-liplet gate.

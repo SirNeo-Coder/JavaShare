@@ -64,15 +64,15 @@
   "java-2-w15-d4-s7": [
     {
       "path": "Main.java",
-      "from": "new FileWriter(\"trip_log.txt\")) {   // same file again",
-      "to": "new FileWriter(\"trip_log.txt\", true)) {   // same file again"
+      "from": "out.write(\"NXA 123 left Monumento\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        try (FileWriter out = new FileWriter(\"trip_log.txt\")) {   // same file again\n",
+      "to": "out.write(\"NXA 123 left Monumento\\n\");\n"
     }
   ],
   "java-2-w15-d4-s8": [
     {
       "path": "Main.java",
-      "from": "new FileWriter(\"trip_log.txt\", true)",
-      "to": "new FileWriter(\"trip_log.txt\")"
+      "from": "            out.write(old);                                 // keep what was there\n",
+      "to": ""
     }
   ],
   "java-2-w15-d4-s9": [

@@ -415,8 +415,10 @@ include the `.txt` file its program opens (`fleet.txt`, `fares.txt`, `trip_log.t
 `fleet_backup.txt`), shown as plain text beside the Java files; students leave it unchanged.
 Steps 3a and 5a no longer ask for Notepad. **Run code** puts the file where the program looks and
 does not compile it (CKB-088). Week 15 is online only for now: offline, the laptop runner still
-refuses programs that read or write files. Step 8's sample (append mode) still shows **Sample not
-verified** online because CheerpJ ignores append mode (CKB-089, open). Earlier weeks' files,
+refuses programs that read or write files. CheerpJ ignores append mode (CKB-089), so Step 8 and the
+personal task add to a log by reading the old lines and writing them back; Steps 7 and 8 have new
+task ids (`-alter-v2`). The personal task still cannot keep a data or log file between online runs
+(CKB-090, open). Earlier weeks' files,
 completions and submitted work are unchanged.
 
 ## Subject-specific shared module sets (approved 2026-10-22)

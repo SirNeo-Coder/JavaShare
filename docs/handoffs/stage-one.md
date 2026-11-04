@@ -1070,3 +1070,22 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   file and keeps the student's earlier device draft as a backup (`restoreModuleDraft`; read in code,
   not run). No student can have passed Steps 3–10 online before this fix.
 
+## Week 15 append mode — 2026-11-05
+
+- Branch `fix/week15-append-mode` (from `main` after PR #78 merged 2026-11-04). Teacher approved
+  read-then-write-back instead of `RandomAccessFile`/`seek`, and switching the personal task too.
+- Problem (CKB-089): CheerpJ ignores every append option; Step 8's sample and Step 7's task failed
+  online, so students could not pass Step 7.
+- Done (content only, no app code): Step 8 sample reads then writes back; Step 7/8 tasks are
+  `-alter-v2`; Writer definition note; Step 8 "run again" answer is three; personal step 8, checklist
+  item 6 and example changed. Task fixture and integrity hash updated.
+- Tested: new guard `Week 15: no sample, task or personal example uses append mode (CKB-089)` failed
+  with `main`'s content, passes now; Week 15–21 file 50/50; personal example on real Java (first run
+  matches the task text, log grows on run 2); live CheerpJ 13/13 (10 samples, Steps 7–8 tasks,
+  personal example).
+- Open: CKB-090 — personal Java projects cannot hold `.txt` files and each online run starts empty,
+  so the personal task's two-run checks cannot be seen online. Needs a teacher decision. PDF/Word
+  appendices still show old append wording.
+- Commit `9571fed`, PR #79 (https://github.com/SirNeo-Coder/JavaShare/pull/79).
+- Next: teacher reviews the PR, merges, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`.
+
