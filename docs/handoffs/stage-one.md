@@ -1086,5 +1086,6 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Open: CKB-090 — personal Java projects cannot hold `.txt` files and each online run starts empty,
   so the personal task's two-run checks cannot be seen online. Needs a teacher decision. PDF/Word
   appendices still show old append wording.
+- Commit `9571fed`, PR #79 (https://github.com/SirNeo-Coder/JavaShare/pull/79).
 - Next: teacher reviews the PR, merges, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`.
 

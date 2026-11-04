@@ -69,4 +69,4 @@ CKB-073 (`delete()` on a non-empty folder).
 - 2026-10-30 — Found during CKB-088's live check; reported to the teacher with options.
 - 2026-11-05 — Review comment on Step 8; Step 7 task also affected. Teacher approved
   read-then-write-back (not `RandomAccessFile`) for Steps 7–8 and the personal task. Branch
-  `fix/week15-append-mode`.
+  `fix/week15-append-mode`, commit `9571fed`, PR #79.
