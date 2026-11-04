@@ -79,3 +79,6 @@ CKB-089) and compare with real Java.
 - 2026-10-30 — Teacher reported Week 15 Step 3 failing online with a screenshot. Diagnosed with
   real Java (empty folder reproduces the screenshot exactly). Teacher approved the data-file plan
   and online only for now. Built on `fix/week15-data-files`; live CheerpJ probe found CKB-089.
+- 2026-11-04 — Teacher reported the same Step 3 symptom on the hosted site for another student (no `fleet.txt`
+  tab). Not a new cause: PR #78 was still open, and the live runner's `runner.js` still lacked the `.txt` rule.
+  Needs: merge PR #78, let the app and `codeshare-java` runner deploy, then re-upload the Week 15 JSON.
