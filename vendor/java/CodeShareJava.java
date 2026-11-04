@@ -133,6 +133,13 @@ public final class CodeShareJava {
             List<String> sources = new ArrayList<>();
             String[] names = paths.split("\\n");
             for (int index = 0; index < names.length; index++) {
+                // A .txt data file goes where the program's own relative paths (new FileReader("fleet.txt")) look.
+                if (names[index].matches("(?:[\\w-]+/)*[\\w-]+(?:\\.[\\w-]+)*\\.txt")) {
+                    java.nio.file.Path data = Paths.get(names[index]);
+                    if (data.getParent() != null) Files.createDirectories(data.getParent());
+                    Files.write(data, Files.readAllBytes(Paths.get(strings, "codeshare-" + index)));
+                    continue;
+                }
                 if (!names[index].matches("(?:[A-Za-z_$][\\w$]*/)*[A-Za-z_$][\\w$]*\\.java")) throw new IllegalArgumentException("Invalid Java path");
                 java.nio.file.Path target = Paths.get(directory, "sources", names[index]);
                 Files.createDirectories(target.getParent());

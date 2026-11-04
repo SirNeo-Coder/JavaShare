@@ -7,6 +7,9 @@ const WEB_PATH = /^(?:[\w-]+\/)*[\w-]+(?:\.[\w-]+)*\.(?:html|css|js)$/;
 // Web module projects may also keep plain-text reference files from the module (teacher, 2026-10-28).
 const MODULE_TEXT_PATH = /^(?:[\w-]+\/)*[\w-]+(?:\.[\w-]+)*\.txt$/;
 
+// Java projects may carry .txt data files that the program reads, e.g. Week 15's fleet.txt (teacher, 2026-10-30).
+export const javaProjectPath = (path: string) => path.length <= JAVA_PATH_MAX_LENGTH && (JAVA_PATH.test(path) || MODULE_TEXT_PATH.test(path));
+
 export function fileLanguage(path: string) {
   if (path.endsWith(".html")) return "html";
   if (path.endsWith(".css")) return "css";

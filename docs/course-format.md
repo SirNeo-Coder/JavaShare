@@ -203,9 +203,18 @@ stored without passing a different exercise. No original module, lesson or step 
 [Weeks 15–21](modules/week15-week21.md) add alteration metadata and matching appendices while
 preserving original sample code and outputs. Include complete per-step supporting sources so a
 previous alteration cannot corrupt the next baseline. Existing named demo launchers receive a
-small Main.java forwarding file for the current classroom runner. Text data/backups are retained
-in the package supporting-files folder, outside both step and starter project arrays; this does
-not implement runtime file access. Reading/presentation-only lessons may use their existing lesson id as the required
+small Main.java forwarding file for the current classroom runner. Text backups are retained
+in the package supporting-files folder, outside both step and starter project arrays.
+
+**Data files in Java steps (2026-10-30, CKB-088).** A `java` step's `files` may include `.txt`
+data files that its program reads, such as Week 15's `fleet.txt`. Each run starts in an empty
+folder holding only the step's own files, so every step supplies each data file it opens, even one
+an earlier step made. The file appears as a tab in the student's editor; Run code puts it where
+`new FileReader("fleet.txt")` looks and does not compile it. Names use letters, digits, `_`, `-`
+and `/` folders only. Offline, the laptop runner still blocks programs that use `java.io`, so these
+steps run online only for now. CheerpJ ignores append mode (CKB-089).
+
+Reading/presentation-only lessons may use their existing lesson id as the required
 exitSlip.afterStep descriptive anchor; it is not a code-completion or handwritten-liplet gate.
 Week 20 has no invented executable steps. See the linked package's file, timing and GUI limits
 before classroom rollout. The schema, application and original files are unchanged.

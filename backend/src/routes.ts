@@ -4,7 +4,7 @@ import { z } from "zod";
 import { courseModule } from "./course-module-schema.ts";
 import { sourcePath, type ModuleFile } from "./module-activities.ts";
 import { database } from "./database.ts";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, moduleWebPathError } from "./file-paths.ts";
+import { JAVA_PATH_MAX_LENGTH, javaProjectPath, moduleWebPathError } from "./file-paths.ts";
 import { broadcast, realtimePass } from "./realtime.ts";
 import { createRouter, type ApiRequest, type ApiResponse, type NextFn } from "./router.ts";
 import {
@@ -622,7 +622,7 @@ app.delete("/api/classrooms/:classroomId/modules/:moduleId", requireAuth, async 
   catch (error) { next(error); }
 });
 
-const javaPath = z.string().trim().min(1).max(JAVA_PATH_MAX_LENGTH).transform((value) => value.replace(/\\/g, "/")).refine((value) => JAVA_PATH.test(value) && !value.includes(".."));
+const javaPath = z.string().trim().min(1).max(JAVA_PATH_MAX_LENGTH).transform((value) => value.replace(/\\/g, "/")).refine((value) => javaProjectPath(value) && !value.includes(".."));
 const javaFiles = z.array(z.object({ path: javaPath, content: z.string().max(200000) })).min(1).max(50)
   .refine((files) => new Set(files.map((file) => sourcePath(file.path))).size === files.length, "Each Java source file must have a different path");
 const webModuleFiles = z.array(z.object({ path: z.string().trim().min(1).max(200).refine((value) => !moduleWebPathError(value)), content: z.string().max(200000) })).min(1).max(50)

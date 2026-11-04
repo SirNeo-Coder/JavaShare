@@ -408,6 +408,17 @@ the one line that deletes a non-empty folder from the sample, with its matching
 curriculum needs to run offline for this reason anymore; the earlier guidance here is
 superseded.
 
+## Week 15 data files online (approved 2026-10-30)
+
+Week 15 (Java File Handling) samples that read a file now find it online. The step's file tabs
+include the `.txt` file its program opens (`fleet.txt`, `fares.txt`, `trip_log.txt` or
+`fleet_backup.txt`), shown as plain text beside the Java files; students leave it unchanged.
+Steps 3a and 5a no longer ask for Notepad. **Run code** puts the file where the program looks and
+does not compile it (CKB-088). Week 15 is online only for now: offline, the laptop runner still
+refuses programs that read or write files. Step 8's sample (append mode) still shows **Sample not
+verified** online because CheerpJ ignores append mode (CKB-089, open). Earlier weeks' files,
+completions and submitted work are unchanged.
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one
