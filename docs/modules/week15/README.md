@@ -1,6 +1,6 @@
 # Week 15 step additions
 
-File exercises run online in CodeShare (2026-10-30, CKB-088): each step that reads a file supplies it in its own files (see "Data files" below). Offline, the laptop runner still blocks file access, so Week 15 is online only for now. Step 8's append sample still fails online because of a CheerpJ bug (CKB-089).
+File exercises run online in CodeShare (2026-10-30, CKB-088): each step that reads a file supplies it in its own files (see "Data files" below). Offline, the laptop runner still blocks file access, so Week 15 is online only for now. Steps 7–8 and the personal task avoid CheerpJ's broken append mode (CKB-089, see below).
 
 The JSON preserves all original lesson text, code, sample outputs, ids, liplets and rubrics,
 with two later exceptions: Step 2's sample Java no longer deletes the (non-empty) `records`
@@ -56,5 +56,21 @@ earlier steps leaves:
 Steps 3a and 5a now tell students to open the supplied tab and leave it unchanged. Task
 instructions, expected outputs and activity ids are unchanged. Checked by
 `tests/week15-week21-modules.test.mjs` (each step alone, through the browser bridge) and live on
-real CheerpJ: 9 of 10 samples match; Step 8 is blocked by CKB-089. The personal performance task's
-append example (`FileWriter(name, true)`) is affected by CKB-089 too.
+real CheerpJ: 9 of 10 samples match; Step 8 is blocked by CKB-089 (fixed below).
+
+## Append without append mode (2026-11-05)
+
+CheerpJ ignores `FileWriter(name, true)` and every other append option (CKB-089). The teacher chose
+not to teach `RandomAccessFile`/`seek`, so Week 15 adds to the end of a file by reading the old lines
+first and writing them back, followed by the new ones, with an overwrite `FileWriter`:
+
+- Step 8 sample uses read-then-write-back (same expected output). Its "run again" question now says
+  three lines, because every CodeShare run starts from the supplied log.
+- Step 8 task `java-2-w15-d4-s8-alter-v2`: stop writing the old lines back (overwrite).
+- Step 7 task `java-2-w15-d4-s7-alter-v2`: write both trips through the first FileWriter.
+- The "Writer" definition explains why; the exit slip question is unchanged.
+- Personal task: step 8, checklist item 6 and the sari-sari example use read-then-write-back.
+
+Live on real CheerpJ: all 10 samples, Steps 7–8 tasks and the personal example match. Not updated:
+the PDF and Word appendices still show the old append code and task wording. Open: the personal task
+cannot keep a data or log file between online runs (CKB-090).

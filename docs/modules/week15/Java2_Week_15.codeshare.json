@@ -710,7 +710,7 @@
         {
           "type": "definition",
           "term": "Writer",
-          "markdown": "A writer sends characters **from** your program **to** a destination. `new FileWriter(\"trip_log.txt\")` **overwrites**: it erases the file and starts it fresh. `new FileWriter(\"trip_log.txt\", true)` **appends**: it keeps what is there and adds to the end. If the file does not exist yet, both make it."
+          "markdown": "A writer sends characters **from** your program **to** a destination. `new FileWriter(\"trip_log.txt\")` **overwrites**: it erases the file and starts it fresh. `new FileWriter(\"trip_log.txt\", true)` **appends**: it keeps what is there and adds to the end. If the file does not exist yet, both make it. **In CodeShare:** online Java ignores `true` for now (it writes over the start of the file), so this week keeps the old lines by reading them first and writing them back before the new ones."
         },
         {
           "type": "analogy",
@@ -761,8 +761,8 @@
           "expectedOutput": "--- trip_log.txt ---\nTRC 456 left Bagong Silang"
         ,
           "activity": {
-            "id": "java-2-w15-d4-s7-alter-v1",
-            "instruction": "Change only the second FileWriter to append mode. Keep both original write calls. The first trip must survive the second write.",
+            "id": "java-2-w15-d4-s7-alter-v2",
+            "instruction": "Keep overwrite mode, but make the first trip survive: write both trips through the first FileWriter. Move the second write call into the first try block and delete the second FileWriter block.",
             "files": [],
             "expectedOutput": "--- trip_log.txt ---\nNXA 123 left Monumento\nTRC 456 left Bagong Silang",
             "stdin": ""
@@ -776,12 +776,12 @@
           "type": "step",
           "id": "java-2-w15-d4-s8",
           "number": 8,
-          "instruction": "Keep `showFile()` from Step 7. Replace only the `main` method (the whole file is shown here). Append mode: the logbook grows.",
+          "instruction": "Keep `showFile()` from Step 7. Replace only the `main` method (the whole file is shown here). Append: read the old logbook first, then write it back with the new lines at the end. The logbook grows.",
           "language": "java",
           "files": [
             {
               "path": "Main.java",
-              "content": "import java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\n\npublic class Main {\n    // prints every line of a file, so we can SEE what is inside\n    static void showFile(String name) {\n        System.out.println(\"--- \" + name + \" ---\");\n        try (BufferedReader in = new BufferedReader(new FileReader(name))) {\n            String line = in.readLine();\n            while (line != null) {\n                System.out.println(line);\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n    }\n\n    public static void main(String[] args) {\n        try (FileWriter out = new FileWriter(\"trip_log.txt\", true)) {   // true = APPEND\n            out.write(\"BUS 789 left Caloocan\\n\");\n            out.write(\"NYB 321 left Sangandaan\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        showFile(\"trip_log.txt\");\n    }\n}\n"
+              "content": "import java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\n\npublic class Main {\n    // prints every line of a file, so we can SEE what is inside\n    static void showFile(String name) {\n        System.out.println(\"--- \" + name + \" ---\");\n        try (BufferedReader in = new BufferedReader(new FileReader(name))) {\n            String line = in.readLine();\n            while (line != null) {\n                System.out.println(line);\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n    }\n\n    public static void main(String[] args) {\n        String old = \"\";                                    // 1. read the logbook first\n        try (BufferedReader in = new BufferedReader(new FileReader(\"trip_log.txt\"))) {\n            String line = in.readLine();\n            while (line != null) {\n                old = old + line + \"\\n\";\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n        try (FileWriter out = new FileWriter(\"trip_log.txt\")) {   // 2. write old + new\n            out.write(old);                                 // keep what was there\n            out.write(\"BUS 789 left Caloocan\\n\");           // add to the end\n            out.write(\"NYB 321 left Sangandaan\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        showFile(\"trip_log.txt\");\n    }\n}\n"
             }
           ,
             {
@@ -819,11 +819,11 @@
           ],
           "run": "Main.java",
           "expectedOutput": "--- trip_log.txt ---\nTRC 456 left Bagong Silang\nBUS 789 left Caloocan\nNYB 321 left Sangandaan",
-          "checkYourself": "Run Step 8 again. Predict: how many lines now? (Five: append never erases, so the two new lines are added again.)"
+          "checkYourself": "Run Step 8 again. Predict: how many lines now? (Still three: every CodeShare run starts from the supplied `trip_log.txt`. On a desktop, where the file stays, it would be five.)"
         ,
           "activity": {
-            "id": "java-2-w15-d4-s8-alter-v1",
-            "instruction": "Begin with the original Step 7 log containing the Tricycle line. Change Step 8 from append mode to overwrite mode. Keep its two write calls; the old Tricycle line must disappear.",
+            "id": "java-2-w15-d4-s8-alter-v2",
+            "instruction": "Begin with the original Step 7 log containing the Tricycle line. Make Step 8 overwrite instead: stop writing the old lines back. Keep its two new write calls; the old Tricycle line must disappear.",
             "files": [],
             "expectedOutput": "--- trip_log.txt ---\nBUS 789 left Caloocan\nNYB 321 left Sangandaan",
             "stdin": ""
@@ -1116,7 +1116,7 @@
       "Copy **Step 4 · Main.java**, keep only its `toVehicle()` method, and paste it into your file. Rename it `toObject` and change it to build your own objects. Load the file with `BufferedReader` and `readLine()` into your List.",
       "Skip a bad line with a message by catching `NumberFormatException`, like **Sample code · Main.java**. Add one bad line to your data file and **Run code**.",
       "Copy `toLine()` from **Step 9 · Main.java** and change it for your class. Save the List back with `BufferedWriter` and `newLine()`. Run twice: the data must not double.",
-      "Append one line to a log file on each run with `new FileWriter(name, true)`, like **Step 8 · Main.java**. Run twice: the log grows.",
+      "Add one line to the end of a log file on each run: read the old log lines first, then write them back followed by the new line, like **Step 8 · Main.java**. Run twice: the log grows.",
       "Build a short report with `StringWriter`, then show it and save it, like **Step 10 · Main.java**. Copy `showFile()` from **Step 7 · Main.java** to check what your files hold.",
       "Make a temporary file, then `delete()` it and print the result, like **Step 2 · Main.java**. Check that every reader and writer is inside try-with-resources.",
       "Add a comment on each part, for example `// APPEND: keep old log lines`.",
@@ -1128,7 +1128,7 @@
       "Load with BufferedReader + readLine() into your List",
       "A toObject / toLine pair: text to object, object to text",
       "Save the List back with BufferedWriter and newLine() (overwrite)",
-      "Append one line to a log file each run: new FileWriter(name, true)",
+      "Add one line to the end of a log file each run: read the old lines, then write them back with the new line",
       "Build a short report with StringWriter; show it and save it",
       "A bad line is skipped with a message (NumberFormatException), never a crash",
       "Every reader and writer is inside try-with-resources",
@@ -1138,7 +1138,7 @@
     "exampleFiles": [
       {
         "path": "Main.java",
-        "content": "import java.io.BufferedReader;\nimport java.io.BufferedWriter;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\nimport java.util.Map;\nimport java.util.TreeMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Map<String, Integer> stock = new TreeMap<>();\n        String file = \"stock.txt\";\n        try (BufferedReader in = new BufferedReader(new FileReader(file))) {\n            String line = in.readLine();\n            while (line != null) {\n                String[] p = line.split(\",\");\n                try {\n                    stock.put(p[0], Integer.parseInt(p[1]));\n                } catch (NumberFormatException e) {\n                    System.out.println(\"Skipped bad line: \" + line);\n                }\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"No stock yet: \" + e.getMessage());\n        }\n        // Ana buys 2 Bread\n        stock.put(\"Bread\", stock.getOrDefault(\"Bread\", 0) - 2);\n        // APPEND: the sales log keeps every old line\n        try (FileWriter log = new FileWriter(\"sales_log.txt\", true)) {\n            log.write(\"Ana bought 2 Bread\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Log failed: \" + e.getMessage());\n        }\n        // OVERWRITE: stock.txt always holds today's numbers\n        try (BufferedWriter out = new BufferedWriter(new FileWriter(file))) {\n            for (Map.Entry<String, Integer> e : stock.entrySet()) {\n                out.write(e.getKey() + \",\" + e.getValue());\n                out.newLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Save failed: \" + e.getMessage());\n        }\n        System.out.println(\"Stock saved: \" + stock);\n    }\n}\n"
+        "content": "import java.io.BufferedReader;\nimport java.io.BufferedWriter;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\nimport java.util.Map;\nimport java.util.TreeMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Map<String, Integer> stock = new TreeMap<>();\n        String file = \"stock.txt\";\n        try (BufferedReader in = new BufferedReader(new FileReader(file))) {\n            String line = in.readLine();\n            while (line != null) {\n                String[] p = line.split(\",\");\n                try {\n                    stock.put(p[0], Integer.parseInt(p[1]));\n                } catch (NumberFormatException e) {\n                    System.out.println(\"Skipped bad line: \" + line);\n                }\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"No stock yet: \" + e.getMessage());\n        }\n        // Ana buys 2 Bread\n        stock.put(\"Bread\", stock.getOrDefault(\"Bread\", 0) - 2);\n        // APPEND: the sales log keeps every old line (read them, write them back, add the new one)\n        String oldLog = \"\";\n        try (BufferedReader in = new BufferedReader(new FileReader(\"sales_log.txt\"))) {\n            String line = in.readLine();\n            while (line != null) {\n                oldLog = oldLog + line + \"\\n\";\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            // first run: no log yet, so start a new one\n        }\n        try (FileWriter log = new FileWriter(\"sales_log.txt\")) {\n            log.write(oldLog);\n            log.write(\"Ana bought 2 Bread\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Log failed: \" + e.getMessage());\n        }\n        // OVERWRITE: stock.txt always holds today's numbers\n        try (BufferedWriter out = new BufferedWriter(new FileWriter(file))) {\n            for (Map.Entry<String, Integer> e : stock.entrySet()) {\n                out.write(e.getKey() + \",\" + e.getValue());\n                out.newLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Save failed: \" + e.getMessage());\n        }\n        System.out.println(\"Stock saved: \" + stock);\n    }\n}\n"
       },
       {
         "path": "stock.txt",

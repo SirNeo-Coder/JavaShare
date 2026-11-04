@@ -68,7 +68,8 @@ for (const content of modules) {
     for (const lesson of restored.lessons) {
       if (before.missingSlipIds.includes(lesson.id)) delete lesson.exitSlip.afterStep;
       for (const step of lesson.blocks.filter((block) => block.type === "step")) {
-        assert.equal(step.activity.id, `${step.id}-alter-v1`);
+        // Week 15 Steps 7–8 tasks changed to avoid CheerpJ's broken append mode (CKB-089).
+        assert.equal(step.activity.id, `${step.id}-alter-${["java-2-w15-d4-s7", "java-2-w15-d4-s8"].includes(step.id) ? "v2" : "v1"}`);
         assert.deepEqual(step.activity.files, [], "no solved source is supplied to students");
         assert.notEqual(step.expectedOutput, step.activity.expectedOutput);
         assert.ok(edits[step.id].length > 0);
@@ -168,6 +169,15 @@ for (const content of modules.filter((content) => content.week !== 15 && content
     }
   });
 }
+
+// CheerpJ ignores append mode and writes over the start of the file (CKB-089); no automated test
+// can run CheerpJ, so Week 15 code must not depend on it. Explanations may still mention it.
+test("Week 15: no sample, task or personal example uses append mode (CKB-089)", () => {
+  const append = /new\s+(?:FileWriter|FileOutputStream)\([^;]*,\s*true\s*\)|StandardOpenOption\.APPEND/;
+  const content = modules[0];
+  const code = [...steps(content).flatMap((step) => [...step.files, ...alter(step)]), ...content.performanceTask.exampleFiles, ...content.performanceTask.starterFiles];
+  for (const file of code) assert.doesNotMatch(file.content, append, file.path);
+});
 
 // Week 15 runs online only for now: the laptop runner still refuses file access (teacher, 2026-10-30).
 test("Week 15: the laptop runner still blocks file access", async () => {
