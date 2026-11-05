@@ -70,7 +70,11 @@ try {
   local = Object.fromEntries(raw.split("\n").map((line) => line.match(/^([A-Z_]+)="?([^"\n]*)"?$/)).filter(Boolean).map((m) => [m[1], m[2]]));
 } catch { local = null; }
 
-test("data files: a step's fleet.txt opens with the step and its online completion is saved", { skip: !local?.API_URL && "local Supabase is not running" }, async () => {
+const needsLocal = { skip: !local?.API_URL && "local Supabase is not running" };
+const activityFixture = () => JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
+
+// A disposable teacher, student and Java class on local Supabase, with `content` uploaded; removed afterwards.
+async function withClass(content, action) {
   Object.assign(process.env, { SUPABASE_URL: local.API_URL, SUPABASE_ANON_KEY: local.ANON_KEY, SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY, SUPABASE_JWT_SECRET: local.JWT_SECRET, DATABASE_MODE: "supabase-local", LOCAL_JAVA_EXECUTION: "false", JAVA_RUNNER_URL: "https://java.example.test/", JWT_SECRET: "data-files-test" });
   const { handleApi } = await import("../backend/src/routes.ts");
   const { getSupabaseAdmin } = await import("../backend/src/database.ts");
@@ -78,13 +82,7 @@ test("data files: a step's fleet.txt opens with the step and its online completi
   const users = [], cookies = [], password = randomUUID();
   let classroomId;
   const call = (path, cookie, method = "GET", body) => handleApi(new Request(`http://localhost:3000${path}`, { method, headers: { "content-type": "application/json", cookie }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) }));
-  const content = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
   content.id = `java-2-data-files-${randomUUID().slice(0, 8)}`;
-  content.sampleFirst = true;
-  const step = content.lessons[0].blocks[0];
-  step.files = [{ path: "Main.java", content: reader }, { path: "fleet.txt", content: fleet }];
-  step.expectedOutput = "First: Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria";
-  step.activity = { id: "data-files-task", instruction: "Print the second line instead.", files: [], expectedOutput: "Second: Bus,BUS 789,Aling Rosa,50", stdin: "" };
   try {
     for (const role of ["teacher", "student"]) {
       const { data, error } = await admin.auth.admin.createUser({ email: `data-files-${randomUUID()}@example.test`, password, email_confirm: true, user_metadata: { name: `Data files ${role}` } });
@@ -98,7 +96,21 @@ test("data files: a step's fleet.txt opens with the step and its online completi
     assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);
     const upload = await call(`/api/classrooms/${classroomId}/modules`, cookies[0], "POST", content);
     assert.equal(upload.status, 201, await upload.text());
-    const base = `/api/classrooms/${classroomId}/modules/${content.id}`;
+    await action({ call, admin, users, cookies, classroomId, base: `/api/classrooms/${classroomId}/modules/${content.id}` });
+  } finally {
+    if (classroomId) await admin.from("classrooms").delete().eq("id", classroomId);
+    for (const user of users) await admin.auth.admin.deleteUser(user.id);
+  }
+}
+
+test("data files: a step's fleet.txt opens with the step and its online completion is saved", needsLocal, async () => {
+  const content = activityFixture();
+  content.sampleFirst = true;
+  const step = content.lessons[0].blocks[0];
+  step.files = [{ path: "Main.java", content: reader }, { path: "fleet.txt", content: fleet }];
+  step.expectedOutput = "First: Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria";
+  step.activity = { id: "data-files-task", instruction: "Print the second line instead.", files: [], expectedOutput: "Second: Bus,BUS 789,Aling Rosa,50", stdin: "" };
+  await withClass(content, async ({ call, cookies, base }) => {
     const opened = await call(`${base}/progress/activity?stepId=${step.id}`, cookies[1]);
     assert.equal(opened.status, 200, await opened.clone().text());
     const progress = await opened.json();
@@ -111,8 +123,29 @@ test("data files: a step's fleet.txt opens with the step and its online completi
     assert.equal(result.progress.stepStates[activityStateId(step)], "pass");
     assert.equal(result.progress.stepStates[sampleStateId(step)], "pass");
     assert.deepEqual(result.progress.projectFiles, changed, "Main.java and fleet.txt are saved together");
-  } finally {
-    if (classroomId) await admin.from("classrooms").delete().eq("id", classroomId);
-    for (const user of users) await admin.auth.admin.deleteUser(user.id);
-  }
+  });
+});
+
+test("data files: a personal Java project keeps a .txt data file through save, run, submit and review (CKB-090)", needsLocal, async () => {
+  const content = activityFixture();
+  await withClass(content, async ({ call, admin, users, cookies, classroomId, base }) => {
+    const [first, second] = content.lessons.map((lesson) => lesson.blocks[0]);
+    assert.equal((await call(`${base}/progress/activity`, cookies[1], "POST", { stepId: first.id })).status, 200);
+    assert.equal((await admin.from("module_progress").update({ step_states: { [first.id]: "pass", [second.id]: "pass" } }).eq("classroom_id", classroomId).eq("student_id", users[1].id)).error, null);
+    const personal = (suffix, body, method = "POST") => call(`${base}/progress/${suffix}`, cookies[1], method, body);
+    let view = await (await personal("performance-project", {})).json();
+    const files = [...view.performanceProjectFiles, { path: "stock.txt", content: "Bread,10\nSoftdrink,24\n" }];
+    assert.equal((await personal("performance-project", { updatedAt: view.updatedAt, files: [...view.performanceProjectFiles, { path: "../stock.txt", content: "x" }] }, "PUT")).status, 400);
+    const saved = await personal("performance-project", { updatedAt: view.updatedAt, files }, "PUT");
+    assert.equal(saved.status, 200, await saved.clone().text()); view = await saved.json();
+    assert.deepEqual(view.performanceProjectFiles, files, "Save work keeps stock.txt");
+    const submit = () => personal("performance-task", { variant: "own", status: "pass", files: view.performanceProjectFiles, updatedAt: view.updatedAt }, "PUT");
+    assert.equal((await submit()).status, 409, "the saved files with stock.txt must run successfully first");
+    view = (await (await personal("personal-run", { updatedAt: view.updatedAt })).json()).progress;
+    view = await (await personal("personal-result", { updatedAt: view.updatedAt, success: true })).json();
+    const submitted = await submit();
+    assert.equal(submitted.status, 200, await submitted.clone().text());
+    const review = await (await call(`/api/classes/${classroomId}/students/${users[1].id}/modules/${content.id}/personal-submission`, cookies[0])).json();
+    assert.deepEqual(review.submission.files, files, "the teacher reviews the frozen files, stock.txt included");
+  });
 });

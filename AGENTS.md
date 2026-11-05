@@ -222,6 +222,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   Preserve current work exactly. Carry personal work across the written Week 20 proposal.
 - Submit this version requires successful execution of the exact saved personal files, checked
   on the server too. Edits, additions, deletions, renames and unsuccessful runs invalidate it.
+- Java personal projects may also keep `.txt` data files (agreed 2026-11-05): **＋** adds one; runs
+  give it to the program; it is saved, submitted, reviewed and carried forward like the Java files.
+  Each online run starts from the saved files, so "second run" checks use old lines in the file tabs.
   Use approved browser evidence online and laptop Java offline; personal output has no sample target.
 - Submission earns its personal-task progress credit and shows Submitted, not a grade or teacher
   approval. Review never gates progression. Preserve lesson and predecessor checks and live locks.

@@ -39,7 +39,8 @@
 Java data files (`.txt` a program reads, e.g. Week 15 `fleet.txt`): `javaProjectPath` in
 `backend/src/file-paths.ts` (upload schema, `routes.ts` `javaPath`, step opening, `javaExecution.ts`);
 `runner.js` passes them on; `CodeShareJava.java` writes them at the program's relative path;
-`java-runner.ts` compiles only `.java`. CKB-088; `tests/java-data-files.test.mjs`.
+`java-runner.ts` compiles only `.java`. CKB-088; `tests/java-data-files.test.mjs`. Personal Java
+projects too (`personalPathError`, personal **＋**/rename in `StudentModuleActivity.tsx`; CKB-090).
 
 Online Java loading timeout / whole-file compiler downloads: `runner.js` loads the
 binary compiler/helper into `/str/`; `javaExecution.ts` authenticates stage messages

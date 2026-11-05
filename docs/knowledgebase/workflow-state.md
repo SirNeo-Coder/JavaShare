@@ -417,9 +417,19 @@ Steps 3a and 5a no longer ask for Notepad. **Run code** puts the file where the 
 does not compile it (CKB-088). Week 15 is online only for now: offline, the laptop runner still
 refuses programs that read or write files. CheerpJ ignores append mode (CKB-089), so Step 8 and the
 personal task add to a log by reading the old lines and writing them back; Steps 7 and 8 have new
-task ids (`-alter-v2`). The personal task still cannot keep a data or log file between online runs
-(CKB-090, open). Earlier weeks' files,
+task ids (`-alter-v2`). The personal task's data and log files are `.txt` tabs in the personal
+project (CKB-090, below). Earlier weeks' files,
 completions and submitted work are unchanged.
+
+## Data files in personal Java projects (approved 2026-11-05)
+
+In **Projects → Personal performance-task project**, a Java project's **＋** beside the file tabs now
+also adds a `.txt` data file (for example `stock.txt`), opened empty as plain text; rename accepts
+`.txt` too. **Run code** gives it to the program; **Save work**, **Submit this version**, the
+teacher's **Review personal submission** and next week's carry-forward keep it like the Java files.
+Each online run starts from the saved file tabs, so Week 15's "second run" checks now say to put
+old lines in the log and data file tabs. The module project is unchanged. Offline, the laptop runner
+still refuses programs that read or write files (CKB-090).
 
 ## Subject-specific shared module sets (approved 2026-10-22)
 

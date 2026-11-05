@@ -98,6 +98,8 @@ Each student has two saved Java projects per module per class, both edited in th
 - **Personal performance-task project** starts from module supporting files and performance-task
   `starterFiles`. Copy only the preceding personal draft, falling back to that week's submitted
   own version for legacy records. Never copy from the module project into the personal project.
+  A Java personal project may also hold `.txt` data files (2026-11-05, CKB-090); the module
+  project stays Java-only apart from the `.txt` files a step supplies.
 
 Current saved files always win and missing supporting files are added. `src/Main.java` and
 `Main.java` identify the same source. At most 50 valid Java files compile together. Supply

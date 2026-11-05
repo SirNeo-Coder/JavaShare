@@ -72,5 +72,6 @@ first and writing them back, followed by the new ones, with an overwrite `FileWr
 - Personal task: step 8, checklist item 6 and the sari-sari example use read-then-write-back.
 
 Live on real CheerpJ: all 10 samples, Steps 7–8 tasks and the personal example match. Not updated:
-the PDF and Word appendices still show the old append code and task wording. Open: the personal task
-cannot keep a data or log file between online runs (CKB-090).
+the PDF and Word appendices still show the old append code and task wording. The personal task's data and
+log files are `.txt` tabs in the personal project (CKB-090, 2026-11-05); its "second run" checks
+put old lines in those tabs, because every CodeShare run starts from the saved files.
