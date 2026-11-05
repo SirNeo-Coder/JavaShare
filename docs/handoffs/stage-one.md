@@ -1116,5 +1116,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   fixed, needs approval).
 - PRs #79, #80: "Review failed: the pull request is closed" (merged before review); no review
   occurred, so nothing was checked.
+- PR #81 reviews: rounds 1–2 (pagination, "no review" wording, CKB-091, full endpoints) fixed;
+  round 3 ("outside-diff comments are in pulls/comments") not valid, checked on PR #78. Also restored
+  an `AGENTS.md` sentence that PR #80 had split from the "Submit this version" bullet.
 - Next: teacher reviews this PR; decide on the `src/*.txt` finding.
 
