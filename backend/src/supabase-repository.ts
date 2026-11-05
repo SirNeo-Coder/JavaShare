@@ -4,7 +4,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
+import { fileLanguage, javaProjectPath, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
 
 export type SupabaseSessionUser = {
   id: string;
@@ -1395,9 +1395,10 @@ async function requirePerformanceProject(user: SupabaseSessionUser, classroomId:
   return { content: courseRow.content, progress };
 }
 
-// Web personal projects keep web and .txt files; Java ones keep Java files (teacher, 2026-10-29).
+// Web personal projects keep web and .txt files (teacher, 2026-10-29); Java ones keep Java and
+// .txt data files (teacher, 2026-11-05, CKB-090).
 function personalPathError(web: boolean, path: string) {
-  return web ? Boolean(moduleWebPathError(path)) : path.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(path);
+  return web ? Boolean(moduleWebPathError(path)) : !javaProjectPath(path);
 }
 
 export async function prepareSupabasePerformanceProject(user: SupabaseSessionUser, classroomId: string, moduleId: string) {

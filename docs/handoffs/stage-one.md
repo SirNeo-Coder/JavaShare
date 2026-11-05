@@ -1089,3 +1089,20 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Commit `9571fed`, PR #79 (https://github.com/SirNeo-Coder/JavaShare/pull/79).
 - Next: teacher reviews the PR, merges, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`.
 
+## Personal Java .txt files — 2026-11-05
+
+- Branch `feature/personal-txt-files` (from `main` after PR #79 merged). Teacher approved plan A.
+- Problem (CKB-090): personal Java projects accepted only `.java`, so Week 15's personal task could not
+  have a data file; each online run starts from the saved files, so "run twice" checks showed nothing.
+- Done: `personalPathError` uses `javaProjectPath`; personal **＋**/rename accept `.txt` (empty, plain
+  text; dialog text updated); Week 15 personal task step 3, testing tip and steps 7, 8, 12 reworded
+  ("second run" = old lines in the file tabs); `AGENTS.md` rule; integrity hash updated. Removed the
+  now-unused `JAVA_PATH`/`JAVA_PATH_MAX_LENGTH` import from `supabase-repository.ts`.
+- Tested: new `data files: a personal Java project keeps a .txt data file through save, run, submit and
+  review (CKB-090)` failed with `main`'s rule, passes now; `tests/java-data-files.test.mjs` 7/7; Week
+  15–21 50/50. Real app online locally: **＋** stock.txt, run matched the example, Save work, Submit,
+  teacher review showed stock.txt.
+- Not run: hosted site; browser carry-forward to the next week. Offline Week 15 still blocked.
+- Commit `1645c70`, PR #80 (https://github.com/SirNeo-Coder/JavaShare/pull/80).
+- Next: teacher reviews the PR, merges, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`.
+

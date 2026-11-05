@@ -7,7 +7,7 @@ import { runJava, getJavaRunner } from "./javaExecution";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
-import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
+import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
 import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
@@ -381,9 +381,10 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const renameFile = () => {
     const entered = window.prompt(web ? "New file path" : "New Java file path", path)?.trim().replace(/\\/g, "/");
     if (!entered || entered === path) return;
+    // Personal Java projects may also keep .txt data files (teacher, 2026-11-05, CKB-090).
     if (web ? moduleWebPathError(entered) || files.some((file) => file.path === entered)
-      : entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered) || files.some((file) => file.path !== path && sourcePath(file.path) === sourcePath(entered))) {
-      setError(web ? "Choose a unique filename ending in .html, .css, .js or .txt." : "Choose a unique Java filename."); return;
+      : (personal ? !javaProjectPath(entered) : entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered)) || files.some((file) => file.path !== path && sourcePath(file.path) === sourcePath(entered))) {
+      setError(web ? "Choose a unique filename ending in .html, .css, .js or .txt." : `Choose a unique Java${personal ? " or .txt" : ""} filename.`); return;
     }
     changeFiles(files.map((file) => file.path === path ? { ...file, path: entered } : file)); setPath(entered);
   };
@@ -400,8 +401,12 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       changeFiles([...files, { path: entered, content: "" }]);
       setPath(entered); setNewPath(""); setAddingFile(false); setFileError(""); setError(""); return;
     }
-    if (files.length >= 50 || entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered) || files.some((file) => sourcePath(file.path) === sourcePath(entered))) {
-      setFileError("Choose a unique Java filename, such as Helper.java (up to 50 files)."); return;
+    if (files.length >= 50 || (personal ? !javaProjectPath(entered) : entered.length > JAVA_PATH_MAX_LENGTH || !JAVA_PATH.test(entered)) || files.some((file) => sourcePath(file.path) === sourcePath(entered))) {
+      setFileError(`Choose a unique Java${personal ? " or .txt" : ""} filename, such as Helper.java${personal ? " or stock.txt" : ""} (up to 50 files).`); return;
+    }
+    if (entered.endsWith(".txt")) {
+      changeFiles([...files, { path: entered, content: "" }]);
+      setPath(entered); setNewPath(""); setAddingFile(false); setFileError(""); setError(""); return;
     }
     const name = entered.split("/").at(-1)!.slice(0, -5);
     const packageName = sourcePath(entered).split("/").slice(0, -1).join(".");
@@ -478,9 +483,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     <NoticeBox notice={notice} onClose={() => setNotice(null)} />
     {addingFile && <div className="activity-overlay file-dialog-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeAddFile(); }}>
       <form className="file-dialog" onSubmit={addFile} onKeyDown={(event) => { if (event.key === "Escape") closeAddFile(); }}>
-        <header><span className="java-icon">{web ? "W" : "J"}</span><div><span className="eyebrow">{web ? "WEB PAGE FILE" : "JAVA SOURCE FILE"}</span><h2>Create a new file</h2><p>{web ? "Add another page, stylesheet, or script." : "Add another class to this project."}</p></div><button type="button" onClick={closeAddFile} aria-label="Close">×</button></header>
+        <header><span className="java-icon">{web ? "W" : "J"}</span><div><span className="eyebrow">{web ? "WEB PAGE FILE" : "JAVA SOURCE FILE"}</span><h2>Create a new file</h2><p>{web ? "Add another page, stylesheet, or script." : personal ? "Add another class, or a .txt data file." : "Add another class to this project."}</p></div><button type="button" onClick={closeAddFile} aria-label="Close">×</button></header>
         <label>File path<input autoFocus required spellCheck={false} value={newPath} onChange={(event) => setNewPath(event.target.value)} placeholder={web ? "about.html" : "Helper.java"} /></label>
-        <small className={fileError ? "module-error" : undefined} role={fileError ? "alert" : undefined}>{fileError || (web ? <>Use a unique filename, for example <b>about.html</b>.</> : <>Use a unique Java filename, for example <b>Helper.java</b>.</>)}</small>
+        <small className={fileError ? "module-error" : undefined} role={fileError ? "alert" : undefined}>{fileError || (web ? <>Use a unique filename, for example <b>about.html</b>.</> : <>Use a unique Java filename, for example <b>Helper.java</b>{personal && <>, or a data file such as <b>stock.txt</b></>}.</>)}</small>
         <footer><button type="button" onClick={closeAddFile}>Cancel</button><button className="create-file-button" disabled={busy || !newPath.trim()}>Create file</button></footer>
       </form>
     </div>}
