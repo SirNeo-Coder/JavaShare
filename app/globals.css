@@ -537,6 +537,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .teacher-status.started { background:#f1e7ff; color:#7e1dc7; }
 .teacher-module-body h3,.teacher-student-card h3 { margin:14px 0 6px; font-size:15px; font-weight:600; line-height:1.5; overflow-wrap:anywhere; }
 .teacher-course-name { margin:0; color:var(--teacher-muted); font-size:11px; text-transform:capitalize; }
+.teacher-last-uploaded { margin:4px 0 0; color:var(--teacher-muted); font-size:11px; }
 .teacher-module-facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:32px 0 18px; padding:14px 0; border-block:1px solid #edf1f1; }
 .teacher-module-facts span { display:grid; gap:5px; padding-left:10px; border-left:1px solid #edf1f1; color:var(--teacher-muted); font-size:9px; }
 .teacher-module-facts span:first-child { padding-left:0; border:0; }

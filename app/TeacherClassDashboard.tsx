@@ -123,6 +123,7 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
         <div className="teacher-module-body">
           <span className={`teacher-status ${state === "finished" ? "finished" : state === "in-progress" ? "started" : ""}`}>{statusLabel(state)}</span>
           <h3>{module.title}</h3><p className="teacher-course-name">{module.course.replaceAll("-", " ")}</p>
+          <p className="teacher-last-uploaded">Last uploaded: {new Date(module.lastUploaded).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</p>
           <div className="teacher-module-facts"><span><b>{module.lessons}</b>Lessons</span><span><b>{module.steps}</b>Practice steps</span><span><b>{forStudent ? forStudent.modules.find((item) => item.moduleId === module.moduleId)?.submissions ?? 0 : module.submissions}</b>Task submissions</span></div>
           <Meter percent={percent} label={forStudent ? "Saved completion" : "Average student completion"} />
           {forStudent && Boolean(forStudent.modules.find((item) => item.moduleId === module.moduleId)?.teacherChecks.length) && <div className="teacher-checked-steps"><b>Checked by you</b><small>Pictures, sound or video steps pass when you mark them done.</small>

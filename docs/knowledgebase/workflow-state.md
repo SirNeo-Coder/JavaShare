@@ -431,6 +431,13 @@ Each online run starts from the saved file tabs, so Week 15's "second run" check
 old lines in the log and data file tabs. The module project is unchanged. Offline, the laptop runner
 still refuses programs that read or write files (CKB-090).
 
+## Last uploaded date on module cards (approved 2026-11-06)
+
+In the teacher's class dashboard, each module card (**Curriculum**, and a student's module cards)
+shows **Last uploaded:** with the date and time of the module's latest upload, in the teacher's own
+time zone. Uploading the same file again also moves it forward, so it confirms an upload went
+through, not that the content changed. Press **Refresh** to see a new upload.
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one
