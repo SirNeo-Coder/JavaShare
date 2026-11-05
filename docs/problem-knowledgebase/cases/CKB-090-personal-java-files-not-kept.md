@@ -62,4 +62,4 @@ suspecting the student's code.
 
 - 2026-11-05 — Found while applying the CKB-089 content change; reported to the teacher.
 - 2026-11-05 — Teacher approved plan A: allow `.txt` in personal Java projects and reword the
-  two-run checks. Branch `feature/personal-txt-files`.
+  two-run checks. Branch `feature/personal-txt-files`, commit `1645c70`, PR #80.

@@ -1103,5 +1103,6 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   15–21 50/50. Real app online locally: **＋** stock.txt, run matched the example, Save work, Submit,
   teacher review showed stock.txt.
 - Not run: hosted site; browser carry-forward to the next week. Offline Week 15 still blocked.
+- Commit `1645c70`, PR #80 (https://github.com/SirNeo-Coder/JavaShare/pull/80).
 - Next: teacher reviews the PR, merges, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`.
 
