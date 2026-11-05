@@ -1106,3 +1106,13 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Commit `1645c70`, PR #80 (https://github.com/SirNeo-Coder/JavaShare/pull/80).
 - Next: teacher reviews the PR, merges, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`.
 
+## CodeRabbit comments rule — 2026-11-05
+
+- Branch `docs/coderabbit-review-rule`. Teacher asked to check CodeRabbit on PRs #78–#80 and to make
+  assistants always check it. Rule added to `AGENTS.md` ("CodeRabbit review comments").
+- PR #78: Step 8 append (already fixed by PR #79); Week 15 README "no runner or schema changes"
+  sentence (valid, fixed here); `src/*.txt` kept online but stripped by the laptop runner (valid but
+  latent: no module uses `src/*.txt`, offline file access is blocked; not fixed, needs approval).
+- PRs #79, #80: "Review failed: the pull request is closed" (merged before review); no findings.
+- Next: teacher reviews this PR; decide on the `src/*.txt` finding.
+
