@@ -15,8 +15,10 @@ the existing lesson id as a descriptive anchor, never a fabricated code step or 
 
 The PDF retains every original page and appends task instructions and complete expected output.
 The Word lesson plan retains its original content and appends teacher activity notes.
-Original files in /home/ireneo/Documents/Java 2026 are unchanged. No runner, schema, migration,
-hosted service or submitted student work changes. The personal project remains separate.
+Original files in /home/ireneo/Documents/Java 2026 are unchanged. The first version (2026-10-22)
+changed no runner or schema. Running Week 15 online now needs the app update from PRs #78–#80
+(Java runner, bridge, upload and personal-project rules) deployed **before** re-uploading this
+JSON; an older runner refuses its `.txt` files. No migration. The personal project remains separate.
 
 Reference edits used only by tests: tests/fixtures/week15-week21-task-edits.json.
 Verification and limitations: docs/verification/week15-week21-step-additions.md.
