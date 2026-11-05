@@ -1112,7 +1112,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   assistants always check it. Rule added to `AGENTS.md` ("CodeRabbit review comments").
 - PR #78: Step 8 append (already fixed by PR #79); Week 15 README "no runner or schema changes"
   sentence (valid, fixed here); `src/*.txt` kept online but stripped by the laptop runner (valid but
-  latent: no module uses `src/*.txt`, offline file access is blocked; not fixed, needs approval).
-- PRs #79, #80: "Review failed: the pull request is closed" (merged before review); no findings.
+  latent: no module uses `src/*.txt`, offline file access is blocked; recorded as CKB-091, not
+  fixed, needs approval).
+- PRs #79, #80: "Review failed: the pull request is closed" (merged before review); no review
+  occurred, so nothing was checked.
 - Next: teacher reviews this PR; decide on the `src/*.txt` finding.
 
