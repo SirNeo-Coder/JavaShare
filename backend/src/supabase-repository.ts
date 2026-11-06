@@ -1791,10 +1791,11 @@ export async function getSupabaseTeacherClassProgress(user: SupabaseSessionUser,
     });
     return { ...student, modules, averagePercent: average(modules.map((module) => module.percent)), status: completionStatus(modules.map((module) => module.percent)), completedModules: modules.filter((module) => module.percent === 100).length };
   });
-  const modules = courseRows.map(({ module_id, content }) => {
+  const modules = courseRows.map(({ module_id, content, updated_at }) => {
     const progress = students.flatMap((student) => student.modules.filter((module) => module.moduleId === module_id));
     return {
-      moduleId: module_id, title: content.title, week: content.week, course: content.course,
+      // Every upload, even of the same file, sets updated_at, so this is the last upload (teacher, 2026-11-06).
+      moduleId: module_id, title: content.title, week: content.week, course: content.course, lastUploaded: updated_at,
       lessons: content.lessons.length,
       steps: content.lessons.reduce((total, lesson) => total + lesson.blocks.filter((block) => block.type === "step").length, 0),
       completedStudents: progress.filter((module) => module.percent === 100).length,

@@ -89,6 +89,15 @@ test("subject modules: one subject per class, one upload per teacher/subject, se
       assert.deepEqual(inB.stepStates, {}); assert.deepEqual(inB.projectFiles, []); assert.deepEqual(inB.performanceTask, {});
       assert.equal((await ok(await call(modulePath(mvc), teacherCookie)))[0].title, net.title);
     });
+    await t.test("Curriculum cards show Last uploaded, which moves forward on every upload, even of the same file", async () => {
+      const lastUploaded = async (id) => (await ok(await call(`/api/classes/${id}/module-progress`, teacherCookie))).modules.find((module) => module.moduleId === fixture.id).lastUploaded;
+      const before = await lastUploaded(a);
+      assert.ok(!Number.isNaN(Date.parse(before)), `a real upload time, got ${before}`);
+      assert.equal(await lastUploaded(b), before, "both classes share one copy, so one upload time");
+      await ok(await call(modulePath(b), teacherCookie, "POST", { ...fixture, title: "Shared Java correction" }), 201);
+      const after = await lastUploaded(a);
+      assert.ok(Date.parse(after) > Date.parse(before), `${after} is after ${before}`);
+    });
     await t.test("shared-only prerequisites unlock per class and never reuse another class's completion", async () => {
       const before = { ...fixture, id: "shared-before", week: 1 };
       const after = { ...fixture, id: "shared-after", week: 2, previousModuleId: before.id };

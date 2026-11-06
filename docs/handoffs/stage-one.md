@@ -1106,6 +1106,18 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Commit `1645c70`, PR #80 (https://github.com/SirNeo-Coder/JavaShare/pull/80).
 - Next: teacher reviews the PR, merges, then re-uploads `docs/modules/week15/Java2_Week_15.codeshare.json`.
 
+## Module card "Last uploaded" — 2026-11-06
+
+- Branch `feature/module-last-uploaded` (from `main`; PR #81 still open and independent). Teacher
+  approved the label "Last uploaded".
+- Done: the class module-progress data sends each module's `lastUploaded` (the module row's existing
+  `updated_at`, set by the database on every upload, even of the same file);
+  `TeacherClassDashboard.tsx` shows "Last uploaded: <date, time>" under the course name. No migration.
+- Tested: `tests/subject-module-sharing.test.mjs` subtest "Curriculum cards show Last uploaded, which
+  moves forward on every upload, even of the same file" failed with `main`'s server file, passes now.
+  Real app: card showed "Nov 6, 2026, 7:44 AM", then 7:45 AM after re-uploading and **Refresh**.
+- Not run: hosted site.
+- Commit on PR #82 (https://github.com/SirNeo-Coder/JavaShare/pull/82). Next: CodeRabbit review, then teacher merges.
 ## CodeRabbit comments rule — 2026-11-05
 
 - Branch `docs/coderabbit-review-rule`. Teacher asked to check CodeRabbit on PRs #78–#80 and to make
