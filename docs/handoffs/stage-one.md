@@ -1118,4 +1118,18 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   Real app: card showed "Nov 6, 2026, 7:44 AM", then 7:45 AM after re-uploading and **Refresh**.
 - Not run: hosted site.
 - Commit on PR #82 (https://github.com/SirNeo-Coder/JavaShare/pull/82). Next: CodeRabbit review, then teacher merges.
+## CodeRabbit comments rule — 2026-11-05
+
+- Branch `docs/coderabbit-review-rule`. Teacher asked to check CodeRabbit on PRs #78–#80 and to make
+  assistants always check it. Rule added to `AGENTS.md` ("CodeRabbit review comments").
+- PR #78: Step 8 append (already fixed by PR #79); Week 15 README "no runner or schema changes"
+  sentence (valid, fixed here); `src/*.txt` kept online but stripped by the laptop runner (valid but
+  latent: no module uses `src/*.txt`, offline file access is blocked; recorded as CKB-091, not
+  fixed, needs approval).
+- PRs #79, #80: "Review failed: the pull request is closed" (merged before review); no review
+  occurred, so nothing was checked.
+- PR #81 reviews: rounds 1–2 (pagination, "no review" wording, CKB-091, full endpoints) fixed;
+  round 3 ("outside-diff comments are in pulls/comments") not valid, checked on PR #78. Also restored
+  an `AGENTS.md` sentence that PR #80 had split from the "Submit this version" bullet.
+- Next: teacher reviews this PR; decide on the `src/*.txt` finding.
 
