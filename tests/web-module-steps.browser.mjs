@@ -1,8 +1,10 @@
 // Real local production browser checks for web module steps (Slices 1-2), with the teacher's own
-// Net MVC Week 1-3 files. Local Supabase only, no hosted data; the server may use offline settings
-// (laptop Java), online settings (browser Java) or Cloudflare's runtime (npm run cf:preview).
-// Env: WEB_STEPS_BASE_URL (default http://localhost:3042), DOTNET_WEEKS_DIR (folder holding the
-// teacher's DotNet1_Week_0N.codeshare.json files), CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
+// Net MVC weeks of the resume course (Resume/Week_NN/, 2026-11-06). Local Supabase only, no hosted data; the server may
+// use offline settings (laptop Java), online settings (browser Java) or Cloudflare's runtime (npm run cf:preview).
+// Env: WEB_STEPS_BASE_URL (default http://localhost:3042), DOTNET_WEEKS_DIR (the teacher's Resume folder holding
+// Week_NN/DotNet1_Week_NN.codeshare.json), CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
+// Subtests that need Week 2 or Week 3 skip until those Resume weeks are built; they still describe the retired canteen
+// weeks and are adapted when each week is built.
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
@@ -17,14 +19,17 @@ const config = execFileSync("npx", ["--no-install", "supabase", "status", "-o", 
 const local = Object.fromEntries(config.split("\n").map((line) => line.match(/^([A-Z_]+)="?([^"\n]*)"?$/)).filter(Boolean).map((m) => [m[1], m[2]]));
 assert.ok(["localhost", "127.0.0.1"].includes(new URL(local.API_URL).hostname));
 const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { persistSession: false } });
-const folder = process.env.DOTNET_WEEKS_DIR || "/home/ireneo/Documents/Java 2026/Net Files";
-const paths = ["DotNet1_Week_01.codeshare.json", "Week_02/DotNet1_Week_02.codeshare.json", "Week_03/DotNet1_Week_03.codeshare.json"].map((name) => join(folder, name));
-const weeks = paths.every(existsSync) ? paths.map((path) => JSON.parse(readFileSync(path, "utf8"))) : null;
+const folder = process.env.DOTNET_WEEKS_DIR || "/home/ireneo/Documents/Java 2026/Net Files/Resume";
+// Every built week, in order from Week 1 (stops at the first week not built yet).
+const paths = Array.from({ length: 10 }, (_, i) => join(folder, `Week_${String(i + 1).padStart(2, "0")}`, `DotNet1_Week_${String(i + 1).padStart(2, "0")}.codeshare.json`));
+const missing = paths.findIndex((path) => !existsSync(path));
+if (missing >= 0) paths.length = missing;
+const weeks = paths.length ? paths.map((path) => JSON.parse(readFileSync(path, "utf8"))) : null;
 const stepsOf = (module) => module.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
 // Weeks in the Java student workflow (teacher, 2026-10-29): run the sample first, then the task. The task
 // answers stay in <week folder>/solutions/<step id>/, never in the JSON.
 const revised = Boolean(weeks?.some((week) => week.sampleFirst));
-assert.ok(!weeks || weeks.every((week) => Boolean(week.sampleFirst) === revised), "Weeks 1–3 must all use the same format (all sample-first or none)");
+assert.ok(!weeks || weeks.every((week) => Boolean(week.sampleFirst) === revised), "The weeks must all use the same format (all sample-first or none)");
 const legacyOnly = revised && "the teacher's weeks are sample-first; the next-to-last student subtest walks every step";
 const answerFiles = (week, step) => {
   const dir = join(dirname(paths[weeks.indexOf(week)]), "solutions", step.id);
@@ -42,7 +47,7 @@ const closePageWindow = async (where) => {
   await where.locator(".page-window").waitFor({ state: "detached" });
 };
 
-test("web module steps: uploads keep checks, teacher preview checks every sample, a student completes Week 2", { skip: !weeks && `teacher files not found in ${folder}` }, async (t) => {
+test("web module steps: uploads keep checks, teacher preview checks every sample, a student completes every built week", { skip: !weeks && `teacher files not found in ${folder}` }, async (t) => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.WEB_STEPS_BASE_URL || "http://localhost:3042";
   const users = []; let classroomId;
@@ -62,13 +67,12 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
 
     await t.test("upload keeps webChecks, mediaChecks and includeMediaOutput", async () => {
       for (const week of weeks) assert.equal((await teacher.request.post(`/api/classrooms/${classroomId}/modules`, { data: week })).status(), 201, week.id);
-      for (const week of weeks.slice(1)) {
+      for (const week of weeks) {
         const saved = stepsOf(await (await teacher.request.get(`/api/classrooms/${classroomId}/modules/${week.id}`)).json());
         for (const [index, step] of stepsOf(week).entries()) {
           for (const field of ["webChecks", "mediaChecks", "includeMediaOutput"]) assert.deepEqual(saved[index][field], step[field], `${step.id} ${field}`);
         }
       }
-      assert.ok(stepsOf(weeks[2]).some((step) => step.mediaChecks), "Week 3 has a mediaChecks step to keep");
     });
 
     await t.test("teacher preview runs every step's own sample through the web check", async () => {
@@ -149,7 +153,8 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       await checks.waitFor();
     };
-    const week2 = weeks[1], steps2 = stepsOf(week2);
+    const week2 = weeks[1], steps2 = week2 ? stepsOf(week2) : [];
+    const needs = (n) => !weeks[n - 1] && `Resume Week ${n} is not built yet`;
 
     await t.test("Week 2 Step 1: mismatch and uncaught error show a cross with Required and Your output, a failed page check shows what was found, then the sample passes", { skip: legacyOnly }, async () => {
       await openCatalog(week2);
@@ -264,7 +269,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.match(await currentTab(), /Step 3$/, "the student resumes after the teacher-marked step");
     });
 
-    await t.test("Week 3 media (Slice 3b, Cloudflare R2): the teacher adds the media files once; media steps then check pictures, sound and video automatically", async (st) => {
+    await t.test("Week 3 media (Slice 3b, Cloudflare R2): the teacher adds the media files once; media steps then check pictures, sound and video automatically", { skip: needs(3) }, async (st) => {
       const week3 = weeks[2], steps3 = stepsOf(week3);
       if ((await teacher.request.get(`/api/classrooms/${classroomId}/modules/${week3.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server; media steps stay teacher-checked"); return; }
       const mediaRoot = join(folder, "Week_03", "project_end");
@@ -319,7 +324,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.screenshot({ path: "/tmp/codeshare-web-media-student.png" });
     });
 
-    await t.test("sample-first weeks (Java workflow): every step of Weeks 1–3 verifies its unchanged sample, then completes its task with the answer in solutions/", { skip: !revised && "the teacher's weeks are not sample-first yet" }, async (st) => {
+    await t.test("sample-first weeks (Java workflow): every step of every built week verifies its unchanged sample, then completes its task with the answer in solutions/", { skip: !revised && "the teacher's weeks are not sample-first yet" }, async (st) => {
       const missing = weeks.flatMap((week) => stepsOf(week).filter((step) => !answerFiles(week, step)).map((step) => step.id));
       if (missing.length) { st.skip(`no task answer in solutions/ for ${missing.join(", ")}`); return; }
       const textarea = page.locator(".student-module-project .editor-card textarea");
@@ -372,7 +377,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.ok(lines.every((line) => /task completed|marked done/.test(line)), lines.join("\n"));
     });
 
-    await t.test("Week 2 personal performance-task project (Slice 2): HTML editor and page preview, run, submit, 100%; the teacher reviews the frozen page", async () => {
+    await t.test("Week 2 personal performance-task project (Slice 2): HTML editor and page preview, run, submit, 100%; the teacher reviews the frozen page", { skip: needs(2) }, async () => {
       const submit = page.getByRole("button", { name: "Submit this version", exact: true });
       const ready = page.getByText("Run succeeded — ready to submit this version.", { exact: false });
       const runPage = async () => {
@@ -450,7 +455,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
-    await t.test("Week 3 personal project: the student adds their own pictures, sound and video; Run shows them; Submit freezes them; the teacher's review shows them", async (st) => {
+    await t.test("Week 3 personal project: the student adds their own pictures, sound and video; Run shows them; Submit freezes them; the teacher's review shows them", { skip: needs(3) }, async (st) => {
       const week3 = weeks[2], steps3 = stepsOf(week3);
       if ((await student.request.get(`/api/classrooms/${classroomId}/modules/${week3.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server"); return; }
       const mediaRoot = join(folder, "Week_03", "project_end");

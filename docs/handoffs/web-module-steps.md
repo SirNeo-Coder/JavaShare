@@ -5,7 +5,7 @@ notes"). Another coding assistant must be able to continue from this file alone.
 `AGENTS.md` first; its "Web module steps (agreed 2026-10-28)" rule is the short version of the
 decisions below.
 
-Last updated: 2026-10-30.
+Last updated: 2026-11-06.
 
 ## Goal
 
@@ -32,7 +32,8 @@ into three slices, then the teacher's own revision of the module files.
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
 | Page window stays until a completed task is synced (CKB-087, review finding on PR #76) | **Built** 2026-10-30, PR open; unit 411/411, web browser tests pass offline (3042); Cloudflare runtime not run | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77), branch `fix/page-window-close-during-sync`, commit `cf54e6f` |
-| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Not started**; the rolling weekly prompt must be rewritten for the new map first | same section |
+| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). Weeks 2–10 not started | teacher's `Resume/Week_01/Verification.md`; branch `docs/net-resume-week-01` |
+| Page window stays until a completed task is synced (CKB-087) | **Merged** 2026-10-30 | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77) |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
 Weeks 2–3 so their `webChecks`/`mediaChecks` are kept (uploads before PR #59 dropped them; same
@@ -418,8 +419,9 @@ it cannot do, stop and propose an app change for approval first):
 4. Module (playbook §4): run every printed example; render and inspect all 8 pages.
 5. JSON last. Check it with the teacher's `check_codeshare.py --run --media-root project_end` and
    `check_web_steps.cjs`, then with CodeShare's `tests/web-module-steps.browser.mjs` on Cloudflare's
-   runtime (8787) and offline settings (3042), one line per step. That test reads only Weeks 1–3
-   today; extending it to a new week is a test change that needs approval.
+   runtime (8787) and offline settings (3042), one line per step. Since 2026-11-06 it reads every built
+   `Resume/Week_NN/` week; its Week 2 and Week 3 subtests (personal project, media) still describe the retired
+   canteen weeks and skip until those Resume weeks exist; adapting them is a test change that needs approval.
 6. Write `Verification.md`; update `DotNet1_Handover.md`, the root `project/`, this handoff;
    commit and push the repository docs on a new branch with a PR.
 7. Teacher: upload the JSON under **Curriculum** (same ids keep student progress); for a media
@@ -468,10 +470,11 @@ built `main` (see `docs/cloudflare-setup.md`):
   `/home/ireneo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs`)
   and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`
   (`/home/ireneo/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome`). The web steps test
-  reads the teacher's files from `DOTNET_WEEKS_DIR` and skips if they are missing.
+  reads the teacher's Resume weeks from `DOTNET_WEEKS_DIR` (default `.../Net Files/Resume`, every
+  `Week_NN/DotNet1_Week_NN.codeshare.json` from Week 1 until the first missing week) and skips if there are none.
 - Sample-first weeks: `tests/web-sample-first.browser.mjs` (two linked practice weeks; no teacher files
   needed) and the sample-first branch of `tests/web-module-steps.browser.mjs`, which walks every step of
-  the teacher's Weeks 1–3 with the answers in each week's `solutions/<step id>/` (skips, naming the
+  every built Resume week with the answers in each week's `solutions/<step id>/` (skips, naming the
   steps, if an answer is missing). Old-format-only subtests skip when the weeks are sample-first.
 - Commands: `npm test`, `npm run lint`, `npm run build:all`,
   `node --test --test-reporter=spec tests/web-module-steps.browser.mjs`.
@@ -527,12 +530,10 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Teacher reviews and merges the page-window PR** (`feature/web-page-window`), then deploys and
-   follows its pull request's test steps on the hosted site.
-2. **Week 1 of the resume course**: the teacher pastes the "Rolling weekly prompt" (below, rewritten
-   and approved 2026-10-30) into a new chat. That chat rewrites `DotNet1_Handover.md`, which still
-   describes the old 20-week plan.
-3. Then **Weeks 2–10**, one week per chat. Week 3 (links, frames, forms) can use the page window.
+1. **Week 1 of the resume course is built** (2026-11-06). Teacher: print it, then in CodeShare **Curriculum**
+   remove the old Weeks 1–3 (`dotnet-1-w01`…`w03`) and upload `Resume/Week_01/DotNet1_Week_01.codeshare.json`.
+2. **Week 2**: the teacher pastes the "Rolling weekly prompt" (below, now Week 2) into a new chat.
+3. Then **Weeks 3–10**, one week per chat. Week 3 (links, frames, forms) can use the page window.
    Weeks 9–10 are built as planned; the teacher checks them in CodeShare when reached.
 4. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
 5. **Offline web steps/media** stays a separate task (needed before media weeks are taught offline).
@@ -784,3 +785,10 @@ I must check, and a Sources list of every reference as clickable links. Then the
 - 2026-10-30 — PR #76 merged. Review finding approved and fixed (CKB-087) on `fix/page-window-close-during-sync`: the
   page window's Close, Esc and click-beside stay off until the screen's whole run finishes, including the check and
   the completion sync. Next: teacher reviews the PR.
+- 2026-11-06 — Resume Week 1 built in the teacher's `Resume/Week_01/` (teacher: ids `dotnet-1-r01`, not the
+  `dotnet-1-resume-w01` names another chat recorded that morning; Friday is performance task day with one Friday step
+  showing the finished page): 9 steps, DLL (7 pages), module (11 pages: 8 + task pages 9–11), JSON from real runs.
+  Teacher's checkers: samples 9/9, answers 9/9, unchanged samples fail 9/9, `test_checker.py` 6/6, printed = JSON.
+  `tests/web-module-steps.browser.mjs` now reads the Resume weeks (approved); 9/9 "sample verified, task completed" on
+  Cloudflare's runtime (8787) and offline settings (3042), 6 pass, 8 skipped, 0 fail; a copy with one wrong answer fails
+  at that step. `npm test` 421/421, lint 0 errors. `DotNet1_Handover.md` rewritten. Branch `docs/net-resume-week-01`.
