@@ -818,3 +818,9 @@ anything I must check, and a Sources list of every reference as clickable links.
   `Week_02/teacher_pictures/` for students without a photo (uploaded under Media files, online only); branch from main
   after PR #83 merged. Found: a table's page text puts each row on its own line with a tab between cells; `video` with
   `source` reports `null` as its file name, so samples put `src` on `img`, `audio` and `video`. Branch `docs/net-resume-week-02`.
+- 2026-11-06 — Resume Week 2 built in the teacher's `Resume/Week_02/` (9 media steps; Juan's drawn picture, generated tune and
+  recorded video in `project_end/`; DLL 7 pages; module 11 pages). Teacher's checkers: samples 9/9, answers 9/9, unchanged
+  samples fail 9/9, `test_checker.py` 8/8, printed = JSON. `revision_tools/resume_w01/build.py` now builds any Resume week
+  (`build.py r02`; Week 1 rebuilds byte-identical). `tests/web-module-steps.browser.mjs`: the retired Week 3 media subtest now
+  uploads Resume Week 2's media before the student walk; the Week 2 personal subtest uses the resume starter and, online, a
+  teacher picture under Media files. Offline settings (3042): 7 pass, 7 skipped, 0 fail. Cloudflare runtime next.

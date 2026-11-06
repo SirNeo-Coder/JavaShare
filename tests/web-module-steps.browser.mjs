@@ -3,8 +3,8 @@
 // use offline settings (laptop Java), online settings (browser Java) or Cloudflare's runtime (npm run cf:preview).
 // Env: WEB_STEPS_BASE_URL (default http://localhost:3042), DOTNET_WEEKS_DIR (the teacher's Resume folder holding
 // Week_NN/DotNet1_Week_NN.codeshare.json), CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
-// Subtests that need Week 2 or Week 3 skip until those Resume weeks are built; they still describe the retired canteen
-// weeks and are adapted when each week is built.
+// Subtests that need Week 3 skip until that Resume week is built; they still describe the retired canteen week and are
+// adapted when it is built. The Week 2 ones use Resume Week 2 (Juan's media in Week_02/project_end, 2026-11-06).
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
@@ -269,27 +269,26 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.match(await currentTab(), /Step 3$/, "the student resumes after the teacher-marked step");
     });
 
-    await t.test("Week 3 media (Slice 3b, Cloudflare R2): the teacher adds the media files once; media steps then check pictures, sound and video automatically", { skip: needs(3) }, async (st) => {
-      const week3 = weeks[2], steps3 = stepsOf(week3);
-      if ((await teacher.request.get(`/api/classrooms/${classroomId}/modules/${week3.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server; media steps stay teacher-checked"); return; }
-      const mediaRoot = join(folder, "Week_03", "project_end");
-      const mediaFiles = ["images/snacks.svg", "images/counter.svg", "audio/chime.wav", "video/canteen.webm"];
-      if (!mediaFiles.every((path) => existsSync(join(mediaRoot, path)))) { st.skip(`teacher media not found in ${mediaRoot}`); return; }
+    await t.test("Week 2 media (Cloudflare R2): the teacher adds Juan's media files once; every media step's sample then checks its pictures, sound and video automatically", { skip: needs(2) }, async (st) => {
+      if ((await teacher.request.get(`/api/classrooms/${classroomId}/modules/${week2.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server; media steps stay teacher-checked"); return; }
+      const mediaRoot = join(folder, "Week_02", "project_end");
+      const mediaFiles = ["images", "audio", "video"].flatMap((kind) => existsSync(join(mediaRoot, kind)) ? readdirSync(join(mediaRoot, kind)).map((name) => `${kind}/${name}`) : []);
+      if (!mediaFiles.length) { st.skip(`teacher media not found in ${mediaRoot}`); return; }
       const details = await teacher.newPage(); details.setDefaultTimeout(20000); details.on("pageerror", (e) => errors.push(e.message));
       await details.goto("/");
       await details.getByRole("button", { name: /Open class/ }).click();
       await details.getByRole("navigation", { name: "Teacher class navigation" }).getByRole("button", { name: /Curriculum/ }).click();
-      await details.locator(".teacher-module-card", { hasText: "Local Canteen Media" }).getByRole("button", { name: /View module details/ }).click();
+      await details.locator(".teacher-module-card", { hasText: week2.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: /View module details/ }).click();
       const section = details.getByRole("region", { name: "Media files" });
       await section.getByText("No media files yet.").waitFor();
       await section.getByLabel("Add media files").setInputFiles(mediaFiles.map((path) => join(mediaRoot, path)));
-      await section.getByText("video/canteen.webm").waitFor();
+      await section.locator("li").nth(mediaFiles.length - 1).waitFor();
       assert.deepEqual((await section.locator("li").allTextContents()).map((line) => line.split(" · ")[0]).sort(), [...mediaFiles].sort());
-      // Every media step's own sample now runs automatically in the teacher preview.
+      // Every media step's own sample now runs automatically in the teacher preview (Run waits for the media, CKB-080).
       const views = details.locator(".module-step");
       const report = [];
-      for (const [index, step] of steps3.entries()) {
-        if (index === 0) continue;
+      for (const [index, step] of steps2.entries()) {
+        if (!/(?:^|\n)Media checks:/.test(step.expectedOutput)) continue;
         const view = views.nth(index), checks = view.locator(".web-checks");
         for (let attempt = 0; attempt < 20; attempt++) {
           await view.getByRole("button", { name: "Run", exact: true }).click();
@@ -303,25 +302,11 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         const media = (await checks.locator("li").allTextContents()).filter((line) => /: (?:image|playback)/.test(line)).length;
         report.push(`${step.id}: ${failed.length ? `fail — ${failed.join("; ")}` : `pass (page text + page checks + ${media} media lines)`}`);
       }
-      console.log(`Week 3 media steps with the teacher's media files:\n${report.join("\n")}`);
+      console.log(`Week 2 media steps with the teacher's media files:\n${report.join("\n")}`);
       t.diagnostic(report.join(" | "));
-      assert.ok(report.every((line) => /: pass/.test(line)), report.join("\n"));
+      assert.ok(report.length && report.every((line) => /: pass/.test(line)), report.join("\n"));
       await details.screenshot({ path: "/tmp/codeshare-web-media-teacher.png", fullPage: true });
       await details.close();
-
-      if (revised) return; // sample-first weeks: the next subtest walks every step, media steps included
-      // The student resumes at Step 3 (Step 2 was marked done above); it is now checked automatically.
-      await openCatalog(week3);
-      assert.match(await currentTab(), /Step 3$/);
-      await page.waitForFunction(() => !/Checked by your teacher/.test(document.querySelector(".student-module-project .web-checks")?.textContent ?? ""));
-      await editor.fill(steps3[2].files[0].content);
-      await run();
-      assert.equal(await checks.locator("li.failed").count(), 0, await checks.textContent());
-      assert.deepEqual((await checks.locator("li.passed").allTextContents()).filter((line) => /: (?:image|playback)/.test(line)),
-        ["✓ images/snacks.svg: image decoded", "✓ images/counter.svg: image decoded", "✓ audio/chime.wav: playback advanced", "✓ video/canteen.webm: playback advanced"]);
-      await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
-      assert.equal((await progress(week3)).stepStates[steps3[2].id], "pass");
-      await page.screenshot({ path: "/tmp/codeshare-web-media-student.png" });
     });
 
     await t.test("sample-first weeks (Java workflow): every step of every built week verifies its unchanged sample, then completes its task with the answer in solutions/", { skip: !revised && "the teacher's weeks are not sample-first yet" }, async (st) => {
@@ -387,7 +372,12 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       };
       const starter = week2.performanceTask.starterFiles[0].content;
       assert.match(starter, /<\/body>/);
-      const mine = starter.replace("</body>", "<p>My stall sells turon.</p></body>");
+      const mine = starter.replace("Write a short introduction about yourself here.", "I am a Grade 11 student who likes drawing posters.");
+      assert.notEqual(mine, starter);
+      const card = week2.title.replace(/^Self-Paced Module:\s*/, "");
+      // Online, the student adds a teacher-supplied picture under Media files; offline the personal project is text only.
+      const withMedia = (await student.request.get(`/api/classrooms/${classroomId}/modules/${week2.id}/media`)).status() !== 503;
+      const picture = join(folder, "Week_02", "teacher_pictures", "resume_picture_1.svg");
       await openCatalog(week2);
       await page.getByRole("button", { name: "Projects", exact: true }).hover();
       const projects = page.locator("#classroom-projects");
@@ -408,16 +398,32 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await ready.waitFor();
       assert.equal(await submit.isEnabled(), true);
       assert.ok((await progress(week2)).performanceTask.project.successfulRun, "the server recorded the successful run of the saved files");
-      await editor.fill(`${mine}\n<!-- changed -->`);
+      let last = `${mine}\n<!-- changed -->`;
+      await editor.fill(last);
       assert.equal(await submit.isDisabled(), true, "an edit after the run needs a new run");
-      await runPage();
+      if (withMedia) {
+        const box = page.locator(".student-module-project").getByRole("region", { name: "Media files" });
+        await box.getByText("No media files yet.").waitFor();
+        await box.getByLabel("Add media files").setInputFiles(picture);
+        await box.getByText("images/resume_picture_1.svg").waitFor();
+        last = last.replace("images/my_picture.jpg", "images/resume_picture_1.svg");
+        await editor.fill(last);
+      }
+      await page.getByRole("button", { name: /Run code/ }).click();
+      const inside = await (await page.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+      await inside.waitForFunction(() => document.querySelector("img")?.complete);
+      assert.deepEqual(await inside.evaluate(() => { const img = document.querySelector("img"); return [img.getAttribute("data-codeshare-src") ?? img.getAttribute("src"), img.naturalWidth > 0]; }),
+        withMedia ? ["images/resume_picture_1.svg", true] : ["images/my_picture.jpg", false], "the personal picture shows online; offline it is not there");
+      await closePageWindow(page);
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       await ready.waitFor();
       await submit.click();
       await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
       await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
       const saved = await progress(week2);
       assert.equal(saved.percent, 100);
-      assert.equal(saved.performanceTask.own.files[0].content, `${mine}\n<!-- changed -->`);
+      assert.equal(saved.performanceTask.own.files[0].content, last);
+      assert.deepEqual((saved.performanceTask.own.media ?? []).map((item) => item.path), withMedia ? ["images/resume_picture_1.svg"] : []);
       await page.screenshot({ path: "/tmp/codeshare-web-personal-student.png" });
 
       // Teacher live help on a web file says Web page and uses the HTML editor (CKB-078).
@@ -439,11 +445,11 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.getByRole("button", { name: /Open class/ }).click();
       await review.getByRole("button", { name: /^Students/ }).click();
       await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
-      assert.match(await review.locator(".teacher-module-card", { hasText: "Canteen Descriptions" }).textContent(), /100%/);
+      assert.match(await review.locator(".teacher-module-card", { hasText: card }).textContent(), /100%/);
       await review.getByRole("button", { name: "Review personal submission" }).click();
       const frozen = review.locator(".student-module-project").getByRole("textbox", { name: "HTML source code editor", exact: true });
       await frozen.waitFor(); assert.equal(await frozen.getAttribute("readonly"), "");
-      assert.match(await frozen.inputValue(), /turon/);
+      assert.match(await frozen.inputValue(), /drawing posters/);
       assert.equal(await review.getByRole("button", { name: "Save work", exact: true }).count(), 0);
       assert.equal(await review.getByLabel("Program input").count(), 0);
       await review.mouse.click(1200, 400);
