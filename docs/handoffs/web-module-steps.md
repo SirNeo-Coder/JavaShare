@@ -542,27 +542,27 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 The teacher pastes this into a new chat for the next week. Each week's chat replaces it with the next week's
 prompt as its last step (teacher, 2026-10-29). Rewritten for the 10-week resume map and approved by the
-teacher on 2026-10-30. Current: **Week 1**.
+teacher on 2026-10-30. Current: **Week 2** (written by the Week 1 chat, 2026-11-06).
 
 ```text
 Use caveman mode and ponytail (minimal, laziest working solution) for this whole chat.
 
 You are working in the CodeShare repository (formerly JavaShare) at /home/ireneo/Documents/GitHub/JavaShare.
 
-Task: build .NET 1 Week 1, "HTML fundamentals, paragraphs and lists" (DLL, printed module, CodeShare JSON), in
-my folder /home/ireneo/Documents/Java 2026/Net Files/Resume/Week_01/. Only this week.
+Task: build .NET 1 Week 2, "Multimedia and tables" (DLL, printed module, CodeShare JSON), in my folder
+/home/ireneo/Documents/Java 2026/Net Files/Resume/Week_02/. Only this week.
 
 Before anything:
 1. Read AGENTS.md and follow it exactly (knowledge-first workflow, approval before changes, plain English,
-   test reporting rules). Its "Net MVC course (agreed 2026-10-30)" and "Page window" rules apply.
+   test reporting rules). Its "Net MVC course (agreed 2026-10-30)", "Page window" and "Module media" rules apply.
 2. Read docs/handoffs/web-module-steps.md in full. Follow "Net MVC weekly modules: required format and
    workflow". Its teacher decisions are approved; do not ask about them again. The old canteen weeks (folder
    root, Week_02/, Week_03/, Week_04/) are retired: use them as format examples only, never their content.
-3. Read in my folder: DotNet1_Course_Map.md (Week 01 section, "Running project and performance task",
+3. Read in my folder: DotNet1_Course_Map.md (Week 02 section, "Running project and performance task",
    "Delivery inside CodeShare"), DotNet1_Handover.md, ILAW_DLL_and_Module_Playbook.md (sections 1, 2.1, 3, 4,
-   7, 8; its Java content does not apply), Week_03/Verification.md (format only), and revision_tools/ (reuse
-   build_tasks.py, run_checks.sh and the Week_03 checkers; extend them instead of writing new ones, and remove
-   their VS Code and Chrome wording).
+   7, 8; its Java content does not apply), Resume/Week_01/Verification.md (format only), and revision_tools/ (reuse
+   resume_w01/ (content.py, build.py), build_tasks.py, tasks.py, consistency.py, render_r01.sh, run_checks.sh and the
+   Resume/Week_01 checkers; extend them instead of writing new ones).
 4. Another session may be working in the main repository folder with uncommitted changes. Never commit, stash,
    discard or build on them. Use a separate git worktree from origin/main for any repository change. Pick free
    ports.
@@ -572,39 +572,48 @@ Before anything:
 
 Week rules (check each against the real files first):
 - Resume theme: module samples build the resume of Juan Dela Cruz, a made-up student (every detail
-  invented). The personal performance task is the student's own resume; Week 1 is a simple personal info page
-  (name, short introduction, lists of skills and interests). No home address, phone number, birth date, ID
-  numbers or personal social-media accounts.
+  invented). The personal performance task is the student's own resume; Week 2 adds a picture (their own photo,
+  online, or a teacher-supplied picture) and an education or skills table. No home address, phone number, birth
+  date, ID numbers or personal social-media accounts.
 - Everything happens inside CodeShare (CKB-085): never tell students to use VS Code, Chrome, Ctrl+O,
   File > Open Folder, local folders or folder copies. Before handing over, search the DLL, module and JSON for
   "VS Code", "Visual Studio", "Chrome", "Ctrl+O" and "folder", and fix every hit.
 - Pictures, sound and video for Juan are made-up files created on this laptop (drawn SVG, generated sound and
   video); never a real person's photo, never downloaded.
-- Week_01/project_start/ is empty (first week); Resume/project/ matches Week_01/project_end/ at the end.
-- JSON: "sampleFirst": true, no previousModuleId (first week). IDs: course dotnet-1, module dotnet-1-r01,
-  lessons dotnet-1-r01-dD, steps dotnet-1-r01-dD-sS (S counts across the week), slips dotnet-1-r01-dD-slip,
-  task dotnet-1-r01-pt. Every step has one meaningful task (activity id "<step id>-alter-v1", instruction,
+- Week_02/project_start/ = Week_01/project_end/; Resume/project/ matches Week_02/project_end/ at the end.
+- JSON: "sampleFirst": true, "previousModuleId": "dotnet-1-r01". IDs: course dotnet-1, module dotnet-1-r02,
+  lessons dotnet-1-r02-dD, steps dotnet-1-r02-dD-sS (S counts across the week), slips dotnet-1-r02-dD-slip,
+  task dotnet-1-r02-pt. Every step has one meaningful task (activity id "<step id>-alter-v1", instruction,
   "files": [], complete expectedOutput) that changes the visible page text or console lines. Answers in
-  Week_01/solutions/<step id>/, never in the JSON. Every expected output from a real run. A task never repairs
+  Week_02/solutions/<step id>/, never in the JSON. Every expected output from a real run. A task never repairs
   a file listed in its step's mediaChecks (CKB-084).
 - Printed module: 8 lesson pages, then task pages after page 8 built with revision_tools/build_tasks.py.
-  Printed module and JSON identical in code and outputs.
-- DLL: Week_03's DLL is the format template only (no canteen or earlier-week text left): five opened
-  references per day, a "Sample, then your task:" line in each Student Activity, no red ADJUST THIS line.
+  Printed module and JSON identical in code and outputs (revision_tools/consistency.py checks it). Once the page is
+  long, print the whole page once and only the new or changed lines for later steps, each block labelled with where
+  it goes (as in Week 1).
+- DLL: Resume/Week_01's DLL is the format template (no Week 1 text left): five opened references per day, a
+  "Sample, then your task:" line in each Student Activity, no red ADJUST THIS line.
+- Friday is performance task day (teacher, 2026-11-06): at most one Friday step, Juan's finished page for the
+  presentation, no new HTML.
 - If the week needs something the CodeShare preview cannot do (handoff, "What the page preview can and cannot
   do"), stop and propose an app change first.
 - Never change an ID that is already used. Never reuse the old dotnet-1-w01…w03 IDs.
 
 This week's checks:
-- List markers are not page text: the numbers and bullets of <ol>/<ul> (and type, start, reversed) never
-  appear in the expected output. A task that only changes a list attribute cannot be checked, so every task
-  changes visible text; check list attributes on the sample with webChecks (attribute + value).
-- Paragraph formatting (<b>, <strong>, <i>, <em>, <mark>, <small>, <sub>, <sup>, <br>, <hr>, <pre>): check
-  with a real run how each comes out in the page text (<br> breaks the line, <pre> keeps spaces, <hr> adds
-  nothing) before writing any expected output, and how the printed module will show it.
-- "Web editors" in the fundamentals means CodeShare's code editor. Versions and the role of HTML are
-  discussion, checked by the liplet, not by a run.
-- No media this week; pictures, sound and video start in Week 2.
+- Media steps: a step whose page shows pictures, sound or video is a media step: its expectedOutput ends with a
+  "Media checks:" section, "includeMediaOutput": true, and mediaChecks lists only files meant to be broken. The
+  task output keeps the Media checks lines. Run a real check with check_codeshare.py --media-root project_end, with
+  Juan's files in Week_02/project_end/images, audio and video (names of letters, numbers, - and _; at most 5 MB
+  each). In CodeShare I add them under View module details → Media files; online they are then checked
+  automatically, offline I press Mark done; Run waits on "Loading media…" until they load (CKB-080).
+- Media in the page: only src on img, audio, video and source loads; pictures or fonts named in CSS url() do not.
+  alt text is not page text, so a task that only changes alt cannot be checked; describe a picture in visible text.
+- Tables: check with a real run how a table comes out in the page text (caption, each row on its own line, how cells
+  are separated) before writing any expected output, and how the printed module will show it. table, caption, tr,
+  th, td, thead, tbody and the scope, colspan and rowspan attributes and values: check structure and attributes on
+  the sample with webChecks (count, attribute + value); every task changes visible text (for example, adds a row).
+- Personal project: the student's own picture is optional and online only (Media files in the personal project,
+  5 MB each, at most 10, safe names); a teacher-supplied picture otherwise. Offline, the personal project is text only.
 
 First, ask me only the questions whose answers change the files, each with your recommendation first, marked
 "(Recommended)". Then show me the day plan, every step with its task (one line each: step, change, why it
@@ -612,27 +621,29 @@ exercises the lesson) and the AGENTS.md proposal (findings, files likely to chan
 choices), and stop for my approval.
 
 Testing (after approval):
-- My checkers in Week_01 (check_codeshare.py <json> --run --media-root project_end, check_web_steps.cjs,
+- My checkers in Week_02 (check_codeshare.py <json> --run --media-root project_end, check_web_steps.cjs,
   test_checker.py) on the samples and every solutions/ answer; each unchanged sample must fail its task output.
+  Add Week 2 to revision_tools/run_checks.sh.
 - Render and inspect every DLL page and every module page (8.5 × 13 in = 612 × 936 pt; each source page renders
   to exactly one page).
-- CodeShare: tests/web-module-steps.browser.mjs still reads the retired Weeks 1–3. Propose changing it to read
-  the Resume weeks (needs my approval), then run it on Cloudflare's runtime on this laptop
+- CodeShare: tests/web-module-steps.browser.mjs reads every built Resume week; its Week 2 and Week 3 subtests
+  (personal project, media) still describe the retired canteen weeks and skip until those weeks exist. Propose
+  adapting the Week 2 ones to Resume Week 2 (needs my approval), then run it on Cloudflare's runtime on this laptop
   (npx opennextjs-cloudflare build, then preview on port 8787 with the git-ignored .dev.vars pointing at local
-  Supabase) and on the offline-settings server (port 3042), following the handoff's "Testing recipe". Report
-  one line per step: sample verified, task completed.
+  Supabase; local R2 for the media) and on the offline-settings server (port 3042; media steps marked done),
+  following the handoff's "Testing recipe". Report one line per step: sample verified, task completed (or
+  teacher-checked, marked done).
 - Report tests as AGENTS.md "Reporting tests after a build" requires, including what could not be verified.
 
-While working: keep docs/handoffs/web-module-steps.md, Week_01/Verification.md and DotNet1_Handover.md updated
-after every finished step (this week, rewrite DotNet1_Handover.md for the resume course; keep the old one in
-before_revision/), add a dated line to the handoff's "Update log", and commit and push the repository docs
-each time. If you find a bug, give it a CKB record; check problem-index.md and open PRs for the next free
-number first.
+While working: keep docs/handoffs/web-module-steps.md, Week_02/Verification.md and DotNet1_Handover.md updated
+after every finished step, add a dated line to the handoff's "Update log", and commit and push the repository docs
+each time. If you find a bug, give it a CKB record; check problem-index.md and open PRs for the next free number
+first.
 
 Last step (rolling prompt): in docs/handoffs/web-module-steps.md, section "Rolling weekly prompt", replace this
-prompt with the one for Week 2. Change every week number (Week 1 → 2, Week_01 → Week_02, dotnet-1-r01 →
-dotnet-1-r02, Week 01 section → Week 02 section); add "previousModuleId": "dotnet-1-r01" and
-"Week_02/project_start/ = Week_01/project_end/"; write "This week's checks" for Week 2 from the course map and
+prompt with the one for Week 3. Change every week number (Week 2 → 3, Week_02 → Week_03, dotnet-1-r02 →
+dotnet-1-r03, Week 02 section → Week 03 section); set "previousModuleId": "dotnet-1-r02" and
+"Week_03/project_start/ = Week_02/project_end/"; write "This week's checks" for Week 3 from the course map and
 the handoff's preview limits; add any rule I approved this week; keep everything else. From Week 3 on, the
 prompt also asks whether the step samples keep Week 2's pictures, sound and video (then every step is a media
 step and offline I press Mark done) or leave them out. Commit and push it, and paste it at the end of your
@@ -640,8 +651,8 @@ final reply. The Week 10 chat writes no new prompt; it says the course is comple
 
 When done, tell me in plain English: what each day covers, the print instructions (pages 1–6 double-sided, flip
 on long edge; pages 7–8 single-sided; task pages double-sided, flip on long edge), the upload steps (Curriculum →
-remove the old Weeks 1–3 the first time → upload Week 1; View module details → Media files if needed), anything
-I must check, and a Sources list of every reference as clickable links. Then the Week 2 prompt.
+upload Week 2; View module details → Media files → add Juan's pictures, sound and video from Week_02/project_end),
+anything I must check, and a Sources list of every reference as clickable links. Then the Week 3 prompt.
 ```
 
 ## Update log
@@ -792,3 +803,5 @@ I must check, and a Sources list of every reference as clickable links. Then the
   `tests/web-module-steps.browser.mjs` now reads the Resume weeks (approved); 9/9 "sample verified, task completed" on
   Cloudflare's runtime (8787) and offline settings (3042), 6 pass, 8 skipped, 0 fail; a copy with one wrong answer fails
   at that step. `npm test` 421/421, lint 0 errors. `DotNet1_Handover.md` rewritten. Branch `docs/net-resume-week-01`.
+- 2026-11-06 — Rolling weekly prompt replaced with Week 2 (Multimedia and tables): `dotnet-1-r02`, previousModuleId
+  `dotnet-1-r01`, Week 1's DLL and tools as templates, media and table checks, Friday rule, test subtests to adapt.
