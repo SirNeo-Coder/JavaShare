@@ -32,7 +32,7 @@ into three slices, then the teacher's own revision of the module files.
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
 | Page window stays until a completed task is synced (CKB-087, review finding on PR #76) | **Built** 2026-10-30, PR open; unit 411/411, web browser tests pass offline (3042); Cloudflare runtime not run | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77), branch `fix/page-window-close-during-sync`, commit `cf54e6f` |
-| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). Weeks 2–10 not started | teacher's `Resume/Week_01/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83), branch `docs/net-resume-week-01` |
+| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). PR #83 merged. **Week 2 in progress** (approved 2026-11-06, module `dotnet-1-r02`, `Resume/Week_02/`). Weeks 3–10 not started | teacher's `Resume/Week_0N/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83) (merged); branch `docs/net-resume-week-02` |
 | Page window stays until a completed task is synced (CKB-087) | **Merged** 2026-10-30 | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77) |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -812,3 +812,9 @@ anything I must check, and a Sources list of every reference as clickable links.
 - 2026-11-06 — CodeRabbit on PR #83 (both valid, fixed in the Week 2 prompt): the Week 2 test adaptation must upload
   Juan's Week 2 media before the student walk so media steps are checked online, not marked done; the Week 3 prompt
   must take its topic, personal-task addition and upload steps from the Week 03 section.
+- 2026-11-06 — Resume Week 2 (Multimedia and tables) approved with the four recommended choices: every step keeps
+  Juan's picture, sound and video (all 9 steps are media steps; offline the teacher presses Mark done); printed outputs
+  show the tab between table cells as →, the JSON keeps the real tab; three made-up avatar pictures in
+  `Week_02/teacher_pictures/` for students without a photo (uploaded under Media files, online only); branch from main
+  after PR #83 merged. Found: a table's page text puts each row on its own line with a tab between cells; `video` with
+  `source` reports `null` as its file name, so samples put `src` on `img`, `audio` and `video`. Branch `docs/net-resume-week-02`.
