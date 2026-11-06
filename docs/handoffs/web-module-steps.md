@@ -32,7 +32,7 @@ into three slices, then the teacher's own revision of the module files.
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
 | Page window stays until a completed task is synced (CKB-087, review finding on PR #76) | **Built** 2026-10-30, PR open; unit 411/411, web browser tests pass offline (3042); Cloudflare runtime not run | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77), branch `fix/page-window-close-during-sync`, commit `cf54e6f` |
-| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). Weeks 2–10 not started | teacher's `Resume/Week_01/Verification.md`; branch `docs/net-resume-week-01` |
+| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). Weeks 2–10 not started | teacher's `Resume/Week_01/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83), branch `docs/net-resume-week-01` |
 | Page window stays until a completed task is synced (CKB-087) | **Merged** 2026-10-30 | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77) |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -805,3 +805,4 @@ anything I must check, and a Sources list of every reference as clickable links.
   at that step. `npm test` 421/421, lint 0 errors. `DotNet1_Handover.md` rewritten. Branch `docs/net-resume-week-01`.
 - 2026-11-06 — Rolling weekly prompt replaced with Week 2 (Multimedia and tables): `dotnet-1-r02`, previousModuleId
   `dotnet-1-r01`, Week 1's DLL and tools as templates, media and table checks, Friday rule, test subtests to adapt.
+- 2026-11-06 — Delivered as [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83); CodeRabbit review not in yet when opened.
