@@ -627,12 +627,14 @@ Testing (after approval):
 - Render and inspect every DLL page and every module page (8.5 × 13 in = 612 × 936 pt; each source page renders
   to exactly one page).
 - CodeShare: tests/web-module-steps.browser.mjs reads every built Resume week; its Week 2 and Week 3 subtests
-  (personal project, media) still describe the retired canteen weeks and skip until those weeks exist. Propose
-  adapting the Week 2 ones to Resume Week 2 (needs my approval), then run it on Cloudflare's runtime on this laptop
-  (npx opennextjs-cloudflare build, then preview on port 8787 with the git-ignored .dev.vars pointing at local
-  Supabase; local R2 for the media) and on the offline-settings server (port 3042; media steps marked done),
-  following the handoff's "Testing recipe". Report one line per step: sample verified, task completed (or
-  teacher-checked, marked done).
+  (personal project, media) still describe the retired canteen weeks and skip until those weeks exist; only the
+  retired Week 3 subtest uploads media. Propose adapting the Week 2 ones to Resume Week 2 (needs my approval),
+  including uploading Juan's Week 2 media (Media files, local R2) before the student walk, so that on Cloudflare's
+  runtime every media step is checked automatically, never marked done. Then run it on Cloudflare's runtime on this
+  laptop (npx opennextjs-cloudflare build, then preview on port 8787 with the git-ignored .dev.vars pointing at local
+  Supabase) and on the offline-settings server (port 3042, where media steps are marked done because offline has no
+  media), following the handoff's "Testing recipe". Report one line per step: sample verified, task completed
+  (offline media steps: teacher-checked, marked done).
 - Report tests as AGENTS.md "Reporting tests after a build" requires, including what could not be verified.
 
 While working: keep docs/handoffs/web-module-steps.md, Week_02/Verification.md and DotNet1_Handover.md updated
@@ -643,8 +645,9 @@ first.
 Last step (rolling prompt): in docs/handoffs/web-module-steps.md, section "Rolling weekly prompt", replace this
 prompt with the one for Week 3. Change every week number (Week 2 → 3, Week_02 → Week_03, dotnet-1-r02 →
 dotnet-1-r03, Week 02 section → Week 03 section); set "previousModuleId": "dotnet-1-r02" and
-"Week_03/project_start/ = Week_02/project_end/"; write "This week's checks" for Week 3 from the course map and
-the handoff's preview limits; add any rule I approved this week; keep everything else. From Week 3 on, the
+"Week_03/project_start/ = Week_02/project_end/"; replace the week's topic, the personal-task addition and the
+upload steps with Week 3's from the course map's Week 03 section; write "This week's checks" for Week 3 from the
+course map and the handoff's preview limits; add any rule I approved this week; keep everything else. From Week 3 on, the
 prompt also asks whether the step samples keep Week 2's pictures, sound and video (then every step is a media
 step and offline I press Mark done) or leave them out. Commit and push it, and paste it at the end of your
 final reply. The Week 10 chat writes no new prompt; it says the course is complete.
@@ -806,3 +809,6 @@ anything I must check, and a Sources list of every reference as clickable links.
 - 2026-11-06 — Rolling weekly prompt replaced with Week 2 (Multimedia and tables): `dotnet-1-r02`, previousModuleId
   `dotnet-1-r01`, Week 1's DLL and tools as templates, media and table checks, Friday rule, test subtests to adapt.
 - 2026-11-06 — Delivered as [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83); CodeRabbit review not in yet when opened.
+- 2026-11-06 — CodeRabbit on PR #83 (both valid, fixed in the Week 2 prompt): the Week 2 test adaptation must upload
+  Juan's Week 2 media before the student walk so media steps are checked online, not marked done; the Week 3 prompt
+  must take its topic, personal-task addition and upload steps from the Week 03 section.
