@@ -273,7 +273,14 @@ evidence, checked by the server against its own expected output and the saved ve
   decode` / `playback advanced` / `playback failed`; `includeMediaOutput: true` appends them after
   `Media checks:`. `mediaChecks: [{ "src", "state": "loaded" | "broken" }]`: every element must load
   unless listed `broken`, and every listed `src` must be on the page. Not covered: sound or video
-  made by JavaScript, pictures from CSS `url()`.
+  made by JavaScript, pictures from CSS `url()`. The media line names the `src` written on `img`,
+  `audio` or `video` itself; a `video` that names its file only in a `source` reports `null`, so put
+  `src` on the element. Do not page-check (`webChecks`) the `src` of an uploaded file: online it is
+  embedded as `data:` and the check fails (CKB-092); its media line already names the `src`.
+- **Tables in page text (checked 2026-11-06).** A `caption` is one line; each `tr` is one line with a
+  tab between its cells; a `colspan` or `rowspan` cell leaves fewer cells on a line; an empty cell
+  still adds its tab. Words inside a `tr` but outside `td`/`th` move above the table. Page checks
+  cover `scope`, `colspan` and `rowspan`; tasks change visible text.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
