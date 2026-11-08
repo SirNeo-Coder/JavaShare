@@ -40,6 +40,16 @@ test("personal submission: button starts disabled and teacher editor cannot save
   assert.doesNotMatch(review, /Save work|Submit this version|Rename file|Delete file|Add personal Java file/);
 });
 
+test("personal submission: Last submitted date beside Submit this version and in teacher review; hidden before a submission", () => {
+  const submittedAt = "2026-11-06T06:15:00.000Z";
+  const shown = `Last submitted: ${new Date(submittedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`;
+  const submitted = { ...activity.progress, performanceTask: { own: { status: "pass", submittedAt } } };
+  assert.ok(render({ ...activity, kind: "performance", progress: submitted }).includes(`${shown}</span><button type="button" class="run-button" disabled="">Submit this version`));
+  assert.ok(render({ ...activity, kind: "review", progress: submitted }).includes(shown));
+  assert.doesNotMatch(render({ ...activity, kind: "performance" }), /Last submitted/);
+  assert.doesNotMatch(render({ ...activity, progress: submitted }), /Last submitted/, "module project shows no personal date");
+});
+
 test("personal task checklist: read-only items, ticks restored only from this device's storage", () => {
   const { PersonalTaskChecklist } = tsxRequire("../app/PersonalSubmissionChecklist.tsx", import.meta.url);
   const items = ["Compiles", "Prints 5 lines"];

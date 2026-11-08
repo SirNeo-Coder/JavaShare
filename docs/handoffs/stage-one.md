@@ -1117,7 +1117,28 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   moves forward on every upload, even of the same file" failed with `main`'s server file, passes now.
   Real app: card showed "Nov 6, 2026, 7:44 AM", then 7:45 AM after re-uploading and **Refresh**.
 - Not run: hosted site.
-- Commit on PR #82 (https://github.com/SirNeo-Coder/JavaShare/pull/82). Next: CodeRabbit review, then teacher merges.
+- Commit on PR #82 (https://github.com/SirNeo-Coder/JavaShare/pull/82). Merged 2026-11-06. CodeRabbit
+  checked 2026-11-08: "Review failed: the pull request is closed" (merged first), so no code review;
+  its only note was a generic docstring-coverage check, not a finding.
+
+## Personal project "Last submitted" — 2026-11-08
+
+- Branch `feature/personal-last-submitted` (from `main` after PR #84). Teacher approved all three
+  places: beside **Submit this version** (student), in **Review personal submission** (teacher) and
+  on the student's module card under "Last uploaded" (teacher). The card's "Last uploaded" is the
+  module upload time, not a submission.
+- Done: the personal submission already stored `submittedAt` (replaced on every resubmission).
+  `StudentModuleActivity.tsx` shows "Last submitted: <date, time>" in the action bar for personal and
+  review projects and updates it straight after **Submit this version**; the class module-progress
+  data now sends `personalSubmittedAt`, shown on `TeacherClassDashboard.tsx` student cards. No migration.
+- Tested: `tests/weekly-java-project-ui.test.mjs` "personal submission: Last submitted date beside
+  Submit this version and in teacher review; hidden before a submission" and new card/review/resubmit
+  checks in `tests/browser-java-progress.test.mjs` "personal browser runs…" both failed with the
+  display/server line removed and pass now; full `npm test` 422/422. Real app (dev, local Supabase,
+  laptop Java): student saw Nov 5 9:30 AM, ran, submitted, saw Nov 8 9:24 PM; teacher card and review
+  showed Nov 8 9:24 PM.
+- Not run: hosted site; `npm run classroom:offline` itself (same code and database as the dev check).
+- PR #85 (https://github.com/SirNeo-Coder/JavaShare/pull/85). Next: teacher reviews and merges; then check CodeRabbit on it.
 ## CodeRabbit comments rule — 2026-11-05
 
 - Branch `docs/coderabbit-review-rule`. Teacher asked to check CodeRabbit on PRs #78–#80 and to make
