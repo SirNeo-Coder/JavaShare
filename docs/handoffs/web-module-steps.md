@@ -32,7 +32,7 @@ into three slices, then the teacher's own revision of the module files.
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
 | Page window stays until a completed task is synced (CKB-087, review finding on PR #76) | **Built** 2026-10-30, PR open; unit 411/411, web browser tests pass offline (3042); Cloudflare runtime not run | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77), branch `fix/page-window-close-during-sync`, commit `cf54e6f` |
-| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). PR #83 merged. **Week 2 built** 2026-11-06 (`Resume/Week_02/`, module `dotnet-1-r02`, 9 media steps): teacher's checkers pass; browser test 18/18 steps "sample verified, task completed" on Cloudflare's runtime (8787, Week 2 media uploaded); offline settings (3042) Week 1 completed, Week 2 media steps marked done. Found CKB-092 (worked around). PR #84 merged. **Week 3 built** 2026-11-08 (`Resume/Week_03/`, module `dotnet-1-r03`, three pages, media on Steps 1 and 9 only): teacher's checkers pass; browser test 27/27 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–3 media uploaded); offline settings (3042) Week 3 Steps 2–8 completed, Steps 1 and 9 marked done. Found CKB-093 (worked around). Weeks 4–10 not started | teacher's `Resume/Week_0N/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83) (merged); [PR #84](https://github.com/SirNeo-Coder/JavaShare/pull/84) (merged); [PR #86](https://github.com/SirNeo-Coder/JavaShare/pull/86), branch `docs/net-resume-week-03` |
+| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). PR #83 merged. **Week 2 built** 2026-11-06 (`Resume/Week_02/`, module `dotnet-1-r02`, 9 media steps): teacher's checkers pass; browser test 18/18 steps "sample verified, task completed" on Cloudflare's runtime (8787, Week 2 media uploaded); offline settings (3042) Week 1 completed, Week 2 media steps marked done. Found CKB-092 (worked around). PR #84 merged. **Week 3 built** 2026-11-08 (`Resume/Week_03/`, module `dotnet-1-r03`, three pages, media on Steps 1 and 9 only): teacher's checkers pass; browser test 27/27 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–3 media uploaded); offline settings (3042) Week 3 Steps 2–8 completed, Steps 1 and 9 marked done. Found CKB-093 (worked around). **Week 4 built** 2026-11-08 (`Resume/Week_04/`, module `dotnet-1-r04`, shared `styles.css`, media on Steps 1, 3 and 9 only): teacher's checkers pass (`test_checker.py` 20/20); browser test 36/36 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–4 media uploaded); offline settings (3042) Week 4 Steps 2 and 4–8 completed, Steps 1, 3 and 9 marked done; new Week 4 personal subtest passes on both. Found CKB-094 (worked around). Weeks 5–10 not started | teacher's `Resume/Week_0N/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83) (merged); [PR #84](https://github.com/SirNeo-Coder/JavaShare/pull/84) (merged); [PR #86](https://github.com/SirNeo-Coder/JavaShare/pull/86), branch `docs/net-resume-week-03`; branch `docs/net-resume-week-04` |
 | Page window stays until a completed task is synced (CKB-087) | **Merged** 2026-10-30 | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77) |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -416,6 +416,12 @@ it cannot do, stop and propose an app change for approval first):
   values, placeholders and `textarea` text are not page text, labels, button words and `option`s are. A missing
   quote before an iframe pastes the framed page into the page in CodeShare (CKB-093, open): samples avoid it. Not
   checked: same-page links (`href="#id"`) inside the page window.
+- Checked for Resume Week 4 (2026-11-08; `docs/course-format.md`, "CSS in page text and page checks"): computed colours,
+  fonts and sizes are the same in CodeShare and the teacher's checker; `text-transform`, `display: none` and
+  `visibility: hidden` change page text (`text-transform` on `option`s does not). CodeShare turns the link line into a
+  `style` element, so `link`/`style` counts differ: never page-check them. A wrong or missing stylesheet leaves the page
+  plain in both. An `href` without quotes is not inlined in CodeShare (CKB-094, open): samples quote every value. Which
+  rule wins and how a missing semicolon, colon or brace or a misspelt class or id come out are the same in both.
 
 **Each week, in order:**
 
@@ -429,8 +435,8 @@ it cannot do, stop and propose an app change for approval first):
 5. JSON last. Check it with the teacher's `check_codeshare.py --run --media-root project_end` and
    `check_web_steps.cjs`, then with CodeShare's `tests/web-module-steps.browser.mjs` on Cloudflare's
    runtime (8787) and offline settings (3042), one line per step. It reads every built `Resume/Week_NN/` week; its media
-   subtest uploads each built week's media before the student walk; personal-project subtests cover Weeks 2 and 3
-   (2026-11-08). A new week's own subtest is a test change that needs approval.
+   subtest uploads each built week's media before the student walk; personal-project subtests cover Weeks 2, 3
+   and 4 (2026-11-08). A new week's own subtest is a test change that needs approval.
 6. Write `Verification.md`; update `DotNet1_Handover.md`, the root `project/`, this handoff;
    commit and push the repository docs on a new branch with a PR.
 7. Teacher: upload the JSON under **Curriculum** (same ids keep student progress); for a media
@@ -510,6 +516,11 @@ built `main` (see `docs/cloudflare-setup.md`):
 - Since CKB-080's fix, **Run** on a media step stays off (**Loading media…**) until the media are loaded;
   tests just wait for **Run** to come on.
 - The worksheet drawer can cover the editor's file tabs; tests click the tab directly.
+- The open editor may be a CSS editor (a Week 4 task ends in `styles.css`), so test helpers find the editor by
+  `.student-module-project .editor-card textarea`, not by the "HTML source code editor" name.
+- Run `revision_tools/build_tasks.py` with the week's key only (`build_tasks.py r04`): with no key it rebuilds every
+  week's task pages, including the retired canteen weeks, whose sources then no longer match their printed PDFs
+  (happened 2026-11-08; restored with the original generator from `revision_tools/before_revision/`).
 
 ## Known limits and open questions
 
@@ -530,6 +541,8 @@ built `main` (see `docs/cloudflare-setup.md`):
   (each 11/11, 2026-10-29); the teacher reports the hosted checks done, with no `exceededCpu`
   in Cloudflare Logs after the Slice 3b check (2026-10-29).
 - CKB-022 remains open for the student's own **New web project** preview.
+- CKB-094 (open): a link line whose `href` has no quotes gets no stylesheet in CodeShare, although a browser loads it.
+  Worked around in Week 4's content and module text (keep the quotes).
 - CKB-080 (fixed on `fix/media-run-before-loaded`): the teacher's **Run** on a media step pressed before the media finish loading showed a
   cross; the Week 3 media browser subtest fails about 1 run in 2 because of it (also on `main`).
 - Student media: a phone photo name with spaces is refused (letters, numbers, `-`, `_` only); the
@@ -539,16 +552,18 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Weeks 1–3 of the resume course are built** (Weeks 1–2 2026-11-06; Week 3 2026-11-08). Teacher: print them; in CodeShare
-   **Curriculum** remove the old Weeks 1–3 (`dotnet-1-w01`…`w03`) the first time, upload `Resume/Week_01/…`,
-   `Resume/Week_02/…` and `Resume/Week_03/DotNet1_Week_03.codeshare.json`, then for Weeks 2 and 3 → **View module details →
+1. **Weeks 1–4 of the resume course are built** (Weeks 1–2 2026-11-06; Weeks 3–4 2026-11-08). Teacher: print them; in CodeShare
+   **Curriculum** remove the old Weeks 1–3 (`dotnet-1-w01`…`w03`) the first time, upload `Resume/Week_01/…` to
+   `Resume/Week_04/DotNet1_Week_04.codeshare.json`, then for Weeks 2, 3 and 4 → **View module details →
    Media files** → add the three files in that week's `project_end/` (`images/`, `audio/`, `video/`; each module keeps its own copy).
 2. **CKB-092 app fix (needs approval)**: page checks read `data-codeshare-src` for `src` on embedded media, so a `src` check
    works online too. Until then, weeks avoid `src` page checks on uploaded files.
 3. **CKB-093 app fix (needs approval)**: rewrite iframes only where the browser sees a real iframe. Until then, samples keep
    no broken quote before an iframe.
-4. **Week 4**: the teacher pastes the "Rolling weekly prompt" (below, now Week 4) into a new chat.
-5. Then **Weeks 5–10**, one week per chat.
+3a. **CKB-094 app fix (needs approval)**: accept an unquoted `href`/`src` when inlining project files. Until then, every
+   value in a sample is quoted and the module tells students to keep the quotes.
+4. **Week 5**: the teacher pastes the "Rolling weekly prompt" (below, now Week 5) into a new chat.
+5. Then **Weeks 6–10**, one week per chat.
    Weeks 9–10 are built as planned; the teacher checks them in CodeShare when reached.
 6. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
 7. **Offline web steps/media** stays a separate task (needed before media weeks are taught offline).
@@ -899,3 +914,20 @@ them), anything I must check, and a Sources list of every reference as clickable
   file it needs; Week 3 already did. The Week 4 chat had already started: the correction was sent to it at the teacher's
   request (no Week_04 files existed yet). (2) The browser test treated any media-list answer but 503 as "media available";
   it now accepts only 200 or 503 and fails at once with the status otherwise.
+- 2026-11-08 — Resume Week 4 (CSS fundamentals and selectors) approved with both recommended choices: Juan's Week 2 picture,
+  sound and video stay on index.html (Steps 1, 3 and 9 run it and are the only media steps; offline the teacher presses Mark
+  done on those three), and a Week 4 personal-project subtest is added. Teacher's correction (CodeRabbit on PR #86): each step
+  lists its run page and every file that page needs (styles.css, a framed contact.html), even when unchanged; the printed
+  module shows only new or changed lines. Found with real runs (teacher's checker and CodeShare's `buildTeacherPreview`, same
+  results): computed styles agree; CodeShare inlines the link line, so `link`/`style` counts differ; an unquoted href is not
+  inlined in CodeShare (CKB-094); which rule wins and how broken rules come out agree. Branch `docs/net-resume-week-04`
+  (from PR #86's tip; PR #86 still open).
+- 2026-11-08 — Resume Week 4 built in the teacher's `Resume/Week_04/` (shared styles.css; DLL 7 pages; module 11 pages).
+  `build.py r04` (an output equal to an earlier one prints "the same as …"; `css` code blocks in the DLL; Weeks 1–3 rebuild
+  byte-identical). Teacher's checkers: samples 9/9, answers 9/9, unchanged samples fail 9/9, `test_checker.py` 20/20, printed =
+  JSON; break-and-restore shown for the listing rule, the quote guard and the printed check. Browser test: Cloudflare's runtime
+  (8787) 10 pass, 5 skipped, 0 fail, 36/36 steps "sample verified, task completed", 14 media steps pass in the teacher preview;
+  a copy with a misspelt class in Step 5's answer failed at that step. Offline settings (3042) 9 pass, 6 skipped, 0 fail
+  (Week 4 Steps 1, 3, 9 marked done). The walk's `openStep` now finds whichever editor is open (a task can end in styles.css).
+  New Week 4 personal subtest passes on both; a copy with an unquoted href failed (CKB-094 shown in the real app).
+  `npm test` 421/421, lint 0 errors, build OK.
