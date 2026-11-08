@@ -163,6 +163,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
   const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
   const progress = useRef(activity.progress);
+  const [submittedAt, setSubmittedAt] = useState(personal ? activity.progress.performanceTask.own?.submittedAt : undefined);
   const [stepStates, setStepStates] = useState(activity.progress.stepStates);
   const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
   const pendingSample = !personal && Boolean(step && samplePending(activity.module, step, stepStates));
@@ -368,7 +369,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       progress.current = await api<Progress>(`${base}/performance-task`, {
         method: "PUT", body: JSON.stringify({ variant: "own", files, status: "pass", updatedAt: progress.current.updatedAt }),
       });
-      setStatus("Submitted"); onChecked();
+      setStatus("Submitted"); setSubmittedAt(progress.current.performanceTask.own?.submittedAt); onChecked();
       setNotice({ title: "Version submitted", text: "Your teacher can now review this version. Submission records progress, not a grade or teacher approval." });
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "Could not submit your project";
@@ -477,7 +478,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div>{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || mediaLoading || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : mediaLoading ? "Loading media…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
+      <div>{submittedAt && <span className="sync">Last submitted: {new Date(submittedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>}{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || mediaLoading || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : mediaLoading ? "Loading media…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
     </footer>
     <RunBox message={javaConsole.running ? null : runMessage} onCancel={javaConsole.active ? () => { javaConsole.stop(); setRunMessage(null); } : undefined} />
     <NoticeBox notice={notice} onClose={() => setNotice(null)} />

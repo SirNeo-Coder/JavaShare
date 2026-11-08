@@ -195,9 +195,13 @@ test("personal browser runs: failure, stale files and direct submission refused;
     }
     assert.equal((await post("personal-result", { updatedAt: view.updatedAt, success: true }, cookies[0])).status, 403);
     assert.equal((await post("personal-result", { updatedAt: view.updatedAt, success: true }, cookies[3])).status, 403);
+    const card = async () => (await (await call(`/api/classes/${classroomId}/module-progress`, { headers: { cookie: cookies[0] } })).json())
+      .students.find((student) => student.id === users[1].id).modules.find((module) => module.moduleId === fixture.id).personalSubmittedAt;
+    assert.equal(await card(), null, "no Last submitted on the teacher card before a submission");
     const submitted = await submit(); assert.equal(submitted.status, 200); view = await submitted.json();
     assert.equal(view.percent, 100, "submission earns credit without review");
     const frozen = structuredClone(view.performanceTask.own);
+    assert.equal(await card(), frozen.submittedAt, "the teacher card shows when the student submitted");
     const reviewBase = `/api/classes/${classroomId}/students/${users[1].id}/modules/${fixture.id}`;
     const reviewGet = (cookie = cookies[0], path = reviewBase) => call(`${path}/personal-submission`, { headers: { cookie } });
     const reviewPut = (body, cookie = cookies[0]) => call(`${reviewBase}/personal-review`, { method: "PUT", headers: { cookie }, body: JSON.stringify(body) });
@@ -211,6 +215,7 @@ test("personal browser runs: failure, stale files and direct submission refused;
     } finally { await admin.auth.admin.deleteUser(otherTeacher.data.user.id); }
     assert.equal((await reviewGet(cookies[0], reviewBase.replace(users[1].id, users[3].id))).status, 404);
     let review = await (await reviewGet()).json();
+    assert.equal(review.submission.submittedAt, frozen.submittedAt, "Review personal submission shows the frozen copy's time");
     assert.deepEqual(review.submission.checklist, fixture.performanceTask.checklist);
     await upload({ ...fixture, performanceTask: { ...fixture.performanceTask, checklist: ["Changed after submission"] } });
     review = await (await reviewGet()).json();
@@ -227,6 +232,8 @@ test("personal browser runs: failure, stale files and direct submission refused;
     assert.deepEqual(view.performanceTask.own.review.checked, checked);
     await run(true); const replacement = await submit(); assert.equal(replacement.status, 200); view = await replacement.json();
     assert.notEqual(view.performanceTask.own.id, frozen.id);
+    assert.ok(view.performanceTask.own.submittedAt > frozen.submittedAt);
+    assert.equal(await card(), view.performanceTask.own.submittedAt, "resubmitting moves the teacher card's Last submitted forward");
     assert.equal(view.performanceTask.own.review, undefined);
     assert.deepEqual(view.performanceTask.own.checklist, ["Changed after submission"]);
     assert.equal((await reviewPut({ submissionId: review.submissionId, checked })).status, 409);
