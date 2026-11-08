@@ -1138,7 +1138,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   laptop Java): student saw Nov 5 9:30 AM, ran, submitted, saw Nov 8 9:24 PM; teacher card and review
   showed Nov 8 9:24 PM.
 - Not run: hosted site; `npm run classroom:offline` itself (same code and database as the dev check).
-- Next: teacher reviews the PR, merges; then check CodeRabbit on it.
+- PR #85 (https://github.com/SirNeo-Coder/JavaShare/pull/85). Next: teacher reviews and merges; then check CodeRabbit on it.
 ## CodeRabbit comments rule — 2026-11-05
 
 - Branch `docs/coderabbit-review-rule`. Teacher asked to check CodeRabbit on PRs #78–#80 and to make
