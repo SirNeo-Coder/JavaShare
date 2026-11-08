@@ -290,6 +290,24 @@ evidence, checked by the server against its own expected output and the saved ve
   are not. A label and its box on one line leave a trailing space, so put `<br>` after each label.
   A step may set `run` to another page (`projects.html`); checks read that page only. A missing quote
   before an `iframe` gives different page text in CodeShare (CKB-093): keep samples free of it.
+- **CSS in page text and page checks (checked 2026-11-08, Resume Week 4).** Colours, fonts, sizes and
+  backgrounds are not page text: check them with `style` + `value` page checks, which read the same
+  computed values in CodeShare and the teacher's checker (`rgb(19, 48, 92)`, `Georgia, serif`, `12px`,
+  `700`, `italic`). `text-transform` changes the page text (`uppercase`, `capitalize`, `none`), also on a
+  `button`, but not on a `select`'s `option`s; `display: none` and `visibility: hidden` remove it.
+  CodeShare puts a linked stylesheet into the page as a `style` element, so never page-check `link` or
+  `style` elements (their counts differ). A wrong, wrongly capitalised or missing stylesheet leaves the
+  page unstyled with no error, in both. An `href` without quotes is not inlined in CodeShare although a
+  browser loads it (CKB-094): write every value in quotes. CodeShare finds a linked stylesheet from the
+  project's top folder, not from the page's own folder, and drops a `media` condition such as
+  `media="print"` (CKB-095): keep pages and stylesheets in the top folder and put no `media` on a link line. Which rule wins (same in both): inline beats
+  an ID, an ID beats a class, a class beats an element; between equal rules the later one wins, also
+  between a `style` element and the link line. A missing semicolon skips that declaration and the next; a
+  missing colon skips one; a missing `}` after a style rule (such as an `h2` rule) stops every later rule,
+  but a missing `}` after an `@media` block keeps the later rules inside that block, where they still apply
+  under its condition (a missing last `}` changes nothing); a misspelt or wrongly capitalised class or id, or a missing dot, matches nothing. A step's
+  `files` include its run page and every file that page needs (its stylesheet, a framed page), even
+  when unchanged: **View module details** runs a step's own files only.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
