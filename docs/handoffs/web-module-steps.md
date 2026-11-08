@@ -364,6 +364,9 @@ task `dotnet-1-rNN-pt`. The retired canteen weeks used `dotnet-1-w01`…`w03`; n
 
 **CodeShare JSON rules for a web week:**
 
+- A step's `files` include its run page and every file that page needs (linked `.css`/`.js`, a framed page), even when
+  unchanged (CodeRabbit on PR #86): **View module details** runs only the step's own files, and a student's project keeps
+  files from the previous task, so a sample that leaves out its run page could never be verified.
 - Every step's `files` are `.html`, `.css` or `.js` (folders allowed; names use letters, numbers, `-`,
   `_`). Module `.txt` starter files are reference only. `run` is `index.html` (page text) or a `.js`
   file (console lines).
@@ -602,9 +605,10 @@ Week rules (check each against the real files first):
   Week_04/solutions/<step id>/, never in the JSON. Every expected output from a real run. A task never repairs
   a file listed in its step's mediaChecks (CKB-084).
 - Juan's site has three pages (index.html, projects.html, contact.html; projects.html shows contact.html in an
-  iframe; the contact form sends nowhere). Each step lists only the files it adds or changes and names its run page
-  ("run"); checks read the run page only (teacher, 2026-11-06). The course map adds a shared styles.css for the
-  resume pages.
+  iframe; the contact form sends nowhere). Each step lists its run page and every file that page needs (its linked
+  styles.css, a framed page), even when unchanged, plus any file it adds or changes, and names its run page ("run");
+  checks read the run page only (teacher, 2026-11-06; CodeRabbit on PR #86). The printed module still shows only new or
+  changed lines. The course map adds a shared styles.css for the resume pages.
 - Printed module: 8 lesson pages, then task pages after page 8 built with revision_tools/build_tasks.py.
   Printed module and JSON identical in code and outputs (revision_tools/consistency.py checks it). Once a file is
   long, print it whole once and only the new or changed lines for later steps, each block labelled with the file and
@@ -889,3 +893,9 @@ them), anything I must check, and a Sources list of every reference as clickable
   `dotnet-1-r03`, Week 3's tools and DLL as templates, multi-page steps with a run page, style page checks and inlined CSS to
   check with real runs, the media question, Thursday CSS repairs, optional Week 4 personal subtest to propose.
 - 2026-11-08 — Delivered as [PR #86](https://github.com/SirNeo-Coder/JavaShare/pull/86); CodeRabbit review not in yet when opened. PR #84's CodeRabbit run reported "Review failed: the pull request is closed" (merged first), so it has no findings.
+- 2026-11-08 — CodeRabbit on PR #86 (both valid, fixed; teacher approved): (1) the Week 4 prompt let a step list only the files
+  it changes, so a CSS-only step could leave out its run page (the teacher preview runs only the step's files; the student's
+  project keeps the previous task's run page, so the sample could never be verified). The rule now lists the run page and every
+  file it needs; Week 3 already did. The Week 4 chat had already started: the correction was sent to it at the teacher's
+  request (no Week_04 files existed yet). (2) The browser test treated any media-list answer but 503 as "media available";
+  it now accepts only 200 or 503 and fails at once with the status otherwise.

@@ -37,6 +37,13 @@ const answerFiles = (week, step) => {
     .map((entry) => ({ path: relative(dir, join(entry.parentPath, entry.name)).replaceAll("\\", "/"), content: readFileSync(join(entry.parentPath, entry.name), "utf8") })) : null;
 };
 
+// Whether this server stores module media: 200 yes, 503 no (offline); any other answer fails at once with its status.
+const mediaStorage = async (request, path) => {
+  const status = (await request.get(path)).status();
+  assert.ok(status === 200 || status === 503, `unexpected media list status ${status} for ${path}`);
+  return status === 200;
+};
+
 // Run opens the floating page window (2026-10-30). Wait until the run has been checked (Close comes on;
 // a RUN CODE box still on top makes the click wait), then close it so the checks show beside the code again.
 const closePageWindow = async (where) => {
@@ -270,7 +277,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
     });
 
     await t.test("Module media (Cloudflare R2): the teacher adds each built week's media files once; every media step's sample then checks its pictures, sound and video automatically", { skip: needs(2) }, async (st) => {
-      if ((await teacher.request.get(`/api/classrooms/${classroomId}/modules/${week2.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server; media steps stay teacher-checked"); return; }
+      if (!(await mediaStorage(teacher.request, `/api/classrooms/${classroomId}/modules/${week2.id}/media`))) { st.skip("no media storage (Cloudflare R2) on this server; media steps stay teacher-checked"); return; }
       const report = [];
       for (const week of weeks.filter((module) => stepsOf(module).some((step) => /(?:^|\n)Media checks:/.test(step.expectedOutput)))) {
         const mediaRoot = join(folder, `Week_${String(week.week).padStart(2, "0")}`, "project_end");
@@ -378,7 +385,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.notEqual(mine, starter);
       const card = week2.title.replace(/^Self-Paced Module:\s*/, "");
       // Online, the student adds a teacher-supplied picture under Media files; offline the personal project is text only.
-      const withMedia = (await student.request.get(`/api/classrooms/${classroomId}/modules/${week2.id}/media`)).status() !== 503;
+      const withMedia = await mediaStorage(student.request, `/api/classrooms/${classroomId}/modules/${week2.id}/media`);
       const picture = join(folder, "Week_02", "teacher_pictures", "resume_picture_1.svg");
       await openCatalog(week2);
       await page.getByRole("button", { name: "Projects", exact: true }).hover();
@@ -465,7 +472,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
 
     await t.test("Week 3 personal project: the Week 2 resume carries forward; the student adds projects.html and contact.html with ＋ and, online, their own sound and video; Run shows them; Submit freezes pages and media; the teacher's review shows them", { skip: needs(3) }, async () => {
       const week3 = weeks[2], steps3 = stepsOf(week3);
-      const withMedia = (await student.request.get(`/api/classrooms/${classroomId}/modules/${week3.id}/media`)).status() !== 503;
+      const withMedia = await mediaStorage(student.request, `/api/classrooms/${classroomId}/modules/${week3.id}/media`);
       const mediaRoot = join(folder, "Week_03", "project_end");
       const own = ["audio/greeting.wav", "video/juan_intro.webm"]; // stand-ins for the student's own sound and video
       // The module steps are checked elsewhere; mark them done so the personal task opens.
