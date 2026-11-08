@@ -108,7 +108,7 @@ export type Progress = {
   // Covers both step blocks and a lesson's exitSlip, keyed by whichever's own "id" - one flag
   // per module couldn't tell lessons apart (CKB-007).
   stepStates: Record<string, StepStatus>;
-  performanceTask: Partial<Record<"sample" | "own", { status: StepStatus }>> & { project?: { media?: import("../backend/src/personal-performance").PersonalMedia[] } };
+  performanceTask: Partial<Record<"sample" | "own", { status: StepStatus; submittedAt?: string }>> & { project?: { media?: import("../backend/src/personal-performance").PersonalMedia[] } };
 };
 
 type Props = { studentId?: string; onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };

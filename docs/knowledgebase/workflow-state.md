@@ -438,6 +438,14 @@ shows **Last uploaded:** with the date and time of the module's latest upload, i
 time zone. Uploading the same file again also moves it forward, so it confirms an upload went
 through, not that the content changed. Press **Refresh** to see a new upload.
 
+## Last submitted date on personal projects (approved 2026-11-08)
+
+A student's **Personal performance-task project** shows **Last submitted:** with the date and time
+beside **Submit this version** once they have submitted; it changes as soon as they submit again.
+The teacher sees the same time on that student's module card (under **Last uploaded**, which is
+the module's upload time) and beside **Run code** in **Review personal submission**, so the copy
+being reviewed can be matched to what the student says they submitted.
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one

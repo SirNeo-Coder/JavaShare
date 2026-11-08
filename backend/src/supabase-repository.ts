@@ -1784,6 +1784,7 @@ export async function getSupabaseTeacherClassProgress(user: SupabaseSessionUser,
         moduleId: module_id,
         percent: moduleCompletionPercent(content, progress),
         personalSubmitted: Boolean(progress.performance_task.own),
+        personalSubmittedAt: progress.performance_task.own?.submittedAt ?? null,
         teacherChecks: content.lessons.flatMap((lesson) => lesson.blocks.filter((block): block is ActivityStep => block.type === "step" && teacherCheckedStep(block)))
           .map((step) => ({ stepId: step.id, number: step.number, done: progress.step_states[activityStateId(step)] === "pass" })),
         submissions: content.performanceTask ? Number(Boolean(progress.performance_task.sample)) + Number(Boolean(progress.performance_task.own)) : 0,
