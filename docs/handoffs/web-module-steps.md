@@ -421,7 +421,10 @@ it cannot do, stop and propose an app change for approval first):
   `visibility: hidden` change page text (`text-transform` on `option`s does not). CodeShare turns the link line into a
   `style` element, so `link`/`style` counts differ: never page-check them. A wrong or missing stylesheet leaves the page
   plain in both. An `href` without quotes is not inlined in CodeShare (CKB-094, open): samples quote every value. Which
-  rule wins and how a missing semicolon, colon or brace or a misspelt class or id come out are the same in both.
+  rule wins and how a missing semicolon, colon or brace or a misspelt class or id come out are the same in both (a missing
+  `}` after an `@media` block keeps later rules inside it). CodeShare finds a linked stylesheet from the project's top
+  folder, not the page's folder, and drops a `media` condition on the link (CKB-095, open, latent): keep pages and
+  stylesheets in the top folder, no `media` on a link line.
 
 **Each week, in order:**
 
@@ -562,6 +565,8 @@ built `main` (see `docs/cloudflare-setup.md`):
    no broken quote before an iframe.
 3a. **CKB-094 app fix (needs approval)**: accept an unquoted `href`/`src` when inlining project files. Until then, every
    value in a sample is quoted and the module tells students to keep the quotes.
+3b. **CKB-095 app fix (needs approval)**: resolve a linked stylesheet from the page's own folder and keep its `media`
+   condition. Until then, pages and stylesheets stay in the top folder and no link line has `media`.
 4. **Week 5**: the teacher pastes the "Rolling weekly prompt" (below, now Week 5) into a new chat.
 5. Then **Weeks 6–10**, one week per chat.
    Weeks 9–10 are built as planned; the teacher checks them in CodeShare when reached.
@@ -627,7 +632,9 @@ Week rules (check each against the real files first):
   page needs (its linked styles.css, a framed page), even when unchanged, plus any file it adds or changes, and names its
   run page ("run"); checks read the run page only (teacher, 2026-11-06 and 2026-11-08; CodeRabbit on PR #86). The
   printed module still shows only new or changed lines. Every attribute value is in quotes: CodeShare does not apply a
-  stylesheet whose href has no quotes (CKB-094).
+  stylesheet whose href has no quotes (CKB-094). Keep every page and styles.css in the project's top folder and put no
+  media attribute on a link line: CodeShare finds a stylesheet from the top folder and drops its media condition
+  (CKB-095).
 - Printed module: 8 lesson pages, then task pages after page 8 built with revision_tools/build_tasks.py r05.
   Printed module and JSON identical in code and outputs (revision_tools/consistency.py checks it). Once a file is
   long, print it whole once and only the new or changed lines for later steps, each block labelled with the file and
@@ -949,3 +956,8 @@ them), anything I must check, and a Sources list of every reference as clickable
   `build_tasks.py` with the week key only, text/font/colour/gradient/opacity checks with real runs, contrast computed for
   every colour pair, the media question, optional Week 5 personal subtest to propose.
 - 2026-11-08 — Delivered as [PR #87](https://github.com/SirNeo-Coder/JavaShare/pull/87) against main (contains PR #86's commits while #86 is open); CodeRabbit review not in yet when opened. PRs #85 and #86 CodeRabbit checked at the start: #85 no findings (generic docstring check, not valid here); #86's two findings valid and already fixed on #86.
+- 2026-11-09 — PR #86 merged. CodeRabbit on PR #87: three Minor findings on `docs/course-format.md`, all valid (checked with
+  real runs in CodeShare's `buildTeacherPreview` and the page opened as a file): a stylesheet linked from a page in a subfolder
+  is looked up from the top folder, and a `media` condition on a link line is dropped (bugs, latent, CKB-095, app fix needs
+  approval); the missing-brace sentence now says a missing `}` after an `@media` block keeps later rules inside it. Teacher
+  approved the document fixes; the Week 5 prompt now says to keep pages and styles.css in the top folder, no `media` on a link.
