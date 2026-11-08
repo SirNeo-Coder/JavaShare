@@ -408,6 +408,11 @@ it cannot do, stop and propose an app change for approval first):
   app fix proposed; its media line names the `src` instead), load pictures or fonts named in CSS `url()` (backgrounds, `@font-face`), send a form
   anywhere (a form can be shown and typed in; Week 3's contact form "sends nowhere"), a frame inside a
   framed page, anything from the internet. Only Chromium was tested.
+- Checked for Resume Week 3 (2026-11-06; `docs/course-format.md`, "Links, frames and forms in page text"): a
+  framed page's text is not page text; an iframe `src` page check reads nothing in CodeShare (`srcdoc`); typed
+  values, placeholders and `textarea` text are not page text, labels, button words and `option`s are. A missing
+  quote before an iframe pastes the framed page into the page in CodeShare (CKB-093, open): samples avoid it. Not
+  checked: same-page links (`href="#id"`) inside the page window.
 
 **Each week, in order:**
 
