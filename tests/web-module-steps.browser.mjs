@@ -3,8 +3,8 @@
 // use offline settings (laptop Java), online settings (browser Java) or Cloudflare's runtime (npm run cf:preview).
 // Env: WEB_STEPS_BASE_URL (default http://localhost:3042), DOTNET_WEEKS_DIR (the teacher's Resume folder holding
 // Week_NN/DotNet1_Week_NN.codeshare.json), CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
-// Subtests that need Week 3 skip until that Resume week is built; they still describe the retired canteen week and are
-// adapted when it is built. The Week 2 ones use Resume Week 2 (Juan's media in Week_02/project_end, 2026-11-06).
+// Subtests that need a week skip until that Resume week is built. Media subtests use each week's own media files in
+// Week_NN/project_end (Juan's picture, sound and video; Resume Weeks 2 and 3, 2026-11-06).
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
@@ -269,44 +269,46 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.match(await currentTab(), /Step 3$/, "the student resumes after the teacher-marked step");
     });
 
-    await t.test("Week 2 media (Cloudflare R2): the teacher adds Juan's media files once; every media step's sample then checks its pictures, sound and video automatically", { skip: needs(2) }, async (st) => {
+    await t.test("Module media (Cloudflare R2): the teacher adds each built week's media files once; every media step's sample then checks its pictures, sound and video automatically", { skip: needs(2) }, async (st) => {
       if ((await teacher.request.get(`/api/classrooms/${classroomId}/modules/${week2.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server; media steps stay teacher-checked"); return; }
-      const mediaRoot = join(folder, "Week_02", "project_end");
-      const mediaFiles = ["images", "audio", "video"].flatMap((kind) => existsSync(join(mediaRoot, kind)) ? readdirSync(join(mediaRoot, kind)).map((name) => `${kind}/${name}`) : []);
-      if (!mediaFiles.length) { st.skip(`teacher media not found in ${mediaRoot}`); return; }
-      const details = await teacher.newPage(); details.setDefaultTimeout(20000); details.on("pageerror", (e) => errors.push(e.message));
-      await details.goto("/");
-      await details.getByRole("button", { name: /Open class/ }).click();
-      await details.getByRole("navigation", { name: "Teacher class navigation" }).getByRole("button", { name: /Curriculum/ }).click();
-      await details.locator(".teacher-module-card", { hasText: week2.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: /View module details/ }).click();
-      const section = details.getByRole("region", { name: "Media files" });
-      await section.getByText("No media files yet.").waitFor();
-      await section.getByLabel("Add media files").setInputFiles(mediaFiles.map((path) => join(mediaRoot, path)));
-      await section.locator("li").nth(mediaFiles.length - 1).waitFor();
-      assert.deepEqual((await section.locator("li").allTextContents()).map((line) => line.split(" · ")[0]).sort(), [...mediaFiles].sort());
-      // Every media step's own sample now runs automatically in the teacher preview (Run waits for the media, CKB-080).
-      const views = details.locator(".module-step");
       const report = [];
-      for (const [index, step] of steps2.entries()) {
-        if (!/(?:^|\n)Media checks:/.test(step.expectedOutput)) continue;
-        const view = views.nth(index), checks = view.locator(".web-checks");
-        for (let attempt = 0; attempt < 20; attempt++) {
-          await view.getByRole("button", { name: "Run", exact: true }).click();
-          await closePageWindow(details);
-          await checks.waitFor();
-          await details.waitForFunction((element) => /✓|✗|Checked by your teacher/.test(element.textContent), await checks.elementHandle());
-          if (!/Checked by your teacher/.test(await checks.textContent())) break;
-          await details.waitForTimeout(500); // the teacher's media files are still loading
+      for (const week of weeks.filter((module) => stepsOf(module).some((step) => /(?:^|\n)Media checks:/.test(step.expectedOutput)))) {
+        const mediaRoot = join(folder, `Week_${String(week.week).padStart(2, "0")}`, "project_end");
+        const mediaFiles = ["images", "audio", "video"].flatMap((kind) => existsSync(join(mediaRoot, kind)) ? readdirSync(join(mediaRoot, kind)).map((name) => `${kind}/${name}`) : []);
+        assert.ok(mediaFiles.length, `teacher media not found in ${mediaRoot}`);
+        const details = await teacher.newPage(); details.setDefaultTimeout(20000); details.on("pageerror", (e) => errors.push(e.message));
+        await details.goto("/");
+        await details.getByRole("button", { name: /Open class/ }).click();
+        await details.getByRole("navigation", { name: "Teacher class navigation" }).getByRole("button", { name: /Curriculum/ }).click();
+        await details.locator(".teacher-module-card", { hasText: week.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: /View module details/ }).click();
+        const section = details.getByRole("region", { name: "Media files" });
+        await section.getByText("No media files yet.").waitFor();
+        await section.getByLabel("Add media files").setInputFiles(mediaFiles.map((path) => join(mediaRoot, path)));
+        await section.locator("li").nth(mediaFiles.length - 1).waitFor();
+        assert.deepEqual((await section.locator("li").allTextContents()).map((line) => line.split(" · ")[0]).sort(), [...mediaFiles].sort());
+        // Every media step's own sample now runs automatically in the teacher preview (Run waits for the media, CKB-080).
+        const views = details.locator(".module-step");
+        for (const [index, step] of stepsOf(week).entries()) {
+          if (!/(?:^|\n)Media checks:/.test(step.expectedOutput)) continue;
+          const view = views.nth(index), checks = view.locator(".web-checks");
+          for (let attempt = 0; attempt < 20; attempt++) {
+            await view.getByRole("button", { name: "Run", exact: true }).click();
+            await closePageWindow(details);
+            await checks.waitFor();
+            await details.waitForFunction((element) => /✓|✗|Checked by your teacher/.test(element.textContent), await checks.elementHandle());
+            if (!/Checked by your teacher/.test(await checks.textContent())) break;
+            await details.waitForTimeout(500); // the teacher's media files are still loading
+          }
+          const failed = (await checks.locator("li.failed").allTextContents()).map((line) => line.replace(/^✗ /, ""));
+          const media = (await checks.locator("li").allTextContents()).filter((line) => /: (?:image|playback)/.test(line)).length;
+          report.push(`${step.id}: ${failed.length ? `fail — ${failed.join("; ")}` : `pass (page text + page checks + ${media} media lines)`}`);
         }
-        const failed = (await checks.locator("li.failed").allTextContents()).map((line) => line.replace(/^✗ /, ""));
-        const media = (await checks.locator("li").allTextContents()).filter((line) => /: (?:image|playback)/.test(line)).length;
-        report.push(`${step.id}: ${failed.length ? `fail — ${failed.join("; ")}` : `pass (page text + page checks + ${media} media lines)`}`);
+        await details.screenshot({ path: `/tmp/codeshare-web-media-teacher-w${week.week}.png`, fullPage: true });
+        await details.close();
       }
-      console.log(`Week 2 media steps with the teacher's media files:\n${report.join("\n")}`);
+      console.log(`Media steps with the teacher's media files:\n${report.join("\n")}`);
       t.diagnostic(report.join(" | "));
       assert.ok(report.length && report.every((line) => /: pass/.test(line)), report.join("\n"));
-      await details.screenshot({ path: "/tmp/codeshare-web-media-teacher.png", fullPage: true });
-      await details.close();
     });
 
     await t.test("sample-first weeks (Java workflow): every step of every built week verifies its unchanged sample, then completes its task with the answer in solutions/", { skip: !revised && "the teacher's weeks are not sample-first yet" }, async (st) => {
@@ -461,84 +463,104 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
-    await t.test("Week 3 personal project: the student adds their own pictures, sound and video; Run shows them; Submit freezes them; the teacher's review shows them", { skip: needs(3) }, async (st) => {
+    await t.test("Week 3 personal project: the Week 2 resume carries forward; the student adds projects.html and contact.html with ＋ and, online, their own sound and video; Run shows them; Submit freezes pages and media; the teacher's review shows them", { skip: needs(3) }, async () => {
       const week3 = weeks[2], steps3 = stepsOf(week3);
-      if ((await student.request.get(`/api/classrooms/${classroomId}/modules/${week3.id}/media`)).status() === 503) { st.skip("no media storage (Cloudflare R2) on this server"); return; }
+      const withMedia = (await student.request.get(`/api/classrooms/${classroomId}/modules/${week3.id}/media`)).status() !== 503;
       const mediaRoot = join(folder, "Week_03", "project_end");
-      // Week 3's starter page already uses these four files; the student adds three, then the fourth.
-      const own = ["images/snacks.svg", "audio/chime.wav", "video/canteen.webm", "images/counter.svg"];
-      if (!own.every((path) => existsSync(join(mediaRoot, path)))) { st.skip(`media files not found in ${mediaRoot}`); return; }
+      const own = ["audio/greeting.wav", "video/juan_intro.webm"]; // stand-ins for the student's own sound and video
       // The module steps are checked elsewhere; mark them done so the personal task opens.
       const states = (await progress(week3)).stepStates;
       assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps3.map((step) => [activityStateId(step), "pass"])) } })
         .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week3.id)).error, null);
       const submit = page.getByRole("button", { name: "Submit this version", exact: true });
       const ready = page.getByText("Run succeeded — ready to submit this version.", { exact: false });
-      // The page window stays open after a run so its media can be inspected; it is closed before the next run.
       const runPage = async () => {
         if (await page.locator(".page-window").count()) await closePageWindow(page);
         await page.getByRole("button", { name: /Run code/ }).click();
         await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
         await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       };
-      // What the preview shows: whether each picture, sound and video came with the page (data:), and whether pictures draw.
+      // What the page window shows: each picture, sound and video, whether it came with the page (data:) and whether pictures draw.
       const shownMedia = async (where) => {
         const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
-        await inside.waitForFunction(() => document.querySelector("img")?.complete && document.querySelector("video")?.readyState >= 2 && document.querySelector("audio")?.readyState >= 2);
-        await inside.evaluate(() => document.querySelector("img").scrollIntoView());
+        await inside.waitForFunction(() => [...document.querySelectorAll("img")].every((img) => img.complete) && [...document.querySelectorAll("audio,video")].every((media) => media.readyState >= 2 || !media.src.startsWith("data:")));
         return inside.evaluate(() => [...document.querySelectorAll("img,audio,video")].map((element) => `${element.getAttribute("data-codeshare-src") ?? element.getAttribute("src")}: ${element.src.startsWith("data:") ? "from the page" : "not found"}${element.tagName === "IMG" ? `, ${element.naturalWidth > 0 ? "drawn" : "broken"}` : ""}`));
       };
-      const starter = week3.performanceTask.starterFiles[0].content;
-      const mine = starter.replace("Describe your own silent video here.", "Our canteen at lunch time.");
-      assert.notEqual(mine, starter);
+      const fileTab = (path) => page.locator(".student-module-project .file-tabs").getByRole("button", { name: path, exact: true });
+      const write = async (path, content) => {
+        await fileTab(path).dispatchEvent("click");
+        await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
+        await editor.fill(content);
+      };
+      const addPage = async (path, content) => {
+        await page.getByRole("button", { name: "Add personal web file", exact: true }).click();
+        await page.getByLabel("File path").fill(path);
+        await page.getByRole("button", { name: "Create file", exact: true }).click();
+        await fileTab(path).waitFor();
+        await write(path, content);
+      };
+      const starter = Object.fromEntries(week3.performanceTask.starterFiles.map((file) => [file.path, file.content]));
+      const week2Own = (await progress(weeks[1])).performanceTask.own;
+      const carried = week2Own.files.find((file) => file.path === "index.html").content;
       await openCatalog(week3);
       await page.getByRole("button", { name: "Projects", exact: true }).hover();
       await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
       await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
-      // Linked weeks (sample-first format) carry the Week 2 submission forward; unlinked weeks start from Week 3's starter.
-      const opening = week3.previousModuleId ? (await progress(weeks[1])).performanceTask.own.files.find((file) => file.path === "index.html").content : starter;
-      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, opening);
+      // Linked weeks carry the Week 2 submission forward: its page, and online its picture.
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried);
       const box = page.locator(".student-module-project").getByRole("region", { name: "Media files" });
-      await box.getByText("No media files yet.").waitFor();
-      await box.getByLabel("Add media files").setInputFiles(own.slice(0, 3).map((path) => join(mediaRoot, path)));
-      await box.getByText("video/canteen.webm").waitFor();
-      assert.deepEqual((await box.locator("li").allTextContents()).map((line) => line.split(" · ")[0]), own.slice(0, 3));
-      await editor.fill(mine);
+      if (withMedia) assert.deepEqual((await box.locator("li").allTextContents()).map((line) => line.split(" · ")[0]), (week2Own.media ?? []).map((item) => item.path));
+      const nav = '  <nav><a href="index.html">Home</a> | <a href="projects.html">Projects</a> | <a href="contact.html">Contact</a></nav>\n';
+      let index = carried.replace("<body>\n", `<body>\n${nav}`);
+      assert.notEqual(index, carried);
+      if (withMedia) {
+        await box.getByLabel("Add media files").setInputFiles(join(mediaRoot, own[0]));
+        await box.getByText(own[0]).waitFor();
+        index = index.replace("</body>", `  <audio src="${own[0]}" controls></audio>\n  <video src="${own[1]}" controls width="320"></video>\n</body>`);
+      }
+      await write("index.html", index);
+      const pages = { "projects.html": starter["projects.html"].replace("Write a school project here", "Science poster about clean water"),
+        "contact.html": starter["contact.html"] };
+      for (const [path, content] of Object.entries(pages)) await addPage(path, content);
       await runPage();
       await ready.waitFor();
-      assert.deepEqual(await shownMedia(page), ["images/snacks.svg: from the page, drawn", "images/counter.svg: not found, broken", "audio/chime.wav: from the page", "video/canteen.webm: from the page"]);
-      await box.getByLabel("Add media files").setInputFiles(join(mediaRoot, own[3]));
-      await box.getByText("images/counter.svg").waitFor();
-      await page.getByText("Run the current files successfully before submitting.", { exact: false }).waitFor();
-      assert.equal(await submit.isDisabled(), true, "adding a media file needs a new run before submitting");
-      await runPage();
-      await ready.waitFor();
-      const allShown = ["images/snacks.svg: from the page, drawn", "images/counter.svg: from the page, drawn", "audio/chime.wav: from the page", "video/canteen.webm: from the page"];
-      assert.deepEqual(await shownMedia(page), allShown);
-      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media.png" });
+      const picture = (week2Own.media ?? []).map((item) => `${item.path}: from the page, drawn`);
+      // Offline there are no media: the carried picture is not found either.
+      assert.deepEqual(await shownMedia(page), withMedia ? [...picture, `${own[0]}: from the page`, `${own[1]}: not found`] : [`${carried.match(/<img src="([^"]+)"/)[1]}: not found, broken`]);
+      if (withMedia) {
+        await box.getByLabel("Add media files").setInputFiles(join(mediaRoot, own[1]));
+        await box.getByText(own[1]).waitFor();
+        await page.getByText("Run the current files successfully before submitting.", { exact: false }).waitFor();
+        assert.equal(await submit.isDisabled(), true, "adding a media file needs a new run before submitting");
+        await runPage();
+        await ready.waitFor();
+        assert.deepEqual(await shownMedia(page), [...picture, `${own[0]}: from the page`, `${own[1]}: from the page`]);
+      }
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week3.png" });
       await closePageWindow(page);
       await submit.click();
       await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
       const saved = await progress(week3);
-      assert.deepEqual(saved.performanceTask.own.media.map((item) => item.path), own);
       assert.equal(saved.percent, 100);
-      await box.scrollIntoViewIfNeeded();
-      await box.screenshot({ path: "/tmp/codeshare-web-student-media-box.png" });
+      assert.deepEqual(Object.fromEntries(saved.performanceTask.own.files.map((file) => [file.path, file.content])), { "index.html": index, ...pages });
+      assert.deepEqual((saved.performanceTask.own.media ?? []).map((item) => item.path), withMedia ? [...(week2Own.media ?? []).map((item) => item.path), ...own] : []);
 
       const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
       await review.goto("/");
       await review.getByRole("button", { name: /Open class/ }).click();
       await review.getByRole("button", { name: /^Students/ }).click();
       await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
-      await review.locator(".teacher-module-card", { hasText: "Local Canteen Media" }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".teacher-module-card", { hasText: week3.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: "Review personal submission" }).click();
       await review.locator(".student-module-project").getByRole("textbox", { name: "HTML source code editor", exact: true }).waitFor();
+      assert.deepEqual(await review.locator(".student-module-project .file-tabs .file-tab").allTextContents(), ["index.html", "projects.html", "contact.html"]);
       assert.equal(await review.locator(".student-module-project").getByRole("region", { name: "Media files" }).count(), 0, "the review cannot add or remove media");
       await review.mouse.click(1200, 400);
       await review.getByRole("button", { name: /Run code/ }).click();
-      assert.deepEqual(await shownMedia(review), allShown, "the review shows the student's submitted media");
+      if (withMedia) assert.deepEqual(await shownMedia(review), [...picture, `${own[0]}: from the page`, `${own[1]}: from the page`], "the review shows the student's submitted media");
       await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       assert.deepEqual(await progress(week3), saved, "teacher runs never change the student's progress");
-      await review.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-media-review.png" });
+      await review.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week3-review.png" });
       await review.close();
     });
 
