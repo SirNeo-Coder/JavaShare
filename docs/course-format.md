@@ -281,6 +281,15 @@ evidence, checked by the server against its own expected output and the saved ve
   tab between its cells; a `colspan` or `rowspan` cell leaves fewer cells on a line; an empty cell
   still adds its tab. Words inside a `tr` but outside `td`/`th` move above the table. Page checks
   cover `scope`, `colspan` and `rowspan`; tasks change visible text.
+- **Links, frames and forms in page text (checked 2026-11-06).** Link text is page text; `href` is not
+  (a page check such as `a[href="projects.html"]` gives the same count in CodeShare and the teacher's checker).
+  A framed page's text is not part of the run file's page text. CodeShare shows a project page in an
+  `iframe` through `srcdoc`, so its `src` reads nothing online and offline: check frames by count,
+  `title`, `width` and `height`, never `src`. Labels, `button` words and every `option` of a `select`
+  are page text; typed values, `placeholder`, `textarea` text and the `value` of `input type="submit"`
+  are not. A label and its box on one line leave a trailing space, so put `<br>` after each label.
+  A step may set `run` to another page (`projects.html`); checks read that page only. A missing quote
+  before an `iframe` gives different page text in CodeShare (CKB-093): keep samples free of it.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
