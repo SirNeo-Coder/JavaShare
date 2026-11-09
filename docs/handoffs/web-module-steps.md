@@ -1004,3 +1004,5 @@ them), anything I must check, and a Sources list of every reference as clickable
   step ("line 3: required HOME | PROJECTS | CONTACT, page gave Home | Projects | Contact"); a copy of the Week 5 personal
   subtest whose CSS drops the `)` failed with `background-image` `none`. The teacher's `run_checks.sh`: every week passes.
   Plain `npm run lint` 0 errors.
+- 2026-11-09 — CodeRabbit on PR #88 (first review): one Minor finding, valid: the new prompt-map row had six cells in a
+  five-column table; the branch name is now inside the Outcome cell. No outside-diff or nitpick comments.
