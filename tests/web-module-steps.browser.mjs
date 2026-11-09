@@ -428,7 +428,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       await ready.waitFor();
       await submit.click();
-      await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
       await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
       const saved = await progress(week2);
       assert.equal(saved.percent, 100);
@@ -547,7 +547,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week3.png" });
       await closePageWindow(page);
       await submit.click();
-      await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
       await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
       const saved = await progress(week3);
       assert.equal(saved.percent, 100);
@@ -624,7 +624,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week4.png" });
       await closePageWindow(page);
       await submit.click();
-      await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
       await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
       const saved = await progress(week4);
       assert.equal(saved.percent, 100);
@@ -701,7 +701,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week5.png" });
       await closePageWindow(page);
       await page.getByRole("button", { name: "Submit this version", exact: true }).click();
-      await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
       await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
       const saved = await progress(week5);
       assert.equal(saved.percent, 100);
