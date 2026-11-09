@@ -1138,7 +1138,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   laptop Java): student saw Nov 5 9:30 AM, ran, submitted, saw Nov 8 9:24 PM; teacher card and review
   showed Nov 8 9:24 PM.
 - Not run: hosted site; `npm run classroom:offline` itself (same code and database as the dev check).
-- PR #85 (https://github.com/SirNeo-Coder/JavaShare/pull/85). Next: teacher reviews and merges; then check CodeRabbit on it.
+- PR #85 (https://github.com/SirNeo-Coder/JavaShare/pull/85). Merged 2026-11-08. CodeRabbit checked
+  2026-11-09: no inline findings, minimal merge risk; its only note was a generic docstring-coverage check, not a finding.
 ## CodeRabbit comments rule — 2026-11-05
 
 - Branch `docs/coderabbit-review-rule`. Teacher asked to check CodeRabbit on PRs #78–#80 and to make
@@ -1154,3 +1155,27 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   an `AGENTS.md` sentence that PR #80 had split from the "Submit this version" bullet.
 - Next: teacher reviews this PR; decide on the `src/*.txt` finding.
 
+## Teacher Work in code editor (module preview) — 2026-11-09
+
+- Branch `feature/teacher-module-preview` (from `main` after PR #88). Teacher reported that, viewing a
+  module while discussing it in class, the work is not in the code editor (CKB-098). Approved: a
+  preview only on the teacher's screen, never saved and never sent to students; covers Java and Net
+  MVC (web) steps.
+- Done: the classroom worksheet shows the teacher **Work in code editor** on each Java/web step
+  (not in the Curriculum dashboard preview, which has no main editor). It opens **Module preview ·
+  <module>** in the main editor with the module's starter files plus the step's sample, editable even
+  in sample-first modules. **▶ Run code** runs Java in the Console (laptop `javac` offline) and web steps
+  in the page window with the step's checks and media. No **Save work**, no progress, no device draft,
+  no live share. **Return to class project** or any **Students / projects** card closes it. New
+  `kind: "preview"` in `StudentModuleActivity`; no route, migration or setting.
+- Tested: `tests/student-module-activity-ui.test.mjs` "teacher module preview: only a teacher opens it,
+  and its main editor never offers Save work"; `tests/classroom-ui.test.mjs` "teacher worksheet: Work in
+  code editor appears only where the main editor can open the step"; `tests/teacher-module-preview.browser.mjs`
+  (real app, offline settings, laptop Java, port 3052) — each failed with the fix removed and passes now.
+  Full `npm test` 424/424; `npm run build:all` passed; lint 0 errors (old warnings only; the 612 errors from
+  plain `npm run lint` are all in untracked `.claude/worktrees` copies).
+- Not run: hosted site; online Java (CheerpJ) in the preview (same console code the teacher's review already
+  uses online); `npm run classroom:offline` itself (the browser test used its settings: local Supabase, laptop Java).
+- PR #90 (https://github.com/SirNeo-Coder/JavaShare/pull/90). CodeRabbit checked 2026-11-09: no inline or
+  outside-diff findings, minimal merge risk, low security risk; its only note was a generic docstring-coverage
+  check (not valid: the code does not use docstrings). Cloudflare build preview succeeded. Next: teacher reviews and merges.
