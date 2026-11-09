@@ -308,6 +308,20 @@ evidence, checked by the server against its own expected output and the saved ve
   under its condition (a missing last `}` changes nothing); a misspelt or wrongly capitalised class or id, or a missing dot, matches nothing. A step's
   `files` include its run page and every file that page needs (its stylesheet, a framed page), even
   when unchanged: **View module details** runs a step's own files only.
+- **Text, font, colour, gradient and opacity (checked 2026-11-09, Resume Week 5).** None of them is page text;
+  page checks read computed values, the same in CodeShare and the teacher's checker: a `font-family` list as written
+  with double quotes (`'Courier New'` reads `"Courier New", monospace`); `em`, `rem` and a unitless `line-height` in px
+  (`1.1em` of 16px reads `17.6px`, `line-height: 1.5` reads `24px`); `white` and `#ffffff` read `rgb(255, 255, 255)`;
+  `text-decoration` reads `underline` or `none`; `text-align` reads `start` when not set. A gradient is page-checked with
+  `background-image` (`linear-gradient(to right, rgb(19, 48, 92), rgb(138, 28, 85))`; `to bottom` is left out;
+  `radial-gradient(circle, …)` as written), never with the `background` shorthand (a long string). Linear and radial
+  gradients show in the page window (they need no `url()`). `opacity` reads `0.75`; text at `opacity: 0` or in a
+  `transparent` colour stays in the page text; `font-variant: small-caps` does not change it; `capitalize` changes
+  labels and buttons, not `option`s. A missing comma between gradient colours, a misspelt direction (`to rigth`) or a
+  colour without `#` drops only that declaration (the page text stays the same); a missing `)` in a gradient makes the
+  rest of the stylesheet part of that value, so every later rule stops (a later `text-transform` disappears from the
+  page text). A task is checked by its page text only, so a repair whose only effect is a style cannot be proven by
+  a run: Thursday repairs must change the page text (teacher, 2026-11-09; CodeRabbit on PR #87).
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has

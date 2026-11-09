@@ -648,6 +648,82 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
+    await t.test("Week 5 personal project: the Week 4 site carries forward; the student adds font lists and a gradient h1 with white capitals to styles.css; Run shows them on index.html and, through the Projects link, on projects.html; Submit freezes styles.css; the teacher's review shows the same styles", { skip: needs(5) }, async () => {
+      const week5 = weeks[4], steps5 = stepsOf(week5);
+      // The module steps are checked elsewhere; mark them done so the personal task opens.
+      const states = (await progress(week5)).stepStates;
+      assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps5.map((step) => [activityStateId(step), "pass"])) } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week5.id)).error, null);
+      const textarea = page.locator(".student-module-project .editor-card textarea");
+      const fileTab = (path) => page.locator(".student-module-project .file-tabs").getByRole("button", { name: path, exact: true });
+      // What the page window shows, read from the page itself: its title, whether the h1's page text is in capitals, and
+      // computed styles. notTitle: wait until a link has replaced that page.
+      const looks = async (where, notTitle) => {
+        for (const until = Date.now() + 15000; Date.now() < until; await where.waitForTimeout(100)) {
+          const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle())?.contentFrame();
+          const seen = await inside?.evaluate(() => {
+            const h1 = document.querySelector("h1"), style = h1 && getComputedStyle(h1);
+            return document.readyState === "complete" && h1 ? [document.title, h1.innerText === h1.textContent.trim().toUpperCase(), style.backgroundImage,
+              style.color, style.fontFamily, getComputedStyle(document.body).fontFamily, getComputedStyle(document.body).lineHeight] : null;
+          }).catch(() => null);
+          if (seen && seen[0] !== notTitle) return seen;
+        }
+        assert.fail(`the page window did not show a page other than ${notTitle}`);
+      };
+      const styled = (title) => [title, true, "linear-gradient(to right, rgb(19, 48, 92), rgb(138, 28, 85))", "rgb(255, 255, 255)",
+        'Georgia, "Times New Roman", serif', "Verdana, Tahoma, sans-serif", "24px"];
+      const week4Own = (await progress(weeks[3])).performanceTask.own;
+      const carried = Object.fromEntries(week4Own.files.map((file) => [file.path, file.content]));
+      const title = (path) => carried[path].match(/<title>(.*)<\/title>/)[1];
+      await openCatalog(week5);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      // Linked weeks carry the Week 4 submission forward: its pages and styles.css.
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried["index.html"]);
+      assert.deepEqual((await page.locator(".student-module-project .file-tabs .file-tab").allTextContents()).sort(), Object.keys(carried).sort());
+      const css = carried["styles.css"] + "\n/* Readable text: a font list ending in a generic family, and space between lines */\nbody {\n"
+        + "  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n}\n\n/* Gradient header: white capitals on navy to maroon (8.8:1 or more) */\nh1 {\n"
+        + "  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n"
+        + "  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n}\n";
+      await fileTab("styles.css").dispatchEvent("click");
+      await page.waitForFunction(() => document.querySelector(".student-module-project .file-tab.active")?.textContent === "styles.css");
+      await textarea.fill(css);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
+      assert.deepEqual(await looks(page), styled(title("index.html")), "styles.css reaches index.html: fonts, the gradient, white text and capitals in the page text");
+      // The Projects link opens projects.html in the same page window, with the same stylesheet (CodeRabbit on PR #87).
+      const frame = await (await page.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+      await frame.locator('nav a[href="projects.html"]').click();
+      assert.deepEqual(await looks(page, title("index.html")), styled(title("projects.html")), "styles.css reaches the linked projects.html too");
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week5.png" });
+      await closePageWindow(page);
+      await page.getByRole("button", { name: "Submit this version", exact: true }).click();
+      await page.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
+      const saved = await progress(week5);
+      assert.equal(saved.percent, 100);
+      assert.deepEqual(Object.fromEntries(saved.performanceTask.own.files.map((file) => [file.path, file.content])), { ...carried, "styles.css": css });
+      assert.deepEqual((saved.performanceTask.own.media ?? []).map((item) => item.path), (week4Own.media ?? []).map((item) => item.path), "the Week 4 media carry forward");
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      await review.locator(".teacher-module-card", { hasText: week5.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".student-module-project .editor-card textarea").waitFor();
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      await review.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      assert.deepEqual(await looks(review), styled(title("index.html")), "the review runs the frozen pages with the frozen styles.css");
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week5), saved, "teacher runs never change the student's progress");
+      await review.close();
+    });
+
     await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
       const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
       const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],
