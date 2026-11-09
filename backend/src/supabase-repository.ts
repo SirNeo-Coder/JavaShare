@@ -1926,12 +1926,11 @@ function mediaPath(path: string) {
   return path;
 }
 
-// The shared step's pictures, sound and video stay readable while it is shared, whatever the student's progress.
+// The shared step's pictures, sound and video are readable only while that step itself can be read: a deleted
+// module or removed step closes them at once (CKB-100). The payload read also checks class membership.
 async function enforceModuleMediaAccess(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
-  await requireClassroomMember(user, classroomId);
-  const { data, error } = await getSupabaseAdmin().from("classrooms").select("shared_module_id").eq("id", classroomId).single();
-  fail(error, "Could not check class status");
-  if (data.shared_module_id !== moduleId) await enforceStudentModuleAccess(user, classroomId, moduleId);
+  const shared = await supabaseSharedStepPayload(user, classroomId);
+  if (!shared.active || shared.moduleId !== moduleId) await enforceStudentModuleAccess(user, classroomId, moduleId);
 }
 
 export async function listSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string) {

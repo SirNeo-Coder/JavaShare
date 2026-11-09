@@ -25,16 +25,17 @@ second.previousModuleId = first.id;
 const step = second.lessons[0].blocks[0];
 const sample = step.files.find((file) => file.path === "Main.java").content;
 const steps = (content) => content.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
+const personalMain = 'public class Main { public static void main(String[] a) { System.out.println("Personal"); } }';
 const passed = (content) => Object.fromEntries(steps(content).map((item) => [`task:${item.activity.id}`, "pass"]));
 
-test("Share with class: students behind and ahead get the same fresh step; Stop sharing returns their own work", async () => {
+test("Share with class: students behind, ahead and in a personal project get the same fresh step; Stop sharing returns their own work; late replies never reopen it", async () => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.PREVIEW_BASE_URL || "http://localhost:3052";
   const users = []; let classId;
   try {
     const password = randomUUID();
     const contexts = [];
-    for (const role of ["teacher", "student", "student"]) {
+    for (const role of ["teacher", "student", "student", "student"]) {
       const { data, error } = await admin.auth.admin.createUser({ email: `shared-${randomUUID()}@example.test`, password, email_confirm: true, user_metadata: { name: `Shared ${role} ${users.length}` } });
       assert.equal(error, null); users.push(data.user);
       assert.equal((await admin.from("profiles").update({ role }).eq("id", data.user.id)).error, null);
@@ -50,19 +51,25 @@ test("Share with class: students behind and ahead get the same fresh step; Stop 
     // "ahead" finished the first week and has their own edits in the second; "behind" has not started.
     const edited = sample.replace('"Capacity: "', '"MY OWN EDIT: "');
     assert.equal((await admin.from("module_progress").insert([
-      { classroom_id: classId, student_id: users[2].id, module_id: first.id, step_states: passed(first), project_files: [] },
-      { classroom_id: classId, student_id: users[2].id, module_id: second.id, step_states: {}, project_files: [...second.starterFiles, { path: "Main.java", content: edited }] },
+      { classroom_id: classId, student_id: users[2].id, module_id: first.id, step_states: passed(first), project_files: [], performance_task: {} },
+      { classroom_id: classId, student_id: users[2].id, module_id: second.id, step_states: {}, project_files: [...second.starterFiles, { path: "Main.java", content: edited }], performance_task: {} },
+      // "personal" finished the first week and is working on its personal project.
+      { classroom_id: classId, student_id: users[3].id, module_id: first.id, step_states: passed(first), project_files: [], performance_task: { project: { files: [{ path: "Main.java", content: personalMain }] } } },
     ])).error, null);
 
     const pages = []; const errors = [];
     for (const context of contexts) { const page = await context.newPage(); page.setDefaultTimeout(30000); page.on("pageerror", (e) => errors.push(e.message)); pages.push(page); }
-    const [teacherPage, behindPage, aheadPage] = pages;
+    const [teacherPage, behindPage, aheadPage, personalPage] = pages;
     const project = (page) => page.locator(".student-module-project");
     const editor = (page) => project(page).getByRole("textbox", { name: "Java source code editor", exact: true });
     const heading = async (page) => (await project(page).locator(".workspace-card-heading").first().innerText());
     const footer = (page) => page.locator("footer.actionbar").filter({ hasText: "Return to class project" });
 
-    for (const page of [behindPage, aheadPage]) { await page.goto("/"); await page.locator(".classroom-workspace").waitFor(); }
+    for (const page of [behindPage, aheadPage, personalPage]) { await page.goto("/"); await page.locator(".classroom-workspace").waitFor(); }
+    await personalPage.getByRole("button", { name: "Module", exact: true }).hover();
+    await personalPage.locator("#classroom-modules .module-catalog-card").filter({ hasText: first.title }).getByRole("button").first().click();
+    await personalPage.locator("#classroom-worksheet").getByRole("button", { name: "Work on performance task" }).click();
+    await personalPage.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, personalMain);
     // The student ahead opens their own Week 42 work.
     await aheadPage.getByRole("button", { name: "Module", exact: true }).hover();
     await aheadPage.locator("#classroom-modules .module-catalog-card").filter({ hasText: second.title }).getByRole("button").first().click();
@@ -83,7 +90,7 @@ test("Share with class: students behind and ahead get the same fresh step; Stop 
     await footer(teacherPage).getByRole("button", { name: "Stop sharing" }).waitFor();
     await teacherPage.locator(".team-header").getByText("Week 42 · Step 1").waitFor();
 
-    for (const page of [behindPage, aheadPage]) {
+    for (const page of [behindPage, aheadPage, personalPage]) {
       await page.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Class step"));
       assert.match(await heading(page), /Class step · Week 42 · Step 1/);
       assert.equal(await editor(page).inputValue(), sample, "the teacher's fresh sample, not the student's own edits");
@@ -100,6 +107,37 @@ test("Share with class: students behind and ahead get the same fresh step; Stop 
     await project(behindPage).waitFor({ state: "detached" });
     await aheadPage.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Module project"));
     await aheadPage.waitForFunction(() => document.querySelector(".student-module-project .editor-card textarea")?.value.includes("MY OWN EDIT"));
+    await personalPage.waitForFunction((value) => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Personal project")
+      && document.querySelector(".student-module-project .editor-card textarea")?.value === value, personalMain);
+
+    // CKB-100: share again, then stop while one student's check reply is slow and another's save is slow.
+    // Neither the older "shared" reply nor the save finishing late may reopen the stopped share.
+    let releaseReply, replyFetched, releaseSave, heldRequest, holdNext = true;
+    const replyGate = new Promise((resolve) => { releaseReply = resolve; });
+    const fetched = new Promise((resolve) => { replyFetched = resolve; });
+    const saveGate = new Promise((resolve) => { releaseSave = resolve; });
+    await behindPage.route("**/shared-step", async (route) => {
+      if (!holdNext || route.request().method() !== "GET") return route.continue();
+      holdNext = false; heldRequest = route.request();
+      const response = await route.fetch(); replyFetched();
+      await replyGate; await route.fulfill({ response });
+    });
+    await personalPage.route("**/progress/performance-project", async (route) => { if (route.request().method() === "PUT") await saveGate; await route.continue(); });
+    await editor(personalPage).fill(`${personalMain}\n// unsaved line`);
+    const saving = personalPage.waitForRequest((request) => request.method() === "PUT" && request.url().includes("/progress/performance-project"));
+    await footer(teacherPage).getByRole("button", { name: "Share with class" }).click();
+    await fetched; await saving;
+    const behindSawStop = behindPage.waitForResponse((response) => response.url().includes("/shared-step") && response.request() !== heldRequest);
+    const personalSawStop = personalPage.waitForResponse((response) => response.url().includes("/shared-step") && response.request().method() === "GET");
+    await footer(teacherPage).getByRole("button", { name: "Stop sharing" }).click();
+    assert.deepEqual(await (await behindSawStop).json(), { active: false });
+    assert.deepEqual(await (await personalSawStop).json(), { active: false });
+    releaseReply(); releaseSave();
+    await personalPage.waitForResponse((response) => response.request().method() === "PUT" && response.url().includes("/progress/performance-project"));
+    await behindPage.waitForTimeout(2000);
+    assert.equal(await project(behindPage).count(), 0, "an older shared reply never reopens the stopped share");
+    assert.match(await heading(personalPage), /^Personal project/, "a save that ends after Stop sharing never opens the stopped share");
+    await behindPage.unrouteAll(); await personalPage.unrouteAll();
 
     const { data: rows } = await admin.from("module_progress").select("student_id,module_id,project_files").eq("classroom_id", classId);
     assert.equal(rows.some((row) => row.student_id === users[1].id), false, "the student behind got no progress");

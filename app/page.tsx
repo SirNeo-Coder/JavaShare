@@ -265,6 +265,9 @@ export default function Home() {
   // The student's own work before the shared step, reopened afterwards; and a share they left, so a refresh doesn't pull them back.
   const beforeSharedRef = useRef<StudentActivity | null>(null);
   const leftShareRef = useRef("");
+  // The newest shared-step check and the share it found: an older reply or a save that finishes late never reopens a stopped share (CKB-100).
+  const sharedRequestRef = useRef(0);
+  const sharedKeyRef = useRef("");
   const [worksheetCloseSignal, setWorksheetCloseSignal] = useState(0);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const liveDraftSequenceRef = useRef(0);
@@ -1801,9 +1804,11 @@ export default function Home() {
 
   async function refreshSharedStep() {
     if (!classroomId || !user) return;
+    const request = ++sharedRequestRef.current;
     const next = await api<{ active: false } | ({ active: true } & SharedStep)>(`/api/classes/${classroomId}/shared-step`).catch(() => null);
-    if (!next) return;
+    if (!next || request !== sharedRequestRef.current) return;
     const shared = next.active ? next : null;
+    sharedKeyRef.current = shared ? `${shared.moduleId}:${shared.step.id}` : "";
     setSharedStep(shared);
     if (user.role !== "student") return;
     if (!shared) { leftShareRef.current = ""; if (moduleActivity?.shared) await returnFromSharedStep(); return; }
@@ -1815,7 +1820,7 @@ export default function Home() {
     const key = `${shared.moduleId}:${shared.step.id}`;
     const open = moduleActivity?.shared ? moduleActivity : null;
     if (leftShareRef.current === key || (open && open.moduleId === shared.moduleId && open.stepId === shared.step.id)) return;
-    if (attempt && `${sharedStep?.moduleId}:${sharedStep?.step.id}` !== key) return;
+    if (sharedKeyRef.current !== key) return;
     try { await moduleEditorRef.current?.save(); }
     catch {
       if (!attempt) notify(`Your teacher shared Week ${shared.week} · Step ${shared.step.number}. It opens when your current run or save finishes.`);
@@ -1823,6 +1828,7 @@ export default function Home() {
       if (attempt < 40) setTimeout(() => void followSharedStepRef.current(shared, attempt + 1), 3000);
       return;
     }
+    if (sharedKeyRef.current !== key) return;
     if (!open) beforeSharedRef.current = moduleActivity;
     const sharedModule = { id: shared.moduleId, title: shared.moduleTitle, week: shared.week, course: shared.course, starterFiles: shared.starterFiles,
       lessons: [{ id: "shared", order: 1, dayLabel: "", title: shared.moduleTitle, blocks: [shared.step], exitSlip: { id: "shared", points: 0, questions: [] } }],

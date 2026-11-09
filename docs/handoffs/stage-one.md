@@ -1202,4 +1202,11 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   unchanged and its route tests pass); `npm run classroom:offline` itself (tests used its settings).
 - Hosted step for the teacher: apply `20261110000100_classroom_shared_step.sql` in the Supabase SQL Editor
   before merging (instructions in the PR).
-- PR #91 (https://github.com/SirNeo-Coder/JavaShare/pull/91). Next: teacher applies the migration on hosted Supabase, reviews and merges; then check CodeRabbit on it.
+- PR #91 (https://github.com/SirNeo-Coder/JavaShare/pull/91). CodeRabbit checked 2026-11-10: valid and fixed with the
+  teacher's approval (CKB-100) — an older shared-step reply or a save ending after Stop sharing could reopen a stopped
+  share (client now ignores older replies and re-checks after saving); shared media stayed readable after the module
+  was deleted or the step renamed (media now opens only while the step itself can be read); students may open a preview
+  only as a shared step; `backend.md` table pipe escaped. Not changed: one extra small read per media request (low value);
+  docstrings (not used here). Tests: browser test now holds a reply and a save (each guard shown failing when removed),
+  real-route media test (shown failing with the old gate); `npm test` 431/431; build and lint pass. Next: teacher
+  applies the migration on hosted Supabase, reviews and merges; then check CodeRabbit's re-review.

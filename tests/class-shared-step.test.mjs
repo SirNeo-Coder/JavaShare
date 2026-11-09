@@ -26,6 +26,8 @@ const activity = (shared) => ({ kind: "preview", shared, classroomId: "class", m
 test("class step: a student's shared step opens for any role, is labelled, and never offers Save work", () => {
   assert.equal(moduleProjectForClass(activity(true), "class", "student").shared, true);
   assert.equal(moduleProjectForClass({ ...activity(false), kind: "review" }, "class", "student"), null, "reviews stay teacher-only");
+  assert.equal(moduleProjectForClass(activity(false), "class", "student"), null, "a student opens a preview only as a shared class step (CKB-100)");
+  assert.equal(moduleProjectForClass(activity(false), "class", "teacher").kind, "preview");
   const html = renderToStaticMarkup(createElement(StudentModuleActivity, { activity: activity(true), ref: { current: null }, onChecked() {}, onClose() {} }));
   assert.match(html, /Class step · Week 42 · Step 1/);
   assert.match(html, /Your teacher shared this step with the class/);
@@ -99,6 +101,17 @@ test("class step: real routes share one step with every member past prerequisite
       assert.equal((await call(media, student)).status, 403);
       const { data } = await admin.from("module_progress").select("module_id").eq("classroom_id", classId).eq("student_id", users[1].id);
       assert.deepEqual(data, []);
+    });
+    await t.test("a removed step or deleted module closes the shared media at once, though the share was never stopped (CKB-100)", async () => {
+      assert.equal((await share(teacher, { moduleId: second.id, stepId: sharedStep.id })).status, 200);
+      assert.notEqual((await call(media, student)).status, 403);
+      const withoutStep = structuredClone(second); // a correction that renames the shared step
+      withoutStep.lessons[1].blocks[0].id = withoutStep.lessons[1].exitSlip.afterStep = `${sharedStep.id}-renamed`;
+      assert.equal((await call(`/api/classrooms/${classId}/modules`, teacher, "POST", withoutStep)).status, 201);
+      assert.deepEqual(await (await call(shared, student)).json(), { active: false });
+      assert.equal((await call(media, student)).status, 403, "the re-uploaded module without the step keeps its normal lock");
+      assert.equal((await call(`/api/classrooms/${classId}/modules/${second.id}`, teacher, "DELETE")).status, 200);
+      assert.equal((await call(media, student)).status, 404, "a deleted module's media is not served");
     });
   } finally {
     for (const id of classes) await admin.from("classrooms").delete().eq("id", id);

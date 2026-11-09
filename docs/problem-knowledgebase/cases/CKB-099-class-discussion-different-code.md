@@ -58,6 +58,7 @@ students but a media step lacks pictures, check `enforceModuleMediaAccess` and t
 
 ## History
 
+- 2026-11-10 — CodeRabbit on PR #91 found late-reply, slow-save and stale-media gaps; fixed before merge (CKB-100).
 - 2026-11-10 — Teacher asked for a current-module mode so every student gets the same default code as the
   teacher while discussing; approved Share with class with the recommended choices (button-started, students
   switch automatically, no completion credit). Built and tested.
