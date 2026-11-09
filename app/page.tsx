@@ -136,6 +136,14 @@ type Submission = {
   status: string;
   files: { path?: string; content?: string }[];
 };
+// Share with class (teacher, 2026-11-10): the step every member practises fresh, whatever their progress.
+type SharedStep = { moduleId: string; moduleTitle: string; week: number; course: string; starterFiles?: CourseModule["starterFiles"]; step: StepBlock };
+// The step's sample with the module's starter files, as students get it; never saved.
+function stepPreview(module: CourseModule, step: StepBlock, classroomId: string, userId: string, shared = false): StudentActivity {
+  return { kind: "preview", shared, module, classroomId, moduleId: module.id, moduleTitle: shared ? `Week ${module.week} · Step ${step.number}` : module.title, stepId: step.id, stateId: "", studentId: userId,
+    instruction: step.instruction, expectedOutput: step.expectedOutput, stdin: step.stdin ?? "",
+    progress: { moduleId: module.id, projectFiles: mergeProjectFiles(module.starterFiles ?? [], step.files), performanceProjectFiles: [], percent: 0, updatedAt: "", stepStates: {}, performanceTask: {} } };
+}
 type LiveShare = {
   active: boolean;
   projectId?: string;
@@ -251,6 +259,13 @@ export default function Home() {
   const teamChannelRef = useRef<RealtimeChannel | null>(null);
   const classChannelRef = useRef<RealtimeChannel | null>(null);
   const refreshLiveShareRef = useRef<(() => void) | null>(null);
+  const [sharedStep, setSharedStep] = useState<SharedStep | null>(null);
+  const refreshSharedStepRef = useRef<() => Promise<void>>(async () => undefined);
+  const followSharedStepRef = useRef<(shared: SharedStep, attempt: number) => Promise<void>>(async () => undefined);
+  // The student's own work before the shared step, reopened afterwards; and a share they left, so a refresh doesn't pull them back.
+  const beforeSharedRef = useRef<StudentActivity | null>(null);
+  const leftShareRef = useRef("");
+  const [worksheetCloseSignal, setWorksheetCloseSignal] = useState(0);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const liveDraftSequenceRef = useRef(0);
   const receivedDraftSequenceRef = useRef(0);
@@ -336,12 +351,12 @@ export default function Home() {
   const teamOnline = Boolean(team?.members.some((member) => onlineUserIds.includes(member.id)));
   const studentLiveView = user?.role === "teacher" && moduleLive && team?.members.some((member) => member.id === moduleLive.studentId) && onlineUserIds.includes(moduleLive.studentId) ? moduleLive : null;
   const workspaceTitle = currentModuleProject
-    ? `${currentModuleProject.kind === "performance" ? "Personal project" : currentModuleProject.kind === "preview" ? "Module preview" : "Module project"} · ${currentModuleProject.moduleTitle}` :
+    ? `${currentModuleProject.kind === "performance" ? "Personal project" : currentModuleProject.kind === "preview" ? currentModuleProject.shared ? "Class step" : "Module preview" : "Module project"} · ${currentModuleProject.moduleTitle}` :
     user?.role === "student" && currentSavedCopy
       ? currentSavedCopy.label
       : team?.name || "Workspace";
   const workspaceSubtitle = currentModuleProject
-    ? currentModuleProject.kind === "performance" ? "Your saved personal performance-task project" : currentModuleProject.kind === "preview" ? "Teacher preview — not saved" : "Your saved module project" :
+    ? currentModuleProject.kind === "performance" ? "Your saved personal performance-task project" : currentModuleProject.kind === "preview" ? currentModuleProject.shared ? "Shared by your teacher — not saved" : "Teacher preview — not saved" : "Your saved module project" :
     user?.role === "student" && currentSavedCopy
       ? `Saved copy · ${activeFile?.path || "Java project"}`
       : `${team?.project?.title || "Java project"} · ${activeFile?.path || ""}`;
@@ -603,6 +618,8 @@ export default function Home() {
     if (!enteredClassroomId || enteredClassroomId !== classroomId) return;
     let cancelled = false;
     const refreshLiveShare = async () => {
+      // The shared step uses the same triggers; a microtask later so its ref is set on the first run.
+      queueMicrotask(() => void refreshSharedStepRef.current());
       try {
         const next = await api<LiveShare>(
           `/api/classes/${classroomId}/live-share`,
@@ -741,6 +758,7 @@ export default function Home() {
       receivedDraftSequenceRef.current = 0;
       setLiveShare(share);
     });
+    on("class:shared-step", () => void refreshSharedStepRef.current());
     on("class:chat-muted", ({ muted }: { muted: boolean }) =>
       setData((current) =>
         current ? { ...current, classroomChatMuted: muted } : current,
@@ -1753,9 +1771,7 @@ export default function Home() {
   async function startModuleActivity(module: CourseModule, step?: StepBlock) {
     // Teacher preview: the step's sample in the main editor, never saved or shared (teacher, 2026-11-09).
     if (classroomId && user?.role === "teacher" && step) {
-      setModuleActivity({ kind: "preview", module, classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step.id, stateId: "", studentId: user.id,
-        instruction: step.instruction, expectedOutput: step.expectedOutput, stdin: step.stdin ?? "",
-        progress: { moduleId: module.id, projectFiles: mergeProjectFiles(module.starterFiles ?? [], step.files), performanceProjectFiles: [], percent: 0, updatedAt: "", stepStates: {}, performanceTask: {} } });
+      setModuleActivity(stepPreview(module, step, classroomId, user.id));
       setProjectsOpen(false);
       return;
     }
@@ -1781,6 +1797,56 @@ export default function Home() {
       showModuleAccessError(error);
       throw error;
     }
+  }
+
+  async function refreshSharedStep() {
+    if (!classroomId || !user) return;
+    const next = await api<{ active: false } | ({ active: true } & SharedStep)>(`/api/classes/${classroomId}/shared-step`).catch(() => null);
+    if (!next) return;
+    const shared = next.active ? next : null;
+    setSharedStep(shared);
+    if (user.role !== "student") return;
+    if (!shared) { leftShareRef.current = ""; if (moduleActivity?.shared) await returnFromSharedStep(); return; }
+    await followSharedStep(shared);
+  }
+  // A run or save in progress can't be interrupted without losing work: wait for it, on this device only.
+  async function followSharedStep(shared: SharedStep, attempt = 0) {
+    if (!classroomId || !user) return;
+    const key = `${shared.moduleId}:${shared.step.id}`;
+    const open = moduleActivity?.shared ? moduleActivity : null;
+    if (leftShareRef.current === key || (open && open.moduleId === shared.moduleId && open.stepId === shared.step.id)) return;
+    if (attempt && `${sharedStep?.moduleId}:${sharedStep?.step.id}` !== key) return;
+    try { await moduleEditorRef.current?.save(); }
+    catch {
+      if (!attempt) notify(`Your teacher shared Week ${shared.week} · Step ${shared.step.number}. It opens when your current run or save finishes.`);
+      // ponytail: fixed 3-second retries for up to 2 minutes (the longest input wait); no request is sent.
+      if (attempt < 40) setTimeout(() => void followSharedStepRef.current(shared, attempt + 1), 3000);
+      return;
+    }
+    if (!open) beforeSharedRef.current = moduleActivity;
+    const sharedModule = { id: shared.moduleId, title: shared.moduleTitle, week: shared.week, course: shared.course, starterFiles: shared.starterFiles,
+      lessons: [{ id: "shared", order: 1, dayLabel: "", title: shared.moduleTitle, blocks: [shared.step], exitSlip: { id: "shared", points: 0, questions: [] } }],
+      availability: { openLessonIds: [], performanceTaskOpen: false } };
+    setModuleActivity(stepPreview(sharedModule, shared.step, classroomId, user.id, true));
+    setProjectsOpen(false); setModulesOpen(false); setWorksheetCloseSignal((signal) => signal + 1);
+  }
+  useEffect(() => { refreshSharedStepRef.current = refreshSharedStep; followSharedStepRef.current = followSharedStep; });
+  // Leaving the shared step reopens the student's own module or personal project through the normal path.
+  async function returnFromSharedStep() {
+    const before = beforeSharedRef.current;
+    beforeSharedRef.current = null;
+    setModuleActivity(null);
+    if (!before || before.kind === "preview" || before.kind === "review") return;
+    const step = before.kind === "module" ? before.module.lessons.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === before.stepId) : undefined;
+    if (before.kind === "module" && !step) return;
+    try { await startModuleActivity(before.module, step); }
+    catch (error) { notify(error instanceof Error ? error.message : "Could not reopen your project"); }
+  }
+  async function shareStep(share: { moduleId: string; stepId: string } | null) {
+    try {
+      await api(`/api/classes/${classroomId}/shared-step`, { method: "PUT", body: JSON.stringify({ share }) });
+      await refreshSharedStep();
+    } catch (error) { notify(error instanceof Error ? error.message : "Could not share this step"); }
   }
 
   async function runCode() {
@@ -2416,7 +2482,7 @@ export default function Home() {
           {currentModuleProject ? <div className="assignment-block">
             <span className="eyebrow">{currentModuleProject.kind === "performance" ? "PERSONAL PERFORMANCE TASK" : "MODULE PROJECT"}</span>
             <h3>{currentModuleProject.moduleTitle}</h3>
-            <p>{currentModuleProject.kind === "review" ? "Frozen submitted files. Teacher runs never change student progress." : currentModuleProject.kind === "preview" ? "This step's sample, for discussing in class. Edits and runs are not saved, and students do not see them." : currentModuleProject.kind === "performance" ? `Your own ${webPerformanceTask(currentModuleProject.module) ? "web" : "Java"} project, continued from the previous week. Saving and running do not submit it.` : "Use the module sample code and match its expected output to progress."}</p>
+            <p>{currentModuleProject.kind === "review" ? "Frozen submitted files. Teacher runs never change student progress." : currentModuleProject.kind === "preview" ? currentModuleProject.shared ? "Your teacher shared this step. Edits and runs are not saved and do not complete your own module step." : "This step's sample, for discussing in class. Edits and runs are not saved. Share with class gives every student a fresh copy." : currentModuleProject.kind === "performance" ? `Your own ${webPerformanceTask(currentModuleProject.module) ? "web" : "Java"} project, continued from the previous week. Saving and running do not submit it.` : "Use the module sample code and match its expected output to progress."}</p>
             <p>{currentModuleProject.kind !== "module" && webPerformanceTask(currentModuleProject.module) ? "Web" : "Java"} files are in the editor tabs.</p>
           </div> : <div className="assignment-block">
             <span className="eyebrow">CURRENT ASSIGNMENT</span>
@@ -2477,6 +2543,15 @@ export default function Home() {
                 <p>{workspaceSubtitle}</p>
               </div>
             </div>
+            {user.role === "teacher" && sharedStep && (
+              <div className="presence">
+                <span>
+                  <b>Shared with class</b>
+                  <small>Week {sharedStep.week} · Step {sharedStep.step.number}</small>
+                </span>
+                <button type="button" onClick={() => void shareStep(null)}>Stop sharing</button>
+              </div>
+            )}
             {team.isTeacherWorkspace ? (
               <div className="presence">
                 <span>
@@ -2570,8 +2645,12 @@ export default function Home() {
             key={`${currentModuleProject.kind}:${currentModuleProject.moduleId}:${currentModuleProject.stepId}:${currentModuleProject.progress.updatedAt}`}
             activity={currentModuleProject} ref={moduleEditorRef}
             onChecked={() => setModuleProgressRevision((revision) => revision + 1)}
-            onClose={() => setModuleActivity(null)}
-            live={user.role === "student" ? {
+            onClose={() => { if (currentModuleProject.shared) { leftShareRef.current = `${currentModuleProject.moduleId}:${currentModuleProject.stepId}`; void returnFromSharedStep(); } else setModuleActivity(null); }}
+            share={user.role === "teacher" && currentModuleProject.kind === "preview" ? {
+              shared: sharedStep?.moduleId === currentModuleProject.moduleId && sharedStep.step.id === currentModuleProject.stepId,
+              toggle: (on) => shareStep(on ? { moduleId: currentModuleProject.moduleId, stepId: currentModuleProject.stepId } : null),
+            } : undefined}
+            live={user.role === "student" && currentModuleProject.kind !== "preview" ? {
               cursors: moduleCursors,
               onFile: (path, content, editable) => {
                 moduleMirrorRef.current = { path, content, base: null };
@@ -2953,7 +3032,7 @@ export default function Home() {
           </footer>
           <RunBox message={running && !javaConsole.running ? "Java is loading or running… Please wait." : null} onCancel={javaConsole.active ? javaConsole.stop : undefined} /></>}
         </section>
-        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} studentId={user.id} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onSelectModule={(module) => setWeeklySelection({ studentId: user.id, classroomId, module })} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} />}
+        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} studentId={user.id} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onSelectModule={(module) => setWeeklySelection({ studentId: user.id, classroomId, module })} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} closeSignal={worksheetCloseSignal} />}
         <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} autoFocus={!chatHoverPreview} onClose={() => { setChatOpen(false); setChatHoverPreview(false); }}>
           <div className="chat">
                   <div className="chat-toolbar">

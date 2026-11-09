@@ -28,7 +28,7 @@ teacher only for **Review personal submission** (`kind: "review"`, read-only).
 - For a teacher, `startModuleActivity` opens a new `kind: "preview"`: the module's starter files
   merged with the step's sample (`mergeProjectFiles`, the same order students get), the step's
   instruction, expected output and input. No server request.
-- `moduleProjectForClass` lets only a teacher open `preview`.
+- `moduleProjectForClass` lets a teacher open `preview`; since CKB-099 a student opens one only as a shared class step (`shared: true`).
 - In `StudentModuleActivity`, `preview` is editable even in sample-first modules, never loads or
   writes device drafts, never saves (`save()` returns), has no **Save work** or result banner, and
   runs like a review: Java through the normal console (laptop `javac` offline), web steps in the page
@@ -38,7 +38,7 @@ teacher only for **Review personal submission** (`kind: "review"`, read-only).
 
 ## Regression proof
 
-- `tests/student-module-activity-ui.test.mjs` — "teacher module preview: only a teacher opens it, and its main editor never offers Save work"
+- `tests/student-module-activity-ui.test.mjs` — "teacher module preview: a teacher opens it (students get previews only as a shared class step), and its main editor never offers Save work" (renamed for CKB-099)
 - `tests/classroom-ui.test.mjs` — "teacher worksheet: Work in code editor appears only where the main editor can open the step"
 - `tests/teacher-module-preview.browser.mjs` — "teacher Work in code editor: Java and Net MVC samples open in the main editor, run, and are never saved"
   (real app, offline settings with laptop Java, port 3052; Java step edited and run prints the edit; resume page edited and shown in the page window;

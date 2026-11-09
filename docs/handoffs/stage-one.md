@@ -1178,4 +1178,27 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   uses online); `npm run classroom:offline` itself (the browser test used its settings: local Supabase, laptop Java).
 - PR #90 (https://github.com/SirNeo-Coder/JavaShare/pull/90). CodeRabbit checked 2026-11-09: no inline or
   outside-diff findings, minimal merge risk, low security risk; its only note was a generic docstring-coverage
-  check (not valid: the code does not use docstrings). Cloudflare build preview succeeded. Next: teacher reviews and merges.
+  check (not valid: the code does not use docstrings). Cloudflare build preview succeeded. Merged 2026-11-09.
+
+## Share with class — 2026-11-10
+
+- Branch `feature/class-shared-step` (from `main` after PR #90). Teacher asked for a current-module mode:
+  while discussing, every student gets the same default code as the teacher, whatever their week (some
+  could not open Week 15; others had their own different code). CKB-099. Approved with the recommended
+  choices: starts only from **Share with class**; students switch automatically; no completion credit.
+- Done: **Share with class** / **Stop sharing** in the teacher's Module preview, and **Shared with class ·
+  Week N · Step M** + **Stop sharing** in the classroom header. New migration
+  `20261110000100_classroom_shared_step.sql` (two nullable `classrooms` columns), `GET`/`PUT
+  /api/classes/:id/shared-step`, live event `class:shared-step`. Students switch to **Class step · Week N ·
+  Step M** (starter files + sample, never the task), editable and runnable, never saved; their worksheet
+  closes; stopping or **Return to class project** reopens their own work. The shared module's media is
+  readable while shared. Rule added to `AGENTS.md` ("Share with class").
+- Tested: `tests/class-shared-step.test.mjs` (rule + real routes, local Supabase) and
+  `tests/class-shared-step.browser.mjs` (real app, offline settings, laptop Java) — each failed with the fix
+  removed and passes now; `tests/teacher-module-preview.browser.mjs` and `tests/teacher-live-help.browser.mjs`
+  still pass; full `npm test` 430/430; `npm run build:all` passed; lint 0 errors (old warnings only).
+- Not run: hosted site (needs the migration first); online Java (CheerpJ) in the class step;
+  `tests/module-prerequisites.browser.mjs` (its fixed ports 3020/3022 were not started; prerequisite code is
+  unchanged and its route tests pass); `npm run classroom:offline` itself (tests used its settings).
+- Hosted step for the teacher: apply `20261110000100_classroom_shared_step.sql` in the Supabase SQL Editor
+  before merging (instructions in the PR).

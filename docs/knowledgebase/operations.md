@@ -43,6 +43,7 @@ Never commit filled-in env files or keys.
 - Online: the **teacher** applies them to the hosted project. Assistants never run `supabase db push`.
 - Applied to the hosted project by the teacher on 2026-10-17 (SQL Editor, by hand): `20261016000100_project_language.sql` and `20261016000200_realtime_private_channels.sql`. Applied by hand, so the hosted migration history doesn't list them.
 - `npx supabase migration up --local` applies new migrations to the local database without erasing it.
+- Share with class adds `20261110000100_classroom_shared_step.sql` (two nullable `classrooms` columns). The teacher applies it to the hosted project before the new app is used online; locally `npx supabase migration up --local`. Only local application was performed by the assistant.
 
 - Lesson-open controls add `20261018000500_module_availability.sql`. Apply it after earlier module migrations and before the new app: existing modules open, new uploads closed, settings separate from source JSON. [Teacher setup and rollback steps](../lesson-availability-setup.md). Only local application was performed by the assistant.
 

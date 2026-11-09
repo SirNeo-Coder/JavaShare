@@ -39,12 +39,12 @@ test("module activity screen: ＋ opens the floating Create a new file window, n
   assert.doesNotMatch(source, /"Java filename"|"Web filename"|>Add file</);
 });
 
-test("teacher module preview: only a teacher opens it, and its main editor never offers Save work", () => {
+test("teacher module preview: a teacher opens it (students get previews only as a shared class step), and its main editor never offers Save work", () => {
   const activity = { kind: "preview", classroomId: "class", moduleId: "module", moduleTitle: "Vehicle project", stepId: "step", stateId: "", studentId: "teacher",
     instruction: "Run the vehicle sample", expectedOutput: "Capacity: 20", stdin: "",
     progress: { moduleId: "module", projectFiles: [{ path: "Main.java", content: "class Main {}" }, { path: "Vehicle.java", content: "abstract class Vehicle {}" }], performanceProjectFiles: [], stepStates: {}, performanceTask: {}, updatedAt: "", percent: 0 } };
   assert.equal(moduleProjectForClass(activity, "class", "teacher"), activity);
-  assert.equal(moduleProjectForClass(activity, "class", "student"), null);
+  assert.equal(moduleProjectForClass({ ...activity, kind: "module" }, "class", "teacher"), null, "a teacher never opens a student's module project");
   const html = renderToStaticMarkup(createElement(StudentModuleActivity, { activity, ref: { current: null }, onChecked() {}, onClose() {} }));
   assert.match(html, /Module preview · Vehicle project/);
   assert.match(html, /Vehicle\.java/);

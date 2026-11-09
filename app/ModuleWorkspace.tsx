@@ -10,8 +10,8 @@ import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
-export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, onSelectModule, progressRevision = 0 }: {
-  onSelectModule?: (module: CourseModule) => void;
+export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, onSelectModule, progressRevision = 0, closeSignal = 0 }: {
+  onSelectModule?: (module: CourseModule) => void; closeSignal?: number;
   onStartActivity: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
   classroomId: string; studentId?: string; role: "teacher" | "student"; browserOpen: boolean; projectsOpen: boolean; onBrowserChange: (open: boolean) => void; onProjectsChange: (open: boolean) => void;
 }) {
@@ -23,6 +23,9 @@ export default function ModuleWorkspace({ classroomId, studentId, role, browserO
   const [projectsHoverPreview, setProjectsHoverPreview] = useState(false);
   const earRef = useRef<HTMLButtonElement>(null);
   const close = (restoreFocus = false) => { setOpen(false); setHoverPreview(false); if (restoreFocus) earRef.current?.focus({ preventScroll: true }); };
+  // A new closeSignal (the teacher shared a step) closes the worksheet so it doesn't cover the editor.
+  const [closedSignal, setClosedSignal] = useState(closeSignal);
+  if (closeSignal !== closedSignal) { setClosedSignal(closeSignal); setOpen(false); }
   const moduleOpen = browserOpen || (open && !projectsOpen);
   const moduleId = browserOpen || !selection ? "classroom-modules" : "classroom-worksheet";
   const openModule = (hover: boolean) => {
