@@ -738,7 +738,8 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         await textarea.fill(content);
       };
       // What the page window shows, read from the page itself: its title, the nav's page text, then computed box, list and link
-      // styles. notTitle: wait until a link has replaced that page.
+      // styles. No border width: the page window follows the text-size zoom, so 2px reads 1.73913px (CKB-097). notTitle: wait
+      // until a link has replaced that page.
       const looks = async (where, notTitle) => {
         for (const until = Date.now() + 15000; Date.now() < until; await where.waitForTimeout(100)) {
           const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle())?.contentFrame();
@@ -747,14 +748,14 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
             const h2 = at("h2"), ul = at("nav ul"), li = at("nav li"), a = at("nav a");
             return document.readyState === "complete" && h2 && li ? [document.title, document.querySelector("nav").innerText.trim(), ul.listStyleType, ul.paddingLeft,
               li.display, li.marginRight, a.color, a.backgroundColor, a.paddingLeft, a.textDecorationLine,
-              h2.borderBottomWidth, h2.borderBottomStyle, h2.borderBottomColor, h2.paddingBottom, h2.marginTop] : null;
+              h2.borderBottomStyle, h2.borderBottomColor, h2.paddingBottom, h2.marginTop] : null;
           }).catch(() => null);
           if (seen && seen[0] !== notTitle) return seen;
         }
         assert.fail(`the page window did not show a page other than ${notTitle}`);
       };
       const styled = (title) => [title, "HOME PROJECTS CONTACT", "none", "0px", "inline-block", "8px", "rgb(255, 255, 255)", "rgb(19, 48, 92)", "12px", "none",
-        "2px", "solid", "rgb(19, 48, 92)", "6px", "36px"];
+        "solid", "rgb(19, 48, 92)", "6px", "36px"];
       const week5Own = (await progress(weeks[4])).performanceTask.own;
       const carried = Object.fromEntries(week5Own.files.map((file) => [file.path, file.content]));
       const title = (path) => carried[path].match(/<title>(.*)<\/title>/)[1];

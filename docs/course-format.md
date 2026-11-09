@@ -325,9 +325,10 @@ evidence, checked by the server against its own expected output and the saved ve
 - **Box model, lists and links (checked 2026-11-09, Resume Week 6).** None of them is page text except `display`;
   page checks read computed values, the same in CodeShare's page window and the teacher's checker. Sizes read in px
   (`padding-bottom: 0.25em` on a 24px `h2` reads `6px`, `margin-top: 1.5em` reads `36px`, `0.25em` on 12px text `3px`). A
-  side's border reads through its longhands (`border-bottom-width` `2px`, `-style` `solid`, `-color` `rgb(…)`) or
-  `border-bottom` (`2px solid rgb(…)`); `border` reads `""` when the four sides differ, and `padding` reads `0px 0px 6px`:
-  page-check longhands. A border with no style reads width `0px` (it does not show); `border: solid` alone reads `3px`.
+  side's border is checked by its style and colour longhands (`border-bottom-style` `solid`, `border-bottom-color`
+  `rgb(…)`); never page-check a border width: CodeShare's page window follows the text-size zoom (1.15 at first), so 2px
+  reads `1.73913px` there but `2px` in the teacher's checker (CKB-097). `border` reads `""` when the four sides differ and
+  `padding` reads `0px 0px 6px`: page-check longhands. A border with no style reads style `none` (it does not show).
   `width: 300px` reads `300px` with or without `box-sizing: border-box` (only the box on screen is 310px without it), so
   check `box-sizing` itself; a `select` is `border-box` by default. A `%` width or an `auto` margin turns into px from the
   window, and the page window is not the checker's 1000 px window (392 px against 492 px for `width: 50%`): never

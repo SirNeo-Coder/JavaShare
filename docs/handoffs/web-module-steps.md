@@ -436,7 +436,8 @@ it cannot do, stop and propose an app change for approval first):
   drops one declaration; a missing `)` in a gradient stops every later rule.
 - Checked for Resume Week 6 (2026-11-09; `docs/course-format.md`, "Box model, lists and links"): padding, borders, margins,
   `box-sizing`, list markers and link colours read the same computed values in CodeShare's page window and the teacher's
-  checker, in px; a side's border through its longhands (`border` reads `""` when sides differ). `width` reads the set value
+  checker, in px, except border widths: the page window follows the app's text-size zoom (1.15 at first), so a 2px border
+  reads 1.73913px in CodeShare (CKB-097, open): check a border's style and colour, never its width. `width` reads the set value
   with or without `border-box`, so check `box-sizing`. `%` widths and `auto` margins follow the window (the page window is
   not 1000 px wide): never page-check them. A list nav shows one link per line until `display: inline`/`inline-block`;
   `li` tags with no space between them run the words together. Link states (`:visited`, `:hover`, `:focus`, `:active`)
