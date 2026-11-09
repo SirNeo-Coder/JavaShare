@@ -5,7 +5,7 @@ notes"). Another coding assistant must be able to continue from this file alone.
 `AGENTS.md` first; its "Web module steps (agreed 2026-10-28)" rule is the short version of the
 decisions below.
 
-Last updated: 2026-11-09 (Week 6).
+Last updated: 2026-11-10 (Week 7).
 
 ## Goal
 
@@ -32,7 +32,7 @@ into three slices, then the teacher's own revision of the module files.
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
 | Page window stays until a completed task is synced (CKB-087, review finding on PR #76) | **Built** 2026-10-30, PR open; unit 411/411, web browser tests pass offline (3042); Cloudflare runtime not run | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77), branch `fix/page-window-close-during-sync`, commit `cf54e6f` |
-| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). PR #83 merged. **Week 2 built** 2026-11-06 (`Resume/Week_02/`, module `dotnet-1-r02`, 9 media steps): teacher's checkers pass; browser test 18/18 steps "sample verified, task completed" on Cloudflare's runtime (8787, Week 2 media uploaded); offline settings (3042) Week 1 completed, Week 2 media steps marked done. Found CKB-092 (worked around). PR #84 merged. **Week 3 built** 2026-11-08 (`Resume/Week_03/`, module `dotnet-1-r03`, three pages, media on Steps 1 and 9 only): teacher's checkers pass; browser test 27/27 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–3 media uploaded); offline settings (3042) Week 3 Steps 2–8 completed, Steps 1 and 9 marked done. Found CKB-093 (worked around). **Week 4 built** 2026-11-08 (`Resume/Week_04/`, module `dotnet-1-r04`, shared `styles.css`, media on Steps 1, 3 and 9 only): teacher's checkers pass (`test_checker.py` 20/20); browser test 36/36 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–4 media uploaded); offline settings (3042) Week 4 Steps 2 and 4–8 completed, Steps 1, 3 and 9 marked done; new Week 4 personal subtest passes on both. Found CKB-094 (worked around). **Week 5 built** 2026-11-09 (`Resume/Week_05/`, module `dotnet-1-r05`, only styles.css changes, media on Steps 1, 6 and 9 only, both Thursday repairs change the page text): teacher's checkers pass (`test_checker.py` 21/21); browser test 45/45 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–5 media uploaded); offline settings (3042) Week 5 Steps 2–5, 7, 8 completed, Steps 1, 6, 9 marked done; new Week 5 personal subtest passes on both; found CKB-096 (stale browser-test locator, fixed). **Week 6 built** 2026-11-09 (`Resume/Week_06/`, module `dotnet-1-r06`, Juan's nav becomes a list on all three pages, media on Steps 1, 5 and 9 only): teacher's checkers pass (`test_checker.py` 27/27); browser test 54/54 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–6 media uploaded); offline settings (3042) Week 6 Steps 2–4, 6–8 completed, Steps 1, 5, 9 marked done; new Week 6 personal subtest passes on both; found CKB-097 (border widths follow the page window's zoom; worked around). Weeks 7–10 not started | teacher's `Resume/Week_0N/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83) (merged); [PR #84](https://github.com/SirNeo-Coder/JavaShare/pull/84) (merged); [PR #86](https://github.com/SirNeo-Coder/JavaShare/pull/86), branch `docs/net-resume-week-03`; [PR #87](https://github.com/SirNeo-Coder/JavaShare/pull/87) (merged); [PR #88](https://github.com/SirNeo-Coder/JavaShare/pull/88) (merged); [PR #89](https://github.com/SirNeo-Coder/JavaShare/pull/89), branch `docs/net-resume-week-06` |
+| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). PR #83 merged. **Week 2 built** 2026-11-06 (`Resume/Week_02/`, module `dotnet-1-r02`, 9 media steps): teacher's checkers pass; browser test 18/18 steps "sample verified, task completed" on Cloudflare's runtime (8787, Week 2 media uploaded); offline settings (3042) Week 1 completed, Week 2 media steps marked done. Found CKB-092 (worked around). PR #84 merged. **Week 3 built** 2026-11-08 (`Resume/Week_03/`, module `dotnet-1-r03`, three pages, media on Steps 1 and 9 only): teacher's checkers pass; browser test 27/27 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–3 media uploaded); offline settings (3042) Week 3 Steps 2–8 completed, Steps 1 and 9 marked done. Found CKB-093 (worked around). **Week 4 built** 2026-11-08 (`Resume/Week_04/`, module `dotnet-1-r04`, shared `styles.css`, media on Steps 1, 3 and 9 only): teacher's checkers pass (`test_checker.py` 20/20); browser test 36/36 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–4 media uploaded); offline settings (3042) Week 4 Steps 2 and 4–8 completed, Steps 1, 3 and 9 marked done; new Week 4 personal subtest passes on both. Found CKB-094 (worked around). **Week 5 built** 2026-11-09 (`Resume/Week_05/`, module `dotnet-1-r05`, only styles.css changes, media on Steps 1, 6 and 9 only, both Thursday repairs change the page text): teacher's checkers pass (`test_checker.py` 21/21); browser test 45/45 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–5 media uploaded); offline settings (3042) Week 5 Steps 2–5, 7, 8 completed, Steps 1, 6, 9 marked done; new Week 5 personal subtest passes on both; found CKB-096 (stale browser-test locator, fixed). **Week 6 built** 2026-11-09 (`Resume/Week_06/`, module `dotnet-1-r06`, Juan's nav becomes a list on all three pages, media on Steps 1, 5 and 9 only): teacher's checkers pass (`test_checker.py` 27/27); browser test 54/54 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–6 media uploaded); offline settings (3042) Week 6 Steps 2–4, 6–8 completed, Steps 1, 5, 9 marked done; new Week 6 personal subtest passes on both; found CKB-097 (border widths follow the page window's zoom; worked around). **Week 7 built** 2026-11-10 (`Resume/Week_07/`, module `dotnet-1-r07`, Juan's gallery and Week 2 media on index.html, media on Steps 2, 4, 5, 6 and 9): teacher's checkers pass (`test_checker.py` 23/23); browser test 63/63 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–7 media uploaded); offline settings (3042) Week 7 Steps 1, 3, 7, 8 completed, Steps 2, 4, 5, 6, 9 marked done; new Week 7 personal subtest passes on both; no new CodeShare bug; [PR #92](https://github.com/SirNeo-Coder/JavaShare/pull/92), branch `docs/net-resume-week-07`. Weeks 8–10 not started | teacher's `Resume/Week_0N/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83) (merged); [PR #84](https://github.com/SirNeo-Coder/JavaShare/pull/84) (merged); [PR #86](https://github.com/SirNeo-Coder/JavaShare/pull/86), branch `docs/net-resume-week-03`; [PR #87](https://github.com/SirNeo-Coder/JavaShare/pull/87) (merged); [PR #88](https://github.com/SirNeo-Coder/JavaShare/pull/88) (merged); [PR #89](https://github.com/SirNeo-Coder/JavaShare/pull/89), branch `docs/net-resume-week-06` |
 | Page window stays until a completed task is synced (CKB-087) | **Merged** 2026-10-30 | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77) |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -442,6 +442,13 @@ it cannot do, stop and propose an app change for approval first):
   not 1000 px wide): never page-check them. A list nav shows one link per line until `display: inline`/`inline-block`;
   `li` tags with no space between them run the words together. Link states (`:visited`, `:hover`, `:focus`, `:active`)
   are never page-checked (`:visited` is hidden, a check has no mouse, and `a:hover` makes the teacher's checker wait 30 s).
+- Checked for Resume Week 7 (2026-11-10; `docs/course-format.md`, "Position, z-index, float and galleries"): position, px offsets,
+  z-index, float and clear read the same computed values in CodeShare's zoomed page window and the teacher's checker; offsets and
+  z-index read as written even on a static box. `position: absolute`, `fixed` and `float` put a box's words on their own line in the
+  page text; `relative` and `sticky` do not. Unset sides, `fixed` offsets and `sticky` places follow the window: never page-check
+  them. `figcaption` is page text, `alt` is not; `inline-block` figures leave a line holding only a space, so galleries float. In
+  today's Chromium a missing `}` nests the later rules inside the broken one. `position: sticky` works in the page window (it scrolls
+  inside its frame); a later positioned box slides over a sticky nav without a `z-index`.
 
 **Each week, in order:**
 
@@ -455,8 +462,8 @@ it cannot do, stop and propose an app change for approval first):
 5. JSON last. Check it with the teacher's `check_codeshare.py --run --media-root project_end` and
    `check_web_steps.cjs`, then with CodeShare's `tests/web-module-steps.browser.mjs` on Cloudflare's
    runtime (8787) and offline settings (3042), one line per step. It reads every built `Resume/Week_NN/` week; its media
-   subtest uploads each built week's media before the student walk; personal-project subtests cover Weeks 2, 3,
-   4, 5 and 6 (2026-11-09). A new week's own subtest is a test change that needs approval.
+   subtest uploads each built week's media before the student walk; personal-project subtests cover Weeks 2–7
+   (2026-11-10). A new week's own subtest is a test change that needs approval.
 6. Write `Verification.md`; update `DotNet1_Handover.md`, the root `project/`, this handoff;
    commit and push the repository docs on a new branch with a PR.
 7. Teacher: upload the JSON under **Curriculum** (same ids keep student progress); for a media
@@ -576,10 +583,11 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Weeks 1–6 of the resume course are built** (Weeks 1–2 2026-11-06; Weeks 3–4 2026-11-08; Weeks 5–6 2026-11-09). Teacher: print
-   them; in CodeShare **Curriculum** remove the old Weeks 1–3 (`dotnet-1-w01`…`w03`) the first time, upload `Resume/Week_01/…` to
-   `Resume/Week_06/DotNet1_Week_06.codeshare.json`, then for Weeks 2, 3, 4, 5 and 6 → **View module details →
-   Media files** → add the three files in that week's `project_end/` (`images/`, `audio/`, `video/`; each module keeps its own copy).
+1. **Weeks 1–7 of the resume course are built** (Weeks 1–2 2026-11-06; Weeks 3–4 2026-11-08; Weeks 5–6 2026-11-09; Week 7 2026-11-10).
+   Teacher: print them; in CodeShare **Curriculum** remove the old Weeks 1–3 (`dotnet-1-w01`…`w03`) the first time, upload
+   `Resume/Week_01/…` to `Resume/Week_07/DotNet1_Week_07.codeshare.json`, then for Weeks 2–6 → **View module details → Media files** →
+   add the three files in that week's `project_end/` (`images/`, `audio/`, `video/`; each module keeps its own copy), and for Week 7 the
+   seven files in `Week_07/project_end/` (Juan's picture, sound, video and four gallery pictures).
 2. **CKB-092 app fix (needs approval)**: page checks read `data-codeshare-src` for `src` on embedded media, so a `src` check
    works online too. Until then, weeks avoid `src` page checks on uploaded files.
 3. **CKB-093 app fix (needs approval)**: rewrite iframes only where the browser sees a real iframe. Until then, samples keep
@@ -590,8 +598,8 @@ built `main` (see `docs/cloudflare-setup.md`):
    condition. Until then, pages and stylesheets stay in the top folder and no link line has `media`.
 3c. **CKB-097 app fix (needs approval, teacher chooses)**: draw the page window at 100% whatever the text size, or compare border
    widths with a tolerance. Until then, weeks never page-check a border width.
-4. **Week 7**: the teacher pastes the "Rolling weekly prompt" (below, now Week 7) into a new chat.
-5. Then **Weeks 8–10**, one week per chat.
+4. **Week 8**: the teacher pastes the "Rolling weekly prompt" (below, now Week 8) into a new chat.
+5. Then **Weeks 9–10**, one week per chat.
    Weeks 9–10 are built as planned; the teacher checks them in CodeShare when reached.
 6. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
 7. **Offline web steps/media** stays a separate task (needed before media weeks are taught offline).
@@ -600,15 +608,15 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 The teacher pastes this into a new chat for the next week. Each week's chat replaces it with the next week's
 prompt as its last step (teacher, 2026-10-29). Rewritten for the 10-week resume map and approved by the
-teacher on 2026-10-30. Current: **Week 7** (written by the Week 6 chat, 2026-11-09).
+teacher on 2026-10-30. Current: **Week 8** (written by the Week 7 chat, 2026-11-10).
 
 ```text
 Use caveman mode and ponytail (minimal, laziest working solution) for this whole chat.
 
 You are working in the CodeShare repository (formerly JavaShare) at /home/ireneo/Documents/GitHub/JavaShare.
 
-Task: build .NET 1 Week 7, "Position, z-index, float and an image gallery" (DLL, printed module, CodeShare JSON), in my
-folder /home/ireneo/Documents/Java 2026/Net Files/Resume/Week_07/. Only this week.
+Task: build .NET 1 Week 8, "Pseudo-classes and pseudo-elements" (DLL, printed module, CodeShare JSON), in my
+folder /home/ireneo/Documents/Java 2026/Net Files/Resume/Week_08/. Only this week.
 
 Before anything:
 1. Read AGENTS.md and follow it exactly (knowledge-first workflow, approval before changes, plain English,
@@ -617,16 +625,17 @@ Before anything:
 2. Read docs/handoffs/web-module-steps.md in full. Follow "Net MVC weekly modules: required format and
    workflow". Its teacher decisions are approved; do not ask about them again. The old canteen weeks (folder
    root, Week_02/, Week_03/, Week_04/) are retired: use them as format examples only, never their content.
-3. Read in my folder: DotNet1_Course_Map.md (Week 07 section, "Running project and performance task",
+3. Read in my folder: DotNet1_Course_Map.md (Week 08 section, "Running project and performance task",
    "Delivery inside CodeShare"), DotNet1_Handover.md, ILAW_DLL_and_Module_Playbook.md (sections 1, 2.1, 3, 4,
-   7, 8; its Java content does not apply), Resume/Week_06/Verification.md (format only), and revision_tools/ (reuse
-   resume_w01/build.py (it builds any Resume week: build.py r07; a step may list several files and name its run page;
+   7, 8; its Java content does not apply), Resume/Week_07/Verification.md (format only), and revision_tools/ (reuse
+   resume_w01/build.py (it builds any Resume week: build.py r08; a step may list several files and name its run page;
    an output a style leaves unchanged prints as "the same as Step N's output"; STANDARDS in content.py fills the DLL's
-   guide Quarter 2 standards; SAME_NOTE sets the "same as" wording), resume_w06/content.py as the template for resume_w07/
-   (it also computes contrast for text and borders), resume_w02/make_media.py (how Juan's media were made), build_tasks.py
-   (always run it with the week key: build_tasks.py r07; without a key it rebuilds every week, including the retired weeks;
-   a task page may hold no task boxes, as Weeks 5–6's page 12; Week 6 prints the chart and starter stylesheet in two
-   columns), tasks.py, consistency.py, render_r01.sh (WEEK=07), run_checks.sh and the Resume/Week_06 checkers; extend them
+   guide Quarter 2 standards; SAME_NOTE sets the "same as" wording), resume_w07/content.py as the template for resume_w08/
+   (it also computes contrast for text and borders), resume_w02/make_media.py and resume_w07/make_gallery.py (how Juan's media and
+   gallery pictures were made), build_tasks.py (always run it with the week key: build_tasks.py r08; without a key it rebuilds every
+   week, including the retired weeks; a task page may hold no task boxes; Week 7 needed five task pages, p9–p13, and a smaller
+   output font (body class r7) because five long index.html outputs did not fit; the chart and starter stylesheet print in two
+   columns), tasks.py, consistency.py, render_r01.sh (WEEK=08), run_checks.sh and the Resume/Week_07 checkers; extend them
    instead of writing new ones).
 4. Another session may be working in the main repository folder with uncommitted changes. Never commit, stash,
    discard or build on them. Use a separate git worktree from origin/main for any repository change. Pick free
@@ -637,38 +646,39 @@ Before anything:
 
 Week rules (check each against the real files first):
 - Resume theme: module samples build the resume of Juan Dela Cruz, a made-up student (every detail
-  invented). The personal performance task is the student's own resume; Week 7 adds a gallery of projects, certificates
-  or activities (their own pictures online, or teacher-supplied pictures) and one positioned element. No home address,
+  invented). The personal performance task is the student's own resume; Week 8 adds hover and focus states and at least one
+  pseudo-element. No home address,
   phone number, birth date, ID numbers or personal social-media accounts; no other people in any picture.
 - Everything happens inside CodeShare (CKB-085): never tell students to use VS Code, Chrome, Ctrl+O,
   File > Open Folder, local folders or folder copies. Before handing over, search the DLL, module and JSON for
   "VS Code", "Visual Studio", "Chrome", "Ctrl+O" and "folder", and fix every hit.
 - Pictures, sound and video for Juan are made-up files created on this laptop (drawn SVG, generated sound and
-  video); never a real person's photo, never downloaded. Week 2's are in Resume/Week_02/project_end/ (Weeks 3–6 reused
-  them). Juan's gallery pictures (his made-up projects and certificates) are new drawn SVGs made on this laptop.
-- Week_07/project_start/ = Week_06/project_end/; Resume/project/ matches Week_07/project_end/ at the end.
-- JSON: "sampleFirst": true, "previousModuleId": "dotnet-1-r06". IDs: course dotnet-1, module dotnet-1-r07,
-  lessons dotnet-1-r07-dD, steps dotnet-1-r07-dD-sS (S counts across the week), slips dotnet-1-r07-dD-slip,
-  task dotnet-1-r07-pt. Every step has one meaningful task (activity id "<step id>-alter-v1", instruction,
+  video); never a real person's photo, never downloaded. Week 2's are in Resume/Week_02/project_end/ (Weeks 3–7 reused
+  them); Juan's four gallery pictures (Week 7, index.html) are in Resume/Week_07/project_end/images/.
+- Week_08/project_start/ = Week_07/project_end/; Resume/project/ matches Week_08/project_end/ at the end.
+- JSON: "sampleFirst": true, "previousModuleId": "dotnet-1-r07". IDs: course dotnet-1, module dotnet-1-r08,
+  lessons dotnet-1-r08-dD, steps dotnet-1-r08-dD-sS (S counts across the week), slips dotnet-1-r08-dD-slip,
+  task dotnet-1-r08-pt. Every step has one meaningful task (activity id "<step id>-alter-v1", instruction,
   "files": [], complete expectedOutput) that changes the visible page text or console lines. Answers in
-  Week_07/solutions/<step id>/, never in the JSON. Every expected output from a real run. A task never repairs
+  Week_08/solutions/<step id>/, never in the JSON. Every expected output from a real run. A task never repairs
   a file listed in its step's mediaChecks (CKB-084).
 - Juan's site has three pages and one stylesheet (index.html, projects.html, contact.html, styles.css; projects.html
   shows contact.html in an iframe; the contact form sends nowhere; since Week 6 the nav on every page is a ul of links,
-  each li on its own line). Each step lists its run page and every file that
+  each li on its own line; since Week 7 the nav is sticky with z-index 2, projects.html's h1 holds an absolute ribbon, and
+  index.html has Juan's floated picture and a floated gallery of four captioned pictures, one with a positioned tag). Each step lists its run page and every file that
   page needs (its linked styles.css, a framed page), even when unchanged, plus any file it adds or changes, and names its
   run page ("run"); checks read the run page only (teacher, 2026-11-06 and 2026-11-08; CodeRabbit on PR #86). The
   printed module still shows only new or changed lines. Every attribute value is in quotes: CodeShare does not apply a
   stylesheet whose href has no quotes (CKB-094). Keep every page and styles.css in the project's top folder and put no
   media attribute on a link line: CodeShare finds a stylesheet from the top folder and drops its media condition
   (CKB-095).
-- Printed module: 8 lesson pages, then task pages after page 8 built with revision_tools/build_tasks.py r07.
+- Printed module: 8 lesson pages, then task pages after page 8 built with revision_tools/build_tasks.py r08.
   Printed module and JSON identical in code and outputs (revision_tools/consistency.py checks it). Once a file is
   long, print it whole once and only the new or changed lines for later steps, each block labelled with the file and
-  where it goes (as in Weeks 1–6). When the outputs no longer fit (teacher, 2026-11-06, as in Weeks 2–6), the lesson
+  where it goes (as in Weeks 1–7). When the outputs no longer fit (teacher, 2026-11-06, as in Weeks 2–7), the lesson
   pages print only the output lines a step changes, with their line numbers (OUTPUT_BASE in content.py), and the task
   pages keep every complete task output. A tab between table cells prints as → (the JSON keeps the tab).
-- DLL: Resume/Week_06's DLL is the format template (no Week 6 text left): five opened references per day, a
+- DLL: Resume/Week_07's DLL is the format template (no Week 7 text left): five opened references per day, a
   "Sample, then your task:" line in each Student Activity, no red ADJUST THIS line, the guide Quarter 2 standards.
 - Friday is performance task day (teacher, 2026-11-06): at most one Friday step, Juan's finished page for the
   presentation, no new HTML or CSS.
@@ -680,46 +690,45 @@ Week rules (check each against the real files first):
 - Never change an ID that is already used. Never reuse the old dotnet-1-w01…w03 IDs.
 
 This week's checks:
-- Media: ask me first whether the step samples keep Week 2's pictures, sound and video (then every step that runs
-  index.html is a media step: expectedOutput ends with "Media checks:", "includeMediaOutput": true, the media files go
-  in Week_07/project_end and I add them under View module details → Media files; offline I press Mark done) or leave
-  them out (then the steps are checked automatically online and offline). Weeks 4–6 kept them and ran index.html on only
-  three steps each. Juan's gallery pictures are media too: ask me which page shows the gallery, because every step that
-  runs that page becomes a media step. Put src on img, audio and video themselves (a video naming its file only in source
-  reports null), and never page-check (webChecks) the src of an uploaded file (online it becomes data:, CKB-092) or of an
-  iframe (CodeShare shows it through srcdoc, CKB-086).
-- Real runs in the real page window (Week 6, keep): CodeShare draws the page window inside its text-size zoom (1.15 at
+- Media: ask me first whether the step samples keep Week 2's pictures, sound and video and Juan's Week 7 gallery (all on
+  index.html; then every step that runs index.html is a media step: expectedOutput ends with "Media checks:",
+  "includeMediaOutput": true, the media files go in Week_08/project_end and I add them under View module details → Media
+  files; offline I press Mark done) or leave them out (then the steps are checked automatically online and offline). Weeks
+  4–7 kept them; Week 7 ran index.html on five steps. Put src on img, audio and video themselves, and never page-check
+  (webChecks) the src of an uploaded file (online it becomes data:, CKB-092) or of an iframe (srcdoc, CKB-086).
+- Real runs in the real page window (Weeks 6–7, keep): CodeShare draws the page window inside its text-size zoom (1.15 at
   first, 1 to 1.45) and it is not my checker's 1000 × 900 window, so check every computed value both in my checker and in
   CodeShare's buildTeacherPreview inside a body with zoom 1.15 in a frame about 800 px wide, before using it. Never
-  page-check a border width (2px reads 1.74px there, CKB-097), a % width, an auto margin or anything else that follows the
-  window. Inside the zoomed page window Playwright clicks land in the wrong place; tests use dispatchEvent("click").
-- Position and z-index: position (static, relative, absolute, fixed, sticky), top/left/right/bottom and z-index are not
-  page text. Check with real runs what a page check reads: whether top and left come back as written or as the used px
-  value, how z-index reads on a static element (auto), and whether an absolutely positioned element moves its words to
-  their own line in the page text (positioned elements become blocks). fixed and sticky depend on the window and on
-  scrolling: never page-check their offsets.
-- Float: float and clear are not page text, but a floated element becomes a block. Check with real runs how its words
-  come out in the page text (their own line, or the same line) and how a float beside a paragraph changes it. A float
-  wraps differently in the narrower page window: never page-check a value that depends on the window.
-- Image gallery: captions (figcaption or a caption div) are page text; alt is not. A gallery of uploaded pictures makes
-  its steps media steps (each picture gets a Media checks line naming its src). Use px widths for the pictures, and
-  float or inline-block for the layout (flex is Week 9). :hover effects on the gallery are never page-checked.
-- Box model, lists and links (Week 6, keep): sizes read in px; check a border by its style and colour; link states
-  (:visited, :hover, :focus, :active) are never page-checked (a style check on a:hover makes my checker wait 30 s);
-  li tags each on their own line.
+  page-check a border width (CKB-097), a % width, an auto margin, a side that is not set, a fixed offset or a sticky place.
+  Inside the zoomed page window Playwright clicks land in the wrong place; tests use dispatchEvent("click").
+- Pseudo-classes: user-action and link states (:hover, :focus, :focus-visible, :active, :visited) are never page-checked:
+  a check has no mouse or keyboard, :visited is hidden, and a style check whose selector matches nothing makes my checker
+  wait 30 s. Structural pseudo-classes (:first-child, :last-child, :nth-child(), :not()) and form states (:required,
+  :invalid, :placeholder-shown, :checked) match real elements: check with real runs which ones a page check can read in
+  both checkers (count and computed style, on Juan's lists and contact form), and make every check selector match at least
+  one element. A hover or focus style is not page text, so a task that only adds one cannot be checked: every task must
+  change the page text.
+- Pseudo-elements: a page check cannot select ::before, ::after, ::first-letter or ::first-line, and my checker reads only
+  an element's own computed style. Check with real runs, in both checkers and in the page window, whether content from
+  ::before/::after appears in the page text, and whether text-transform on ::first-letter or ::first-line changes it. Never
+  put url() in content (nothing loads in the page window).
+- Position, float and gallery (Week 7, keep): absolute, fixed and floated boxes put their words on their own line in the page
+  text; relative and sticky do not; offsets and z-index read as written in px, even on a static box; captions are page
+  text, alt is not; a missing } nests the later rules inside the broken one in today's Chromium.
+- Box model, lists and links (Week 6, keep): sizes read in px; check a border by its style and colour; li tags each on
+  their own line.
 - Text, font and colour (Week 5, keep): sizes read in px, colours as rgb(), font lists with double quotes, gradients
   through background-image; text at opacity 0 or in a transparent colour stays in the page text.
 - External stylesheet (checked in Week 4, keep): CodeShare inlines the link line into a style element, so never
   page-check link or style elements; a wrong or missing stylesheet leaves the page plain with no error.
-- Thursday repairs (fixing overlapping and floating problems): check with real runs how the hardest mistakes (a missing
-  position on the parent of an absolute element, a z-index on a static element, a missing clear, a missing ; or } in a
-  position or float rule) come out in both checkers before choosing them; an invalid value drops the whole declaration.
-  Each repair must change the page text (rule above). A missing quote before an iframe gives different page text in
-  CodeShare (CKB-093): no broken quote before an iframe in any sample.
-- Personal project: a gallery of their own projects, certificates or activities (their own pictures online under Media
-  files, 5 MB each, at most 10, safe names, no other people; teacher-supplied pictures for students without) with
-  captions, and one positioned element, all in their own styles.css. Offline the personal project has no media: check
-  what a run of a gallery without its pictures shows offline before writing the offline instructions.
+- Thursday repairs (the hardest selector combinations): check with real runs how the hardest mistakes (a misspelt
+  pseudo-class such as :frist-child, one invalid selector in a comma list, a space before a pseudo-class (a :hover), one colon
+  before an element name such as :before, a missing quote in content) come out in both checkers; an invalid selector drops
+  the whole rule. Each repair must change the page text (rule above). A missing quote before an iframe gives different page
+  text in CodeShare (CKB-093): no broken quote before an iframe in any sample.
+- Personal project: hover and focus states (focus as easy to see as hover; colours from the chart, 4.5:1) and at least
+  one pseudo-element, all in their own styles.css. Check what a pseudo-element shows in a personal run online and offline
+  before writing the instructions.
 
 First, ask me only the questions whose answers change the files, each with your recommendation first, marked
 "(Recommended)". Then show me the day plan, every step with its task (one line each: step, change, why it
@@ -727,32 +736,34 @@ exercises the lesson) and the AGENTS.md proposal (findings, files likely to chan
 choices), and stop for my approval.
 
 Testing (after approval):
-- My checkers in Week_07 (check_codeshare.py <json> --run --media-root project_end, check_web_steps.cjs,
+- My checkers in Week_08 (check_codeshare.py <json> --run --media-root project_end, check_web_steps.cjs,
   test_checker.py) on the samples and every solutions/ answer; each unchanged sample must fail its task output.
-  Add Week 7 to revision_tools/run_checks.sh.
+  Add Week 8 to revision_tools/run_checks.sh.
 - Render and inspect every DLL page and every module page (8.5 × 13 in = 612 × 936 pt; each source page renders
   to exactly one page).
 - CodeShare: tests/web-module-steps.browser.mjs reads every built Resume week; its media subtest uploads the media of
   every built week with media steps before the student walk, so on Cloudflare's runtime every media step is checked
-  automatically, never marked done. Its personal-project subtests cover Weeks 2–6; propose a Week 7 one (online, the
-  student adds gallery pictures under Media files, a gallery with captions and one positioned element in styles.css,
-  runs, and the test reads the captions, the media lines and the computed position) if it is worth it (needs my approval). Then run it on Cloudflare's runtime on this laptop (npx
+  automatically, never marked done. Its personal-project subtests cover Weeks 2–7; propose a Week 8 one (online, the
+  student adds hover and focus states and a pseudo-element to styles.css, runs, and the test reads the page text, the
+  computed styles of a structural pseudo-class and, through getComputedStyle(element, "::before") in the page window, the
+  pseudo-element; personal runs show no Media checks lines, so pictures are read from the page) if it is worth it (needs my
+  approval). Then run it on Cloudflare's runtime on this laptop (npx
   opennextjs-cloudflare build, then preview on port 8787 with the git-ignored .dev.vars pointing at local Supabase) and
   on the offline-settings server (port 3042, where media steps are marked done because offline has no media), following
   the handoff's "Testing recipe". Report one line per step: sample verified, task completed (offline media steps:
   teacher-checked, marked done).
 - Report tests as AGENTS.md "Reporting tests after a build" requires, including what could not be verified.
 
-While working: keep docs/handoffs/web-module-steps.md, Week_07/Verification.md and DotNet1_Handover.md updated
+While working: keep docs/handoffs/web-module-steps.md, Week_08/Verification.md and DotNet1_Handover.md updated
 after every finished step, add a dated line to the handoff's "Update log", and commit and push the repository docs
 each time. If you find a bug, give it a CKB record; check problem-index.md and open PRs for the next free number
 first.
 
 Last step (rolling prompt): in docs/handoffs/web-module-steps.md, section "Rolling weekly prompt", replace this
-prompt with the one for Week 8. Change every week number (Week 7 → 8, Week_07 → Week_08, dotnet-1-r07 →
-dotnet-1-r08, Week 07 section → Week 08 section); set "previousModuleId": "dotnet-1-r07" and
-"Week_08/project_start/ = Week_07/project_end/"; replace the week's topic, the personal-task addition and the
-upload steps with Week 8's from the course map's Week 08 section; write "This week's checks" for Week 8 from the
+prompt with the one for Week 9. Change every week number (Week 8 → 9, Week_08 → Week_09, dotnet-1-r08 →
+dotnet-1-r09, Week 08 section → Week 09 section); set "previousModuleId": "dotnet-1-r08" and
+"Week_09/project_start/ = Week_08/project_end/"; replace the week's topic, the personal-task addition and the
+upload steps with Week 9's from the course map's Week 09 section; write "This week's checks" for Week 9 from the
 course map and the handoff's preview limits; add any rule I approved this week; keep everything else. The prompt keeps
 asking whether the step samples keep Week 2's pictures, sound and video (then every step that runs index.html is a
 media step and offline I press Mark done) or leave them out. Commit and push it, and paste it at the end of your
@@ -760,8 +771,8 @@ final reply. The Week 10 chat writes no new prompt; it says the course is comple
 
 When done, tell me in plain English: what each day covers, the print instructions (pages 1–6 double-sided, flip
 on long edge; pages 7–8 single-sided; task pages double-sided, flip on long edge), the upload steps (Curriculum →
-upload Week 7; View module details → Media files → add Juan's media and gallery pictures from Week_07/project_end), anything
-I must check, and a Sources list of every reference as clickable links. Then the Week 8 prompt.
+upload Week 8; View module details → Media files → add Juan's media and gallery pictures from Week_08/project_end), anything
+I must check, and a Sources list of every reference as clickable links. Then the Week 9 prompt.
 ```
 
 ## Update log
@@ -1052,3 +1063,21 @@ I must check, and a Sources list of every reference as clickable links. Then the
   previousModuleId `dotnet-1-r06`, Week 6's tools and DLL as templates, the media question plus Juan's made-up gallery pictures,
   position/z-index/float/gallery checks with real runs in the zoomed page window, CKB-097, optional Week 7 personal subtest.
 - 2026-11-09 — Delivered as [PR #89](https://github.com/SirNeo-Coder/JavaShare/pull/89) against main; CodeRabbit review not in yet when opened. PR #88's CodeRabbit review: one finding, already fixed on #88.
+- 2026-11-10 — CodeRabbit on PR #89 (merged, checked at the start of Week 7): two Minor findings, both valid. (1) The Week 6
+  prompt-map row said box values agree "except border widths"; % widths and auto margins also follow the window: row reworded.
+  (2) Pages opened through a link in the page window are built without media lines (`app/WebStepRun.tsx`, `openLink`), and
+  personal runs never show them (`include: false`): the Week 7 gallery sits on the run page, and the Week 7 personal subtest reads
+  each picture from the page instead. No app change.
+- 2026-11-10 — Resume Week 7 (Position, z-index, float and an image gallery) approved with the four recommended choices: Juan's
+  gallery on index.html with Week 2's media (Steps 2, 4, 5, 6, 9 are media steps; Steps 1, 3, 7, 8 run projects.html), three drawn
+  teacher gallery pictures, a Week 7 personal subtest. Found with real runs (teacher's checker and CodeShare's `buildTeacherPreview` at
+  zoom 1.15 in an 800 px frame, the same in both): see "What the page preview can and cannot do". Built in the teacher's
+  `Resume/Week_07/` (DLL 7 pages; module 13 pages, task pages 9–13; `build_tasks.py r07`; Weeks 1–6 rebuild identical apart from an
+  unused `.r7` rule in their `tasks.css`, then restored). Teacher's checkers: samples 9/9, answers 9/9, unchanged samples fail 9/9,
+  `test_checker.py` 23/23 (guard and answer break-and-restore shown), printed = JSON. Browser test: Cloudflare's runtime (8787) 13 pass,
+  5 skipped, 0 fail, 63/63 steps "sample verified, task completed"; offline settings (3042) 12 pass, 6 skipped, 0 fail (Week 7 Steps 2,
+  4, 5, 6, 9 marked done); the Week 7 personal subtest passes on both (offline the pictures are not found, the run still succeeds).
+  Proofs on 3042: a Step 7 answer still missing its `;` stopped the walk; a personal stylesheet without `position: absolute` failed
+  the subtest. web-sample-first 6/6 (8787). `npm test` 422/422, lint 0 errors, build OK. No new CodeShare bug. Rolling prompt now Week 8.
+  Branch `docs/net-resume-week-07`.
+- 2026-11-10 — Delivered as [PR #92](https://github.com/SirNeo-Coder/JavaShare/pull/92) against main; CodeRabbit review not in yet when opened.

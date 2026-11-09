@@ -813,6 +813,96 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
+    await t.test("Week 7 personal project: the Week 6 site carries forward; online the student adds three teacher gallery pictures under Media files; a floated gallery with captions and an absolutely positioned ribbon in styles.css; Run shows the captions and ribbon on their own lines, the computed position and float, and each picture drawn (offline: not found, and the run still succeeds); Submit freezes them; the teacher's review shows the same", { skip: needs(7) }, async () => {
+      const week7 = weeks[6], steps7 = stepsOf(week7);
+      const withMedia = await mediaStorage(student.request, `/api/classrooms/${classroomId}/modules/${week7.id}/media`);
+      const pictures = ["images/gallery_project.svg", "images/gallery_certificate.svg", "images/gallery_activity.svg"]; // the teacher's pictures for students with none
+      // The module steps are checked elsewhere; mark them done so the personal task opens.
+      const states = (await progress(week7)).stepStates;
+      assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps7.map((step) => [activityStateId(step), "pass"])) } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week7.id)).error, null);
+      const textarea = page.locator(".student-module-project .editor-card textarea");
+      const fileTab = (path) => page.locator(".student-module-project .file-tabs").getByRole("button", { name: path, exact: true });
+      const write = async (path, content) => {
+        await fileTab(path).dispatchEvent("click");
+        await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
+        await textarea.fill(content);
+      };
+      // What the page window shows, read from the page itself: the page text lines of the h1 and the gallery, the computed position,
+      // offsets, z-index and float (offsets only as set in px; none follows the window), and each gallery picture: whether it came
+      // with the page (data:) and whether it draws. Personal runs show no Media checks lines (CodeRabbit on PR #89), so the page is read.
+      const captions = ["My science project", "My certificate", "Our club activity"];
+      const looks = async (where) => {
+        const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+        await inside.waitForFunction(() => document.readyState === "complete" && [...document.querySelectorAll("img")].every((img) => img.complete));
+        return inside.evaluate((captions) => {
+          const at = (selector) => getComputedStyle(document.querySelector(selector));
+          const ribbon = at(".ribbon"), h1 = at("h1"), figure = at(".gallery figure");
+          const lines = document.body.innerText.split("\n").filter((line) => captions.includes(line));
+          return [document.querySelector("h1").innerText.split("\n").slice(1), lines, ribbon.position, ribbon.top, ribbon.right, ribbon.zIndex, h1.position, figure.float, figure.width, figure.position,
+            ...[...document.querySelectorAll(".gallery img")].map((img) => `${img.getAttribute("data-codeshare-src") ?? img.getAttribute("src")}: ${img.src.startsWith("data:") ? "from the page" : "not found"}, ${img.naturalWidth > 0 ? "drawn" : "broken"}`)];
+        }, captions);
+      };
+      const week6Own = (await progress(weeks[5])).performanceTask.own;
+      const carried = Object.fromEntries(week6Own.files.map((file) => [file.path, file.content]));
+      await openCatalog(week7);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      // Linked weeks carry the Week 6 submission forward: its pages and styles.css.
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried["index.html"]);
+      assert.deepEqual((await page.locator(".student-module-project .file-tabs .file-tab").allTextContents()).sort(), Object.keys(carried).sort());
+      const box = page.locator(".student-module-project").getByRole("region", { name: "Media files" });
+      if (withMedia) for (const picture of pictures) {
+        await box.getByLabel("Add media files").setInputFiles(join(folder, "Week_07", "teacher_pictures", picture.slice("images/".length)));
+        await box.getByText(picture).waitFor();
+      }
+      const gallery = '  <h2>My gallery</h2>\n  <div class="gallery">\n' + pictures.map((src, i) => `    <figure>\n      <img src="${src}" alt="A drawing for my gallery" `
+        + `width="160" height="110">\n      <figcaption>${captions[i]}</figcaption>\n    </figure>\n`).join("") + "  </div>\n";
+      const index = carried["index.html"].replace("</h1>", ' <span class="ribbon">ICT strand</span></h1>').replace("</body>", gallery + "</body>");
+      assert.equal(index.split('class="ribbon"').length, 2); assert.notEqual(index, carried["index.html"]);
+      await write("index.html", index);
+      const css = carried["styles.css"] + "\n/* Position: my h1 is the reference box; the ribbon sits in its top-right corner, above it */\nh1 {\n  position: relative;\n}\n"
+        + ".ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n"
+        + "\n/* Float: my gallery's figures side by side */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n}\n"
+        + ".gallery img {\n  width: 160px;\n  height: 110px;\n}\nh2 {\n  clear: both;\n}\n";
+      await write("styles.css", css);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      // Offline there are no media files: the pictures are not found, but the run still succeeds (no uncaught error).
+      await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
+      const expected = [["ICT STRAND"], captions, "absolute", "8px", "8px", "1", "relative", "left", "170px", "static",
+        ...pictures.map((src) => `${src}: ${withMedia ? "from the page, drawn" : "not found, broken"}`)];
+      const seen = await looks(page);
+      assert.deepEqual(seen, expected, "the ribbon and every caption on their own lines; position, offsets, z-index and float as written; each picture");
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week7.png" });
+      await closePageWindow(page);
+      await page.getByRole("button", { name: "Submit this version", exact: true }).click();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
+      const saved = await progress(week7);
+      assert.equal(saved.percent, 100);
+      assert.deepEqual(Object.fromEntries(saved.performanceTask.own.files.map((file) => [file.path, file.content])), { ...carried, "index.html": index, "styles.css": css });
+      assert.deepEqual((saved.performanceTask.own.media ?? []).map((item) => item.path), [...(week6Own.media ?? []).map((item) => item.path), ...(withMedia ? pictures : [])],
+        "the Week 6 media carry forward and, online, the three gallery pictures are frozen with the submission");
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      await review.locator(".teacher-module-card", { hasText: week7.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".student-module-project .editor-card textarea").waitFor();
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      await review.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      assert.deepEqual(await looks(review), expected, "the review runs the frozen pages, styles.css and pictures");
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week7), saved, "teacher runs never change the student's progress");
+      await review.close();
+    });
+
     await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
       const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
       const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],

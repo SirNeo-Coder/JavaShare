@@ -341,6 +341,23 @@ evidence, checked by the server against its own expected output and the saved ve
   on `a:hover` makes the teacher's checker wait 30 seconds: never page-check a link state. `padding: 10` (no unit),
   `1.5 em`, a misspelt property and a negative padding each drop only that declaration (a negative margin works); a
   missing `;` skips that declaration and the next one (`display` too); a missing `}` after a rule stops every later rule.
+- **Position, z-index, float and galleries (checked 2026-11-10, Resume Week 7).** `position`, `top`/`right`/`bottom`/`left`,
+  `z-index`, `float` and `clear` are not page text; page checks read computed values, the same in CodeShare's page window
+  (zoom 1.15, about 800 px wide) and the teacher's checker. Offsets you set read as written in px (`top: 8px` reads `8px`;
+  `top: 1em` on a 32px `h1` reads `32px`), even on a static box, and `z-index` reads as written on a static box too (`2`), where
+  it does nothing. A side you did not set on an absolute box reads a px value that follows the window (`left` 851 px in the
+  checker against 651 px in CodeShare on one test page); `fixed` offsets and `sticky` places follow the window and scrolling:
+  never page-check them. `position: absolute`, `fixed` and `float` make a box a block, so its words get their own line in
+  the page text (`PROJECTS OF JUAN DELA CRUZ` then `ICT STRAND`); `relative`, `sticky` and static keep them in their line. A
+  missing `;` after `position: absolute` skips `top` too and puts the words back in the line; an unknown value (`float:
+  rigth`, `float: center`) is skipped. A positioned box with no positioned ancestor is placed from the page (Juan's ribbon
+  over the nav); a sticky nav needs a `z-index` above later positioned boxes, or they slide over it when the page window
+  scrolls. Galleries: `figcaption` is page text, `alt` is not; floated `figure`s give one caption per line, while
+  `inline-block` figures leave a line holding only a space between captions, and a tag that is not positioned leaves a
+  trailing space after its word: use `float` and positioned tags. In today's Chromium a missing `}` makes the later rules
+  nested rules of the broken one, so a later rule can still match inside it: do not rely on it to stop a rule inside a
+  figure. A personal gallery offline (no media files) still runs successfully; each picture shows its alt text and a small
+  broken-picture icon.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
