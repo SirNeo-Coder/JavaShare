@@ -89,7 +89,7 @@ type PerformanceTask = {
   totalPoints: number;
 };
 type Availability = { openLessonIds: string[]; performanceTaskOpen: boolean };
-export type CourseModule = { moduleVersion?: string; continues?: string; sampleFirst?: boolean; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
+export type CourseModule = { moduleVersion?: string; continues?: string; sampleFirst?: boolean; starterFiles?: ModuleFile[]; id: string; title: string; week: number; course: string; lessons: Lesson[]; performanceTask?: PerformanceTask; closedPerformanceTask?: { title: string }; availability: Availability };
 type ModuleSummary = { moduleId: string; title: string; week: number; course: string; updatedAt: string; isActive?: boolean; locked?: boolean; moduleAccess?: ModuleAccessBlock };
 export function sortModuleCatalog(modules: ModuleSummary[], summaries: Record<string, number>) {
   return modules.toSorted((a, b) =>
@@ -268,6 +268,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
       {teacherChecked && <p><b>Checked by your teacher for now.</b> Your teacher marks this step done after looking at your page.</p>}
       {checkableStep(step) ? <button type="button" className="worksheet-practise" disabled={busy || !onStart} onClick={() => void run()}>{busy ? "Opening…" : "Work in code editor"}</button> : <p>Automatic activity checking currently supports Java and web pages only.</p>}
     </div>}
+    {role === "teacher" && checkableStep(step) && onStart && <button type="button" className="worksheet-practise" disabled={busy} onClick={() => void onStart()}>Work in code editor</button>}
     {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy || (mediaLoading && teacherCheckedStep(step))} onClick={() => void run()}>{mediaLoading && teacherCheckedStep(step) ? "Loading media…" : "Run"}</button>}{web && <>{!webPage.opened && webChecks}{webPage.show && <button type="button" className="show-page-button" onClick={webPage.show}>Show page</button>}{webPage.pageWindow(webChecks)}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
@@ -416,7 +417,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
               {!page.part.blocks.some(isStepBlock) && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}
             </>}
           </>}
-          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed sampleFirst={module.sampleFirst} media={media} mediaLoading={mediaLoading} step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={() => onStartActivity?.(module, page.step!) ?? Promise.resolve()} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
+          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed sampleFirst={module.sampleFirst} media={media} mediaLoading={mediaLoading} step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={onStartActivity && (() => onStartActivity(module, page.step!))} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
         </article>)}
         {hasTask && <article className="worksheet-paper" hidden={currentPage !== pages.length} aria-label="Performance task">
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
@@ -466,7 +467,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
                 step={block}
                 status={progress.stepStates[activityStateId(block)]}
                 role={role}
-                onStart={() => onStartActivity?.(module, block) ?? Promise.resolve()}
+                onStart={onStartActivity && (() => onStartActivity(module, block))}
               />
             ) : (
               <ModulePaperBlock key={index} block={block} />

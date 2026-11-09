@@ -14,7 +14,7 @@ import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecor
 import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
 
 export type StudentActivity = {
-  kind: "module" | "performance" | "review";
+  kind: "module" | "performance" | "review" | "preview";
   review?: { studentId: string; studentName: string; submissionId: string; submission: import("../backend/src/personal-performance").PersonalSubmission }; module: CourseModule;
   classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string; studentId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
@@ -119,7 +119,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void; live?: ModuleLiveLink;
 }) {
   const review = activity.kind === "review";
-  const personal = activity.kind !== "module";
+  // A teacher's preview of one step's sample: editable and runnable, never saved or checked.
+  const preview = activity.kind === "preview";
+  const personal = activity.kind === "performance" || review;
   const task = !personal && activity.stateId.startsWith("task:");
   const step = activity.module?.lessons?.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === activity.stepId);
   // Web steps and web personal projects run in the student's own browser preview, online and offline; Java keeps its runners.
@@ -161,20 +163,20 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [notice, setNotice] = useState<Notice | null>(null);
   const [output, setOutput] = useState("Ready — edit your project, then press Run code.");
   const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
-  const [status, setStatus] = useState(personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
+  const [status, setStatus] = useState(preview ? "Preview — not saved" : personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
   const progress = useRef(activity.progress);
   const [submittedAt, setSubmittedAt] = useState(personal ? activity.progress.performanceTask.own?.submittedAt : undefined);
   const [stepStates, setStepStates] = useState(activity.progress.stepStates);
   const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
-  const pendingSample = !personal && Boolean(step && samplePending(activity.module, step, stepStates));
+  const pendingSample = !personal && !preview && Boolean(step && samplePending(activity.module, step, stepStates));
   const completed = !personal && stepStates[activity.stateId] === "pass";
   // The web result list judges a run by what it was checked as: a verified sample stays ticked against the
   // sample, not re-judged against the task that opens right after it (CKB-083).
-  const shownAsSample = lastCheck ? lastCheck.check === "sample" : pendingSample;
+  const shownAsSample = preview || (lastCheck ? lastCheck.check === "sample" : pendingSample);
   const checkInput = pendingSample ? step?.stdin ?? "" : activity.stdin;
   const [successfulFiles, setSuccessfulFiles] = useState<string | null>(null);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
-  const [deviceReady, setDeviceReady] = useState(personal);
+  const [deviceReady, setDeviceReady] = useState(personal || preview);
   const localKey = moduleRecordKey("activity", activity.studentId, activity.classroomId, activity.moduleId, activity.stepId);
   const draftRef = useRef<Omit<ModuleDeviceDraft, "files">>({ moduleVersion: activity.progress.moduleVersion, stateId: activity.stateId });
   const [backups, setBackups] = useState<ModuleDeviceDraft["backups"]>([]);
@@ -190,13 +192,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   }, [files, localKey]);
 
   useEffect(() => {
-    if (personal || !deviceReady) return;
+    if (personal || preview || !deviceReady) return;
     const timer = setTimeout(() => { void saveDeviceDraft().catch((storageError) => setError(storageError instanceof Error ? `Device storage is unavailable: ${storageError.message}` : "Device storage is unavailable")); }, 250);
     return () => clearTimeout(timer);
-  }, [files, deviceReady, personal, saveDeviceDraft]);
+  }, [files, deviceReady, personal, preview, saveDeviceDraft]);
 
   useEffect(() => {
-    if (personal) return;
+    if (personal || preview) return;
     let active = true;
     void readDeviceRecord<ModuleDeviceDraft>(localKey).then(async (saved) => {
       if (!active) return;
@@ -221,11 +223,11 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     }).catch((storageError) => setError(storageError instanceof Error ? `Device storage is unavailable: ${storageError.message}` : "Device storage is unavailable"))
       .finally(() => { if (active) setDeviceReady(true); });
     return () => { active = false; };
-  }, [activity.module, activity.progress, activity.stateId, localKey, personal, step, web]);
+  }, [activity.module, activity.progress, activity.stateId, localKey, personal, preview, step, web]);
 
   const save = async () => {
     if (busyRef.current) throw new Error("Wait for the current save or run to finish");
-    if (review || !dirty) return;
+    if (review || preview || !dirty) return;
     busyRef.current = true; setBusy(true); setError("");
     try {
       if (personal) {
@@ -270,6 +272,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     try {
       if (review && web) { setRunMessage("Running the page…"); setWebResult(await webPage.run(files, "index.html", [], await personalPage())); return; }
       if (review) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, stdin, () => setStdin("")); return; }
+      if (preview && web) { setRunMessage("Running the page…"); setWebResult(await webPage.run(files, step!.run, step!.webChecks, hasMedia ? { files: media, include: Boolean(step!.includeMediaOutput) } : undefined)); return; }
+      if (preview) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, checkInput); return; }
       if (!personal) await saveDeviceDraft();
       else {
         progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
@@ -425,13 +429,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       if (event.ctrlKey && event.key === "Enter" && !javaConsole.waiting) { event.preventDefault(); void run(); }
     }}>
       <section className="editor-card">
-        <div className="workspace-card-heading"><b>{review ? "Submitted personal project — read-only" : personal ? "Personal project" : "Module project"} · {activity.moduleTitle}</b><span>{web ? "Web page" : "Java"}</span></div>
+        <div className="workspace-card-heading"><b>{review ? "Submitted personal project — read-only" : personal ? "Personal project" : preview ? "Module preview" : "Module project"} · {activity.moduleTitle}</b><span>{web ? "Web page" : "Java"}</span></div>
         <div className="file-tabs" aria-label={personal ? "Personal project files" : "Module project files"}>
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
           {!review && <button type="button" className="add-file" aria-label={`Add ${personal ? "personal" : "module"} ${web ? "web" : "Java"} file`} disabled={busy || pendingSample} onClick={() => setAddingFile(true)}>＋</button>}
         </div>
         <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language={web ? fileLanguage(path) : path.endsWith(".txt") ? "text" : "java"} readOnly={review || busy || pendingSample || !deviceReady} files={files.map((file) => file.content)} remoteCursors={live?.cursors} onCursorChange={live?.onCursor} onChange={(content) => { changeFiles(files.map((file) => file.path === path ? { ...file, content } : file)); live?.onEdit(path, content); }} />
-        <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
+        <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : preview ? "Preview only — nothing is saved" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
         {personal && !review && <div className="module-step-actions"><button type="button" disabled={busy} onClick={renameFile}>Rename file</button><button type="button" disabled={busy || files.length < 2} onClick={() => {
           if (!window.confirm(`Delete ${path}?`)) return;
           const remaining = files.filter((file) => file.path !== path); changeFiles(remaining); setPath(remaining[0].path);
@@ -459,7 +463,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
         {personal && !review && <p role="status">{successfulFiles === JSON.stringify(files) ? "Run succeeded — ready to submit this version." : "Run the current files successfully before submitting."} Submission records progress, not a grade or teacher approval.</p>}
-        {!personal && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} expectedError={web ? undefined : step?.expectedError} />}
+        {!personal && !preview && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} expectedError={web ? undefined : step?.expectedError} />}
         {web ? <>
           <JavaRunProgress message={runMessage} />
           {!webPage.opened && webResults}
@@ -478,7 +482,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     </div>
     <footer className="actionbar">
       <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
-      <div>{submittedAt && <span className="sync">Last submitted: {new Date(submittedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>}{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || mediaLoading || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : mediaLoading ? "Loading media…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
+      <div>{submittedAt && <span className="sync">Last submitted: {new Date(submittedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>}{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || mediaLoading || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : mediaLoading ? "Loading media…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && !preview && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
     </footer>
     <RunBox message={javaConsole.running ? null : runMessage} onCancel={javaConsole.active ? () => { javaConsole.stop(); setRunMessage(null); } : undefined} />
     <NoticeBox notice={notice} onClose={() => setNotice(null)} />
