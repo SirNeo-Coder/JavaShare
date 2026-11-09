@@ -1176,3 +1176,4 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   plain `npm run lint` are all in untracked `.claude/worktrees` copies).
 - Not run: hosted site; online Java (CheerpJ) in the preview (same console code the teacher's review already
   uses online); `npm run classroom:offline` itself (the browser test used its settings: local Supabase, laptop Java).
+- PR #90 (https://github.com/SirNeo-Coder/JavaShare/pull/90). Next: teacher reviews and merges; then check CodeRabbit on it.
