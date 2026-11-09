@@ -322,6 +322,24 @@ evidence, checked by the server against its own expected output and the saved ve
   rest of the stylesheet part of that value, so every later rule stops (a later `text-transform` disappears from the
   page text). A task is checked by its page text only, so a repair whose only effect is a style cannot be proven by
   a run: Thursday repairs must change the page text (teacher, 2026-11-09; CodeRabbit on PR #87).
+- **Box model, lists and links (checked 2026-11-09, Resume Week 6).** None of them is page text except `display`;
+  page checks read computed values, the same in CodeShare's page window and the teacher's checker. Sizes read in px
+  (`padding-bottom: 0.25em` on a 24px `h2` reads `6px`, `margin-top: 1.5em` reads `36px`, `0.25em` on 12px text `3px`). A
+  side's border reads through its longhands (`border-bottom-width` `2px`, `-style` `solid`, `-color` `rgb(…)`) or
+  `border-bottom` (`2px solid rgb(…)`); `border` reads `""` when the four sides differ, and `padding` reads `0px 0px 6px`:
+  page-check longhands. A border with no style reads width `0px` (it does not show); `border: solid` alone reads `3px`.
+  `width: 300px` reads `300px` with or without `box-sizing: border-box` (only the box on screen is 310px without it), so
+  check `box-sizing` itself; a `select` is `border-box` by default. A `%` width or an `auto` margin turns into px from the
+  window, and the page window is not the checker's 1000 px window (392 px against 492 px for `width: 50%`): never
+  page-check them. Two top and bottom margins that meet become one, the larger (20px and 30px leave 30px). List items
+  are blocks: a nav made of `li`s shows one link per line until `display: inline` or `inline-block` puts them on one line
+  (`display: flex` gives one per line again); `li` tags typed with no space between them run the words together
+  (`HOMEPROJECTSCONTACT`). `list-style-type` and `list-style-position` read as written and beat a list's `type` attribute;
+  markers are never page text. A link's plain style reads (`color`, `text-decoration` `underline`/`none`); `a:visited`
+  and `a:hover` match nothing in a check (`querySelectorAll` hides visited links, a check has no mouse), and a style check
+  on `a:hover` makes the teacher's checker wait 30 seconds: never page-check a link state. `padding: 10` (no unit),
+  `1.5 em`, a misspelt property and a negative padding each drop only that declaration (a negative margin works); a
+  missing `;` skips that declaration and the next one (`display` too); a missing `}` after a rule stops every later rule.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
