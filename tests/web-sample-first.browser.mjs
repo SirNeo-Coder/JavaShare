@@ -184,7 +184,7 @@ test("web steps in the Java workflow: sample first, then the task; the next step
       await tab.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
       await closePageWindow(tab);
       await tab.getByRole("button", { name: "Submit this version", exact: true }).click();
-      await tab.locator(".actionbar .sync", { hasText: "Submitted" }).waitFor();
+      await tab.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
       assert.equal((await progress(weekA)).percent, 100);
 
       const b1 = weekB.lessons[0].blocks[0];
