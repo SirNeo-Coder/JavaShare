@@ -1202,3 +1202,4 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   unchanged and its route tests pass); `npm run classroom:offline` itself (tests used its settings).
 - Hosted step for the teacher: apply `20261110000100_classroom_shared_step.sql` in the Supabase SQL Editor
   before merging (instructions in the PR).
+- PR #91 (https://github.com/SirNeo-Coder/JavaShare/pull/91). Next: teacher applies the migration on hosted Supabase, reviews and merges; then check CodeRabbit on it.
