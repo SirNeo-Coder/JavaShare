@@ -724,6 +724,95 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
+    await t.test("Week 6 personal project: the Week 5 site carries forward; the student turns the nav into a list on every page and adds padding, a border, margins and nav link styles to styles.css; Run shows the nav bar on one line and the box values on index.html and, through the Projects link, on projects.html; Submit freezes the pages and styles.css; the teacher's review shows the same", { skip: needs(6) }, async () => {
+      const week6 = weeks[5], steps6 = stepsOf(week6);
+      // The module steps are checked elsewhere; mark them done so the personal task opens.
+      const states = (await progress(week6)).stepStates;
+      assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps6.map((step) => [activityStateId(step), "pass"])) } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week6.id)).error, null);
+      const textarea = page.locator(".student-module-project .editor-card textarea");
+      const fileTab = (path) => page.locator(".student-module-project .file-tabs").getByRole("button", { name: path, exact: true });
+      const write = async (path, content) => {
+        await fileTab(path).dispatchEvent("click");
+        await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
+        await textarea.fill(content);
+      };
+      // What the page window shows, read from the page itself: its title, the nav's page text, then computed box, list and link
+      // styles. No border width: the page window follows the text-size zoom, so 2px reads 1.73913px (CKB-097). notTitle: wait
+      // until a link has replaced that page.
+      const looks = async (where, notTitle) => {
+        for (const until = Date.now() + 15000; Date.now() < until; await where.waitForTimeout(100)) {
+          const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle())?.contentFrame();
+          const seen = await inside?.evaluate(() => {
+            const at = (selector) => document.querySelector(selector) && getComputedStyle(document.querySelector(selector));
+            const h2 = at("h2"), ul = at("nav ul"), li = at("nav li"), a = at("nav a");
+            return document.readyState === "complete" && h2 && li ? [document.title, document.querySelector("nav").innerText.trim(), ul.listStyleType, ul.paddingLeft,
+              li.display, li.marginRight, a.color, a.backgroundColor, a.paddingLeft, a.textDecorationLine,
+              h2.borderBottomStyle, h2.borderBottomColor, h2.paddingBottom, h2.marginTop] : null;
+          }).catch(() => null);
+          if (seen && seen[0] !== notTitle) return seen;
+        }
+        assert.fail(`the page window did not show a page other than ${notTitle}`);
+      };
+      const styled = (title) => [title, "HOME PROJECTS CONTACT", "none", "0px", "inline-block", "8px", "rgb(255, 255, 255)", "rgb(19, 48, 92)", "12px", "none",
+        "solid", "rgb(19, 48, 92)", "6px", "36px"];
+      const week5Own = (await progress(weeks[4])).performanceTask.own;
+      const carried = Object.fromEntries(week5Own.files.map((file) => [file.path, file.content]));
+      const title = (path) => carried[path].match(/<title>(.*)<\/title>/)[1];
+      await openCatalog(week6);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      // Linked weeks carry the Week 5 submission forward: its pages and styles.css.
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried["index.html"]);
+      assert.deepEqual((await page.locator(".student-module-project .file-tabs .file-tab").allTextContents()).sort(), Object.keys(carried).sort());
+      // The nav becomes a list of links on every page, each li on its own line.
+      const oldNav = '<nav><a href="index.html">Home</a> | <a href="projects.html">Projects</a> | <a href="contact.html">Contact</a></nav>';
+      const newNav = '<nav>\n    <ul>\n      <li><a href="index.html">Home</a></li>\n      <li><a href="projects.html">Projects</a></li>\n'
+        + '      <li><a href="contact.html">Contact</a></li>\n    </ul>\n  </nav>';
+      const pages = Object.fromEntries(Object.entries(carried).filter(([path]) => path.endsWith(".html")).map(([path, content]) => [path, content.replace(oldNav, newNav)]));
+      for (const path of Object.keys(pages)) { assert.notEqual(pages[path], carried[path], path); await write(path, pages[path]); }
+      const css = carried["styles.css"] + "\n/* Box model: room and a line under every section heading */\nh2 {\n  border-bottom: 2px solid #13305c;\n"
+        + "  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\n\n/* Lists: the nav list with no bullets and no indent, its items on one line */\nnav ul {\n"
+        + "  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n"
+        + "/* Links in nav, in state order: white on navy, maroon under the mouse or the keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n"
+        + "  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n";
+      await write("styles.css", css);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
+      assert.deepEqual(await looks(page), styled(title("index.html")), "index.html: the nav list is one line of white-on-navy links; h2 has its line, padding and margin");
+      // The Projects link opens projects.html in the same page window, with the same stylesheet.
+      const frame = await (await page.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+      await frame.locator('nav a[href="projects.html"]').click();
+      assert.deepEqual(await looks(page, title("index.html")), styled(title("projects.html")), "styles.css reaches the linked projects.html too");
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week6.png" });
+      await closePageWindow(page);
+      await page.getByRole("button", { name: "Submit this version", exact: true }).click();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
+      const saved = await progress(week6);
+      assert.equal(saved.percent, 100);
+      assert.deepEqual(Object.fromEntries(saved.performanceTask.own.files.map((file) => [file.path, file.content])), { ...pages, "styles.css": css });
+      assert.deepEqual((saved.performanceTask.own.media ?? []).map((item) => item.path), (week5Own.media ?? []).map((item) => item.path), "the Week 5 media carry forward");
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      await review.locator(".teacher-module-card", { hasText: week6.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".student-module-project .editor-card textarea").waitFor();
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      await review.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      assert.deepEqual(await looks(review), styled(title("index.html")), "the review runs the frozen pages with the frozen styles.css");
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week6), saved, "teacher runs never change the student's progress");
+      await review.close();
+    });
+
     await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
       const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
       const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],
