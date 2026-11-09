@@ -196,3 +196,12 @@ test("module worksheet: inter-step tables and notes retain the uploaded reading 
   assert.doesNotMatch(articles[1], /LIPLET/);
   assert.match(articles[2], /After the second output[\s\S]*LIPLET/);
 });
+
+test("teacher worksheet: Work in code editor appears only where the main editor can open the step", () => {
+  const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
+  const inClassroom = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true, onStartActivity: async () => {} }));
+  assert.match(inClassroom, />Work in code editor<\/button>/);
+  assert.match(inClassroom, /Preview sample code/);
+  const dashboard = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true }));
+  assert.doesNotMatch(dashboard, />Work in code editor<\/button>/);
+});

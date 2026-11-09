@@ -14,7 +14,7 @@ import useOutsideDismiss from "./useOutsideDismiss";
 import ModuleWorkspace from "./ModuleWorkspace";
 import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
-import { activityStateId, activityTask, checkableStep, webPerformanceTask } from "../backend/src/module-activities";
+import { activityStateId, activityTask, checkableStep, mergeProjectFiles, webPerformanceTask } from "../backend/src/module-activities";
 import { fileLanguage } from "../backend/src/file-paths";
 import StudentModuleActivity, { JavaRunProgress, RunBox, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import { PerformanceTaskSteps, type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
@@ -336,12 +336,12 @@ export default function Home() {
   const teamOnline = Boolean(team?.members.some((member) => onlineUserIds.includes(member.id)));
   const studentLiveView = user?.role === "teacher" && moduleLive && team?.members.some((member) => member.id === moduleLive.studentId) && onlineUserIds.includes(moduleLive.studentId) ? moduleLive : null;
   const workspaceTitle = currentModuleProject
-    ? `${currentModuleProject.kind === "performance" ? "Personal project" : "Module project"} · ${currentModuleProject.moduleTitle}` :
+    ? `${currentModuleProject.kind === "performance" ? "Personal project" : currentModuleProject.kind === "preview" ? "Module preview" : "Module project"} · ${currentModuleProject.moduleTitle}` :
     user?.role === "student" && currentSavedCopy
       ? currentSavedCopy.label
       : team?.name || "Workspace";
   const workspaceSubtitle = currentModuleProject
-    ? currentModuleProject.kind === "performance" ? "Your saved personal performance-task project" : "Your saved module project" :
+    ? currentModuleProject.kind === "performance" ? "Your saved personal performance-task project" : currentModuleProject.kind === "preview" ? "Teacher preview — not saved" : "Your saved module project" :
     user?.role === "student" && currentSavedCopy
       ? `Saved copy · ${activeFile?.path || "Java project"}`
       : `${team?.project?.title || "Java project"} · ${activeFile?.path || ""}`;
@@ -1751,6 +1751,14 @@ export default function Home() {
   }
 
   async function startModuleActivity(module: CourseModule, step?: StepBlock) {
+    // Teacher preview: the step's sample in the main editor, never saved or shared (teacher, 2026-11-09).
+    if (classroomId && user?.role === "teacher" && step) {
+      setModuleActivity({ kind: "preview", module, classroomId, moduleId: module.id, moduleTitle: module.title, stepId: step.id, stateId: "", studentId: user.id,
+        instruction: step.instruction, expectedOutput: step.expectedOutput, stdin: step.stdin ?? "",
+        progress: { moduleId: module.id, projectFiles: mergeProjectFiles(module.starterFiles ?? [], step.files), performanceProjectFiles: [], percent: 0, updatedAt: "", stepStates: {}, performanceTask: {} } });
+      setProjectsOpen(false);
+      return;
+    }
     if (!classroomId || user?.role !== "student") return;
     try {
       await moduleEditorRef.current?.save();
@@ -2408,7 +2416,7 @@ export default function Home() {
           {currentModuleProject ? <div className="assignment-block">
             <span className="eyebrow">{currentModuleProject.kind === "performance" ? "PERSONAL PERFORMANCE TASK" : "MODULE PROJECT"}</span>
             <h3>{currentModuleProject.moduleTitle}</h3>
-            <p>{currentModuleProject.kind === "review" ? "Frozen submitted files. Teacher runs never change student progress." : currentModuleProject.kind === "performance" ? `Your own ${webPerformanceTask(currentModuleProject.module) ? "web" : "Java"} project, continued from the previous week. Saving and running do not submit it.` : "Use the module sample code and match its expected output to progress."}</p>
+            <p>{currentModuleProject.kind === "review" ? "Frozen submitted files. Teacher runs never change student progress." : currentModuleProject.kind === "preview" ? "This step's sample, for discussing in class. Edits and runs are not saved, and students do not see them." : currentModuleProject.kind === "performance" ? `Your own ${webPerformanceTask(currentModuleProject.module) ? "web" : "Java"} project, continued from the previous week. Saving and running do not submit it.` : "Use the module sample code and match its expected output to progress."}</p>
             <p>{currentModuleProject.kind !== "module" && webPerformanceTask(currentModuleProject.module) ? "Web" : "Java"} files are in the editor tabs.</p>
           </div> : <div className="assignment-block">
             <span className="eyebrow">CURRENT ASSIGNMENT</span>

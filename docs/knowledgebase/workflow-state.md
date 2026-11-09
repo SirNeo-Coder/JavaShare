@@ -446,6 +446,17 @@ The teacher sees the same time on that student's module card (under **Last uploa
 the module's upload time) and beside **Run code** in **Review personal submission**, so the copy
 being reviewed can be matched to what the student says they submitted.
 
+## Teacher Work in code editor (approved 2026-11-09)
+
+In the classroom, the teacher's **Module** worksheet shows **Work in code editor** on each Java and
+Net MVC (web) step, beside **Preview sample code**. It opens **Module preview · <module>** in the main
+editor with the step's sample and the module's starter files, for discussing in class. The teacher
+can edit it and press **▶ Run code** (Java output in the Console; web pages in the page window with
+the step's checks). It is only on the teacher's screen: nothing is saved, no progress is recorded,
+and students do not see it through live share. **Return to class project** or any card in
+**Students / projects** closes it. The **Curriculum** dashboard's **View module details** keeps its
+worksheet-only preview. No new route, migration or setting; offline Java uses the laptop runner.
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one
