@@ -1208,5 +1208,6 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   was deleted or the step renamed (media now opens only while the step itself can be read); students may open a preview
   only as a shared step; `backend.md` table pipe escaped. Not changed: one extra small read per media request (low value);
   docstrings (not used here). Tests: browser test now holds a reply and a save (each guard shown failing when removed),
-  real-route media test (shown failing with the old gate); `npm test` 431/431; build and lint pass. Next: teacher
-  applies the migration on hosted Supabase, reviews and merges; then check CodeRabbit's re-review.
+  real-route media test (shown failing with the old gate); `npm test` 431/431; build and lint pass. The teacher
+  applied the migration on hosted Supabase on 2026-11-10 (SQL Editor: "Success. No rows returned"). CodeRabbit was still
+  re-reviewing commit dc9055b. Next: teacher merges after that review appears; then check it.
