@@ -367,6 +367,18 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   const mediaLoading = role === "teacher" && mediaModule && teacherMedia.files !== mediaFiles;
   const [lessonPage, setLessonPage] = useState(0);
   const [paperPage, setPaperPage] = useState<number | null>(null);
+  // The worksheet's note, progress and step tabs fold away while reading down and return on
+  // scrolling up; hovering the title bar reopens them too (CSS).
+  const [headerFolded, setHeaderFolded] = useState(false);
+  const lastScroll = useRef({ top: 0, at: 0 });
+  const foldOnScroll = (event: { currentTarget: HTMLDivElement }) => {
+    const top = event.currentTarget.scrollTop, now = Date.now(), last = lastScroll.current;
+    lastScroll.current = { top, at: last.at };
+    // Folding resizes the page, which can move the scroll by itself; ignore moves just after a fold.
+    if (now - last.at < 300) return;
+    const fold = top > last.top ? top > 24 : top < last.top ? false : headerFolded;
+    if (fold !== headerFolded) { lastScroll.current.at = now; setHeaderFolded(fold); }
+  };
 
   useEffect(() => {
     if (role !== "student") return;
@@ -396,6 +408,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
     const taskDone = Boolean(progress.performanceTask.own);
     const completed = parts.filter(partDone).length + Number(hasTask && taskDone);
     return <div className="worksheet-content">
+      <div className="worksheet-fold" data-folded={headerFolded}><div>
       {role === "teacher" && <p className="module-preview-note">Teacher preview — running code does not save student progress.</p>}
       <div className="worksheet-progress">
         <div><span><small>MODULE PROGRESS</small>{role === "student" ? `${completed} of ${parts.length + Number(hasTask)} parts completed` : "Teacher preview"}</span>{role === "student" && <b>{progress.percent}%</b>}</div>
@@ -406,7 +419,8 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
         </nav>
       </div>
       {current && <nav className="worksheet-tabs" aria-label="Part pages">{pages.map((page, index) => page.part.id === current.part.id && <button key={index} type="button" aria-current={index === currentPage ? "page" : undefined} onClick={() => setPaperPage(index)}>{page.label}</button>)}</nav>}
-      <div className="worksheet-desk">
+      </div></div>
+      <div className="worksheet-desk" onScroll={foldOnScroll}>
         {pages.map((page, index) => <article key={`${page.part.id}:${page.step?.id || "overview"}`} className="worksheet-paper" hidden={currentPage !== index} aria-label={`${page.part.title} — ${page.label}`}>
           {!page.step && <>
             {index === 0 && <><header className="paper-title"><h2>Self-Paced Module: {module.title.replace(/^Self-Paced Module:\s*/i, "")}</h2><p>{module.course.toUpperCase()} · Week {module.week}{module.continues ? ` · Continues ${module.continues}` : ""}</p></header><table className="paper-schedule"><thead><tr><th>Day</th><th>Topic</th></tr></thead><tbody>{module.lessons.map((lesson) => <tr key={lesson.id}><td>{lesson.dayLabel}</td><td>{lesson.title}</td></tr>)}</tbody></table></>}
@@ -602,7 +616,7 @@ export default function ModuleViewer({ role, classroomId, studentId, initialModu
         <header>
           <div>
             <span className="eyebrow">{drawer ? selected ? "MODULE LESSON" : "YOUR LEARNING" : "MODULES"}</span>
-            <h2>{selected ? selected.title : drawer ? "Your learning modules" : "Modules"}</h2>
+            <h2>{selected ? worksheet ? `Week ${selected.week} · ${selected.title}` : selected.title : drawer ? "Your learning modules" : "Modules"}</h2>
             {worksheet && selected && modules?.some((item) => item.moduleId === selected.id && item.isActive) && <small className="worksheet-weekly">LESSON OF THE WEEK</small>}
             {drawer && !selected && <p>Continue a lesson or revisit what you’ve learned.</p>}
           </div>
