@@ -1,6 +1,6 @@
 # CKB-099 — Students had different code, or none, while the class discussed Week 15
 
-- Status: resolved (Share with class); hosted migration pending
+- Status: resolved (Share with class); hosted migration applied 2026-11-10
 - First recorded: 2026-11-10
 - Last verified: 2026-11-10
 - Area: classroom module discussion — `app/page.tsx` (shared step), `app/StudentModuleActivity.tsx`, `app/ModuleWorkspace.tsx`, `backend/src/supabase-repository.ts`, `backend/src/routes.ts`, `classrooms.shared_module_id`/`shared_step_id`
