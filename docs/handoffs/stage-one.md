@@ -1245,4 +1245,5 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   (need the teacher's approval): the Week 8 prompt says media steps' expected output "ends with Media checks:" but real
   files list one result line per picture/sound/video after it; `:before` is valid legacy CSS, so it is not an example
   of a broken selector. PR #93 is being worked on separately (uncommitted CKB-101 changes on its branch); not touched.
-- Next: teacher reviews PR; then slice 2.
+- Delivered as [PR #94](https://github.com/SirNeo-Coder/JavaShare/pull/94); CodeRabbit review not in yet when opened.
+- Next: teacher applies the migration on hosted Supabase, reviews and merges PR #94; check CodeRabbit on #94; then slice 2.
