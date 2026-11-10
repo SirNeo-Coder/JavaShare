@@ -444,6 +444,9 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .printed-module-viewer.activity-modal>header>div { min-width:0; }.printed-module-viewer.activity-modal>header h2 { margin:0; font-size:12px; }
 .printed-module-viewer.activity-modal>header .eyebrow { display:none; }.printed-module-viewer.activity-modal>header>button { flex:none; color:#1c4375; font-size:10px; }
 .worksheet-content { flex:1; min-height:0; display:flex; flex-direction:column; }
+.worksheet-fold { flex:none; display:grid; grid-template-rows:1fr; transition:grid-template-rows .25s ease; }.worksheet-fold>div { min-height:0; overflow:hidden; }
+.worksheet-fold[data-folded="true"]:not(:hover):not(:focus-within) { grid-template-rows:0fr; }.printed-module-viewer>header:hover~.worksheet-content .worksheet-fold { grid-template-rows:1fr; }
+@media (prefers-reduced-motion:reduce) { .worksheet-fold { transition:none; } }
 .worksheet-progress { flex:none; padding:14px 14px 8px; border-bottom:1px solid #d5dfed; background:#f6f8fc; font-size:11px; }
 .worksheet-progress>div { display:flex; align-items:end; justify-content:space-between; gap:10px; font-weight:700; }.worksheet-progress small { display:block; margin-bottom:5px; color:#647897; font-size:8px; letter-spacing:1px; }.worksheet-progress b { color:#00855e; }
 .worksheet-progress progress { width:100%; height:5px; display:block; margin:10px 0; border:0; border-radius:4px; overflow:hidden; background:#dce4ef; accent-color:#00a77a; }.worksheet-progress progress::-webkit-progress-bar { background:#dce4ef; }.worksheet-progress progress::-webkit-progress-value { background:#00a77a; }
