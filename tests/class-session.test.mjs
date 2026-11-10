@@ -158,6 +158,23 @@ test("class session: real routes start, follow, renew, expire and end a session;
       assert.deepEqual(await (await call(`/api/classes/${classId}/shared-step`, student)).json(), { active: false });
       assert.equal((await call(moduleUrl, student)).status, 403);
     });
+    await t.test("requests at the same moment: End session stays ended; re-entering never restores a closed page (CKB-104)", async () => {
+      // Timing: each round sends two requests together; the server may run them in either order.
+      let revived = 0, reopened = 0;
+      for (let round = 0; round < 30; round++) {
+        assert.equal((await put(teacher, { active: true })).status, 200);
+        assert.equal((await put(teacher, { active: true, follow: follow(second.lessons[0], stepOne) })).status, 200);
+        await Promise.all([put(teacher, { active: true, follow: null }), put(teacher, { active: false })]);
+        if ((await row()).session_seen_at) revived++;
+        assert.equal((await put(teacher, { active: true })).status, 200);
+        assert.equal((await put(teacher, { active: true, follow: follow(second.lessons[0], stepOne) })).status, 200);
+        await Promise.all([put(teacher, { active: true, follow: null }), put(teacher, { active: true })]);
+        if ((await row()).session_module_id) reopened++;
+      }
+      assert.equal(revived, 0, `End session came back to life in ${revived} of 30 rounds`);
+      assert.equal(reopened, 0, `re-entering restored the closed page in ${reopened} of 30 rounds`);
+      assert.equal((await put(teacher, { active: false })).status, 200);
+    });
     await t.test("a followed module deleted during the session does not block Enter classroom (CKB-103)", async () => {
       assert.equal((await put(teacher, { active: true })).status, 200);
       assert.equal((await put(teacher, { active: true, follow: follow(second.lessons[0], stepOne) })).status, 200);

@@ -1252,4 +1252,10 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   sends "no page" to the class it left, and the server checks only a newly sent page (a page report never starts a session).
   Tests: 2 new route subtests and the browser test's keyboard Class home check, each shown failing with its fix removed;
   `npm test` 444/444; build and lint pass; browser 3/3.
-- Next: teacher applies the migration on hosted Supabase, reviews and merges PR #94 (check CodeRabbit's re-review); then slice 2.
+- CodeRabbit re-review of PR #94 (2026-11-10, up to 0da0c06): two Minor findings, both valid, fixed with the teacher's
+  approval (CKB-104): a page request arriving with **End session** could start the session again (likely: clicking End
+  session closes the open worksheet), and a quick **Class home** → **Enter classroom** could restore the closed page. Now
+  Enter classroom leaves the followed page alone, and writes to a running session apply only to the session they read.
+  Timing test (30 rounds each): old code failed in about half the rounds, fixed 0/30 in three runs. Docstring check not
+  applied (not used here). `npm test` 445/445; build, lint and both class browser tests pass.
+- Next: teacher applies the migration on hosted Supabase, reviews and merges PR #94 (check CodeRabbit's next re-review); then slice 2.

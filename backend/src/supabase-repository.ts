@@ -622,20 +622,22 @@ export async function setSupabaseClassSession(user: SupabaseSessionUser, classro
   const running = classSessionActive(classroom);
   // Only Enter classroom starts a session: a page report that arrives after it ended starts nothing (CKB-103).
   if (input.follow !== undefined && !running) return { classroomId, active: false };
-  const follow = input.follow === undefined ? running && classroom.session_module_id && classroom.session_page
-    ? { moduleId: classroom.session_module_id, page: classroom.session_page, stepId: classroom.session_step_id } : null : input.follow;
   // Check only a newly sent page: a kept one whose module was since deleted or changed must not block Enter classroom (CKB-103).
   if (input.follow) {
     const content = (await loadCourseModuleRow(classroomId, input.follow.moduleId)).content;
     if (input.follow.stepId && !findActivity(content, input.follow.stepId)) throw new SupabaseRepositoryError(404, "Step not found in this module");
   }
+  // Enter classroom on a running session leaves the followed page alone; only a page report changes it (CKB-104).
+  const follow = input.follow ?? null;
+  const page = input.follow === undefined && running ? {}
+    : { session_module_id: follow?.moduleId ?? null, session_page: follow?.page ?? null, session_step_id: follow?.stepId ?? null };
   const now = new Date().toISOString();
-  const { error } = await getSupabaseAdmin().from("classrooms").update({
-    session_started_at: running ? classroom.session_started_at : now, session_seen_at: now,
-    session_module_id: follow?.moduleId ?? null, session_page: follow?.page ?? null, session_step_id: follow?.stepId ?? null,
-  }).eq("id", classroomId);
+  let update = getSupabaseAdmin().from("classrooms").update({ session_started_at: running ? classroom.session_started_at : now, session_seen_at: now, ...page }).eq("id", classroomId);
+  // Save only into the session that was read: an End session that landed in between wins (CKB-104).
+  if (running) update = update.eq("session_started_at", classroom.session_started_at!);
+  const { data, error } = await update.select("id");
   fail(error, "Could not start the class session");
-  return { classroomId, active: true };
+  return { classroomId, active: data.length > 0 };
 }
 
 // The teacher's interaction keeps their running sessions going (the sign-in renewal calls this at most once a minute).
