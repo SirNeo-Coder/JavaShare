@@ -23,7 +23,7 @@ type Props = {
 };
 
 function LiveBadge({ classroom }: { classroom: LandingClassroom }) {
-  if (!classroom.hasActivity && !classroom.hasLiveShare) return null;
+  if (!classroom.hasActivity && !classroom.hasLiveShare && !classroom.hasSession) return null;
   return <span className="activity-state active">Live now</span>;
 }
 
@@ -139,6 +139,11 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
     onDismissLiveClasses([item]);
     onEnter(item.id);
   };
+  // A class session pulls the student straight in, once per session (teacher, 2026-11-10).
+  const sessionClass = invitations.find((item) => item.hasSession);
+  const enterRef = useRef(enterClassroom);
+  useEffect(() => { enterRef.current = enterClassroom; });
+  useEffect(() => { if (sessionClass) enterRef.current(sessionClass); }, [sessionClass]);
 
   useEffect(() => {
     if (role !== "student" || classroomIds === "[]") return;
@@ -233,7 +238,7 @@ export default function Landing({ role, name, classrooms, initialClassroomId, on
           </section>
         ))}
       </section>
-      {invitations.length > 0 && (
+      {invitations.length > 0 && !sessionClass && (
         <LiveClassInvitation classrooms={invitations} onJoin={enterClassroom} onDismiss={() => onDismissLiveClasses(invitations)} />
       )}
     </main>

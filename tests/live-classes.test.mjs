@@ -48,22 +48,22 @@ test("live invitations: receive-only listeners refresh on start, stop, and recon
   for (const channel of channels) {
     assert.equal(channel.options.config.private, true);
     assert.equal(channel.options.config.presence, undefined);
-    assert.deepEqual(Object.keys(channel.handlers), ["class:activity-deployed", "class:activity-ended", "class:live-share"]);
+    assert.deepEqual(Object.keys(channel.handlers), ["class:activity-deployed", "class:activity-ended", "class:live-share", "class:session"]);
     channel.statusChanged("SUBSCRIBED");
   }
   assert.equal(refreshes, 2, "joining recovers an announcement sent before subscription");
   assert.deepEqual(availability, [true]);
   for (const handler of Object.values(channels[0].handlers)) handler();
-  assert.equal(refreshes, 5);
+  assert.equal(refreshes, 6, "a class session starting or ending refreshes too");
   channels[0].statusChanged("CHANNEL_ERROR");
   channels[0].statusChanged("SUBSCRIBED");
-  assert.equal(refreshes, 6);
+  assert.equal(refreshes, 7);
   assert.deepEqual(availability, [true, false, true]);
   await stop();
   assert.deepEqual(removed, channels);
   channels[0].handlers["class:activity-deployed"]();
   channels[1].statusChanged("SUBSCRIBED");
-  assert.equal(refreshes, 6, "late callbacks after leaving must not update another screen");
+  assert.equal(refreshes, 7, "late callbacks after leaving must not update another screen");
   assert.deepEqual(availability, [true, false, true]);
 });
 

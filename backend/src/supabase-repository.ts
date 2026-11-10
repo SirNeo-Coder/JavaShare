@@ -21,7 +21,8 @@ export class SupabaseRepositoryError extends Error {
 }
 
 type ModuleSubject = "java" | "net-mvc";
-type ClassroomRow = { module_subject: ModuleSubject | null; id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean; active_module_id: string | null; shared_module_id: string | null; shared_step_id: string | null };
+type ClassroomRow = { module_subject: ModuleSubject | null; id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean; active_module_id: string | null; shared_module_id: string | null; shared_step_id: string | null;
+  session_started_at: string | null; session_seen_at: string | null; session_module_id: string | null; session_page: string | null; session_step_id: string | null };
 type TeamRow = { id: string; classroom_id: string; owner_id: string | null; slug: string; name: string; leader_id: string | null; chat_muted: boolean; editing_locked: boolean };
 type ProjectRow = { id: string; classroom_id: string; team_id: string; activity_id: string | null; title: string; description: string; language?: string };
 type ActivityRow = { id: string; classroom_id: string; title: string; mode: "individual" | "group"; ended_at: string | null };
@@ -258,10 +259,10 @@ export async function canAccessSupabaseClass(user: SupabaseSessionUser, classroo
 function classSummary(user: SupabaseSessionUser, classroom: ClassroomRow) {
   return {
     id: classroom.id, name: classroom.name, subject: classroom.module_subject === "java" ? "Java" : classroom.module_subject === "net-mvc" ? "Net MVC" : classroom.subject,
-    hasActivity: Boolean(classroom.current_activity_id), hasLiveShare: Boolean(classroom.live_share_project_id),
+    hasActivity: Boolean(classroom.current_activity_id), hasLiveShare: Boolean(classroom.live_share_project_id), hasSession: classSessionActive(classroom),
     // shortcut: a same-project restart missed entirely while disconnected has the same id;
     // add a persisted session start time if those restarts must be distinguished too.
-    liveSessionId: classroom.current_activity_id ? `activity:${classroom.current_activity_id}`
+    liveSessionId: classSessionActive(classroom) ? `session:${classroom.session_started_at}` : classroom.current_activity_id ? `activity:${classroom.current_activity_id}`
       : classroom.live_share_project_id ? `share:${classroom.live_share_project_id}` : null,
     ...(user.role === "teacher" ? { joinCode: classroom.join_code } : {}),
   };
@@ -575,6 +576,90 @@ export async function setSupabaseSharedStep(user: SupabaseSessionUser, classroom
   const { error } = await getSupabaseAdmin().from("classrooms").update({ shared_module_id: share?.moduleId ?? null, shared_step_id: share?.stepId ?? null }).eq("id", classroomId);
   fail(error, "Could not share this step");
   return { classroomId, active: Boolean(share), moduleId: share?.moduleId ?? null, stepId: share?.stepId ?? null };
+}
+
+// Class session (teacher, 2026-11-10): Enter classroom starts it; End session or 30 minutes without the teacher's
+// interaction ends it. Students follow the worksheet page the teacher has open and may read that module through
+// the teacher's page, whatever their own progress. Reading only: runs, saves and completion keep their own rules.
+const CLASS_SESSION_IDLE_MS = 30 * 60000;
+type ClassSessionRow = Pick<ClassroomRow, "session_started_at" | "session_seen_at" | "session_module_id" | "session_page" | "session_step_id">;
+function classSessionActive(row: Pick<ClassroomRow, "session_seen_at">, now = Date.now()) {
+  return Boolean(row.session_seen_at) && Date.parse(row.session_seen_at!) > now - CLASS_SESSION_IDLE_MS;
+}
+const classSessionColumns = "session_started_at,session_seen_at,session_module_id,session_page,session_step_id";
+const noClassSession = { session_started_at: null, session_seen_at: null, session_module_id: null, session_page: null, session_step_id: null };
+
+// Ending also stops the shared step. seenAt: end only the session that was read, never one the teacher just renewed.
+async function endClassSession(classroomId: string, seenAt?: string) {
+  let update = getSupabaseAdmin().from("classrooms").update({ ...noClassSession, shared_module_id: null, shared_step_id: null }).eq("id", classroomId);
+  if (seenAt) update = update.eq("session_seen_at", seenAt);
+  const { data, error } = await update.select("id");
+  fail(error, "Could not end the class session");
+  return data.length > 0;
+}
+
+async function loadClassSession(classroomId: string) {
+  const { data, error } = await getSupabaseAdmin().from("classrooms").select(classSessionColumns).eq("id", classroomId).single();
+  fail(error, "Could not load the class session");
+  return data as ClassSessionRow;
+}
+
+// ended: this read found the session past its 30 minutes and ended it, so the route tells the class.
+export async function supabaseClassSession(user: SupabaseSessionUser, classroomId: string) {
+  if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Classroom access denied");
+  const row = await loadClassSession(classroomId);
+  if (!row.session_seen_at) return { active: false as const, ended: false };
+  if (!classSessionActive(row)) return { active: false as const, ended: await endClassSession(classroomId, row.session_seen_at) };
+  return { active: true as const, ended: false, endsAt: Date.parse(row.session_seen_at) + CLASS_SESSION_IDLE_MS,
+    follow: row.session_module_id && row.session_page ? { moduleId: row.session_module_id, page: row.session_page, stepId: row.session_step_id } : null };
+}
+
+// follow: the teacher's open worksheet page (null = closed); left out = unchanged.
+export async function setSupabaseClassSession(user: SupabaseSessionUser, classroomId: string,
+  input: { active: false } | { active: true; follow?: { moduleId: string; page: string; stepId: string | null } | null }) {
+  const classroom = await teacherClassroom(user, classroomId);
+  if (!input.active) { await endClassSession(classroomId); return { classroomId, active: false }; }
+  const running = classSessionActive(classroom);
+  // Only Enter classroom starts a session: a page report that arrives after it ended starts nothing (CKB-103).
+  if (input.follow !== undefined && !running) return { classroomId, active: false };
+  // Check only a newly sent page: a kept one whose module was since deleted or changed must not block Enter classroom (CKB-103).
+  if (input.follow) {
+    const content = (await loadCourseModuleRow(classroomId, input.follow.moduleId)).content;
+    if (input.follow.stepId && !findActivity(content, input.follow.stepId)) throw new SupabaseRepositoryError(404, "Step not found in this module");
+  }
+  // Enter classroom on a running session leaves the followed page alone; only a page report changes it (CKB-104).
+  const follow = input.follow ?? null;
+  const page = input.follow === undefined && running ? {}
+    : { session_module_id: follow?.moduleId ?? null, session_page: follow?.page ?? null, session_step_id: follow?.stepId ?? null };
+  const now = new Date().toISOString();
+  let update = getSupabaseAdmin().from("classrooms").update({ session_started_at: running ? classroom.session_started_at : now, session_seen_at: now, ...page }).eq("id", classroomId);
+  // Save only into the session that was read: an End session that landed in between wins (CKB-104).
+  if (running) update = update.eq("session_started_at", classroom.session_started_at!);
+  const { data, error } = await update.select("id");
+  fail(error, "Could not start the class session");
+  return { classroomId, active: data.length > 0 };
+}
+
+// The teacher's interaction keeps their running sessions going (the sign-in renewal calls this at most once a minute).
+export async function touchSupabaseClassSessions(user: SupabaseSessionUser, at: number) {
+  if (user.role !== "teacher") return;
+  const { error } = await getSupabaseAdmin().from("classrooms").update({ session_seen_at: new Date(at).toISOString() })
+    .eq("teacher_id", user.id).gt("session_seen_at", new Date(Date.now() - CLASS_SESSION_IDLE_MS).toISOString()).lt("session_seen_at", new Date(at).toISOString());
+  fail(error, "Could not renew the class session");
+}
+
+// A followed module is only read: its progress is never started by following (no new row).
+async function readFollowedProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string): Promise<ModuleProgressRow> {
+  const { data, error } = await getSupabaseAdmin().from("module_progress").select("*").eq("student_id", user.id).eq("classroom_id", classroomId).eq("module_id", moduleId).maybeSingle();
+  fail(error, "Could not load module progress");
+  return (data ?? { student_id: user.id, classroom_id: classroomId, module_id: moduleId, step_states: {}, performance_task: {}, project_files: [], updated_at: "" }) as ModuleProgressRow;
+}
+
+// A student reading the module the session is on: open through the teacher's page (stepId), past their own locks.
+async function classSessionFollow(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  if (user.role !== "student") return null;
+  const row = await loadClassSession(classroomId);
+  return classSessionActive(row) && row.session_module_id === moduleId ? { stepId: row.session_step_id, page: row.session_page } : null;
 }
 
 export async function supabaseLiveSharePayload(user: SupabaseSessionUser, classroomId: string) {
@@ -1349,9 +1434,11 @@ function moduleProgressView(row: ModuleProgressRow, module: CourseModule) {
 export async function getSupabaseModuleProgress(user: SupabaseSessionUser, classroomId: string, moduleId: string, includeModuleVersion = false) {
   if (user.role !== "student") throw new SupabaseRepositoryError(403, "Only students have module progress");
   await requireClassroomMember(user, classroomId);
-  await enforceStudentModuleAccess(user, classroomId, moduleId);
+  const follow = await classSessionFollow(user, classroomId, moduleId);
+  if (!follow) await enforceStudentModuleAccess(user, classroomId, moduleId);
   const courseRow = await loadCourseModuleRow(classroomId, moduleId);
-  return { ...moduleProgressView(await loadOrCreateModuleProgress(user, classroomId, moduleId), courseRow.content), ...(includeModuleVersion ? { moduleVersion: courseRow.updated_at } : {}) };
+  const row = follow ? await readFollowedProgress(user, classroomId, moduleId) : await loadOrCreateModuleProgress(user, classroomId, moduleId);
+  return { ...moduleProgressView(row, courseRow.content), ...(includeModuleVersion ? { moduleVersion: courseRow.updated_at } : {}) };
 }
 
 // stepId is either a step block's own "id" (docs/course-format.md) or a lesson's exitSlip "id" -
@@ -1930,7 +2017,7 @@ function mediaPath(path: string) {
 // module or removed step closes them at once (CKB-100). The payload read also checks class membership.
 async function enforceModuleMediaAccess(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   const shared = await supabaseSharedStepPayload(user, classroomId);
-  if (!shared.active || shared.moduleId !== moduleId) await enforceStudentModuleAccess(user, classroomId, moduleId);
+  if ((!shared.active || shared.moduleId !== moduleId) && !await classSessionFollow(user, classroomId, moduleId)) await enforceStudentModuleAccess(user, classroomId, moduleId);
 }
 
 export async function listSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
@@ -2188,15 +2275,24 @@ export async function setSupabaseClassroomActiveModule(user: SupabaseSessionUser
   return { activeModuleId: moduleId };
 }
 
-function studentModuleView(content: CourseModule, states: Record<string, string>, moduleVersion?: string) {
+// follow: a class session opens every step up to the teacher's page as well, the discussion text shown on that
+// step's page (owned by the next step, which stays locked), and on the task page the task text, for reading (CKB-106).
+function studentModuleView(content: CourseModule, states: Record<string, string>, moduleVersion?: string, follow?: { stepId: string | null; page: string | null } | null) {
   const access = activityAccess(content, states);
   const openSteps = new Set(access.openStepIds);
+  const allSteps = content.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
+  const through = follow?.stepId ? allSteps.findIndex((step) => step.id === follow.stepId) : -1;
+  for (const step of allSteps.slice(0, through + 1)) openSteps.add(activityStateId(step));
+  // ponytail: also shows text before the next part's first step if the teacher is on a part's last step; reading only.
+  const textOpen = new Set(openSteps);
+  if (follow && allSteps[through + 1]) textOpen.add(activityStateId(allSteps[through + 1]));
+  const taskShown = access.performanceTaskOpen || follow?.page === "task";
   const lessons = content.lessons.map((lesson) => {
     const steps = lesson.blocks.filter((block) => block.type === "step");
     const blocks = lesson.blocks.map((block, index) => {
       const owner = lesson.blocks.slice(index).find((item) => item.type === "step") ?? steps.at(-1);
       if (!owner || owner.type !== "step" || openSteps.has(activityStateId(owner))) return block;
-      if (block.type !== "step") return { type: "text", markdown: "" };
+      if (block.type !== "step") return textOpen.has(activityStateId(owner)) ? block : { type: "text", markdown: "" };
       return { type: "step", id: block.id, number: block.number, part: block.part, language: block.language, locked: true,
         ...(block.activity?.id ? { activity: { id: block.activity.id, instruction: "", files: [], expectedOutput: "" } } : {}),
         instruction: "Complete the previous activity to unlock this step.", files: [], expectedOutput: "" };
@@ -2208,18 +2304,19 @@ function studentModuleView(content: CourseModule, states: Record<string, string>
     id: content.id, title: content.title, course: content.course, week: content.week, ...(moduleVersion ? { moduleVersion } : {}),
     continues: content.continues, starterFiles: content.starterFiles, sampleFirst: content.sampleFirst,
     lessons, availability: { openLessonIds: lessons.filter((lesson) => !lesson.closed).map((lesson) => lesson.id), performanceTaskOpen: access.performanceTaskOpen },
-    ...(content.performanceTask ? access.performanceTaskOpen ? { performanceTask: content.performanceTask }
+    ...(content.performanceTask ? taskShown ? { performanceTask: content.performanceTask }
       : { closedPerformanceTask: { title: content.performanceTask.title } } : {}),
   };
 }
 
 export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   await requireClassroomMember(user, classroomId);
-  await enforceStudentModuleAccess(user, classroomId, moduleId);
+  const follow = await classSessionFollow(user, classroomId, moduleId);
+  if (!follow) await enforceStudentModuleAccess(user, classroomId, moduleId);
   const row = await loadCourseModuleRow(classroomId, moduleId);
   if (user.role === "teacher") return { ...row.content, availability: moduleAvailability(row) };
-  const progress = await loadOrCreateModuleProgress(user, classroomId, moduleId);
-  return studentModuleView(row.content, progress.step_states, row.updated_at);
+  const progress = follow ? await readFollowedProgress(user, classroomId, moduleId) : await loadOrCreateModuleProgress(user, classroomId, moduleId);
+  return studentModuleView(row.content, progress.step_states, row.updated_at, follow);
 }
 
 export async function deleteSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {

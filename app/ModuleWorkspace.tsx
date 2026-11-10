@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ModuleViewer, { type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { moduleResumeStep } from "./moduleParts";
 import { checkableStep } from "../backend/src/module-activities";
@@ -10,8 +10,12 @@ import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
-export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, onSelectModule, progressRevision = 0, closeSignal = 0 }: {
+export type ClassFollow = { moduleId: string; page: string; stepId: string | null };
+
+export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, onSelectModule, progressRevision = 0, closeSignal = 0, follow = null, onFollowChange }: {
   onSelectModule?: (module: CourseModule) => void; closeSignal?: number;
+  // Class session: a student's worksheet follows the teacher's page; the teacher's open worksheet page is reported.
+  follow?: ClassFollow | null; onFollowChange?: (follow: ClassFollow | null) => void;
   onStartActivity: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
   classroomId: string; studentId?: string; role: "teacher" | "student"; browserOpen: boolean; projectsOpen: boolean; onBrowserChange: (open: boolean) => void; onProjectsChange: (open: boolean) => void;
 }) {
@@ -26,6 +30,21 @@ export default function ModuleWorkspace({ classroomId, studentId, role, browserO
   // A new closeSignal (the teacher shared a step) closes the worksheet so it doesn't cover the editor.
   const [closedSignal, setClosedSignal] = useState(closeSignal);
   if (closeSignal !== closedSignal) { setClosedSignal(closeSignal); setOpen(false); }
+  // Following opens the teacher's module and page over whatever the student has open; it stops when the teacher closes theirs.
+  const [followedId, setFollowedId] = useState<string | null>(null);
+  if ((follow?.moduleId ?? null) !== followedId) {
+    setFollowedId(follow?.moduleId ?? null);
+    if (follow) { setSelection((current) => ({ id: follow.moduleId, visit: (current?.visit ?? 0) + 1 })); setOpen(true); setHoverPreview(false); }
+    else setOpen(false);
+  }
+  const followedModule = follow?.moduleId;
+  useEffect(() => { if (followedModule) { onBrowserChange(false); onProjectsChange(false); } }, [followedModule, onBrowserChange, onProjectsChange]);
+  const [teacherPage, setTeacherPage] = useState<ClassFollow | null>(null);
+  const reportPage = useCallback((page: ClassFollow) => setTeacherPage(page), []);
+  const teacherFollow = role === "teacher" && selection && open && !browserOpen && !projectsOpen && !hoverPreview && teacherPage?.moduleId === selection.id ? JSON.stringify(teacherPage) : "";
+  useEffect(() => { onFollowChange?.(teacherFollow ? JSON.parse(teacherFollow) : null); }, [teacherFollow, onFollowChange]);
+  // Leaving the classroom closes the worksheet too, so its page is never sent again afterwards (CKB-103).
+  useEffect(() => () => onFollowChange?.(null), [onFollowChange]);
   const moduleOpen = browserOpen || (open && !projectsOpen);
   const moduleId = browserOpen || !selection ? "classroom-modules" : "classroom-worksheet";
   const openModule = (hover: boolean) => {
@@ -81,7 +100,9 @@ export default function ModuleWorkspace({ classroomId, studentId, role, browserO
     </WorkspaceDrawer>
     {selection && <div className="worksheet-drawer-group">
       <WorkspaceDrawer id="classroom-worksheet" title="Module worksheet" side="left" className="worksheet-drawer" open={open && !browserOpen && !projectsOpen} autoFocus={!hoverPreview} onClose={() => close(true)}>
-        <ModuleViewer key={selection.visit} role={role} classroomId={classroomId} studentId={studentId} initialModuleId={selection.id} embedded worksheet progressRevision={progressRevision} onStartActivity={async (module, step) => { await onStartActivity(module, step); close(); }} onClose={() => { close(); onBrowserChange(true); }} />
+        <ModuleViewer key={follow ? `${selection.visit}:${follow.stepId}` : selection.visit} role={role} classroomId={classroomId} studentId={studentId} initialModuleId={selection.id} embedded worksheet progressRevision={progressRevision}
+          followPage={follow?.page} onPageChange={role === "teacher" ? reportPage : undefined}
+          onStartActivity={follow ? undefined : async (module, step) => { await onStartActivity(module, step); close(); }} onClose={() => { close(); onBrowserChange(true); }} />
       </WorkspaceDrawer>
     </div>}
   </>;

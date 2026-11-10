@@ -1235,3 +1235,66 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   (2026-11-10, up to b019ed8): merge risk Low, security risk Low, no concerns; one valid docs nitpick (CKB-099 status
   still said migration pending) fixed. Final review (up to 5e950f3): no comments; its summary repeats the two
   docs points, both checked fixed on GitHub (table row renders 2 cells; status updated). Next: teacher merges.
+
+## Class session, slice 1 of 2 — 2026-11-10
+
+- Branch `feature/class-session` (from `main` at `31e26c4`, after PR #91; worktree `../JavaShare-session`). CKB-102.
+  Teacher asked that **Enter classroom** bring every online student in and that students see whatever module the
+  teacher opens, without pressing **Share with class**. Approved (two pull requests): slice 1 = session, pull-in,
+  follow the teacher's worksheet page (option A: students read that module up to the teacher's page, past their
+  locks), auto-share on **Work in code editor**, **End session**, end after 30 minutes without the teacher.
+  Slice 2 = students edit the shared step and a correct task run is credited even in a locked week (earlier weeks
+  stay unfinished), everyone moves with the teacher's step, unfinished steps leave the student's own work unchanged,
+  **Show code** / **Hide code** for the teacher's typing (window covers the editor while open; the teacher said
+  "approved" without choosing, so the recommended options were assumed: covering window, prerequisite rule kept).
+- Done (slice 1): migration `20261111000100_class_session.sql` (five nullable `classrooms` columns),
+  `GET`/`PUT /api/classes/:id/session`, live event `class:session`, teacher renewal in `POST /api/auth/activity`,
+  `hasSession`/`liveSessionId: session:<start>` in class summaries, student class list auto-enters once per session,
+  worksheet follow (`followPage`/`onPageChange`, page buttons disabled, no device copy, no progress row started),
+  **Class session · End session** in the classroom header, auto **Share with class** during a session. Rule added
+  to `AGENTS.md` ("Class session").
+- Tested: `tests/class-session.test.mjs` (rule test + real routes, 12/12) and `tests/class-session.browser.mjs`
+  (real app, offline settings, laptop Java) — route pieces, worksheet follow, auto-join and browser follow each shown
+  failing when broken, passing restored. The existing `class-shared-step.browser.mjs` caught a progress row created by
+  following (fixed) and now presses **End session** first; `tests/live-classes.test.mjs` expects `class:session`.
+  Browser tests also passing on this build: teacher-module-preview, java-suggestions, teacher-live-help,
+  web-module-steps, web-sample-first, workspace-drawers.
+- Not run: `java-run-progress.browser.mjs` (needs the online runner on ports 3030–3032); hosted site (needs the
+  migration first); `npm run classroom:offline` itself (tests used its settings); online Java (CheerpJ).
+- Hosted step for the teacher: apply `20261111000100_class_session.sql` in the Supabase SQL Editor before
+  merging (instructions in the PR).
+- CodeRabbit on PR #92 (checked at the start of this work): two Minor findings, both valid, docs only, not fixed yet
+  (need the teacher's approval): the Week 8 prompt says media steps' expected output "ends with Media checks:" but real
+  files list one result line per picture/sound/video after it; `:before` is valid legacy CSS, so it is not an example
+  of a broken selector. PR #93 is being worked on separately (uncommitted CKB-101 changes on its branch); not touched.
+- Delivered as [PR #94](https://github.com/SirNeo-Coder/JavaShare/pull/94); CodeRabbit review not in yet when opened.
+- CodeRabbit on PR #94 (2026-11-10): two Minor findings, both valid, fixed with the teacher's approval (CKB-103): leaving the
+  classroom (keyboard **Class home**) left students following, and the old page was re-sent from the class list; a module
+  deleted during a session blocked **Enter classroom**. Now the worksheet reports closed when it unmounts, the teacher's page
+  sends "no page" to the class it left, and the server checks only a newly sent page (a page report never starts a session).
+  Tests: 2 new route subtests and the browser test's keyboard Class home check, each shown failing with its fix removed;
+  `npm test` 444/444; build and lint pass; browser 3/3.
+- CodeRabbit re-review of PR #94 (2026-11-10, up to 0da0c06): two Minor findings, both valid, fixed with the teacher's
+  approval (CKB-104): a page request arriving with **End session** could start the session again (likely: clicking End
+  session closes the open worksheet), and a quick **Class home** → **Enter classroom** could restore the closed page. Now
+  Enter classroom leaves the followed page alone, and writes to a running session apply only to the session they read.
+  Timing test (30 rounds each): old code failed in about half the rounds, fixed 0/30 in three runs. Docstring check not
+  applied (not used here). `npm test` 445/445; build, lint and both class browser tests pass.
+- 2026-11-10 — PR #93 (folding worksheet header, CKB-101) merged into main and conflicted with PR #94 in the worksheet
+  page buttons. Resolved by merging main into `feature/class-session`: kept main's `showPage` and folding wrapper and added
+  back `disabled={following}`; a followed page change also unfolds the header (2 lines; no automated test, the test
+  module's pages are too short to fold). `npm test` 446/446; build, lint, class-session, class-shared-step and
+  workspace-drawers browser tests pass.
+- 2026-11-10 — The teacher applied `20261111000100_class_session.sql` on hosted Supabase (SQL Editor: "Success. No rows returned").
+- CodeRabbit third review of PR #94 (2026-11-10, up to 3a0ba02): three findings, all valid, fixed with the teacher's approval
+  (CKB-105): page reports now go one at a time (newest waits); **Class home** releases students before leaving and, if that
+  fails, stays with "Could not release students from your worksheet…"; only a failed first load undoes a student's session
+  dismissal. Browser checks for each shown failing with the fix removed; `npm test` 446/446; build and lint pass; browser
+  tests class-session (2/2), class-shared-step, teacher-live-help, workspace-drawers pass.
+- CodeRabbit fourth/fifth reviews of PR #94 (up to 8bd4cd0): four findings, all valid, fixed with the teacher's approval
+  (CKB-106): following onto **Performance task** shows the task text (submitting still refused); the discussion text on a
+  followed step's page is shown (next step stays locked); **Class home** stops page reports, waits, then releases the
+  current class. Route tests and browser checks shown failing with each fix removed; `npm test` 448/448; build and lint
+  pass; browser tests class-session (2/2), class-shared-step, teacher-module-preview, teacher-live-help, workspace-drawers,
+  web-sample-first pass. These rounds are now finding narrow timing cases; the teacher may merge before the next review.
+- Next: teacher tests and merges PR #94 (check CodeRabbit's next re-review); then slice 2.

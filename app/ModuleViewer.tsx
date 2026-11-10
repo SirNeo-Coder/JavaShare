@@ -111,7 +111,10 @@ export type Progress = {
   performanceTask: Partial<Record<"sample" | "own", { status: StepStatus; submittedAt?: string }>> & { project?: { media?: import("../backend/src/personal-performance").PersonalMedia[] } };
 };
 
-type Props = { studentId?: string; onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
+// Class session (teacher, 2026-11-10): followPage is the teacher's page a student's worksheet shows, with no
+// page buttons and no device copy; onPageChange reports the teacher's page and the step it opens through.
+type Follow = { followPage?: string; onPageChange?: (page: { moduleId: string; page: string; stepId: string | null }) => void };
+type Props = Follow & { studentId?: string; onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number; role: "teacher" | "student"; classroomId: string; initialModuleId?: string; embedded?: boolean; drawer?: boolean; active?: boolean; worksheet?: boolean; onOpenModule?: (id: string) => void; onClose?: () => void };
 
 function isStepBlock(block: Block): block is StepBlock {
   return block.type === "step";
@@ -337,7 +340,11 @@ function PerformanceTaskSlot({
 // submit buttons, status chips) for that role.
 const emptyProgress = (moduleId: string): Progress => ({ moduleId, stepStates: {}, performanceTask: {}, projectFiles: [], performanceProjectFiles: [], percent: 0, updatedAt: "" });
 
-export function ModuleContent({ module, classroomId, role, paged = false, worksheet = false, onStartActivity, progressRevision = 0 }: {
+function worksheetPages(module: CourseModule) {
+  return groupModuleParts(module).flatMap((part) => modulePartPages(part).map((page) => ({ ...page, part, key: `${part.id}:${page.step?.id || "overview"}` })));
+}
+
+export function ModuleContent({ module, classroomId, role, paged = false, worksheet = false, onStartActivity, progressRevision = 0, followPage, onPageChange }: Follow & {
   worksheet?: boolean; paged?: boolean; module: CourseModule; classroomId: string; role: "teacher" | "student";
   onStartActivity?: (module: CourseModule, step?: StepBlock) => Promise<void>; progressRevision?: number;
 }) {
@@ -385,6 +392,17 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   };
   // Every page change shows the progress and step tabs again.
   const showPage = (index: number) => { setPaperPage(index); setHeaderFolded(false); };
+  // A followed page change (class session) shows them again too.
+  const [shownFollow, setShownFollow] = useState(followPage);
+  if (followPage !== shownFollow) { setShownFollow(followPage); setHeaderFolded(false); }
+
+  // The teacher's page and the step it opens through: its own step, its part's first step, or the last one before it.
+  useEffect(() => {
+    if (!worksheet || !onPageChange) return;
+    const pages = worksheetPages(module), index = Math.max(0, Math.min(paperPage ?? 0, pages.length));
+    const page = pages[index];
+    onPageChange({ moduleId: module.id, page: page?.key ?? "task", stepId: page?.step?.id ?? page?.part.blocks.find(isStepBlock)?.id ?? pages.slice(0, index).findLast((item) => item.step)?.step?.id ?? null });
+  }, [worksheet, onPageChange, module, paperPage]);
 
   useEffect(() => {
     if (role !== "student") return;
@@ -400,15 +418,17 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
 
   if (worksheet) {
     const parts = groupModuleParts(module);
-    const pages = parts.flatMap((part) => modulePartPages(part).map((page) => ({
-      ...page, part,
-      label: page.step ? `${part.lessons.find((lesson) => lesson.blocks.some((block) => isStepBlock(block) && block.id === page.step?.id))?.dayLabel || "Lesson"} · Step ${page.step.number}` : "Overview",
-    })));
+    const pages = worksheetPages(module).map((page) => ({
+      ...page,
+      label: page.step ? `${page.part.lessons.find((lesson) => lesson.blocks.some((block) => isStepBlock(block) && block.id === page.step?.id))?.dayLabel || "Lesson"} · Step ${page.step.number}` : "Overview",
+    }));
     const hasTask = Boolean(module.performanceTask || module.closedPerformanceTask);
     const totalPages = pages.length + Number(hasTask);
     const resumeStep = moduleResumeStep(module, progress.stepStates);
     const resumePage = resumeStep ? pages.findIndex((page) => page.step?.id === resumeStep.id) : totalPages - 1;
-    const currentPage = Math.max(0, Math.min(paperPage ?? (role === "student" ? resumePage : 0), totalPages - 1));
+    const followed = followPage === undefined ? -1 : followPage === "task" ? pages.length : pages.findIndex((page) => page.key === followPage);
+    const currentPage = Math.max(0, Math.min(followed >= 0 ? followed : paperPage ?? (role === "student" ? resumePage : 0), totalPages - 1));
+    const following = followPage !== undefined;
     const current = pages[currentPage];
     const partDone = (part: typeof parts[number]) => !part.closed && part.blocks.filter(isStepBlock).every((step) => progress.stepStates[activityStateId(step)] === "pass");
     const taskDone = Boolean(progress.performanceTask.own);
@@ -420,11 +440,11 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
         <div><span><small>MODULE PROGRESS</small>{role === "student" ? `${completed} of ${parts.length + Number(hasTask)} parts completed` : "Teacher preview"}</span>{role === "student" && <b>{progress.percent}%</b>}</div>
         {role === "student" && <progress aria-label="Module progress" value={progress.percent} max={100} />}
         <nav aria-label="Module parts" className="worksheet-parts">
-          {parts.map((part, index) => <button key={part.id} type="button" aria-current={current?.part.id === part.id ? "step" : undefined} className={role === "student" && partDone(part) ? "part-done" : ""} onClick={() => showPage(pages.findIndex((page) => page.part.id === part.id))}><i aria-hidden="true">{role === "student" && partDone(part) ? "✓" : part.closed ? "⊘" : index + 1}</i><span>{part.title}</span></button>)}
-          {hasTask && <button type="button" aria-current={!current ? "step" : undefined} className={role === "student" && taskDone ? "part-done" : ""} onClick={() => showPage(pages.length)}><i aria-hidden="true">{role === "student" && taskDone ? "✓" : "★"}</i><span>Performance task</span></button>}
+          {parts.map((part, index) => <button key={part.id} type="button" aria-current={current?.part.id === part.id ? "step" : undefined} className={role === "student" && partDone(part) ? "part-done" : ""} disabled={following} onClick={() => showPage(pages.findIndex((page) => page.part.id === part.id))}><i aria-hidden="true">{role === "student" && partDone(part) ? "✓" : part.closed ? "⊘" : index + 1}</i><span>{part.title}</span></button>)}
+          {hasTask && <button type="button" aria-current={!current ? "step" : undefined} className={role === "student" && taskDone ? "part-done" : ""} disabled={following} onClick={() => showPage(pages.length)}><i aria-hidden="true">{role === "student" && taskDone ? "✓" : "★"}</i><span>Performance task</span></button>}
         </nav>
       </div>
-      {current && <nav className="worksheet-tabs" aria-label="Part pages">{pages.map((page, index) => page.part.id === current.part.id && <button key={index} type="button" aria-current={index === currentPage ? "page" : undefined} onClick={() => showPage(index)}>{page.label}</button>)}</nav>}
+      {current && <nav className="worksheet-tabs" aria-label="Part pages">{pages.map((page, index) => page.part.id === current.part.id && <button key={index} type="button" aria-current={index === currentPage ? "page" : undefined} disabled={following} onClick={() => showPage(index)}>{page.label}</button>)}</nav>}
       </div></div>
       <div className="worksheet-desk" onScroll={foldOnScroll}>
         {pages.map((page, index) => <article key={`${page.part.id}:${page.step?.id || "overview"}`} className="worksheet-paper" hidden={currentPage !== index} aria-label={`${page.part.title} — ${page.label}`}>
@@ -444,14 +464,14 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
           {module.closedPerformanceTask && <p className="module-preview-note">Complete the previous part first</p>}
           {module.performanceTask && <><Markdown markdown={module.performanceTask.markdown} /><PerformanceTaskSteps steps={module.performanceTask.steps} module={module} /><ul>{module.performanceTask.checklist.map((item, index) => <li key={index}>{item}</li>)}</ul>
             <PerformanceTaskSlot label="Sample code" files={module.performanceTask.exampleFiles} variant="sample" role={role} paper={paperPerformanceTask(module)} submitted={progress.performanceTask.sample?.status} />
-            <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} variant="own" role={role} paper={paperPerformanceTask(module)} onStart={() => onStartActivity?.(module) ?? Promise.resolve()} submitted={progress.performanceTask.own?.status} />
+            <PerformanceTaskSlot label="Your own version" files={module.performanceTask.starterFiles} variant="own" role={role} paper={paperPerformanceTask(module)} onStart={onStartActivity && (() => onStartActivity(module))} submitted={progress.performanceTask.own?.status} />
             {module.performanceTask.presentationOutline?.length ? <><h3 className="paper-heading">Presentation</h3><ol>{module.performanceTask.presentationOutline.map((item, index) => <li key={index}>{item}</li>)}</ol></> : null}
             {module.performanceTask.questionsToPrepare?.length ? <><h3 className="paper-heading">Prepare for these questions</h3><ul>{module.performanceTask.questionsToPrepare.map((item, index) => <li key={index}>{item}</li>)}</ul></> : null}
             {module.performanceTask.rubric?.length ? <ModulePaperBlock block={{ type: "table", columns: ["Criterion", "Points"], rows: module.performanceTask.rubric.map((row) => [row.criterion, String(row.points)]) }} /> : null}
           </>}
         </article>}
       </div>
-      <footer className="worksheet-pagination"><button type="button" disabled={currentPage === 0} onClick={() => showPage(currentPage - 1)}>← Previous page</button><span aria-live="polite">Page {currentPage + 1} of {totalPages}</span><button type="button" disabled={currentPage === totalPages - 1} onClick={() => showPage(currentPage + 1)}>Next page →</button></footer>
+      <footer className="worksheet-pagination"><button type="button" disabled={following || currentPage === 0} onClick={() => showPage(currentPage - 1)}>← Previous page</button><span aria-live="polite">Page {currentPage + 1} of {totalPages}</span><button type="button" disabled={following || currentPage === totalPages - 1} onClick={() => showPage(currentPage + 1)}>Next page →</button></footer>
     </div>;
   }
 
@@ -524,7 +544,9 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   );
 }
 
-export default function ModuleViewer({ role, classroomId, studentId, initialModuleId, embedded = false, drawer = false, active = true, worksheet = false, onOpenModule, onClose, onStartActivity, progressRevision = 0 }: Props) {
+export default function ModuleViewer({ role, classroomId, studentId, initialModuleId, embedded = false, drawer = false, active = true, worksheet = false, onOpenModule, onClose, onStartActivity, progressRevision = 0, followPage, onPageChange }: Props) {
+  // A followed module opens through the teacher's page: never from or into this device's copy.
+  const deviceCopy = followPage === undefined;
   const [modules, setModules] = useState<ModuleSummary[] | null>(null);
   const [selected, setSelected] = useState<CourseModule | null>(null);
   const [accessBlock, setAccessBlock] = useState<ModuleAccessBlock | null>(null);
@@ -535,20 +557,20 @@ export default function ModuleViewer({ role, classroomId, studentId, initialModu
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (role !== "student" || !studentId || !selected) return;
+    if (role !== "student" || !studentId || !selected || !deviceCopy) return;
     let active = true;
     void readDeviceRecord<{ value: CourseModule; savedAt: number }>(moduleRecordKey("content", studentId, classroomId, selected.id))
       .then((cached) => { if (active && cached && JSON.stringify(cached.value) !== JSON.stringify(selected)) setSelected(cached.value); })
       .catch(() => undefined);
     return () => { active = false; };
-  }, [classroomId, progressRevision, role, selected, studentId]);
+  }, [classroomId, progressRevision, role, selected, studentId, deviceCopy]);
 
   const openModule = useCallback((moduleId: string) => {
     setAccessBlock(null);
     if (onOpenModule) { onOpenModule(moduleId); return; }
     setError(null);
     void (async () => {
-      const key = studentId && role === "student" ? moduleRecordKey("content", studentId, classroomId, moduleId) : "";
+      const key = studentId && role === "student" && deviceCopy ? moduleRecordKey("content", studentId, classroomId, moduleId) : "";
       const cached = key ? await readDeviceRecord<{ value: CourseModule; savedAt: number }>(key).catch(() => null) : null;
       if (cached && isFreshDeviceRecord(cached)) { setSelected(cached.value); return; }
       try {
@@ -561,7 +583,7 @@ export default function ModuleViewer({ role, classroomId, studentId, initialModu
         else setError(loadError instanceof Error ? loadError.message : "Could not load module");
       }
     })();
-  }, [classroomId, onOpenModule, role, studentId]);
+  }, [classroomId, onOpenModule, role, studentId, deviceCopy]);
 
   const refreshList = useCallback(() => {
     api<ModuleSummary[]>(`/api/classrooms/${classroomId}/modules`)
@@ -656,7 +678,7 @@ export default function ModuleViewer({ role, classroomId, studentId, initialModu
             ))}
           </div>
         )}
-        {selected && <ModuleContent key={selected.id} worksheet={worksheet} paged={drawer} module={selected} classroomId={classroomId} role={role} onStartActivity={onStartActivity} progressRevision={progressRevision} />}
+        {selected && <ModuleContent key={selected.id} worksheet={worksheet} paged={drawer} module={selected} classroomId={classroomId} role={role} onStartActivity={onStartActivity} progressRevision={progressRevision} followPage={followPage} onPageChange={onPageChange} />}
     </>
   );
 
