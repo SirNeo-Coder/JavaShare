@@ -462,6 +462,19 @@ and students do not see it through live share. **Return to class project** or an
 **Students / projects** closes it. The **Curriculum** dashboard's **View module details** keeps its
 worksheet-only preview. No new route, migration or setting; offline Java uses the laptop runner.
 
+## Share with class (approved 2026-11-10)
+
+In the teacher's **Module preview**, **Share with class** sends that step to every student in the
+class. Their editor switches to **Class step · Week N · Step M** with the same fresh code the teacher
+started from (the module's starter files plus the step's sample), even if they have not reached that
+week or step. A student's own module worksheet closes so it doesn't cover the editor. They can edit
+and press **▶ Run code**; nothing is saved and nothing counts as progress. The teacher sees **Shared
+with class · Week N · Step M** with **Stop sharing** at the top of the classroom, and **Stop sharing**
+in the preview. Stopping, or the student's **Return to class project**, reopens the student's own
+module or personal project unchanged. Sharing another step replaces the first; students who join or
+reload while a step is shared get it. Only the shared step opens: the rest of a later module stays
+locked, and the step's task is not sent. Works online and offline (laptop Java offline).
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one

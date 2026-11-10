@@ -270,6 +270,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Selecting a group lets the teacher type in the group's shared code while a member is online;
   members' Save work keeps it. The teacher never auto-saves into group files.
 
+## Share with class (agreed 2026-11-10)
+
+- In the classroom, the teacher's Module preview (Work in code editor) has **Share with class**. Every
+  student in the class switches to that step fresh — the module's starter files plus the step's
+  sample — whatever their own week, step or prerequisites. Only that step opens; the rest of the
+  module keeps its normal locks, and the task stays out of it.
+- The class step is practice only: editable and runnable, never saved, no progress or completion
+  credit. Students' own module projects, drafts, completions and submissions are never changed.
+- **Stop sharing** (or **Return to class project**) reopens each student's own work. Students who
+  join or reload while a step is shared get it too. Sharing starts only from the button.
+
 ## Web module steps (agreed 2026-10-28)
 
 - A step whose files are all `.html`, `.css` or `.js` is a web step; no new module field. Its page

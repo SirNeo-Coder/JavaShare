@@ -69,6 +69,7 @@ import {
   setSupabaseClassroomChatMuted,
   setSupabaseClassroomActiveModule,
   setSupabaseLiveShare,
+  setSupabaseSharedStep,
   setSupabaseModuleAvailability,
   setSupabaseModulePerformanceTask,
   setSupabaseModuleProjectFiles,
@@ -77,6 +78,7 @@ import {
   supabaseActivitySummary,
   supabaseClassIds,
   supabaseLiveSharePayload,
+  supabaseSharedStepPayload,
   SupabaseRepositoryError,
   updateSupabaseGroup,
   updateSupabaseGroupPermissions,
@@ -429,6 +431,22 @@ app.put("/api/classes/:classroomId/chat-mute", requireAuth, requireTeacher, asyn
 app.get("/api/classes/:classroomId/live-share", requireAuth, async (req: AuthedRequest, res, next) => {
   try { return res.json(await supabaseLiveSharePayload(req.user!, String(req.params.classroomId))); }
   catch (error) { next(error); }
+});
+
+// Share with class: members read the shared step; the teacher shares or stops. The live event only says it
+// changed, so each member fetches the step through the access check above.
+app.get("/api/classes/:classroomId/shared-step", requireAuth, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await supabaseSharedStepPayload(req.user!, String(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
+app.put("/api/classes/:classroomId/shared-step", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { share } = z.object({ share: z.object({ moduleId: z.string().min(1).max(200), stepId: z.string().min(1).max(200) }).nullable() }).parse(req.body);
+    const payload = await setSupabaseSharedStep(req.user!, String(req.params.classroomId), share);
+    await broadcast(`class:${payload.classroomId}`, "class:shared-step", payload);
+    return res.json(payload);
+  } catch (error) { next(error); }
 });
 
 app.post("/api/classes/:classroomId/live-share", requireAuth, async (req: AuthedRequest, res, next) => {
