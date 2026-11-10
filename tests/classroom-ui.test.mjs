@@ -171,6 +171,16 @@ test("module worksheet: named parts, unchanged samples, page controls and teache
   assert.doesNotMatch(html, /\d+ of \d+ parts completed/, "teacher preview must not invent student progress");
 });
 
+test("module worksheet: note, progress and step tabs sit in one fold above the scrolling page", () => {
+  const html = renderToStaticMarkup(createElement(ModuleContent, { module: worksheetFixture(), classroomId: "local-test", role: "teacher", worksheet: true }));
+  const fold = html.match(/<div class="worksheet-fold" data-folded="false"><div>([\s\S]*?)<\/div><\/div><div class="worksheet-desk">/);
+  assert.ok(fold, "the fold opens unfolded, directly above the worksheet page");
+  assert.match(fold[1], /Teacher preview — running code/);
+  assert.match(fold[1], /class="worksheet-progress"/);
+  assert.match(fold[1], /class="worksheet-tabs"/);
+  assert.doesNotMatch(fold[1], /worksheet-paper/);
+});
+
 const { modulePartPages } = tsxRequire("../app/moduleParts.ts", import.meta.url);
 test("module worksheet: inter-step tables and notes retain the uploaded reading order", () => {
   const course = worksheetFixture();
