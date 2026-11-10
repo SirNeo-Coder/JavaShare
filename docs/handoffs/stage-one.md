@@ -1246,4 +1246,10 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   files list one result line per picture/sound/video after it; `:before` is valid legacy CSS, so it is not an example
   of a broken selector. PR #93 is being worked on separately (uncommitted CKB-101 changes on its branch); not touched.
 - Delivered as [PR #94](https://github.com/SirNeo-Coder/JavaShare/pull/94); CodeRabbit review not in yet when opened.
-- Next: teacher applies the migration on hosted Supabase, reviews and merges PR #94; check CodeRabbit on #94; then slice 2.
+- CodeRabbit on PR #94 (2026-11-10): two Minor findings, both valid, fixed with the teacher's approval (CKB-103): leaving the
+  classroom (keyboard **Class home**) left students following, and the old page was re-sent from the class list; a module
+  deleted during a session blocked **Enter classroom**. Now the worksheet reports closed when it unmounts, the teacher's page
+  sends "no page" to the class it left, and the server checks only a newly sent page (a page report never starts a session).
+  Tests: 2 new route subtests and the browser test's keyboard Class home check, each shown failing with its fix removed;
+  `npm test` 444/444; build and lint pass; browser 3/3.
+- Next: teacher applies the migration on hosted Supabase, reviews and merges PR #94 (check CodeRabbit's re-review); then slice 2.

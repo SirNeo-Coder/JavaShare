@@ -43,6 +43,8 @@ export default function ModuleWorkspace({ classroomId, studentId, role, browserO
   const reportPage = useCallback((page: ClassFollow) => setTeacherPage(page), []);
   const teacherFollow = role === "teacher" && selection && open && !browserOpen && !projectsOpen && !hoverPreview && teacherPage?.moduleId === selection.id ? JSON.stringify(teacherPage) : "";
   useEffect(() => { onFollowChange?.(teacherFollow ? JSON.parse(teacherFollow) : null); }, [teacherFollow, onFollowChange]);
+  // Leaving the classroom closes the worksheet too, so its page is never sent again afterwards (CKB-103).
+  useEffect(() => () => onFollowChange?.(null), [onFollowChange]);
   const moduleOpen = browserOpen || (open && !projectsOpen);
   const moduleId = browserOpen || !selection ? "classroom-modules" : "classroom-worksheet";
   const openModule = (hover: boolean) => {

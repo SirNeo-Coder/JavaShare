@@ -78,11 +78,11 @@ test("class session: real routes start, follow, renew, expire and end a session;
       assert.equal((await summary()).hasSession, false);
       assert.equal((await call(moduleUrl, student)).status, 403);
     });
-    await t.test("only the class teacher starts it, and only on a real step", async () => {
+    await t.test("only the class teacher starts it; a page report alone never starts one (CKB-103)", async () => {
       assert.equal((await put(student, { active: true })).status, 403);
       assert.equal((await put(otherTeacher, { active: true })).status, 403);
-      assert.equal((await put(teacher, { active: true, follow: { moduleId: second.id, page: "x", stepId: "missing-step" } })).status, 404);
-      assert.equal((await put(teacher, { active: true, follow: { moduleId: "missing-module", page: "x", stepId: null } })).status, 404);
+      const late = await put(teacher, { active: true, follow: follow(second.lessons[0], stepOne) });
+      assert.equal(late.status, 200); assert.equal((await late.json()).active, false);
       assert.deepEqual(await read(), { active: false });
     });
     await t.test("Enter classroom starts it: the class list pulls students in, nothing is followed yet", async () => {
@@ -94,6 +94,8 @@ test("class session: real routes start, follow, renew, expire and end a session;
       assert.equal(item.hasSession, true); assert.match(item.liveSessionId, /^session:/);
       assert.equal((await call(session, outsider)).status, 403);
       assert.equal((await call(moduleUrl, student)).status, 403, "an unfollowed module keeps its lock");
+      assert.equal((await put(teacher, { active: true, follow: { moduleId: second.id, page: "x", stepId: "missing-step" } })).status, 404);
+      assert.equal((await put(teacher, { active: true, follow: { moduleId: "missing-module", page: "x", stepId: null } })).status, 404);
       const started = (await row()).session_started_at;
       assert.equal((await put(teacher, { active: true })).status, 200);
       assert.equal((await row()).session_started_at, started, "entering again keeps the same session, so students are not pulled twice");
@@ -155,6 +157,14 @@ test("class session: real routes start, follow, renew, expire and end a session;
       assert.deepEqual(await read(), { active: false });
       assert.deepEqual(await (await call(`/api/classes/${classId}/shared-step`, student)).json(), { active: false });
       assert.equal((await call(moduleUrl, student)).status, 403);
+    });
+    await t.test("a followed module deleted during the session does not block Enter classroom (CKB-103)", async () => {
+      assert.equal((await put(teacher, { active: true })).status, 200);
+      assert.equal((await put(teacher, { active: true, follow: follow(second.lessons[0], stepOne) })).status, 200);
+      assert.equal((await call(moduleUrl, teacher, "DELETE")).status, 200);
+      const entered = await put(teacher, { active: true });
+      assert.equal(entered.status, 200, await entered.clone().text());
+      assert.equal((await read()).active, true);
     });
   } finally {
     for (const id of classes) await admin.from("classrooms").delete().eq("id", id);

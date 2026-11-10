@@ -52,5 +52,6 @@ check `session_step_id` and `classSessionFollow`.
 
 ## History
 
+- 2026-11-10 — CodeRabbit on PR #94 found two gaps (leaving the classroom, a deleted followed module); fixed before merge (CKB-103).
 - 2026-11-10 — Teacher asked for a class mode; approved slice 1 and slice 2 (A: students read the module up to
   the teacher's page; credit for tasks done in a locked week; earlier weeks stay unfinished). Slice 1 built.

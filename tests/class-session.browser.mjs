@@ -42,11 +42,12 @@ test("class session: Enter classroom pulls students in; they follow the teacher'
       contexts.push(context);
     }
     const [teacher] = contexts;
-    for (const name of ["Class session browser", "Another class"]) {
+    // The session class is second, so the class list never treats it as the current class (CKB-103).
+    for (const name of ["Another class", "Class session browser"]) {
       const created = await teacher.request.post("/api/classes", { data: { subject: "Java", name } });
       assert.equal(created.status(), 201, await created.text()); classIds.push((await created.json()).id);
     }
-    const [classId, otherClassId] = classIds;
+    const [otherClassId, classId] = classIds;
     for (const content of [first, second]) assert.equal((await teacher.request.post(`/api/classrooms/${classId}/modules`, { data: content })).status(), 201);
     // "listed" belongs to two classes, so it waits on the class list; "inside" is already in the classroom. Neither has started Week 51.
     assert.equal((await admin.from("classroom_members").insert([
@@ -101,6 +102,29 @@ test("class session: Enter classroom pulls students in; they follow the teacher'
       assert.equal(await page.locator(".student-module-project").getByRole("textbox", { name: "Java source code editor", exact: true }).inputValue(), lastSample);
       assert.notEqual(await page.locator("#classroom-worksheet").getAttribute("data-open"), "true");
     }
+
+    // CKB-103: leaving with the worksheet open (Class home) releases the students too.
+    await teacherPage.getByRole("button", { name: "Module", exact: true }).click(); // reopens the same worksheet (a click, not the hover preview)
+    await worksheet.locator("article:not([hidden])").waitFor();
+    for (const page of students) await page.waitForFunction(() => document.getElementById("classroom-worksheet")?.dataset.open === "true");
+    const followed = async () => (await admin.from("classrooms").select("session_module_id").eq("id", classId).single()).data.session_module_id;
+    assert.equal(await followed(), second.id);
+    const sentAfterLeaving = [];
+    teacherPage.on("request", (request) => { if (request.method() === "PUT" && request.url().endsWith("/session")) sentAfterLeaving.push(JSON.parse(request.postData())); });
+    // By keyboard: a pointer click outside already closes the worksheet, which releases them on its own.
+    await teacherPage.getByRole("button", { name: "Class home" }).focus();
+    await teacherPage.keyboard.press("Enter");
+    await teacherPage.getByRole("button", { name: "Enter classroom" }).waitFor();
+    for (let tries = 0; await followed() && tries < 50; tries++) await teacherPage.waitForTimeout(100);
+    assert.equal(await followed(), null, "Class home released the followed page on the server");
+    for (const page of students) await page.waitForFunction(() => document.getElementById("classroom-worksheet")?.dataset.open !== "true");
+    await teacherPage.waitForTimeout(1500);
+    assert.equal(await followed(), null, "the closed worksheet's page is never sent again from the class list");
+    await teacherPage.getByRole("button", { name: "Enter classroom" }).click();
+    await teacherPage.locator(".classroom-workspace").waitFor();
+    await teacherPage.waitForTimeout(1500);
+    assert.equal(await followed(), null, "nor after entering again");
+    assert.deepEqual(sentAfterLeaving.filter((body) => body.follow), [], "the closed worksheet's page was never sent again");
 
     await teacherPage.locator(".team-header").getByRole("button", { name: "End session" }).click();
     await teacherPage.locator(".team-header").getByRole("button", { name: "End session" }).waitFor({ state: "detached" });

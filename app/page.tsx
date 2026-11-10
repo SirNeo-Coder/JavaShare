@@ -266,7 +266,7 @@ export default function Home() {
   const [teacherFollow, setTeacherFollow] = useState<ClassFollow | null>(null);
   const refreshClassSessionRef = useRef<() => Promise<void>>(async () => undefined);
   const classSessionRequestRef = useRef(0);
-  const sentFollowRef = useRef("");
+  const sentFollowRef = useRef({ classroomId: "", key: "" });
   const refreshSharedStepRef = useRef<() => Promise<void>>(async () => undefined);
   const followSharedStepRef = useRef<(shared: SharedStep, attempt: number) => Promise<void>>(async () => undefined);
   // The student's own work before the shared step, reopened afterwards; and a share they left, so a refresh doesn't pull them back.
@@ -380,14 +380,17 @@ export default function Home() {
     const timer = setTimeout(() => void refreshClassSessionRef.current(), Math.max(0, sessionEndsAt - Date.now()) + 5000);
     return () => clearTimeout(timer);
   }, [sessionEndsAt]);
-  // The teacher's open worksheet page, sent once per change while the session runs.
+  // The teacher's open worksheet page, sent once per change while the session runs. Leaving the class with a
+  // worksheet open (Class home) releases the students too (CKB-103).
   const teacherFollowKey = user?.role === "teacher" && session.active ? JSON.stringify(teacherFollow) : "";
   useEffect(() => {
-    if (!teacherFollowKey || !classroomId) { sentFollowRef.current = ""; return; }
-    if (sentFollowRef.current === teacherFollowKey) return;
-    sentFollowRef.current = teacherFollowKey;
-    void api(`/api/classes/${classroomId}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow: JSON.parse(teacherFollowKey) }) })
-      .catch(() => { sentFollowRef.current = ""; });
+    const sent = sentFollowRef.current;
+    const put = (id: string, follow: ClassFollow | null) => api(`/api/classes/${id}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow }) });
+    if (sent.classroomId && sent.classroomId !== classroomId && sent.key !== "null") void put(sent.classroomId, null).catch(() => undefined);
+    if (!teacherFollowKey || !classroomId) { sentFollowRef.current = { classroomId: "", key: "" }; return; }
+    if (sent.classroomId === classroomId && sent.key === teacherFollowKey) return;
+    sentFollowRef.current = { classroomId, key: teacherFollowKey };
+    void put(classroomId, JSON.parse(teacherFollowKey)).catch(() => { sentFollowRef.current = { classroomId: "", key: "" }; });
   }, [teacherFollowKey, classroomId]);
   const weeklyModule = weeklySelection && user?.role === "student" && weeklySelection.studentId === user.id && weeklySelection.classroomId === classroomId ? weeklySelection.module : null;
   memberPhotoUrlsRef.current = new Map(

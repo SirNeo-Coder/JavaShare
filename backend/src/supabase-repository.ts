@@ -620,11 +620,14 @@ export async function setSupabaseClassSession(user: SupabaseSessionUser, classro
   const classroom = await teacherClassroom(user, classroomId);
   if (!input.active) { await endClassSession(classroomId); return { classroomId, active: false }; }
   const running = classSessionActive(classroom);
+  // Only Enter classroom starts a session: a page report that arrives after it ended starts nothing (CKB-103).
+  if (input.follow !== undefined && !running) return { classroomId, active: false };
   const follow = input.follow === undefined ? running && classroom.session_module_id && classroom.session_page
     ? { moduleId: classroom.session_module_id, page: classroom.session_page, stepId: classroom.session_step_id } : null : input.follow;
-  if (follow) {
-    const content = (await loadCourseModuleRow(classroomId, follow.moduleId)).content;
-    if (follow.stepId && !findActivity(content, follow.stepId)) throw new SupabaseRepositoryError(404, "Step not found in this module");
+  // Check only a newly sent page: a kept one whose module was since deleted or changed must not block Enter classroom (CKB-103).
+  if (input.follow) {
+    const content = (await loadCourseModuleRow(classroomId, input.follow.moduleId)).content;
+    if (input.follow.stepId && !findActivity(content, input.follow.stepId)) throw new SupabaseRepositoryError(404, "Step not found in this module");
   }
   const now = new Date().toISOString();
   const { error } = await getSupabaseAdmin().from("classrooms").update({
