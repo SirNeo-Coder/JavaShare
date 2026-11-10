@@ -19,6 +19,12 @@ const [first, second] = [1, 2].map((week) => {
 });
 second.previousModuleId = first.id;
 const [stepOne, stepTwo] = second.lessons.map((lesson) => lesson.blocks[0]);
+// A lesson with discussion text between two steps: on step one's page, owned by the (locked) step after it.
+const third = structuredClone(second);
+third.id = `class-session-week-3-${randomUUID().slice(0, 6)}`; third.week = 53; third.previousModuleId = first.id;
+const extra = structuredClone(third.lessons[0].blocks[0]);
+extra.id = `${extra.id}-extra`; extra.number = 2; extra.activity.id = `${extra.activity.id}-extra`;
+third.lessons[0].blocks.push({ type: "text", markdown: "Talk about step one together." }, extra);
 
 test("class session: a followed worksheet shows the teacher's page and offers no page buttons", () => {
   const render = (followPage) => renderToStaticMarkup(createElement(ModuleContent, { module: second, classroomId: "class", role: "teacher", worksheet: true, followPage }));
@@ -63,7 +69,7 @@ test("class session: real routes start, follow, renew, expire and end a session;
     const created = await call("/api/classes", teacher, "POST", { subject: "Java", name: "Class session class" });
     assert.equal(created.status, 201); const classId = (await created.json()).id; classes.push(classId);
     assert.equal((await admin.from("classroom_members").insert({ classroom_id: classId, user_id: users[1].id })).error, null);
-    for (const content of [first, second]) assert.equal((await call(`/api/classrooms/${classId}/modules`, teacher, "POST", content)).status, 201);
+    for (const content of [first, second, third]) { const uploaded = await call(`/api/classrooms/${classId}/modules`, teacher, "POST", content); assert.equal(uploaded.status, 201, await uploaded.clone().text()); }
     const session = `/api/classes/${classId}/session`;
     const moduleUrl = `/api/classrooms/${classId}/modules/${second.id}`;
     const put = (cookie, body) => call(session, cookie, "PUT", body);
@@ -119,6 +125,25 @@ test("class session: real routes start, follow, renew, expire and end a session;
       assert.deepEqual((await read()).follow, follow(second.lessons[1], stepTwo));
       const [one, two] = steps(await (await call(moduleUrl, student)).json());
       assert.equal(one.locked, undefined); assert.equal(two.locked, undefined);
+    });
+    await t.test("the task page shows the task text for reading; submitting it stays refused (CKB-106)", async () => {
+      const lastStep = steps(second).at(-1);
+      assert.equal((await put(teacher, { active: true, follow: { moduleId: second.id, page: "task", stepId: lastStep.id } })).status, 200);
+      const view = await (await call(moduleUrl, student)).json();
+      assert.equal(view.performanceTask?.title, second.performanceTask.title);
+      assert.equal(view.closedPerformanceTask, undefined);
+      assert.equal(view.availability.performanceTaskOpen, false, "the student's own task access is unchanged");
+      const submit = await call(`${moduleUrl}/progress/performance-task`, student, "PUT", { variant: "own", files: [{ path: "Main.java", content: "class Main {}" }], status: "pass" });
+      assert.equal(submit.status, 403);
+      assert.equal((await put(teacher, { active: true, follow: follow(second.lessons[1], stepTwo) })).status, 200);
+    });
+    await t.test("a followed step's page keeps its discussion text; the next step stays locked (CKB-106)", async () => {
+      const [lesson] = third.lessons;
+      assert.equal((await put(teacher, { active: true, follow: { ...follow(lesson, lesson.blocks[0]), moduleId: third.id } })).status, 200);
+      const view = await (await call(`/api/classrooms/${classId}/modules/${third.id}`, student)).json();
+      assert.equal(view.lessons[0].blocks[1].markdown, "Talk about step one together.");
+      assert.equal(view.lessons[0].blocks[2].locked, true);
+      assert.equal((await put(teacher, { active: true, follow: follow(second.lessons[1], stepTwo) })).status, 200);
     });
     await t.test("following never opens writing: recording progress keeps its prerequisite lock", async () => {
       const response = await call(`${moduleUrl}/progress/step`, student, "PUT", { stepId: second.lessons[0].exitSlip.id, status: "pass" });

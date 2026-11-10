@@ -153,6 +153,40 @@ test("class session: Enter classroom pulls students in; they follow the teacher'
     assert.equal(await teacherPage.locator(".classroom-workspace").count(), 1, "the teacher stays in the classroom");
     await teacherPage.unroute("**/session");
 
+    // CKB-106: a failed page report, then one still on its way, then Class home: the students are still released.
+    // A page turned while the release is on its way must not start a report after it.
+    let failOne = true, holdNext = true, released = false, letFail, letGo, releaseSeen, letRelease;
+    const failGate = new Promise((resolve) => { letFail = resolve; });
+    const gate = new Promise((resolve) => { letGo = resolve; });
+    const releaseStarted = new Promise((resolve) => { releaseSeen = resolve; });
+    const releaseGate = new Promise((resolve) => { letRelease = resolve; });
+    const lateReports = [];
+    await teacherPage.route("**/session", async (route) => {
+      const body = route.request().method() === "PUT" ? JSON.parse(route.request().postData() || "{}") : {};
+      if (body.follow && released) lateReports.push(body.follow.page);
+      if (body.follow && failOne) { failOne = false; await failGate; return route.abort(); }
+      if (body.follow && holdNext) { holdNext = false; await gate; }
+      if (body.follow === null && !released) { released = true; releaseSeen(); await releaseGate; }
+      return route.continue();
+    });
+    // The first report fails only once the second is waiting behind it, then the second is held on its way.
+    await next.click(); await teacherPage.waitForTimeout(300); await next.click(); await teacherPage.waitForTimeout(300);
+    letFail(); await teacherPage.waitForTimeout(300);
+    await teacherPage.getByRole("button", { name: "Class home" }).focus();
+    await teacherPage.keyboard.press("Enter");
+    await teacherPage.waitForTimeout(500); letGo();
+    await Promise.race([releaseStarted, teacherPage.waitForTimeout(3000)]);
+    await next.click({ timeout: 2000 }).catch(() => undefined);
+    await teacherPage.waitForTimeout(500); letRelease();
+    await teacherPage.getByRole("button", { name: "Enter classroom" }).waitFor();
+    assert.deepEqual(lateReports, [], "no page report starts while Class home releases the students");
+    await teacherPage.unroute("**/session");
+    for (let tries = 0; await followed() && tries < 50; tries++) await teacherPage.waitForTimeout(100);
+    await teacherPage.waitForTimeout(1000);
+    assert.equal(await followed(), null, "released even after a failed report and one still on its way");
+    await teacherPage.getByRole("button", { name: "Enter classroom" }).click();
+    await teacherPage.locator(".classroom-workspace").waitFor();
+
     // CKB-105: a later failed refresh in the classroom keeps the student's "already joined" note for this session.
     let failNext = true;
     await listedPage.route("**/api/bootstrap?*", (route) => failNext && route.request().url().includes("classroomId=") ? (failNext = false, route.fulfill({ status: 500, body: JSON.stringify({ error: "Refresh failed" }) })) : route.continue());

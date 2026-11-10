@@ -659,7 +659,7 @@ async function readFollowedProgress(user: SupabaseSessionUser, classroomId: stri
 async function classSessionFollow(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   if (user.role !== "student") return null;
   const row = await loadClassSession(classroomId);
-  return classSessionActive(row) && row.session_module_id === moduleId ? { stepId: row.session_step_id } : null;
+  return classSessionActive(row) && row.session_module_id === moduleId ? { stepId: row.session_step_id, page: row.session_page } : null;
 }
 
 export async function supabaseLiveSharePayload(user: SupabaseSessionUser, classroomId: string) {
@@ -2275,19 +2275,24 @@ export async function setSupabaseClassroomActiveModule(user: SupabaseSessionUser
   return { activeModuleId: moduleId };
 }
 
-// throughStepId: a class session opens every step up to the teacher's page as well.
-function studentModuleView(content: CourseModule, states: Record<string, string>, moduleVersion?: string, throughStepId?: string | null) {
+// follow: a class session opens every step up to the teacher's page as well, the discussion text shown on that
+// step's page (owned by the next step, which stays locked), and on the task page the task text, for reading (CKB-106).
+function studentModuleView(content: CourseModule, states: Record<string, string>, moduleVersion?: string, follow?: { stepId: string | null; page: string | null } | null) {
   const access = activityAccess(content, states);
   const openSteps = new Set(access.openStepIds);
   const allSteps = content.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
-  const through = throughStepId ? allSteps.findIndex((step) => step.id === throughStepId) : -1;
+  const through = follow?.stepId ? allSteps.findIndex((step) => step.id === follow.stepId) : -1;
   for (const step of allSteps.slice(0, through + 1)) openSteps.add(activityStateId(step));
+  // ponytail: also shows text before the next part's first step if the teacher is on a part's last step; reading only.
+  const textOpen = new Set(openSteps);
+  if (follow && allSteps[through + 1]) textOpen.add(activityStateId(allSteps[through + 1]));
+  const taskShown = access.performanceTaskOpen || follow?.page === "task";
   const lessons = content.lessons.map((lesson) => {
     const steps = lesson.blocks.filter((block) => block.type === "step");
     const blocks = lesson.blocks.map((block, index) => {
       const owner = lesson.blocks.slice(index).find((item) => item.type === "step") ?? steps.at(-1);
       if (!owner || owner.type !== "step" || openSteps.has(activityStateId(owner))) return block;
-      if (block.type !== "step") return { type: "text", markdown: "" };
+      if (block.type !== "step") return textOpen.has(activityStateId(owner)) ? block : { type: "text", markdown: "" };
       return { type: "step", id: block.id, number: block.number, part: block.part, language: block.language, locked: true,
         ...(block.activity?.id ? { activity: { id: block.activity.id, instruction: "", files: [], expectedOutput: "" } } : {}),
         instruction: "Complete the previous activity to unlock this step.", files: [], expectedOutput: "" };
@@ -2299,7 +2304,7 @@ function studentModuleView(content: CourseModule, states: Record<string, string>
     id: content.id, title: content.title, course: content.course, week: content.week, ...(moduleVersion ? { moduleVersion } : {}),
     continues: content.continues, starterFiles: content.starterFiles, sampleFirst: content.sampleFirst,
     lessons, availability: { openLessonIds: lessons.filter((lesson) => !lesson.closed).map((lesson) => lesson.id), performanceTaskOpen: access.performanceTaskOpen },
-    ...(content.performanceTask ? access.performanceTaskOpen ? { performanceTask: content.performanceTask }
+    ...(content.performanceTask ? taskShown ? { performanceTask: content.performanceTask }
       : { closedPerformanceTask: { title: content.performanceTask.title } } : {}),
   };
 }
@@ -2311,7 +2316,7 @@ export async function getSupabaseModule(user: SupabaseSessionUser, classroomId: 
   const row = await loadCourseModuleRow(classroomId, moduleId);
   if (user.role === "teacher") return { ...row.content, availability: moduleAvailability(row) };
   const progress = follow ? await readFollowedProgress(user, classroomId, moduleId) : await loadOrCreateModuleProgress(user, classroomId, moduleId);
-  return studentModuleView(row.content, progress.step_states, row.updated_at, follow?.stepId);
+  return studentModuleView(row.content, progress.step_states, row.updated_at, follow);
 }
 
 export async function deleteSupabaseModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {

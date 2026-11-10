@@ -487,7 +487,8 @@ While the teacher has a module worksheet open (opened by a click, not the hover 
 student's **Module worksheet** opens the same module on the same page, and follows each page turn.
 Their page buttons (parts, page tabs, **← Previous page**, **Next page →**) are greyed out and their
 **Work in code editor** is off. A student who has not reached that week can read it up to the
-teacher's page; later steps stay locked, and nothing can be run, saved or recorded through it. When
+teacher's page, including the discussion text on that page and, on the **Performance task** page, the task
+text; later steps stay locked, and nothing can be run, saved, submitted or recorded through it. When
 the teacher closes the worksheet, the students' worksheets close too.
 
 During a session the teacher's **Work in code editor** also does **Share with class** (below), so

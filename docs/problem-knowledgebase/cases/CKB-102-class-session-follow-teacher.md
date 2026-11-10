@@ -52,6 +52,7 @@ check `session_step_id` and `classSessionFollow`.
 
 ## History
 
+- 2026-11-10 — CodeRabbit fourth/fifth reviews: followed task page and discussion text, Class home timing; fixed (CKB-106).
 - 2026-11-10 — CodeRabbit third review: page order, silent failed release, re-join after a failed refresh; fixed (CKB-105).
 - 2026-11-10 — CodeRabbit re-review: simultaneous requests could revive End session or a closed page; fixed (CKB-104).
 - 2026-11-10 — CodeRabbit on PR #94 found two gaps (leaving the classroom, a deleted followed module); fixed before merge (CKB-103).

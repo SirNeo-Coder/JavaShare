@@ -270,6 +270,8 @@ export default function Home() {
   // Page reports go one at a time, newest waiting, so an older page never lands last (CKB-105).
   const followQueueRef = useRef<{ busy: boolean; waiting: { classroomId: string; follow: ClassFollow | null }[] }>({ busy: false, waiting: [] });
   const sendFollowRef = useRef<(item: { classroomId: string; follow: ClassFollow | null }) => Promise<void>>(async () => undefined);
+  // True while Class home releases the students: no page report may start then (CKB-106).
+  const leavingRef = useRef(false);
   // The class whose workspace loaded since it was entered: only a failed first load undoes its live-session dismissal (CKB-105).
   const loadedClassroomRef = useRef("");
   const refreshSharedStepRef = useRef<() => Promise<void>>(async () => undefined);
@@ -1875,6 +1877,7 @@ export default function Home() {
   useEffect(() => { refreshSharedStepRef.current = refreshSharedStep; followSharedStepRef.current = followSharedStep; refreshClassSessionRef.current = refreshClassSession; sendFollowRef.current = sendFollow; });
   async function sendFollow(item: { classroomId: string; follow: ClassFollow | null }) {
     const queue = followQueueRef.current;
+    if (leavingRef.current) return;
     if (queue.busy) { queue.waiting = [...queue.waiting.filter((other) => other.classroomId !== item.classroomId), item]; return; }
     queue.busy = true;
     try { await api(`/api/classes/${item.classroomId}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow: item.follow }) }); }
@@ -2030,16 +2033,20 @@ export default function Home() {
   const showClasses = async () => {
     try { await moduleEditorRef.current?.save(); }
     catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); return; }
-    // Release students following the open worksheet before leaving, after any page report still on its way; if that
-    // fails, stay so the teacher sees why and can try again or press End session (CKB-105).
-    const sent = sentFollowRef.current;
-    if (user?.role === "teacher" && sent.classroomId && sent.key !== "null") {
+    // Release students following the open worksheet before leaving: stop new page reports, wait for any still on its
+    // way, then release this class. If that fails, stay, report pages again and say why (CKB-105, CKB-106).
+    const leavingClass = classroomId;
+    if (user?.role === "teacher" && leavingClass && session.active && teacherFollow) {
+      leavingRef.current = true;
       // ponytail: 50 ms polling of the one-at-a-time page reports; a promise per report if this ever matters.
       while (followQueueRef.current.busy) await new Promise((resolve) => setTimeout(resolve, 50));
       try {
-        await api(`/api/classes/${sent.classroomId}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow: null }) });
-        sentFollowRef.current = { ...sent, key: "null" };
+        await api(`/api/classes/${leavingClass}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow: null }) });
+        sentFollowRef.current = { classroomId: leavingClass, key: "null" };
       } catch {
+        leavingRef.current = false;
+        sentFollowRef.current = { classroomId: "", key: "" };
+        void sendFollow({ classroomId: leavingClass, follow: teacherFollow });
         notify("Could not release students from your worksheet. Check the connection and press Class home again, or press End session.");
         return;
       }
@@ -2055,6 +2062,7 @@ export default function Home() {
     setActiveTeam(0);
     setData(null);
     setEnteredClassroomId(null);
+    leavingRef.current = false;
   };
 
   if (loading) return <CenteredCard title="Starting CodeShare…" />;

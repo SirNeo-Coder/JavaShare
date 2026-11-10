@@ -1291,4 +1291,10 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   fails, stays with "Could not release students from your worksheet…"; only a failed first load undoes a student's session
   dismissal. Browser checks for each shown failing with the fix removed; `npm test` 446/446; build and lint pass; browser
   tests class-session (2/2), class-shared-step, teacher-live-help, workspace-drawers pass.
+- CodeRabbit fourth/fifth reviews of PR #94 (up to 8bd4cd0): four findings, all valid, fixed with the teacher's approval
+  (CKB-106): following onto **Performance task** shows the task text (submitting still refused); the discussion text on a
+  followed step's page is shown (next step stays locked); **Class home** stops page reports, waits, then releases the
+  current class. Route tests and browser checks shown failing with each fix removed; `npm test` 448/448; build and lint
+  pass; browser tests class-session (2/2), class-shared-step, teacher-module-preview, teacher-live-help, workspace-drawers,
+  web-sample-first pass. These rounds are now finding narrow timing cases; the teacher may merge before the next review.
 - Next: teacher tests and merges PR #94 (check CodeRabbit's next re-review); then slice 2.
