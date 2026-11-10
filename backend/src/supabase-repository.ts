@@ -21,7 +21,7 @@ export class SupabaseRepositoryError extends Error {
 }
 
 type ModuleSubject = "java" | "net-mvc";
-type ClassroomRow = { module_subject: ModuleSubject | null; id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean; active_module_id: string | null };
+type ClassroomRow = { module_subject: ModuleSubject | null; id: string; name: string; subject: string; join_code: string; teacher_id: string; current_activity_id: string | null; live_share_project_id: string | null; chat_muted: boolean; active_module_id: string | null; shared_module_id: string | null; shared_step_id: string | null };
 type TeamRow = { id: string; classroom_id: string; owner_id: string | null; slug: string; name: string; leader_id: string | null; chat_muted: boolean; editing_locked: boolean };
 type ProjectRow = { id: string; classroom_id: string; team_id: string; activity_id: string | null; title: string; description: string; language?: string };
 type ActivityRow = { id: string; classroom_id: string; title: string; mode: "individual" | "group"; ended_at: string | null };
@@ -549,6 +549,32 @@ export async function updateSupabaseGroupPermissions(user: SupabaseSessionUser, 
   const { error } = await db.from("group_member_permissions").upsert({ team_id: teamId, user_id: input.userId, chat_muted: input.chatMuted, editing_locked: input.editingLocked, updated_at: new Date().toISOString() }, { onConflict: "team_id,user_id" });
   fail(error, "Could not update member permissions");
   return { teamId, classroomId: team.classroom_id, userId: input.userId, chatMuted: input.chatMuted, editingLocked: input.editingLocked };
+}
+
+// Share with class (teacher, 2026-11-10): the step the teacher is discussing, fresh for every member whatever
+// their progress. Sample fields only (never the task); students practise it unsaved, so no progress rule applies.
+export async function supabaseSharedStepPayload(user: SupabaseSessionUser, classroomId: string) {
+  if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Classroom access denied");
+  const { data: classroom, error } = await getSupabaseAdmin().from("classrooms").select("shared_module_id,shared_step_id").eq("id", classroomId).single();
+  fail(error, "Could not load the shared step");
+  if (!classroom.shared_module_id || !classroom.shared_step_id) return { active: false as const };
+  const content = await loadCourseModuleRow(classroomId, classroom.shared_module_id).then((row) => row.content, () => null);
+  const step = content && findActivity(content, classroom.shared_step_id);
+  if (!content || !step) return { active: false as const };
+  const { id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput } = step;
+  return { active: true as const, moduleId: content.id, moduleTitle: content.title, week: content.week, course: content.course, starterFiles: content.starterFiles,
+    step: { type: "step" as const, id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput } };
+}
+
+export async function setSupabaseSharedStep(user: SupabaseSessionUser, classroomId: string, share: { moduleId: string; stepId: string } | null) {
+  await teacherClassroom(user, classroomId);
+  if (share) {
+    const step = findActivity((await loadCourseModuleRow(classroomId, share.moduleId)).content, share.stepId);
+    if (!step || !checkableStep(step)) throw new SupabaseRepositoryError(404, "Step not found in this module");
+  }
+  const { error } = await getSupabaseAdmin().from("classrooms").update({ shared_module_id: share?.moduleId ?? null, shared_step_id: share?.stepId ?? null }).eq("id", classroomId);
+  fail(error, "Could not share this step");
+  return { classroomId, active: Boolean(share), moduleId: share?.moduleId ?? null, stepId: share?.stepId ?? null };
 }
 
 export async function supabaseLiveSharePayload(user: SupabaseSessionUser, classroomId: string) {
@@ -1900,9 +1926,15 @@ function mediaPath(path: string) {
   return path;
 }
 
+// The shared step's pictures, sound and video are readable only while that step itself can be read: a deleted
+// module or removed step closes them at once (CKB-100). The payload read also checks class membership.
+async function enforceModuleMediaAccess(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  const shared = await supabaseSharedStepPayload(user, classroomId);
+  if (!shared.active || shared.moduleId !== moduleId) await enforceStudentModuleAccess(user, classroomId, moduleId);
+}
+
 export async function listSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
-  await requireClassroomMember(user, classroomId);
-  await enforceStudentModuleAccess(user, classroomId, moduleId);
+  await enforceModuleMediaAccess(user, classroomId, moduleId);
   const bucket = await requireMediaBucket();
   const prefix = await moduleMediaPrefix(classroomId, moduleId);
   const { objects } = await bucket.list({ prefix });
@@ -1910,8 +1942,7 @@ export async function listSupabaseModuleMedia(user: SupabaseSessionUser, classro
 }
 
 export async function readSupabaseModuleMedia(user: SupabaseSessionUser, classroomId: string, moduleId: string, path: string) {
-  await requireClassroomMember(user, classroomId);
-  await enforceStudentModuleAccess(user, classroomId, moduleId);
+  await enforceModuleMediaAccess(user, classroomId, moduleId);
   const object = await (await requireMediaBucket()).get(await moduleMediaPrefix(classroomId, moduleId) + mediaPath(path));
   if (!object) throw new SupabaseRepositoryError(404, "Media file not found");
   return { body: object.body, contentType: mediaPathType(path)! };

@@ -15,6 +15,8 @@ import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMed
 
 export type StudentActivity = {
   kind: "module" | "performance" | "review" | "preview";
+  // A student's copy of the step their teacher shared with the class (2026-11-10); a preview, never saved.
+  shared?: boolean;
   review?: { studentId: string; studentName: string; submissionId: string; submission: import("../backend/src/personal-performance").PersonalSubmission }; module: CourseModule;
   classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string; studentId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
@@ -115,8 +117,9 @@ function firstPath(list: ModuleFile[], web: boolean, run = "index.html") {
     : list.find((file) => /(?:^|\/)Main\.java$/.test(file.path)))?.path ?? list[0]?.path ?? "";
 }
 
-export default function StudentModuleActivity({ activity, ref, onChecked, onClose, live }: {
+export default function StudentModuleActivity({ activity, ref, onChecked, onClose, live, share }: {
   activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void; live?: ModuleLiveLink;
+  share?: { shared: boolean; toggle: (on: boolean) => Promise<void> };
 }) {
   const review = activity.kind === "review";
   // A teacher's preview of one step's sample: editable and runnable, never saved or checked.
@@ -163,7 +166,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [notice, setNotice] = useState<Notice | null>(null);
   const [output, setOutput] = useState("Ready — edit your project, then press Run code.");
   const javaConsole = useJavaConsole(setOutput, `${activity.classroomId}/${activity.moduleId}/${activity.kind}`);
-  const [status, setStatus] = useState(preview ? "Preview — not saved" : personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
+  const [status, setStatus] = useState(preview ? activity.shared ? "Class step — not saved" : "Preview — not saved" : personal ? activity.progress.performanceTask.own ? "Submitted" : "Personal project" : activity.progress.stepStates[activity.stateId] === "pass" ? "Completed" : "Not checked yet");
   const progress = useRef(activity.progress);
   const [submittedAt, setSubmittedAt] = useState(personal ? activity.progress.performanceTask.own?.submittedAt : undefined);
   const [stepStates, setStepStates] = useState(activity.progress.stepStates);
@@ -429,7 +432,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       if (event.ctrlKey && event.key === "Enter" && !javaConsole.waiting) { event.preventDefault(); void run(); }
     }}>
       <section className="editor-card">
-        <div className="workspace-card-heading"><b>{review ? "Submitted personal project — read-only" : personal ? "Personal project" : preview ? "Module preview" : "Module project"} · {activity.moduleTitle}</b><span>{web ? "Web page" : "Java"}</span></div>
+        <div className="workspace-card-heading"><b>{review ? "Submitted personal project — read-only" : personal ? "Personal project" : preview ? activity.shared ? "Class step" : "Module preview" : "Module project"} · {activity.moduleTitle}</b><span>{web ? "Web page" : "Java"}</span></div>
         <div className="file-tabs" aria-label={personal ? "Personal project files" : "Module project files"}>
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
           {!review && <button type="button" className="add-file" aria-label={`Add ${personal ? "personal" : "module"} ${web ? "web" : "Java"} file`} disabled={busy || pendingSample} onClick={() => setAddingFile(true)}>＋</button>}
@@ -445,6 +448,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
+          {activity.shared && <p role="note">Your teacher shared this step with the class. Practise here: it is not saved and does not complete your own module step. Return to class project goes back to your work.</p>}
           {personal && !review && <PerformanceTaskSteps steps={activity.module?.performanceTask?.steps} module={activity.module} />}
           {personal && web && !review && <ModuleMediaFiles<Progress> base={`${projectPath}/media`} files={personalMedia}
             note="Your own pictures, sound and video for this project (5 MB each, up to 10). Use the path shown, for example images/photo.png, in your page. Online only."
@@ -481,7 +485,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       </aside>
     </div>
     <footer className="actionbar">
-      <div><span className="sync" aria-live="polite">{status}</span><button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
+      <div><span className="sync" aria-live="polite">{status}</span>{share && <button type="button" onClick={() => void share.toggle(!share.shared)}>{share.shared ? "Stop sharing" : "Share with class"}</button>}<button type="button" disabled={busy} onClick={async () => { try { await save(); onClose(); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : "Could not save"); } }}>Return to class project</button></div>
       <div>{submittedAt && <span className="sync">Last submitted: {new Date(submittedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span>}{personal && !review && <button type="button" className="run-button" disabled={busy || successfulFiles !== JSON.stringify(files)} onClick={() => void submit()}>Submit this version</button>}<button type="button" className="run-button" disabled={busy || !deviceReady || mediaLoading || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void run()}>{busy ? "Working…" : mediaLoading ? "Loading media…" : "▶ Run code"}<kbd>Ctrl ↵</kbd></button>{!review && !preview && <button type="button" className={personal ? `run-button save-${saveColour}` : "run-button"} disabled={busy || !deviceReady || Boolean(error && error.startsWith("Device storage is unavailable"))} onClick={() => void saveWork()}>Save work</button>}</div>
     </footer>
     <RunBox message={javaConsole.running ? null : runMessage} onCancel={javaConsole.active ? () => { javaConsole.stop(); setRunMessage(null); } : undefined} />
