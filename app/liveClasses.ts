@@ -8,6 +8,7 @@ export type LiveClassroom = {
   joinCode?: string;
   hasActivity?: boolean;
   hasLiveShare?: boolean;
+  hasSession?: boolean;
   liveSessionId?: string | null;
 };
 
@@ -26,7 +27,7 @@ export async function listenForLiveClasses(client: SupabaseClient, classroomIds:
   const ids = [...new Set(classroomIds)];
   const channels = await Promise.all(ids.map(async (id) => {
     const channel = await privateChannel(client, `class:${id}`);
-    for (const event of ["class:activity-deployed", "class:activity-ended", "class:live-share"]) {
+    for (const event of ["class:activity-deployed", "class:activity-ended", "class:live-share", "class:session"]) {
       channel.on("broadcast", { event }, () => { if (!stopped) refresh(); });
     }
     channel.subscribe((status) => {

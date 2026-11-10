@@ -70,6 +70,9 @@ import {
   setSupabaseClassroomActiveModule,
   setSupabaseLiveShare,
   setSupabaseSharedStep,
+  setSupabaseClassSession,
+  supabaseClassSession,
+  touchSupabaseClassSessions,
   setSupabaseModuleAvailability,
   setSupabaseModulePerformanceTask,
   setSupabaseModuleProjectFiles,
@@ -192,6 +195,7 @@ app.post("/api/auth/activity", requireAuth, async (req, res, next) => {
   try {
     const { elapsedMs } = z.object({ elapsedMs: z.number().int().min(0).max(60000) }).parse(req.body);
     const session = await setSession(req, res, req.user!, req.session, elapsedMs);
+    await touchSupabaseClassSessions(req.user!, Date.now() - elapsedMs).catch((error) => console.error(error));
     return res.json({ session });
   } catch (error) { next(error); }
 });
@@ -445,6 +449,28 @@ app.put("/api/classes/:classroomId/shared-step", requireAuth, requireTeacher, as
     const { share } = z.object({ share: z.object({ moduleId: z.string().min(1).max(200), stepId: z.string().min(1).max(200) }).nullable() }).parse(req.body);
     const payload = await setSupabaseSharedStep(req.user!, String(req.params.classroomId), share);
     await broadcast(`class:${payload.classroomId}`, "class:shared-step", payload);
+    return res.json(payload);
+  } catch (error) { next(error); }
+});
+
+// Class session: members read it; the teacher starts it, moves the followed page, or ends it. The live event only
+// says it changed, so each member re-reads it. A read that finds it past its 30 minutes ends it and tells the class.
+app.get("/api/classes/:classroomId/session", requireAuth, async (req: AuthedRequest, res, next) => {
+  try {
+    const classroomId = String(req.params.classroomId);
+    const { ended, ...session } = await supabaseClassSession(req.user!, classroomId);
+    if (ended) await Promise.all(["class:session", "class:shared-step"].map((event) => broadcast(`class:${classroomId}`, event, { classroomId, active: false })));
+    return res.json(session);
+  } catch (error) { next(error); }
+});
+
+app.put("/api/classes/:classroomId/session", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const follow = z.object({ moduleId: z.string().min(1).max(200), page: z.string().min(1).max(420), stepId: z.string().min(1).max(200).nullable() }).nullable().optional();
+    const input = z.union([z.object({ active: z.literal(false) }), z.object({ active: z.literal(true), follow })]).parse(req.body);
+    const payload = await setSupabaseClassSession(req.user!, String(req.params.classroomId), input);
+    await broadcast(`class:${payload.classroomId}`, "class:session", payload);
+    if (!payload.active) await broadcast(`class:${payload.classroomId}`, "class:shared-step", payload);
     return res.json(payload);
   } catch (error) { next(error); }
 });

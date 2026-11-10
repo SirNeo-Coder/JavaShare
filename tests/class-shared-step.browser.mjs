@@ -80,6 +80,9 @@ test("Share with class: students behind, ahead and in a personal project get the
     await teacherPage.getByRole("button", { name: "Open class", exact: true }).click();
     await teacherPage.getByRole("button", { name: "Enter classroom" }).click();
     await teacherPage.locator(".classroom-workspace").waitFor();
+    // Enter classroom starts a class session (CKB-102); end it so this checks the Share with class button on its own.
+    await teacherPage.locator(".team-header").getByRole("button", { name: "End session" }).click();
+    await teacherPage.locator(".team-header").getByRole("button", { name: "End session" }).waitFor({ state: "detached" });
     await teacherPage.getByRole("button", { name: "Module", exact: true }).hover();
     await teacherPage.locator("#classroom-modules .module-catalog-card").filter({ hasText: second.title }).getByRole("button").first().click();
     const worksheet = teacherPage.locator("#classroom-worksheet");

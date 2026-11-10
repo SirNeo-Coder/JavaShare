@@ -281,6 +281,22 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - **Stop sharing** (or **Return to class project**) reopens each student's own work. Students who
   join or reload while a step is shared get it too. Sharing starts only from the button.
 
+## Class session (agreed 2026-11-10)
+
+- The teacher's **Enter classroom** starts a class session. Every student who has CodeShare open on
+  the class list is pulled into that classroom, once per session, with no popup; their own work is
+  kept first as Share with class does. **End session**, or 30 minutes without the teacher's
+  interaction, ends it (and any shared step); students then work on their own.
+- While the teacher's module worksheet is open, every student's worksheet shows the same module and
+  page, with no page buttons, even a week they have not reached: the server opens that module up to
+  the teacher's page for reading only. Closing the worksheet stops following.
+- During a session the teacher's **Work in code editor** also shares that step with the class (no
+  button). This replaces "students do not see it" from 2026-11-09 only while a session runs.
+- Agreed for the second slice, not yet built: students may edit the shared step; a correct task run
+  is credited as Completed even in a locked week (earlier unfinished weeks stay unfinished);
+  everyone moves with the teacher's step; unfinished steps leave the student's own work unchanged;
+  **Show code** / **Hide code** shows the teacher's typing.
+
 ## Web module steps (agreed 2026-10-28)
 
 - A step whose files are all `.html`, `.css` or `.js` is a web step; no new module field. Its page

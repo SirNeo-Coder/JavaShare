@@ -470,6 +470,27 @@ module or personal project unchanged. Sharing another step replaces the first; s
 reload while a step is shared get it. Only the shared step opens: the rest of a later module stays
 locked, and the step's task is not sent. Works online and offline (laptop Java offline).
 
+## Class session (approved 2026-11-10)
+
+The teacher's **Enter classroom** starts a class session; the classroom header shows **Class session ·
+Students follow your worksheet** with **End session**, and the class list shows **Live now**. A
+student signed in on the **Classes** screen is taken straight into that classroom (no **Your class is
+live** popup), once per session; a student who goes back to **Classes** stays there. Students already
+in the classroom keep working until the teacher opens a module.
+
+While the teacher has a module worksheet open (opened by a click, not the hover preview), every
+student's **Module worksheet** opens the same module on the same page, and follows each page turn.
+Their page buttons (parts, page tabs, **← Previous page**, **Next page →**) are greyed out and their
+**Work in code editor** is off. A student who has not reached that week can read it up to the
+teacher's page; later steps stay locked, and nothing can be run, saved or recorded through it. When
+the teacher closes the worksheet, the students' worksheets close too.
+
+During a session the teacher's **Work in code editor** also does **Share with class** (below), so
+every student gets the step in their editor. **End session**, or 30 minutes without the teacher using
+CodeShare, ends the session and any shared step; students return to their own work. Works online and
+offline. Credit for tasks done in the session, everyone moving with the teacher's step, and **Show
+code** come in a second slice.
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one

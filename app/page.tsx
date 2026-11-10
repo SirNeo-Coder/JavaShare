@@ -11,7 +11,7 @@ import Landing from "./Landing";
 import { studentEntryClassroom, rememberedStudentClassroom, rememberStudentClassroom } from "./studentClassroomEntry";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import useOutsideDismiss from "./useOutsideDismiss";
-import ModuleWorkspace from "./ModuleWorkspace";
+import ModuleWorkspace, { type ClassFollow } from "./ModuleWorkspace";
 import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
 import { activityStateId, activityTask, checkableStep, mergeProjectFiles, webPerformanceTask } from "../backend/src/module-activities";
@@ -137,6 +137,7 @@ type Submission = {
   files: { path?: string; content?: string }[];
 };
 // Share with class (teacher, 2026-11-10): the step every member practises fresh, whatever their progress.
+type ClassSession = { classroomId: string; active: false } | { classroomId: string; active: true; endsAt: number; follow: ClassFollow | null };
 type SharedStep = { moduleId: string; moduleTitle: string; week: number; course: string; starterFiles?: CourseModule["starterFiles"]; step: StepBlock };
 // The step's sample with the module's starter files, as students get it; never saved.
 function stepPreview(module: CourseModule, step: StepBlock, classroomId: string, userId: string, shared = false): StudentActivity {
@@ -260,6 +261,12 @@ export default function Home() {
   const classChannelRef = useRef<RealtimeChannel | null>(null);
   const refreshLiveShareRef = useRef<(() => void) | null>(null);
   const [sharedStep, setSharedStep] = useState<SharedStep | null>(null);
+  // Class session (teacher, 2026-11-10): started by Enter classroom; students follow the teacher's worksheet page.
+  const [classSession, setClassSession] = useState<ClassSession>({ classroomId: "", active: false });
+  const [teacherFollow, setTeacherFollow] = useState<ClassFollow | null>(null);
+  const refreshClassSessionRef = useRef<() => Promise<void>>(async () => undefined);
+  const classSessionRequestRef = useRef(0);
+  const sentFollowRef = useRef("");
   const refreshSharedStepRef = useRef<() => Promise<void>>(async () => undefined);
   const followSharedStepRef = useRef<(shared: SharedStep, attempt: number) => Promise<void>>(async () => undefined);
   // The student's own work before the shared step, reopened afterwards; and a share they left, so a refresh doesn't pull them back.
@@ -365,6 +372,23 @@ export default function Home() {
       : `${team?.project?.title || "Java project"} · ${activeFile?.path || ""}`;
   const userId = user?.id;
   const classroomId = data?.classrooms[0]?.id;
+  const session: ClassSession = classSession.classroomId === classroomId ? classSession : { classroomId: classroomId ?? "", active: false };
+  // Past its 30 minutes the next read ends the session, so check again then (a renewal just moves it on).
+  const sessionEndsAt = session.active ? session.endsAt : 0;
+  useEffect(() => {
+    if (!sessionEndsAt) return;
+    const timer = setTimeout(() => void refreshClassSessionRef.current(), Math.max(0, sessionEndsAt - Date.now()) + 5000);
+    return () => clearTimeout(timer);
+  }, [sessionEndsAt]);
+  // The teacher's open worksheet page, sent once per change while the session runs.
+  const teacherFollowKey = user?.role === "teacher" && session.active ? JSON.stringify(teacherFollow) : "";
+  useEffect(() => {
+    if (!teacherFollowKey || !classroomId) { sentFollowRef.current = ""; return; }
+    if (sentFollowRef.current === teacherFollowKey) return;
+    sentFollowRef.current = teacherFollowKey;
+    void api(`/api/classes/${classroomId}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow: JSON.parse(teacherFollowKey) }) })
+      .catch(() => { sentFollowRef.current = ""; });
+  }, [teacherFollowKey, classroomId]);
   const weeklyModule = weeklySelection && user?.role === "student" && weeklySelection.studentId === user.id && weeklySelection.classroomId === classroomId ? weeklySelection.module : null;
   memberPhotoUrlsRef.current = new Map(
     data?.teams.flatMap((entry) =>
@@ -622,7 +646,7 @@ export default function Home() {
     let cancelled = false;
     const refreshLiveShare = async () => {
       // The shared step uses the same triggers; a microtask later so its ref is set on the first run.
-      queueMicrotask(() => void refreshSharedStepRef.current());
+      queueMicrotask(() => { void refreshSharedStepRef.current(); void refreshClassSessionRef.current(); });
       try {
         const next = await api<LiveShare>(
           `/api/classes/${classroomId}/live-share`,
@@ -762,6 +786,7 @@ export default function Home() {
       setLiveShare(share);
     });
     on("class:shared-step", () => void refreshSharedStepRef.current());
+    on("class:session", () => void refreshClassSessionRef.current());
     on("class:chat-muted", ({ muted }: { muted: boolean }) =>
       setData((current) =>
         current ? { ...current, classroomChatMuted: muted } : current,
@@ -1772,10 +1797,12 @@ export default function Home() {
   }
 
   async function startModuleActivity(module: CourseModule, step?: StepBlock) {
-    // Teacher preview: the step's sample in the main editor, never saved or shared (teacher, 2026-11-09).
+    // Teacher preview: the step's sample in the main editor, never saved (teacher, 2026-11-09). During a class
+    // session it is also shared with the class (teacher, 2026-11-10).
     if (classroomId && user?.role === "teacher" && step) {
       setModuleActivity(stepPreview(module, step, classroomId, user.id));
       setProjectsOpen(false);
+      if (session.active) void shareStep({ moduleId: module.id, stepId: step.id });
       return;
     }
     if (!classroomId || user?.role !== "student") return;
@@ -1836,7 +1863,20 @@ export default function Home() {
     setModuleActivity(stepPreview(sharedModule, shared.step, classroomId, user.id, true));
     setProjectsOpen(false); setModulesOpen(false); setWorksheetCloseSignal((signal) => signal + 1);
   }
-  useEffect(() => { refreshSharedStepRef.current = refreshSharedStep; followSharedStepRef.current = followSharedStep; });
+  useEffect(() => { refreshSharedStepRef.current = refreshSharedStep; followSharedStepRef.current = followSharedStep; refreshClassSessionRef.current = refreshClassSession; });
+  async function refreshClassSession() {
+    if (!classroomId) return;
+    const request = ++classSessionRequestRef.current;
+    const next = await api<{ active: false } | { active: true; endsAt: number; follow: ClassFollow | null }>(`/api/classes/${classroomId}/session`).catch(() => null);
+    if (next && request === classSessionRequestRef.current) setClassSession({ ...next, classroomId });
+  }
+  async function setClassSessionState(body: { active: boolean }) {
+    if (!classroomId) return;
+    try {
+      await api(`/api/classes/${classroomId}/session`, { method: "PUT", body: JSON.stringify(body) });
+      await Promise.all([refreshClassSession(), refreshSharedStep()]);
+    } catch (error) { notify(error instanceof Error ? error.message : "Could not update the class session"); }
+  }
   // Leaving the shared step reopens the student's own module or personal project through the normal path.
   async function returnFromSharedStep() {
     const before = beforeSharedRef.current;
@@ -2004,6 +2044,9 @@ export default function Home() {
           setWorkspaceError("");
           setHomeClassroomId(classroomId);
           setEnteredClassroomId(classroomId);
+          if (user.role === "teacher")
+            void api(`/api/classes/${classroomId}/session`, { method: "PUT", body: JSON.stringify({ active: true }) })
+              .then(() => refreshClassSessionRef.current(), (error) => notify(error instanceof Error ? error.message : "Could not start the class session"));
         }}
         onReviewPersonal={async (classId, studentId, studentName, moduleId) => {
           const result = await api<{ module: CourseModule; submission: import("../backend/src/personal-performance").PersonalSubmission; submissionId: string }>(`/api/classes/${classId}/students/${studentId}/modules/${moduleId}/personal-submission`);
@@ -2549,6 +2592,15 @@ export default function Home() {
                 <p>{workspaceSubtitle}</p>
               </div>
             </div>
+            {user.role === "teacher" && session.active && (
+              <div className="presence">
+                <span>
+                  <b>Class session</b>
+                  <small>Students follow your worksheet</small>
+                </span>
+                <button type="button" onClick={() => void setClassSessionState({ active: false })}>End session</button>
+              </div>
+            )}
             {user.role === "teacher" && sharedStep && (
               <div className="presence">
                 <span>
@@ -3038,7 +3090,8 @@ export default function Home() {
           </footer>
           <RunBox message={running && !javaConsole.running ? "Java is loading or running… Please wait." : null} onCancel={javaConsole.active ? javaConsole.stop : undefined} /></>}
         </section>
-        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} studentId={user.id} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onSelectModule={(module) => setWeeklySelection({ studentId: user.id, classroomId, module })} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} closeSignal={worksheetCloseSignal} />}
+        {classroomId && <ModuleWorkspace key={classroomId} classroomId={classroomId} studentId={user.id} role={user.role} browserOpen={modulesOpen} projectsOpen={projectsOpen} onBrowserChange={setModulesOpen} onProjectsChange={setProjectsOpen} onSelectModule={(module) => setWeeklySelection({ studentId: user.id, classroomId, module })} onStartActivity={startModuleActivity} progressRevision={moduleProgressRevision} closeSignal={worksheetCloseSignal}
+          follow={user.role === "student" && session.active ? session.follow : null} onFollowChange={user.role === "teacher" ? setTeacherFollow : undefined} />}
         <WorkspaceDrawer id="classroom-chat" title={!data.currentActivity ? "Classroom chat" : data.currentActivity.mode === "individual" ? "Private chat" : "Group chat"} side="right" open={chatOpen} autoFocus={!chatHoverPreview} onClose={() => { setChatOpen(false); setChatHoverPreview(false); }}>
           <div className="chat">
                   <div className="chat-toolbar">

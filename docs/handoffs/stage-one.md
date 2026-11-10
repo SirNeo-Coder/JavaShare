@@ -1213,3 +1213,36 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   (2026-11-10, up to b019ed8): merge risk Low, security risk Low, no concerns; one valid docs nitpick (CKB-099 status
   still said migration pending) fixed. Final review (up to 5e950f3): no comments; its summary repeats the two
   docs points, both checked fixed on GitHub (table row renders 2 cells; status updated). Next: teacher merges.
+
+## Class session, slice 1 of 2 — 2026-11-10
+
+- Branch `feature/class-session` (from `main` at `31e26c4`, after PR #91; worktree `../JavaShare-session`). CKB-102.
+  Teacher asked that **Enter classroom** bring every online student in and that students see whatever module the
+  teacher opens, without pressing **Share with class**. Approved (two pull requests): slice 1 = session, pull-in,
+  follow the teacher's worksheet page (option A: students read that module up to the teacher's page, past their
+  locks), auto-share on **Work in code editor**, **End session**, end after 30 minutes without the teacher.
+  Slice 2 = students edit the shared step and a correct task run is credited even in a locked week (earlier weeks
+  stay unfinished), everyone moves with the teacher's step, unfinished steps leave the student's own work unchanged,
+  **Show code** / **Hide code** for the teacher's typing (window covers the editor while open; the teacher said
+  "approved" without choosing, so the recommended options were assumed: covering window, prerequisite rule kept).
+- Done (slice 1): migration `20261111000100_class_session.sql` (five nullable `classrooms` columns),
+  `GET`/`PUT /api/classes/:id/session`, live event `class:session`, teacher renewal in `POST /api/auth/activity`,
+  `hasSession`/`liveSessionId: session:<start>` in class summaries, student class list auto-enters once per session,
+  worksheet follow (`followPage`/`onPageChange`, page buttons disabled, no device copy, no progress row started),
+  **Class session · End session** in the classroom header, auto **Share with class** during a session. Rule added
+  to `AGENTS.md` ("Class session").
+- Tested: `tests/class-session.test.mjs` (rule test + real routes, 12/12) and `tests/class-session.browser.mjs`
+  (real app, offline settings, laptop Java) — route pieces, worksheet follow, auto-join and browser follow each shown
+  failing when broken, passing restored. The existing `class-shared-step.browser.mjs` caught a progress row created by
+  following (fixed) and now presses **End session** first; `tests/live-classes.test.mjs` expects `class:session`.
+  Browser tests also passing on this build: teacher-module-preview, java-suggestions, teacher-live-help,
+  web-module-steps, web-sample-first, workspace-drawers.
+- Not run: `java-run-progress.browser.mjs` (needs the online runner on ports 3030–3032); hosted site (needs the
+  migration first); `npm run classroom:offline` itself (tests used its settings); online Java (CheerpJ).
+- Hosted step for the teacher: apply `20261111000100_class_session.sql` in the Supabase SQL Editor before
+  merging (instructions in the PR).
+- CodeRabbit on PR #92 (checked at the start of this work): two Minor findings, both valid, docs only, not fixed yet
+  (need the teacher's approval): the Week 8 prompt says media steps' expected output "ends with Media checks:" but real
+  files list one result line per picture/sound/video after it; `:before` is valid legacy CSS, so it is not an example
+  of a broken selector. PR #93 is being worked on separately (uncommitted CKB-101 changes on its branch); not touched.
+- Next: teacher reviews PR; then slice 2.
