@@ -99,11 +99,20 @@ test("workspace drawers: real offline classroom pointer and keyboard interaction
         await page.locator("#classroom-modules .module-catalog-card").first().getByRole("button").first().click();
         await settled("classroom-worksheet", true);
         const sheet = page.locator("#classroom-worksheet");
-        assert.match(await sheet.locator(".printed-module-viewer>header h2").textContent(), /^Week \d+ · /, "worksheet title names its week");
+        // The worksheet title names its week once the module has loaded.
+        await sheet.locator(".printed-module-viewer>header h2", { hasText: /^Week \d+ · / }).waitFor();
         const foldHeight = () => page.waitForTimeout(400).then(() => sheet.locator(".worksheet-fold").evaluate((el) => el.getBoundingClientRect().height));
         const open = await foldHeight();
         assert.ok(open > 40, "progress and step tabs show at first");
+        const pageHeight = (extra) => sheet.locator(".worksheet-desk").evaluate((desk, extra) => {
+          desk.scrollTop = 0;
+          desk.querySelector(".worksheet-paper:not([hidden])").style.minHeight = extra ? `${desk.clientHeight + extra}px` : "";
+        }, extra);
+        await pageHeight(open / 2); await page.waitForTimeout(400);
         await sheet.locator(".worksheet-desk").hover(); await page.mouse.wheel(0, 400);
+        assert.equal(await foldHeight(), open, "a page that would fit once folded never folds, so scrolling up is never stuck");
+        await pageHeight(3000); await page.waitForTimeout(400);
+        await page.mouse.wheel(0, 400);
         assert.equal(await foldHeight(), 0, "scrolling down folds the progress and step tabs away");
         await sheet.locator(".printed-module-viewer>header").hover();
         assert.equal(await foldHeight(), open, "hovering the title bar shows them again");
@@ -111,6 +120,7 @@ test("workspace drawers: real offline classroom pointer and keyboard interaction
         assert.equal(await foldHeight(), 0, "leaving the title bar folds them again");
         await page.mouse.wheel(0, -100);
         assert.equal(await foldHeight(), open, "scrolling up shows them again");
+        await pageHeight(0);
         await outside(); await settled("classroom-worksheet", false);
         const editor = page.getByRole("textbox", { name: "Java source code editor", exact: true });
         const draft = (await editor.inputValue()) + "\n// Keep this unsaved edit";

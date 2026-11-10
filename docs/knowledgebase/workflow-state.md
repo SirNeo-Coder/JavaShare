@@ -264,6 +264,10 @@ What teachers and students can do today. Keep this page current when their use o
   **Module** returns to that visit. Closing Projects does not automatically reopen the worksheet.
   The classroom top bar and existing chat system are retained. Class-home upload, availability, progress and submission
   routes retain their existing storage and permissions. No new route, dependency or migration.
+- Folding header (2026-11-10): the worksheet's title bar reads **Week N · <module title>** with
+  **← All modules**, and always stays. Scrolling the page down folds the Teacher preview note,
+  **MODULE PROGRESS** and the step tabs away; scrolling up, pointing at the title bar or tabbing onto
+  them shows them again. A page that would fit once folded never folds (CKB-101). Display only.
 
 ## Teacher class dashboard (approved workflow change, 2026-10-20)
 

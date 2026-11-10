@@ -371,12 +371,15 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   // scrolling up; hovering the title bar reopens them too (CSS).
   const [headerFolded, setHeaderFolded] = useState(false);
   const lastScroll = useRef({ top: 0, at: 0 });
+  const foldRef = useRef<HTMLDivElement>(null);
   const foldOnScroll = (event: { currentTarget: HTMLDivElement }) => {
-    const top = event.currentTarget.scrollTop, now = Date.now(), last = lastScroll.current;
+    const desk = event.currentTarget, top = desk.scrollTop, now = Date.now(), last = lastScroll.current;
     lastScroll.current = { top, at: last.at };
     // Folding resizes the page, which can move the scroll by itself; ignore moves just after a fold.
     if (now - last.at < 300) return;
-    const fold = top > last.top ? top > 24 : top < last.top ? false : headerFolded;
+    // Fold only when the page still scrolls afterwards, so scrolling up can always unfold it.
+    const room = desk.scrollHeight - desk.clientHeight - (headerFolded ? 0 : foldRef.current?.offsetHeight ?? 0);
+    const fold = top > last.top ? top > 24 && room > 24 : top < last.top ? false : headerFolded;
     if (fold !== headerFolded) { lastScroll.current.at = now; setHeaderFolded(fold); }
   };
 
@@ -408,7 +411,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
     const taskDone = Boolean(progress.performanceTask.own);
     const completed = parts.filter(partDone).length + Number(hasTask && taskDone);
     return <div className="worksheet-content">
-      <div className="worksheet-fold" data-folded={headerFolded}><div>
+      <div ref={foldRef} className="worksheet-fold" data-folded={headerFolded}><div>
       {role === "teacher" && <p className="module-preview-note">Teacher preview — running code does not save student progress.</p>}
       <div className="worksheet-progress">
         <div><span><small>MODULE PROGRESS</small>{role === "student" ? `${completed} of ${parts.length + Number(hasTask)} parts completed` : "Teacher preview"}</span>{role === "student" && <b>{progress.percent}%</b>}</div>

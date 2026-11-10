@@ -1179,3 +1179,19 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - PR #90 (https://github.com/SirNeo-Coder/JavaShare/pull/90). CodeRabbit checked 2026-11-09: no inline or
   outside-diff findings, minimal merge risk, low security risk; its only note was a generic docstring-coverage
   check (not valid: the code does not use docstrings). Cloudflare build preview succeeded. Next: teacher reviews and merges.
+
+## Worksheet folding header — 2026-11-10
+
+- Branch `feature/worksheet-collapsing-header` (from `main` `98ff790`). Teacher asked for the Module
+  worksheet header to collapse upward on scroll down, return on hover or scroll up, and show the module
+  title with its week. Approved with the recommended choice: the step tabs fold too.
+- Done: title bar reads **Week N · <module title>** and stays; the Teacher preview note, **MODULE
+  PROGRESS** and step tabs fold away on scroll down and return on scroll up, title-bar hover or keyboard
+  focus. Short pages never fold (CKB-101, found while building). Display only: no route, migration,
+  setting or server change; offline unaffected.
+- Tested: `tests/classroom-ui.test.mjs` "module worksheet: note, progress and step tabs sit in one fold
+  above the scrolling page"; `tests/workspace-drawers.browser.mjs` (real app via `npm run classroom:offline`,
+  port 3000) 17/17. Each shown failing with the fix broken, passing restored. Full `npm test` 425/425;
+  `npm run build:all` passed; lint 0 errors (old warnings only; `.claude/worktrees` copies excluded).
+- Not run: hosted site, phones, non-Chromium browsers.
+- PR #91 (Share with class, branch `feature/class-shared-step`) is still open and separate.
