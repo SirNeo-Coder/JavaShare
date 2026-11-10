@@ -1285,4 +1285,5 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   back `disabled={following}`; a followed page change also unfolds the header (2 lines; no automated test, the test
   module's pages are too short to fold). `npm test` 446/446; build, lint, class-session, class-shared-step and
   workspace-drawers browser tests pass.
-- Next: teacher applies the migration on hosted Supabase, reviews and merges PR #94 (check CodeRabbit's next re-review); then slice 2.
+- 2026-11-10 — The teacher applied `20261111000100_class_session.sql` on hosted Supabase (SQL Editor: "Success. No rows returned").
+- Next: teacher tests and merges PR #94 (check CodeRabbit's next re-review); then slice 2.
