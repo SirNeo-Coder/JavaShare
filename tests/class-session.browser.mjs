@@ -79,6 +79,21 @@ test("class session: Enter classroom pulls students in; they follow the teacher'
     const worksheet = teacherPage.locator("#classroom-worksheet");
     await worksheet.locator("article:not([hidden])").waitFor();
     const next = worksheet.getByRole("button", { name: "Next page →" });
+    // CKB-105: page reports go one at a time, so an older page held up on the way never lands last.
+    let releaseHeld; const held = new Promise((resolve) => { releaseHeld = resolve; }); let holdOne = true;
+    await teacherPage.route("**/session", async (route) => {
+      const body = route.request().method() === "PUT" ? JSON.parse(route.request().postData() || "{}") : {};
+      if (holdOne && body.follow) { holdOne = false; await held; }
+      await route.continue();
+    });
+    await next.click(); await next.click();
+    const newest = await shownPage(teacherPage);
+    await teacherPage.waitForTimeout(500); releaseHeld();
+    for (const page of students) await page.waitForFunction((value) => document.querySelector("#classroom-worksheet article.worksheet-paper:not([hidden])")?.getAttribute("aria-label") === value, newest);
+    await teacherPage.waitForTimeout(1500);
+    for (const page of students) assert.equal(await shownPage(page), newest, "an older page report never lands last");
+    await teacherPage.unroute("**/session");
+    for (let back = 0; back < 2; back++) await worksheet.getByRole("button", { name: "← Previous page" }).click();
     // Turn the teacher's pages until the second step page (the second week part), checking the students each time.
     for (let stepPages = 0; ;) {
       const label = await shownPage(teacherPage);
@@ -125,6 +140,30 @@ test("class session: Enter classroom pulls students in; they follow the teacher'
     await teacherPage.waitForTimeout(1500);
     assert.equal(await followed(), null, "nor after entering again");
     assert.deepEqual(sentAfterLeaving.filter((body) => body.follow), [], "the closed worksheet's page was never sent again");
+
+    // CKB-105: if releasing them fails, Class home keeps the teacher in the classroom and says why.
+    await teacherPage.getByRole("button", { name: "Module", exact: true }).hover();
+    await teacherPage.locator("#classroom-modules .module-catalog-card").filter({ hasText: second.title }).getByRole("button").first().click();
+    await worksheet.locator("article:not([hidden])").waitFor();
+    for (const page of students) await page.waitForFunction(() => document.getElementById("classroom-worksheet")?.dataset.open === "true");
+    await teacherPage.route("**/session", (route) => route.request().method() === "PUT" && JSON.parse(route.request().postData() || "{}").follow === null ? route.abort() : route.continue());
+    await teacherPage.getByRole("button", { name: "Class home" }).focus();
+    await teacherPage.keyboard.press("Enter");
+    await teacherPage.getByText("Could not release students from your worksheet").waitFor();
+    assert.equal(await teacherPage.locator(".classroom-workspace").count(), 1, "the teacher stays in the classroom");
+    await teacherPage.unroute("**/session");
+
+    // CKB-105: a later failed refresh in the classroom keeps the student's "already joined" note for this session.
+    let failNext = true;
+    await listedPage.route("**/api/bootstrap?*", (route) => failNext && route.request().url().includes("classroomId=") ? (failNext = false, route.fulfill({ status: 500, body: JSON.stringify({ error: "Refresh failed" }) })) : route.continue());
+    const failedRefresh = listedPage.waitForResponse((response) => response.url().includes("/api/bootstrap") && response.status() === 500);
+    assert.equal((await teacher.request.post(`/api/classes/${classId}/auto-group`, { data: { groupSize: 2, studentIds: [users[1].id, users[2].id] } })).ok(), true);
+    await failedRefresh;
+    await listedPage.unroute("**/api/bootstrap?*");
+    await listedPage.getByRole("button", { name: "Classes", exact: true }).first().click();
+    await listedPage.getByRole("button", { name: "Join another class" }).waitFor();
+    await listedPage.waitForTimeout(3000);
+    assert.equal(await listedPage.locator(".classroom-workspace").count(), 0, "the same session does not pull the student in again");
 
     await teacherPage.locator(".team-header").getByRole("button", { name: "End session" }).click();
     await teacherPage.locator(".team-header").getByRole("button", { name: "End session" }).waitFor({ state: "detached" });

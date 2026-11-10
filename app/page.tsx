@@ -267,6 +267,11 @@ export default function Home() {
   const refreshClassSessionRef = useRef<() => Promise<void>>(async () => undefined);
   const classSessionRequestRef = useRef(0);
   const sentFollowRef = useRef({ classroomId: "", key: "" });
+  // Page reports go one at a time, newest waiting, so an older page never lands last (CKB-105).
+  const followQueueRef = useRef<{ busy: boolean; waiting: { classroomId: string; follow: ClassFollow | null }[] }>({ busy: false, waiting: [] });
+  const sendFollowRef = useRef<(item: { classroomId: string; follow: ClassFollow | null }) => Promise<void>>(async () => undefined);
+  // The class whose workspace loaded since it was entered: only a failed first load undoes its live-session dismissal (CKB-105).
+  const loadedClassroomRef = useRef("");
   const refreshSharedStepRef = useRef<() => Promise<void>>(async () => undefined);
   const followSharedStepRef = useRef<(shared: SharedStep, attempt: number) => Promise<void>>(async () => undefined);
   // The student's own work before the shared step, reopened afterwards; and a share they left, so a refresh doesn't pull them back.
@@ -385,13 +390,13 @@ export default function Home() {
   const teacherFollowKey = user?.role === "teacher" && session.active ? JSON.stringify(teacherFollow) : "";
   useEffect(() => {
     const sent = sentFollowRef.current;
-    const put = (id: string, follow: ClassFollow | null) => api(`/api/classes/${id}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow }) });
-    if (sent.classroomId && sent.classroomId !== classroomId && sent.key !== "null") void put(sent.classroomId, null).catch(() => undefined);
+    if (sent.classroomId && sent.classroomId !== classroomId && sent.key !== "null") void sendFollowRef.current({ classroomId: sent.classroomId, follow: null });
     if (!teacherFollowKey || !classroomId) { sentFollowRef.current = { classroomId: "", key: "" }; return; }
     if (sent.classroomId === classroomId && sent.key === teacherFollowKey) return;
     sentFollowRef.current = { classroomId, key: teacherFollowKey };
-    void put(classroomId, JSON.parse(teacherFollowKey)).catch(() => { sentFollowRef.current = { classroomId: "", key: "" }; });
+    void sendFollowRef.current({ classroomId, follow: JSON.parse(teacherFollowKey) });
   }, [teacherFollowKey, classroomId]);
+  useEffect(() => { loadedClassroomRef.current = ""; }, [enteredClassroomId]);
   const weeklyModule = weeklySelection && user?.role === "student" && weeklySelection.studentId === user.id && weeklySelection.classroomId === classroomId ? weeklySelection.module : null;
   memberPhotoUrlsRef.current = new Map(
     data?.teams.flatMap((entry) =>
@@ -557,6 +562,7 @@ export default function Home() {
         }
         if (enteredClassroomId && next.user.role === "student") rememberStudentClassroom(next.user.id, enteredClassroomId);
         setData(next);
+        if (enteredClassroomId) loadedClassroomRef.current = enteredClassroomId;
         if (!enteredClassroomId) setDismissedLiveSessions((current) => retainLiveDismissals(next.classrooms, current));
         setUser(next.user);
         setWorkspaceError("");
@@ -620,7 +626,7 @@ export default function Home() {
         }
         // A failed scoped load must not leave a live-class invitation dismissed for a class the
         // student never actually entered; a no-op if this class wasn't a dismissed invitation.
-        if (enteredClassroomId) {
+        if (enteredClassroomId && loadedClassroomRef.current !== enteredClassroomId) {
           setDismissedLiveSessions((current) =>
             enteredClassroomId in current
               ? Object.fromEntries(Object.entries(current).filter(([id]) => id !== enteredClassroomId))
@@ -1866,7 +1872,19 @@ export default function Home() {
     setModuleActivity(stepPreview(sharedModule, shared.step, classroomId, user.id, true));
     setProjectsOpen(false); setModulesOpen(false); setWorksheetCloseSignal((signal) => signal + 1);
   }
-  useEffect(() => { refreshSharedStepRef.current = refreshSharedStep; followSharedStepRef.current = followSharedStep; refreshClassSessionRef.current = refreshClassSession; });
+  useEffect(() => { refreshSharedStepRef.current = refreshSharedStep; followSharedStepRef.current = followSharedStep; refreshClassSessionRef.current = refreshClassSession; sendFollowRef.current = sendFollow; });
+  async function sendFollow(item: { classroomId: string; follow: ClassFollow | null }) {
+    const queue = followQueueRef.current;
+    if (queue.busy) { queue.waiting = [...queue.waiting.filter((other) => other.classroomId !== item.classroomId), item]; return; }
+    queue.busy = true;
+    try { await api(`/api/classes/${item.classroomId}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow: item.follow }) }); }
+    catch { if (sentFollowRef.current.classroomId === item.classroomId) sentFollowRef.current = { classroomId: "", key: "" }; }
+    finally {
+      queue.busy = false;
+      const next = queue.waiting.shift();
+      if (next) void sendFollow(next);
+    }
+  }
   async function refreshClassSession() {
     if (!classroomId) return;
     const request = ++classSessionRequestRef.current;
@@ -2012,6 +2030,20 @@ export default function Home() {
   const showClasses = async () => {
     try { await moduleEditorRef.current?.save(); }
     catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); return; }
+    // Release students following the open worksheet before leaving, after any page report still on its way; if that
+    // fails, stay so the teacher sees why and can try again or press End session (CKB-105).
+    const sent = sentFollowRef.current;
+    if (user?.role === "teacher" && sent.classroomId && sent.key !== "null") {
+      // ponytail: 50 ms polling of the one-at-a-time page reports; a promise per report if this ever matters.
+      while (followQueueRef.current.busy) await new Promise((resolve) => setTimeout(resolve, 50));
+      try {
+        await api(`/api/classes/${sent.classroomId}/session`, { method: "PUT", body: JSON.stringify({ active: true, follow: null }) });
+        sentFollowRef.current = { ...sent, key: "null" };
+      } catch {
+        notify("Could not release students from your worksheet. Check the connection and press Class home again, or press End session.");
+        return;
+      }
+    }
     setModuleActivity(null);
     setModuleAccessError(null);
     setChoosingStudentClass(user?.role === "student");

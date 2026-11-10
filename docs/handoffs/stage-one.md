@@ -1286,4 +1286,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   module's pages are too short to fold). `npm test` 446/446; build, lint, class-session, class-shared-step and
   workspace-drawers browser tests pass.
 - 2026-11-10 — The teacher applied `20261111000100_class_session.sql` on hosted Supabase (SQL Editor: "Success. No rows returned").
+- CodeRabbit third review of PR #94 (2026-11-10, up to 3a0ba02): three findings, all valid, fixed with the teacher's approval
+  (CKB-105): page reports now go one at a time (newest waits); **Class home** releases students before leaving and, if that
+  fails, stays with "Could not release students from your worksheet…"; only a failed first load undoes a student's session
+  dismissal. Browser checks for each shown failing with the fix removed; `npm test` 446/446; build and lint pass; browser
+  tests class-session (2/2), class-shared-step, teacher-live-help, workspace-drawers pass.
 - Next: teacher tests and merges PR #94 (check CodeRabbit's next re-review); then slice 2.
