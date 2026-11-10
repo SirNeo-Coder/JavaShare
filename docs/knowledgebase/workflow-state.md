@@ -267,7 +267,8 @@ What teachers and students can do today. Keep this page current when their use o
 - Folding header (2026-11-10): the worksheet's title bar reads **Week N · <module title>** with
   **← All modules**, and always stays. Scrolling the page down folds the Teacher preview note,
   **MODULE PROGRESS** and the step tabs away; scrolling up, pointing at the title bar or tabbing onto
-  them shows them again. A page that would fit once folded never folds (CKB-101). Display only.
+  them shows them again, and so does every page change. A page that would fit once folded never
+  folds (CKB-101). Display only.
 
 ## Teacher class dashboard (approved workflow change, 2026-10-20)
 

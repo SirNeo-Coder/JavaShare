@@ -375,13 +375,16 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   const foldOnScroll = (event: { currentTarget: HTMLDivElement }) => {
     const desk = event.currentTarget, top = desk.scrollTop, now = Date.now(), last = lastScroll.current;
     lastScroll.current = { top, at: last.at };
-    // Folding resizes the page, which can move the scroll by itself; ignore moves just after a fold.
-    if (now - last.at < 300) return;
+    // Folding gives the page room, which can pull its scroll back to the bottom by itself; ignore
+    // only that move just after a fold, so the student's own scrolling up always unfolds (CKB-101).
+    if (now - last.at < 300 && top >= desk.scrollHeight - desk.clientHeight - 1) return;
     // Fold only when the page still scrolls afterwards, so scrolling up can always unfold it.
     const room = desk.scrollHeight - desk.clientHeight - (headerFolded ? 0 : foldRef.current?.offsetHeight ?? 0);
     const fold = top > last.top ? top > 24 && room > 24 : top < last.top ? false : headerFolded;
     if (fold !== headerFolded) { lastScroll.current.at = now; setHeaderFolded(fold); }
   };
+  // Every page change shows the progress and step tabs again.
+  const showPage = (index: number) => { setPaperPage(index); setHeaderFolded(false); };
 
   useEffect(() => {
     if (role !== "student") return;
@@ -417,11 +420,11 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
         <div><span><small>MODULE PROGRESS</small>{role === "student" ? `${completed} of ${parts.length + Number(hasTask)} parts completed` : "Teacher preview"}</span>{role === "student" && <b>{progress.percent}%</b>}</div>
         {role === "student" && <progress aria-label="Module progress" value={progress.percent} max={100} />}
         <nav aria-label="Module parts" className="worksheet-parts">
-          {parts.map((part, index) => <button key={part.id} type="button" aria-current={current?.part.id === part.id ? "step" : undefined} className={role === "student" && partDone(part) ? "part-done" : ""} onClick={() => setPaperPage(pages.findIndex((page) => page.part.id === part.id))}><i aria-hidden="true">{role === "student" && partDone(part) ? "✓" : part.closed ? "⊘" : index + 1}</i><span>{part.title}</span></button>)}
-          {hasTask && <button type="button" aria-current={!current ? "step" : undefined} className={role === "student" && taskDone ? "part-done" : ""} onClick={() => setPaperPage(pages.length)}><i aria-hidden="true">{role === "student" && taskDone ? "✓" : "★"}</i><span>Performance task</span></button>}
+          {parts.map((part, index) => <button key={part.id} type="button" aria-current={current?.part.id === part.id ? "step" : undefined} className={role === "student" && partDone(part) ? "part-done" : ""} onClick={() => showPage(pages.findIndex((page) => page.part.id === part.id))}><i aria-hidden="true">{role === "student" && partDone(part) ? "✓" : part.closed ? "⊘" : index + 1}</i><span>{part.title}</span></button>)}
+          {hasTask && <button type="button" aria-current={!current ? "step" : undefined} className={role === "student" && taskDone ? "part-done" : ""} onClick={() => showPage(pages.length)}><i aria-hidden="true">{role === "student" && taskDone ? "✓" : "★"}</i><span>Performance task</span></button>}
         </nav>
       </div>
-      {current && <nav className="worksheet-tabs" aria-label="Part pages">{pages.map((page, index) => page.part.id === current.part.id && <button key={index} type="button" aria-current={index === currentPage ? "page" : undefined} onClick={() => setPaperPage(index)}>{page.label}</button>)}</nav>}
+      {current && <nav className="worksheet-tabs" aria-label="Part pages">{pages.map((page, index) => page.part.id === current.part.id && <button key={index} type="button" aria-current={index === currentPage ? "page" : undefined} onClick={() => showPage(index)}>{page.label}</button>)}</nav>}
       </div></div>
       <div className="worksheet-desk" onScroll={foldOnScroll}>
         {pages.map((page, index) => <article key={`${page.part.id}:${page.step?.id || "overview"}`} className="worksheet-paper" hidden={currentPage !== index} aria-label={`${page.part.title} — ${page.label}`}>
@@ -448,7 +451,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
           </>}
         </article>}
       </div>
-      <footer className="worksheet-pagination"><button type="button" disabled={currentPage === 0} onClick={() => setPaperPage(currentPage - 1)}>← Previous page</button><span aria-live="polite">Page {currentPage + 1} of {totalPages}</span><button type="button" disabled={currentPage === totalPages - 1} onClick={() => setPaperPage(currentPage + 1)}>Next page →</button></footer>
+      <footer className="worksheet-pagination"><button type="button" disabled={currentPage === 0} onClick={() => showPage(currentPage - 1)}>← Previous page</button><span aria-live="polite">Page {currentPage + 1} of {totalPages}</span><button type="button" disabled={currentPage === totalPages - 1} onClick={() => showPage(currentPage + 1)}>Next page →</button></footer>
     </div>;
   }
 

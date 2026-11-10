@@ -106,7 +106,8 @@ test("workspace drawers: real offline classroom pointer and keyboard interaction
         assert.ok(open > 40, "progress and step tabs show at first");
         const pageHeight = (extra) => sheet.locator(".worksheet-desk").evaluate((desk, extra) => {
           desk.scrollTop = 0;
-          desk.querySelector(".worksheet-paper:not([hidden])").style.minHeight = extra ? `${desk.clientHeight + extra}px` : "";
+          for (const paper of desk.querySelectorAll(".worksheet-paper")) paper.style.minHeight = "";
+          if (extra) desk.querySelector(".worksheet-paper:not([hidden])").style.minHeight = `${desk.clientHeight + extra}px`;
         }, extra);
         await pageHeight(open / 2); await page.waitForTimeout(400);
         await sheet.locator(".worksheet-desk").hover(); await page.mouse.wheel(0, 400);
@@ -120,6 +121,16 @@ test("workspace drawers: real offline classroom pointer and keyboard interaction
         assert.equal(await foldHeight(), 0, "leaving the title bar folds them again");
         await page.mouse.wheel(0, -100);
         assert.equal(await foldHeight(), open, "scrolling up shows them again");
+        const folded = () => sheet.locator('.worksheet-fold[data-folded="true"]').waitFor();
+        await page.waitForTimeout(400); await page.mouse.wheel(0, 400); await folded(); await page.mouse.wheel(0, -2000);
+        assert.equal(await foldHeight(), open, "scrolling straight back up right after folding still shows them");
+        await page.waitForTimeout(400); await page.mouse.wheel(0, 400); await folded();
+        await sheet.locator(".worksheet-tabs button").first().focus();
+        assert.equal(await foldHeight(), open, "keyboard focus on a step tab shows them while folded");
+        assert.equal(await sheet.locator(".worksheet-fold").getAttribute("data-folded"), "true");
+        await sheet.getByRole("button", { name: "Next page →", exact: true }).click();
+        assert.equal(await sheet.locator(".worksheet-fold").getAttribute("data-folded"), "false", "changing page shows them again");
+        assert.equal(await foldHeight(), open);
         await pageHeight(0);
         await outside(); await settled("classroom-worksheet", false);
         const editor = page.getByRole("textbox", { name: "Java source code editor", exact: true });

@@ -1195,3 +1195,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   `npm run build:all` passed; lint 0 errors (old warnings only; `.claude/worktrees` copies excluded).
 - Not run: hosted site, phones, non-Chromium browsers.
 - PR #91 (Share with class, branch `feature/class-shared-step`) is still open and separate.
+- PR #93 (https://github.com/SirNeo-Coder/JavaShare/pull/93). CodeRabbit checked 2026-11-10: low merge risk;
+  3 findings, all valid and fixed after approval: scrolling straight back up right after a fold was ignored;
+  every page change now shows the strip again (teacher's choice); a browser check for keyboard focus added.
+  Each check shown failing without its fix; browser 17/17, `npm test` 425/425, lint 0 errors, build passed.
+  Docstring-coverage note not valid (no docstrings in this code). Next: teacher reviews and merges.
