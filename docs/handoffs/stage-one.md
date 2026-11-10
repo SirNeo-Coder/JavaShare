@@ -1211,4 +1211,5 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   real-route media test (shown failing with the old gate); `npm test` 431/431; build and lint pass. The teacher
   applied the migration on hosted Supabase on 2026-11-10 (SQL Editor: "Success. No rows returned"). CodeRabbit re-review
   (2026-11-10, up to b019ed8): merge risk Low, security risk Low, no concerns; one valid docs nitpick (CKB-099 status
-  still said migration pending) fixed. Next: teacher merges.
+  still said migration pending) fixed. Final review (up to 5e950f3): no comments; its summary repeats the two
+  docs points, both checked fixed on GitHub (table row renders 2 cells; status updated). Next: teacher merges.
