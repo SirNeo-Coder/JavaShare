@@ -732,7 +732,8 @@ This week's checks:
   data:, CKB-092) or of an iframe (srcdoc, CKB-086).
 - Real runs in the real page window (Weeks 6–8, keep): CodeShare draws the page window inside its text-size zoom (1.15 at
   first, 1 to 1.45) and it is not my checker's 1000 × 900 window, so check every computed value both in my checker and in
-  CodeShare's buildTeacherPreview inside a body with zoom 1.15 in a frame about 800 px wide, before using it. Never
+  CodeShare's buildTeacherPreview inside a body with zoom 1.15, in a frame of the width that place really uses (see the next
+  point: a module step's is below 900 px, a personal project's is wider), before using it. Never
   page-check a border or outline width (CKB-097), a % width, an auto margin, a side that is not set, a fixed offset or a
   sticky place. Inside the zoomed page window Playwright clicks land in the wrong place; tests use dispatchEvent("click").
 - Widths (Week 9 settled this; read CKB-112 first): the page runs at three different widths, so never assume one. A module
