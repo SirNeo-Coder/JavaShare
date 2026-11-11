@@ -78,27 +78,21 @@ test("module worksheet: alteration instructions and target stay separate from th
   assert.match(html, /Capacity: 20/); assert.match(html, /Capacity: 25/);
 });
 
-test("module worksheet: the answer key shows only the lines the answer changes, and only to the teacher", () => {
-  const sample = ["public class Jeepney extends Vehicle {", "  public Jeepney(String plate) { super(plate); }", "  public int getCapacity() { return 20; }",
-    "  public String getPlate() { return plate; }", "  public String toString() { return \"Jeepney\"; }", "}"].join("\n");
+test("module worksheet: the answer key shows the module's own answer lines, and only to the teacher", () => {
   const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
   const step = course.lessons[0].blocks[0];
-  step.files = [{ path: "Jeepney.java", content: sample }];
   step.activity.id = "capacity-change";
-  step.activity.files = [];
-  const answer = sample.replace("return 20", "return 25").replace('return "Jeepney"', 'return "Jeepney 25"');
-  step.activity.solution = { files: [{ path: "Jeepney.java", content: answer }], note: "Return 25 instead of 20." };
+  step.activity.solution = {
+    lines: 'line 3: public int getCapacity() { return 25; }',
+    note: "Only the returned capacity changes.",
+  };
   const teacher = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true }));
-  const block = teacher.match(/<details class="answer-key">([\s\S]*?)<\/details>/);
-  assert.ok(block, "the teacher worksheet has an Answer key panel");
-  assert.match(block[1], /Answer key \(teacher only\)/);
-  assert.match(block[1], /Return 25 instead of 20\./);
-  assert.match(block[1], /Jeepney\.java · from line 3/);
-  assert.match(block[1], /Jeepney\.java · from line 5/, "a second, far-apart edit gets its own block at its own line");
-  assert.match(block[1], /return 25/);
-  assert.match(block[1], /Jeepney 25/);
-  assert.doesNotMatch(block[1], /extends Vehicle|super\(plate\)|getPlate/, "unchanged lines stay out, including between two edits");
-  assert.doesNotMatch(block[1], /return 20|return &quot;Jeepney&quot;;/, "the sample's own lines never appear as the answer");
+  const panel = teacher.match(/<details class="answer-key">([\s\S]*?)<\/details>/);
+  assert.ok(panel, "the teacher worksheet has an Answer key panel");
+  assert.match(panel[1], /Answer key \(teacher only\)/);
+  assert.match(panel[1], /Only the returned capacity changes\./);
+  assert.match(panel[1], /line 3: public int getCapacity\(\) \{ return 25; \}/, "the answer appears exactly as the module file wrote it");
+  assert.doesNotMatch(panel[1], /Load answer/, "nothing is loaded or worked out here");
 
   // The student worksheet is served without the answer key (tests/module-activities.test.mjs);
   // the panel is also behind the teacher role here.
@@ -106,37 +100,14 @@ test("module worksheet: the answer key shows only the lines the answer changes, 
     /role === "teacher" && task\?\.solution && <details className="answer-key">/);
 });
 
-test("module worksheet: the answer key separates far-apart edits and the preview then checks the task", () => {
-  const { changedLines, answerPreviewFiles, previewTarget, runnableFiles } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
-
-  // Two separate edits never drag the untouched lines between them along (CodeRabbit on PR #101).
-  assert.deepEqual(changedLines("a\nb\nc", "A\nb\nC"), [{ line: 1, lines: ["A"] }, { line: 3, lines: ["C"] }]);
-  assert.deepEqual(changedLines("a\nb\nc", "a\nb\nc"), [], "an answer the same as the sample shows nothing");
-  assert.deepEqual(changedLines("a\nb\nc", "a\nc"), [{ line: 2, lines: [] }], "a block with no lines only takes a line out");
-  assert.deepEqual(changedLines("a\nb", "a\nb\nc"), [{ line: 3, lines: ["c"] }], "an added line keeps its own line number");
-
-  // Load answer keeps a helper the task supplies and replaces only what the answer provides.
-  const step = { files: [{ path: "Main.java", content: "class Main { int x = 1; }" }] };
-  const taskFiles = [{ path: "Helper.java", content: "class Helper {}" }];
-  const answer = [{ path: "Main.java", content: "class Main { int x = 2; }" }];
-  assert.deepEqual(answerPreviewFiles(runnableFiles(taskFiles, step.files), answer), [taskFiles[0], answer[0]]);
-
-  // A loaded answer is run and checked against the task, not the sample.
-  const withTask = { ...step, stdin: "sample", expectedOutput: "Sample", activity: { id: "alter-v1", stdin: "task", expectedOutput: "Task" } };
-  assert.equal(previewTarget(withTask, true).stdin, "task");
-  assert.equal(previewTarget(withTask, true).expectedOutput, "Task");
-  assert.equal(previewTarget(withTask, false).stdin, "sample");
-  assert.equal(previewTarget({ ...step, stdin: "sample" }, true).stdin, "sample", "a step without a task keeps its own input");
-  assert.match(readFileSync(new URL("../app/ModuleViewer.tsx", import.meta.url), "utf8"),
-    /webPage\.run\(runnable, step\.run, answerLoaded \? undefined : step\.webChecks/, "sample-only page checks are left out in answer mode");
-});
-
 test("module worksheet: a sample preview run carries the module's supporting classes (CKB-113)", () => {
-  const { runnableFiles } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
-  const support = [{ path: "Vehicle.java", content: "abstract class Vehicle {}" }, { path: "Jeepney.java", content: "class Jeepney {}" }];
+  const { mergeProjectFiles } = tsxRequire("../backend/src/module-activities.ts", import.meta.url);
+  const support = [{ path: "Vehicle.java", content: "abstract class Vehicle {}" }, { path: "src/Jeepney.java", content: "class Jeepney {}" }];
   const files = [{ path: "Jeepney.java", content: "class Jeepney { int c = 25; }" }, { path: "Main.java", content: "class Main {}" }];
-  assert.deepEqual(runnableFiles(support, files), [support[0], ...files], "supporting classes join the run; the step's own copy wins");
-  assert.deepEqual(runnableFiles([], files), files);
+  assert.deepEqual(mergeProjectFiles(support, files), [support[0], ...files],
+    "supporting classes join the run; the step's own file wins, and src/Jeepney.java is the same file as Jeepney.java");
+  assert.match(readFileSync(new URL("../app/ModuleViewer.tsx", import.meta.url), "utf8"),
+    /const runnable = mergeProjectFiles\(support, files\);/, "the preview run uses CodeShare's own merger");
 });
 
 test("module parts: a locked next task does not hide the current task's discussion", () => {

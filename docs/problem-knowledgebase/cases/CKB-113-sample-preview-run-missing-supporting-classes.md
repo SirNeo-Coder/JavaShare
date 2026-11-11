@@ -22,20 +22,22 @@ through the Module project, which merges supporting files server-side.
 
 ## Durable solution
 
-`runnableFiles(support, files)` adds the module's `starterFiles` to what the preview run sends,
-leaving out any path the step itself supplies, and the editable boxes keep showing only the step's
-own files. Both worksheet and paged views pass `support={module.starterFiles ?? []}`.
+The preview run sends `mergeProjectFiles(support, files)` - the same merger a student's Module
+project uses, so the module's `starterFiles` join the run, the step's own file wins on a shared
+path, and `src/Main.java` and `Main.java` stay one file (CodeRabbit on PR #101). The editable boxes
+keep showing only the step's own files. Both worksheet and paged views pass
+`support={module.starterFiles ?? []}`.
 
-Known ceiling (marked `ponytail:` in the code): only the module's starter files are added, not
-classes a previous step introduced. A sample that depends on an earlier step's new class still
-needs **Work in code editor**.
+Known ceiling: only the module's starter files are added, not classes a previous step introduced.
+A sample that depends on an earlier step's new class still needs **Work in code editor**.
 
 ## Regression proof
 
 - `tests/classroom-ui.test.mjs` — "module worksheet: a sample preview run carries the module's
-  supporting classes (CKB-113)": `runnableFiles` adds the supporting class, keeps the step's own
-  copy of a shared path, and preserves order. Shown failing with the merge removed.
-- Real app (local Supabase, `npm run dev`): teacher worksheet → Step 1 → **Answer key (teacher
-  only)** → **Load answer into Preview sample code** → **Run** printed `Capacity: 25`; before the
-  fix the same click printed `cannot find symbol: class Vehicle`.
+  supporting classes (CKB-113)": the merge adds the supporting class, keeps the step's own copy of a
+  shared path, and treats `src/Jeepney.java` and `Jeepney.java` as one file; it also checks the
+  preview run calls that merger. Shown failing with the merge removed.
+- Real app (local Supabase, `npm run dev`): teacher worksheet → Step 1 → **Preview sample code** →
+  **Run** printed the step's sample output; before the fix the same click printed
+  `cannot find symbol: class Vehicle`.
 - Commit: branch `feature/module-answer-key`

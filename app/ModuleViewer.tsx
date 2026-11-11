@@ -10,7 +10,7 @@ import { runJava } from "./javaExecution";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
 import { paperPerformanceTask } from "../backend/src/personal-performance";
-import { activityStateId, checkableStep, teacherCheckedStep, webStep, type MediaCheck, type WebCheck } from "../backend/src/module-activities";
+import { activityStateId, checkableStep, mergeProjectFiles, teacherCheckedStep, webStep, type MediaCheck, type WebCheck } from "../backend/src/module-activities";
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import ModuleCatalogCard from "./ModuleCatalogCard";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
@@ -47,7 +47,7 @@ async function runFiles(files: ModuleFile[], stdin = "") {
 export type ModuleFile = { path: string; content: string };
 export type StepBlock = {
   locked?: boolean;
-  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string; solution?: { files: ModuleFile[]; note?: string } };
+  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string; solution?: { lines: string; note?: string } };
   part?: string;
   type: "step";
   id: string;
@@ -238,55 +238,6 @@ export function ModuleMediaFiles<T>({ base, files, note, onChange }: { base: str
   </section>;
 }
 
-// A sample (or a loaded answer) needs the module's supporting classes to compile, while the
-// editable boxes keep showing this step's own files (CKB-113).
-// ponytail: starter files only, not earlier steps' rolling classes - enough for one sample run.
-export function runnableFiles(support: ModuleFile[], files: ModuleFile[]) {
-  return [...support.filter((file) => !files.some((item) => item.path === file.path)), ...files];
-}
-
-// The answer key shows only the lines the answer changes, one block per place it changes them, so
-// two far-apart edits never drag the untouched lines between them along (teacher, 2026-11-11).
-// Each block says which line of the answer it starts at. A block with no lines only removes lines.
-// ponytail: compares every line against every line (fine for a module file of a few hundred lines).
-export function changedLines(sample: string, answer: string) {
-  const before = sample.split("\n"), after = answer.split("\n");
-  // longest run of lines the two share, so only real changes are left over
-  const same: number[][] = Array.from({ length: before.length + 1 }, () => new Array(after.length + 1).fill(0));
-  for (let i = before.length - 1; i >= 0; i -= 1) {
-    for (let j = after.length - 1; j >= 0; j -= 1) {
-      same[i][j] = before[i] === after[j] ? same[i + 1][j + 1] + 1 : Math.max(same[i + 1][j], same[i][j + 1]);
-    }
-  }
-  const blocks: { line: number; lines: string[] }[] = [];
-  let i = 0, j = 0;
-  while (i < before.length || j < after.length) {
-    if (i < before.length && j < after.length && before[i] === after[j]) { i += 1; j += 1; continue; }
-    const line = j + 1, lines: string[] = [];
-    while ((i < before.length || j < after.length) && !(i < before.length && j < after.length && before[i] === after[j])) {
-      if (j < after.length && (i >= before.length || same[i][j + 1] >= same[i + 1][j])) { lines.push(after[j]); j += 1; }
-      else i += 1; // a line the answer takes out
-    }
-    blocks.push({ line, lines });
-  }
-  return blocks;
-}
-
-// What the teacher's preview runs and checks against: the step's sample, or the task once its
-// answer is loaded (its own Program input and Expected task output).
-export function previewTarget(step: StepBlock, answerLoaded: boolean) {
-  return answerLoaded && step.activity?.id ? step.activity : step;
-}
-
-// Load answer: the answer replaces files in the sample plus the task's own supporting files, so a
-// helper the task supplies stays in the preview.
-export function answerPreviewFiles(base: ModuleFile[], answer: ModuleFile[]) {
-  return [
-    ...base.map((file) => answer.find((item) => item.path === file.path) ?? file),
-    ...answer.filter((item) => !base.some((file) => file.path === item.path)),
-  ];
-}
-
 function StepView({ step, status, role, printed = false, sampleFirst = false, onStart, support = [], media = {}, mediaLoading = false }: {
   step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; sampleFirst?: boolean; onStart?: () => Promise<void>;
   support?: ModuleFile[]; media?: Record<string, string>; mediaLoading?: boolean;
@@ -299,23 +250,17 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
   const mediaRun = web && teacherCheckedStep(step) && hasMedia ? { files: media, include: Boolean(step.includeMediaOutput) } : undefined;
   const webPage = useWebPageRun(busy);
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
-  // Once the teacher loads the answer, the preview checks the task, not the sample: its own Program
-  // input and Expected task output, and no sample-only page checks (CodeRabbit on PR #101).
-  const [answerLoaded, setAnswerLoaded] = useState(false);
   const run = async () => {
     setBusy(true);
-    const runnable = runnableFiles(support, files);
-    const checked = previewTarget(step, answerLoaded);
-    try { if (role === "student") await onStart?.(); else if (web) setWebResult(await webPage.run(runnable, step.run, answerLoaded ? undefined : step.webChecks, mediaRun)); else setOutput(await runFiles(runnable, checked.stdin ?? "")); }
+    // The module's supporting classes join the run so the sample compiles, merged the same way as a
+    // student's Module project, so src/Main.java and Main.java stay one file (CKB-113).
+    const runnable = mergeProjectFiles(support, files);
+    try { if (role === "student") await onStart?.(); else if (web) setWebResult(await webPage.run(runnable, step.run, step.webChecks, mediaRun)); else setOutput(await runFiles(runnable, step.stdin ?? "")); }
     catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
     finally { setBusy(false); }
   };
   const task = step.activity?.id ? step.activity : null;
-  const loadAnswer = (answer: ModuleFile[]) => {
-    setFiles(answerPreviewFiles(runnableFiles(task?.files ?? [], step.files), answer));
-    setAnswerLoaded(true);
-  };
-  const webChecks = <WebCheckList result={webResult} expected={previewTarget(step, answerLoaded).expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} webChecks={answerLoaded ? undefined : step.webChecks} mediaChecks={mediaRun ? step.mediaChecks ?? [] : undefined} />;
+  const webChecks = <WebCheckList result={webResult} expected={step.expectedOutput} teacherChecked={teacherChecked && Boolean(webResult)} webChecks={step.webChecks} mediaChecks={mediaRun ? step.mediaChecks ?? [] : undefined} />;
   if (step.locked) return <p className="module-preview-note">Complete the previous activity to unlock this step.</p>;
   return <div className="module-step">
     <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Completed" : "Try again"}</span>}</div>
@@ -334,16 +279,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     {role === "teacher" && task?.solution && <details className="answer-key"><summary>Answer key (teacher only)</summary>
       <p className="module-preview-note">Only your teacher account sees this. It is never sent to a student.</p>
       {task.solution.note && <Markdown markdown={task.solution.note} />}
-      {task.solution.files.map((file) => {
-        const blocks = changedLines([...step.files, ...task.files].find((item) => item.path === file.path)?.content ?? "", file.content);
-        return <div key={file.path} className="answer-key-change">
-          {blocks.length ? blocks.map((block, index) => <div key={index}>
-            <small>{file.path} · from line {block.line}</small>
-            {block.lines.length ? <pre><code>{block.lines.join("\n")}</code></pre> : <p>Nothing new here — the answer only takes lines out at this place.</p>}
-          </div>) : <small>{file.path} · the same as the sample</small>}
-        </div>;
-      })}
-      <button type="button" onClick={() => loadAnswer(task.solution!.files)}>Load answer into Preview sample code</button>
+      <pre><code>{task.solution.lines}</code></pre>
     </details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}

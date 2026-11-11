@@ -32,9 +32,10 @@ const block = z.discriminatedUnion("type", [
       files: z.array(file).max(50).default([]),
       expectedOutput: z.string().max(100000),
       stdin: z.string().max(10000).default(""),
-      // The teacher's answer key: the solved alteration (teacher, 2026-11-11). Never reaches a
-      // student view (studentModuleView strips it) and never joins a student project.
-      solution: z.object({ files: z.array(file).min(1).max(50), note: z.string().max(5000).optional() }).optional(),
+      // The teacher's answer key, written out in the module file: the lines the task changes, as the
+      // teacher wants them shown, and an optional note (teacher, 2026-11-12). CodeShare compares
+      // nothing. It never reaches a student view (studentModuleView strips it).
+      solution: z.object({ lines: z.string().trim().min(1).max(5000), note: z.string().max(5000).optional() }).optional(),
     }).optional(),
     // Groups this step (and any text/definition/analogy/table/note blocks leading into it) under
     // one named, gated part of the module viewer - a part can span several lessons (e.g. a
@@ -122,6 +123,9 @@ export const courseModule = z.object({
   ]);
   return module.previousModuleId !== module.id && progressIds.length === new Set(progressIds).size;
 }, { message: "Two lessons, steps or exit slips in this module share the same id - their ids must be unique across the whole module" })
+  .refine((module) => module.lessons.every((lesson) => lesson.blocks.every((block) =>
+    block.type !== "step" || !block.activity?.solution || Boolean(block.activity.id))),
+  { message: "A task answer (activity.solution) needs the task's own activity.id - without it the worksheet would never show the answer" })
   .refine((module) => {
     // /api/execute only runs java files whose path matches a strict identifier-style regex, at
     // most JAVA_PATH_MAX_LENGTH characters (routes.ts). A java step's files, and any .java
@@ -132,7 +136,7 @@ export const courseModule = z.object({
       ...module.starterFiles.filter((file) => file.path.endsWith(".java")),
       ...(module.performanceTask ? [...module.performanceTask.exampleFiles, ...module.performanceTask.starterFiles].filter((file) => file.path.endsWith(".java")) : []),
     ];
-    const stepFiles = module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? []), ...(block.activity?.solution?.files ?? [])] : [])));
+    const stepFiles = module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? [])] : [])));
     return javaFiles.every((file) => file.path.length <= JAVA_PATH_MAX_LENGTH && JAVA_PATH.test(file.path)) && stepFiles.every((file) => javaProjectPath(file.path));
   }, { message: `A java step's file path (or a .java performance-task file) must be a valid Java filename of at most ${JAVA_PATH_MAX_LENGTH} characters, e.g. "src/Main.java" - no spaces or punctuation besides "/" and "_"; a java step may also supply .txt data files such as fleet.txt` });
 

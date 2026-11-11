@@ -126,10 +126,7 @@ test("module tasks: upload rejects duplicate task ids and collisions with stored
 // The teacher's answer key for a task: stored in the module, never shown to a student (teacher, 2026-11-11).
 const answerKey = (step) => {
   step.activity.id = "answer-key-alteration";
-  step.activity.solution = {
-    files: [{ path: "Jeepney.java", content: "// ANSWER-KEY-MARKER\npublic class Jeepney extends Vehicle { public int getCapacity() { return 25; } }" }],
-    note: "Return 25 instead of 20.",
-  };
+  step.activity.solution = { lines: "line 1: ANSWER-KEY-MARKER return 25;", note: "Return 25 instead of 20." };
   return step;
 };
 
@@ -145,10 +142,13 @@ test("module answer key: a step keeps the solved alteration, a student view drop
   assert.deepEqual(activityTask(stripped).files, activityTask(step).files, "the student's task files are unchanged");
   const plain = { id: "no-task" };
   assert.equal(stepWithoutAnswerKey(plain), plain);
-  // An answer key cannot carry a file path the Java runner would refuse.
-  const broken = structuredClone(content);
-  broken.lessons[0].blocks[0].activity.solution.files[0].path = "Not a class.java";
-  assert.equal(courseModule.safeParse(broken).success, false);
+  // An answer the worksheet could never show is refused at upload (CodeRabbit on PR #101).
+  const noId = structuredClone(content);
+  delete noId.lessons[0].blocks[0].activity.id;
+  assert.equal(courseModule.safeParse(noId).success, false);
+  const empty = structuredClone(content);
+  empty.lessons[0].blocks[0].activity.solution.lines = "   ";
+  assert.equal(courseModule.safeParse(empty).success, false);
 });
 
 async function withClass(action) {
@@ -547,7 +547,7 @@ test("module answer key: the teacher receives it, the student never does", needs
     answerKey(content.lessons[0].blocks[0]);
     await upload(content);
     const teacherView = await (await request("", undefined, cookies[0])).json();
-    assert.match(teacherView.lessons[0].blocks[0].activity.solution.files[0].content, /ANSWER-KEY-MARKER/);
+    assert.match(teacherView.lessons[0].blocks[0].activity.solution.lines, /ANSWER-KEY-MARKER/);
     const studentView = await (await request()).json();
     assert.equal(studentView.lessons[0].blocks[0].locked, undefined, "the first step is open for the student");
     assert.equal(studentView.lessons[0].blocks[0].activity.solution, undefined);

@@ -137,9 +137,10 @@ Keep the printed sample in the step's `files`, `instruction`, `expectedOutput`, 
 }
 ```
 
-### Teacher-only answer key (approved 2026-11-11)
+### Teacher-only answer key (approved 2026-11-11, simplified 2026-11-12)
 
-A task may also carry the solved alteration, for the teacher only:
+A task may also carry the answer, for the teacher only. You write the changed lines yourself;
+CodeShare works nothing out and compares nothing:
 
 ```json
 "activity": {
@@ -147,19 +148,18 @@ A task may also carry the solved alteration, for the teacher only:
   "instruction": "Change the removal from index 1 to index 3. Keep the other output lines.",
   "expectedOutput": "the complete, verified output after the alteration",
   "solution": {
-    "files": [{ "path": "Main.java", "content": "the complete solved file" }],
+    "lines": "line 8:  numbers.remove(3);\nline 10: System.out.println(numbers);",
     "note": "Optional markdown: what to point out while explaining it."
   }
 }
 ```
 
-`solution.files` hold the complete solved files (each a valid Java path for a java step), so the
-teacher can run them. CodeShare removes `solution` from every student view, open or locked step
-alike, and never merges it into a student project; it is not a progress id. The worksheet shows the
-teacher a collapsed **Answer key (teacher only)** panel under the step with only the lines that
-differ from the step's sample, one block per place the answer changes, and **Load answer into
-Preview sample code**, which starts from the sample plus the task's own files, replaces what the
-answer gives, and then runs and checks against the task's input and **Expected task output**.
+`lines` is plain text (at most 5000 characters), shown exactly as written in a collapsed
+**Answer key (teacher only)** panel under the step, with `note` above it. It needs the task's own
+`activity.id`, or the upload is refused: without an id the worksheet would never show the panel.
+CodeShare removes `solution` from every student view, open or locked step alike, and it is not a
+progress id. Keep the complete solved files in your own week folder as before; the panel is for
+explaining in class, not for running.
 
 Deploy the app change before uploading a module that carries answers: an older server has no rule
 to remove them, so it would send a step's answer to students. If the site is ever put back to an

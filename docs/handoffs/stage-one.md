@@ -1409,4 +1409,20 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   `npm test` 464/464, build passed, lint 0 errors; each new check shown failing with its fix removed;
   re-checked in the running app (two blocks at lines 8 and 10, **Load answer** then **Run** printed
   `Start 15 Middle Finished`, the task's own input and helper; a student still received no answer key).
+- CodeRabbit's second pass on PR #101 (2026-11-11, 7 findings) led the teacher to simplify the whole
+  feature on 2026-11-12: the module file now carries the answer as **text the teacher writes**
+  (`activity.solution.lines`, plus the optional `note`), and CodeShare compares nothing. Gone with the
+  comparison: the freeze risk on a very large file, the wrong baseline for a supporting class, the
+  stale run result, **Load answer into Preview sample code** and the answer-mode run target. The
+  complete solved files stay in the teacher's week folder, as before.
+- Kept from that pass: the teacher's sample preview now merges with CodeShare's own `mergeProjectFiles`
+  (CKB-113), so supporting classes join the run and `src/Main.java` and `Main.java` stay one file; and
+  an answer without the task's `activity.id` is refused at upload, since the worksheet could never
+  show it. Not taken: a pass/fail chip on the teacher's Java preview (it has never had one; the
+  teacher compares with **Expected task output** printed above).
+- Tested after the simplification: `npm test` 463/463 (one Supabase test flaked once on a first run and
+  passed alone and on a rerun), `npm run build:all` passed, lint 0 errors. Both new checks shown
+  failing with their fix removed. In the running app: the panel showed the note and exactly the two
+  supplied lines with no Load answer button; a student account received no answer, note or panel; and
+  the real upload route refused an answer on a task with no id with its plain-English message.
 
