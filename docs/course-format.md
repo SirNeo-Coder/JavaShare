@@ -370,6 +370,25 @@ evidence, checked by the server against its own expected output and the saved ve
   page. A misspelt pseudo-class or pseudo-element, one bad selector in a comma list, or a space before the colon drops or empties
   the whole rule; one colon (`:before`, `:first-letter`) still works; a missing quote in `content` drops that declaration and the
   next one only. In a personal run the pseudo-element is drawn online and offline and its text stays out of the page text.
+- **Flexbox and media queries (checked 2026-11-11, Resume Week 9).** `display`, `flex-direction`, `flex-wrap`, `row-gap` and
+  `column-gap` give the same computed values in CodeShare's page window and the teacher's checker, so page checks may use them.
+  Making a box a flex container changes the page text only when it changes whether its children are boxes of their own: a column
+  of block-level items (`li`, `p`) reads exactly as before, while `display: flex` on a `nav ul` whose `li` were `inline-block`
+  splits one line of links into one line per link. `display: inline` on list items with no flex container above them runs them
+  together onto one line, which is page text. `gap` is never page text, and it does nothing at all without `display: flex`.
+  `float` on a flex item still computes to `left` but has no effect (W3C: it creates no floating and does not take the item
+  out-of-flow), so adding or removing it changes neither the layout nor the page text; a flex row needs no `clear: both` after it.
+  **The page runs at different widths in different places, so a media query can be on in one and off in another** (all three
+  measured in the app by the Week 9 personal subtest of `tests/web-module-steps.browser.mjs`): on a **module step** the preview
+  shares its row with the checks panel, so it is narrower than 900 px and a `max-width: 900px` query is already on; in a
+  **personal project** there is no checks panel, so the preview fills the page window (`width:min(1180px,100%)`) and is wider
+  than 900 px, leaving that query off; and the **teacher's checker** runs at 1000 px, also above it. The page window itself
+  cannot be dragged, but it follows the browser window, so making the browser window narrower turns a query on while you watch.
+  A checked page must therefore keep its page text and every page-checked value identical at every width — never put anything
+  inside a query that adds, removes or re-letters a word, and never page-check a property a query changes (Week 9 checks
+  `display` and `flex-wrap`, never `flex-direction`, on the queried `nav ul` and `.project-list`). A length in a media feature
+  needs its unit: `(max-width: 900)` drops the whole query at every width. `Resume/Week_09/test_checker.py` runs every sample
+  and task answer at 760, 800, 899 and 1000 px and fails if any output differs.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has

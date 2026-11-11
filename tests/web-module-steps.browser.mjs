@@ -982,6 +982,107 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
+    await t.test("Week 9 personal project: the Week 8 site carries forward; the student makes the skills list a flex column and adds a max-width: 900px media query; a module step's page window is below that breakpoint, the personal project's fills the window and is above it, and making the browser window narrower turns the query on without changing one word of the page text; Submit freezes them; the teacher's review shows the same", { skip: needs(9) }, async () => {
+      const week9 = weeks[8], steps9 = stepsOf(week9);
+      const previewWidth = async (where) => (await (await (await where.locator(".page-window .module-web-preview iframe")
+        .elementHandle()).contentFrame()).evaluate(() => window.innerWidth));
+      // A module step's page window shares its row with the checks panel, so its preview is narrower than the 900px
+      // breakpoint and the class sees the narrow layout on the module steps. Measured before the steps are marked done.
+      await openCatalog(week9);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      const moduleWidth = await previewWidth(page);
+      assert.ok(moduleWidth <= 900, `a module step's page window is below the 900px breakpoint (${moduleWidth}px)`);
+      await closePageWindow(page);
+      // The module steps are checked elsewhere; mark them done so the personal task opens.
+      const states = (await progress(week9)).stepStates;
+      assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps9.map((step) => [activityStateId(step), "pass"])) } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week9.id)).error, null);
+      const textarea = page.locator(".student-module-project .editor-card textarea");
+      const fileTab = (path) => page.locator(".student-module-project .file-tabs").getByRole("button", { name: path, exact: true });
+      const write = async (path, content) => {
+        await fileTab(path).dispatchEvent("click");
+        await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
+        await textarea.fill(content);
+      };
+      // Read from the page window itself: the skill lines of the page text, the flex container's own values and whether gap
+      // replaced the per-item margin. The nav's direction is read separately, because that is what the media query changes.
+      const looks = async (where) => {
+        const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+        // The frame can report "complete" before the student's page arrives, so wait for the elements read below too (CKB-111).
+        await inside.waitForFunction(() => document.readyState === "complete" && document.querySelector(".top li:first-child") && document.querySelector("nav ul"));
+        return inside.evaluate(() => {
+          const lines = document.body.innerText.split("\n");
+          const top = document.querySelector(".top"), nav = document.querySelector("nav ul");
+          return [lines.slice(lines.indexOf("Top skills") + 1, lines.indexOf("Top skills") + 3),
+            getComputedStyle(top).display, getComputedStyle(top).flexDirection, getComputedStyle(top).rowGap !== "normal",
+            getComputedStyle(nav).display];
+        });
+      };
+      const navDirection = async (where) => (await (await (await where.locator(".page-window .module-web-preview iframe")
+        .elementHandle()).contentFrame()).evaluate(() => getComputedStyle(document.querySelector("nav ul")).flexDirection));
+      const week8Own = (await progress(weeks[7])).performanceTask.own;
+      const carried = Object.fromEntries(week8Own.files.map((file) => [file.path, file.content]));
+      await openCatalog(week9);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      // Linked weeks carry the Week 8 submission forward: its pages, its states and its pseudo-elements.
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried["index.html"]);
+      assert.deepEqual((await page.locator(".student-module-project .file-tabs .file-tab").allTextContents()).sort(), Object.keys(carried).sort());
+      assert.match(carried["index.html"], /<ul class="top">/, "the Week 8 list carries forward, so this week only adds CSS");
+      const css = carried["styles.css"] + "\n/* Flexbox: my top skills in a column, with one gap instead of a margin on each item */\n"
+        + ".top {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n"
+        + "\n/* Flexbox for my nav bar: a row of items, with gap between them */\n"
+        + "nav ul {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n"
+        + "\n/* Media query: at 900px and narrower, my nav items stand one under the other */\n"
+        + "@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n";
+      await write("styles.css", css);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
+      // The skills keep the Week 8 capitals and one line each: a flex column of list items is not page text.
+      const expected = [["TYPING", "Drawing"], "flex", "column", true, "flex"];
+      assert.deepEqual(await looks(page), expected, "a flex column leaves the page text alone");
+      // A personal project has no checks panel, so its preview fills the page window and is wider than the breakpoint:
+      // the query is off here. The student sees the narrow layout by making the browser window narrower, and when they do,
+      // the nav stacks while every word of the page text and every other value stays exactly the same.
+      const wide = await previewWidth(page);
+      assert.ok(wide > 900, `the personal project's page window is wider than the breakpoint (${wide}px)`);
+      assert.equal(await navDirection(page), "row", "above the breakpoint the nav keeps its row");
+      await page.setViewportSize({ width: 820, height: 1050 });
+      try {
+        const narrow = await previewWidth(page);
+        assert.ok(narrow <= 900, `a narrower browser window takes the page window below the breakpoint (${narrow}px)`);
+        assert.equal(await navDirection(page), "column", "below the breakpoint the query stacks the nav");
+        assert.deepEqual(await looks(page), expected, "the media query changes no page text and no other computed value");
+      } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week9.png" });
+      await closePageWindow(page);
+      await page.getByRole("button", { name: "Submit this version", exact: true }).click();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
+      const saved = await progress(week9);
+      assert.equal(saved.percent, 100);
+      assert.deepEqual(Object.fromEntries(saved.performanceTask.own.files.map((file) => [file.path, file.content])), { ...carried, "styles.css": css });
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      await review.locator(".teacher-module-card", { hasText: week9.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".student-module-project .editor-card textarea").waitFor();
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      await review.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      assert.deepEqual(await looks(review), expected, "the review runs the frozen pages and styles.css");
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week9), saved, "teacher runs never change the student's progress");
+      await review.close();
+    });
+
     await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
       const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
       const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],
