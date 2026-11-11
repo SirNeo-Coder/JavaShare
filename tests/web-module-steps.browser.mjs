@@ -922,7 +922,9 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       // mouse, so focus stands in for hover; the ordinary link shows the new a:focus rule, which nav a:focus overrides on the nav).
       const looks = async (where) => {
         const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
-        await inside.waitForFunction(() => document.readyState === "complete");
+        // The frame can report "complete" before the student's page arrives, so wait for the elements read below too (CKB-111).
+        await inside.waitForFunction(() => document.readyState === "complete" && document.querySelector("h2") && document.querySelector(".top li:first-child")
+          && document.querySelector("nav a") && document.querySelector(".more a"));
         return inside.evaluate(() => {
           const lines = document.body.innerText.split("\n");
           const focused = (link) => { link.focus(); return [link.matches(":focus"), getComputedStyle(link).backgroundColor]; };

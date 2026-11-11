@@ -1,4 +1,4 @@
-# CKB-107 — Session step count returned "not found" after the followed module was deleted
+# CKB-109 — Session step count returned "not found" after the followed module was deleted
 
 - Status: resolved on PR #95 before merge
 - First recorded: 2026-11-11
@@ -24,9 +24,10 @@ A 404 from loading the followed module means "no step": the route answers `{ ste
 ## Regression proof
 
 - `tests/session-step-done.test.mjs` (real routes): "a followed module deleted during the session has no count, not an
-  error (CKB-107)" — shown failing with the fix removed, passing restored.
+  error (CKB-109)" — shown failing with the fix removed, passing restored.
 
 ## History
 
 - 2026-11-11 — CodeRabbit: one valid finding (fixed with the teacher's approval); index-key suggestion not valid (two
   students can share a name); docstring check not applied.
+- 2026-11-11 — Renumbered from CKB-107: PR #96 had already used CKB-107 for the worksheet step-tab test fix.
