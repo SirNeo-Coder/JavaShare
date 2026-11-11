@@ -553,7 +553,8 @@ export async function updateSupabaseGroupPermissions(user: SupabaseSessionUser, 
 }
 
 // Share with class (teacher, 2026-11-10): the step the teacher is discussing, fresh for every member whatever
-// their progress. Sample fields only (never the task); students practise it unsaved, so no progress rule applies.
+// their progress. Sample fields plus the task's instruction and expected output to read (teacher, 2026-11-11); task
+// files and ids stay on the server. Students practise it unsaved, so no progress rule applies.
 export async function supabaseSharedStepPayload(user: SupabaseSessionUser, classroomId: string) {
   if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Classroom access denied");
   const { data: classroom, error } = await getSupabaseAdmin().from("classrooms").select("shared_module_id,shared_step_id").eq("id", classroomId).single();
@@ -564,7 +565,8 @@ export async function supabaseSharedStepPayload(user: SupabaseSessionUser, class
   if (!content || !step) return { active: false as const };
   const { id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput } = step;
   return { active: true as const, moduleId: content.id, moduleTitle: content.title, week: content.week, course: content.course, starterFiles: content.starterFiles,
-    step: { type: "step" as const, id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput } };
+    step: { type: "step" as const, id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput },
+    task: step.activity && { instruction: step.activity.instruction, expectedOutput: step.activity.expectedOutput } };
 }
 
 export async function setSupabaseSharedStep(user: SupabaseSessionUser, classroomId: string, share: { moduleId: string; stepId: string } | null) {
@@ -640,18 +642,21 @@ export async function setSupabaseClassSession(user: SupabaseSessionUser, classro
   return { classroomId, active: data.length > 0 };
 }
 
-// Who has finished the step the class session is on (teacher, 2026-11-11). Null when no session step is open;
-// the task page reports the preceding step, so it has no count.
+// Who has finished the step the class session is on (teacher, 2026-11-11): the followed worksheet page's step, or with
+// the worksheet closed (Work in code editor), the Shared with class step (CKB-108). Null with neither; the task page
+// reports the preceding step, so it has no count.
 export async function getSupabaseSessionStepProgress(user: SupabaseSessionUser, classroomId: string) {
   const classroom = await teacherClassroom(user, classroomId);
-  if (!classSessionActive(classroom) || !classroom.session_module_id || !classroom.session_step_id || classroom.session_page === "task") return { step: null };
-  const moduleId = classroom.session_module_id;
-  // A followed module deleted during the session has no step, like Enter classroom (CKB-103, CKB-107).
+  if (!classSessionActive(classroom)) return { step: null };
+  const [moduleId, stepId] = classroom.session_page ? [classroom.session_module_id, classroom.session_page === "task" ? null : classroom.session_step_id]
+    : [classroom.shared_module_id, classroom.shared_step_id];
+  if (!moduleId || !stepId) return { step: null };
+  // A followed module deleted during the session has no step, like Enter classroom (CKB-103, CKB-109).
   const row = await loadCourseModuleRow(classroomId, moduleId).catch((error) => {
     if (error instanceof SupabaseRepositoryError && error.status === 404) return null;
     throw error;
   });
-  const step = row && findActivity(row.content, classroom.session_step_id);
+  const step = row && findActivity(row.content, stepId);
   if (!step) return { step: null };
   const [{ students }, { data, error }] = await Promise.all([
     listSupabaseClassroomStudents(user, classroomId),

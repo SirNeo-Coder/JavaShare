@@ -81,7 +81,7 @@ test("class step: real routes share one step with every member past prerequisite
       assert.equal((await share(teacher, { moduleId: "missing-module", stepId: sharedStep.id })).status, 404);
       assert.deepEqual(await (await call(shared, student)).json(), { active: false });
     });
-    await t.test("a shared step reaches the student despite prerequisites: sample and starter files, never the task", async () => {
+    await t.test("a shared step reaches the student despite prerequisites: sample and starter files; the task only to read", async () => {
       const response = await share(teacher, { moduleId: second.id, stepId: sharedStep.id });
       assert.equal(response.status, 200, await response.clone().text());
       const payload = await (await call(shared, student)).json();
@@ -90,7 +90,8 @@ test("class step: real routes share one step with every member past prerequisite
       assert.equal(payload.step.id, sharedStep.id);
       assert.deepEqual(payload.step.files, sharedStep.files);
       assert.deepEqual(payload.starterFiles, second.starterFiles);
-      assert.equal(payload.step.activity, undefined, "the task stays out of the shared step");
+      assert.equal(payload.step.activity, undefined, "task files and id stay out of the shared step");
+      assert.deepEqual(payload.task, { instruction: sharedStep.activity.instruction, expectedOutput: sharedStep.activity.expectedOutput }, "the task's text and expected output, to read (teacher, 2026-11-11)");
       assert.equal((await call(`/api/classrooms/${classId}/modules/${second.id}`, student)).status, 403, "the rest of the module stays locked");
       assert.notEqual((await call(media, student)).status, 403, "the shared module's media is readable");
       assert.equal((await call(shared, outsider)).status, 403);

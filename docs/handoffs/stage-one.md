@@ -1339,3 +1339,31 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - CodeRabbit on PR #96 checked: Week 8 check now waits for the elements it reads (CKB-111, test only); the non-nav focus link was
   already fixed; the dispatchEvent click is deliberate (CKB-107). `web-module-steps.browser.mjs` 13 passed, 6 skipped, 0 failed.
 - Merge this before PR #98, then PR #98 is updated from main (its index row sits next to the renumbered one).
+## Console shows the step's task — 2026-11-11
+
+- Branch `feature/console-shows-task` (from `main` at `1df8cf1`; worktree `../JavaShare-done-count`). Teacher asked that the
+  Console in **Work in code editor** show the task to be done, not only the sample's expected output, and chose that
+  students in a shared step see it too (this changes the 2026-11-10 "task is not sent" rule for Share with class).
+- Done: `supabaseSharedStepPayload` adds `task` (instruction + expected output only; task files/ids stay on the server);
+  `stepPreview` carries it (teacher: from the step; student: from the share); the Console shows **Student task** and
+  **Expected task output** under the sample in previews only.
+- Tested: UI render test (new), `class-shared-step.test.mjs` (updated payload check) and `class-shared-step.browser.mjs`
+  (teacher and three students see the task), each shown failing without its part; `npm test` 458/458; build and lint
+  pass; class-session and teacher-module-preview browser tests pass.
+- Not run: hosted site, online Java (CheerpJ).
+- PR #98 (CKB-108, count stays in Work in code editor) is separate and still open.
+## Step count in Work in code editor — 2026-11-11 (CKB-108)
+
+- Branch `fix/session-count-shared-step` (from `main` at `1df8cf1`, after PR #97; worktree `../JavaShare-done-count`).
+  Teacher report: after **Work in code editor** the **Step N · done/total** chip disappeared, leaving only **Shared with
+  class**. Teacher confirmed that pull-in at **Enter classroom** and auto-share on **Work in code editor** are wanted.
+- Done: with the worksheet closed, the count uses the **Shared with class** step; `class:shared-step` re-reads it.
+- Tested: route test (9/9) and browser check, each shown failing without the fix; `npm test` 458/458; build and lint
+  pass; class-session and class-shared-step browser tests pass (offline settings, laptop Java).
+- Not run: hosted site, online Java (CheerpJ).
+- Open (needs a plan and approval): teacher asked that the console in Work in code editor also show the step's
+  alteration task, not only the sample's expected output.
+- CodeRabbit on PR #98 (2026-11-11): Minor finding valid, fixed with approval (CKB-110): the count now re-reads with every
+  shared-step re-read (own share, live message, reconnect). Test nitpick valid: the browser check now presses **Stop sharing** and
+  requires the chip to go; shown failing without the fix. `npm test` 458/458; build, lint, step-count, class-session and
+  class-shared-step browser checks pass.

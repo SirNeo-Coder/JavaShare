@@ -473,7 +473,9 @@ with class · Week N · Step M** with **Stop sharing** at the top of the classro
 in the preview. Stopping, or the student's **Return to class project**, reopens the student's own
 module or personal project unchanged. Sharing another step replaces the first; students who join or
 reload while a step is shared get it. Only the shared step opens: the rest of a later module stays
-locked, and the step's task is not sent. Works online and offline (laptop Java offline).
+locked. Under the sample in the Console, the teacher's **Module preview** and each student's class step show
+**Student task** with the task instruction and **Expected task output**, to read (approved 2026-11-11); the task's own
+files are not sent, and runs there still never count. Works online and offline (laptop Java offline).
 
 ## Class session (approved 2026-11-10)
 
@@ -501,8 +503,8 @@ Next to **End session**, the teacher sees how many students have finished the st
 example **Step 1 · 3/20 done** (approved 2026-11-11). Hovering over it, or moving the keyboard focus to it,
 lists **Done** and **Not yet** by name. It counts a step's task (or the step itself when it has no separate
 task), never the sample check, and only this class's students. It updates when the teacher turns to another
-page and whenever a student finishes a task (or the teacher marks a step done); it never re-reads on a timer.
-It is hidden while no worksheet is open and on the **Performance task** page. The student list is unchanged.
+page, starts or stops a share, and whenever a student finishes a task (or the teacher marks a step done); it never re-reads on a timer.
+With the worksheet closed after **Work in code editor**, it counts the **Shared with class** step instead, so the teacher can keep watching while coding (CKB-108). It is hidden when neither a worksheet page nor a shared step is open, and on the **Performance task** page. The student list is unchanged.
 
 ## Subject-specific shared module sets (approved 2026-10-22)
 

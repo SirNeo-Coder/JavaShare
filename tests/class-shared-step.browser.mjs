@@ -92,11 +92,16 @@ test("Share with class: students behind, ahead and in a personal project get the
     await footer(teacherPage).getByRole("button", { name: "Share with class" }).click();
     await footer(teacherPage).getByRole("button", { name: "Stop sharing" }).waitFor();
     await teacherPage.locator(".team-header").getByText("Week 42 · Step 1").waitFor();
+    // The console shows the step's task under the sample, for the teacher and each student (teacher, 2026-11-11).
+    const taskText = async (page) => (await page.locator(".module-activity-details .module-preview-task").innerText()).replace(/\n+/g, "\n");
+    const expectedTask = `Student task\n${step.activity.instruction}\nExpected task output\n${step.activity.expectedOutput}`;
+    assert.equal(await taskText(teacherPage), expectedTask);
 
     for (const page of [behindPage, aheadPage, personalPage]) {
       await page.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Class step"));
       assert.match(await heading(page), /Class step · Week 42 · Step 1/);
       assert.equal(await editor(page).inputValue(), sample, "the teacher's fresh sample, not the student's own edits");
+      assert.equal(await taskText(page), expectedTask);
       assert.equal(await editor(page).isEditable(), true);
       assert.equal(await footer(page).getByRole("button", { name: "Save work" }).count(), 0);
       assert.notEqual(await page.evaluate(() => document.getElementById("classroom-worksheet")?.dataset.open), "true", "the student's own worksheet no longer covers the class step");
