@@ -1118,7 +1118,8 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
           const gallery = document.querySelector(".gallery"), picture = document.querySelector(".gallery img");
           return [document.body.innerText, getComputedStyle(gallery).display, getComputedStyle(gallery).columnGap,
             getComputedStyle(picture).maxWidth, getComputedStyle(document.querySelector("nav ul")).display,
-            getComputedStyle(gallery).gridTemplateColumns.split(" ").length];
+            getComputedStyle(gallery).gridTemplateColumns.split(" ").length,
+            [...document.querySelectorAll(".gallery figcaption")].map((caption) => caption.textContent)];
         });
       };
       const week9Own = (await progress(weeks[8])).performanceTask.own;
@@ -1149,14 +1150,16 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       const seen = await looks(page);
       assert.deepEqual(seen.slice(1, 5), ["grid", "12px", "100%", "flex"], "a grid, its gap and a picture that fits; the Week 9 nav stays a flex row");
       assert.ok(seen[5] > 1, `above the breakpoint the gallery keeps more than one column (${seen[5]})`);
-      assert.match(seen[0], /Write a caption here/, "the captions are still page text, one per figure");
+      const lines = seen[0].split("\n");
+      assert.ok(seen[6].length >= 2 && seen[6].every((caption) => lines.includes(caption)),
+        `every gallery caption is still page text, one per figure (${JSON.stringify(seen[6])})`);
       // Making the browser window narrower takes the page window below the breakpoint: the grid falls to one column while
       // every word of the page text and every other computed value stays exactly the same.
       await page.setViewportSize({ width: 820, height: 1050 });
       try {
         const narrow = await previewWidth(page);
         assert.ok(narrow <= 900, `a narrower browser window takes the page window below the breakpoint (${narrow}px)`);
-        assert.deepEqual(await looks(page), [...seen.slice(0, 5), 1], "the query changes only the number of columns");
+        assert.deepEqual(await looks(page), [...seen.slice(0, 5), 1, seen[6]], "the query changes only the number of columns");
       } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
       await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week10.png" });
       await closePageWindow(page);
