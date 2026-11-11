@@ -104,6 +104,12 @@ test("session step count: real routes count only this class's passes of the foll
       const after = await count();
       assert.deepEqual([after.done, after.notDone], [["Ben Notyet"], ["Ana Done"]], "Ana's earlier pass was a sample check only");
     });
+    await t.test("a followed module deleted during the session has no count, not an error (CKB-107)", async () => {
+      assert.equal((await call(`/api/classrooms/${classId}/modules/${fixture.id}`, teacher, "DELETE")).status, 200);
+      const response = await call(`/api/classes/${classId}/session/step-progress`, teacher);
+      assert.equal(response.status, 200, await response.clone().text());
+      assert.deepEqual(await response.json(), { step: null });
+    });
     await t.test("End session ends the count", async () => {
       assert.equal((await call(`/api/classes/${classId}/session`, teacher, "PUT", { active: false })).status, 200);
       assert.deepEqual(await count(), { step: null });

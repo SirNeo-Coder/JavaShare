@@ -1317,4 +1317,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - CodeRabbit (checked at the start): PR #94's findings were all fixed in CKB-103–106; its final commit was never
   re-reviewed. PR #93: one finding still valid, not fixed (needs approval): when a student's progress reload jumps the
   worksheet to another page, the folded header is not reopened (hover or keyboard focus still reopens it).
+- CodeRabbit on PR #95 (2026-11-11): one valid Minor finding fixed with the teacher's approval (CKB-107): a followed module
+  deleted during the session made the count route answer 404; it now answers `{ step: null }`. Route test shown failing
+  without the fix. Not valid: name keys instead of index (two students can share a name). Docstring check not applied.
 - Next: teacher tests and merges this PR; then class session slice 2.

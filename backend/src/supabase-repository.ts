@@ -646,7 +646,12 @@ export async function getSupabaseSessionStepProgress(user: SupabaseSessionUser, 
   const classroom = await teacherClassroom(user, classroomId);
   if (!classSessionActive(classroom) || !classroom.session_module_id || !classroom.session_step_id || classroom.session_page === "task") return { step: null };
   const moduleId = classroom.session_module_id;
-  const step = findActivity((await loadCourseModuleRow(classroomId, moduleId)).content, classroom.session_step_id);
+  // A followed module deleted during the session has no step, like Enter classroom (CKB-103, CKB-107).
+  const row = await loadCourseModuleRow(classroomId, moduleId).catch((error) => {
+    if (error instanceof SupabaseRepositoryError && error.status === 404) return null;
+    throw error;
+  });
+  const step = row && findActivity(row.content, classroom.session_step_id);
   if (!step) return { step: null };
   const [{ students }, { data, error }] = await Promise.all([
     listSupabaseClassroomStudents(user, classroomId),
