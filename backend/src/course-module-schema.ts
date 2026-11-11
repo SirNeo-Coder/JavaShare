@@ -32,6 +32,9 @@ const block = z.discriminatedUnion("type", [
       files: z.array(file).max(50).default([]),
       expectedOutput: z.string().max(100000),
       stdin: z.string().max(10000).default(""),
+      // The teacher's answer key: the solved alteration (teacher, 2026-11-11). Never reaches a
+      // student view (studentModuleView strips it) and never joins a student project.
+      solution: z.object({ files: z.array(file).min(1).max(50), note: z.string().max(5000).optional() }).optional(),
     }).optional(),
     // Groups this step (and any text/definition/analogy/table/note blocks leading into it) under
     // one named, gated part of the module viewer - a part can span several lessons (e.g. a
@@ -129,7 +132,7 @@ export const courseModule = z.object({
       ...module.starterFiles.filter((file) => file.path.endsWith(".java")),
       ...(module.performanceTask ? [...module.performanceTask.exampleFiles, ...module.performanceTask.starterFiles].filter((file) => file.path.endsWith(".java")) : []),
     ];
-    const stepFiles = module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? [])] : [])));
+    const stepFiles = module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? []), ...(block.activity?.solution?.files ?? [])] : [])));
     return javaFiles.every((file) => file.path.length <= JAVA_PATH_MAX_LENGTH && JAVA_PATH.test(file.path)) && stepFiles.every((file) => javaProjectPath(file.path));
   }, { message: `A java step's file path (or a .java performance-task file) must be a valid Java filename of at most ${JAVA_PATH_MAX_LENGTH} characters, e.g. "src/Main.java" - no spaces or punctuation besides "/" and "_"; a java step may also supply .txt data files such as fleet.txt` });
 

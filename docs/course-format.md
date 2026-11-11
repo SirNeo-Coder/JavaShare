@@ -137,6 +137,28 @@ Keep the printed sample in the step's `files`, `instruction`, `expectedOutput`, 
 }
 ```
 
+### Teacher-only answer key (approved 2026-11-11)
+
+A task may also carry the solved alteration, for the teacher only:
+
+```json
+"activity": {
+  "id": "java-2-w14-d1-s1-alter-v1",
+  "instruction": "Change the removal from index 1 to index 3. Keep the other output lines.",
+  "expectedOutput": "the complete, verified output after the alteration",
+  "solution": {
+    "files": [{ "path": "Main.java", "content": "the complete solved file" }],
+    "note": "Optional markdown: what to point out while explaining it."
+  }
+}
+```
+
+`solution.files` hold the complete solved files (each a valid Java path for a java step), so the
+teacher can run them. CodeShare removes `solution` from every student view, open or locked step
+alike, and never merges it into a student project; it is not a progress id. The worksheet shows the
+teacher a collapsed **Answer key (teacher only)** panel under the step with only the lines that
+differ from the step's sample, and **Load answer into Preview sample code** to run it.
+
 A nonempty stable `activity.id` opts into task checking and one-step-at-a-time unlocking.
 It must be unique across the module's lesson, sample, slip and task ids, including generated
 progress keys. Completion is stored under `task:<activity.id>`; old sample and legacy

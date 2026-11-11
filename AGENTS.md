@@ -323,7 +323,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   alteration task (`activity.id`) per step, and `previousModuleId` linking each week to the one
   before (projects carry forward; the previous week must be finished first). Task runs are checked
   by their output only, so every task must change the visible page text or console lines. Task
-  answer files stay in the teacher's week folder, never in the JSON.
+  answer files stayed outside the JSON until the teacher-only answer key (agreed 2026-11-11, below).
 - Net MVC course (agreed 2026-10-30): ten weeks from the teacher's `DotNet1_Course_Map.md`, all about
   resumes. Module samples build a resume for a made-up student, Juan Dela Cruz; each student builds
   their own resume as the personal performance task (no home address, phone, birth date or ID
@@ -338,3 +338,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   copy, so a frozen submission keeps its media; adding or removing media needs a new run before
   submitting. Only the student and their class teacher read them; they are not kept on the device.
   Media carries forward to the next week with the personal files. Unused copies are deleted.
+
+## Teacher-only answer key (agreed 2026-11-11)
+
+- A step's task may carry `activity.solution` in the module JSON: the solved files and an optional
+  note. This replaces the earlier rule that task answer files never go in the JSON.
+- Only a teacher account ever receives it. The server strips it from every student view, open or
+  locked step alike, and it never joins a student project or a performance submission.
+- The module worksheet shows it to the teacher in a collapsed **Answer key (teacher only)** panel
+  under the step, listing only the lines the answer changes, with **Load answer into Preview
+  sample code** so the teacher can run it and see the expected task output.

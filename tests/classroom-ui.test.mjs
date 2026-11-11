@@ -78,6 +78,37 @@ test("module worksheet: alteration instructions and target stay separate from th
   assert.match(html, /Capacity: 20/); assert.match(html, /Capacity: 25/);
 });
 
+test("module worksheet: the answer key shows only the lines the answer changes, and only to the teacher", () => {
+  const sample = ["public class Jeepney extends Vehicle {", "  public Jeepney(String plate) { super(plate); }", "  public int getCapacity() { return 20; }", "}"].join("\n");
+  const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
+  const step = course.lessons[0].blocks[0];
+  step.files = [{ path: "Jeepney.java", content: sample }];
+  step.activity.id = "capacity-change";
+  step.activity.files = [];
+  step.activity.solution = { files: [{ path: "Jeepney.java", content: sample.replace("return 20", "return 25") }], note: "Return 25 instead of 20." };
+  const teacher = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true }));
+  const block = teacher.match(/<details class="answer-key">([\s\S]*?)<\/details>/);
+  assert.ok(block, "the teacher worksheet has an Answer key panel");
+  assert.match(block[1], /Answer key \(teacher only\)/);
+  assert.match(block[1], /Return 25 instead of 20\./);
+  assert.match(block[1], /Jeepney\.java · from line 3/);
+  assert.match(block[1], /return 25/);
+  assert.doesNotMatch(block[1], /extends Vehicle|super\(plate\)/, "unchanged lines stay out of the answer key");
+
+  // The student worksheet is served without the answer key (tests/module-activities.test.mjs);
+  // the panel is also behind the teacher role here.
+  assert.match(readFileSync(new URL("../app/ModuleViewer.tsx", import.meta.url), "utf8"),
+    /role === "teacher" && task\?\.solution && <details className="answer-key">/);
+});
+
+test("module worksheet: a sample preview run carries the module's supporting classes (CKB-112)", () => {
+  const { runnableFiles } = tsxRequire("../app/ModuleViewer.tsx", import.meta.url);
+  const support = [{ path: "Vehicle.java", content: "abstract class Vehicle {}" }, { path: "Jeepney.java", content: "class Jeepney {}" }];
+  const files = [{ path: "Jeepney.java", content: "class Jeepney { int c = 25; }" }, { path: "Main.java", content: "class Main {}" }];
+  assert.deepEqual(runnableFiles(support, files), [support[0], ...files], "supporting classes join the run; the step's own copy wins");
+  assert.deepEqual(runnableFiles([], files), files);
+});
+
 test("module parts: a locked next task does not hide the current task's discussion", () => {
   const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
   course.lessons.forEach((lesson) => { lesson.blocks[0].part = "Vehicle"; });

@@ -1367,3 +1367,32 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   shared-step re-read (own share, live message, reconnect). Test nitpick valid: the browser check now presses **Stop sharing** and
   requires the chip to go; shown failing without the fix. `npm test` 458/458; build, lint, step-count, class-session and
   class-shared-step browser checks pass.
+
+## Teacher-only answer key — 2026-11-11
+
+- Branch `feature/module-answer-key` (from `main` `fc48c60`). Teacher asked to see, in the Module
+  worksheet only, how each task is solved, showing only the part that needs changing, with nothing
+  of it reaching students. Approved the JSON-field version.
+- Done: a module's task may carry `activity.solution` (the solved files plus an optional note). The
+  server removes it from every student view, open or locked step alike, so it never reaches a student
+  page or a Module project. The teacher's worksheet shows a collapsed **Answer key (teacher only)**
+  panel under the step: the note, then for each file only the lines that differ from the sample
+  (file name and starting line above each block), and **Load answer into Preview sample code**, which
+  fills the sample boxes so the existing **Run** shows the expected task output. No route, table,
+  migration or setting changed; offline unaffected.
+- Found and fixed on the way (CKB-112): **Preview sample code → Run** sent only the step's own files,
+  so any sample using a supporting class printed `cannot find symbol`. `runnableFiles` now adds the
+  module's starter files to that run (ceiling: not classes added by an earlier step).
+- Tested: `tests/module-activities.test.mjs` — "module answer key: a step keeps the solved alteration,
+  a student view drops it" and "module answer key: the teacher receives it, the student never does"
+  (real upload and read through the API with local Supabase); `tests/classroom-ui.test.mjs` — "module
+  worksheet: the answer key shows only the lines the answer changes, and only to the teacher" and
+  "a sample preview run carries the module's supporting classes (CKB-112)". Each shown failing with
+  its fix removed, passing restored. Full `npm test` 463/463, `npm run build:all` passed, lint 0 errors.
+- Checked in the running app (local Supabase, `npm run dev`): teacher worksheet shows the panel with
+  only `public int getCapacity() { return 25; }` from line 3, **Load answer** then **Run** printed
+  `Capacity: 25`; a student account reading the same module received no answer key, no note and no
+  solved line, while its task instruction stayed.
+- Still to do: add `activity.solution` to the existing week JSON (curriculum work, separate), and the
+  teacher must re-upload those modules for the panel to appear.
+- Not run: hosted site, online Java (CheerpJ), phones.

@@ -58,6 +58,14 @@ Explicit alteration tasks: `activityTask` / `activityStateId` / `activityAccess.
 browser-java-progress, classroom-ui, weekly-java-project-ui and rolling-module-tasks.
 First example: `docs/modules/week14/`; CKB-052.
 
+Teacher-only answer key (2026-11-11): `activity.solution` in `course-module-schema.ts`;
+`stepWithoutAnswerKey` in `module-activities.ts`, applied by `studentModuleView` in
+`supabase-repository.ts`; `changedLines` and the **Answer key (teacher only)** panel in
+`app/ModuleViewer.tsx` (`.answer-key` in `app/globals.css`); the teacher's sample preview runs with
+the module's supporting classes through `runnableFiles` (CKB-112). No new route, table or migration.
+Tests: `tests/module-activities.test.mjs` (unit plus the real upload and read) and
+`tests/classroom-ui.test.mjs` (worksheet panel shows only the changed lines).
+
 Sample-first loading and visible run feedback: `samplePending`, `sampleStateId`, `matchesSample`
 and `unchangedSample` in `module-activities.ts`; activity preparation, project saves and result
 recording in `supabase-repository.ts`; existing project route adds optional `stepId`.
