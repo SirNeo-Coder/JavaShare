@@ -640,18 +640,21 @@ export async function setSupabaseClassSession(user: SupabaseSessionUser, classro
   return { classroomId, active: data.length > 0 };
 }
 
-// Who has finished the step the class session is on (teacher, 2026-11-11). Null when no session step is open;
-// the task page reports the preceding step, so it has no count.
+// Who has finished the step the class session is on (teacher, 2026-11-11): the followed worksheet page's step, or with
+// the worksheet closed (Work in code editor), the Shared with class step (CKB-108). Null with neither; the task page
+// reports the preceding step, so it has no count.
 export async function getSupabaseSessionStepProgress(user: SupabaseSessionUser, classroomId: string) {
   const classroom = await teacherClassroom(user, classroomId);
-  if (!classSessionActive(classroom) || !classroom.session_module_id || !classroom.session_step_id || classroom.session_page === "task") return { step: null };
-  const moduleId = classroom.session_module_id;
+  if (!classSessionActive(classroom)) return { step: null };
+  const [moduleId, stepId] = classroom.session_page ? [classroom.session_module_id, classroom.session_page === "task" ? null : classroom.session_step_id]
+    : [classroom.shared_module_id, classroom.shared_step_id];
+  if (!moduleId || !stepId) return { step: null };
   // A followed module deleted during the session has no step, like Enter classroom (CKB-103, CKB-107).
   const row = await loadCourseModuleRow(classroomId, moduleId).catch((error) => {
     if (error instanceof SupabaseRepositoryError && error.status === 404) return null;
     throw error;
   });
-  const step = row && findActivity(row.content, classroom.session_step_id);
+  const step = row && findActivity(row.content, stepId);
   if (!step) return { step: null };
   const [{ students }, { data, error }] = await Promise.all([
     listSupabaseClassroomStudents(user, classroomId),

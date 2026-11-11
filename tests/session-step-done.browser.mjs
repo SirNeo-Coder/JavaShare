@@ -19,7 +19,7 @@ const content = JSON.parse(readFileSync(new URL("./fixtures/student-activity.cod
 content.id = `step-done-browser-${randomUUID().slice(0, 6)}`; content.week = 60; content.title = "Step done week 60";
 const stepOne = content.lessons[0].blocks[0];
 
-test("class session step count: Step 1 · 0/2 done, a student's finished run makes it 1/2 live, hover lists Done and Not yet", async () => {
+test("class session step count: Step 1 · 0/2 done, a student's finished run makes it 1/2 live, Work in code editor keeps it, hover lists Done and Not yet", async () => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.PREVIEW_BASE_URL || "http://localhost:3062";
   const users = []; let classId;
@@ -34,7 +34,7 @@ test("class session step count: Step 1 · 0/2 done, a student's finished run mak
       assert.equal((await context.request.post("/api/auth/login", { data: { email: data.user.email, password } })).status(), 200);
       contexts.push(context);
     }
-    const [teacher, ana] = contexts;
+    const [teacher, ana, ben] = contexts;
     const created = await teacher.request.post("/api/classes", { data: { subject: "Java", name: "Step done browser" } });
     assert.equal(created.status(), 201); classId = (await created.json()).id;
     assert.equal((await teacher.request.post(`/api/classrooms/${classId}/modules`, { data: content })).status(), 201);
@@ -64,11 +64,27 @@ test("class session step count: Step 1 · 0/2 done, a student's finished run mak
     await chip.getByRole("button", { name: "Step 1 · 1/2 done" }).waitFor();
     assert.equal(reads.length, before + 1, "one re-read for one finished task");
 
+    // Work in code editor closes the worksheet and shares the step: the count stays, now for the shared step (CKB-108).
+    await page.locator("#classroom-worksheet").getByRole("button", { name: "Next page →" }).click();
+    await chip.getByRole("button", { name: "Step 1 · 1/2 done" }).waitFor();
+    await page.locator("#classroom-worksheet article:not([hidden])").getByRole("button", { name: "Work in code editor", exact: true }).click();
+    await page.locator(".team-header").getByText("Shared with class").waitFor();
+    // Wait for the server to drop the followed page and for that change to reach the screen, then check the chip.
+    for (let tries = 0; (await admin.from("classrooms").select("session_page").eq("id", classId).single()).data.session_page; tries++) {
+      assert.ok(tries < 50, "the closed worksheet's page was never cleared"); await page.waitForTimeout(200);
+    }
+    await page.waitForTimeout(2000);
+    assert.equal(await chip.getByRole("button").innerText(), "Step 1 · 1/2 done", "the count stays in the code editor");
+    const benPrepared = await (await ben.request.post(`${base}/activity`, { data: { stepId: stepOne.id } })).json();
+    const benRun = await (await ben.request.post(`${base}/run`, { data: { stepId: stepOne.id, files: benPrepared.projectFiles, updatedAt: benPrepared.updatedAt } })).json();
+    assert.equal(benRun.passed, true);
+    await chip.getByRole("button", { name: "Step 1 · 2/2 done" }).waitFor();
+
     const list = chip.getByRole("tooltip");
     assert.equal(await list.isVisible(), false, "the names stay hidden until hover");
     await chip.getByRole("button").hover();
     await list.waitFor({ state: "visible" });
-    assert.equal(await list.innerText(), "Done (1)\nAna Done\nNot yet (1)\nBen Notyet");
+    assert.equal((await list.innerText()).replace(/\n+/g, "\n"), "Done (2)\nAna Done\nBen Notyet\nNot yet (0)\nNobody yet");
     if (process.env.STEP_DONE_SCREENSHOT) await page.screenshot({ path: process.env.STEP_DONE_SCREENSHOT });
 
     // No timer: nothing re-reads while nobody finishes.

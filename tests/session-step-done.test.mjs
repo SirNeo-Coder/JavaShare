@@ -88,6 +88,17 @@ test("session step count: real routes count only this class's passes of the foll
       assert.equal((await call(`/api/classes/${classId}/session`, teacher, "PUT", { active: true, follow: { moduleId: fixture.id, page: "task", stepId: stepTwo.id } })).status, 200);
       assert.deepEqual(await count(), { step: null });
     });
+    await t.test("Work in code editor: with the worksheet closed, the Shared with class step is counted (CKB-108)", async () => {
+      const share = (body) => call(`/api/classes/${classId}/shared-step`, teacher, "PUT", { share: body });
+      assert.equal((await share({ moduleId: fixture.id, stepId: stepTwo.id })).status, 200);
+      assert.equal((await call(`/api/classes/${classId}/session`, teacher, "PUT", { active: true, follow: null })).status, 200);
+      assert.deepEqual((await count()).step, { moduleId: fixture.id, stepId: stepTwo.id, number: 1 });
+      assert.equal((await follow(fixture.lessons[0], stepOne)).status, 200);
+      assert.equal((await count()).step.stepId, stepOne.id, "an open worksheet page wins over the shared step");
+      assert.equal((await call(`/api/classes/${classId}/session`, teacher, "PUT", { active: true, follow: null })).status, 200);
+      assert.equal((await share(null)).status, 200);
+      assert.deepEqual(await count(), { step: null }, "neither open nor shared: no count");
+    });
     await t.test("a student finishing a task sends class:step-done; a failed run sends nothing", async () => {
       await admin.from("module_progress").delete().eq("classroom_id", classId).eq("student_id", users[2].id);
       assert.equal((await follow(fixture.lessons[0], stepOne)).status, 200);

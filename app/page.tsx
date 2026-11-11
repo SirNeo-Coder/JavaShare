@@ -798,7 +798,7 @@ export default function Home() {
       receivedDraftSequenceRef.current = 0;
       setLiveShare(share);
     });
-    on("class:shared-step", () => void refreshSharedStepRef.current());
+    on("class:shared-step", () => { void refreshSharedStepRef.current(); setSessionStepRevision((revision) => revision + 1); });
     on("class:session", () => { void refreshClassSessionRef.current(); setSessionStepRevision((revision) => revision + 1); });
     on("class:step-done", () => setSessionStepRevision((revision) => revision + 1));
     on("class:chat-muted", ({ muted }: { muted: boolean }) =>

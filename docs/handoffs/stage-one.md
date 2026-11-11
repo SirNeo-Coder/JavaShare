@@ -1330,3 +1330,15 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   deleted during the session made the count route answer 404; it now answers `{ step: null }`. Route test shown failing
   without the fix. Not valid: name keys instead of index (two students can share a name). Docstring check not applied.
 - Next: teacher tests and merges this PR; then class session slice 2.
+
+## Step count in Work in code editor — 2026-11-11 (CKB-108)
+
+- Branch `fix/session-count-shared-step` (from `main` at `1df8cf1`, after PR #97; worktree `../JavaShare-done-count`).
+  Teacher report: after **Work in code editor** the **Step N · done/total** chip disappeared, leaving only **Shared with
+  class**. Teacher confirmed that pull-in at **Enter classroom** and auto-share on **Work in code editor** are wanted.
+- Done: with the worksheet closed, the count uses the **Shared with class** step; `class:shared-step` re-reads it.
+- Tested: route test (9/9) and browser check, each shown failing without the fix; `npm test` 458/458; build and lint
+  pass; class-session and class-shared-step browser tests pass (offline settings, laptop Java).
+- Not run: hosted site, online Java (CheerpJ).
+- Open (needs a plan and approval): teacher asked that the console in Work in code editor also show the step's
+  alteration task, not only the sample's expected output.
