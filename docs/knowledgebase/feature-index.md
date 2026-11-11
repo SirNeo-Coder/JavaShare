@@ -65,7 +65,9 @@ optional `note`, and the rule that it needs `activity.id`) in `course-module-sch
 (`.answer-key` in `app/globals.css`). The teacher's sample preview runs through `mergeProjectFiles`,
 so supporting classes join it and `src/` names do not duplicate a file (CKB-113). No new route,
 table or migration. Tests: `tests/module-activities.test.mjs` (unit plus the real upload and read)
-and `tests/classroom-ui.test.mjs` (the panel and the preview merge).
+and `tests/classroom-ui.test.mjs` (the panel, its place under Your task, and the preview merge).
+Week 15 answers: `docs/modules/week15/Java2_Week_15.codeshare.json`, checked against the verified
+task edits by "Week 15 answers" in `tests/week15-week21-modules.test.mjs`.
 
 Sample-first loading and visible run feedback: `samplePending`, `sampleStateId`, `matchesSample`
 and `unchangedSample` in `module-activities.ts`; activity preparation, project saves and result

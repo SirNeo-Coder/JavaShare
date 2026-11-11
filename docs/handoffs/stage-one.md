@@ -1425,4 +1425,19 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   failing with their fix removed. In the running app: the panel showed the note and exactly the two
   supplied lines with no Load answer button; a student account received no answer, note or panel; and
   the real upload route refused an answer on a task with no id with its plain-English message.
+- 2026-11-12, after seeing it in the app the teacher asked for two changes, both done: the panel now
+  sits **directly under Your task and Expected task output** (where the teacher is reading), and each
+  answer carries a plain-English explanation under **Why this answers the task** (the `note` field).
+- Week 15 now ships with answers for all ten tasks, written from the verified task edits in
+  `tests/fixtures/week15-week21-task-edits.json` - the same edits the real-Java test applies to prove
+  each task reaches its expected output. Each answer names the file and line numbers and says why the
+  change produces that output. A new check, "Week 15 answers: every quoted line sits where the answer
+  says, in the solved file" in `tests/week15-week21-modules.test.mjs`, compares every quoted line with
+  the solved file (or, for a deletion, with the sample) at the stated line number; it caught two wrong
+  line ranges while writing them and was shown failing on a deliberately wrong line number.
+- `npm test` 464/464, build passed, lint 0 errors. In the running app the real Week 15 module uploaded
+  (201), Step 1 showed the answer line and its explanation under the task, and a student account
+  reading the same module received no answer, explanation or panel.
+- Still to do: answers for Weeks 16-21 (same method), and the teacher re-uploads Week 15 once this is
+  merged and live.
 
