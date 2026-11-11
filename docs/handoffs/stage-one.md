@@ -1380,14 +1380,14 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   (file name and starting line above each block), and **Load answer into Preview sample code**, which
   fills the sample boxes so the existing **Run** shows the expected task output. No route, table,
   migration or setting changed; offline unaffected.
-- Found and fixed on the way (CKB-112): **Preview sample code → Run** sent only the step's own files,
+- Found and fixed on the way (CKB-113): **Preview sample code → Run** sent only the step's own files,
   so any sample using a supporting class printed `cannot find symbol`. `runnableFiles` now adds the
   module's starter files to that run (ceiling: not classes added by an earlier step).
 - Tested: `tests/module-activities.test.mjs` — "module answer key: a step keeps the solved alteration,
   a student view drops it" and "module answer key: the teacher receives it, the student never does"
   (real upload and read through the API with local Supabase); `tests/classroom-ui.test.mjs` — "module
   worksheet: the answer key shows only the lines the answer changes, and only to the teacher" and
-  "a sample preview run carries the module's supporting classes (CKB-112)". Each shown failing with
+  "a sample preview run carries the module's supporting classes (CKB-113)". Each shown failing with
   its fix removed, passing restored. Full `npm test` 463/463, `npm run build:all` passed, lint 0 errors.
 - Checked in the running app (local Supabase, `npm run dev`): teacher worksheet shows the panel with
   only `public int getCapacity() { return 25; }` from line 3, **Load answer** then **Run** printed
@@ -1396,3 +1396,17 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Still to do: add `activity.solution` to the existing week JSON (curriculum work, separate), and the
   teacher must re-upload those modules for the panel to appear.
 - Not run: hosted site, online Java (CheerpJ), phones.
+- CodeRabbit on PR #101 (2026-11-11): low merge risk; 4 Minor findings, all valid, all fixed after the
+  teacher approved. (1) The panel showed the untouched lines between two far-apart edits; it now gives
+  one block per place the answer changes, each with its own starting line. (2) A loaded answer ran with
+  the sample's Program input; it now uses the task's. (3) On a web step a loaded answer was checked
+  against the sample's page text and sample-only page checks; it now checks **Expected task output**
+  without them. (4) **Load answer** left out a helper the task supplies; it now starts from the sample
+  plus the task's own files. Docstring-coverage note not valid (this code has no docstrings). Its
+  security note (a rollback to an older server would send uploaded answers to students) is now a rule
+  in `docs/course-format.md` and AGENTS.md: deploy before uploading answer-bearing modules.
+  My case was renumbered CKB-113 because PR #102 took CKB-112 the same day.
+  `npm test` 464/464, build passed, lint 0 errors; each new check shown failing with its fix removed;
+  re-checked in the running app (two blocks at lines 8 and 10, **Load answer** then **Run** printed
+  `Start 15 Middle Finished`, the task's own input and helper; a student still received no answer key).
+

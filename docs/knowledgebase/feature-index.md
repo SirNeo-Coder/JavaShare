@@ -62,7 +62,7 @@ Teacher-only answer key (2026-11-11): `activity.solution` in `course-module-sche
 `stepWithoutAnswerKey` in `module-activities.ts`, applied by `studentModuleView` in
 `supabase-repository.ts`; `changedLines` and the **Answer key (teacher only)** panel in
 `app/ModuleViewer.tsx` (`.answer-key` in `app/globals.css`); the teacher's sample preview runs with
-the module's supporting classes through `runnableFiles` (CKB-112). No new route, table or migration.
+the module's supporting classes through `runnableFiles` (CKB-113). No new route, table or migration.
 Tests: `tests/module-activities.test.mjs` (unit plus the real upload and read) and
 `tests/classroom-ui.test.mjs` (worksheet panel shows only the changed lines).
 

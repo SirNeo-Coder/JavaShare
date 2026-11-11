@@ -346,5 +346,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Only a teacher account ever receives it. The server strips it from every student view, open or
   locked step alike, and it never joins a student project or a performance submission.
 - The module worksheet shows it to the teacher in a collapsed **Answer key (teacher only)** panel
-  under the step, listing only the lines the answer changes, with **Load answer into Preview
-  sample code** so the teacher can run it and see the expected task output.
+  under the step, listing only the lines the answer changes, one block per place it changes them,
+  with **Load answer into Preview sample code** so the teacher can run it and see the expected task
+  output. A loaded answer runs with the task's own Program input and is checked against the task's
+  expected output, without the sample's page checks.
+- Upload answer-bearing modules only after the app change is live; an older server would send them
+  to students.

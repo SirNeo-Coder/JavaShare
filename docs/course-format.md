@@ -157,7 +157,13 @@ A task may also carry the solved alteration, for the teacher only:
 teacher can run them. CodeShare removes `solution` from every student view, open or locked step
 alike, and never merges it into a student project; it is not a progress id. The worksheet shows the
 teacher a collapsed **Answer key (teacher only)** panel under the step with only the lines that
-differ from the step's sample, and **Load answer into Preview sample code** to run it.
+differ from the step's sample, one block per place the answer changes, and **Load answer into
+Preview sample code**, which starts from the sample plus the task's own files, replaces what the
+answer gives, and then runs and checks against the task's input and **Expected task output**.
+
+Deploy the app change before uploading a module that carries answers: an older server has no rule
+to remove them, so it would send a step's answer to students. If the site is ever put back to an
+older version, upload those modules again without `solution` first.
 
 A nonempty stable `activity.id` opts into task checking and one-step-at-a-time unlocking.
 It must be unique across the module's lesson, sample, slip and task ids, including generated

@@ -1,4 +1,4 @@
-# CKB-112 — Preview sample code could not compile a sample that uses a supporting class
+# CKB-113 — Preview sample code could not compile a sample that uses a supporting class
 
 - Status: resolved
 - First recorded: 2026-11-11
@@ -33,7 +33,7 @@ needs **Work in code editor**.
 ## Regression proof
 
 - `tests/classroom-ui.test.mjs` — "module worksheet: a sample preview run carries the module's
-  supporting classes (CKB-112)": `runnableFiles` adds the supporting class, keeps the step's own
+  supporting classes (CKB-113)": `runnableFiles` adds the supporting class, keeps the step's own
   copy of a shared path, and preserves order. Shown failing with the merge removed.
 - Real app (local Supabase, `npm run dev`): teacher worksheet → Step 1 → **Answer key (teacher
   only)** → **Load answer into Preview sample code** → **Run** printed `Capacity: 25`; before the
