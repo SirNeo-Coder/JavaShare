@@ -917,17 +917,18 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
         await textarea.fill(content);
       };
-      // Read from the page window itself: the page text lines of the new list, whether the star is page text, the ::before content
-      // and colour, the :first-child's computed letters, and a focused link's background (a check has no mouse, so focus stands in for hover).
+      // Read from the page window itself: the page text lines of the new list, whether the star is page text, the ::before content,
+      // the :first-child's computed letters, and the background of a focused nav link and of a focused ordinary link (a check has no
+      // mouse, so focus stands in for hover; the ordinary link shows the new a:focus rule, which nav a:focus overrides on the nav).
       const looks = async (where) => {
         const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
         await inside.waitForFunction(() => document.readyState === "complete");
         return inside.evaluate(() => {
           const lines = document.body.innerText.split("\n");
-          const link = document.querySelector("a"); link.focus();
+          const focused = (link) => { link.focus(); return [link.matches(":focus"), getComputedStyle(link).backgroundColor]; };
           return [lines.slice(lines.indexOf("Top skills") + 1, lines.indexOf("Top skills") + 3), document.body.innerText.includes("★"),
             getComputedStyle(document.querySelector("h2"), "::before").content, getComputedStyle(document.querySelector(".top li:first-child")).textTransform,
-            link.matches(":focus"), getComputedStyle(link).backgroundColor];
+            ...focused(document.querySelector("nav a")), ...focused(document.querySelector(".more a"))];
         });
       };
       const week7Own = (await progress(weeks[6])).performanceTask.own;
@@ -939,7 +940,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       // Linked weeks carry the Week 7 submission forward: its pages and styles.css.
       await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried["index.html"]);
       assert.deepEqual((await page.locator(".student-module-project .file-tabs .file-tab").allTextContents()).sort(), Object.keys(carried).sort());
-      const index = carried["index.html"].replace("</body>", "  <h2>Top skills</h2>\n  <ul class=\"top\">\n    <li>Typing</li>\n    <li>Drawing</li>\n  </ul>\n</body>");
+      const index = carried["index.html"].replace("</body>", "  <h2>Top skills</h2>\n  <ul class=\"top\">\n    <li>Typing</li>\n    <li>Drawing</li>\n  </ul>\n  <p class=\"more\"><a href=\"projects.html\">See my projects</a></p>\n</body>");
       assert.notEqual(index, carried["index.html"]);
       await write("index.html", index);
       const css = carried["styles.css"] + "\n/* Hover and focus: the same light yellow for the mouse and the keyboard, an outline for the keyboard */\n"
@@ -951,9 +952,9 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
       await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
-      // The first link is a nav link: the student's Week 6 rule nav a:hover, nav a:focus makes it maroon, as under the mouse.
-      const expected = [["TYPING", "Drawing"], false, "\"★ \"", "uppercase", true, "rgb(138, 28, 85)"];
-      assert.deepEqual(await looks(page), expected, "the first item in capitals and no star in the page text; the star drawn by ::before; focus shows the nav hover colour");
+      // A nav link takes the student's Week 6 nav a:hover, nav a:focus maroon; the ordinary link takes this week's a:focus light yellow.
+      const expected = [["TYPING", "Drawing"], false, "\"★ \"", "uppercase", true, "rgb(138, 28, 85)", true, "rgb(255, 243, 196)"];
+      assert.deepEqual(await looks(page), expected, "the first item in capitals and no star in the page text; the star drawn by ::before; focus shows the hover colours");
       await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week8.png" });
       await closePageWindow(page);
       await page.getByRole("button", { name: "Submit this version", exact: true }).click();

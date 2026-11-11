@@ -1126,3 +1126,9 @@ I must check, and a Sources list of every reference as clickable links. Then the
   `npm test` 448/448, lint 0 errors, build OK. Rolling prompt now Week 9 (asks to check first whether a narrow-screen media query can be
   seen in the page window at all). Branch `docs/net-resume-week-08`.
 - 2026-11-11 — Delivered as [PR #96](https://github.com/SirNeo-Coder/JavaShare/pull/96) against main; CodeRabbit review not in yet when opened.
+- 2026-11-11 — CodeRabbit on PR #96: one Minor outside-diff finding, valid: the Week 8 personal subtest focused a nav link, whose Week 6 `nav a:focus`
+  colour overrides the new `a:focus` rule, so the subtest passed without that rule. Approved fix: the student also adds an ordinary link and the
+  subtest expects its focused light yellow (student run and teacher review). Shown failing with the yellow rule removed (`rgba(0, 0, 0, 0)`,
+  3042). After the teacher merged main into the branch: 3042 13 pass, 6 skipped, 0 fail; 8787 14 pass, 5 skipped, 0 fail, 72/72 steps; `npm test`
+  first 454/457 (three `subject-module-sharing` database tests failed; alone 10/10; all migrations applied locally; probably another
+  run on the shared local database), then 457/457. Test only; no CKB record (a weak check, not a CodeShare bug).
