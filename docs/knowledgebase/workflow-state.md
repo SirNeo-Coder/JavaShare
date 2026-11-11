@@ -497,6 +497,13 @@ CodeShare, ends the session and any shared step; students return to their own wo
 offline. Credit for tasks done in the session, everyone moving with the teacher's step, and **Show
 code** come in a second slice.
 
+Next to **End session**, the teacher sees how many students have finished the step the class is on, for
+example **Step 1 · 3/20 done** (approved 2026-11-11). Hovering over it, or moving the keyboard focus to it,
+lists **Done** and **Not yet** by name. It counts a step's task (or the step itself when it has no separate
+task), never the sample check, and only this class's students. It updates when the teacher turns to another
+page and whenever a student finishes a task (or the teacher marks a step done); it never re-reads on a timer.
+It is hidden while no worksheet is open and on the **Performance task** page. The student list is unchanged.
+
 ## Subject-specific shared module sets (approved 2026-10-22)
 
 - **Create a class** requires **Subject**: **Java** or **Net MVC**. Each class uses exactly one
