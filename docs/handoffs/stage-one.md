@@ -1298,3 +1298,26 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   pass; browser tests class-session (2/2), class-shared-step, teacher-module-preview, teacher-live-help, workspace-drawers,
   web-sample-first pass. These rounds are now finding narrow timing cases; the teacher may merge before the next review.
 - Next: teacher tests and merges PR #94 (check CodeRabbit's next re-review); then slice 2.
+
+## Class session step count — 2026-11-11
+
+- Branch `feature/session-step-done-count` (from `main` at `7dab7be`, after PR #94; worktree `../JavaShare-done-count`).
+  Teacher asked for a count of who has finished the step the class is on (e.g. 3/20), with hover showing who is done
+  and who is not, kept out of the student list. Approved plan; teacher chose: refresh only when a student finishes, no timer.
+- Done: `getSupabaseSessionStepProgress` + teacher-only `GET /api/classes/:id/session/step-progress` (no new table);
+  `stepDone` in `routes.ts` sends `class:step-done` (no names) after an accepted task pass (browser-result, complete,
+  laptop run) and after a teacher check; `app/SessionStepDone.tsx` shows **Step N · done/total done** next to
+  **End session**, with **Done** / **Not yet** lists on hover or keyboard focus. Re-reads on `class:session` (page
+  change) and `class:step-done` only. Hidden with no worksheet open and on the **Performance task** page.
+- Tested: `tests/session-step-done.test.mjs` (real routes, 8/8) and `tests/session-step-done.browser.mjs` (real app,
+  offline settings, laptop Java). Shown failing when broken: counting sample checks, counting another class's pass,
+  no broadcast, and the screen not listening. `npm test` 456/456; build and lint pass; `class-session.browser.mjs` passes.
+- Not run: hosted site (Cloudflare) and online Java (CheerpJ) end to end — the online `browser-result` and `complete`
+  routes are covered by the route test only; `npm run classroom:offline` itself (tests used its settings).
+- CodeRabbit (checked at the start): PR #94's findings were all fixed in CKB-103–106; its final commit was never
+  re-reviewed. PR #93: one finding still valid, not fixed (needs approval): when a student's progress reload jumps the
+  worksheet to another page, the folded header is not reopened (hover or keyboard focus still reopens it).
+- CodeRabbit on PR #95 (2026-11-11): one valid Minor finding fixed with the teacher's approval (CKB-107): a followed module
+  deleted during the session made the count route answer 404; it now answers `{ step: null }`. Route test shown failing
+  without the fix. Not valid: name keys instead of index (two students can share a name). Docstring check not applied.
+- Next: teacher tests and merges this PR; then class session slice 2.

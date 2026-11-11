@@ -640,6 +640,29 @@ export async function setSupabaseClassSession(user: SupabaseSessionUser, classro
   return { classroomId, active: data.length > 0 };
 }
 
+// Who has finished the step the class session is on (teacher, 2026-11-11). Null when no session step is open;
+// the task page reports the preceding step, so it has no count.
+export async function getSupabaseSessionStepProgress(user: SupabaseSessionUser, classroomId: string) {
+  const classroom = await teacherClassroom(user, classroomId);
+  if (!classSessionActive(classroom) || !classroom.session_module_id || !classroom.session_step_id || classroom.session_page === "task") return { step: null };
+  const moduleId = classroom.session_module_id;
+  // A followed module deleted during the session has no step, like Enter classroom (CKB-103, CKB-107).
+  const row = await loadCourseModuleRow(classroomId, moduleId).catch((error) => {
+    if (error instanceof SupabaseRepositoryError && error.status === 404) return null;
+    throw error;
+  });
+  const step = row && findActivity(row.content, classroom.session_step_id);
+  if (!step) return { step: null };
+  const [{ students }, { data, error }] = await Promise.all([
+    listSupabaseClassroomStudents(user, classroomId),
+    getSupabaseAdmin().from("module_progress").select("student_id,step_states").eq("classroom_id", classroomId).eq("module_id", moduleId),
+  ]);
+  fail(error, "Could not load class progress");
+  const passed = new Set(data.filter((row) => row.step_states[activityStateId(step)] === "pass").map((row) => row.student_id));
+  const names = (done: boolean) => students.filter((student) => passed.has(student.id) === done).map((student) => student.name);
+  return { step: { moduleId, stepId: step.id, number: step.number }, done: names(true), notDone: names(false) };
+}
+
 // The teacher's interaction keeps their running sessions going (the sign-in renewal calls this at most once a minute).
 export async function touchSupabaseClassSessions(user: SupabaseSessionUser, at: number) {
   if (user.role !== "teacher") return;
