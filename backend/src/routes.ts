@@ -72,6 +72,7 @@ import {
   setSupabaseSharedStep,
   setSupabaseClassSession,
   supabaseClassSession,
+  getSupabaseSessionStepProgress,
   touchSupabaseClassSessions,
   setSupabaseModuleAvailability,
   setSupabaseModulePerformanceTask,
@@ -475,6 +476,11 @@ app.put("/api/classes/:classroomId/session", requireAuth, requireTeacher, async 
   } catch (error) { next(error); }
 });
 
+app.get("/api/classes/:classroomId/session/step-progress", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseSessionStepProgress(req.user!, z.string().uuid().parse(req.params.classroomId))); }
+  catch (error) { next(error); }
+});
+
 app.post("/api/classes/:classroomId/live-share", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const { projectId } = z.object({ projectId: z.string().uuid().nullable() }).parse(req.body);
@@ -553,6 +559,13 @@ app.get("/api/submissions", requireAuth, async (req: AuthedRequest, res, next) =
   try { return res.json(await listSupabaseSubmissions(req.user!)); }
   catch (error) { next(error); }
 });
+
+// A finished task (not a sample check) tells the class, so the teacher's session count re-reads
+// (teacher, 2026-11-11). No names travel: students hear it too.
+async function stepDone<T extends { passed?: boolean; check?: string }>(classroomId: string, result: T) {
+  if (result.passed && result.check === "task") await broadcast(`class:${classroomId}`, "class:step-done");
+  return result;
+}
 
 // Module progress (docs/course-format.md): the goal meter, per-step checklist, and the two
 // performance-task submissions (sample code run, student's own version). moduleId is the
@@ -720,7 +733,7 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/browser-result
     if (localJavaEnabled) throw new SupabaseRepositoryError(403, "Offline progress must use the classroom Java runner");
     if (!process.env.JAVA_RUNNER_URL) throw new SupabaseRepositoryError(503, "Online Java is not configured");
     const { stepId, updatedAt, success, output } = z.object({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }), success: z.boolean(), output: z.string().max(70000) }).parse(req.body);
-    return res.json(await recordSupabaseModuleActivityResult(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId, updatedAt, { mode: "browser", success, output }));
+    return res.json(await stepDone(String(req.params.classroomId), await recordSupabaseModuleActivityResult(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId, updatedAt, { mode: "browser", success, output })));
   } catch (error) { next(error); }
 });
 
@@ -762,7 +775,7 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", req
       media: z.array(z.string().max(1000)).max(100).optional() });
     const checkpoint = evidence.extend({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }),
       moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional() }).parse(req.body);
-    return res.json(await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint));
+    return res.json(await stepDone(req.params.classroomId, await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint)));
   } catch (error) { next(error); }
 });
 
@@ -844,7 +857,9 @@ app.put("/api/classes/:classroomId/students/:studentId/modules/:moduleId/teacher
   try {
     const { classroomId, studentId } = z.object({ classroomId: z.string().uuid(), studentId: z.string().uuid() }).parse(req.params);
     const { stepId } = z.object({ stepId: z.string().trim().min(1).max(100) }).parse(req.body);
-    return res.json(await markSupabaseTeacherCheckedStep(req.user!, classroomId, studentId, String(req.params.moduleId), stepId));
+    const result = await markSupabaseTeacherCheckedStep(req.user!, classroomId, studentId, String(req.params.moduleId), stepId);
+    await broadcast(`class:${classroomId}`, "class:step-done");
+    return res.json(result);
   } catch (error) { next(error); }
 });
 
@@ -865,6 +880,6 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/activity", req
 app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/run", requireAuth, async (req: AuthedRequest, res, next) => {
   try {
     const { stepId, files, updatedAt } = z.object({ stepId: z.string().trim().min(1).max(100), files: javaFiles, updatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
-    return res.json(await runSupabaseModuleActivity(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId, files, updatedAt, (sources, stdin) => executeJava(req.user!.id, sources, stdin)));
+    return res.json(await stepDone(String(req.params.classroomId), await runSupabaseModuleActivity(req.user!, String(req.params.classroomId), String(req.params.moduleId), stepId, files, updatedAt, (sources, stdin) => executeJava(req.user!.id, sources, stdin))));
   } catch (error) { next(error); }
 });

@@ -16,6 +16,7 @@ import { moduleResumeStep } from "./moduleParts";
 import { moduleProjectForClass } from "./moduleActivityState";
 import { activityStateId, activityTask, checkableStep, mergeProjectFiles, webPerformanceTask } from "../backend/src/module-activities";
 import { fileLanguage } from "../backend/src/file-paths";
+import SessionStepDone from "./SessionStepDone";
 import StudentModuleActivity, { JavaRunProgress, RunBox, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
 import { PerformanceTaskSteps, type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
@@ -264,6 +265,7 @@ export default function Home() {
   // Class session (teacher, 2026-11-10): started by Enter classroom; students follow the teacher's worksheet page.
   const [classSession, setClassSession] = useState<ClassSession>({ classroomId: "", active: false });
   const [teacherFollow, setTeacherFollow] = useState<ClassFollow | null>(null);
+  const [sessionStepRevision, setSessionStepRevision] = useState(0);
   const refreshClassSessionRef = useRef<() => Promise<void>>(async () => undefined);
   const classSessionRequestRef = useRef(0);
   const sentFollowRef = useRef({ classroomId: "", key: "" });
@@ -797,7 +799,8 @@ export default function Home() {
       setLiveShare(share);
     });
     on("class:shared-step", () => void refreshSharedStepRef.current());
-    on("class:session", () => void refreshClassSessionRef.current());
+    on("class:session", () => { void refreshClassSessionRef.current(); setSessionStepRevision((revision) => revision + 1); });
+    on("class:step-done", () => setSessionStepRevision((revision) => revision + 1));
     on("class:chat-muted", ({ muted }: { muted: boolean }) =>
       setData((current) =>
         current ? { ...current, classroomChatMuted: muted } : current,
@@ -2641,6 +2644,7 @@ export default function Home() {
                   <b>Class session</b>
                   <small>Students follow your worksheet</small>
                 </span>
+                <SessionStepDone classroomId={session.classroomId} revision={sessionStepRevision} />
                 <button type="button" onClick={() => void setClassSessionState({ active: false })}>End session</button>
               </div>
             )}
