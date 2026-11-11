@@ -1326,7 +1326,16 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - CodeRabbit (checked at the start): PR #94's findings were all fixed in CKB-103–106; its final commit was never
   re-reviewed. PR #93: one finding still valid, not fixed (needs approval): when a student's progress reload jumps the
   worksheet to another page, the folded header is not reopened (hover or keyboard focus still reopens it).
-- CodeRabbit on PR #95 (2026-11-11): one valid Minor finding fixed with the teacher's approval (CKB-107): a followed module
+- CodeRabbit on PR #95 (2026-11-11): one valid Minor finding fixed with the teacher's approval (CKB-109, first numbered CKB-107): a followed module
   deleted during the session made the count route answer 404; it now answers `{ step: null }`. Route test shown failing
   without the fix. Not valid: name keys instead of index (two students can share a name). Docstring check not applied.
 - Next: teacher tests and merges this PR; then class session slice 2.
+
+## Knowledge base renumber and Week 8 test wait — 2026-11-11
+
+- Branch `fix/kb-renumber-week8-wait` (from `main` at `1df8cf1`). Two cases were both CKB-107 (PR #95's session step count and
+  PR #96's worksheet step tab). The session step-count case is now CKB-109; the step-tab case keeps CKB-107. The code comment
+  and test name that say CKB-107 for the step count are renamed on PR #98's branch (they sit next to its changes).
+- CodeRabbit on PR #96 checked: Week 8 check now waits for the elements it reads (CKB-111, test only); the non-nav focus link was
+  already fixed; the dispatchEvent click is deliberate (CKB-107). `web-module-steps.browser.mjs` 13 passed, 6 skipped, 0 failed.
+- Merge this before PR #98, then PR #98 is updated from main (its index row sits next to the renumbered one).
