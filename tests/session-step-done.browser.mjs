@@ -91,6 +91,9 @@ test("class session step count: Step 1 · 0/2 done, a student's finished run mak
     const quiet = reads.length;
     await page.waitForTimeout(4000);
     assert.equal(reads.length, quiet, "no re-reads without a finished task or a page change");
+    // Only a share re-read can hide the chip here: with the worksheet closed, Stop sharing leaves no step (CKB-110).
+    await page.locator(".team-header").getByRole("button", { name: "Stop sharing" }).click();
+    await chip.waitFor({ state: "detached" });
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();

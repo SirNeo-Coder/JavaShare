@@ -798,7 +798,7 @@ export default function Home() {
       receivedDraftSequenceRef.current = 0;
       setLiveShare(share);
     });
-    on("class:shared-step", () => { void refreshSharedStepRef.current(); setSessionStepRevision((revision) => revision + 1); });
+    on("class:shared-step", () => void refreshSharedStepRef.current());
     on("class:session", () => { void refreshClassSessionRef.current(); setSessionStepRevision((revision) => revision + 1); });
     on("class:step-done", () => setSessionStepRevision((revision) => revision + 1));
     on("class:chat-muted", ({ muted }: { muted: boolean }) =>
@@ -1851,6 +1851,8 @@ export default function Home() {
     const shared = next.active ? next : null;
     sharedKeyRef.current = shared ? `${shared.moduleId}:${shared.step.id}` : "";
     setSharedStep(shared);
+    // Every share re-read (own share, live event, reconnect) also re-reads the session step count (CKB-110).
+    setSessionStepRevision((revision) => revision + 1);
     if (user.role !== "student") return;
     if (!shared) { leftShareRef.current = ""; if (moduleActivity?.shared) await returnFromSharedStep(); return; }
     await followSharedStep(shared);

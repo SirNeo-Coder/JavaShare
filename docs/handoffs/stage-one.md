@@ -1342,3 +1342,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Not run: hosted site, online Java (CheerpJ).
 - Open (needs a plan and approval): teacher asked that the console in Work in code editor also show the step's
   alteration task, not only the sample's expected output.
+- CodeRabbit on PR #98 (2026-11-11): Minor finding valid, fixed with approval (CKB-110): the count now re-reads with every
+  shared-step re-read (own share, live message, reconnect). Test nitpick valid: the browser check now presses **Stop sharing** and
+  requires the chip to go; shown failing without the fix. `npm test` 458/458; build, lint, step-count, class-session and
+  class-shared-step browser checks pass.
