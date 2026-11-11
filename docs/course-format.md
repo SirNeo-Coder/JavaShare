@@ -358,6 +358,18 @@ evidence, checked by the server against its own expected output and the saved ve
   nested rules of the broken one, so a later rule can still match inside it: do not rely on it to stop a rule inside a
   figure. A personal gallery offline (no media files) still runs successfully; each picture shows its alt text and a small
   broken-picture icon.
+- **Pseudo-classes and pseudo-elements (checked 2026-11-11, Resume Week 8).** Structural pseudo-classes (`:first-child`,
+  `:last-child`, `:nth-child(odd)`, `:not()`, `:first-of-type`) and form states (`:required`, `:invalid`, `:placeholder-shown`,
+  `option:checked`) give the same counts and computed styles in CodeShare's page window and the teacher's checker, so page checks
+  may use them; every check selector must match at least one element. `:hover`, `:focus` and `:focus-visible` match nothing in a
+  check (no mouse or keyboard; the teacher's checker waits 30 s on a style check that matches nothing): never page-check them. A
+  page check cannot pick a pseudo-element (`::before`, `::after`, `::first-letter`). Text from `content` on `::before`/`::after` is
+  not page text; `text-transform` on `::first-letter` is (a badge written `solo work` reads `Solo work`), and a floated drop cap
+  leaves the page text as it was. Text from `::before` becomes the first letter, so `::first-letter` then styles that symbol.
+  `::first-line` follows where the line wraps, which differs between the page window and the checker: never use it in a checked
+  page. A misspelt pseudo-class or pseudo-element, one bad selector in a comma list, or a space before the colon drops or empties
+  the whole rule; one colon (`:before`, `:first-letter`) still works; a missing quote in `content` drops that declaration and the
+  next one only. In a personal run the pseudo-element is drawn online and offline and its text stays out of the page text.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has

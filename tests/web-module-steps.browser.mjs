@@ -150,7 +150,8 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       // The open tab may be any web file (Week 4: a task ends in styles.css, a CSS editor), so take whichever editor is there.
       const old = await page.locator(".student-module-project .editor-card textarea").elementHandle();
       await openWorksheet();
-      await worksheet.getByRole("button", { name: new RegExp(`Step ${step.number}$`) }).click();
+      // The step tabs fold away while the worksheet scrolls down (PR #93), under its header: click the tab itself (CKB-107).
+      await worksheet.getByRole("button", { name: new RegExp(`Step ${step.number}$`) }).dispatchEvent("click");
       await worksheet.locator("article:not([hidden])").getByRole("button", { name: "Work in code editor", exact: true }).click();
       await editorReady(old);
     };
@@ -900,6 +901,81 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       assert.deepEqual(await looks(review), expected, "the review runs the frozen pages, styles.css and pictures");
       await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       assert.deepEqual(await progress(week7), saved, "teacher runs never change the student's progress");
+      await review.close();
+    });
+
+    await t.test("Week 8 personal project: the Week 7 site carries forward; the student adds a list, hover and focus states, a :first-child rule and an h2::before star to styles.css; Run shows the first item in capitals in the page text but no star, while the page window draws the star (::before) and gives a focused link the hover colour; Submit freezes them; the teacher's review shows the same", { skip: needs(8) }, async () => {
+      const week8 = weeks[7], steps8 = stepsOf(week8);
+      // The module steps are checked elsewhere; mark them done so the personal task opens.
+      const states = (await progress(week8)).stepStates;
+      assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps8.map((step) => [activityStateId(step), "pass"])) } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week8.id)).error, null);
+      const textarea = page.locator(".student-module-project .editor-card textarea");
+      const fileTab = (path) => page.locator(".student-module-project .file-tabs").getByRole("button", { name: path, exact: true });
+      const write = async (path, content) => {
+        await fileTab(path).dispatchEvent("click");
+        await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
+        await textarea.fill(content);
+      };
+      // Read from the page window itself: the page text lines of the new list, whether the star is page text, the ::before content
+      // and colour, the :first-child's computed letters, and a focused link's background (a check has no mouse, so focus stands in for hover).
+      const looks = async (where) => {
+        const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+        await inside.waitForFunction(() => document.readyState === "complete");
+        return inside.evaluate(() => {
+          const lines = document.body.innerText.split("\n");
+          const link = document.querySelector("a"); link.focus();
+          return [lines.slice(lines.indexOf("Top skills") + 1, lines.indexOf("Top skills") + 3), document.body.innerText.includes("★"),
+            getComputedStyle(document.querySelector("h2"), "::before").content, getComputedStyle(document.querySelector(".top li:first-child")).textTransform,
+            link.matches(":focus"), getComputedStyle(link).backgroundColor];
+        });
+      };
+      const week7Own = (await progress(weeks[6])).performanceTask.own;
+      const carried = Object.fromEntries(week7Own.files.map((file) => [file.path, file.content]));
+      await openCatalog(week8);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      // Linked weeks carry the Week 7 submission forward: its pages and styles.css.
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried["index.html"]);
+      assert.deepEqual((await page.locator(".student-module-project .file-tabs .file-tab").allTextContents()).sort(), Object.keys(carried).sort());
+      const index = carried["index.html"].replace("</body>", "  <h2>Top skills</h2>\n  <ul class=\"top\">\n    <li>Typing</li>\n    <li>Drawing</li>\n  </ul>\n</body>");
+      assert.notEqual(index, carried["index.html"]);
+      await write("index.html", index);
+      const css = carried["styles.css"] + "\n/* Hover and focus: the same light yellow for the mouse and the keyboard, an outline for the keyboard */\n"
+        + "a:hover, a:focus {\n  background-color: #fff3c4;\n}\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n"
+        + "\n/* A pseudo-class: my top skill in capitals. A pseudo-element: a star before each heading */\n"
+        + ".top li:first-child {\n  text-transform: uppercase;\n}\nh2::before {\n  content: \"★ \";\n}\n";
+      await write("styles.css", css);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
+      // The first link is a nav link: the student's Week 6 rule nav a:hover, nav a:focus makes it maroon, as under the mouse.
+      const expected = [["TYPING", "Drawing"], false, "\"★ \"", "uppercase", true, "rgb(138, 28, 85)"];
+      assert.deepEqual(await looks(page), expected, "the first item in capitals and no star in the page text; the star drawn by ::before; focus shows the nav hover colour");
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week8.png" });
+      await closePageWindow(page);
+      await page.getByRole("button", { name: "Submit this version", exact: true }).click();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
+      const saved = await progress(week8);
+      assert.equal(saved.percent, 100);
+      assert.deepEqual(Object.fromEntries(saved.performanceTask.own.files.map((file) => [file.path, file.content])), { ...carried, "index.html": index, "styles.css": css });
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      await review.locator(".teacher-module-card", { hasText: week8.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".student-module-project .editor-card textarea").waitFor();
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      await review.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      assert.deepEqual(await looks(review), expected, "the review runs the frozen pages and styles.css");
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week8), saved, "teacher runs never change the student's progress");
       await review.close();
     });
 
