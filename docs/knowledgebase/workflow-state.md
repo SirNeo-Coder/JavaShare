@@ -501,8 +501,8 @@ Next to **End session**, the teacher sees how many students have finished the st
 example **Step 1 · 3/20 done** (approved 2026-11-11). Hovering over it, or moving the keyboard focus to it,
 lists **Done** and **Not yet** by name. It counts a step's task (or the step itself when it has no separate
 task), never the sample check, and only this class's students. It updates when the teacher turns to another
-page and whenever a student finishes a task (or the teacher marks a step done); it never re-reads on a timer.
-It is hidden while no worksheet is open and on the **Performance task** page. The student list is unchanged.
+page, starts or stops a share, and whenever a student finishes a task (or the teacher marks a step done); it never re-reads on a timer.
+With the worksheet closed after **Work in code editor**, it counts the **Shared with class** step instead, so the teacher can keep watching while coding (CKB-108). It is hidden when neither a worksheet page nor a shared step is open, and on the **Performance task** page. The student list is unchanged.
 
 ## Subject-specific shared module sets (approved 2026-10-22)
 
