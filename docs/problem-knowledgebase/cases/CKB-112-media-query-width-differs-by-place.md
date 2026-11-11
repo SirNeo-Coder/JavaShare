@@ -35,7 +35,9 @@ Width is place-dependent; module content must never depend on a particular one:
   checker, or the other way round, and the student can never complete it.
 - Tell students the truth about the two places: on a module step the page sits beside its checks and is already narrower than
   900 px, so the query is on; in their own project the page fills the page window, so the query is off until the **browser**
-  window is made narrower. The page window itself cannot be dragged, but it follows the browser window.
+  window is made narrower. The page window itself cannot be dragged, but it follows the browser window. A personal project in an
+  already narrow browser window can start below the breakpoint, so the window is widened first and then narrowed again
+  (CodeRabbit on PR #102); Resume Week 10's module text and its task pages say so.
 - `docs/course-format.md` records all three widths under "Flexbox and media queries".
 
 ## Regression proof
@@ -49,6 +51,15 @@ Width is place-dependent; module content must never depend on a particular one:
 - `Resume/Week_09/test_checker.py::test_every_sample_and_task_output_is_the_same_at_every_width` runs every sample and task
   answer at 760, 800, 899 and 1000 px. Proved to have teeth: adding `.motto { display: none }` inside the Step 5 query made it
   fail at all three narrow widths; removing it passed again.
+
+## Also seen in
+
+- 2026-11-12 (Resume Week 10): the same three widths with a grid. A track size in `fr`, `%`, `auto` or `minmax()` resolves to
+  used pixels, and `repeat(auto-fit, minmax(...))` even changes the number of columns with the width, so Week 10 page-checks
+  `display`, `gap` and `max-width` and never a track. Its `test_checker.py` runs every sample and task answer at 696, 760, 800,
+  899, 901 and 1000 px, and the Week 10 personal subtest asserts the module step's preview is `<= 900` px, the personal
+  project's is `> 900` px with more than one column, and that narrowing the browser window to 820 px drops it to one column
+  with the whole page text and every other computed value unchanged.
 
 ## History
 
