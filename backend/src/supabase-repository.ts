@@ -649,7 +649,7 @@ export async function getSupabaseSessionStepProgress(user: SupabaseSessionUser, 
   const [moduleId, stepId] = classroom.session_page ? [classroom.session_module_id, classroom.session_page === "task" ? null : classroom.session_step_id]
     : [classroom.shared_module_id, classroom.shared_step_id];
   if (!moduleId || !stepId) return { step: null };
-  // A followed module deleted during the session has no step, like Enter classroom (CKB-103, CKB-107).
+  // A followed module deleted during the session has no step, like Enter classroom (CKB-103, CKB-109).
   const row = await loadCourseModuleRow(classroomId, moduleId).catch((error) => {
     if (error instanceof SupabaseRepositoryError && error.status === 404) return null;
     throw error;
