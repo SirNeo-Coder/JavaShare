@@ -2,7 +2,7 @@
 
 - Status: resolved
 - First recorded: 2026-11-10
-- Last verified: 2026-11-10
+- Last verified: 2026-11-11
 - Area: classroom Module worksheet folding header — `app/ModuleViewer.tsx` (`ModuleContent`, `foldOnScroll`), `app/globals.css` (`.worksheet-fold`)
 - Search terms: worksheet header stuck folded, progress strip hidden, step tabs gone, cannot scroll up, short page, header collapse, fold away
 
@@ -32,7 +32,16 @@ CodeRabbit on PR #93 found two more ways to stay folded, both fixed (teacher app
 - Every page change (part buttons, step tabs, **Previous / Next page**) now shows the strip again
   (`showPage`), as the teacher chose.
 
+Teacher follow-up (2026-11-11, approved): the strip came back on any scroll up, even mid-page. It now
+shows again only within 24 pixels of the page top; scrolling up mid-page keeps it folded. The
+0.3-second wait was removed: the room check keeps a folded page scrollable past the top zone, so the
+move folding causes can no longer reach the top and unfold it.
+
 ## Regression proof
+
+- 2026-11-11: "scrolling up in the middle of the page keeps them folded" and "scrolling back to the top
+  shows them again" (teacher and student). With the old "any scroll up shows" rule put back and the app
+  rebuilt: 14 passed, 3 failed on that assertion; restored: 17/17.
 
 - `tests/workspace-drawers.browser.mjs` — "worksheet hover stays open, outside closing preserves pages, Escape restores its ear"
   (teacher and student): "a page that would fit once folded never folds, so scrolling up is never stuck",

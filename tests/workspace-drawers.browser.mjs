@@ -119,12 +119,12 @@ test("workspace drawers: real offline classroom pointer and keyboard interaction
         assert.equal(await foldHeight(), open, "hovering the title bar shows them again");
         await sheet.locator(".worksheet-desk").hover();
         assert.equal(await foldHeight(), 0, "leaving the title bar folds them again");
-        await page.mouse.wheel(0, -100);
-        assert.equal(await foldHeight(), open, "scrolling up shows them again");
+        await page.mouse.wheel(0, 400); await page.mouse.wheel(0, -100);
+        assert.equal(await foldHeight(), 0, "scrolling up in the middle of the page keeps them folded");
+        await page.mouse.wheel(0, -2000);
+        assert.equal(await foldHeight(), open, "scrolling back to the top shows them again");
         const folded = () => sheet.locator('.worksheet-fold[data-folded="true"]').waitFor();
-        await page.waitForTimeout(400); await page.mouse.wheel(0, 400); await folded(); await page.mouse.wheel(0, -2000);
-        assert.equal(await foldHeight(), open, "scrolling straight back up right after folding still shows them");
-        await page.waitForTimeout(400); await page.mouse.wheel(0, 400); await folded();
+        await page.mouse.wheel(0, 400); await folded();
         await sheet.locator(".worksheet-tabs button").first().focus();
         assert.equal(await foldHeight(), open, "keyboard focus on a step tab shows them while folded");
         assert.equal(await sheet.locator(".worksheet-fold").getAttribute("data-folded"), "true");
