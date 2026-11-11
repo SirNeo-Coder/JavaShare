@@ -32,6 +32,10 @@ const block = z.discriminatedUnion("type", [
       files: z.array(file).max(50).default([]),
       expectedOutput: z.string().max(100000),
       stdin: z.string().max(10000).default(""),
+      // The teacher's answer key, written out in the module file: the lines the task changes, as the
+      // teacher wants them shown, and an optional note (teacher, 2026-11-12). CodeShare compares
+      // nothing. It never reaches a student view (studentModuleView strips it).
+      solution: z.object({ lines: z.string().trim().min(1).max(5000), note: z.string().max(5000).optional() }).optional(),
     }).optional(),
     // Groups this step (and any text/definition/analogy/table/note blocks leading into it) under
     // one named, gated part of the module viewer - a part can span several lessons (e.g. a
@@ -119,6 +123,9 @@ export const courseModule = z.object({
   ]);
   return module.previousModuleId !== module.id && progressIds.length === new Set(progressIds).size;
 }, { message: "Two lessons, steps or exit slips in this module share the same id - their ids must be unique across the whole module" })
+  .refine((module) => module.lessons.every((lesson) => lesson.blocks.every((block) =>
+    block.type !== "step" || !block.activity?.solution || Boolean(block.activity.id))),
+  { message: "A task answer (activity.solution) needs the task's own activity.id - without it the worksheet would never show the answer" })
   .refine((module) => {
     // /api/execute only runs java files whose path matches a strict identifier-style regex, at
     // most JAVA_PATH_MAX_LENGTH characters (routes.ts). A java step's files, and any .java

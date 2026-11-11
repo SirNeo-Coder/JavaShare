@@ -137,6 +137,34 @@ Keep the printed sample in the step's `files`, `instruction`, `expectedOutput`, 
 }
 ```
 
+### Teacher-only answer key (approved 2026-11-11, simplified 2026-11-12)
+
+A task may also carry the answer, for the teacher only. You write the changed lines yourself;
+CodeShare works nothing out and compares nothing:
+
+```json
+"activity": {
+  "id": "java-2-w14-d1-s1-alter-v1",
+  "instruction": "Change the removal from index 1 to index 3. Keep the other output lines.",
+  "expectedOutput": "the complete, verified output after the alteration",
+  "solution": {
+    "lines": "line 8:  numbers.remove(3);\nline 10: System.out.println(numbers);",
+    "note": "Optional markdown: what to point out while explaining it."
+  }
+}
+```
+
+`lines` is plain text (at most 5000 characters), shown exactly as written in a collapsed
+**Answer key (teacher only)** panel under the step, with `note` above it. It needs the task's own
+`activity.id`, or the upload is refused: without an id the worksheet would never show the panel.
+CodeShare removes `solution` from every student view, open or locked step alike, and it is not a
+progress id. Keep the complete solved files in your own week folder as before; the panel is for
+explaining in class, not for running.
+
+Deploy the app change before uploading a module that carries answers: an older server has no rule
+to remove them, so it would send a step's answer to students. If the site is ever put back to an
+older version, upload those modules again without `solution` first.
+
 A nonempty stable `activity.id` opts into task checking and one-step-at-a-time unlocking.
 It must be unique across the module's lesson, sample, slip and task ids, including generated
 progress keys. Completion is stored under `task:<activity.id>`; old sample and legacy

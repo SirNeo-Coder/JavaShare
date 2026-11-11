@@ -102,6 +102,12 @@ What teachers and students can do today. Keep this page current when their use o
   cannot complete new tasks. `sampleFirst` additionally verifies the unchanged sample before editing.
   Compilation and execution must succeed. Match spaces/blank lines exactly; normalize CRLF
   and allow one final newline (Java println). Failed exploratory runs retain earlier passes.
+- **Answer key (2026-11-11, simplified 2026-11-12):** when a module's JSON gives a task an
+  `activity.solution`, the teacher's worksheet shows a collapsed **Answer key (teacher only)** panel
+  under that step: the optional note, then the answer lines exactly as the teacher wrote them in the
+  module file. CodeShare compares nothing and runs nothing here. Students never receive it: the
+  server strips it from every student view, and an answer without the task's `activity.id` is
+  refused at upload.
 - Explicit alteration tasks open one step at a time; legacy samples open one part at a time.
   Locked content and premature requests are refused server-side. Reopening resumes unfinished work.
   Handwritten liplets are assessed separately and do not gate progress. Teacher availability
