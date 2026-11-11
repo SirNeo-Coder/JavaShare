@@ -1311,7 +1311,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   change) and `class:step-done` only. Hidden with no worksheet open and on the **Performance task** page.
 - Tested: `tests/session-step-done.test.mjs` (real routes, 8/8) and `tests/session-step-done.browser.mjs` (real app,
   offline settings, laptop Java). Shown failing when broken: counting sample checks, counting another class's pass,
-  no broadcast, and the screen not listening. `npm test` 457/457; build and lint pass; `class-session.browser.mjs` passes.
+  no broadcast, and the screen not listening. `npm test` 456/456; build and lint pass; `class-session.browser.mjs` passes.
 - Not run: hosted site (Cloudflare) and online Java (CheerpJ) end to end — the online `browser-result` and `complete`
   routes are covered by the route test only; `npm run classroom:offline` itself (tests used its settings).
 - CodeRabbit (checked at the start): PR #94's findings were all fixed in CKB-103–106; its final commit was never
