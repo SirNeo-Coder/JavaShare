@@ -20,6 +20,8 @@ export type StudentActivity = {
   review?: { studentId: string; studentName: string; submissionId: string; submission: import("../backend/src/personal-performance").PersonalSubmission }; module: CourseModule;
   classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string; studentId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
+  // A preview's alteration task, shown under the sample to read (teacher, 2026-11-11).
+  task?: { instruction: string; expectedOutput: string };
 };
 export type ModuleEditorHandle = { save: () => Promise<void>; applyEdit: (path: string, edit: (content: string) => string) => void };
 // Teacher live help: the open file, typing and cursor go to the watching teacher; their cursor comes back.
@@ -458,6 +460,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
               event.preventDefault(); javaConsole.send(stdin); setStdin("");
             }
           }} /></label> : <><b>{pendingSample ? step?.expectedError ? "Expected error" : "Expected sample output" : task ? "Expected task output" : "Expected output"}</b><pre>{pendingSample ? step?.expectedError ?? step?.expectedOutput : activity.expectedOutput}</pre></>}
+          {preview && activity.task && <div className="module-preview-task"><b>Student task</b><p>{activity.task.instruction}</p><b>Expected task output</b><pre>{activity.task.expectedOutput}</pre></div>}
           {checkInput && <><b>Program input for this check</b><pre>{checkInput}</pre></>}
           {!personal && activity.progress.activityProjects?.beforeSampleFiles && <details className="module-before-sample"><summary>Work saved before sample loading</summary>{activity.progress.activityProjects.beforeSampleFiles.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</details>}
           {!personal && Boolean(backups?.length) && <details className="module-before-sample"><summary>Work saved before lesson changes</summary><p>Your earlier code is kept below. Run the current sample first, then copy any changes you still need.</p>{backups?.map((backup, index) => <div key={index}><b>Backup {index + 1}</b>{backup.files.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</div>)}</details>}

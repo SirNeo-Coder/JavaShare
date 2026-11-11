@@ -53,3 +53,17 @@ test("teacher module preview: a teacher opens it (students get previews only as 
   assert.match(html, /Run code/);
   assert.doesNotMatch(html, /Save work|Submit this version|Not checked yet|First, run the sample/);
 });
+
+test("preview console shows the step's task under the sample, for the teacher and a shared class step (2026-11-11)", () => {
+  const activity = { kind: "preview", classroomId: "class", moduleId: "module", moduleTitle: "Vehicle project", stepId: "step", stateId: "", studentId: "teacher",
+    instruction: "Run the vehicle sample", expectedOutput: "Capacity: 20", stdin: "",
+    progress: { moduleId: "module", projectFiles: [{ path: "Main.java", content: "class Main {}" }], performanceProjectFiles: [], stepStates: {}, performanceTask: {}, updatedAt: "", percent: 0 } };
+  const render = (value) => renderToStaticMarkup(createElement(StudentModuleActivity, { activity: value, ref: { current: null }, onChecked() {}, onClose() {} }));
+  const task = { instruction: "Change the capacity to 25", expectedOutput: "Capacity: 25" };
+  for (const shared of [false, true]) {
+    const html = render({ ...activity, shared, task });
+    assert.match(html, /Module sample.*Capacity: 20.*Student task.*Change the capacity to 25.*Expected task output.*Capacity: 25/s, "the task follows the sample");
+  }
+  assert.doesNotMatch(render(activity), /Student task/, "a step without a task shows none");
+  assert.doesNotMatch(render({ ...activity, kind: "module", stateId: "step", task }), /Student task/, "a student's own module project is unchanged");
+});

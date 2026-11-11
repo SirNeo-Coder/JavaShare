@@ -553,7 +553,8 @@ export async function updateSupabaseGroupPermissions(user: SupabaseSessionUser, 
 }
 
 // Share with class (teacher, 2026-11-10): the step the teacher is discussing, fresh for every member whatever
-// their progress. Sample fields only (never the task); students practise it unsaved, so no progress rule applies.
+// their progress. Sample fields plus the task's instruction and expected output to read (teacher, 2026-11-11); task
+// files and ids stay on the server. Students practise it unsaved, so no progress rule applies.
 export async function supabaseSharedStepPayload(user: SupabaseSessionUser, classroomId: string) {
   if (!await canAccessSupabaseClass(user, classroomId)) throw new SupabaseRepositoryError(403, "Classroom access denied");
   const { data: classroom, error } = await getSupabaseAdmin().from("classrooms").select("shared_module_id,shared_step_id").eq("id", classroomId).single();
@@ -564,7 +565,8 @@ export async function supabaseSharedStepPayload(user: SupabaseSessionUser, class
   if (!content || !step) return { active: false as const };
   const { id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput } = step;
   return { active: true as const, moduleId: content.id, moduleTitle: content.title, week: content.week, course: content.course, starterFiles: content.starterFiles,
-    step: { type: "step" as const, id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput } };
+    step: { type: "step" as const, id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput },
+    task: step.activity && { instruction: step.activity.instruction, expectedOutput: step.activity.expectedOutput } };
 }
 
 export async function setSupabaseSharedStep(user: SupabaseSessionUser, classroomId: string, share: { moduleId: string; stepId: string } | null) {

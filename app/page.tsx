@@ -139,11 +139,11 @@ type Submission = {
 };
 // Share with class (teacher, 2026-11-10): the step every member practises fresh, whatever their progress.
 type ClassSession = { classroomId: string; active: false } | { classroomId: string; active: true; endsAt: number; follow: ClassFollow | null };
-type SharedStep = { moduleId: string; moduleTitle: string; week: number; course: string; starterFiles?: CourseModule["starterFiles"]; step: StepBlock };
+type SharedStep = { moduleId: string; moduleTitle: string; week: number; course: string; starterFiles?: CourseModule["starterFiles"]; step: StepBlock; task?: StudentActivity["task"] };
 // The step's sample with the module's starter files, as students get it; never saved.
-function stepPreview(module: CourseModule, step: StepBlock, classroomId: string, userId: string, shared = false): StudentActivity {
+function stepPreview(module: CourseModule, step: StepBlock, classroomId: string, userId: string, shared = false, task: StudentActivity["task"] = step.activity): StudentActivity {
   return { kind: "preview", shared, module, classroomId, moduleId: module.id, moduleTitle: shared ? `Week ${module.week} · Step ${step.number}` : module.title, stepId: step.id, stateId: "", studentId: userId,
-    instruction: step.instruction, expectedOutput: step.expectedOutput, stdin: step.stdin ?? "",
+    instruction: step.instruction, expectedOutput: step.expectedOutput, stdin: step.stdin ?? "", task: task && { instruction: task.instruction, expectedOutput: task.expectedOutput },
     progress: { moduleId: module.id, projectFiles: mergeProjectFiles(module.starterFiles ?? [], step.files), performanceProjectFiles: [], percent: 0, updatedAt: "", stepStates: {}, performanceTask: {} } };
 }
 type LiveShare = {
@@ -1874,7 +1874,7 @@ export default function Home() {
     const sharedModule = { id: shared.moduleId, title: shared.moduleTitle, week: shared.week, course: shared.course, starterFiles: shared.starterFiles,
       lessons: [{ id: "shared", order: 1, dayLabel: "", title: shared.moduleTitle, blocks: [shared.step], exitSlip: { id: "shared", points: 0, questions: [] } }],
       availability: { openLessonIds: [], performanceTaskOpen: false } };
-    setModuleActivity(stepPreview(sharedModule, shared.step, classroomId, user.id, true));
+    setModuleActivity(stepPreview(sharedModule, shared.step, classroomId, user.id, true, shared.task));
     setProjectsOpen(false); setModulesOpen(false); setWorksheetCloseSignal((signal) => signal + 1);
   }
   useEffect(() => { refreshSharedStepRef.current = refreshSharedStep; followSharedStepRef.current = followSharedStep; refreshClassSessionRef.current = refreshClassSession; sendFollowRef.current = sendFollow; });

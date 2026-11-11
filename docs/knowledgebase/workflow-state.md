@@ -473,7 +473,9 @@ with class · Week N · Step M** with **Stop sharing** at the top of the classro
 in the preview. Stopping, or the student's **Return to class project**, reopens the student's own
 module or personal project unchanged. Sharing another step replaces the first; students who join or
 reload while a step is shared get it. Only the shared step opens: the rest of a later module stays
-locked, and the step's task is not sent. Works online and offline (laptop Java offline).
+locked. Under the sample in the Console, the teacher's **Module preview** and each student's class step show
+**Student task** with the task instruction and **Expected task output**, to read (approved 2026-11-11); the task's own
+files are not sent, and runs there still never count. Works online and offline (laptop Java offline).
 
 ## Class session (approved 2026-11-10)
 

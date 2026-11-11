@@ -1330,3 +1330,17 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   deleted during the session made the count route answer 404; it now answers `{ step: null }`. Route test shown failing
   without the fix. Not valid: name keys instead of index (two students can share a name). Docstring check not applied.
 - Next: teacher tests and merges this PR; then class session slice 2.
+
+## Console shows the step's task — 2026-11-11
+
+- Branch `feature/console-shows-task` (from `main` at `1df8cf1`; worktree `../JavaShare-done-count`). Teacher asked that the
+  Console in **Work in code editor** show the task to be done, not only the sample's expected output, and chose that
+  students in a shared step see it too (this changes the 2026-11-10 "task is not sent" rule for Share with class).
+- Done: `supabaseSharedStepPayload` adds `task` (instruction + expected output only; task files/ids stay on the server);
+  `stepPreview` carries it (teacher: from the step; student: from the share); the Console shows **Student task** and
+  **Expected task output** under the sample in previews only.
+- Tested: UI render test (new), `class-shared-step.test.mjs` (updated payload check) and `class-shared-step.browser.mjs`
+  (teacher and three students see the task), each shown failing without its part; `npm test` 458/458; build and lint
+  pass; class-session and teacher-module-preview browser tests pass.
+- Not run: hosted site, online Java (CheerpJ).
+- PR #98 (CKB-108, count stays in Work in code editor) is separate and still open.
