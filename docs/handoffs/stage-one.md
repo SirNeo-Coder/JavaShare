@@ -1,3 +1,12 @@
+> Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
+> **MODULE PROGRESS** and step tabs coming back on any scroll up, even mid-page; approved showing them
+> only at the top. Branch `fix/worksheet-fold-top-only` from main (PR #93 merged; its CodeRabbit
+> findings were all already fixed). `foldOnScroll` in `app/ModuleViewer.tsx` now unfolds only within
+> 24 px of the top; title-bar hover, Tab focus and page change still show it; the 0.3 s wait is gone.
+> CKB-101 updated. Tested: `tests/workspace-drawers.browser.mjs` (real app, `npm run classroom:offline`)
+> 17/17, shown failing (14/17) with the old rule; `npm test` 457/457; `build:all` passed; lint 0 errors,
+> 8 old warnings. Not run: hosted site, phones, non-Chromium browsers. Next: teacher reviews the PR.
+
 > Net MVC web module steps have their own rolling handoff from 2026-10-29:
 > [web-module-steps.md](web-module-steps.md). Update that file, not this one, for Slices 2–3 and
 > the Weeks 1–3 revision.

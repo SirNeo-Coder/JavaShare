@@ -374,21 +374,19 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
   const mediaLoading = role === "teacher" && mediaModule && teacherMedia.files !== mediaFiles;
   const [lessonPage, setLessonPage] = useState(0);
   const [paperPage, setPaperPage] = useState<number | null>(null);
-  // The worksheet's note, progress and step tabs fold away while reading down and return on
-  // scrolling up; hovering the title bar reopens them too (CSS).
+  // The worksheet's note, progress and step tabs fold away while reading down and return only at
+  // the top of the page; hovering the title bar reopens them too (CSS).
   const [headerFolded, setHeaderFolded] = useState(false);
-  const lastScroll = useRef({ top: 0, at: 0 });
+  const lastTop = useRef(0);
   const foldRef = useRef<HTMLDivElement>(null);
   const foldOnScroll = (event: { currentTarget: HTMLDivElement }) => {
-    const desk = event.currentTarget, top = desk.scrollTop, now = Date.now(), last = lastScroll.current;
-    lastScroll.current = { top, at: last.at };
-    // Folding gives the page room, which can pull its scroll back to the bottom by itself; ignore
-    // only that move just after a fold, so the student's own scrolling up always unfolds (CKB-101).
-    if (now - last.at < 300 && top >= desk.scrollHeight - desk.clientHeight - 1) return;
-    // Fold only when the page still scrolls afterwards, so scrolling up can always unfold it.
+    const desk = event.currentTarget, top = desk.scrollTop, down = top > lastTop.current;
+    lastTop.current = top;
+    // Fold only when the page still scrolls past the top zone afterwards, so the top stays
+    // reachable to unfold it (CKB-101).
     const room = desk.scrollHeight - desk.clientHeight - (headerFolded ? 0 : foldRef.current?.offsetHeight ?? 0);
-    const fold = top > last.top ? top > 24 && room > 24 : top < last.top ? false : headerFolded;
-    if (fold !== headerFolded) { lastScroll.current.at = now; setHeaderFolded(fold); }
+    const fold = top <= 24 ? false : down && room > 24 ? true : headerFolded;
+    if (fold !== headerFolded) setHeaderFolded(fold);
   };
   // Every page change shows the progress and step tabs again.
   const showPage = (index: number) => { setPaperPage(index); setHeaderFolded(false); };
