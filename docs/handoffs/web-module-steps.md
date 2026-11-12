@@ -493,8 +493,9 @@ it cannot do, stop and propose an app change for approval first):
   `display: grid`, `row-gap` and `column-gap` agree in CodeShare's page window and the teacher's checker, and `max-width` reads
   back as the literal `100%`. A **track size is never page-checked**: `fr`, `%`, `auto` and `minmax()` resolve to used pixels
   that follow the window, `repeat(auto-fit, minmax(...))` changes the number of columns with the width, and a media query
-  changes `grid-template-columns` itself. A grid changes no page text (items are blockified and stay in HTML order; `order` and
-  a different column count move boxes only). `max-width: 100%` with `height: auto` keeps a picture wider than the page inside
+  changes `grid-template-columns` itself. A grid changes the page text in the same case flexbox does: items are blockified, so a box
+  whose children are already block boxes (figures, `li`, `section`) reads as before, while inline children are split onto
+  their own lines; `order` and a different column count move boxes only. `max-width: 100%` with `height: auto` keeps a picture wider than the page inside
   it; without it the page scrolls sideways, which the page text never shows, so the `width`/`height` attributes stay in the
   HTML. **Two stylesheets may be linked on one page**: both are inlined in order and the later one wins a tie, so a local
   template file works with no internet. `display: gird` drops one declaration, a grid property on the items does nothing, and a
