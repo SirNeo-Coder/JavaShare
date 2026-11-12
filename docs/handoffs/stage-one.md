@@ -1468,3 +1468,17 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - CodeRabbit on PR #105: one Minor finding, valid: `Arrays.toString(null)` as written does not compile
   (ambiguous; checked with `javac`). The Week 15 Step 2 note now says `folder.list()` returns a null `String[]`,
   which prints `null`. The teacher re-uploads Week 15 after merge for the new wording to reach the class.
+
+## Live-help edits carry their project — 2026-11-12 (CKB-115)
+
+- Branch: `fix/live-help-activity-label` (PR #106 was merged before CodeRabbit was checked). CodeRabbit on PR #106:
+  two findings, both valid, teacher approved fixing both.
+- Done: `liveActivityKey` labels every live snapshot and edit with its project (kind, module, step). The student's
+  editor refuses edits for another project, so a teacher keystroke still in transit when the student switches
+  (Stop sharing, Module ↔ Personal) no longer lands in the new project. `class-step-live-help.browser.mjs` now also
+  compares the student's whole saved row before and after.
+- Tested: rule test (`tests/teacher-live-help.test.mjs`) and the browser test replaying a captured late edit after
+  Stop sharing; shown failing with the check removed (student's own code changed), passing restored. Also passing:
+  `teacher-live-help`, `class-shared-step`, `class-session`, `session-step-done` browser tests; `npm test` 466/466;
+  `npm run build:all`; lint 0 errors (8 older warnings).
+- Not run: online (Cloudflare/CheerpJ) end to end; `npm run classroom:offline` itself (tests used its settings).

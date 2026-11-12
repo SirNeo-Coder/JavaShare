@@ -12,6 +12,7 @@ import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, source
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
+import { liveActivityKey } from "./liveText";
 
 export type StudentActivity = {
   kind: "module" | "performance" | "review" | "preview";
@@ -23,7 +24,7 @@ export type StudentActivity = {
   // A preview's alteration task, shown under the sample to read (teacher, 2026-11-11).
   task?: { instruction: string; expectedOutput: string };
 };
-export type ModuleEditorHandle = { save: () => Promise<void>; applyEdit: (path: string, edit: (content: string) => string) => void };
+export type ModuleEditorHandle = { save: () => Promise<void>; applyEdit: (activityKey: string, path: string, edit: (content: string) => string) => void };
 // Teacher live help: the open file, typing and cursor go to the watching teacher; their cursor comes back.
 export type ModuleLiveLink = {
   cursors: ComponentProps<typeof CodeEditor>["remoteCursors"];
@@ -255,8 +256,8 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   };
   const editable = !review && deviceReady && !pendingSample;
   // A teacher's edit lands like the student's own typing: unsaved until Save work or a run keeps it.
-  const applyEdit = (editPath: string, edit: (content: string) => string) => {
-    if (!editable) return;
+  const applyEdit = (activityKey: string, editPath: string, edit: (content: string) => string) => {
+    if (!editable || activityKey !== liveActivityKey(activity)) return;
     setFiles((current) => current.map((file) => file.path === editPath ? { ...file, content: edit(file.content) } : file));
     setSuccessfulFiles(null);
   };

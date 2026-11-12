@@ -44,4 +44,6 @@ the class step (check `class:shared-step` / CKB-099).
 
 ## History
 
+- 2026-11-12 — CodeRabbit on PR #106: late edits across a project switch (CKB-115) and a stronger saved-row check; fixed.
+
 - 2026-11-12 — Teacher reported old code in classroom mode; approved showing the live class step. Built and tested.

@@ -99,6 +99,12 @@ export function liveProjectKind(activity: { kind: string; shared?: boolean } | n
   return activity.kind === "preview" && activity.shared ? "preview" : null;
 }
 
+// Which open project a live edit belongs to. An edit labelled for another project is ignored, so a
+// late edit never lands in the project a student switched to (CKB-115).
+export function liveActivityKey(activity: { kind: string; moduleId: string; stepId: string }) {
+  return `${activity.kind}:${activity.moduleId}:${activity.stepId}`;
+}
+
 export function teacherWatching(presence: Record<string, unknown[]>) {
   return Object.values(presence).flat().some((entry) => (entry as { teacher?: unknown }).teacher === true);
 }

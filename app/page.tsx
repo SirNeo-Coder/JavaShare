@@ -27,7 +27,7 @@ import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
 import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, releaseRealtimeChannels, throttle } from "./realtime";
-import { applyOperation, createOperation, liveProjectKind, localEdit, pointAt, remoteEdit, shareModuleLive, takeOperation, teacherWatching, type FileOperation, type LiveMirror, type TextPoint } from "./liveText";
+import { applyOperation, createOperation, liveActivityKey, liveProjectKind, localEdit, pointAt, remoteEdit, shareModuleLive, takeOperation, teacherWatching, type FileOperation, type LiveMirror, type TextPoint } from "./liveText";
 
 const FRESH_LESSON_CODE = `public class Main {
     public static void main(String[] args) {
@@ -155,7 +155,7 @@ type LiveShare = {
   studentName?: string;
   files?: FileData[];
 };
-type ModuleLive = { kind: "module" | "performance" | "preview"; moduleTitle: string; path: string; content: string; editable: boolean; studentId: string; studentName: string };
+type ModuleLive = { kind: "module" | "performance" | "preview"; activity: string; moduleTitle: string; path: string; content: string; editable: boolean; studentId: string; studentName: string };
 type RemoteCursor = TextPoint & {
   userId: string;
   name: string;
@@ -327,6 +327,8 @@ export default function Home() {
   // while the teacher has that student selected (the teacher marks this with presence on the channel).
   const moduleMirrorRef = useRef<LiveMirror | null>(null);
   const moduleEditableRef = useRef(false);
+  // The open project's label (liveActivityKey): the student's own, or the one the teacher is watching.
+  const moduleActivityKeyRef = useRef("");
   const teacherWatchingRef = useRef(false);
   const [studentWatched, setStudentWatched] = useState(false);
   const [moduleLive, setModuleLive] = useState<ModuleLive | null>(null);
@@ -336,7 +338,7 @@ export default function Home() {
       const channel = teamChannelRef.current, mirror = moduleMirrorRef.current, sendTeamId = liveRef.current.team?.id;
       if (!channel || !mirror || !sendTeamId) return; // kept in the mirror until the next send
       const operation = takeOperation(mirror, sendTeamId, ++groupDraftSequenceRef.current);
-      if (operation) void channel.send({ type: "broadcast", event: "team:module-operation", payload: operation });
+      if (operation) void channel.send({ type: "broadcast", event: "team:module-operation", payload: { ...operation, activity: moduleActivityKeyRef.current } });
     }, LIVE_CAPS.typingMs),
   );
   const [sendModuleCursor] = useState(() =>
@@ -1059,16 +1061,17 @@ export default function Home() {
     onModule("team:module-live", (live: ModuleLive | { kind: null; studentId: string }) => {
       if (user?.role !== "teacher" || !liveRef.current.team?.members.some((member) => member.id === live.studentId)) return;
       moduleMirrorRef.current = live.kind ? { path: live.path, content: live.content, base: null } : null;
+      moduleActivityKeyRef.current = live.kind ? live.activity : "";
       setModuleLive(live.kind ? live : null);
       setModuleCursors([]);
     });
-    onModule("team:module-operation", (operation: FileOperation) => {
+    onModule("team:module-operation", (operation: FileOperation & { activity?: string }) => {
       const mirror = moduleMirrorRef.current;
       if (user?.role === "student") {
         if (!shareModuleLive(user.role, liveRef.current.team, teacherWatchingRef.current)) return;
-        moduleEditorRef.current?.applyEdit(operation.fileId, (content) => applyOperation(content, operation));
+        moduleEditorRef.current?.applyEdit(operation.activity ?? "", operation.fileId, (content) => applyOperation(content, operation));
       }
-      if (mirror?.path !== operation.fileId) return;
+      if (mirror?.path !== operation.fileId || operation.activity !== moduleActivityKeyRef.current) return;
       remoteEdit(mirror, operation);
       if (user?.role === "teacher") setModuleLive((live) => live && { ...live, content: mirror.content });
     });
@@ -1472,7 +1475,7 @@ export default function Home() {
     const kind = liveProjectKind(moduleActivity);
     if (mirror) mirror.base = null;
     void teamChannelRef.current?.send({ type: "broadcast", event: "team:module-live", payload: mirror && moduleActivity && kind
-      ? { kind, moduleTitle: moduleActivity.moduleTitle, path: mirror.path, content: mirror.content, editable: moduleEditableRef.current, studentId: user.id, studentName: user.name }
+      ? { kind, activity: liveActivityKey(moduleActivity), moduleTitle: moduleActivity.moduleTitle, path: mirror.path, content: mirror.content, editable: moduleEditableRef.current, studentId: user.id, studentName: user.name }
       : { kind: null, studentId: user.id } });
   }
   function editModuleLive(content: string) {
@@ -2761,6 +2764,7 @@ export default function Home() {
               cursors: moduleCursors,
               onFile: (path, content, editable) => {
                 moduleMirrorRef.current = { path, content, base: null };
+                moduleActivityKeyRef.current = liveActivityKey(currentModuleProject);
                 moduleEditableRef.current = editable;
                 setModuleCursors([]);
                 sendModuleSnapshot();

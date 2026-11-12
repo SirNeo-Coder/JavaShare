@@ -50,6 +50,20 @@ test("class step live help: the teacher sees and edits the class step a student 
     }));
     const studentEditor = studentPage.locator(".student-module-project").getByRole("textbox", { name: "Java source code editor", exact: true });
     await studentPage.goto("/"); await studentPage.locator(".classroom-workspace").waitFor();
+    // The student has their own module project open when the session starts.
+    await studentPage.getByRole("button", { name: "Module", exact: true }).hover();
+    await studentPage.locator("#classroom-modules .module-catalog-card").filter({ hasText: week60.title }).getByRole("button").first().click();
+    await studentPage.waitForFunction(() => document.querySelector(".student-module-project .editor-card textarea")?.value.includes("MY OWN EDIT"));
+    // The teacher's live connection is passed through unchanged; the last live edit it sends is kept to replay late (CKB-115).
+    let lateEdit, lateServer;
+    await teacherPage.routeWebSocket(/\/realtime\//, (ws) => {
+      const server = ws.connectToServer();
+      ws.onMessage((message) => {
+        if (String(message).includes("team:module-operation")) { lateEdit = message; lateServer = server; }
+        server.send(message);
+      });
+      server.onMessage((message) => ws.send(message));
+    });
 
     // Enter classroom starts the session; Work in code editor shares the step with the class (CKB-102).
     await teacherPage.goto("/");
@@ -65,6 +79,9 @@ test("class step live help: the teacher sees and edits the class step a student 
     await teacherPage.locator(".team-header").getByText("Week 60 · Step 1").waitFor();
 
     await studentPage.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Class step"));
+    const saved = async () => (await admin.from("module_progress").select("project_files,step_states,performance_task")
+      .eq("classroom_id", classId).eq("student_id", users[1].id).eq("module_id", week60.id).single()).data;
+    const before = await saved();
     const classEdit = sample.replace('"Capacity: "', '"Class edit: "');
     await studentEditor.fill(classEdit);
 
@@ -83,9 +100,19 @@ test("class step live help: the teacher sees and edits the class step a student 
     await studentPage.waitForFunction(() => document.querySelector(".student-module-project .editor-card textarea")?.value.includes("Teacher help: "));
     assert.match(await studentPage.locator(".student-module-project .workspace-card-heading b").first().innerText(), /^Class step/);
 
-    const { data: rows } = await admin.from("module_progress").select("project_files").eq("classroom_id", classId);
-    assert.match(JSON.stringify(rows), /MY OWN EDIT/, "the student's own project is unchanged");
-    assert.doesNotMatch(JSON.stringify(rows), /Class edit|Teacher help/, "a class step is never saved");
+    // Stop sharing returns the student to their own project; the teacher's view follows. A late class-step edit
+    // arriving after that is ignored, not typed into the student's own Main.java (CKB-115).
+    assert.ok(lateEdit, "a teacher edit was captured");
+    await teacherPage.locator(".team-header").getByRole("button", { name: "Stop sharing" }).click();
+    await studentPage.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Module project"));
+    await helping.getByText(`Live: Class live student · Module project · ${week60.title}`).waitFor();
+    const own = await studentEditor.inputValue();
+    assert.match(own, /MY OWN EDIT/);
+    lateServer.send(lateEdit);
+    await studentPage.waitForTimeout(2000);
+    assert.equal(await studentEditor.inputValue(), own, "the late class-step edit never lands in the student's own project");
+
+    assert.deepEqual(await saved(), before, "saved files, step progress and personal project are all unchanged");
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();
