@@ -5,6 +5,8 @@
 // Week_NN/DotNet1_Week_NN.codeshare.json), CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
 // Subtests that need a week skip until that Resume week is built. Media subtests use each week's own media files in
 // Week_NN/project_end (Juan's picture, sound and video; Resume Weeks 2 and 3, 2026-11-06).
+// .NET 2 Game weeks (2026-11-12): DOTNET2_WEEKS_DIR (default the teacher's Game folder holding Week_NN/DotNet2_Week_NN.codeshare.json)
+// are read after the Resume weeks and walked by the same sample-first subtest; their .js steps also check the Console box (CKB-117).
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
@@ -24,6 +26,12 @@ const folder = process.env.DOTNET_WEEKS_DIR || "/home/ireneo/Documents/Java 2026
 const paths = Array.from({ length: 10 }, (_, i) => join(folder, `Week_${String(i + 1).padStart(2, "0")}`, `DotNet1_Week_${String(i + 1).padStart(2, "0")}.codeshare.json`));
 const missing = paths.findIndex((path) => !existsSync(path));
 if (missing >= 0) paths.length = missing;
+const resumeCount = paths.length;
+const gameFolder = process.env.DOTNET2_WEEKS_DIR || "/home/ireneo/Documents/Java 2026/Net Files/Game";
+const gamePaths = Array.from({ length: 10 }, (_, i) => join(gameFolder, `Week_${String(i + 1).padStart(2, "0")}`, `DotNet2_Week_${String(i + 1).padStart(2, "0")}.codeshare.json`));
+const gameMissing = gamePaths.findIndex((path) => !existsSync(path));
+if (gameMissing >= 0) gamePaths.length = gameMissing;
+paths.push(...gamePaths);
 const weeks = paths.length ? paths.map((path) => JSON.parse(readFileSync(path, "utf8"))) : null;
 const stepsOf = (module) => module.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
 // Weeks in the Java student workflow (teacher, 2026-10-29): run the sample first, then the task. The task
@@ -163,7 +171,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await checks.waitFor();
     };
     const week2 = weeks[1], steps2 = week2 ? stepsOf(week2) : [];
-    const needs = (n) => !weeks[n - 1] && `Resume Week ${n} is not built yet`;
+    const needs = (n) => !(n <= resumeCount && weeks[n - 1]) && `Resume Week ${n} is not built yet`;
 
     await t.test("Week 2 Step 1: mismatch and uncaught error show a cross with Required and Your output, a failed page check shows what was found, then the sample passes", { skip: legacyOnly }, async () => {
       await openCatalog(week2);
@@ -360,7 +368,10 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
             await run();
             await banner(/Completed — next activity unlocked|Not completed|Still showing sample output/);
             const done = /Completed — next activity unlocked/.test(await feedback.textContent()) && (await progress(week)).stepStates[activityStateId(step)] === "pass";
-            lines.push(`${step.id}: ${done ? "sample verified, task completed" : `task NOT completed — ${await why(step.activity.expectedOutput)}`}`);
+            // CKB-117: a .js step's printed lines show in the Console box after a passing run, not only in a failed comparison.
+            const shown = step.run?.endsWith(".js") ? await checks.locator(".web-console pre").textContent() : null;
+            if (done && shown !== null) assert.equal(shown, step.activity.expectedOutput, `${step.id}: the Console box shows the printed lines`);
+            lines.push(`${step.id}: ${done ? `sample verified, task completed${shown !== null ? `, Console box shows its ${shown.split("\n").length} lines` : ""}` : `task NOT completed — ${await why(step.activity.expectedOutput)}`}`);
             if (!done) break;
           }
           if (lines.at(-1) && !/completed|marked done/.test(lines.at(-1))) break;
@@ -1203,6 +1214,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await views.nth(0).getByRole("button", { name: "Run", exact: true }).click();
       await closePageWindow(preview);
       assert.equal(await views.nth(0).locator(".web-checks li").textContent(), "✓ Console output matches");
+      assert.equal(await views.nth(0).locator(".web-console pre").textContent(), "Total: 5\nDone", "CKB-117: the teacher sees the printed lines after a match; an alert is not one");
       await views.nth(1).getByRole("button", { name: "Run", exact: true }).click();
       await closePageWindow(preview);
       assert.equal(await views.nth(1).locator(".web-checks li").textContent(), "✗ Console output matches");
@@ -1211,6 +1223,7 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await openCatalog(consoleWeek);
       await run();
       assert.equal(await checks.locator("li.passed").textContent(), "✓ Console output matches");
+      assert.equal(await checks.locator(".web-console pre").textContent(), "Total: 5\nDone", "CKB-117: the student sees the printed lines after a match");
       await page.waitForFunction(() => document.querySelector(".module-run-feedback")?.textContent.includes("Completed"));
       assert.equal((await progress(consoleWeek)).stepStates["web-console-s1"], "pass");
     });

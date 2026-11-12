@@ -425,8 +425,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     setPath(entered); setNewPath(""); setAddingFile(false); setFileError(""); setError("");
   };
 
-  // Shown in the floating page window while it is open, otherwise in the side panel.
-  const webResults = personal ? webResult && <>{webResult.error && <p className="module-error" role="alert">{webResult.error}</p>}<WebConsole result={webResult} /></>
+  // Shown in the floating page window while it is open, otherwise in the side panel. A personal page that printed nothing
+  // and raised no error shows no panel, so it keeps the window's full width (CKB-112, CKB-117).
+  const webResults = personal ? (webResult?.error || webResult?.lines?.length) ? <>{webResult.error && <p className="module-error" role="alert">{webResult.error}</p>}<WebConsole result={webResult} /></> : null
     : <WebCheckList result={webResult} expected={shownAsSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
       webChecks={shownAsSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />;
 

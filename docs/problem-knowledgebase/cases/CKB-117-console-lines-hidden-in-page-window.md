@@ -27,13 +27,20 @@ only in the side-by-side comparison of a failed check. Nothing displayed the lin
   **View module details**, which uses the same `WebCheckList`) and web personal projects, including the teacher's review.
   A page-text run that printed nothing shows no box, so HTML and CSS weeks look as before; a `.js` run that printed nothing
   says "Nothing was printed with console.log."
+- A web personal project shows its results panel only when the run printed a line or raised an error. The first version
+  always gave it an (empty) panel, which narrowed the personal page window from the full window to 798 px and turned
+  Resume Week 9's and Week 10's `max-width: 900px` query on (CKB-112); `tests/web-module-steps.browser.mjs` caught it
+  ("the personal project's page window is wider than the breakpoint at this browser size (798px)", Week 9 and Week 10
+  personal subtests, offline settings). A personal page that prints lines now has a narrower page, like a module step.
 
 ## Regression proof
 
 - `tests/web-module-steps.test.mjs` — "web console (CKB-117)": a passing `.js` run shows its lines in the Console box with
   no comparison; a page-text run shows its lines; a silent HTML page shows no box. Shown failing with the box removed from
   `WebCheckList`; restored, passes.
-- Real app: `tests/web-module-steps.browser.mjs` walks .NET 2 Game Week 1 and checks the Console box after each run.
+- Real app: `tests/web-module-steps.browser.mjs` walks .NET 2 Game Week 1 and checks the Console box after each `.js` task run
+  (Steps 2–9), and its `.js` subtest checks the box on the teacher's **Run** and the student's run. Its Resume Week 9 and 10
+  personal subtests failed against the first version (empty panel, 798 px) and pass after the fix.
 
 ## Recurrence triage
 
