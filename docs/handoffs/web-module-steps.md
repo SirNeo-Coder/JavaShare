@@ -1042,6 +1042,11 @@ format and workflow" above: it is the format that produced these ten weeks.
   PR #102 fixed (including Week 9's `looks()`, which now compares the whole page text). One browser-test run in three failed
   from Week 6 on (a 401 and two 20 s timeouts) and passed again unchanged before and after: recorded as a flake, not
   reproduced.
+- 2026-11-12 — CodeRabbit on PR #104: the grid guidance said a grid never changes the page text. Checked with a real run
+  and corrected in `docs/course-format.md`, this handoff, the teacher's course map and handover: a grid blockifies its
+  items, so a box holding **inline** children splits them onto their own lines (`<span>A</span><span>B</span>` reads
+  `AB` before and `A`, `B` after), exactly as flexbox does. Week 10's own samples are unaffected: their grid items are
+  figures, `li` and `section`.
 - 2026-11-12 — **The ten-week resume course is complete** (Weeks 1–10, `dotnet-1-r01` … `dotnet-1-r10`). The "Rolling weekly
   prompt" section now records that and lists the ten weeks; "Next step" lists what is left for the teacher (print, upload,
   the hosted check, the five open app fixes, and the deferred offline web steps and media). No new weekly prompt was written.
