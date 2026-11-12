@@ -47,3 +47,6 @@ next-env.d.ts
 .wrangler/
 .dev.vars*
 !.dev.vars.example
+
+# coding-assistant scratch (dev-server shortcuts, worktrees): local only
+/.claude/

@@ -1440,4 +1440,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   reading the same module received no answer, explanation or panel.
 - Still to do: answers for Weeks 16-21 (same method), and the teacher re-uploads Week 15 once this is
   merged and live.
+- Housekeeping (2026-11-12): `.claude/launch.json` - a local list of dev-server shortcuts each coding
+  assistant edits - had been swept into the answer-key commit and reached `main`. It is now untracked
+  and `/.claude/` is in `.gitignore`, so it stops blocking pulls and dirtying the working tree. The
+  teacher's laptop checkout is on `main` and builds; its own 45-entry copy was restored locally.
 
