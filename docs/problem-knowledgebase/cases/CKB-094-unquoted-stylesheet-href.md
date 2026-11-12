@@ -2,7 +2,7 @@
 
 - Status: open; worked around in the teacher's Resume Week 4 content (2026-11-08); app fix not approved yet
 - First recorded: 2026-11-08
-- Last verified: 2026-11-08 (CodeShare's own `buildTeacherPreview` in a sandboxed `srcdoc` frame, and a student's personal
+- Last verified: 2026-11-12 (script `src`, Game Week 1); 2026-11-08 (CodeShare's own `buildTeacherPreview` in a sandboxed `srcdoc` frame, and a student's personal
   project in the real app on the offline-settings server, port 3042; Chromium)
 - Area: `app/webPreview.ts` (`buildPreview`: the `<link…>` and `<script src…>` matches that inline project files)
 - Search terms: styles.css not applied, no style in CodeShare, href=styles.css without quotes, unquoted href, stylesheet works
@@ -43,6 +43,14 @@ unit test of `buildPreview` for `<link rel=stylesheet href=styles.css>`.
   subtest (with quotes) passed on 3042 and 8787.
 - The content guard was shown failing: with Step 4's projects.html link line unquoted in a copy of the JSON,
   `test_every_value_in_quotes_ckb_094` failed (`('dotnet-1-r04-d2-s4', 'projects.html')`); with the real JSON it passed.
+
+## Also a script's src (2026-11-12, .NET 2 Game Week 1)
+
+The same cause covers `<script src=game.js></script>`: `buildPreview` inlines a script only when its `src` is in quotes, so the
+unquoted line loads nothing in CodeShare's srcdoc page window (no error, no console lines; with the Console box of CKB-117 the
+box simply does not appear), while the teacher's checker and any browser run it. Worked around in the content again: every
+Game week's `index.html` quotes every value (`test_checker.py`, "every attribute value is in quotes"), and the Thursday problem
+guide names the missing quotes as a cause.
 
 ## Recurrence triage
 
