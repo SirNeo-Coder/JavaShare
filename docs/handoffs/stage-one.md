@@ -1499,3 +1499,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Status (covers CKB-114, CKB-115 and CKB-116): nothing in progress. Next: the teacher merges PR #107, then PR #108
   (stacked on it), tries both in class, and re-uploads Week 15 for the corrected Step 2 note (PR #106). Check CodeRabbit
   on #108 at the start of the next piece of work. CodeRabbit on #107 asked for this status line (Minor, valid; added here).
+- CodeRabbit on #108 (Major, valid, fixed with approval): after **Back to Week N · Step M** and selecting the same student
+  again, the live view froze. Closing the teacher's own editor cleared the hidden copy behind it; that cleanup now runs on
+  students' screens only. Browser test now checks typing both ways after the return; shown failing with the old line, passing
+  restored. All seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
+  #108 was merged first, so this fix is on `fix/reselect-live-view-frozen`, PR #109. Next: the teacher merges #109;
+  check CodeRabbit on #109 at the start of the next piece of work.
