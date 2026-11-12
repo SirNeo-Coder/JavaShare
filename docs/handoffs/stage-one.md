@@ -1446,7 +1446,25 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   teacher's laptop checkout is on `main` and builds; its own 45-entry copy was restored locally.
 - CodeRabbit on PR #103 (2026-11-11 23:22, review cancelled when the teacher merged at 03:47): one
   Minor finding, valid and fixed on `fix/week15-answer-null-wording`. The Week 15 Step 2 explanation
-  claimed the null guard prevents a crash; real Java shows `Arrays.toString(null)` prints the word
-  `null`, so the explanation now says the guard replaces it with `[]`, which is what the expected
+  claimed the null guard prevents a crash; real Java shows `Arrays.toString` of the null `String[]` from
+  `folder.list()` prints the word `null`, so the explanation now says the guard replaces it with `[]`, which is what the expected
   output asks for. Teaching content only, no code change.
 
+
+## Live class step in teacher live help — 2026-11-12 (CKB-114)
+
+- Branch: `fix/class-step-live-help`. Teacher report: in classroom mode, selecting a student showed the code
+  they had before the session, not the class step they were typing in. Approved plan: send the shared class
+  step through live help too; CodeRabbit's PR #105 wording fix rides on the same branch.
+- Done: `liveProjectKind` in `app/liveText.ts` (module, personal, or the student's shared class step; never a
+  teacher's own preview or review) decides both the student's live link and the snapshot it sends. The teacher's
+  card reads **Live: <name> · Class step · Week N · Step M**; the teacher's typing reaches the student; nothing is
+  saved. Rule added to `AGENTS.md` (Teacher live help); `workflow-state.md` updated.
+- Tested: rule test in `tests/teacher-live-help.test.mjs` and real-app `tests/class-step-live-help.browser.mjs`
+  (offline settings, local Supabase); both shown failing with the fix broken, passing restored. Also passing:
+  `class-shared-step`, `class-session`, `session-step-done`, `teacher-live-help` browser tests; `npm test`
+  465/465; `npm run build:all` passes; lint 0 errors (8 older warnings).
+- Not run: online (Cloudflare/CheerpJ) end to end; `npm run classroom:offline` itself (tests used its settings).
+- CodeRabbit on PR #105: one Minor finding, valid: `Arrays.toString(null)` as written does not compile
+  (ambiguous; checked with `javac`). The Week 15 Step 2 note now says `folder.list()` returns a null `String[]`,
+  which prints `null`. The teacher re-uploads Week 15 after merge for the new wording to reach the class.
