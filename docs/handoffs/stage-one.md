@@ -1503,3 +1503,5 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   again, the live view froze. Closing the teacher's own editor cleared the hidden copy behind it; that cleanup now runs on
   students' screens only. Browser test now checks typing both ways after the return; shown failing with the old line, passing
   restored. All seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
+  #108 was merged first, so this fix is on `fix/reselect-live-view-frozen`, PR #109. Next: the teacher merges #109;
+  check CodeRabbit on #109 at the start of the next piece of work.
