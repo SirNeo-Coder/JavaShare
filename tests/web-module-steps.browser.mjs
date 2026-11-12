@@ -1005,16 +1005,16 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
         await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
         await textarea.fill(content);
       };
-      // Read from the page window itself: the skill lines of the page text, the flex container's own values and whether gap
-      // replaced the per-item margin. The nav's direction is read separately, because that is what the media query changes.
+      // Read from the page window itself: the whole page text (so a rule that hides anything at one width is caught, not just
+      // the skills), the flex container's own values and whether gap replaced the per-item margin. The nav's direction is read
+      // separately, because that is the one value the media query changes.
       const looks = async (where) => {
         const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
         // The frame can report "complete" before the student's page arrives, so wait for the elements read below too (CKB-111).
         await inside.waitForFunction(() => document.readyState === "complete" && document.querySelector(".top li:first-child") && document.querySelector("nav ul"));
         return inside.evaluate(() => {
-          const lines = document.body.innerText.split("\n");
           const top = document.querySelector(".top"), nav = document.querySelector("nav ul");
-          return [lines.slice(lines.indexOf("Top skills") + 1, lines.indexOf("Top skills") + 3),
+          return [document.body.innerText.trim().replace(/\n{2,}/g, "\n"),
             getComputedStyle(top).display, getComputedStyle(top).flexDirection, getComputedStyle(top).rowGap !== "normal",
             getComputedStyle(nav).display];
         });
@@ -1043,20 +1043,21 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
       await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
       // The skills keep the Week 8 capitals and one line each: a flex column of list items is not page text.
-      const expected = [["TYPING", "Drawing"], "flex", "column", true, "flex"];
-      assert.deepEqual(await looks(page), expected, "a flex column leaves the page text alone");
-      // A personal project has no checks panel, so its preview fills the page window and is wider than the breakpoint:
-      // the query is off here. The student sees the narrow layout by making the browser window narrower, and when they do,
-      // the nav stacks while every word of the page text and every other value stays exactly the same.
+      const expected = await looks(page);
+      assert.match(expected[0], /\nTYPING\nDrawing\n/, "a flex column leaves the page text alone, capitals and one line each");
+      assert.deepEqual(expected.slice(1), ["flex", "column", true, "flex"], "the student's own flex container, with a gap");
+      // A personal project has no checks panel, so its preview fills the page window, which is `min(1180px, 100%)`: at this
+      // browser size it is wider than the breakpoint, so the query is off. Narrowing the browser window takes the preview
+      // below the breakpoint and stacks the nav, while the whole page text and every other value stay exactly the same.
       const wide = await previewWidth(page);
-      assert.ok(wide > 900, `the personal project's page window is wider than the breakpoint (${wide}px)`);
+      assert.ok(wide > 900, `the personal project's page window is wider than the breakpoint at this browser size (${wide}px)`);
       assert.equal(await navDirection(page), "row", "above the breakpoint the nav keeps its row");
       await page.setViewportSize({ width: 820, height: 1050 });
       try {
         const narrow = await previewWidth(page);
         assert.ok(narrow <= 900, `a narrower browser window takes the page window below the breakpoint (${narrow}px)`);
         assert.equal(await navDirection(page), "column", "below the breakpoint the query stacks the nav");
-        assert.deepEqual(await looks(page), expected, "the media query changes no page text and no other computed value");
+        assert.deepEqual(await looks(page), expected, "the media query changes no word of the page text and no other computed value");
       } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
       await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week9.png" });
       await closePageWindow(page);
