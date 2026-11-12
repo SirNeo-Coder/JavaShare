@@ -1496,3 +1496,6 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   `session-step-done`, `teacher-module-preview`, `workspace-drawers` browser tests; `npm test` 466/466;
   `npm run build:all`; lint 0 errors (8 older warnings).
 - Not run: online (Cloudflare/CheerpJ) end to end; `npm run classroom:offline` itself; narrow laptop screens (checked at 1500 px wide).
+- Status (covers CKB-114, CKB-115 and CKB-116): nothing in progress. Next: the teacher merges PR #107, then PR #108
+  (stacked on it), tries both in class, and re-uploads Week 15 for the corrected Step 2 note (PR #106). Check CodeRabbit
+  on #108 at the start of the next piece of work. CodeRabbit on #107 asked for this status line (Minor, valid; added here).
