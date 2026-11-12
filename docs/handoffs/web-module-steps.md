@@ -478,15 +478,19 @@ it cannot do, stop and propose an app change for approval first):
    week, add its files under **Media files**.
 
 - Checked for Resume Week 9 (2026-11-11; `docs/course-format.md`, "Flexbox and media queries"; CKB-112): computed `display`,
-  `flex-direction`, `flex-wrap`, `row-gap` and `column-gap` agree in CodeShare's page window and the teacher's checker.
+  `flex-direction`, `flex-wrap`, `row-gap` and `column-gap` agree in CodeShare's page window and the teacher's checker **only
+  where no media query changes them**, because those places run at different widths; page-check such a property only where its
+  value is the same at every width (Week 9 checks `display` and `flex-wrap`, never `flex-direction`, on the queried selectors).
   Flexbox changes the page text only where it changes whether a child is a box of its own: a column of block-level items
   (`li`, `p`) reads exactly as before, `display: flex` on a `nav ul` whose `li` were `inline-block` turns one line of links
   into one per link, and `display: inline` on list items with no flex container runs them onto one line. `gap` is never page
-  text and does nothing without `display: flex`; `float` on a flex item still computes to `left` but has no effect, so a flex
+  text; it needs a container that lays its children out (flex, grid or multicolumn), so it does nothing on the ordinary block
+  that deleting `display: flex` leaves behind. `float` on a flex item still computes to `left` but has no effect, so a flex
   row needs no `clear: both`. **The page runs at three widths:** a module step's page sits beside its web-checks panel and is
-  narrower than 900 px, a personal project's page fills the page window and is wider, and the checker is 1000 px — so a
-  `max-width: 900px` query is on for the module steps and off in a personal project until the browser window is made narrower
-  (the page window cannot be dragged, but follows the browser window). A checked page must keep its page text and every
+  narrower than 900 px, a personal project's page fills the page window (`min(1180px,100%)`, so wider on a maximized laptop
+  but below the breakpoint again on a narrow browser window), and the checker is 1000 px — so a `max-width: 900px` query is on
+  for the module steps and, in a personal project, depends on the browser window's size (the page window cannot be dragged,
+  but follows the browser window: narrow it if the query is off, widen it if it is already on). A checked page must keep its page text and every
   checked value identical at every width, so nothing inside a query may add, remove or re-letter a word and no check may read
   a property a query changes. `(max-width: 900)` without its unit drops the whole query at every width.
 - Checked for Resume Week 10 (2026-11-12; `docs/course-format.md`, "Grid, responsive pictures and a local template"): computed
@@ -1054,3 +1058,20 @@ format and workflow" above: it is the format that produced these ten weeks.
   It leads with CKB-112 (never assume one width), asks about grid, responsive pictures and video and which **local** template
   or framework copy Wednesday should compare (AGENTS.md rule 5: nothing from the internet), and tells that chat to write no
   new prompt but to record that the course is complete.
+- 2026-11-12 — CodeRabbit on PR #102 checked (all three endpoints; a later pass over the last commit added nothing). **Four
+  findings, all valid, all in Week 9's own new text, all fixed with the teacher's approval:** (1) `flex-direction` was listed
+  among the values that "agree in both places", which is exactly what a media query changes — the list is now limited to values
+  that are the same at every width, and the handoff's copy with it; (2) "`gap` does nothing without `display: flex`" is wrong
+  (`gap` also works on grid and multicolumn) and contradicted the Week 10 grid prompt — corrected in both copies; (3) a
+  personal project's preview is **not** always wider than 900 px: the page window is `min(1180px,100%)`, so a narrow browser
+  window takes it back below the breakpoint (776 px at an 820 px viewport) — `docs/course-format.md`, this handoff, CKB-112,
+  the problem index, the Week 10 prompt and the student-facing module text now say "narrow the browser window if the query is
+  off, widen it if it is already on"; (4) the Week 9 personal subtest compared only the two lines after "Top skills" while
+  claiming the page text was unchanged — it now captures and compares the **whole** page text at both widths. Shown failing
+  first: a query hiding the `h1` on a narrow page (outside the old two-line window) passed before and fails now. Week 9
+  rebuilt for the student-text change (`build.py r09`, `build_tasks.py r09`, `WEEK=09 render_r01.sh`): 9/9 samples, 9/9 task
+  answers, all 9 unchanged samples failing, `test_checker.py` 22/22, `consistency.py` ALL MATCH, 13 pages all clearing their
+  footers. `npm run build:all` OK, lint 0 errors, `npm test` 459/459, browser test 14 pass / 6 skipped / 0 fail. No CKB record
+  for these: documentation and one test assertion I wrote this week, not CodeShare bugs. **Week 9's rebuild also rewrites the
+  shared `Resume/project/`, which Week 10 now owns** — it was snapshotted before the rebuild and restored after, and verified
+  identical to `Week_10/project_end` again.

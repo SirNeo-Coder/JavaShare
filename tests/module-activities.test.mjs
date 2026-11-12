@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
-import { activityAccess, activityStateId, activityTask, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles } from "../backend/src/module-activities.ts";
+import { activityAccess, activityStateId, activityTask, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles } from "../backend/src/module-activities.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
@@ -121,6 +121,34 @@ test("module tasks: upload rejects duplicate task ids and collisions with stored
     broken.lessons[1].blocks[0].activity.id = id;
     assert.equal(courseModule.safeParse(broken).success, false);
   }
+});
+
+// The teacher's answer key for a task: stored in the module, never shown to a student (teacher, 2026-11-11).
+const answerKey = (step) => {
+  step.activity.id = "answer-key-alteration";
+  step.activity.solution = { lines: "line 1: ANSWER-KEY-MARKER return 25;", note: "Return 25 instead of 20." };
+  return step;
+};
+
+test("module answer key: a step keeps the solved alteration, a student view drops it", () => {
+  const content = structuredClone(fixture);
+  const step = answerKey(content.lessons[0].blocks[0]);
+  assert.equal(courseModule.safeParse(content).success, true);
+  const stripped = stepWithoutAnswerKey(step);
+  assert.equal(stripped.activity.solution, undefined);
+  assert.equal(stripped.activity.instruction, step.activity.instruction);
+  assert.equal(stripped.activity.expectedOutput, step.activity.expectedOutput);
+  assert.ok(step.activity.solution, "the stored module keeps its answer key");
+  assert.deepEqual(activityTask(stripped).files, activityTask(step).files, "the student's task files are unchanged");
+  const plain = { id: "no-task" };
+  assert.equal(stepWithoutAnswerKey(plain), plain);
+  // An answer the worksheet could never show is refused at upload (CodeRabbit on PR #101).
+  const noId = structuredClone(content);
+  delete noId.lessons[0].blocks[0].activity.id;
+  assert.equal(courseModule.safeParse(noId).success, false);
+  const empty = structuredClone(content);
+  empty.lessons[0].blocks[0].activity.solution.lines = "   ";
+  assert.equal(courseModule.safeParse(empty).success, false);
 });
 
 async function withClass(action) {
@@ -510,5 +538,22 @@ test("personal offline runs: compile failure, crash and timeout cannot submit; h
     const teacherRun = await call("/api/execute", { method: "POST", headers: { cookie: cookies[0] }, body: JSON.stringify({ files: before.performanceTask.own.files }) });
     assert.equal((await teacherRun.json()).success, true);
     assert.deepEqual(await (await request("/progress")).json(), before, "teacher execution never changes the student record");
+  });
+});
+
+test("module answer key: the teacher receives it, the student never does", needsLocal, async () => {
+  await withClass(async ({ upload, request, prepare, cookies }) => {
+    const content = structuredClone(fixture);
+    answerKey(content.lessons[0].blocks[0]);
+    await upload(content);
+    const teacherView = await (await request("", undefined, cookies[0])).json();
+    assert.match(teacherView.lessons[0].blocks[0].activity.solution.lines, /ANSWER-KEY-MARKER/);
+    const studentView = await (await request()).json();
+    assert.equal(studentView.lessons[0].blocks[0].locked, undefined, "the first step is open for the student");
+    assert.equal(studentView.lessons[0].blocks[0].activity.solution, undefined);
+    assert.equal(studentView.lessons[0].blocks[0].activity.instruction, content.lessons[0].blocks[0].activity.instruction);
+    assert.ok(!JSON.stringify(studentView).includes("ANSWER-KEY-MARKER"), "no student view may carry the answer key");
+    const prepared = await prepare(first.id);
+    assert.ok(!JSON.stringify(prepared).includes("ANSWER-KEY-MARKER"), "opening the task never loads the answer into the student project");
   });
 });

@@ -137,6 +137,36 @@ Keep the printed sample in the step's `files`, `instruction`, `expectedOutput`, 
 }
 ```
 
+### Teacher-only answer key (approved 2026-11-11, simplified 2026-11-12)
+
+A task may also carry the answer, for the teacher only. You write the changed lines yourself;
+CodeShare works nothing out and compares nothing:
+
+```json
+"activity": {
+  "id": "java-2-w14-d1-s1-alter-v1",
+  "instruction": "Change the removal from index 1 to index 3. Keep the other output lines.",
+  "expectedOutput": "the complete, verified output after the alteration",
+  "solution": {
+    "lines": "Main.java, line 8 \u2014 replace the removal:\n            numbers.remove(3);",
+    "note": "Why it answers the task, in plain English: what the changed line does and how that produces the expected output."
+  }
+}
+```
+
+`lines` is plain text (at most 5000 characters), shown exactly as written in a collapsed
+**Answer key (teacher only)** panel directly under **Your task** and **Expected task output**, with
+`note` under it as **Why this answers the task**. Name the file and the line numbers in `lines`
+yourself; CodeShare neither checks nor renumbers them. It needs the task's own
+`activity.id`, or the upload is refused: without an id the worksheet would never show the panel.
+CodeShare removes `solution` from every student view, open or locked step alike, and it is not a
+progress id. Keep the complete solved files in your own week folder as before; the panel is for
+explaining in class, not for running.
+
+Deploy the app change before uploading a module that carries answers: an older server has no rule
+to remove them, so it would send a step's answer to students. If the site is ever put back to an
+older version, upload those modules again without `solution` first.
+
 A nonempty stable `activity.id` opts into task checking and one-step-at-a-time unlocking.
 It must be unique across the module's lesson, sample, slip and task ids, including generated
 progress keys. Completion is stored under `task:<activity.id>`; old sample and legacy
@@ -371,24 +401,26 @@ evidence, checked by the server against its own expected output and the saved ve
   the whole rule; one colon (`:before`, `:first-letter`) still works; a missing quote in `content` drops that declaration and the
   next one only. In a personal run the pseudo-element is drawn online and offline and its text stays out of the page text.
 - **Flexbox and media queries (checked 2026-11-11, Resume Week 9).** `display`, `flex-direction`, `flex-wrap`, `row-gap` and
-  `column-gap` give the same computed values in CodeShare's page window and the teacher's checker. A page check may use one of
-  them only where no media query changes it, because the page runs at different widths in different places (below): Week 9
-  checks `display` and `flex-wrap`, never `flex-direction`, on the queried `nav ul` and `.project-list`.
+  `column-gap` give the same computed values in CodeShare's page window and the teacher's checker **as long as no media query
+  changes them at one of those widths** — the places run at different widths (below), so a property a query sets is not
+  comparable between them. Page checks may use these properties only where their value is the same at every width: Week 9
+  checks `display` and `flex-wrap` on the queried `nav ul` and `.project-list`, never `flex-direction`.
   Making a box a flex container changes the page text only when it changes whether its children are boxes of their own: a column
   of block-level items (`li`, `p`) reads exactly as before, while `display: flex` on a `nav ul` whose `li` were `inline-block`
   splits one line of links into one line per link. `display: inline` on list items with no flex container above them runs them
-  together onto one line, which is page text. `gap` is never page text, and it does nothing without a container that lays its children out — `display: flex`, `grid` or
-  multi-column.
+  together onto one line, which is page text. `gap` is never page text. It needs a container that lays its children out — flex, grid or multicolumn — so it does nothing
+  on an ordinary block, which is what deleting `display: flex` leaves behind (Week 10 uses the same `gap` with `display: grid`).
   `float` on a flex item still computes to `left` but has no effect (W3C: it creates no floating and does not take the item
   out-of-flow), so adding or removing it changes neither the layout nor the page text; a flex row needs no `clear: both` after it.
   **The page runs at different widths in different places, so a media query can be on in one and off in another** (all three
   measured in the app by the Week 9 personal subtest of `tests/web-module-steps.browser.mjs`): on a **module step** the preview
   shares its row with the checks panel, so it is narrower than 900 px and a `max-width: 900px` query is already on; in a
-  **personal project** there is no checks panel, so the preview fills the page window (`width:min(1180px,100%)`) and is wider
-  than 900 px, leaving that query off; and the **teacher's checker** runs at 1000 px, also above it. The page window itself
-  cannot be dragged, but it follows the browser window, so making the browser window narrower turns a query on while you watch —
-  and a personal preview in an already narrow browser window can start below the breakpoint, so widen the window first if you
-  want to see the query turn on.
+  **personal project** there is no checks panel, so the preview fills the page window (`width:min(1180px,100%)`), which on a
+  maximized laptop is wider than 900 px and leaves that query off — but because of the `100%`, a narrow browser window takes it
+  back below the breakpoint (measured 776 px at an 820 px viewport), so a personal preview is **not** always on the wide side;
+  and the **teacher's checker** runs at 1000 px, above it. The page window itself cannot be dragged, but it follows the browser
+  window, so resizing the browser moves a query's condition while you watch: narrow the window if the query is off, widen it if
+  it is already on.
   A checked page must therefore keep its page text and every page-checked value identical at every width — never put anything
   inside a query that adds, removes or re-letters a word, and never page-check a property a query changes (Week 9 checks
   `display` and `flex-wrap`, never `flex-direction`, on the queried `nav ul` and `.project-list`). A length in a media feature

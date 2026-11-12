@@ -1,7 +1,7 @@
 import { paperPerformanceTask, personalProjectFiles, type PersonalMedia, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
-import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
 import { fileLanguage, javaProjectPath, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
@@ -2319,7 +2319,7 @@ function studentModuleView(content: CourseModule, states: Record<string, string>
     const steps = lesson.blocks.filter((block) => block.type === "step");
     const blocks = lesson.blocks.map((block, index) => {
       const owner = lesson.blocks.slice(index).find((item) => item.type === "step") ?? steps.at(-1);
-      if (!owner || owner.type !== "step" || openSteps.has(activityStateId(owner))) return block;
+      if (!owner || owner.type !== "step" || openSteps.has(activityStateId(owner))) return stepWithoutAnswerKey(block);
       if (block.type !== "step") return textOpen.has(activityStateId(owner)) ? block : { type: "text", markdown: "" };
       return { type: "step", id: block.id, number: block.number, part: block.part, language: block.language, locked: true,
         ...(block.activity?.id ? { activity: { id: block.activity.id, instruction: "", files: [], expectedOutput: "" } } : {}),

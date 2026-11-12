@@ -1367,3 +1367,86 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   shared-step re-read (own share, live message, reconnect). Test nitpick valid: the browser check now presses **Stop sharing** and
   requires the chip to go; shown failing without the fix. `npm test` 458/458; build, lint, step-count, class-session and
   class-shared-step browser checks pass.
+
+## Teacher-only answer key — 2026-11-11
+
+- Branch `feature/module-answer-key` (from `main` `fc48c60`). Teacher asked to see, in the Module
+  worksheet only, how each task is solved, showing only the part that needs changing, with nothing
+  of it reaching students. Approved the JSON-field version.
+- Done: a module's task may carry `activity.solution` (the solved files plus an optional note). The
+  server removes it from every student view, open or locked step alike, so it never reaches a student
+  page or a Module project. The teacher's worksheet shows a collapsed **Answer key (teacher only)**
+  panel under the step: the note, then for each file only the lines that differ from the sample
+  (file name and starting line above each block), and **Load answer into Preview sample code**, which
+  fills the sample boxes so the existing **Run** shows the expected task output. No route, table,
+  migration or setting changed; offline unaffected.
+- Found and fixed on the way (CKB-113): **Preview sample code → Run** sent only the step's own files,
+  so any sample using a supporting class printed `cannot find symbol`. `runnableFiles` now adds the
+  module's starter files to that run (ceiling: not classes added by an earlier step).
+- Tested: `tests/module-activities.test.mjs` — "module answer key: a step keeps the solved alteration,
+  a student view drops it" and "module answer key: the teacher receives it, the student never does"
+  (real upload and read through the API with local Supabase); `tests/classroom-ui.test.mjs` — "module
+  worksheet: the answer key shows only the lines the answer changes, and only to the teacher" and
+  "a sample preview run carries the module's supporting classes (CKB-113)". Each shown failing with
+  its fix removed, passing restored. Full `npm test` 463/463, `npm run build:all` passed, lint 0 errors.
+- Checked in the running app (local Supabase, `npm run dev`): teacher worksheet shows the panel with
+  only `public int getCapacity() { return 25; }` from line 3, **Load answer** then **Run** printed
+  `Capacity: 25`; a student account reading the same module received no answer key, no note and no
+  solved line, while its task instruction stayed.
+- Still to do: add `activity.solution` to the existing week JSON (curriculum work, separate), and the
+  teacher must re-upload those modules for the panel to appear.
+- Not run: hosted site, online Java (CheerpJ), phones.
+- CodeRabbit on PR #101 (2026-11-11): low merge risk; 4 Minor findings, all valid, all fixed after the
+  teacher approved. (1) The panel showed the untouched lines between two far-apart edits; it now gives
+  one block per place the answer changes, each with its own starting line. (2) A loaded answer ran with
+  the sample's Program input; it now uses the task's. (3) On a web step a loaded answer was checked
+  against the sample's page text and sample-only page checks; it now checks **Expected task output**
+  without them. (4) **Load answer** left out a helper the task supplies; it now starts from the sample
+  plus the task's own files. Docstring-coverage note not valid (this code has no docstrings). Its
+  security note (a rollback to an older server would send uploaded answers to students) is now a rule
+  in `docs/course-format.md` and AGENTS.md: deploy before uploading answer-bearing modules.
+  My case was renumbered CKB-113 because PR #102 took CKB-112 the same day.
+  `npm test` 464/464, build passed, lint 0 errors; each new check shown failing with its fix removed;
+  re-checked in the running app (two blocks at lines 8 and 10, **Load answer** then **Run** printed
+  `Start 15 Middle Finished`, the task's own input and helper; a student still received no answer key).
+- CodeRabbit's second pass on PR #101 (2026-11-11, 7 findings) led the teacher to simplify the whole
+  feature on 2026-11-12: the module file now carries the answer as **text the teacher writes**
+  (`activity.solution.lines`, plus the optional `note`), and CodeShare compares nothing. Gone with the
+  comparison: the freeze risk on a very large file, the wrong baseline for a supporting class, the
+  stale run result, **Load answer into Preview sample code** and the answer-mode run target. The
+  complete solved files stay in the teacher's week folder, as before.
+- Kept from that pass: the teacher's sample preview now merges with CodeShare's own `mergeProjectFiles`
+  (CKB-113), so supporting classes join the run and `src/Main.java` and `Main.java` stay one file; and
+  an answer without the task's `activity.id` is refused at upload, since the worksheet could never
+  show it. Not taken: a pass/fail chip on the teacher's Java preview (it has never had one; the
+  teacher compares with **Expected task output** printed above).
+- Tested after the simplification: `npm test` 463/463 (one Supabase test flaked once on a first run and
+  passed alone and on a rerun), `npm run build:all` passed, lint 0 errors. Both new checks shown
+  failing with their fix removed. In the running app: the panel showed the note and exactly the two
+  supplied lines with no Load answer button; a student account received no answer, note or panel; and
+  the real upload route refused an answer on a task with no id with its plain-English message.
+- 2026-11-12, after seeing it in the app the teacher asked for two changes, both done: the panel now
+  sits **directly under Your task and Expected task output** (where the teacher is reading), and each
+  answer carries a plain-English explanation under **Why this answers the task** (the `note` field).
+- Week 15 now ships with answers for all ten tasks, written from the verified task edits in
+  `tests/fixtures/week15-week21-task-edits.json` - the same edits the real-Java test applies to prove
+  each task reaches its expected output. Each answer names the file and line numbers and says why the
+  change produces that output. A new check, "Week 15 answers: every quoted line sits where the answer
+  says, in the solved file" in `tests/week15-week21-modules.test.mjs`, compares every quoted line with
+  the solved file (or, for a deletion, with the sample) at the stated line number; it caught two wrong
+  line ranges while writing them and was shown failing on a deliberately wrong line number.
+- `npm test` 464/464, build passed, lint 0 errors. In the running app the real Week 15 module uploaded
+  (201), Step 1 showed the answer line and its explanation under the task, and a student account
+  reading the same module received no answer, explanation or panel.
+- Still to do: answers for Weeks 16-21 (same method), and the teacher re-uploads Week 15 once this is
+  merged and live.
+- Housekeeping (2026-11-12): `.claude/launch.json` - a local list of dev-server shortcuts each coding
+  assistant edits - had been swept into the answer-key commit and reached `main`. It is now untracked
+  and `/.claude/` is in `.gitignore`, so it stops blocking pulls and dirtying the working tree. The
+  teacher's laptop checkout is on `main` and builds; its own 45-entry copy was restored locally.
+- CodeRabbit on PR #103 (2026-11-11 23:22, review cancelled when the teacher merged at 03:47): one
+  Minor finding, valid and fixed on `fix/week15-answer-null-wording`. The Week 15 Step 2 explanation
+  claimed the null guard prevents a crash; real Java shows `Arrays.toString(null)` prints the word
+  `null`, so the explanation now says the guard replaces it with `[]`, which is what the expected
+  output asks for. Teaching content only, no code change.
+

@@ -22,8 +22,10 @@ The page window is `width:min(1180px,100%)` and lays its preview out in a two-co
 second column (`minmax(240px,380px)`). A **module step** has checks, so the preview takes only the first column and ends up
 narrower than 900 px — the query is on. A **personal project** has no checks panel, so
 `.page-window .module-web-preview:last-child { grid-column:1/-1 }` makes the preview span both columns and fill the page
-window, which is wider than 900 px — the query is off. The teacher's checker is a third width again (1000 px). So the width a
-page runs at depends on *where* it runs, and no single width can be assumed.
+window. Because that window is `min(1180px,100%)`, the preview is wider than 900 px on a maximized laptop (the query is off)
+but falls back below the breakpoint on a narrow browser window — 776 px measured at an 820 px viewport — so a personal preview
+is not reliably on either side. The teacher's checker is a third width again (1000 px). So the width a page runs at depends on
+*where* it runs and on the browser window, and no single width can be assumed.
 
 ## Durable solution
 
@@ -34,10 +36,9 @@ Width is place-dependent; module content must never depend on a particular one:
   `flex-direction`, on the queried `nav ul` and `.project-list`). Otherwise a step that passes in the page window fails in the
   checker, or the other way round, and the student can never complete it.
 - Tell students the truth about the two places: on a module step the page sits beside its checks and is already narrower than
-  900 px, so the query is on; in their own project the page fills the page window, so the query is off until the **browser**
-  window is made narrower. The page window itself cannot be dragged, but it follows the browser window. A personal project in an
-  already narrow browser window can start below the breakpoint, so the window is widened first and then narrowed again
-  (CodeRabbit on PR #102); Resume Week 10's module text and its task pages say so.
+  900 px, so the query is on; in their own project the page fills the page window, so which side of the breakpoint they are on
+  depends on the browser window. The page window itself cannot be dragged, but it follows the browser window, so the advice
+  that always works is: narrow the browser window if the query is off, widen it if it is already on.
 - `docs/course-format.md` records all three widths under "Flexbox and media queries".
 
 ## Regression proof

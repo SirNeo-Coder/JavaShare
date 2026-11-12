@@ -470,6 +470,10 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 @media (min-width:1400px) { .classroom-workspace:has(.worksheet-drawer.drawer-pinned[data-open="true"]) .main-area { margin-left:752px; } }
 @media (max-width:600px) { .worksheet-paper { padding:14px; font-size:13px; }.worksheet-paper .paper-title h2 { font-size:18px; }.worksheet-pagination { padding:10px 4px; font-size:9px; }.worksheet-pagination button { font-size:10px; } }
 .worksheet-weekly { color:#a56809; font-size:8px; letter-spacing:.8px; }
+/* Teacher-only answer key for a step's task (teacher, 2026-11-11). */
+.answer-key { margin:8px 0; padding:8px 10px; border:1px dashed #8200ed; background:#fbf5ff; color:#2b1240; }
+.answer-key > summary { font:700 11px system-ui,sans-serif; cursor:pointer; }
+.answer-key pre { margin:4px 0 8px; padding:8px; border:1px solid #cdb6e4; background:#fff; white-space:pre-wrap; overflow-wrap:anywhere; font:11px/1.5 monospace; }
 
 /* Teacher class home: local assets and saved module progress, online and offline. */
 .teacher-class-dashboard { --teacher-ink:#17292b; --teacher-muted:#708284; --teacher-line:#e0e8e8; --teacher-purple:#8200ed; display:grid; grid-template-columns:224px minmax(0,1fr); min-height:calc(100dvh / var(--ui-scale)); background:#f4f7f7; color:var(--teacher-ink); font-size:13px; }
