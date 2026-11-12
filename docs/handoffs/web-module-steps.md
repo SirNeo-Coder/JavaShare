@@ -1046,6 +1046,11 @@ format and workflow" above: it is the format that produced these ten weeks.
   PR #102 fixed (including Week 9's `looks()`, which now compares the whole page text). One browser-test run in three failed
   from Week 6 on (a 401 and two 20 s timeouts) and passed again unchanged before and after: recorded as a flake, not
   reproduced.
+- 2026-11-12 — PR #104 brought `docs/net-resume-week-09` in (it had gained main plus its own fix for the same four
+  CodeRabbit findings). Four files conflicted because both branches had fixed them: Week 9's own wording was kept in
+  `docs/course-format.md`, CKB-112 and the Week 9 subtest; Week 10's completion note was kept in this handoff's
+  "Rolling weekly prompt" section. The browser test was re-run on the merged branch (offline settings, port 3052):
+  **15 pass, 6 skipped, 0 fail**, with Week 10's Steps 2, 5 and 6 completed and its six media steps marked done.
 - 2026-11-12 — CodeRabbit on PR #104: the grid guidance said a grid never changes the page text. Checked with a real run
   and corrected in `docs/course-format.md`, this handoff, the teacher's course map and handover: a grid blockifies its
   items, so a box holding **inline** children splits them onto their own lines (`<span>A</span><span>B</span>` reads
