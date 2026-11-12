@@ -393,8 +393,10 @@ task `dotnet-1-rNN-pt`. The retired canteen weeks used `dotnet-1-w01`…`w03`; n
   only (page checks apply to the sample), so the change must show in the page text or console lines.
   On a media step the task output keeps its `Media checks:` lines, and a task must not repair or remove a
   file listed in its step's `mediaChecks` (they apply to the task too; CKB-084).
-- **Task answers**: keep each task's answer files in `<week folder>/solutions/<step id>/` (never in the
-  JSON; students must not see them). Every task `expectedOutput` comes from running those files.
+- **Task answers**: keep each task's answer files in `<week folder>/solutions/<step id>/`; every task
+  `expectedOutput` comes from running those files. Each task also carries its answer in the JSON's teacher-only
+  answer key (`activity.solution`: `lines`, `note`), shown only on the teacher's side of the module. The printed
+  module never prints an answer (teacher, 2026-11-12).
 - **`previousModuleId`**: every week except Week 1 names the week before (`dotnet-1-r01` …). The module
   and personal projects carry forward, and a student must finish every task of the previous week
   before the next week opens.
@@ -718,7 +720,9 @@ Week rules (check each against the real files first):
   dotnet-2-g01-dD, steps dotnet-2-g01-dD-sS (S counts across the week), slips dotnet-2-g01-dD-slip. Every step has one
   meaningful task (activity id "<step id>-alter-v1", instruction, "files": [], complete expectedOutput) that changes the
   visible page text or a console line; a comment or pseudocode task also changes a printed line. Answers in
-  Week_01/solutions/<step id>/; every expected output from a real run. No dotnet-1 id is reused.
+  Week_01/solutions/<step id>/ and in each task's teacher-only answer key (activity.solution: lines naming the
+  file and line numbers, and a note on why it answers the task), never in the printed module; every expected output
+  from a real run. No dotnet-1 id is reused.
 - Each step lists its run page and every file that page needs (index.html, style.css, game.js), even when unchanged,
   and names its run page ("run"). Every attribute value is in quotes (CKB-094); every file sits in the project's top
   folder (CKB-095).
@@ -744,8 +748,7 @@ This week's checks (new: the first JavaScript week; check each with real runs be
   no output) and a missing quote or bracket in game.js (an uncaught SyntaxError fails the whole run). Thursday's hardest
   problems must each change a printed line when repaired.
 - Flowchart (Thursday): drawn on paper and checked by the teacher; CodeShare checks only the box text printed in order.
-- Teacher-only answer key: ask me whether each task carries activity.solution (lines, note) as Week 15 does, or keeps
-  its answer only in solutions/ (DotNet2_Handover.md still says never in the JSON; AGENTS.md now allows it).
+- Answer key: check every quoted answer line really sits at the line number it gives, as Week 15's test does.
 - The reference game has not yet been run inside CodeShare: run it once in the page window and record its page text and
   console lines in Verification.md (it should end "Juan wins the match!").
 
@@ -1198,3 +1201,5 @@ reference as clickable links. Then the Week 2 prompt.
   identical to `Week_10/project_end` again.
 - 2026-11-12 — The Week 10 chat wrote no prompt (as told), so no .NET 2 prompt existed. Added "Rolling weekly prompt —
   .NET 2" with the .NET 2 Week 1 prompt (JavaScript fundamentals, `Game/Week_01/`, `dotnet-2-g01`).
+- 2026-11-12 — Teacher: every task's answer goes in the JSON's teacher-only answer key; the "never in the module" rule
+  is for the printed module only. Format section, .NET 2 Week 1 prompt and AGENTS.md updated.

@@ -356,5 +356,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   **Why this answers the task**.
 - Week 15 carries answers for all ten tasks, taken from the verified task edits; a test checks every
   quoted line really sits at the line number the answer gives.
+- Every module task carries its answer in the JSON this way (teacher, 2026-11-12). "Never put the
+  answer in the module" applies only to the printed (PDF) module, which never prints an answer.
 - Upload answer-bearing modules only after the app change is live; an older server would send them
   to students.
