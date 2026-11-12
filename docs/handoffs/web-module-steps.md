@@ -5,7 +5,7 @@ notes"). Another coding assistant must be able to continue from this file alone.
 `AGENTS.md` first; its "Web module steps (agreed 2026-10-28)" rule is the short version of the
 decisions below.
 
-Last updated: 2026-11-11 (Week 9).
+Last updated: 2026-11-12 (Week 10, the last week of the resume course).
 
 ## Goal
 
@@ -32,7 +32,7 @@ into three slices, then the teacher's own revision of the module files.
 | App task — sample-first and alteration tasks for web steps (Java workflow) | **Done, merged** 2026-10-29: works online and offline; fixed CKB-083 | [PR #72](https://github.com/SirNeo-Coder/JavaShare/pull/72), branch `feature/web-sample-first`; `tests/web-sample-first.browser.mjs`, `tests/web-module-steps.*` |
 | Page window: **Run code** shows the page in a floating window with its checks; links and frames open the project's own pages (CKB-086) | **Built** 2026-10-30, PR open; unit 411/411, browser tests pass offline (3042) and on Cloudflare's runtime (8787) | [PR #76](https://github.com/SirNeo-Coder/JavaShare/pull/76), branch `feature/web-page-window`, commit `f2bb36f` |
 | Page window stays until a completed task is synced (CKB-087, review finding on PR #76) | **Built** 2026-10-30, PR open; unit 411/411, web browser tests pass offline (3042); Cloudflare runtime not run | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77), branch `fix/page-window-close-during-sync`, commit `cf54e6f` |
-| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). PR #83 merged. **Week 2 built** 2026-11-06 (`Resume/Week_02/`, module `dotnet-1-r02`, 9 media steps): teacher's checkers pass; browser test 18/18 steps "sample verified, task completed" on Cloudflare's runtime (8787, Week 2 media uploaded); offline settings (3042) Week 1 completed, Week 2 media steps marked done. Found CKB-092 (worked around). PR #84 merged. **Week 3 built** 2026-11-08 (`Resume/Week_03/`, module `dotnet-1-r03`, three pages, media on Steps 1 and 9 only): teacher's checkers pass; browser test 27/27 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–3 media uploaded); offline settings (3042) Week 3 Steps 2–8 completed, Steps 1 and 9 marked done. Found CKB-093 (worked around). **Week 4 built** 2026-11-08 (`Resume/Week_04/`, module `dotnet-1-r04`, shared `styles.css`, media on Steps 1, 3 and 9 only): teacher's checkers pass (`test_checker.py` 20/20); browser test 36/36 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–4 media uploaded); offline settings (3042) Week 4 Steps 2 and 4–8 completed, Steps 1, 3 and 9 marked done; new Week 4 personal subtest passes on both. Found CKB-094 (worked around). **Week 5 built** 2026-11-09 (`Resume/Week_05/`, module `dotnet-1-r05`, only styles.css changes, media on Steps 1, 6 and 9 only, both Thursday repairs change the page text): teacher's checkers pass (`test_checker.py` 21/21); browser test 45/45 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–5 media uploaded); offline settings (3042) Week 5 Steps 2–5, 7, 8 completed, Steps 1, 6, 9 marked done; new Week 5 personal subtest passes on both; found CKB-096 (stale browser-test locator, fixed). **Week 6 built** 2026-11-09 (`Resume/Week_06/`, module `dotnet-1-r06`, Juan's nav becomes a list on all three pages, media on Steps 1, 5 and 9 only): teacher's checkers pass (`test_checker.py` 27/27); browser test 54/54 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–6 media uploaded); offline settings (3042) Week 6 Steps 2–4, 6–8 completed, Steps 1, 5, 9 marked done; new Week 6 personal subtest passes on both; found CKB-097 (border widths follow the page window's zoom; worked around). **Week 7 built** 2026-11-10 (`Resume/Week_07/`, module `dotnet-1-r07`, Juan's gallery and Week 2 media on index.html, media on Steps 2, 4, 5, 6 and 9): teacher's checkers pass (`test_checker.py` 23/23); browser test 63/63 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–7 media uploaded); offline settings (3042) Week 7 Steps 1, 3, 7, 8 completed, Steps 2, 4, 5, 6, 9 marked done; new Week 7 personal subtest passes on both; no new CodeShare bug; [PR #92](https://github.com/SirNeo-Coder/JavaShare/pull/92) (merged). **Week 8 built** 2026-11-11 (`Resume/Week_08/`, module `dotnet-1-r08`, pseudo-classes and pseudo-elements, only styles.css and two classes on index.html change, media on Steps 1, 4, 5, 8 and 9): teacher's checkers pass (`test_checker.py` 23/23); browser test 72/72 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–8 media uploaded); offline settings (3042) Week 8 Steps 2, 3, 6, 7 completed, Steps 1, 4, 5, 8, 9 marked done; new Week 8 personal subtest passes on both; found CKB-107 (stale browser-test click after PR #93, fixed); [PR #96](https://github.com/SirNeo-Coder/JavaShare/pull/96), branch `docs/net-resume-week-08`. **Week 9 built** 2026-11-11 (`Resume/Week_09/`, module `dotnet-1-r09`, flexbox and media queries, only `styles.css` and one class on `projects.html` change, media on Steps 1, 3, 4, 5, 8 and 9, no new media file): teacher's checkers pass (`test_checker.py` 22/22, every sample and task answer byte-identical at 696–1000 px); browser test on offline settings (3072): Week 9 Steps 2, 6 and 7 completed, Steps 1, 3, 4, 5, 8 and 9 marked done (offline has no media storage), 14 pass / 6 skipped / 0 fail; new Week 9 personal subtest passes; found CKB-112 (the page runs at three widths, so a `max-width: 900px` query is on for module steps and off in a personal project; module text corrected, no app change); not run on Cloudflare's runtime this week; [PR #102](https://github.com/SirNeo-Coder/JavaShare/pull/102), branch `docs/net-resume-week-09`. Week 10 not started | teacher's `Resume/Week_0N/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83) (merged); [PR #84](https://github.com/SirNeo-Coder/JavaShare/pull/84) (merged); [PR #86](https://github.com/SirNeo-Coder/JavaShare/pull/86), branch `docs/net-resume-week-03`; [PR #87](https://github.com/SirNeo-Coder/JavaShare/pull/87) (merged); [PR #88](https://github.com/SirNeo-Coder/JavaShare/pull/88) (merged); [PR #89](https://github.com/SirNeo-Coder/JavaShare/pull/89), branch `docs/net-resume-week-06` |
+| Weeks 1–10 of the 10-week resume map (JSON, DLL, printed module) | **Week 1 built** 2026-11-06 (`Resume/Week_01/`, module `dotnet-1-r01`): teacher's checkers pass, CodeShare browser test 9/9 steps "sample verified, task completed" on Cloudflare's runtime (8787) and offline settings (3042). PR #83 merged. **Week 2 built** 2026-11-06 (`Resume/Week_02/`, module `dotnet-1-r02`, 9 media steps): teacher's checkers pass; browser test 18/18 steps "sample verified, task completed" on Cloudflare's runtime (8787, Week 2 media uploaded); offline settings (3042) Week 1 completed, Week 2 media steps marked done. Found CKB-092 (worked around). PR #84 merged. **Week 3 built** 2026-11-08 (`Resume/Week_03/`, module `dotnet-1-r03`, three pages, media on Steps 1 and 9 only): teacher's checkers pass; browser test 27/27 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–3 media uploaded); offline settings (3042) Week 3 Steps 2–8 completed, Steps 1 and 9 marked done. Found CKB-093 (worked around). **Week 4 built** 2026-11-08 (`Resume/Week_04/`, module `dotnet-1-r04`, shared `styles.css`, media on Steps 1, 3 and 9 only): teacher's checkers pass (`test_checker.py` 20/20); browser test 36/36 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–4 media uploaded); offline settings (3042) Week 4 Steps 2 and 4–8 completed, Steps 1, 3 and 9 marked done; new Week 4 personal subtest passes on both. Found CKB-094 (worked around). **Week 5 built** 2026-11-09 (`Resume/Week_05/`, module `dotnet-1-r05`, only styles.css changes, media on Steps 1, 6 and 9 only, both Thursday repairs change the page text): teacher's checkers pass (`test_checker.py` 21/21); browser test 45/45 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–5 media uploaded); offline settings (3042) Week 5 Steps 2–5, 7, 8 completed, Steps 1, 6, 9 marked done; new Week 5 personal subtest passes on both; found CKB-096 (stale browser-test locator, fixed). **Week 6 built** 2026-11-09 (`Resume/Week_06/`, module `dotnet-1-r06`, Juan's nav becomes a list on all three pages, media on Steps 1, 5 and 9 only): teacher's checkers pass (`test_checker.py` 27/27); browser test 54/54 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–6 media uploaded); offline settings (3042) Week 6 Steps 2–4, 6–8 completed, Steps 1, 5, 9 marked done; new Week 6 personal subtest passes on both; found CKB-097 (border widths follow the page window's zoom; worked around). **Week 7 built** 2026-11-10 (`Resume/Week_07/`, module `dotnet-1-r07`, Juan's gallery and Week 2 media on index.html, media on Steps 2, 4, 5, 6 and 9): teacher's checkers pass (`test_checker.py` 23/23); browser test 63/63 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–7 media uploaded); offline settings (3042) Week 7 Steps 1, 3, 7, 8 completed, Steps 2, 4, 5, 6, 9 marked done; new Week 7 personal subtest passes on both; no new CodeShare bug; [PR #92](https://github.com/SirNeo-Coder/JavaShare/pull/92) (merged). **Week 8 built** 2026-11-11 (`Resume/Week_08/`, module `dotnet-1-r08`, pseudo-classes and pseudo-elements, only styles.css and two classes on index.html change, media on Steps 1, 4, 5, 8 and 9): teacher's checkers pass (`test_checker.py` 23/23); browser test 72/72 steps "sample verified, task completed" on Cloudflare's runtime (8787, Weeks 2–8 media uploaded); offline settings (3042) Week 8 Steps 2, 3, 6, 7 completed, Steps 1, 4, 5, 8, 9 marked done; new Week 8 personal subtest passes on both; found CKB-107 (stale browser-test click after PR #93, fixed); [PR #96](https://github.com/SirNeo-Coder/JavaShare/pull/96), branch `docs/net-resume-week-08`. **Week 9 built** 2026-11-11 (`Resume/Week_09/`, module `dotnet-1-r09`, flexbox and media queries, only `styles.css` and one class on `projects.html` change, media on Steps 1, 3, 4, 5, 8 and 9, no new media file): teacher's checkers pass (`test_checker.py` 22/22, every sample and task answer byte-identical at 696–1000 px); browser test on offline settings (3072): Week 9 Steps 2, 6 and 7 completed, Steps 1, 3, 4, 5, 8 and 9 marked done (offline has no media storage), 14 pass / 6 skipped / 0 fail; new Week 9 personal subtest passes; found CKB-112 (the page runs at three widths, so a `max-width: 900px` query is on for module steps and off in a personal project; module text corrected, no app change); not run on Cloudflare's runtime this week; [PR #102](https://github.com/SirNeo-Coder/JavaShare/pull/102), branch `docs/net-resume-week-09`. **Week 10 built** 2026-11-12 (`Resume/Week_10/`, module `dotnet-1-r10`, responsive resume (RWD layouts): grid view, pictures and video that fit, a local template, media on Steps 1, 3, 4, 7, 8 and 9, one new media file `images/juan_banner.svg` so the week has eight): teacher's checkers pass (`test_checker.py` 29/29, every sample and task answer byte-identical at 696–1000 px, and the same in CodeShare's own page window at 760, 820 and 1100 px); browser test on Cloudflare's runtime (8787, Weeks 2–10 media uploaded) 16 pass / 5 skipped / 0 fail with all nine Week 10 steps "sample verified, task completed"; offline settings (3052) 15 pass / 6 skipped / 0 fail, Week 10 Steps 2, 5 and 6 completed and its six media steps marked done; new Week 10 personal subtest passes on both; no new CodeShare bug; the four CodeRabbit findings on PR #102 fixed. **The ten-week course is complete.** | teacher's `Resume/Week_0N/Verification.md`; [PR #83](https://github.com/SirNeo-Coder/JavaShare/pull/83) (merged); [PR #84](https://github.com/SirNeo-Coder/JavaShare/pull/84) (merged); [PR #86](https://github.com/SirNeo-Coder/JavaShare/pull/86), branch `docs/net-resume-week-03`; [PR #87](https://github.com/SirNeo-Coder/JavaShare/pull/87) (merged); [PR #88](https://github.com/SirNeo-Coder/JavaShare/pull/88) (merged); [PR #89](https://github.com/SirNeo-Coder/JavaShare/pull/89), branch `docs/net-resume-week-06` |
 | Page window stays until a completed task is synced (CKB-087) | **Merged** 2026-10-30 | [PR #77](https://github.com/SirNeo-Coder/JavaShare/pull/77) |
 
 Nothing is deployed by assistants. After merging, the teacher deploys the app and re-uploads
@@ -493,6 +493,17 @@ it cannot do, stop and propose an app change for approval first):
   but follows the browser window: narrow it if the query is off, widen it if it is already on). A checked page must keep its page text and every
   checked value identical at every width, so nothing inside a query may add, remove or re-letter a word and no check may read
   a property a query changes. `(max-width: 900)` without its unit drops the whole query at every width.
+- Checked for Resume Week 10 (2026-11-12; `docs/course-format.md`, "Grid, responsive pictures and a local template"): computed
+  `display: grid`, `row-gap` and `column-gap` agree in CodeShare's page window and the teacher's checker, and `max-width` reads
+  back as the literal `100%`. A **track size is never page-checked**: `fr`, `%`, `auto` and `minmax()` resolve to used pixels
+  that follow the window, `repeat(auto-fit, minmax(...))` changes the number of columns with the width, and a media query
+  changes `grid-template-columns` itself. A grid changes the page text in the same case flexbox does: items are blockified, so a box
+  whose children are already block boxes (figures, `li`, `section`) reads as before, while inline children are split onto
+  their own lines; `order` and a different column count move boxes only. `max-width: 100%` with `height: auto` keeps a picture wider than the page inside
+  it; without it the page scrolls sideways, which the page text never shows, so the `width`/`height` attributes stay in the
+  HTML. **Two stylesheets may be linked on one page**: both are inlined in order and the later one wins a tie, so a local
+  template file works with no internet. `display: gird` drops one declaration, a grid property on the items does nothing, and a
+  value whose bracket is never closed swallows every later rule in the file (W3C CSS Syntax).
 ## Hosted check after deploy (teacher)
 
 Assistants never deploy or change hosted settings. PR #62 is merged into `main`; once Cloudflare has
@@ -609,241 +620,53 @@ built `main` (see `docs/cloudflare-setup.md`):
 
 ## Next step
 
-1. **Weeks 1–9 of the resume course are built** (Weeks 1–2 2026-11-06; Weeks 3–4 2026-11-08; Weeks 5–6 2026-11-09; Week 7 2026-11-10;
-   Weeks 8–9 2026-11-11). Teacher: print them; in CodeShare **Curriculum** remove the old Weeks 1–3 (`dotnet-1-w01`…`w03`) the first time,
-   upload `Resume/Week_01/…` to `Resume/Week_09/DotNet1_Week_09.codeshare.json`, then for Weeks 2–6 → **View module details → Media
-   files** → add the three files in that week's `project_end/` (`images/`, `audio/`, `video/`; each module keeps its own copy), and for
-   Weeks 7, 8 and 9 the seven files in that week's `project_end/` (Juan's picture, sound, video and four gallery pictures;
-   Week 9 adds no new media file).
-2. **CKB-092 app fix (needs approval)**: page checks read `data-codeshare-src` for `src` on embedded media, so a `src` check
-   works online too. Until then, weeks avoid `src` page checks on uploaded files.
-3. **CKB-093 app fix (needs approval)**: rewrite iframes only where the browser sees a real iframe. Until then, samples keep
-   no broken quote before an iframe.
-3a. **CKB-094 app fix (needs approval)**: accept an unquoted `href`/`src` when inlining project files. Until then, every
-   value in a sample is quoted and the module tells students to keep the quotes.
-3b. **CKB-095 app fix (needs approval)**: resolve a linked stylesheet from the page's own folder and keep its `media`
-   condition. Until then, pages and stylesheets stay in the top folder and no link line has `media`.
-3c. **CKB-097 app fix (needs approval, teacher chooses)**: draw the page window at 100% whatever the text size, or compare border
-   widths with a tolerance. Until then, weeks never page-check a border width.
-4. **Week 10**, the last week: the teacher pastes the "Rolling weekly prompt" (below, now Week 10) into a new chat. That chat
-   writes no new prompt; it records that the course is complete.
-   Week 10 is built as planned; the teacher checks it in CodeShare when reached.
-6. **Hosted check of student media (teacher)**, PR #68 (see "Hosted check after deploy").
-7. **Offline web steps/media** stays a separate task (needed before media weeks are taught offline).
+The ten-week resume course (.NET 1) is **built**: Weeks 1–2 2026-11-06, Weeks 3–4 2026-11-08, Weeks 5–6 2026-11-09,
+Week 7 2026-11-10, Weeks 8–9 2026-11-11, Week 10 2026-11-12. No week is left to write.
 
-## Rolling weekly prompt
+1. **Teacher: print and upload.** Print each week (pp. 1–6 double-sided, long-edge flip; pp. 7–8 single-sided; the task pages
+   double-sided, long-edge flip). In CodeShare **Curriculum**, remove the old Weeks 1–3 (`dotnet-1-w01`…`w03`) the first time,
+   then upload `Resume/Week_01/…` to `Resume/Week_10/DotNet1_Week_10.codeshare.json`. For Weeks 2–6 → **View module details →
+   Media files** → add the three files in that week's `project_end/`; for Weeks 7–9 the seven files in that week's
+   `project_end/`; for Week 10 the **eight** files in `Resume/Week_10/project_end/` (the seven of Weeks 7–9 plus Juan's new
+   `images/juan_banner.svg`).
+2. **Teacher: the hosted check** after deploying (see "Hosted check after deploy"), including the student-media check of
+   PR #68, which is still outstanding.
+3. **Offline web steps and media** stays a separate, still-deferred task: offline has no Cloudflare R2, so offline the teacher
+   presses **Mark done** on every media step (Weeks 2–10).
+4. **App fixes still waiting for the teacher's approval**, each worked around in the module content:
+   CKB-092 (page-check the `src` of an uploaded media file), CKB-093 (iframes rewritten inside a broken quote),
+   CKB-094 (unquoted `href`/`src` not inlined), CKB-095 (a linked stylesheet resolved from the top folder, `media` dropped),
+   CKB-097 (border widths follow the page window's zoom).
 
-The teacher pastes this into a new chat for the next week. Each week's chat replaces it with the next week's
-prompt as its last step (teacher, 2026-10-29). Rewritten for the 10-week resume map and approved by the
-teacher on 2026-10-30. Current: **Week 10**, the last week (written by the Week 9 chat, 2026-11-11).
+## Rolling weekly prompt — finished
 
-```text
-Use caveman mode and ponytail (minimal, laziest working solution) for this whole chat.
+There is no next weekly prompt: **Week 10 was the last week of .NET 1**, so the Week 10 chat wrote none (teacher, 2026-10-30;
+the course map ends at Week 10). The ten built weeks, each in the teacher's `Resume/Week_NN/` folder:
 
-You are working in the CodeShare repository (formerly JavaShare) at /home/ireneo/Documents/GitHub/JavaShare.
+| Week | Topic | Module id |
+| --- | --- | --- |
+| 1 | HTML fundamentals, paragraphs and lists | `dotnet-1-r01` |
+| 2 | Multimedia and tables | `dotnet-1-r02` |
+| 3 | Links, frames and forms | `dotnet-1-r03` |
+| 4 | CSS fundamentals and selectors | `dotnet-1-r04` |
+| 5 | Text, font, colour, gradient and opacity | `dotnet-1-r05` |
+| 6 | Box model, list and link styling | `dotnet-1-r06` |
+| 7 | Position, z-index, float and an image gallery | `dotnet-1-r07` |
+| 8 | Pseudo-classes and pseudo-elements | `dotnet-1-r08` |
+| 9 | Flexbox and media queries | `dotnet-1-r09` |
+| 10 | Responsive resume (RWD layouts) | `dotnet-1-r10` |
 
-Task: build .NET 1 Week 10, "Responsive resume (RWD layouts)" (DLL, printed module, CodeShare JSON), in my
-folder /home/ireneo/Documents/Java 2026/Net Files/Resume/Week_10/. Only this week.
+Each week links to the one before (`previousModuleId`), has `"sampleFirst": true`, nine steps and one task per step
+(`<step id>-alter-v1`), and keeps its answers in `Resume/Week_NN/solutions/`.
 
-Before anything:
-1. Read AGENTS.md and follow it exactly (knowledge-first workflow, approval before changes, plain English,
-   test reporting rules, CodeRabbit review comments). Its "Net MVC course (agreed 2026-10-30)", "Page window" and
-   "Module media" rules apply.
-2. Read docs/handoffs/web-module-steps.md in full. Follow "Net MVC weekly modules: required format and
-   workflow". Its teacher decisions are approved; do not ask about them again. The old canteen weeks (folder
-   root, Week_02/, Week_03/, Week_04/) are retired: use them as format examples only, never their content.
-3. Read in my folder: DotNet1_Course_Map.md (Week 10 section, "Running project and performance task",
-   "Delivery inside CodeShare"), DotNet1_Handover.md, ILAW_DLL_and_Module_Playbook.md (sections 1, 2.1, 3, 4,
-   7, 8; its Java content does not apply), Resume/Week_09/Verification.md (format only), and revision_tools/ (reuse
-   resume_w01/build.py (it builds any Resume week: build.py r10; a step may list several files and name its run page;
-   an output a style leaves unchanged prints as "the same as Step N's output"; STANDARDS in content.py fills the DLL's
-   guide Quarter 2 standards; SAME_NOTE sets the "same as" wording), resume_w09/content.py as the template for resume_w10/
-   (it also computes contrast for text, outlines and borders), resume_w02/make_media.py and resume_w07/make_gallery.py (how Juan's media and
-   gallery pictures were made), build_tasks.py (always run it with the week key: build_tasks.py r10; without a key it rebuilds every
-   week, including the retired weeks; a task page may hold no task boxes; Weeks 7–9 needed five task pages, p9–p13, and a smaller
-   output font (body class r7, and r9 again for Week 9, whose nav splits into three lines) because the long index.html
-   outputs did not fit; the chart and starter stylesheet print in two
-   columns; Week 8's EXTRA_CSS keeps a code label with its code across a column break; watch each page's reported spare
-   room and trim prose until every page clears its footer), tasks.py, consistency.py,
-   render_r01.sh (WEEK=10), run_checks.sh and the Resume/Week_09 checkers; extend them
-   instead of writing new ones).
-4. Another session may be working in the main repository folder with uncommitted changes. Never commit, stash,
-   discard or build on them. Use a separate git worktree from origin/main for any repository change. Pick free
-   ports.
-5. I merge pull requests quickly. Before every push to a PR branch, check the PR is still open
-   (gh pr view N --json state). If it is already merged, put the new commits on a new branch and open a new PR
-   against main.
+**What is left for the teacher** (nothing is left to build): print the ten modules and their task pages; upload the ten JSON
+files under **Curriculum** (removing the old `dotnet-1-w01`…`w03` the first time) and add each media week's files under
+**View module details → Media files**; do the hosted check after the next deploy, including the still-outstanding student-media
+check of PR #68; and decide the five open app fixes above. Offline web steps and offline media remain a separate, deferred
+task, so offline the teacher presses **Mark done** on media steps.
 
-Week rules (check each against the real files first):
-- Resume theme: module samples build the resume of Juan Dela Cruz, a made-up student (every detail
-  invented). The personal performance task is the student's own resume; Week 10 finishes it as a complete, responsive site and
-  presents it. No home address,
-  phone number, birth date, ID numbers or personal social-media accounts; no other people in any picture.
-- Everything happens inside CodeShare (CKB-085): never tell students to use VS Code, Chrome, Ctrl+O,
-  File > Open Folder, local folders or folder copies. Before handing over, search the DLL, module and JSON for
-  "VS Code", "Visual Studio", "Chrome", "Ctrl+O" and "folder", and fix every hit.
-- Pictures, sound and video for Juan are made-up files created on this laptop (drawn SVG, generated sound and
-  video); never a real person's photo, never downloaded. Week 2's are in Resume/Week_02/project_end/ (Weeks 3–9 reused
-  them); Juan's four gallery pictures (Week 7, index.html) are in Resume/Week_07/project_end/images/ (Weeks 8–9 reused
-  them, and Week 9 added no new media file of its own).
-- Week_10/project_start/ = Week_09/project_end/; Resume/project/ matches Week_10/project_end/ at the end.
-- JSON: "sampleFirst": true, "previousModuleId": "dotnet-1-r09". IDs: course dotnet-1, module dotnet-1-r10,
-  lessons dotnet-1-r10-dD, steps dotnet-1-r10-dD-sS (S counts across the week), slips dotnet-1-r10-dD-slip,
-  task dotnet-1-r10-pt. Every step has one meaningful task (activity id "<step id>-alter-v1", instruction,
-  "files": [], complete expectedOutput) that changes the visible page text or console lines. Answers in
-  Week_10/solutions/<step id>/, never in the JSON. Every expected output from a real run. A task never repairs
-  a file listed in its step's mediaChecks (CKB-084).
-- Juan's site has three pages and one stylesheet (index.html, projects.html, contact.html, styles.css; projects.html
-  shows contact.html in an iframe; the contact form sends nowhere; since Week 6 the nav on every page is a ul of links,
-  each li on its own line; since Week 7 the nav is sticky with z-index 2, projects.html's h1 holds an absolute ribbon, and
-  index.html has Juan's floated picture and a floated gallery of four captioned pictures, one with a positioned tag; since Week 8 skills get hover and a ✓ from ::before, the first skill is bold capitals,
-  badges get a capital first letter from ::first-letter, the form has :required and :focus styles, links a :focus-visible
-  outline, the goals list (class="goals") odd items maroon, the motto (class="motto") quotation marks and projects.html a
-  drop cap from h1 + p::first-letter; since Week 9 the skills, the project cards (class="project-list" on projects.html), the
-  gallery, the nav bar and the contact form are flex containers with gap, the gallery's float is gone, and two
-  @media (max-width: 900px) queries stack the nav and turn the card column into a wrapping row). Each step lists its run page and every file that
-  page needs (its linked styles.css, a framed page), even when unchanged, plus any file it adds or changes, and names its
-  run page ("run"); checks read the run page only (teacher, 2026-11-06 and 2026-11-08; CodeRabbit on PR #86). The
-  printed module still shows only new or changed lines. Every attribute value is in quotes: CodeShare does not apply a
-  stylesheet whose href has no quotes (CKB-094). Keep every page and styles.css in the project's top folder and put no
-  media attribute on a link line: CodeShare finds a stylesheet from the top folder and drops its media condition
-  (CKB-095).
-- Printed module: 8 lesson pages, then task pages after page 8 built with revision_tools/build_tasks.py r10.
-  Printed module and JSON identical in code and outputs (revision_tools/consistency.py checks it). Once a file is
-  long, print it whole once and only the new or changed lines for later steps, each block labelled with the file and
-  where it goes (as in Weeks 1–9). When the outputs no longer fit (teacher, 2026-11-06, as in Weeks 2–9), the lesson
-  pages print only the output lines a step changes, with their line numbers (OUTPUT_BASE in content.py), and the task
-  pages keep every complete task output. A tab between table cells prints as → (the JSON keeps the tab).
-- DLL: Resume/Week_09's DLL is the format template (no Week 9 text left): five opened references per day, a
-  "Sample, then your task:" line in each Student Activity, no red ADJUST THIS line, the guide Quarter 2 standards.
-- Friday is performance task day (teacher, 2026-11-06): at most one Friday step, Juan's finished page for the
-  presentation, no new HTML or CSS.
-- A repair task must change the page text (teacher, 2026-11-09; CodeRabbit on PR #87): tasks are checked by page text
-  only, so pick mistakes whose repair also brings back visible words (for example a missing ; or ) that also stops a
-  later text-transform).
-- If the week needs something the CodeShare preview cannot do (handoff, "What the page preview can and cannot
-  do"), stop and propose an app change first.
-- Never change an ID that is already used. Never reuse the old dotnet-1-w01…w03 IDs.
-
-
-This week's checks:
-- Media: ask me first whether the step samples keep Week 2's pictures, sound and video and Juan's Week 7 gallery (all on
-  index.html; then every step that runs index.html is a media step: expectedOutput ends with a Media checks: section (the
-  heading, then one result line per picture, sound and video), "includeMediaOutput": true, the media files go in
-  Week_10/project_end and I add them under View module details → Media files; offline I press Mark done) or leave them out
-  (then the steps are checked automatically online and offline). Weeks 4–9 kept them; Week 9 ran index.html on six steps.
-  Put src on img, audio and video themselves, and never page-check (webChecks) the src of an uploaded file (online it becomes
-  data:, CKB-092) or of an iframe (srcdoc, CKB-086).
-- Real runs in the real page window (Weeks 6–8, keep): CodeShare draws the page window inside its text-size zoom (1.15 at
-  first, 1 to 1.45) and it is not my checker's 1000 × 900 window, so check every computed value both in my checker and in
-  CodeShare's buildTeacherPreview inside a body with zoom 1.15, in a frame of the width that place really uses (see the next
-  point: a module step's is below 900 px, a personal project's is wider), before using it. Never
-  page-check a border or outline width (CKB-097), a % width, an auto margin, a side that is not set, a fixed offset or a
-  sticky place. Inside the zoomed page window Playwright clicks land in the wrong place; tests use dispatchEvent("click").
-- Widths (Week 9 settled this; read CKB-112 first): the page runs at three different widths, so never assume one. A module
-  step's page sits beside its web-checks panel and is narrower than 900 px; a personal project has no checks panel, so its
-  page fills the page window (width: min(1180px, 100%)), which is wider than 900 px on a maximized laptop but drops below it
-  again on a narrow browser window (776 px measured at an 820 px viewport); my checker is 1000 px. A max-width: 900px query is
-  therefore on for the module steps, and in a personal project it depends on the browser window. The page window cannot be
-  dragged, but it follows the browser window: narrow it if a query is off, widen it if it is already on. This matters more in Week 10 than in any other week, because every
-  layout is width-dependent. Keep every sample's and task's page text and every page-checked value identical at every width
-  (Week 9's test_checker.py runs every output at 760, 800, 899 and 1000 px: do the same), never put anything inside a media
-  query that adds, removes or re-letters a word, and never page-check a property a query changes (Week 9 checks display and
-  flex-wrap, never flex-direction, on the queried nav ul and .project-list). A length in a media feature needs its unit:
-  (max-width: 900) drops the whole query at every width, with no error shown.
-- Grid (new this week; check with real runs before writing anything): display: grid, grid-template-columns,
-  grid-template-areas, gap and the fr unit. Check how a grid item's words come out in the page text (as with flexbox a
-  blockified item should keep its own line, but confirm it), which computed values a page check reads the same at every width
-  (display grid and gap in px should; a track size in fr, %, auto or minmax resolves to used pixels that follow the window, so
-  never page-check a track size or a column width), and what repeat(auto-fit, minmax(...)) does to the page text when the
-  number of columns changes with the width. If the page text changes with the column count, that layout cannot be used in a
-  checked sample.
-- Responsive pictures and video (new this week): check with real runs what the page window does with max-width: 100%,
-  height: auto, the width and height attributes, srcset and sizes on an img, and a video with max-width: 100%. Uploaded media
-  is embedded as data: online, so never page-check a src (CKB-092), and % and auto values follow the window and must never be
-  page-checked. Juan's gallery pictures are 160 x 110 px drawings: check they still look right when they resize, and what the
-  page text is offline, where they show only their alt text.
-- Local templates and frameworks (Wednesday; AGENTS.md rule 5): nothing may be loaded from the internet, so a template or
-  framework must be a local copy inside the project (a .css file the student can read), never a CDN link. Ask me which copy to
-  use before writing Wednesday, and never tell students to download one.
-- Flexbox (Week 9, keep): display: flex, flex-direction, flex-wrap, justify-content, align-items and gap are not page text,
-  and their computed values agree in both checkers. Flexbox changes the page text only where it changes whether a child is a
-  box of its own: a column of block-level items (li, p) reads exactly as before, display: flex on a nav ul whose li were
-  inline-block turns one line of links into one per link, and display: inline on list items with no flex container runs them
-  together onto one line. gap is never page text; it needs a container that lays its children out (flex, grid or multicolumn),
-  so it does nothing on the ordinary block that deleting display: flex leaves behind, and the same gap works with display: grid
-  this week. float on a flex item still computes to left but has no effect, and a flex row needs no clear: both after it.
-- Pseudo-classes and pseudo-elements (Week 8, keep): :hover, :focus, :focus-visible and :active are never page-checked (no
-  mouse or keyboard); structural pseudo-classes and form states are. Text from ::before/::after is not page text;
-  text-transform on ::first-letter is; text from ::before becomes the first letter; never use ::first-line (it follows the
-  window).
-- Position, float and gallery (Week 7, keep): absolute, fixed and floated boxes put their words on their own line in the page
-  text; relative and sticky do not; offsets and z-index read as written in px, even on a static box; captions are page
-  text, alt is not; a missing } nests the later rules inside the broken one in today's Chromium. Floats and flexbox both lay
-  out Juan's gallery and cards: Week 9 moved the gallery from float to flexbox with no change to the page text.
-- Box model, lists and links (Week 6, keep): sizes read in px; check a border by its style and colour; li tags each on
-  their own line.
-- Text, font and colour (Week 5, keep): sizes read in px, colours as rgb(), font lists with double quotes, gradients
-  through background-image; text at opacity 0 or in a transparent colour stays in the page text.
-- External stylesheet (checked in Week 4, keep): CodeShare inlines the link line into a style element, so never
-  page-check link or style elements; a wrong or missing stylesheet leaves the page plain with no error. A media attribute on
-  the link line is dropped (CKB-095): write media queries inside styles.css with @media.
-- Thursday (check the whole site at different widths, then repair the hardest problem): check with real runs how the hardest
-  mistakes (display: gird or another invalid value, a grid or flex property on the items instead of the container, a missing }
-  after an @media block, a media query with no space after "and" or a missing unit, a picture with a fixed width that
-  overflows a narrow page) come out in both checkers; an invalid value drops only its declaration, a broken
-  @media condition drops the whole block. Each repair must change the page text (rule above), so pick one that, for example,
-  also stops a later text-transform. A missing quote before an iframe gives different page text in CodeShare (CKB-093): no
-  broken quote before an iframe in any sample.
-- Personal project: the complete responsive resume. This is the last week, so the task is the finished site rather than a new
-  trick: a grid or flex layout that reflows, pictures and video that resize with the page, their own media queries, and
-  colours from the chart (4.5:1). Friday is the final presentation and Submit this version. Check what a personal run shows
-  online and offline before writing the instructions, and remember a personal project's page window is wider than a module
-  step's (CKB-112).
-
-First, ask me only the questions whose answers change the files, each with your recommendation first, marked
-"(Recommended)". Then show me the day plan, every step with its task (one line each: step, change, why it
-exercises the lesson) and the AGENTS.md proposal (findings, files likely to change, steps, tests, risks, open
-choices), and stop for my approval.
-
-Testing (after approval):
-- My checkers in Week_10 (check_codeshare.py <json> --run --media-root project_end, check_web_steps.cjs,
-  test_checker.py) on the samples and every solutions/ answer; each unchanged sample must fail its task output.
-  Add Week 10 to revision_tools/run_checks.sh.
-- Render and inspect every DLL page and every module page (8.5 × 13 in = 612 × 936 pt; each source page renders
-  to exactly one page).
-- CodeShare: tests/web-module-steps.browser.mjs reads every built Resume week; its media subtest uploads the media of
-  every built week with media steps before the student walk, so on Cloudflare's runtime every media step is checked
-  automatically, never marked done. Its personal-project subtests cover Weeks 2–9; propose a Week 10 one (online, the
-  student makes their layout responsive (a grid or flex layout and a picture that resizes), runs, and the test reads the page
-  text and, in the page window at its real width and again with the browser window narrowed, the computed display and gap and
-  which side of each query the page is on; personal runs show no Media checks lines, so pictures are read from the page) if it is worth
-  it (needs my approval). The student walk clicks worksheet step tabs with dispatchEvent("click"): the tabs fold away while
-  the worksheet scrolls (CKB-107), and a page-window wait must also wait for the elements it reads, not just readyState
-  (CKB-111). Week 9's subtest measures the preview's own width and narrows the browser window with page.setViewportSize:
-  reuse that for anything width-dependent. Then run it on Cloudflare's runtime on this laptop (npx
-  opennextjs-cloudflare build, then preview on port 8787 with the git-ignored .dev.vars pointing at local Supabase) and
-  on the offline-settings server (port 3042, where media steps are marked done because offline has no media), following
-  the handoff's "Testing recipe". Report one line per step: sample verified, task completed (offline media steps:
-  teacher-checked, marked done).
-- Report tests as AGENTS.md "Reporting tests after a build" requires, including what could not be verified.
-
-While working: keep docs/handoffs/web-module-steps.md, Week_10/Verification.md and DotNet1_Handover.md updated
-after every finished step, add a dated line to the handoff's "Update log", and commit and push the repository docs
-each time. If you find a bug, give it a CKB record; check problem-index.md and open PRs for the next free number
-first.
-
-Last step: Week 10 is the last week of the course, so write no new weekly prompt. In
-docs/handoffs/web-module-steps.md, section "Rolling weekly prompt", replace this prompt with a short note that the ten-week
-resume course is complete, listing the ten weeks and their module ids, and say what is left for me to do (print, upload, the
-hosted check, and the deferred offline web steps and media). Update "Next step" the same way. Commit and push it.
-
-When done, tell me in plain English: what each day covers, the print instructions (pages 1–6 double-sided, flip
-on long edge; pages 7–8 single-sided; task pages double-sided, flip on long edge), the upload steps (Curriculum →
-upload Week 10; View module details → Media files → add Juan's media and gallery pictures from Week_10/project_end),
-anything I must check, and a Sources list of every reference as clickable links. Then say the course is complete and list
-what is left for me to do.
-```
+Anyone starting the next .NET 2 course (JavaScript, `DotNet2_Course_Map.md`) should read "Net MVC weekly modules: required
+format and workflow" above: it is the format that produced these ten weeks.
 
 ## Update log
 
@@ -1206,6 +1029,36 @@ what is left for me to do.
   no change to the page text or any other computed value. Recorded with its index and prompt-map rows and in
   `docs/course-format.md`. Also fixed before delivery, caught by Week 9's own `test_checker.py`: Step 9 said "four flex
   containers" when the stylesheet has five, and Step 6 claimed its output was "the same as Step 2's" when the nav bar differs.
+- 2026-11-12 — Resume **Week 10** (Responsive resume, RWD layouts), the last week of .NET 1, built in the teacher's
+  `Resume/Week_10/` (DLL; module 13 pages, task pages 9–13; `build.py r10`, `build_tasks.py r10`, `WEEK=10 render_r01.sh`;
+  module `dotnet-1-r10`, `previousModuleId` `dotnet-1-r09`, 9 steps, each one task `-alter-v1`). Teacher's choices: Juan's
+  media and gallery stay on `index.html` (Steps 1, 3, 4, 7, 8, 9 are the media steps); **one new media file**,
+  `images/juan_banner.svg` (900 × 240, drawn here), because Juan's other pictures never need to shrink in the page window;
+  one breakpoint, `max-width: 900px`; Wednesday's template is a local `resume-template.css` written for the course, never a
+  framework link; `srcset`/`sizes` are printed knowledge only. Week 10 checks: 9/9 samples, 9/9 task answers, all 9 unchanged
+  samples correctly failing their task output, `test_checker.py` 29/29, `consistency.py` ALL MATCH, printed module 13 pages
+  all clearing their footer. Every sample and task answer verified **byte-identical at 696, 760, 800, 899, 901 and 1000 px**
+  and again in CodeShare's own `buildTeacherPreview` at 760, 820 and 1100 px. `npm run build:all` OK, `npm run lint` clean,
+  `npm test` green, browser test **16/0/5 on Cloudflare's runtime (8787)** with all nine steps "sample verified, task
+  completed" and **15/0/6 offline (3052)** with the six media steps marked done. Repository: `docs/course-format.md`
+  ("Grid, responsive pictures and a local template"), this handoff (status, preview facts, Next step, the finished prompt
+  note), CKB-112's widen-first note and Week 10 sighting, a Week 10 personal subtest, and the four CodeRabbit findings from
+  PR #102 fixed (including Week 9's `looks()`, which now compares the whole page text). One browser-test run in three failed
+  from Week 6 on (a 401 and two 20 s timeouts) and passed again unchanged before and after: recorded as a flake, not
+  reproduced.
+- 2026-11-12 — PR #104 brought `docs/net-resume-week-09` in (it had gained main plus its own fix for the same four
+  CodeRabbit findings). Four files conflicted because both branches had fixed them: Week 9's own wording was kept in
+  `docs/course-format.md`, CKB-112 and the Week 9 subtest; Week 10's completion note was kept in this handoff's
+  "Rolling weekly prompt" section. The browser test was re-run on the merged branch (offline settings, port 3052):
+  **15 pass, 6 skipped, 0 fail**, with Week 10's Steps 2, 5 and 6 completed and its six media steps marked done.
+- 2026-11-12 — CodeRabbit on PR #104: the grid guidance said a grid never changes the page text. Checked with a real run
+  and corrected in `docs/course-format.md`, this handoff, the teacher's course map and handover: a grid blockifies its
+  items, so a box holding **inline** children splits them onto their own lines (`<span>A</span><span>B</span>` reads
+  `AB` before and `A`, `B` after), exactly as flexbox does. Week 10's own samples are unaffected: their grid items are
+  figures, `li` and `section`.
+- 2026-11-12 — **The ten-week resume course is complete** (Weeks 1–10, `dotnet-1-r01` … `dotnet-1-r10`). The "Rolling weekly
+  prompt" section now records that and lists the ten weeks; "Next step" lists what is left for the teacher (print, upload,
+  the hosted check, the five open app fixes, and the deferred offline web steps and media). No new weekly prompt was written.
 - 2026-11-11 — Rolling weekly prompt replaced with **Week 10** (Responsive resume, RWD layouts), the last week of the course.
   It leads with CKB-112 (never assume one width), asks about grid, responsive pictures and video and which **local** template
   or framework copy Wednesday should compare (AGENTS.md rule 5: nothing from the internet), and tells that chat to write no

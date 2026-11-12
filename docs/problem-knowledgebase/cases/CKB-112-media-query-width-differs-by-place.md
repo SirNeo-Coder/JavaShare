@@ -53,6 +53,15 @@ Width is place-dependent; module content must never depend on a particular one:
   answer at 760, 800, 899 and 1000 px. Proved to have teeth: adding `.motto { display: none }` inside the Step 5 query made it
   fail at all three narrow widths; removing it passed again.
 
+## Also seen in
+
+- 2026-11-12 (Resume Week 10): the same three widths with a grid. A track size in `fr`, `%`, `auto` or `minmax()` resolves to
+  used pixels, and `repeat(auto-fit, minmax(...))` even changes the number of columns with the width, so Week 10 page-checks
+  `display`, `gap` and `max-width` and never a track. Its `test_checker.py` runs every sample and task answer at 696, 760, 800,
+  899, 901 and 1000 px, and the Week 10 personal subtest asserts the module step's preview is `<= 900` px, the personal
+  project's is `> 900` px with more than one column, and that narrowing the browser window to 820 px drops it to one column
+  with the whole page text and every other computed value unchanged.
+
 ## History
 
 - 2026-11-11 — found while building Resume Week 9; the teacher had pre-approved the 900 px breakpoint on the stated premise that

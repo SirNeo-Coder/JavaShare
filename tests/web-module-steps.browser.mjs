@@ -1084,6 +1084,107 @@ test("web module steps: uploads keep checks, teacher preview checks every sample
       await review.close();
     });
 
+    await t.test("Week 10 personal project: the Week 9 site carries forward; the student lays the gallery out as a grid and gives every picture max-width: 100%; above the breakpoint the grid keeps its columns, and making the browser window narrower turns the query on with no change to the whole page text or to display, gap and max-width; Submit freezes them; the teacher's review shows the same", { skip: needs(10) }, async () => {
+      const week10 = weeks[9], steps10 = stepsOf(week10);
+      const previewWidth = async (where) => (await (await (await where.locator(".page-window .module-web-preview iframe")
+        .elementHandle()).contentFrame()).evaluate(() => window.innerWidth));
+      // A module step's page window shares its row with the checks panel, so its preview is below the 900px breakpoint
+      // and the class sees the narrow layout on the module steps (CKB-112). Measured before the steps are marked done.
+      await openCatalog(week10);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      const moduleWidth = await previewWidth(page);
+      assert.ok(moduleWidth <= 900, `a module step's page window is below the 900px breakpoint (${moduleWidth}px)`);
+      await closePageWindow(page);
+      // The module steps are checked elsewhere; mark them done so the personal task opens.
+      const states = (await progress(week10)).stepStates;
+      assert.equal((await admin.from("module_progress").update({ step_states: { ...states, ...Object.fromEntries(steps10.map((step) => [activityStateId(step), "pass"])) } })
+        .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", week10.id)).error, null);
+      const textarea = page.locator(".student-module-project .editor-card textarea");
+      const fileTab = (path) => page.locator(".student-module-project .file-tabs").getByRole("button", { name: path, exact: true });
+      const write = async (path, content) => {
+        await fileTab(path).dispatchEvent("click");
+        await page.waitForFunction((value) => document.querySelector(".student-module-project .file-tab.active")?.textContent === value, path);
+        await textarea.fill(content);
+      };
+      // Read from the page window itself: the whole page text, the grid's own values, a picture's max-width, and how many
+      // columns the grid really has — the one value the media query changes, so it is read on purpose, never page-checked.
+      const looks = async (where) => {
+        const inside = await (await where.locator(".page-window .module-web-preview iframe").elementHandle()).contentFrame();
+        // The frame can report "complete" before the student's page arrives, so wait for the elements read below too (CKB-111).
+        await inside.waitForFunction(() => document.readyState === "complete" && document.querySelector(".gallery figure") && document.querySelector("nav ul"));
+        return inside.evaluate(() => {
+          const gallery = document.querySelector(".gallery"), picture = document.querySelector(".gallery img");
+          return [document.body.innerText, getComputedStyle(gallery).display, getComputedStyle(gallery).columnGap,
+            getComputedStyle(picture).maxWidth, getComputedStyle(document.querySelector("nav ul")).display,
+            getComputedStyle(gallery).gridTemplateColumns.split(" ").length,
+            [...document.querySelectorAll(".gallery figcaption")].map((caption) => caption.textContent)];
+        });
+      };
+      const week9Own = (await progress(weeks[8])).performanceTask.own;
+      const carried = Object.fromEntries(week9Own.files.map((file) => [file.path, file.content]));
+      await openCatalog(week10);
+      await page.getByRole("button", { name: "Projects", exact: true }).hover();
+      await page.locator("#classroom-projects").getByRole("button", { name: "Personal performance-task project", exact: true }).click();
+      await page.waitForFunction(() => document.getElementById("classroom-projects")?.dataset.open === "false");
+      // Linked weeks carry the Week 9 submission forward: its pages, its flex containers and its media query.
+      await page.waitForFunction((value) => document.querySelector(".student-module-project .editor-card textarea")?.value === value, carried["index.html"]);
+      assert.deepEqual((await page.locator(".student-module-project .file-tabs .file-tab").allTextContents()).sort(), Object.keys(carried).sort());
+      assert.match(carried["index.html"], /<div class="gallery">/, "the gallery carries forward, so this week only adds CSS");
+      const css = carried["styles.css"] + "\n/* Grid view: my gallery in as many columns as fit, each at least 220px wide */\n"
+        + ".gallery {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));\n  gap: 12px;\n}\n"
+        + "\n/* Responsive pictures: never wider than the box they are in, and the height follows the width */\n"
+        + "img {\n  max-width: 100%;\n  height: auto;\n}\n"
+        + "\n/* Media query: at 900px and narrower my gallery stands in one column */\n"
+        + "@media (max-width: 900px) {\n  .gallery {\n    grid-template-columns: 1fr;\n  }\n}\n";
+      await write("styles.css", css);
+      await page.getByRole("button", { name: /Run code/ }).click();
+      await page.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      await page.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      await page.getByText("Run succeeded — ready to submit this version.", { exact: false }).waitFor();
+      // A personal project has no checks panel, so its preview fills the page window and is wider than the breakpoint:
+      // the query is off here and the grid keeps more than one column.
+      const wide = await previewWidth(page);
+      assert.ok(wide > 900, `the personal project's page window is wider than the breakpoint (${wide}px)`);
+      const seen = await looks(page);
+      assert.deepEqual(seen.slice(1, 5), ["grid", "12px", "100%", "flex"], "a grid, its gap and a picture that fits; the Week 9 nav stays a flex row");
+      assert.ok(seen[5] > 1, `above the breakpoint the gallery keeps more than one column (${seen[5]})`);
+      const lines = seen[0].split("\n");
+      assert.ok(seen[6].length >= 2 && seen[6].every((caption) => lines.includes(caption)),
+        `every gallery caption is still page text, one per figure (${JSON.stringify(seen[6])})`);
+      // Making the browser window narrower takes the page window below the breakpoint: the grid falls to one column while
+      // every word of the page text and every other computed value stays exactly the same.
+      await page.setViewportSize({ width: 820, height: 1050 });
+      try {
+        const narrow = await previewWidth(page);
+        assert.ok(narrow <= 900, `a narrower browser window takes the page window below the breakpoint (${narrow}px)`);
+        assert.deepEqual(await looks(page), [...seen.slice(0, 5), 1, seen[6]], "the query changes only the number of columns");
+      } finally { await page.setViewportSize({ width: 1500, height: 1050 }); }
+      await page.locator(".page-window .module-web-preview").screenshot({ path: "/tmp/codeshare-web-student-week10.png" });
+      await closePageWindow(page);
+      await page.getByRole("button", { name: "Submit this version", exact: true }).click();
+      await page.locator(".actionbar .sync", { hasText: /^Submitted$/ }).waitFor();
+      await page.getByRole("alertdialog", { name: "Version submitted" }).getByRole("button", { name: "OK" }).click();
+      const saved = await progress(week10);
+      assert.equal(saved.percent, 100);
+      assert.deepEqual(Object.fromEntries(saved.performanceTask.own.files.map((file) => [file.path, file.content])), { ...carried, "styles.css": css });
+
+      const review = await teacher.newPage(); review.setDefaultTimeout(20000); review.on("pageerror", (e) => errors.push(e.message));
+      await review.goto("/");
+      await review.getByRole("button", { name: /Open class/ }).click();
+      await review.getByRole("button", { name: /^Students/ }).click();
+      await review.getByRole("button", { name: /Open Web student.*progress/ }).click();
+      await review.locator(".teacher-module-card", { hasText: week10.title.replace(/^Self-Paced Module:\s*/, "") }).getByRole("button", { name: "Review personal submission" }).click();
+      await review.locator(".student-module-project .editor-card textarea").waitFor();
+      await review.mouse.click(1200, 400);
+      await review.getByRole("button", { name: /Run code/ }).click();
+      await review.locator(".page-window .module-web-preview iframe").waitFor({ state: "attached" });
+      assert.deepEqual((await looks(review)).slice(0, 5), seen.slice(0, 5), "the review runs the frozen pages and styles.css");
+      await review.waitForFunction(() => [...document.querySelectorAll(".actionbar button")].some((button) => /Run code/.test(button.textContent) && !button.disabled));
+      assert.deepEqual(await progress(week10), saved, "teacher runs never change the student's progress");
+      await review.close();
+    });
+
     await t.test("a .js step compares real console lines: teacher preview ticks a match, crosses an uncaught error; a student completes it", async () => {
       const step = (id, number, code, expectedOutput) => ({ type: "step", id, number, instruction: "Run app.js.", language: "javascript", run: "app.js", files: [{ path: "app.js", content: code }], expectedOutput });
       const lessonOf = (id, order, block) => ({ id, order, dayLabel: `DAY ${order}`, title: `Console ${order}`, hours: 1, objectives: { cognitive: "c", affective: "a", psychomotor: "p" }, blocks: [block],

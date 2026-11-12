@@ -426,6 +426,24 @@ evidence, checked by the server against its own expected output and the saved ve
   `display` and `flex-wrap`, never `flex-direction`, on the queried `nav ul` and `.project-list`). A length in a media feature
   needs its unit: `(max-width: 900)` drops the whole query at every width. `Resume/Week_09/test_checker.py` runs every sample
   and task answer at 760, 800, 899 and 1000 px and fails if any output differs.
+- **Grid, responsive pictures and a local template (checked 2026-11-12, Resume Week 10).** `display: grid`, `row-gap` and
+  `column-gap` read the same computed values in CodeShare's page window and the teacher's checker, so page checks may use them.
+  A **track size never may be page-checked**: a track written in `fr`, `%`, `auto` or `minmax()` resolves to used pixels that
+  follow the window (`repeat(auto-fit, minmax(220px, 1fr))` even changes the number of columns), and `grid-template-columns` is
+  exactly what a media query changes. Making a box a grid container changes the page text in exactly the case flexbox does: a grid
+  item is blockified (W3C), so `display: grid` on a box whose children are already block boxes (figures, `li`, `section`)
+  reads as before, in HTML order, while a box holding inline children splits them onto their own lines (`<span>A</span>
+  <span>B</span>` reads `AB` before and `A`, `B` after — measured). `order` and a different column count move boxes without
+  moving words. `max-width: 100%` reads back as the literal `100%` at every width and may be page-checked, while
+  `width` and `height` resolve to pixels and may not; `max-width: 100%` with `height: auto` keeps a picture wider than the page
+  inside it (without it the page scrolls sideways, which the page text never shows). The `width` and `height` attributes stay in
+  the HTML as the natural size. **Two stylesheets may be linked on one page**: both are inlined in the order they are written,
+  and on equal specificity the later one wins (Week 10 links a local `resume-template.css` before `styles.css`), so a local
+  template needs no internet. An invalid value (`display: gird`) drops only its own declaration, and a grid property written on
+  the items instead of the container does nothing; a value whose bracket is never closed swallows **every later rule in the
+  file** (W3C CSS Syntax: what is still open at the end is closed automatically and then thrown away), which is page text as
+  soon as one of those rules changed letters. `Resume/Week_10/test_checker.py` runs every sample and task answer at 696, 760,
+  800, 899, 901 and 1000 px and fails if any output differs.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has
