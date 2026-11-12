@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { require as tsxRequire } from "tsx/cjs/api";
-const { liveProjectKind, localEdit, remoteEdit, shareModuleLive, takeOperation, teacherWatching } = tsxRequire("../app/liveText.ts", import.meta.url);
+const { liveActivityKey, liveProjectKind, localEdit, remoteEdit, shareModuleLive, takeOperation, teacherWatching } = tsxRequire("../app/liveText.ts", import.meta.url);
 
 const own = { isGroup: false, isTeacherWorkspace: false };
 
@@ -54,4 +54,12 @@ test("teacher live help: a student's shared class step is sent; a teacher's own 
   assert.equal(liveProjectKind({ kind: "preview" }), null, "the teacher's own Module preview");
   assert.equal(liveProjectKind({ kind: "review" }), null);
   assert.equal(liveProjectKind(null), null);
+});
+
+test("teacher live help: each open project has its own label, so a late edit for the class step never fits the student's own project (CKB-115)", () => {
+  const step = { moduleId: "week15", stepId: "step-1" };
+  const labels = [{ kind: "preview", shared: true }, { kind: "module" }, { kind: "performance" }].map((kind) => liveActivityKey({ ...step, ...kind }));
+  assert.equal(new Set(labels).size, 3, "class step, module project and personal project of the same step all differ");
+  assert.notEqual(liveActivityKey({ kind: "module", moduleId: "week15", stepId: "step-2" }), labels[1], "another step of the same module differs");
+  assert.equal(liveActivityKey({ kind: "module", ...step }), labels[1], "the same project keeps its label");
 });
