@@ -269,6 +269,11 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>
     <b>{task ? "Sample output" : "Output (expected):"}</b><pre className="printed-output">{step.expectedOutput}</pre>
     {task && <div className="paper-instructions"><b>Your task</b><Markdown markdown={task.instruction} /><b>Expected task output</b><pre className="printed-output">{task.expectedOutput}</pre></div>}
+    {role === "teacher" && task?.solution && <details className="answer-key"><summary>Answer key (teacher only)</summary>
+      <p className="module-preview-note">Only your teacher account sees this. It is never sent to a student.</p>
+      <pre><code>{task.solution.lines}</code></pre>
+      {task.solution.note && <><b>Why this answers the task</b><Markdown markdown={task.solution.note} /></>}
+    </details>}
     {role === "student" && <div className="paper-instructions">
       <p>{task && sampleFirst ? "Work in code editor loads this step's sample on first opening. Run the sample unchanged to verify it, then make the changes in Your task and Run code again. A matching task run completes this step and unlocks the next activity. Reopening a started step restores your saved edits." : task ? "Continue in your saved module project. Make the changes in Your task, then Run code. Successful execution matching Expected task output completes this task and unlocks the next step." : "Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step."}</p>
       {teacherChecked && <p><b>Checked by your teacher for now.</b> Your teacher marks this step done after looking at your page.</p>}
@@ -276,11 +281,6 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     </div>}
     {role === "teacher" && checkableStep(step) && onStart && <button type="button" className="worksheet-practise" disabled={busy} onClick={() => void onStart()}>Work in code editor</button>}
     {role === "teacher" && <details open={!printed}><summary>Preview sample code</summary><ModuleFileEditors files={files} onChange={(index, content) => setFiles((current) => current.map((file, i) => i === index ? { ...file, content } : file))} />{checkableStep(step) && <button type="button" disabled={busy || (mediaLoading && teacherCheckedStep(step))} onClick={() => void run()}>{mediaLoading && teacherCheckedStep(step) ? "Loading media…" : "Run"}</button>}{web && <>{!webPage.opened && webChecks}{webPage.show && <button type="button" className="show-page-button" onClick={webPage.show}>Show page</button>}{webPage.pageWindow(webChecks)}</>}{step.activity && !task && <><b>Student activity</b><Markdown markdown={step.activity.instruction} /><pre>{step.activity.expectedOutput}</pre></>}</details>}
-    {role === "teacher" && task?.solution && <details className="answer-key"><summary>Answer key (teacher only)</summary>
-      <p className="module-preview-note">Only your teacher account sees this. It is never sent to a student.</p>
-      {task.solution.note && <Markdown markdown={task.solution.note} />}
-      <pre><code>{task.solution.lines}</code></pre>
-    </details>}
     <JavaRunnerBrand />{output !== null && <pre className="module-step-output" role="alert">{output}</pre>}
     {step.checkYourself && <div className="module-check-yourself"><Markdown markdown={step.checkYourself} /></div>}
   </div>;

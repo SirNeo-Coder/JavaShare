@@ -148,14 +148,16 @@ CodeShare works nothing out and compares nothing:
   "instruction": "Change the removal from index 1 to index 3. Keep the other output lines.",
   "expectedOutput": "the complete, verified output after the alteration",
   "solution": {
-    "lines": "line 8:  numbers.remove(3);\nline 10: System.out.println(numbers);",
-    "note": "Optional markdown: what to point out while explaining it."
+    "lines": "Main.java, line 8 \u2014 replace the removal:\n            numbers.remove(3);",
+    "note": "Why it answers the task, in plain English: what the changed line does and how that produces the expected output."
   }
 }
 ```
 
 `lines` is plain text (at most 5000 characters), shown exactly as written in a collapsed
-**Answer key (teacher only)** panel under the step, with `note` above it. It needs the task's own
+**Answer key (teacher only)** panel directly under **Your task** and **Expected task output**, with
+`note` under it as **Why this answers the task**. Name the file and the line numbers in `lines`
+yourself; CodeShare neither checks nor renumbers them. It needs the task's own
 `activity.id`, or the upload is refused: without an id the worksheet would never show the panel.
 CodeShare removes `solution` from every student view, open or locked step alike, and it is not a
 progress id. Keep the complete solved files in your own week folder as before; the panel is for

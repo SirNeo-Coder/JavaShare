@@ -104,10 +104,10 @@ What teachers and students can do today. Keep this page current when their use o
   and allow one final newline (Java println). Failed exploratory runs retain earlier passes.
 - **Answer key (2026-11-11, simplified 2026-11-12):** when a module's JSON gives a task an
   `activity.solution`, the teacher's worksheet shows a collapsed **Answer key (teacher only)** panel
-  under that step: the optional note, then the answer lines exactly as the teacher wrote them in the
-  module file. CodeShare compares nothing and runs nothing here. Students never receive it: the
+  directly under **Your task** and **Expected task output**: the answer lines exactly as the teacher
+  wrote them in the module file, then **Why this answers the task** with the explanation. CodeShare compares nothing and runs nothing here. Students never receive it: the
   server strips it from every student view, and an answer without the task's `activity.id` is
-  refused at upload.
+  refused at upload. Week 15 is the first module with answers (ten tasks).
 - Explicit alteration tasks open one step at a time; legacy samples open one part at a time.
   Locked content and premature requests are refused server-side. Reopening resumes unfinished work.
   Handwritten liplets are assessed separately and do not gate progress. Teacher availability

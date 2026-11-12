@@ -342,13 +342,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Teacher-only answer key (agreed 2026-11-11, simplified 2026-11-12)
 
 - A step's task may carry `activity.solution` in the module JSON: `lines` (the changed lines, plain
-  text, written by the teacher) and an optional `note`. This replaces the earlier rule that task
+  text, written by the teacher, naming the file and line numbers) and `note`, the plain-English
+  explanation of why it answers the task. This replaces the earlier rule that task
   answer files never go in the JSON. CodeShare compares nothing and never runs the answer; the
   complete solved files stay in the teacher's week folder.
 - Only a teacher account ever receives it. The server strips it from every student view, open or
   locked step alike, and it never joins a student project or a performance submission.
 - An answer needs the task's own `activity.id`; an upload without one is refused.
 - The module worksheet shows it to the teacher in a collapsed **Answer key (teacher only)** panel
-  under the step, exactly as the module file wrote it.
+  directly under **Your task**, exactly as the module file wrote it, with the explanation under
+  **Why this answers the task**.
+- Week 15 carries answers for all ten tasks, taken from the verified task edits; a test checks every
+  quoted line really sits at the line number the answer gives.
 - Upload answer-bearing modules only after the app change is live; an older server would send them
   to students.
