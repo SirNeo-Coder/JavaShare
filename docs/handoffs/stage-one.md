@@ -1444,4 +1444,9 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   assistant edits - had been swept into the answer-key commit and reached `main`. It is now untracked
   and `/.claude/` is in `.gitignore`, so it stops blocking pulls and dirtying the working tree. The
   teacher's laptop checkout is on `main` and builds; its own 45-entry copy was restored locally.
+- CodeRabbit on PR #103 (2026-11-11 23:22, review cancelled when the teacher merged at 03:47): one
+  Minor finding, valid and fixed on `fix/week15-answer-null-wording`. The Week 15 Step 2 explanation
+  claimed the null guard prevents a crash; real Java shows `Arrays.toString(null)` prints the word
+  `null`, so the explanation now says the guard replaces it with `[]`, which is what the expected
+  output asks for. Teaching content only, no code change.
 
