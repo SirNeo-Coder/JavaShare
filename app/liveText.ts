@@ -91,6 +91,14 @@ export function shareModuleLive(role: string | undefined, team: { isGroup: boole
   return role === "student" && watching && Boolean(team) && !team!.isGroup && !team!.isTeacherWorkspace;
 }
 
+// The open project a student's live help sends: their module or personal project, or the class step
+// their teacher shared (CKB-114). A teacher's own preview or review is never sent.
+export function liveProjectKind(activity: { kind: string; shared?: boolean } | null | undefined) {
+  if (!activity) return null;
+  if (activity.kind === "module" || activity.kind === "performance") return activity.kind;
+  return activity.kind === "preview" && activity.shared ? "preview" : null;
+}
+
 export function teacherWatching(presence: Record<string, unknown[]>) {
   return Object.values(presence).flat().some((entry) => (entry as { teacher?: unknown }).teacher === true);
 }
