@@ -146,10 +146,11 @@ export function webPageOutput(page: { title: string; text: string }) {
 
 // What a web module step compares: console lines when the run file is .js, otherwise the page text.
 // Any uncaught error, or a page that never finished, makes the run unsuccessful.
+// lines: every console line, kept so the page window can show them whatever the run file (CKB-117).
 // includeMedia: the step's includeMediaOutput, which appends the media lines like the teacher's checker.
 export function webRunResult(mode: "page" | "console", run: { lines: string[]; errors: string[]; page?: { title: string; text: string; checks?: WebCheckSeen[]; media?: string[] } }, includeMedia = false) {
   const error = run.errors.length ? `Uncaught error: ${run.errors[0]}` : run.page ? undefined : "The page did not finish loading within 5 seconds. Keep the page preview on screen and run again.";
   const media = run.page?.media ?? [];
   const pageText = run.page ? webPageOutput(run.page) + (includeMedia && media.length ? `\nMedia checks:\n${media.join("\n")}` : "") : "";
-  return { mode, success: !error, output: mode === "console" ? run.lines.join("\n") : pageText, checks: run.page?.checks ?? [], media, ...(error ? { error } : {}) };
+  return { mode, success: !error, output: mode === "console" ? run.lines.join("\n") : pageText, checks: run.page?.checks ?? [], media, lines: run.lines, ...(error ? { error } : {}) };
 }

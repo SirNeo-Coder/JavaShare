@@ -271,6 +271,9 @@ evidence, checked by the server against its own expected output and the saved ve
   rejection). `expectedError` and Program input do not apply to web steps.
 - **Result.** A checklist with one line per check (**Page text matches** or **Console output
   matches**), ticked or crossed; a cross shows **Required output** and **Your output** side by side.
+  Under it a **Console** box lists every line `console.log` printed in that run, whatever the run file
+  (2026-11-12, CKB-117): students never use the browser's own console. A page that printed nothing
+  shows no box; a `.js` run that printed nothing says so. Web personal projects show the same box.
 - **No internet.** The page runs under the same no-internet rule as the teacher viewer, like the
   course-building checker: links, scripts, pictures, fonts and `fetch` to other sites do not load.
   Pictures and fonts can only be embedded in the file (`data:`).

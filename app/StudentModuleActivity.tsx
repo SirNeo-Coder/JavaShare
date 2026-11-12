@@ -9,7 +9,7 @@ import JavaRunnerBrand from "./JavaRunnerBrand";
 import { ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
 import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
-import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
+import { WebCheckList, WebConsole, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
 import { liveActivityKey } from "./liveText";
@@ -425,8 +425,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     setPath(entered); setNewPath(""); setAddingFile(false); setFileError(""); setError("");
   };
 
-  // Shown in the floating page window while it is open, otherwise in the side panel.
-  const webResults = personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
+  // Shown in the floating page window while it is open, otherwise in the side panel. A personal page that printed nothing
+  // and raised no error shows no panel, so it keeps the window's full width (CKB-112, CKB-117).
+  const webResults = personal ? (webResult?.error || webResult?.lines?.length) ? <>{webResult.error && <p className="module-error" role="alert">{webResult.error}</p>}<WebConsole result={webResult} /></> : null
     : <WebCheckList result={webResult} expected={shownAsSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
       webChecks={shownAsSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />;
 
