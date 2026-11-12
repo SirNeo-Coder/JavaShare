@@ -12,7 +12,7 @@ import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
 import { MEDIA_LIMIT, mediaPathType, moduleWebPathError } from "../backend/src/file-paths.ts";
 import { buildTeacherPreview } from "../app/teacherWebPreview.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
-const { WebCheckList } = tsxRequire("../app/WebStepRun.tsx", import.meta.url);
+const { WebCheckList, WebConsole } = tsxRequire("../app/WebStepRun.tsx", import.meta.url);
 const { default: StudentModuleActivity } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
 
 const page = (title, body) => `<!doctype html>\n<html>\n<head>\n  <title>${title}</title>\n</head>\n<body>\n${body}\n</body>\n</html>\n`;
@@ -41,7 +41,7 @@ test("web check rule: page text is the tab title then the visible text with blan
   const output = webPageOutput({ title: "School Canteen", text: "\n School Canteen\n\nWelcome\n\n\nFood choices\nPandesal\n" });
   assert.equal(output, "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome\nFood choices\nPandesal");
   const result = webRunResult("page", { lines: ["ignored console line"], errors: [], page: { title: "School Canteen", text: "School Canteen\n\nWelcome" } });
-  assert.deepEqual(result, { mode: "page", success: true, output: "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome", checks: [], media: [] });
+  assert.deepEqual(result, { mode: "page", success: true, output: "Tab title: School Canteen\nVisible page text:\nSchool Canteen\nWelcome", checks: [], media: [], lines: ["ignored console line"] });
   assert.equal(matchesActivityOutput(result, "Tab title: School Canteen\r\nVisible page text:\r\nSchool Canteen\r\nWelcome\r\n"), true, "Windows line endings and one final line break are ignored");
 });
 
@@ -65,7 +65,7 @@ test("web check rule: an uncaught error or a page that never finished makes the 
 
 test("web check rule: a .js run file compares the console lines, joined with line breaks", () => {
   const result = webRunResult("console", { lines: ["Total: 5", "Done"], errors: [], page: { title: "", text: "" } });
-  assert.deepEqual(result, { mode: "console", success: true, output: "Total: 5\nDone", checks: [], media: [] });
+  assert.deepEqual(result, { mode: "console", success: true, output: "Total: 5\nDone", checks: [], media: [], lines: ["Total: 5", "Done"] });
   assert.equal(matchesActivityOutput(result, "Total: 5\nDone\n"), true);
   assert.equal(matchesActivityOutput(result, "Total: 5"), false);
   const thrown = webRunResult("console", { lines: ["Total: 5"], errors: ["boom"], page: { title: "", text: "" } });
@@ -161,6 +161,20 @@ test("web check list: a tick when it matches; a cross with Required output and Y
   assert.match(failed, /web-check-compare"><div><b>Required output<\/b><pre>Total: 5<\/pre><\/div><div><b>Your output<\/b><pre aria-label="Your output">Total: 4<\/pre>/);
   assert.match(failed, /role="alert">Uncaught error: boom/);
   assert.match(renderToStaticMarkup(createElement(WebCheckList, { result: null, expected: "x", teacherChecked: true })), /Checked by your teacher for now/);
+});
+
+test("web console (CKB-117): the page window shows every console.log line after a passing run, whatever the run file", () => {
+  const consoleRun = webRunResult("console", { lines: ["Two-Player Battle Game", "Health: 100"], errors: [], page: { title: "", text: "" } });
+  const passed = renderToStaticMarkup(createElement(WebCheckList, { result: consoleRun, expected: "Two-Player Battle Game\nHealth: 100" }));
+  assert.match(passed, /Console output matches/);
+  assert.doesNotMatch(passed, /Your output/, "a passing run has no side-by-side comparison");
+  assert.match(passed, /<b>Console<\/b><pre aria-label="Console lines">Two-Player Battle Game\nHealth: 100<\/pre>/);
+  const pageRun = webRunResult("page", { lines: ["printed while the page opened"], errors: [], page: { title: "A", text: "A" } });
+  assert.match(renderToStaticMarkup(createElement(WebCheckList, { result: pageRun, expected: "Tab title: A\nVisible page text:\nA" })), /aria-label="Console lines">printed while the page opened</, "a page-text run still shows its console lines");
+  const silent = webRunResult("page", { lines: [], errors: [], page: { title: "A", text: "A" } });
+  assert.doesNotMatch(renderToStaticMarkup(createElement(WebCheckList, { result: silent, expected: "x" })), /Console lines/, "an HTML page that printed nothing shows no console box");
+  const empty = webRunResult("console", { lines: [], errors: ["boom"], page: { title: "", text: "" } });
+  assert.match(renderToStaticMarkup(createElement(WebConsole, { result: empty })), /Nothing was printed with console.log\./);
 });
 
 test("module editor for a web step: HTML editor on index.html, page preview instead of the Java console, no Program input", () => {

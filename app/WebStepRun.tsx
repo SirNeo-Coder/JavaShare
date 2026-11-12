@@ -61,7 +61,7 @@ export function useWebPageRun(busy: boolean) {
     const preview = mode === "console"
       ? buildTeacherPreview([...files, { path: WRAPPER, content: `<!doctype html><html><head></head><body><script src="${runPath.replace(/[^\w./-]/g, "")}"></script></body></html>` }], WRAPPER, checks, Boolean(media))
       : buildTeacherPreview(files, runPath, checks, Boolean(media), true);
-    if (!preview.html) { resolve({ mode, success: false, output: "", checks: [], media: [], error: preview.warnings[0] }); return; }
+    if (!preview.html) { resolve({ mode, success: false, output: "", checks: [], media: [], lines: [], error: preview.warnings[0] }); return; }
     const timer = setTimeout(() => pending.current?.finish(), 5000);
     pending.current = { lines: [], errors: [], finish: (page) => {
       clearTimeout(timer);
@@ -115,5 +115,14 @@ export function WebCheckList({ result, expected, teacherChecked = false, webChec
       <div><b>Required output</b><pre>{expected}</pre></div>
       <div><b>Your output</b><pre aria-label="Your output">{result.output}</pre></div>
     </div>}
+    <WebConsole result={result} />
   </div>;
+}
+
+// What console.log printed, shown after every run (CKB-117): students never use the browser's own console.
+// A page-text run that printed nothing shows no box, so HTML and CSS steps look as before.
+export function WebConsole({ result }: { result: WebRunResult | null }) {
+  const lines = result?.lines ?? [];
+  if (!result || (!lines.length && result.mode !== "console")) return null;
+  return <div className="web-console"><b>Console</b><pre aria-label="Console lines">{lines.length ? lines.join("\n") : "Nothing was printed with console.log."}</pre></div>;
 }

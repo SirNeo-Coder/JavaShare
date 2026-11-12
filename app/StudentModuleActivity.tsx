@@ -9,7 +9,7 @@ import JavaRunnerBrand from "./JavaRunnerBrand";
 import { ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
 import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
-import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
+import { WebCheckList, WebConsole, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
 import { liveActivityKey } from "./liveText";
@@ -426,7 +426,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   };
 
   // Shown in the floating page window while it is open, otherwise in the side panel.
-  const webResults = personal ? webResult?.error && <p className="module-error" role="alert">{webResult.error}</p>
+  const webResults = personal ? webResult && <>{webResult.error && <p className="module-error" role="alert">{webResult.error}</p>}<WebConsole result={webResult} /></>
     : <WebCheckList result={webResult} expected={shownAsSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
       webChecks={shownAsSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />;
 
