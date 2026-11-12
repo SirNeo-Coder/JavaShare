@@ -1428,7 +1428,8 @@ export default function Home() {
   }, [code, activeFile, user?.role, team?.isGroup]);
 
   useEffect(() => {
-    if (!moduleActivity) moduleMirrorRef.current = null;
+    // A student's closed project ends their mirror; a teacher's mirror is the watched student's and stays (CKB-116).
+    if (!moduleActivity && user?.role === "student") moduleMirrorRef.current = null;
     sendModuleSnapshot();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- resend only when watching or the open project changes
   }, [studentWatched, moduleActivity]);

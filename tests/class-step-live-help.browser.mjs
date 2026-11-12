@@ -114,6 +114,11 @@ test("class step live help: the teacher sees and edits the class step a student 
     await teacherPage.locator(".team-select").filter({ hasText: "Class live student" }).click();
     await helping.getByText("Live: Class live student · Class step · Week 60 · Step 1").waitFor();
     await teacherPage.waitForFunction(() => document.querySelector('[aria-label="Student live project"] textarea')?.value.includes("Away edit: "));
+    // Back with that student, the view is still live both ways, not a frozen copy (CodeRabbit on PR #108).
+    await studentEditor.fill(classEdit.replace('"Class edit: "', '"After return: "'));
+    await teacherPage.waitForFunction(() => document.querySelector('[aria-label="Student live project"] textarea')?.value.includes("After return: "));
+    await liveEditor.fill((await liveEditor.inputValue()).replace('"After return: "', '"Teacher help: "'));
+    await studentPage.waitForFunction(() => document.querySelector(".student-module-project .editor-card textarea")?.value.includes("Teacher help: "));
 
     // Stop sharing returns the student to their own project; the teacher's view follows. A late class-step edit
     // arriving after that is ignored, not typed into the student's own Main.java (CKB-115).

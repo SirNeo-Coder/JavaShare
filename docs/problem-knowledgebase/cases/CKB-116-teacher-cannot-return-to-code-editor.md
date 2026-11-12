@@ -22,16 +22,19 @@ cleared their live view, and the student never resent it (the teacher's watching
 - Before closing it, the teacher's preview is kept in memory with its current files (`teacherPreview`); never saved.
 - **Back to Week N · Step M** next to the workspace title reopens it exactly as it was. It is in the title column because the
   header grid has three columns: a fourth item wrapped out of sight and hid **Stop sharing**.
-- Reselecting the same student keeps their live project, which kept updating in the background.
+- Reselecting the same student keeps their live project, which kept updating in the background. Closing the
+  teacher's own editor no longer clears the hidden copy behind that view (the cleanup is for a student's own editor only),
+  so the view stays live both ways rather than freezing (CodeRabbit on PR #108).
 - Students are not touched: no re-share, their class step is not reset.
 
 ## Regression proof
 
 - `tests/class-step-live-help.browser.mjs` — real app, offline settings: the teacher edits their copy, opens a student, presses
   **Back to Week 60 · Step 1** and finds their edit; the student's class step is unchanged; the student types meanwhile and selecting
-  them again shows it live.
+  them again shows it live; their next typing reaches the teacher and the teacher's typing reaches them.
 - Shown failing: keeping the copy without the teacher's files ("the teacher's own edits are back"); clearing the live view on
-  reselect (the **Live:** card never returned). Restored: passes.
+  reselect (the **Live:** card never returned); clearing the hidden copy when the teacher's editor closed (the student's
+  "After return" typing never arrived). Restored: passes.
 - Display-only check: screenshot of the header shows **Back to Week 60 · Step 1**, **End session** and **Stop sharing** on one row.
 
 ## Recurrence triage
@@ -40,5 +43,7 @@ If the button is missing, check `teacherPreview` is set in the **Students / proj
 student's live card is blank after going back and forth, check `chooseTeam` keeps live state for the same team.
 
 ## History
+
+- 2026-11-12 — CodeRabbit on PR #108 (Major, valid): the reselected view froze; fixed with the teacher's approval.
 
 - 2026-11-12 — Teacher reported it while testing CKB-114, then asked to keep their edits; approved. Built and tested.
