@@ -77,6 +77,9 @@ test("class step live help: the teacher sees and edits the class step a student 
     await worksheet.getByRole("button", { name: /Step 1$/ }).first().click();
     await worksheet.locator("article:not([hidden])").getByRole("button", { name: "Work in code editor", exact: true }).click();
     await teacherPage.locator(".team-header").getByText("Week 60 · Step 1").waitFor();
+    // The teacher edits their own copy before looking at a student (CKB-116).
+    const teacherEditor = teacherPage.locator(".student-module-project").getByRole("textbox", { name: "Java source code editor", exact: true });
+    await teacherEditor.fill(sample.replace('"Capacity: "', '"Teacher demo: "'));
 
     await studentPage.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Class step"));
     const saved = async () => (await admin.from("module_progress").select("project_files,step_states,performance_task")
@@ -99,6 +102,18 @@ test("class step live help: the teacher sees and edits the class step a student 
     await liveEditor.fill((await liveEditor.inputValue()).replace('"Class edit two: "', '"Teacher help: "'));
     await studentPage.waitForFunction(() => document.querySelector(".student-module-project .editor-card textarea")?.value.includes("Teacher help: "));
     assert.match(await studentPage.locator(".student-module-project .workspace-card-heading b").first().innerText(), /^Class step/);
+
+    // Back to Week 60 · Step 1 reopens the teacher's own copy with their edits; the students' class step is untouched (CKB-116).
+    await teacherPage.getByRole("button", { name: "Back to Week 60 · Step 1" }).click();
+    await teacherPage.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Module preview"));
+    assert.match(await teacherEditor.inputValue(), /"Teacher demo: "/, "the teacher's own edits are back");
+    assert.match(await studentEditor.inputValue(), /"Teacher help: "/, "the student's class step was not reset");
+    // The student types while the teacher is away; selecting them again shows it.
+    await studentEditor.fill(classEdit.replace('"Class edit: "', '"Away edit: "'));
+    await teacherPage.getByRole("button", { name: "Students / projects", exact: true }).hover();
+    await teacherPage.locator(".team-select").filter({ hasText: "Class live student" }).click();
+    await helping.getByText("Live: Class live student · Class step · Week 60 · Step 1").waitFor();
+    await teacherPage.waitForFunction(() => document.querySelector('[aria-label="Student live project"] textarea')?.value.includes("Away edit: "));
 
     // Stop sharing returns the student to their own project; the teacher's view follows. A late class-step edit
     // arriving after that is ignored, not typed into the student's own Main.java (CKB-115).

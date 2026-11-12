@@ -1482,3 +1482,17 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   `teacher-live-help`, `class-shared-step`, `class-session`, `session-step-done` browser tests; `npm test` 466/466;
   `npm run build:all`; lint 0 errors (8 older warnings).
 - Not run: online (Cloudflare/CheerpJ) end to end; `npm run classroom:offline` itself (tests used its settings).
+
+## Back to the teacher's code editor — 2026-11-12 (CKB-116)
+
+- Branch: `fix/teacher-back-to-code-editor`, stacked on `fix/live-help-activity-label` (PR #107, still open). Teacher
+  report: after opening a student there was no way back to the shared **Work in code editor**; teacher asked to keep
+  their edits too. Approved.
+- Done: the teacher's preview is kept in memory with its edits when a student is opened (never saved); **Back to Week N ·
+  Step M** beside the workspace title reopens it. Reselecting the same student keeps their live view (it used to go blank).
+  The button sits in the title column: a fourth header item wrapped out of sight and hid **Stop sharing**.
+- Tested: `class-step-live-help.browser.mjs` extended; shown failing two ways (edits not kept; live view cleared on
+  reselect), passing restored. Also passing: `teacher-live-help`, `class-shared-step`, `class-session`,
+  `session-step-done`, `teacher-module-preview`, `workspace-drawers` browser tests; `npm test` 466/466;
+  `npm run build:all`; lint 0 errors (8 older warnings).
+- Not run: online (Cloudflare/CheerpJ) end to end; `npm run classroom:offline` itself; narrow laptop screens (checked at 1500 px wide).
