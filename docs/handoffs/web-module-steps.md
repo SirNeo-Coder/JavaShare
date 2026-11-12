@@ -775,8 +775,10 @@ next free number first.
 
 Last step (rolling prompt): in docs/handoffs/web-module-steps.md, section "Rolling weekly prompt — .NET 2", replace this
 prompt with the one for Week 2. Change every week number (Week 1 → 2, Week_01 → Week_02, dotnet-2-g01 → dotnet-2-g02,
-Week 01 section → Week 02 section); set "previousModuleId": "dotnet-2-g01" and "Week_02/project_start/ =
-Week_01/project_end/"; replace the topic and checks with Week 2's from the course map (variables, data types and
+Week 01 section → Week 02 section); replace "no previousModuleId (first week)" with "previousModuleId":
+"dotnet-2-g01" and add "Week_02/project_start/ = Week_01/project_end/"; replace the "Week 1 has no personal project"
+rule with the Week 2 personal project (it starts on Friday; the course map's personal-project and safe-details rules);
+replace the topic and checks with Week 2's from the course map (variables, data types and
 functions; the personal project, the student's own game, starts on Friday: add the personal-project rules and a
 personal-run check, as .NET 1's prompts had); add any rule I approved this week; keep everything else. The Week 10
 chat of .NET 2 writes no new prompt. Commit and push it, and paste it at the end of your final reply.
@@ -1203,3 +1205,5 @@ reference as clickable links. Then the Week 2 prompt.
   .NET 2" with the .NET 2 Week 1 prompt (JavaScript fundamentals, `Game/Week_01/`, `dotnet-2-g01`).
 - 2026-11-12 — Teacher: every task's answer goes in the JSON's teacher-only answer key; the "never in the module" rule
   is for the printed module only. Format section, .NET 2 Week 1 prompt and AGENTS.md updated.
+- 2026-11-12 — CodeRabbit on PR #110: the Week 1 prompt's last step now says to replace its two Week 1-only rules (no
+  personal project, no previousModuleId) when writing Week 2's prompt.
