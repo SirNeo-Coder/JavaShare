@@ -262,6 +262,8 @@ export default function Home() {
   const classChannelRef = useRef<RealtimeChannel | null>(null);
   const refreshLiveShareRef = useRef<(() => void) | null>(null);
   const [sharedStep, setSharedStep] = useState<SharedStep | null>(null);
+  // The teacher's Work in code editor, with their edits, kept in memory while they look at a student (CKB-116).
+  const [teacherPreview, setTeacherPreview] = useState<StudentActivity | null>(null);
   // Class session (teacher, 2026-11-10): started by Enter classroom; students follow the teacher's worksheet page.
   const [classSession, setClassSession] = useState<ClassSession>({ classroomId: "", active: false });
   const [teacherFollow, setTeacherFollow] = useState<ClassFollow | null>(null);
@@ -751,6 +753,8 @@ export default function Home() {
     setActiveSavedWork(null);
     setPreview(null);
     setPreviewLogs([]);
+    // Reselecting the same student keeps their live project: it kept updating while the teacher was away (CKB-116).
+    if (index === activeTeam) return;
     moduleMirrorRef.current = null;
     setModuleLive(null);
     setModuleCursors([]);
@@ -2447,7 +2451,12 @@ export default function Home() {
                   <button
                     className="team-select"
                     onClick={moduleActivity ? async () => {
-                      try { await moduleEditorRef.current?.save(); setModuleActivity(null); chooseTeam(index); }
+                      try {
+                        await moduleEditorRef.current?.save();
+                        const files = moduleActivity.kind === "preview" && user.role === "teacher" ? moduleEditorRef.current?.files() : undefined;
+                        if (files) setTeacherPreview({ ...moduleActivity, progress: { ...moduleActivity.progress, projectFiles: files } });
+                        setModuleActivity(null); chooseTeam(index);
+                      }
                       catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); }
                     } : () => chooseTeam(index)}
                     aria-expanded={item.isGroup ? groupExpanded : undefined}
@@ -2642,6 +2651,11 @@ export default function Home() {
                 <h1>{workspaceTitle}</h1>
                 <p>{workspaceSubtitle}</p>
               </div>
+              {user.role === "teacher" && teacherPreview && teacherPreview.classroomId === classroomId && !currentModuleProject && (
+                <button type="button" title="Your code editor, with your changes" onClick={() => { setModuleActivity(teacherPreview); setProjectsOpen(false); }}>
+                  Back to Week {teacherPreview.module.week} · Step {teacherPreview.module.lessons.flatMap((lesson) => lesson.blocks).find((block): block is StepBlock => block.type === "step" && "id" in block && block.id === teacherPreview.stepId)?.number}
+                </button>
+              )}
             </div>
             {user.role === "teacher" && session.active && (
               <div className="presence">

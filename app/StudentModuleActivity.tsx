@@ -24,7 +24,7 @@ export type StudentActivity = {
   // A preview's alteration task, shown under the sample to read (teacher, 2026-11-11).
   task?: { instruction: string; expectedOutput: string };
 };
-export type ModuleEditorHandle = { save: () => Promise<void>; applyEdit: (activityKey: string, path: string, edit: (content: string) => string) => void };
+export type ModuleEditorHandle = { save: () => Promise<void>; files: () => ModuleFile[]; applyEdit: (activityKey: string, path: string, edit: (content: string) => string) => void };
 // Teacher live help: the open file, typing and cursor go to the watching teacher; their cursor comes back.
 export type ModuleLiveLink = {
   cursors: ComponentProps<typeof CodeEditor>["remoteCursors"];
@@ -261,7 +261,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
     setFiles((current) => current.map((file) => file.path === editPath ? { ...file, content: edit(file.content) } : file));
     setSuccessfulFiles(null);
   };
-  useImperativeHandle(ref, () => ({ save, applyEdit }));
+  useImperativeHandle(ref, () => ({ save, files: () => files, applyEdit }));
   // A new snapshot only when the open file or editability changes; typing travels as edits.
   const sentFile = useRef("");
   useEffect(() => {
