@@ -393,8 +393,10 @@ task `dotnet-1-rNN-pt`. The retired canteen weeks used `dotnet-1-w01`…`w03`; n
   only (page checks apply to the sample), so the change must show in the page text or console lines.
   On a media step the task output keeps its `Media checks:` lines, and a task must not repair or remove a
   file listed in its step's `mediaChecks` (they apply to the task too; CKB-084).
-- **Task answers**: keep each task's answer files in `<week folder>/solutions/<step id>/` (never in the
-  JSON; students must not see them). Every task `expectedOutput` comes from running those files.
+- **Task answers**: keep each task's answer files in `<week folder>/solutions/<step id>/`; every task
+  `expectedOutput` comes from running those files. Each task also carries its answer in the JSON's teacher-only
+  answer key (`activity.solution`: `lines`, `note`), shown only on the teacher's side of the module. The printed
+  module never prints an answer (teacher, 2026-11-12).
 - **`previousModuleId`**: every week except Week 1 names the week before (`dotnet-1-r01` …). The module
   and personal projects carry forward, and a student must finish every task of the previous week
   before the next week opens.
@@ -667,6 +669,125 @@ task, so offline the teacher presses **Mark done** on media steps.
 
 Anyone starting the next .NET 2 course (JavaScript, `DotNet2_Course_Map.md`) should read "Net MVC weekly modules: required
 format and workflow" above: it is the format that produced these ten weeks.
+
+## Rolling weekly prompt — .NET 2
+
+The teacher pastes this into a new chat for the next .NET 2 week. Each week's chat replaces it with the next week's prompt
+as its last step, as in .NET 1. Current: **.NET 2 Week 1** (written 2026-11-12, after the Week 10 chat wrote none).
+
+```text
+Use caveman mode and ponytail (minimal, laziest working solution) for this whole chat.
+
+You are working in the CodeShare repository (formerly JavaShare) at /home/ireneo/Documents/GitHub/JavaShare.
+
+Task: build .NET 2 Week 1, "JavaScript fundamentals, statements, algorithm, flowchart and pseudocode" (DLL, printed
+module, CodeShare JSON), in my folder /home/ireneo/Documents/Java 2026/Net Files/Game/Week_01/. Only this week. This is
+the first week of a new course (.NET 2, JavaScript only, course id dotnet-2); it does not continue .NET 1's numbering.
+
+Before anything:
+1. Read AGENTS.md and follow it exactly (knowledge-first workflow, approval before changes, plain English,
+   test reporting rules, CodeRabbit review comments). Its "Web module steps", "Net MVC weekly modules", "Page window"
+   and "Teacher-only answer key" rules apply.
+2. Read docs/handoffs/web-module-steps.md in full. Follow "Net MVC weekly modules: required format and
+   workflow" (it produced all ten .NET 1 weeks). Its teacher decisions are approved; do not ask about them again.
+3. Read in my folder: DotNet2_Course_Map.md (Week 01 section, "Running project and personal project", "Delivery inside
+   CodeShare"), DotNet2_Handover.md, DotNet2_Battle_Game_Reference/ (index.html, style.css, game.js: Week 10's target;
+   Week 1 starts it), ILAW_DLL_and_Module_Playbook.md (sections 1, 2.1, 3, 4, 7, 8; its Java content does not apply),
+   Resume/Week_10/Verification.md (format only), and revision_tools/ (reuse resume_w01/build.py, resume_w10/content.py as
+   the template for a new game_w01/content.py, build_tasks.py (always with the week key), tasks.py, consistency.py,
+   render_r01.sh, run_checks.sh and the Resume/Week_10 checkers; extend them to the Game/ folder and the g01 key instead of
+   writing new ones, and never rebuild or change a Resume week).
+4. Another session may be working in the main repository folder with uncommitted changes. Never commit, stash,
+   discard or build on them. Use a separate git worktree from origin/main for any repository change. Pick free
+   ports.
+5. I merge pull requests quickly. Before every push to a PR branch, check the PR is still open
+   (gh pr view N --json state). If it is already merged, put the new commits on a new branch and open a new PR
+   against main.
+
+Week rules (check each against the real files first):
+- Game theme: module samples start the Two-Player Battle Game with the made-up players Juan (Sword) and Ana (Axe).
+  Week 1 adds the game page (heading, two player boxes, style.css) and game.js; comments and console.log print the title
+  and rules; one attack is written as an algorithm, a flowchart on paper and pseudocode comments. Keep the code a true
+  early version of the reference game (same names and wording where they already exist), so later weeks grow into it.
+- Week 1 has no personal project: Friday is the pseudocode lesson day, no performance task (teacher, 2026-11-06). The
+  student's own game starts on Week 2's Friday.
+- Everything happens inside CodeShare (CKB-085): never tell students to use VS Code, Chrome, Ctrl+O,
+  File > Open Folder, local folders, the browser's own console or developer tools. Before handing over, search the DLL,
+  module and JSON for "VS Code", "Visual Studio", "Chrome", "Ctrl+O", "F12", "DevTools" and "folder", and fix every hit.
+- No media files this week (the game uses none until the course map says so).
+- Game/Week_01/project_end/ holds the finished Week 1 game; Game/project/ matches it at the end.
+- JSON: "sampleFirst": true, no previousModuleId (first week). IDs: course dotnet-2, module dotnet-2-g01, lessons
+  dotnet-2-g01-dD, steps dotnet-2-g01-dD-sS (S counts across the week), slips dotnet-2-g01-dD-slip. Every step has one
+  meaningful task (activity id "<step id>-alter-v1", instruction, "files": [], complete expectedOutput) that changes the
+  visible page text or a console line; a comment or pseudocode task also changes a printed line. Answers in
+  Week_01/solutions/<step id>/ and in each task's teacher-only answer key (activity.solution: lines naming the
+  file and line numbers, and a note on why it answers the task), never in the printed module; every expected output
+  from a real run. No dotnet-1 id is reused.
+- Each step lists its run page and every file that page needs (index.html, style.css, game.js), even when unchanged,
+  and names its run page ("run"). Every attribute value is in quotes (CKB-094); every file sits in the project's top
+  folder (CKB-095).
+- Printed module: 8 lesson pages, then task pages after page 8 built with build_tasks.py g01. Printed module and JSON
+  identical in code and outputs (consistency.py). Watch each page's reported spare room and trim prose until every page
+  clears its footer.
+- DLL: Resume/Week_10's DLL is the format template (no resume text left): five opened references per day, a "Sample,
+  then your task:" line in each Student Activity, no red ADJUST THIS line, the guide Quarter 2 standards quoted in the
+  course map, the Learner Context rewritten for the battle game in CodeShare.
+- If the week needs something the CodeShare preview cannot do (handoff, "What the page preview can and cannot do"),
+  stop and propose an app change first.
+
+This week's checks (new: the first JavaScript week; check each with real runs before writing anything):
+- Console output: check with real runs exactly what CodeShare's expected output holds for a step whose run file is
+  index.html linking game.js (tab title and page text only, or also the console lines?) and for one whose run file is
+  game.js itself, online and offline, in my checker and in CodeShare's buildTeacherPreview. Pick the run file per step
+  from that, so every console.log a task changes is really checked.
+- Where console lines show: students see them in CodeShare's page window, never the browser's console. Check what the
+  page window shows for console.log of text, a number and several values, and for an uncaught error (the run fails).
+- Comments: comments never show in the output, so check that a comment-only change leaves the output unchanged (an
+  unchanged output must fail its task) and give each comment task a printed line as well.
+- Script loading: check a script tag with src="game.js" at the end of body and in head, a misspelled src (no error,
+  no output) and a missing quote or bracket in game.js (an uncaught SyntaxError fails the whole run). Thursday's hardest
+  problems must each change a printed line when repaired.
+- Flowchart (Thursday): drawn on paper and checked by the teacher; CodeShare checks only the box text printed in order.
+- Answer key: check every quoted answer line really sits at the line number it gives, as Week 15's test does.
+- The reference game has not yet been run inside CodeShare: run it once in the page window and record its page text and
+  console lines in Verification.md (it should end "Juan wins the match!").
+
+First, ask me only the questions whose answers change the files, each with your recommendation first, marked
+"(Recommended)". Then show me the day plan, every step with its task (one line each: step, change, why it
+exercises the lesson) and the AGENTS.md proposal (findings, files likely to change, steps, tests, risks, open
+choices), and stop for my approval.
+
+Testing (after approval):
+- My checkers in Week_01 (check_codeshare.py <json> --run, check_web_steps.cjs, test_checker.py) on the samples and every
+  solutions/ answer; each unchanged sample must fail its task output. Add Game Week 1 to revision_tools/run_checks.sh.
+- Render and inspect every DLL page and every module page (8.5 × 13 in = 612 × 936 pt; each source page renders
+  to exactly one page).
+- CodeShare: extend tests/web-module-steps.browser.mjs to read the built Game week too and walk its steps as a student
+  (sample verified, then task completed). Run it on Cloudflare's runtime on this laptop (npx opennextjs-cloudflare
+  build, then preview on port 8787 with the git-ignored .dev.vars pointing at local Supabase) and on the
+  offline-settings server (port 3042), following the handoff's "Testing recipe". Report one line per step.
+- Report tests as AGENTS.md "Reporting tests after a build" requires, including what could not be verified.
+
+While working: keep docs/handoffs/web-module-steps.md, Game/Week_01/Verification.md and DotNet2_Handover.md
+("Completed weeks") updated after every finished step, add a dated line to the handoff's "Update log", and commit and
+push the repository docs each time. If you find a bug, give it a CKB record; check problem-index.md and open PRs for the
+next free number first.
+
+Last step (rolling prompt): in docs/handoffs/web-module-steps.md, section "Rolling weekly prompt — .NET 2", replace this
+prompt with the one for Week 2. Change every week number (Week 1 → 2, Week_01 → Week_02, dotnet-2-g01 → dotnet-2-g02,
+Week 01 section → Week 02 section); replace "no previousModuleId (first week)" with "previousModuleId":
+"dotnet-2-g01" and add "Week_02/project_start/ = Week_01/project_end/"; replace the "Week 1 has no personal project"
+rule with the Week 2 personal project (it starts on Friday; the course map's personal-project and safe-details rules);
+replace the topic and checks with Week 2's from the course map (variables, data types and
+functions; the personal project, the student's own game, starts on Friday: add the personal-project rules and a
+personal-run check, as .NET 1's prompts had); add any rule I approved this week; keep everything else. The Week 10
+chat of .NET 2 writes no new prompt. Commit and push it, and paste it at the end of your final reply.
+
+When done, tell me in plain English: what each day covers, the print instructions (pages 1–6 double-sided, flip
+on long edge; pages 7–8 single-sided; task pages double-sided, flip on long edge), the upload steps (Curriculum →
+upload .NET 2 Week 1; it needs a class whose subject is Net MVC), anything I must check, and a Sources list of every
+reference as clickable links. Then the Week 2 prompt.
+```
 
 ## Update log
 
@@ -1080,3 +1201,9 @@ format and workflow" above: it is the format that produced these ten weeks.
   for these: documentation and one test assertion I wrote this week, not CodeShare bugs. **Week 9's rebuild also rewrites the
   shared `Resume/project/`, which Week 10 now owns** — it was snapshotted before the rebuild and restored after, and verified
   identical to `Week_10/project_end` again.
+- 2026-11-12 — The Week 10 chat wrote no prompt (as told), so no .NET 2 prompt existed. Added "Rolling weekly prompt —
+  .NET 2" with the .NET 2 Week 1 prompt (JavaScript fundamentals, `Game/Week_01/`, `dotnet-2-g01`).
+- 2026-11-12 — Teacher: every task's answer goes in the JSON's teacher-only answer key; the "never in the module" rule
+  is for the printed module only. Format section, .NET 2 Week 1 prompt and AGENTS.md updated.
+- 2026-11-12 — CodeRabbit on PR #110: the Week 1 prompt's last step now says to replace its two Week 1-only rules (no
+  personal project, no previousModuleId) when writing Week 2's prompt.
