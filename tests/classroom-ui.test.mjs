@@ -78,6 +78,43 @@ test("module worksheet: alteration instructions and target stay separate from th
   assert.match(html, /Capacity: 20/); assert.match(html, /Capacity: 25/);
 });
 
+test("module worksheet: the answer key shows the module's own answer lines, and only to the teacher", () => {
+  const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
+  const step = course.lessons[0].blocks[0];
+  step.activity.id = "capacity-change";
+  step.activity.solution = {
+    lines: 'Jeepney.java, line 3: public int getCapacity() { return 25; }',
+    note: "The task prints the capacity through the parent class, so changing what Jeepney returns changes the printed line.",
+  };
+  const teacher = renderToStaticMarkup(createElement(ModuleContent, { module: course, classroomId: "local-test", role: "teacher", worksheet: true }));
+  const panel = teacher.match(/<details class="answer-key">([\s\S]*?)<\/details>/);
+  assert.ok(panel, "the teacher worksheet has an Answer key panel");
+  assert.match(panel[1], /Answer key \(teacher only\)/);
+  assert.match(panel[1], /Why this answers the task/);
+  assert.match(panel[1], /changing what Jeepney returns changes the printed line/);
+  assert.match(panel[1], /Jeepney\.java, line 3: public int getCapacity\(\) \{ return 25; \}/, "the answer appears exactly as the module file wrote it");
+  assert.doesNotMatch(panel[1], /Load answer/, "nothing is loaded or worked out here");
+  // The panel sits directly under Your task / Expected task output, where the teacher is reading.
+  const page = teacher.slice(teacher.indexOf("Expected task output"));
+  assert.ok(page.indexOf('<details class="answer-key">') < page.indexOf("Preview sample code"),
+    "the answer key comes before Work in code editor and Preview sample code");
+
+  // The student worksheet is served without the answer key (tests/module-activities.test.mjs);
+  // the panel is also behind the teacher role here.
+  assert.match(readFileSync(new URL("../app/ModuleViewer.tsx", import.meta.url), "utf8"),
+    /role === "teacher" && task\?\.solution && <details className="answer-key">/);
+});
+
+test("module worksheet: a sample preview run carries the module's supporting classes (CKB-113)", () => {
+  const { mergeProjectFiles } = tsxRequire("../backend/src/module-activities.ts", import.meta.url);
+  const support = [{ path: "Vehicle.java", content: "abstract class Vehicle {}" }, { path: "src/Jeepney.java", content: "class Jeepney {}" }];
+  const files = [{ path: "Jeepney.java", content: "class Jeepney { int c = 25; }" }, { path: "Main.java", content: "class Main {}" }];
+  assert.deepEqual(mergeProjectFiles(support, files), [support[0], ...files],
+    "supporting classes join the run; the step's own file wins, and src/Jeepney.java is the same file as Jeepney.java");
+  assert.match(readFileSync(new URL("../app/ModuleViewer.tsx", import.meta.url), "utf8"),
+    /const runnable = mergeProjectFiles\(support, files\);/, "the preview run uses CodeShare's own merger");
+});
+
 test("module parts: a locked next task does not hide the current task's discussion", () => {
   const course = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url), "utf8"));
   course.lessons.forEach((lesson) => { lesson.blocks[0].part = "Vehicle"; });

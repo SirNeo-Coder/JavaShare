@@ -143,6 +143,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d1-s1-alter-v1",
+            "solution": {
+              "lines": "Main.java, line 12 — add one line after the \"Created now?\" line, inside the same try:\n            System.out.println(\"Created again? \" + report.createNewFile());",
+              "note": "createNewFile() only makes a file that is not there yet, and it answers true only when it made one. The first call finds nothing and makes fleet.txt, so it prints true; the second call finds the file it just made, leaves it alone and prints false. That is the Created again? false line in the expected output, and it is also why Size in bytes stays 0 — a refused call writes nothing."
+            },
             "instruction": "Create fleet.txt twice in the same run. Immediately after printing Created now, call createNewFile() again and print \"Created again? \" followed by its boolean result. Start in a clean exercise folder.",
             "files": [],
             "expectedOutput": "File name: fleet.txt\nExists before? false\nCreated now? true\nCreated again? false\nExists after? true\nIs a file? true\nSize in bytes: 0",
@@ -253,6 +257,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d1-s2-alter-v1",
+            "solution": {
+              "lines": "Main.java, lines 26-28 — replace the \"Left inside\" line with these three:\n        System.out.println(\"Delete trips.txt? \" + trips.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());\n        System.out.println(\"Left inside: \" + Arrays.toString(folder.list() == null ? new String[0] : folder.list()));",
+              "note": "delete() answers true only when it really removed something, and a folder refuses to go while anything is still inside it. Deleting trips.txt first empties records, so the folder's own delete() then succeeds; in the other order it would print false. Once the folder is gone there is nothing to list, so folder.list() returns null. Arrays.toString(null) does not crash — it prints the word null — so without the guard the last line would read Left inside: null. The guard puts an empty array in its place, which is the Left inside: [] the expected output asks for."
+            },
             "instruction": "After deleting old_log.txt twice, delete trips.txt and print \"Delete trips.txt? \" plus the result. Then delete the folder and print \"Delete the folder? \" plus the result, then print what is left inside it. Print an empty array if folder.list() is null because the folder was deleted. Start with a clean records folder.",
             "files": [],
             "expectedOutput": "Folder made? true\nIs a folder? true\nInside records: [old_log.txt, trips.txt]\nDelete old_log.txt? true\nDelete it again? false\nDelete trips.txt? true\nDelete the folder? true\nLeft inside: []",
@@ -364,6 +372,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d2-s3-alter-v1",
+            "solution": {
+              "lines": "Main.java, line 7 — rename the counter:\n        int newlines = 0;\n\nMain.java, line 13 — count inside the branch that already spots the line break, just before firstDone = true;:\n                    newlines++;\n\nMain.java, lines 14-15 — delete the comma branch:\n                } else if (ch == ',') {\n                    commas++;\n\nMain.java, line 25 — the printed label:\n        System.out.println(\"Newline characters in the file: \" + newlines);",
+              "note": "The loop already stops at every line break, because that is how it knows the first line has ended. Counting there means the newline is counted exactly once per line, and the comma branch then has no job left, so it goes along with the counter it used. fleet.txt holds four lines, each ending with a newline, which is why the answer is 4."
+            },
             "instruction": "Keep fleet.txt unchanged. Count newline characters instead of commas. Rename the counter to newlines and its final printed label to \"Newline characters in the file: \". The supplied file ends with a newline.",
             "files": [],
             "expectedOutput": "First line: Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nNewline characters in the file: 4",
@@ -425,6 +437,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d2-s4-alter-v1",
+            "solution": {
+              "lines": "Main.java, lines 26-27 — replace the single add with two lines:\n                    Vehicle vehicle = toVehicle(line);\n                    if (vehicle instanceof Bus) fleet.add(vehicle);",
+              "note": "Every line is still parsed by toVehicle(line), so the reading part of the program is unchanged; naming the result is what lets the if decide whether it joins the list. instanceof Bus is true only for a bus record, so only buses reach the list, and because the printed count is taken from the list, the count and the printed list always agree."
+            },
             "instruction": "Load the unchanged four-line fleet file. Before adding a parsed vehicle to the list, include only Bus objects. The loaded count and printed list must reflect filtering, not edited labels.",
             "files": [],
             "expectedOutput": "Loaded 1 vehicles from fleet.txt\nBUS 789 | Driver: Aling Rosa | Passengers: 0/50",
@@ -570,6 +586,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d3-s5-alter-v1",
+            "solution": {
+              "lines": "Main.java, lines 11-15 — replace the two lines that add every fare:\n                double fare = sc.nextDouble();\n                if (fare >= 15.00) {\n                    total = total + fare;\n                    count++;\n                }",
+              "note": "Reading the fare into its own variable is what makes it possible to look at it before using it. Both total and count then sit inside the if, so a fare under P15.00 changes neither of them, and the average — total divided by count — is taken over the accepted fares only. Reading first also keeps the Scanner moving through every number in the file, so nothing is left unread."
+            },
             "instruction": "Keep fares.txt unchanged. Read each number, then count and add it only when the fare is at least P15.00. Compute the average from the accepted fares.",
             "files": [],
             "expectedOutput": "Fares read: 3\nTotal collected: P63.0\nAverage fare: P21.00",
@@ -635,6 +655,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d3-s6-alter-v1",
+            "solution": {
+              "lines": "Main.java, line 14 — replace the blank-line test:\n            if (line.startsWith(\"Tricycle,\")) {",
+              "note": "A line that begins with \"Tricycle,\" cannot be blank, so startsWith does the blank-line check and the new check at the same time; one condition replaces two. The method still takes the same three inputs — a String, a file and an empty String — so only the counted lines change, not how the counting is called."
+            },
             "instruction": "Change countVehicles so it counts only nonblank lines beginning with \"Tricycle,\". Use the same String, file and empty-String inputs.",
             "files": [],
             "expectedOutput": "From a String: 1\nFrom fleet.txt: 1\nFrom an empty String: 0",
@@ -762,6 +786,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d4-s7-alter-v2",
+            "solution": {
+              "lines": "Main.java, lines 24-27 — delete these four lines, so both writes happen inside the first try:\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        try (FileWriter out = new FileWriter(\"trip_log.txt\")) {   // same file again",
+              "note": "Both writes went to the same file name, and opening a FileWriter in overwrite mode empties the file the moment it opens, so the second writer wiped the first trip. Deleting the catch and the second try leaves one writer, opened once, with both write calls inside it: the file is emptied once and then receives both lines in order. The catch that follows still covers them, so the program is as safe as before."
+            },
             "instruction": "Keep overwrite mode, but make the first trip survive: write both trips through the first FileWriter. Move the second write call into the first try block and delete the second FileWriter block.",
             "files": [],
             "expectedOutput": "--- trip_log.txt ---\nNXA 123 left Monumento\nTRC 456 left Bagong Silang",
@@ -823,6 +851,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d4-s8-alter-v2",
+            "solution": {
+              "lines": "Main.java, line 33 — delete the line that writes the old text back:\n            out.write(old);                                 // keep what was there",
+              "note": "This step's FileWriter overwrites, so whatever is already in trip_log.txt is gone as soon as it opens. Writing the old text back was the only thing restoring it. Without that line the file keeps just the two new trips, which is why the Tricycle line written in Step 7 is missing from the final file — the point the task is making about overwrite mode."
+            },
             "instruction": "Begin with the original Step 7 log containing the Tricycle line. Make Step 8 overwrite instead: stop writing the old lines back. Keep its two new write calls; the old Tricycle line must disappear.",
             "files": [],
             "expectedOutput": "--- trip_log.txt ---\nBUS 789 left Caloocan\nNYB 321 left Sangandaan",
@@ -884,6 +916,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d4-s9-alter-v1",
+            "solution": {
+              "lines": "Main.java, line 52 — replace the extra Tricycle with a Bus:\n        fleet.add(new Bus(\"BUS 654\", \"Mang Lito\", 30));",
+              "note": "Only the fifth vehicle changes, so the saving and loading code is untouched and still writes one line per vehicle and reads it back the same way. A Bus writes a seat count where a Tricycle wrote a TODA name, so the reloaded list shows BUS 654 with 30 seats in the fifth position — the object really came back from the file, not from memory."
+            },
             "instruction": "Load the original four vehicles. Replace the extra Tricycle with new Bus(\"BUS 654\", \"Mang Lito\", 30). Save and reload exactly as before; the final object must have capacity 30.",
             "files": [],
             "expectedOutput": "Loaded from fleet.txt: 4\nSaved to fleet_backup.txt: 5\nReloaded: 5\nBUS 654 | Driver: Mang Lito | Passengers: 0/30",
@@ -954,6 +990,10 @@
         ,
           "activity": {
             "id": "java-2-w15-d4-s10-alter-v1",
+            "solution": {
+              "lines": "Main.java, lines 17-20 — add the skip right after the split, before count++:\n                if (!part[0].equals(\"Bus\")) {\n                    line = in.readLine();\n                    continue;\n                }",
+              "note": "The line has already been split, so part[0] says what kind of record it is. Skipping the non-bus lines before count++ keeps the count equal to the number of bus lines actually saved. Reading the next line before continue is what stops the loop from meeting the same line again and again — continue goes straight back to the test, so without that read the program would never finish."
+            },
             "instruction": "Use the original Step 9 backup with five vehicles. Build and save a report containing only Bus records. Skip other lines before increasing count; keep numbering consecutive.",
             "files": [],
             "expectedOutput": "DAILY FLEET REPORT\n1. BUS 789 (Bus) - Aling Rosa\nTotal vehicles: 1\nreport.txt size: 67 bytes",

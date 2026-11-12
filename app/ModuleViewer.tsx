@@ -10,7 +10,7 @@ import { runJava } from "./javaExecution";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { groupModuleParts, modulePartPages, moduleResumeStep } from "./moduleParts";
 import { paperPerformanceTask } from "../backend/src/personal-performance";
-import { activityStateId, checkableStep, teacherCheckedStep, webStep, type MediaCheck, type WebCheck } from "../backend/src/module-activities";
+import { activityStateId, checkableStep, mergeProjectFiles, teacherCheckedStep, webStep, type MediaCheck, type WebCheck } from "../backend/src/module-activities";
 import { WebCheckList, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import ModuleCatalogCard from "./ModuleCatalogCard";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
@@ -47,7 +47,7 @@ async function runFiles(files: ModuleFile[], stdin = "") {
 export type ModuleFile = { path: string; content: string };
 export type StepBlock = {
   locked?: boolean;
-  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string };
+  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string; solution?: { lines: string; note?: string } };
   part?: string;
   type: "step";
   id: string;
@@ -238,9 +238,9 @@ export function ModuleMediaFiles<T>({ base, files, note, onChange }: { base: str
   </section>;
 }
 
-function StepView({ step, status, role, printed = false, sampleFirst = false, onStart, media = {}, mediaLoading = false }: {
+function StepView({ step, status, role, printed = false, sampleFirst = false, onStart, support = [], media = {}, mediaLoading = false }: {
   step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; sampleFirst?: boolean; onStart?: () => Promise<void>;
-  media?: Record<string, string>; mediaLoading?: boolean;
+  support?: ModuleFile[]; media?: Record<string, string>; mediaLoading?: boolean;
 }) {
   const [files, setFiles] = useState(step.files);
   const [output, setOutput] = useState<string | null>(null);
@@ -252,7 +252,10 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
   const [webResult, setWebResult] = useState<WebRunResult | null>(null);
   const run = async () => {
     setBusy(true);
-    try { if (role === "student") await onStart?.(); else if (web) setWebResult(await webPage.run(files, step.run, step.webChecks, mediaRun)); else setOutput(await runFiles(files, step.stdin ?? "")); }
+    // The module's supporting classes join the run so the sample compiles, merged the same way as a
+    // student's Module project, so src/Main.java and Main.java stay one file (CKB-113).
+    const runnable = mergeProjectFiles(support, files);
+    try { if (role === "student") await onStart?.(); else if (web) setWebResult(await webPage.run(runnable, step.run, step.webChecks, mediaRun)); else setOutput(await runFiles(runnable, step.stdin ?? "")); }
     catch (error) { setOutput(error instanceof Error ? error.message : "Could not open this activity"); }
     finally { setBusy(false); }
   };
@@ -266,6 +269,11 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>
     <b>{task ? "Sample output" : "Output (expected):"}</b><pre className="printed-output">{step.expectedOutput}</pre>
     {task && <div className="paper-instructions"><b>Your task</b><Markdown markdown={task.instruction} /><b>Expected task output</b><pre className="printed-output">{task.expectedOutput}</pre></div>}
+    {role === "teacher" && task?.solution && <details className="answer-key"><summary>Answer key (teacher only)</summary>
+      <p className="module-preview-note">Only your teacher account sees this. It is never sent to a student.</p>
+      <pre><code>{task.solution.lines}</code></pre>
+      {task.solution.note && <><b>Why this answers the task</b><Markdown markdown={task.solution.note} /></>}
+    </details>}
     {role === "student" && <div className="paper-instructions">
       <p>{task && sampleFirst ? "Work in code editor loads this step's sample on first opening. Run the sample unchanged to verify it, then make the changes in Your task and Run code again. A matching task run completes this step and unlocks the next activity. Reopening a started step restores your saved edits." : task ? "Continue in your saved module project. Make the changes in Your task, then Run code. Successful execution matching Expected task output completes this task and unlocks the next step." : "Use the sample code above in your module project. Run it successfully with the exact expected output to complete this step."}</p>
       {teacherChecked && <p><b>Checked by your teacher for now.</b> Your teacher marks this step done after looking at your page.</p>}
@@ -455,7 +463,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
               {!page.part.blocks.some(isStepBlock) && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}
             </>}
           </>}
-          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed sampleFirst={module.sampleFirst} media={media} mediaLoading={mediaLoading} step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={onStartActivity && (() => onStartActivity(module, page.step!))} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
+          {page.step && <><h3 className="paper-heading">{page.label}</h3><StepView printed sampleFirst={module.sampleFirst} support={module.starterFiles ?? []} media={media} mediaLoading={mediaLoading} step={page.step} status={progress.stepStates[activityStateId(page.step)]} role={role} onStart={onStartActivity && (() => onStartActivity(module, page.step!))} />{page.blocks.map((block, index) => <ModulePaperBlock key={index} block={block as OtherBlock} />)}{page.part.blocks.filter(isStepBlock).at(-1)?.id === page.step.id && page.part.exitLessons.map((lesson) => <div key={lesson.id} className="module-exit-slip"><b>LIPLET · {lesson.dayLabel || lesson.title}</b>{lesson.exitSlip.questions.map((question) => <p key={question.id}>{question.id}. {question.prompt}</p>)}{role === "student" && <p>Write your liplet answers on paper and submit them to your teacher. This does not block your next activity.</p>}</div>)}</>}
         </article>)}
         {hasTask && <article className="worksheet-paper" hidden={currentPage !== pages.length} aria-label="Performance task">
           <h3 className="paper-heading">{module.performanceTask?.title || module.closedPerformanceTask?.title}</h3>
@@ -499,6 +507,7 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
             isStepBlock(block) ? (
               <StepView
                 sampleFirst={module.sampleFirst}
+                support={module.starterFiles ?? []}
                 media={media}
                 mediaLoading={mediaLoading}
                 key={block.id}

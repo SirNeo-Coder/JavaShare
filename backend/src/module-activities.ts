@@ -60,6 +60,15 @@ export function activityAccess(module: CourseModule, states: Record<string, stri
   return { parts, openStepIds, performanceTaskOpen: parts.every((part) => part.done) };
 }
 
+// The answer key belongs to the teacher only (teacher, 2026-11-11): drop it from a student view.
+export function stepWithoutAnswerKey<T>(block: T): T {
+  const activity = (block as { activity?: { solution?: unknown } }).activity;
+  if (!activity?.solution) return block;
+  const withoutKey = { ...activity };
+  delete withoutKey.solution;
+  return { ...block, activity: withoutKey } as T;
+}
+
 export function findActivity(module: CourseModule, stepId: string) {
   return module.lessons.flatMap((lesson) => lesson.blocks).find((block): block is ActivityStep => block.type === "step" && block.id === stepId);
 }

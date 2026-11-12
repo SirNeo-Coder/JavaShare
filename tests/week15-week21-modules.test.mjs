@@ -31,6 +31,34 @@ const alter = (step) => step.files.map((file) => {
   return { ...file, content };
 });
 
+// The teacher's answer key is written in the module file, so nothing checks it at runtime. This
+// does: every quoted line must really sit at the line number the answer gives (teacher, 2026-11-12).
+test("Week 15 answers: every quoted line sits where the answer says, in the solved file", () => {
+  const week15 = curriculum.find((content) => content.week === 15);
+  const checked = [];
+  for (const step of steps(week15)) {
+    const answer = step.activity.solution;
+    assert.ok(answer?.lines, `${step.id} has no answer key`);
+    const solved = new Map(alter(step).map((file) => [file.path, file.content.split("\n")]));
+    const sample = new Map(step.files.map((file) => [file.path, file.content.split("\n")]));
+    for (const block of answer.lines.split("\n\n")) {
+      const [heading, ...quoted] = block.split("\n");
+      const where = heading.match(/^(\S+\.java), lines? (\d+)(?:-(\d+))?/);
+      assert.ok(where, `${step.id}: an answer block must start with "<file>, line N" - got ${heading}`);
+      const [, path, from, to] = where;
+      // A block that deletes quotes the sample's lines; every other block quotes the solved file.
+      const source = /delete/i.test(heading) ? sample.get(path) : solved.get(path);
+      assert.ok(source, `${step.id}: ${path} is not a file of this step`);
+      const first = Number(from), last = Number(to ?? from);
+      assert.equal(last - first + 1, quoted.length, `${step.id}: ${heading} promises ${last - first + 1} lines but quotes ${quoted.length}`);
+      assert.deepEqual(source.slice(first - 1, last), quoted, `${step.id}: ${path} line ${first} is not what the answer quotes`);
+      checked.push(`${step.id} ${path}:${first}`);
+    }
+  }
+  assert.equal(steps(week15).length, 10);
+  assert.ok(checked.length >= 10, "each Week 15 task shows at least one answer block");
+});
+
 test("Weeks 12–21: actual curriculum links resolve and current tasks control ordered access", () => {
   const available = new Map(curriculum.map((content) => [content.id, content]));
   const states = new Map();
