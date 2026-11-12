@@ -27,7 +27,7 @@ import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { buildPreview, originOf, type ConsoleMessage, type Preview } from "./webPreview";
 import { LIVE_CAPS, forgetRealtimeClient, privateChannel, realtimeClient, releaseRealtimeChannels, throttle } from "./realtime";
-import { applyOperation, createOperation, localEdit, pointAt, remoteEdit, shareModuleLive, takeOperation, teacherWatching, type FileOperation, type LiveMirror, type TextPoint } from "./liveText";
+import { applyOperation, createOperation, liveProjectKind, localEdit, pointAt, remoteEdit, shareModuleLive, takeOperation, teacherWatching, type FileOperation, type LiveMirror, type TextPoint } from "./liveText";
 
 const FRESH_LESSON_CODE = `public class Main {
     public static void main(String[] args) {
@@ -155,7 +155,7 @@ type LiveShare = {
   studentName?: string;
   files?: FileData[];
 };
-type ModuleLive = { kind: "module" | "performance"; moduleTitle: string; path: string; content: string; editable: boolean; studentId: string; studentName: string };
+type ModuleLive = { kind: "module" | "performance" | "preview"; moduleTitle: string; path: string; content: string; editable: boolean; studentId: string; studentName: string };
 type RemoteCursor = TextPoint & {
   userId: string;
   name: string;
@@ -1469,9 +1469,9 @@ export default function Home() {
   function sendModuleSnapshot() {
     if (!user || !shareModuleLive(user.role, team, teacherWatchingRef.current)) return;
     const mirror = moduleMirrorRef.current;
-    const kind = moduleActivity?.kind;
+    const kind = liveProjectKind(moduleActivity);
     if (mirror) mirror.base = null;
-    void teamChannelRef.current?.send({ type: "broadcast", event: "team:module-live", payload: mirror && moduleActivity && (kind === "module" || kind === "performance")
+    void teamChannelRef.current?.send({ type: "broadcast", event: "team:module-live", payload: mirror && moduleActivity && kind
       ? { kind, moduleTitle: moduleActivity.moduleTitle, path: mirror.path, content: mirror.content, editable: moduleEditableRef.current, studentId: user.id, studentName: user.name }
       : { kind: null, studentId: user.id } });
   }
@@ -2757,7 +2757,7 @@ export default function Home() {
               shared: sharedStep?.moduleId === currentModuleProject.moduleId && sharedStep.step.id === currentModuleProject.stepId,
               toggle: (on) => shareStep(on ? { moduleId: currentModuleProject.moduleId, stepId: currentModuleProject.stepId } : null),
             } : undefined}
-            live={user.role === "student" && currentModuleProject.kind !== "preview" ? {
+            live={user.role === "student" && liveProjectKind(currentModuleProject) ? {
               cursors: moduleCursors,
               onFile: (path, content, editable) => {
                 moduleMirrorRef.current = { path, content, base: null };
@@ -2775,10 +2775,10 @@ export default function Home() {
             } : undefined}
           /> : <><div className="content-grid">
             {studentLiveView ? <section className="editor-card student-module-project" aria-label="Student live project">
-              <div className="workspace-card-heading"><b>Live: {studentLiveView.studentName} · {studentLiveView.kind === "performance" ? "Personal project" : "Module project"} · {studentLiveView.moduleTitle}</b><span>{fileLanguage(studentLiveView.path) === "java" ? "Java" : "Web page"}</span></div>
+              <div className="workspace-card-heading"><b>Live: {studentLiveView.studentName} · {studentLiveView.kind === "performance" ? "Personal project" : studentLiveView.kind === "preview" ? "Class step" : "Module project"} · {studentLiveView.moduleTitle}</b><span>{fileLanguage(studentLiveView.path) === "java" ? "Java" : "Web page"}</span></div>
               <div className="file-tabs"><button type="button" className="file-tab active">{studentLiveView.path}</button></div>
               <CodeEditor value={studentLiveView.content} onChange={editModuleLive} onCursorChange={moveModuleCursor} remoteCursors={moduleCursors} readOnly={!studentLiveView.editable} language={fileLanguage(studentLiveView.path)} />
-              <div className="editor-status"><span>{studentLiveView.path}</span><span>{studentLiveView.editable ? "Your changes appear on the student's screen. Their Save work or a successful run keeps them." : "Read-only until the student runs the unchanged sample."}</span></div>
+              <div className="editor-status"><span>{studentLiveView.path}</span><span>{studentLiveView.editable ? studentLiveView.kind === "preview" ? "Your changes appear on the student's screen. A class step is never saved." : "Your changes appear on the student's screen. Their Save work or a successful run keeps them." : "Read-only until the student runs the unchanged sample."}</span></div>
             </section> : <section className="editor-card">
               <div className="workspace-card-heading"><b><span aria-hidden="true">⌘</span> Code editor</b><span>{languageLabel(activeFile?.language || "java")}</span></div>
               <div className="file-tabs">

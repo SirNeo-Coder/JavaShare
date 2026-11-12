@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { require as tsxRequire } from "tsx/cjs/api";
-const { localEdit, remoteEdit, shareModuleLive, takeOperation, teacherWatching } = tsxRequire("../app/liveText.ts", import.meta.url);
+const { liveProjectKind, localEdit, remoteEdit, shareModuleLive, takeOperation, teacherWatching } = tsxRequire("../app/liveText.ts", import.meta.url);
 
 const own = { isGroup: false, isTeacherWorkspace: false };
 
@@ -45,4 +45,13 @@ test("teacher live help: a teacher edit arriving before the student's typing is 
   const teacher = { path: "Main.java", content: "Xabc", base: null };
   remoteEdit(teacher, takeOperation(student, "team", 1));
   assert.equal(teacher.content, "Xabcd");
+});
+
+test("teacher live help: a student's shared class step is sent; a teacher's own preview or review is not (CKB-114)", () => {
+  assert.equal(liveProjectKind({ kind: "preview", shared: true }), "preview", "the class step the student is typing in during a session");
+  assert.equal(liveProjectKind({ kind: "module" }), "module");
+  assert.equal(liveProjectKind({ kind: "performance" }), "performance");
+  assert.equal(liveProjectKind({ kind: "preview" }), null, "the teacher's own Module preview");
+  assert.equal(liveProjectKind({ kind: "review" }), null);
+  assert.equal(liveProjectKind(null), null);
 });
