@@ -72,7 +72,7 @@ What teachers and students can do today. Keep this page current when their use o
 
 ## Accounts
 
-- The first account ever registered becomes the teacher and gets a starter class (code `JAVA101`) plus the "Teacher Demo Workspace" with "Live Lesson Code". Every later account is a student.
+- The first account ever registered becomes the teacher and gets a starter class (code `JAVA101`) plus the teacher demo workspace (shown to the teacher as **Live Classroom**; saved name "Teacher Demo Workspace") with "Live Lesson Code". Every later account is a student.
 - Students join a class with its code; each gets a personal workspace with "My Practice Code" (Java).
 - Teachers manage student accounts at `/teacher/accounts` (edit, photo, approve password reset, delete) and see an activity summary at `/teacher`.
 
@@ -82,7 +82,7 @@ What teachers and students can do today. Keep this page current when their use o
 - Students without a class see **Join your class** and enter the classroom after successfully joining. A required password reset takes priority over classroom entry.
 - The student classroom header has **Classes** to switch or **Join another class**. This deliberately opens the chooser even with one class. **Open class** enters directly; there is no separate student module home. Modules and saved progress remain in the existing left-hand classroom module browser and worksheet.
 - Teachers still start with the class list. Each card shows the class name, subject, join code and a **Live now** badge when appropriate. **Open class** shows the teacher dashboard with **Overview**, **Students**, and **Curriculum**. **Enter classroom** opens the live workspace and **Class home** returns to that dashboard.
-- A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and "Teacher Demo Workspace". A student can **Join another class** from the chooser.
+- A teacher can **Create a class** (name + subject) from the class list. It gets its own join code and its **Live Classroom** (teacher demo workspace). A student can **Join another class** from the chooser.
 - Student entry failures show the server's error, **Retry**, and **Classes** so a removed membership or connection failure need not trap the student. Server membership checks and per-class workspace loading remain authoritative.
 - While students are on **Classes**, **Your class is live** offers **Join live class** or **Not now**; several live classes appear as a choice. Teachers do not receive this popup. The initial classroom entry rule is independent of whether a live session is running.
 - **Not now** (or Escape) dismisses the displayed sessions while this page remains open, including trips into the workspace and back. Joining dismisses that chosen session. A new activity, or a session stopped and restarted while the page can observe the stop, can invite again. Reloading the page or signing out resets dismissal.
@@ -197,7 +197,7 @@ What teachers and students can do today. Keep this page current when their use o
 
 ## Teachers
 
-- Teacher Demo Workspace with autosave, **Save lesson**, **New lesson**, and the lesson library.
+- **Live Classroom** (the teacher demo workspace, saved as "Teacher Demo Workspace") with autosave, **Save lesson**, **New lesson**, and the lesson library.
 - **Live share** the demo workspace to every student, keystroke by keystroke.
 - **New activity** (individual or group, with starter code), **End activity**, reopen and delete, auto-grouping, Students/Groups views, following a student's active file live, viewing submissions, muting classroom chat.
 - **Teacher live help (2026-10-27):** selecting a student's card in **Students / projects** shows the **Module project** or **Personal performance-task project** that student has open, headed **Live: <name> · Module project / Personal project · <module>**, with the student's name cursor; the view follows file switches. The teacher can type in it: changes appear in the student's editor with a **Teacher** cursor and are kept only by the student's **Save work** (or, for the module project, the device draft and a successful run). Read-only while the student still has to run the unchanged sample. When the student closes the project or goes offline, the saved workspace shows again. Nothing is sent unless the teacher has that student selected. Selecting a group lets the teacher type in its shared code while a member is online (**Editing opens when a group member is online** otherwise); the group's own **Save work** keeps it. Not during a group activity for a single student's module project (the student's open workspace is then the group's). During a class session (2026-11-12, CKB-114) a student on the shared step shows as **Live: <name> · Class step · Week N · Step M**; the teacher can type in it, and nothing is saved, as with the class step itself. Opening a student keeps the teacher's own **Work in code editor** with its edits in memory; **Back to Week N · Step M** beside the workspace title reopens it (CKB-116).

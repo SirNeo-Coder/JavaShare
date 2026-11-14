@@ -183,6 +183,10 @@ test("class list and creation: a teacher creates classes, a student joins one, a
     assert.equal(activityList.classrooms[0].hasActivity, true);
     assert.equal(activityList.classrooms[0].joinCode, undefined, "students must not receive teacher-only join codes");
     const demoProjectId = enteredA.teams.find((team) => team.isTeacherWorkspace).project.id;
+    const demoTeam = enteredA.teams.find((team) => team.isTeacherWorkspace);
+    assert.equal(demoTeam.name, "Live Classroom", "the teacher sees the demo workspace as Live Classroom");
+    const { data: savedDemo } = await admin.from("teams").select("name").eq("id", demoTeam.id).single();
+    assert.equal(savedDemo.name, "Teacher Demo Workspace", "the saved name is kept (data is never renamed)");
     await admin.from("classrooms").update({ current_activity_id: null, live_share_project_id: demoProjectId }).eq("id", classroomAId);
     const shareList = await (await call("/api/bootstrap", { headers: { cookie: studentCookie } })).json();
     assert.equal(shareList.classrooms[0].liveSessionId, `share:${demoProjectId}`);
