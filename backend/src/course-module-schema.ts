@@ -36,6 +36,14 @@ const block = z.discriminatedUnion("type", [
       // teacher wants them shown, and an optional note (teacher, 2026-11-12). CodeShare compares
       // nothing. It never reaches a student view (studentModuleView strips it).
       solution: z.object({ lines: z.string().trim().min(1).max(5000), note: z.string().max(5000).optional() }).optional(),
+      // Guided example (teacher, 2026-11-15): shown with its code after the sample; its pass never completes the step.
+      guided: z.object({
+        discussion: z.string().max(10000).optional(),
+        instruction: z.string().trim().min(1).max(5000),
+        code: z.string().max(20000),
+        expectedOutput: z.string().max(100000),
+        stdin: z.string().max(10000).default(""),
+      }).optional(),
     }).optional(),
     // Groups this step (and any text/definition/analogy/table/note blocks leading into it) under
     // one named, gated part of the module viewer - a part can span several lessons (e.g. a
@@ -118,7 +126,7 @@ export const courseModule = z.object({
     lesson.id, lesson.exitSlip.id,
     ...lesson.blocks.filter((block) => block.type === "step").flatMap((block) => [block.id,
       ...(block.activity ? [`${block.id}:activity`] : []),
-      ...(block.activity?.id ? [block.activity.id, `task:${block.activity.id}`, `sample:${block.activity.id}`] : []),
+      ...(block.activity?.id ? [block.activity.id, `task:${block.activity.id}`, `sample:${block.activity.id}`, `guided:${block.activity.id}`] : []),
     ]),
   ]);
   return module.previousModuleId !== module.id && progressIds.length === new Set(progressIds).size;
@@ -126,6 +134,15 @@ export const courseModule = z.object({
   .refine((module) => module.lessons.every((lesson) => lesson.blocks.every((block) =>
     block.type !== "step" || !block.activity?.solution || Boolean(block.activity.id))),
   { message: "A task answer (activity.solution) needs the task's own activity.id - without it the worksheet would never show the answer" })
+  .refine((module) => steps(module).every((step) => !step.activity?.guided || Boolean(step.activity.id)),
+    { message: "A guided example (activity.guided) needs the task's own activity.id" })
+  .refine((module) => steps(module).every((step) => !step.activity?.guided || step.language === "java"),
+    { message: "A guided example (activity.guided) works on Java steps only for now" })
+  .refine((module) => steps(module).every((step) => !step.activity?.guided || step.activity.guided.expectedOutput.trim() !== ""),
+    { message: "A guided example (activity.guided) needs its expected output" })
+  .refine((module) => steps(module).every((step) => !step.activity?.guided
+    || sameOutput(step.activity.guided.expectedOutput) !== sameOutput(step.activity.expectedOutput)),
+  { message: "A guided example's expected output must differ from its own task's expected output - otherwise the guided run would also pass the task" })
   .refine((module) => {
     // /api/execute only runs java files whose path matches a strict identifier-style regex, at
     // most JAVA_PATH_MAX_LENGTH characters (routes.ts). A java step's files, and any .java
@@ -139,5 +156,11 @@ export const courseModule = z.object({
     const stepFiles = module.lessons.flatMap((lesson) => lesson.blocks.flatMap((block) => (block.type === "step" && block.language === "java" ? [...block.files, ...(block.activity?.files ?? [])] : [])));
     return javaFiles.every((file) => file.path.length <= JAVA_PATH_MAX_LENGTH && JAVA_PATH.test(file.path)) && stepFiles.every((file) => javaProjectPath(file.path));
   }, { message: `A java step's file path (or a .java performance-task file) must be a valid Java filename of at most ${JAVA_PATH_MAX_LENGTH} characters, e.g. "src/Main.java" - no spaces or punctuation besides "/" and "_"; a java step may also supply .txt data files such as fleet.txt` });
+
+function steps(module: { lessons: { blocks: z.infer<typeof block>[] }[] }) {
+  return module.lessons.flatMap((lesson) => lesson.blocks).filter((item) => item.type === "step");
+}
+// The same comparison runs use: Windows line endings and one final line break do not count.
+const sameOutput = (text: string) => text.replace(/\r\n/g, "\n").replace(/\n$/, "");
 
 export type CourseModule = z.infer<typeof courseModule>;

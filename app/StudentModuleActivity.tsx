@@ -6,9 +6,9 @@ import { api } from "./apiClient";
 import { runJava, getJavaRunner } from "./javaExecution";
 import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
-import { ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
+import { Markdown, ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
-import { checkModuleRun, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
+import { checkModuleRun, checkStdin, guidedPending, guidedStateId, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
 import { WebCheckList, WebConsole, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
@@ -33,24 +33,28 @@ export type ModuleLiveLink = {
   onCursor: (offset: number) => void;
 };
 
-type RunCheck = { check: "sample" | "task"; passed: boolean; sampleMatched: boolean; success: boolean; syncPending?: boolean };
+type RunCheck = { check: "sample" | "guided" | "task"; passed: boolean; sampleMatched: boolean; guidedMatched?: boolean; success: boolean; syncPending?: boolean };
 
-export function ModuleRunFeedback({ result, completed, pendingSample, expectedError }: {
-  result: RunCheck | null; completed: boolean; pendingSample: boolean; expectedError?: string;
+export function ModuleRunFeedback({ result, completed, pendingSample, pendingGuided = false, hasGuided = false, expectedError }: {
+  result: RunCheck | null; completed: boolean; pendingSample: boolean; pendingGuided?: boolean; hasGuided?: boolean; expectedError?: string;
 }) {
   const good = !result?.syncPending && (result?.passed ?? completed);
   const title = result?.syncPending ? "Passed locally — awaiting sync."
     : result?.check === "sample" ? result.passed
-    ? expectedError ? "Expected error observed — now complete Your task." : "Sample verified — now complete Your task."
+    ? expectedError ? `Expected error observed — now ${hasGuided ? "do the Guided example" : "complete Your task"}.` : hasGuided ? "Sample verified — now do the Guided example." : "Sample verified — now complete Your task."
     : "Sample not verified — run the supplied sample unchanged."
+    : result?.check === "guided" ? result.passed ? "Guided example verified — now do Your task on your own."
+    : "Guided example not verified — compare your output with Expected guided output."
     : result ? result.passed ? "Completed — next activity unlocked."
+      : result.guidedMatched ? "Still showing the guided example output. Make your own change and run again."
       : result.sampleMatched ? "Still showing sample output. Apply the task changes and run again."
         : "Not completed — this run differs from the required output."
-      : completed ? "Completed — your progress is saved." : pendingSample ? "First, run the sample unchanged." : "Not checked yet — complete Your task, then Run code.";
+      : completed ? "Completed — your progress is saved." : pendingSample ? "First, run the sample unchanged." : pendingGuided ? "Next, type the Guided example, then Run code." : "Not checked yet — complete Your task, then Run code.";
   return <div className={`module-run-feedback ${good ? "passed" : result ? "retry" : "ready"}`} role="status" aria-live="polite">
     <strong>{title}</strong>
     {result?.syncPending && <p>Your code is kept on this device. The next activity opens after CodeShare accepts this completion.</p>}
     {result?.check === "sample" && result.passed && <p>Sample verification is saved. This step stays open until your alteration matches Expected task output.</p>}
+    {result?.check === "guided" && result.passed && <p>Guided example verification is kept. It does not complete this step: only Your task does. Your code stays in the editor.</p>}
     {result && !result.passed && <p>{completed ? "This task was completed earlier. Your saved completion remains." : "Progress has not advanced. Compare Actual output with the expected output above."}</p>}
   </div>;
 }
@@ -175,11 +179,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [stepStates, setStepStates] = useState(activity.progress.stepStates);
   const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
   const pendingSample = !personal && !preview && Boolean(step && samplePending(activity.module, step, stepStates));
+  const guided = !personal && !preview ? step?.activity?.guided : undefined;
+  const pendingGuided = Boolean(guided && step && guidedPending(activity.module, step, stepStates));
   const completed = !personal && stepStates[activity.stateId] === "pass";
   // The web result list judges a run by what it was checked as: a verified sample stays ticked against the
   // sample, not re-judged against the task that opens right after it (CKB-083).
   const shownAsSample = preview || (lastCheck ? lastCheck.check === "sample" : pendingSample);
-  const checkInput = pendingSample ? step?.stdin ?? "" : activity.stdin;
+  const checkInput = step && (pendingSample || pendingGuided) ? checkStdin(activity.module, step, stepStates) : activity.stdin;
   const [successfulFiles, setSuccessfulFiles] = useState<string | null>(null);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
   const [deviceReady, setDeviceReady] = useState(personal || preview);
@@ -221,6 +227,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
         draftRef.current = evidence;
         setBackups(draft.backups);
         if (draft.sample) setStepStates((current) => ({ ...current, [sampleStateId(step)]: "pass" }));
+        if (draft.guided) setStepStates((current) => ({ ...current, [guidedStateId(step)]: "pass" }));
         if (draft.pending) {
           setLastCheck({ check: "task", passed: true, sampleMatched: false, success: true, syncPending: true });
           setStatus("Passed locally — awaiting sync");
@@ -311,7 +318,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           const result = await api<RunCheck & { output: string; progress: Progress; module?: CourseModule }>(`${base}/run`, { method: "POST", body: JSON.stringify({ stepId: activity.stepId, updatedAt: progress.current.updatedAt, files }) });
           progress.current = { ...result.progress, moduleVersion: progress.current.moduleVersion }; setStepStates(result.progress.stepStates); setOutput(result.output); setLastCheck(result);
           if (result.module) await writeDeviceRecord(moduleRecordKey("content", activity.studentId, activity.classroomId, activity.moduleId), { value: result.module, savedAt: Date.now() });
-          setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : result.check === "sample" && result.passed ? "Sample verified" : "Try again");
+          setStatus(result.progress.stepStates[activity.stateId] === "pass" ? "Completed" : result.check === "sample" && result.passed ? "Sample verified" : result.check === "guided" && result.passed ? "Guided example verified" : "Try again");
           if (result.passed) onChecked();
         } else {
           const result = runner ? await runJava(files, checkInput, runner)
@@ -327,9 +334,14 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
             setStepStates((current) => ({ ...current, [sampleStateId(step!)]: "pass" }));
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setStatus("Sample verified on this device");
+          } else if (check.check === "guided" && check.passed) {
+            draftRef.current.guided = { files, success: result.success, output: result.output };
+            setStepStates((current) => ({ ...current, [guidedStateId(step!)]: "pass" }));
+            await writeDeviceRecord(localKey, { files, ...draftRef.current });
+            setStatus("Guided example verified on this device");
           } else if (check.check === "task" && check.passed) {
             const pending = { stepId: activity.stepId, updatedAt: progress.current.updatedAt, moduleVersion: progress.current.moduleVersion, completionId: crypto.randomUUID(), files, success: true, output: result.output,
-              ...pageReport, ...(draftRef.current.sample ? { sample: draftRef.current.sample } : {}) };
+              ...pageReport, ...(draftRef.current.sample ? { sample: draftRef.current.sample } : {}), ...(draftRef.current.guided ? { guided: draftRef.current.guided } : {}) };
             draftRef.current.pending = pending;
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setRunMessage("Syncing your completed task…");
@@ -340,7 +352,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
             await writeDeviceRecord(localKey, { files, ...draftRef.current });
             setStepStates(progress.current.stepStates); setStatus("Completed — saved to CodeShare"); onChecked();
             setLastCheck((current) => current ? { ...current, syncPending: false } : current);
-          } else setStatus(check.check === "sample" ? "Sample not verified" : "Try again");
+          } else setStatus(check.check === "sample" ? "Sample not verified" : check.check === "guided" ? "Guided example not verified" : "Try again");
         }
       }
     } catch (runError) {
@@ -451,7 +463,12 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
       <aside className="right-panel module-activity-console">
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
-          <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? "The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for Your task." : activity.instruction}</p>
+          <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : pendingGuided ? "Guided example" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? `The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for ${guided ? "the Guided example" : "Your task"}.` : pendingGuided ? "Read the discussion, type the guided example into your code, then Run code. It does not complete this step." : activity.instruction}</p>
+          {guided && !pendingSample && <details className="module-guided" open={pendingGuided}><summary>Discussion and guided example</summary>
+            {guided.discussion && <><b>Discussion</b><Markdown markdown={guided.discussion} /></>}
+            <b>Guided example</b><Markdown markdown={guided.instruction} /><pre>{guided.code}</pre>
+            {!pendingGuided && <><b>Expected guided output</b><pre>{guided.expectedOutput}</pre></>}
+          </details>}
           {activity.shared && <p role="note">Your teacher shared this step with the class. Practise here: it is not saved and does not complete your own module step. Return to class project goes back to your work.</p>}
           {personal && !review && <PerformanceTaskSteps steps={activity.module?.performanceTask?.steps} module={activity.module} />}
           {personal && web && !review && <ModuleMediaFiles<Progress> base={`${projectPath}/media`} files={personalMedia}
@@ -461,7 +478,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
             if (javaConsole.waiting && event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
               event.preventDefault(); javaConsole.send(stdin); setStdin("");
             }
-          }} /></label> : <><b>{pendingSample ? step?.expectedError ? "Expected error" : "Expected sample output" : task ? "Expected task output" : "Expected output"}</b><pre>{pendingSample ? step?.expectedError ?? step?.expectedOutput : activity.expectedOutput}</pre></>}
+          }} /></label> : <><b>{pendingSample ? step?.expectedError ? "Expected error" : "Expected sample output" : pendingGuided ? "Expected guided output" : task ? "Expected task output" : "Expected output"}</b><pre>{pendingSample ? step?.expectedError ?? step?.expectedOutput : pendingGuided ? guided?.expectedOutput : activity.expectedOutput}</pre></>}
           {preview && activity.task && <div className="module-preview-task"><b>Student task</b><p>{activity.task.instruction}</p><b>Expected task output</b><pre>{activity.task.expectedOutput}</pre></div>}
           {checkInput && <><b>Program input for this check</b><pre>{checkInput}</pre></>}
           {!personal && activity.progress.activityProjects?.beforeSampleFiles && <details className="module-before-sample"><summary>Work saved before sample loading</summary>{activity.progress.activityProjects.beforeSampleFiles.map((file) => <div key={file.path}><b>{file.path}</b><pre>{file.content}</pre></div>)}</details>}
@@ -472,7 +489,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
         {personal && !review && <p role="status">{successfulFiles === JSON.stringify(files) ? "Run succeeded — ready to submit this version." : "Run the current files successfully before submitting."} Submission records progress, not a grade or teacher approval.</p>}
-        {!personal && !preview && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} expectedError={web ? undefined : step?.expectedError} />}
+        {!personal && !preview && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} pendingGuided={pendingGuided} hasGuided={Boolean(guided)} expectedError={web ? undefined : step?.expectedError} />}
         {web ? <>
           <JavaRunProgress message={runMessage} />
           {!webPage.opened && webResults}
