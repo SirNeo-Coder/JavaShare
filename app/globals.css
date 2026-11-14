@@ -654,6 +654,9 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .page-window .module-web-preview:last-child { grid-column:1/-1; }
 .page-window-results { grid-column:2; grid-row:3; overflow:auto; border-left:1px solid var(--line); }
 .page-window-results .web-check-compare { grid-template-columns:1fr; }
+.web-console { padding:0 16px 10px; font-size:13px; }
+.web-checks .web-console { padding:8px 0 0; }
+.web-console pre { margin:4px 0 0; padding:8px; max-height:220px; overflow:auto; white-space:pre-wrap; font-size:12px; border:1px solid var(--line); border-radius:6px; }
 .show-page-button { margin:10px 16px; justify-self:start; }
 @media (max-width:760px) { .page-window { grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto minmax(0,1fr) auto; } .page-window-results { grid-column:1; grid-row:4; max-height:40vh; border-left:0; border-top:1px solid var(--line); } }
 .teacher-checked-steps { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; font-size:12px; }

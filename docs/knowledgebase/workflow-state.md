@@ -116,7 +116,8 @@ What teachers and students can do today. Keep this page current when their use o
   same **Module project** with the HTML/CSS/JavaScript editor, `index.html` first, and the sandboxed
   page preview in place of the Java console. **Run code** checks the page in the student's browser,
   online and offline, and shows a checklist (**Page text matches** / **Console output matches**) with
-  **Required output** and **Your output** side by side on a cross. Since 2026-10-29 each
+  **Required output** and **Your output** side by side on a cross. Since 2026-11-12 (CKB-117) a **Console** box
+  under every run lists what `console.log` printed (also in web personal projects); a page that printed nothing shows none. Since 2026-10-29 each
   `webChecks` entry adds a line (**Page has 1 h1**, **html has lang="en"**, …) with what was found on a
   cross; the step completes only when every line is ticked (also on the teacher's **Run** in
   **View module details**).
