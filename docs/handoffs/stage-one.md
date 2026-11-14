@@ -1505,3 +1505,18 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   restored. All seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   #108 was merged first, so this fix is on `fix/reselect-live-view-frozen`, PR #109. Next: the teacher merges #109;
   check CodeRabbit on #109 at the start of the next piece of work.
+
+## Week 15 beginner task instructions (draft) — 2026-11-15
+
+- Branch: `docs/week15-beginner-instructions`. Teacher asked for every Week 15 task instruction to be rewritten for
+  beginners (what it does now, what to change, where, hint) and each teacher answer to match.
+- Done: `docs/modules/week15/Java2_Week_15.revised.codeshare.json`, a separate copy. The live
+  `Java2_Week_15.codeshare.json` is unchanged; a script confirmed only activity instructions and answers differ.
+  Answers for Steps 2, 4, 6 and 10 now use only Java already shown this week (no `null`/`? :`, `instanceof`,
+  `startsWith` or `continue`); Step 5 uses `fare > 13.00` because `>=` is never shown, so the task now reads "bigger than P13.00".
+- Tested: each answer run with laptop `javac`/`java` outside the app; all ten print the expected output exactly. Answer
+  line numbers checked against the solved files the same way the Week 15 answer test does. `npm test` 466/466,
+  `npm run build:all`, lint 0 errors (8 older warnings). The revised copy is not read by any test or by the app.
+- Not done (needs teacher decision): replacing the live file with the revised copy. Doing that also needs
+  `tests/fixtures/week15-week21-task-edits.json` updated for Steps 2, 4, 5, 6 and 10, or the answer-line test fails.
+  Teacher to confirm the Step 5 wording.
