@@ -1529,6 +1529,8 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   findings; #112 and #113 were never reviewed ("does not receive automatic reviews because it has fewer than 10 stars").
 - Done (CKB-119, approved): **End session** and **Stop sharing** now use the header button style. Source check in
   `npm test` (469/469; failed without the fix); real app offline, light and dark, styles equal **Lesson library**.
-  **Stop sharing** not opened in the real app. Not done (offered, not approved): at 900 px and narrower the whole
-  **Class session · End session** box is hidden, so a narrow window cannot end the session from the header.
+  **Stop sharing** not opened in the real app.
+- Done (CKB-120, approved): at 900 px and narrower **End session** / **Stop sharing** stay visible (681–900 px the button
+  alone, the teacher's choice; phones keep the label). Layout test 22/22 (6 cases failed without the fix); real app
+  offline at 850 and 600 px, light and dark, clicking **End session** ended the session. `npm test` 469/469.
 - Next: the teacher reviews and merges the PR; check CodeRabbit on it at the start of the next piece of work.

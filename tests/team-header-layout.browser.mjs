@@ -1,5 +1,5 @@
 // The workspace header must keep Present this code / Lesson library visible while a class session
-// or a shared step adds boxes to it (CKB-118). Lays out the header markup from app/page.tsx with the real stylesheet.
+// or a shared step adds boxes to it (CKB-118), and End session / Stop sharing usable at every width (CKB-120). Lays out the header markup from app/page.tsx with the real stylesheet.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
@@ -31,11 +31,14 @@ test('workspace header: buttons stay inside the header at every width', async (t
         const m = await tab.evaluate(() => {
           const r = (s) => document.querySelector(s).getBoundingClientRect();
           const header = document.querySelector('.team-header');
-          return { buttons: r('.team-buttons').bottom, headerBottom: r('.team-header').bottom, grid: r('.content-grid').top, sideways: header.scrollWidth > header.clientWidth };
+          const clickable = (b) => { const box = b.getBoundingClientRect(); return box.width > 0 && document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2) === b; };
+          return { buttons: r('.team-buttons').bottom, headerBottom: r('.team-header').bottom, grid: r('.content-grid').top, sideways: header.scrollWidth > header.clientWidth,
+            sessionButtons: [...document.querySelectorAll('.presence button')].map((b) => [b.textContent, clickable(b)]) };
         });
         assert.ok(m.buttons <= m.headerBottom + 0.5, `buttons end at ${m.buttons}, header ends at ${m.headerBottom}`);
         assert.ok(m.buttons <= m.grid + 0.5, `buttons end at ${m.buttons}, Code editor starts at ${m.grid}`);
         assert.equal(m.sideways, false, 'header must not scroll sideways');
+        for (const [label, ok] of m.sessionButtons) assert.ok(ok, `${label} must be visible and clickable (CKB-120)`);
       });
     }
   } finally { await browser.close(); }
