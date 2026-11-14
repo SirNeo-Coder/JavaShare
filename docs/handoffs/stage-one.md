@@ -1510,3 +1510,21 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   `fix/leave-class-clears-live-view`. No new test (the case needs a student listed before Teacher Demo Workspace, which
   the app does not produce); seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
+
+## Live Classroom name and header buttons — 2026-11-15 (CKB-118)
+
+Branch `fix/live-classroom-header`. Both approved by the teacher.
+
+- Done (CKB-118): **Present this code** and **Lesson library** were hidden behind the **Code editor** whenever a class
+  session ran (Enter classroom always starts one). The header now keeps all its boxes on one line and grows if needed.
+  `tests/team-header-layout.browser.mjs` 21/21 (8 failed with the old stylesheet); stylesheet check in `npm test`.
+- Done: the teacher demo workspace is shown to the teacher as **Live Classroom** (server display only; the saved name
+  "Teacher Demo Workspace" is unchanged, rule 6). Students still see **Live Lesson Code**. `tests/landing-pages.test.mjs`
+  checks both (failed with the rename undone). The teacher chose to keep **TEACHER WORKSPACE · Lesson demonstration**.
+- Checked in the real app (offline, local Supabase, light and dark): title **Live Classroom**; header buttons above the
+  editor and clickable at 1400, 1000 and 600 px, with and after **End session**. Online/Cloudflare not run.
+- Known, not from this change: `tests/teacher-live-help.browser.mjs` group subtest times out on unchanged `main` too
+  (5/6 subtests pass on both). Flagged for separate work.
+- CodeRabbit: #105's finding already fixed in the current Week 15 note; #110 answered by #112's handoff; #111 no
+  findings; #112 and #113 were never reviewed ("does not receive automatic reviews because it has fewer than 10 stars").
+- Next: the teacher reviews and merges the PR; check CodeRabbit on it at the start of the next piece of work.
