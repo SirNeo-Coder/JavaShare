@@ -2072,6 +2072,10 @@ export default function Home() {
     setChatOpen(false);
     setSettingsOpen(false);
     setWorkspaceError("");
+    // A watched student's live view belongs to this class visit; chooseTeam keeps it only for the same visit (CKB-116).
+    moduleMirrorRef.current = null;
+    setModuleLive(null);
+    setModuleCursors([]);
     setActiveTeam(0);
     setData(null);
     setEnteredClassroomId(null);
