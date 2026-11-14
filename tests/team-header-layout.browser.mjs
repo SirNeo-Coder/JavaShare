@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 const { chromium } = await import(process.env.CODESHARE_PLAYWRIGHT_MODULE || 'playwright');
 
-const box = (title, note, button) => `<div class="presence"><span><b>${title}</b><small>${note}</small></span>${button ? `<button type="button">${button}</button>` : ''}</div>`;
+const box = (title, note, button) => `<div class="presence"><span><b>${title}</b><small>${note}</small></span>${button ? `<button type="button" class="secondary">${button}</button>` : ''}</div>`;
 const page = (extra) => `<div class="app-shell"><section class="workspace classroom-workspace"><section class="main-area">
 <div class="workspace-mode"><span>TEACHER WORKSPACE</span><b>Lesson demonstration</b></div>
 <div class="team-header"><div class="team-heading"><span class="team-icon blue">L</span><div><h1>Live Classroom</h1><p>Live Lesson Code · src/Main.java</p></div></div>
