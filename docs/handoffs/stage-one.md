@@ -1528,6 +1528,19 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   the app does not produce); seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
 
+## Group card showed Teacher Demo's code — 2026-11-15 (CKB-118)
+
+- Branch: `fix/group-view-double-load`, from main `974fee7`. Teacher reported the `teacher-live-help` browser test's group
+  subtest timing out offline; plan approved.
+- Done: **Groups**/**Students** started two class-list loads; an older answer arriving after a card click put Teacher
+  Demo's file under the clicked group. `loadWorkspace` in `app/page.tsx` now ignores any answer a newer load replaced.
+- Tested: `teacher-live-help.browser.mjs` now holds the first groups answer back one second; without the fix 3/3 runs
+  failed, with it 10/10 runs passed 7/7. Also passing: `class-step-live-help`, `class-session`, `class-shared-step`,
+  `workspace-drawers` (17/17) browser tests; `npm test` 467/467; `npm run build:all`; lint 0 errors (8 older warnings).
+- Not run: online (Cloudflare) end to end; `npm run classroom:offline` itself (same settings run by hand with `next start`).
+- Open, not changed: a reload started by a live event (e.g. a group update) that lands after a card click can still reset
+  the editor. It is rarer than this case and would need its own fix.
+- Next: the teacher merges the PR; check CodeRabbit on it at the start of the next piece of work.
 ## Live Classroom name and header buttons — 2026-11-15 (CKB-118)
 
 Branch `fix/live-classroom-header`. Both approved by the teacher.
