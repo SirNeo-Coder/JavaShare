@@ -1621,3 +1621,14 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
 - Next: the teacher tries it on the laptop and approves Stage B; then Stage C builds
   `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` and its report. CodeRabbit: #111 no findings;
   #112/#113 not reviewed (automatic reviews off for repos under 10 stars).
+
+## Guided example, Stage C (Week 15 three-part file) — 2026-11-15
+
+- Branch: `feature/guided-example`. The teacher approved Stage B ("continue").
+- Done: `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` and `Week_15_Three_Part_Report.md`. All 10
+  guided examples and own tasks were run on laptop Java and the online runner (CheerpJ); all pass. Upload rules and
+  a real local upload pass; students get the guided code, never the answer key. Only `activity` changed.
+- For a separate test class only, never the current class (teacher, 2026-11-15).
+- Found: CKB-119. Online, the current Week 15 Step 1 task can never pass. The current module is unchanged and the
+  teacher must decide. Steps 1, 2 (adjusted for CKB-119/CKB-073) and 7 are marked NEEDS TEACHER REVIEW in the report.
+- Not pushed (teacher said not to). Next: the teacher reviews the report; do not start another week.
