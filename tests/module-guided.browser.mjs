@@ -79,6 +79,10 @@ for (const mode of (process.env.GUIDED_BROWSER_MODE ? [process.env.GUIDED_BROWSE
       assert.ok(at("Guided example") < at("fleet.remove(2);"));
       assert.ok(at("Expected guided output") < at("Your task"));
       assert.ok(!text.includes("Answer key"), "students never see the answer key panel");
+      // The guided code sits in the same box as Sample code, not in the single-word highlight (CKB-124).
+      const guidedCode = step.locator(".module-guided .printed-sample pre code");
+      assert.equal(await guidedCode.count(), 1, "the guided code is boxed like Sample code");
+      assert.equal(await guidedCode.evaluate((el) => getComputedStyle(el).backgroundColor), "rgba(0, 0, 0, 0)", "no grey highlight behind the guided code");
       await page.screenshot({ path: `/tmp/guided-worksheet-${mode}.png`, fullPage: false });
     });
 

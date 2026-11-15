@@ -1667,3 +1667,11 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
 - Tests: new bridge test (call from `Thread-0`) shown failing before, passing after; bridge tests 6/6; Week 16 three-part
   online 24/24 and Week 15 online 21/21 with this branch's runner.
 - Next: teacher merges #124 first, then this PR; Cloudflare's `codeshare-java` Worker redeploys from `main`.
+## Guided example display and Week 15 note (CKB-124) — 2026-11-15
+
+- Branch: `fix/week15-guided-display`. Teacher tried the three-part Week 15 in a test class and approved three fixes.
+- Done: worksheet guided code in the Sample code box (no grey bars); Step 1 discussion points in line order; Step 1's
+  "Run Step 1 a second time" note now says each CodeShare run starts in an empty folder (module file, three-part file
+  and the teacher's untracked revised copy, still byte-identical to the module file).
+- Next: the teacher merges, re-uploads Week 15 (current class: revised or module file; test class: three-part file),
+  and corrects the same note in the printed PDF by hand.
