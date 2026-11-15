@@ -97,7 +97,7 @@ for (const content of modules) {
       if (before.missingSlipIds.includes(lesson.id)) delete lesson.exitSlip.afterStep;
       for (const step of lesson.blocks.filter((block) => block.type === "step")) {
         // Week 15 Steps 7–8 tasks changed to avoid CheerpJ's broken append mode (CKB-089); Step 1 to avoid
-        // CheerpJ's createNewFile answering true for an existing file (CKB-119; -v2 is the three-part file's).
+        // CheerpJ's createNewFile answering true for an existing file (CKB-123; -v2 is the three-part file's).
         const version = step.id === "java-2-w15-d1-s1" ? "v3" : ["java-2-w15-d4-s7", "java-2-w15-d4-s8"].includes(step.id) ? "v2" : "v1";
         assert.equal(step.activity.id, `${step.id}-alter-${version}`);
         assert.deepEqual(step.activity.files, [], "no solved source is supplied to students");
