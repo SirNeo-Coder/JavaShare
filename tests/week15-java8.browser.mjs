@@ -1,6 +1,6 @@
 // Week 15 runs online only (the laptop runner blocks java.io), so every sample and every task answer must
 // pass in the real online runner (CheerpJ Java 8), whose java.io.File differs from laptop Java (CKB-073,
-// CKB-089, CKB-119). Needs any page on http://localhost:3020 and java-runtime/public served on 3021.
+// CKB-089, CKB-123). Needs any page on http://localhost:3020 and java-runtime/public served on 3021.
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFileSync } from "node:fs";

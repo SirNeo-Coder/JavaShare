@@ -1528,7 +1528,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   the app does not produce); seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
 
-## Week 15 Step 1 task fix (CKB-119) — 2026-11-15
+## Week 15 Step 1 task fix (CKB-123, first numbered CKB-119) — 2026-11-15
 
 - Branch: `fix/week15-step1-createnewfile`. Teacher approved; done before any more guided-example work
   (`feature/guided-example` waits, not pushed; it also adds CKB-118/CKB-119 records, so rebase it on this first).

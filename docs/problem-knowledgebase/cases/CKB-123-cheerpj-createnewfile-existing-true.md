@@ -1,7 +1,7 @@
-# CKB-119 — Online, createNewFile() on a file that already exists answers true
+# CKB-123 — Online, createNewFile() on a file that already exists answers true
 
 - Status: resolved in Week 15 content (CheerpJ's own behaviour remains)
-- First recorded: 2026-11-15
+- First recorded: 2026-11-15 (as CKB-119; renumbered because CKB-119 was already taken)
 - Last verified: 2026-11-15
 - Area: online Java / CheerpJ browser runtime (`java.io.File#createNewFile`); Week 15 Step 1 task
 - Search terms: Created again? true, createNewFile second time true, Week 15 Step 1 task never completes, File
