@@ -61,9 +61,27 @@ different order.
 | 5 | `java-2-w16-d3-s5-alter-v2` | 7, 9, 16, 19 (ReadyReport), 23 (ReadyReport), 19, 24, 26 | PASSED (laptop and online) | Main.java, line 7 — wait for 3 reports, as in the guided example:<br>        CountDownLatch latch = new CountDownLatch(3);      // wait for 3 reports<br><br>Main.java, lines 9-11 — the three vehicles left, with BUS 789 back and NXA 123 gone:<br>        reports.add(new ReadyReport("TRC 456", 100, latch));<br>        reports.add(new ReadyReport("BUS 789", 300, latch));<br>        reports.add(new ReadyReport("NYB 321", 200, latch)); | PASSED (laptop and online) | OK; sample changed (no timing) |
 | 6 | `java-2-w16-d4-s6-alter-v2` | 7, 9, 15, 18 (ConvoyLeg), 19 (ConvoyLeg), 21 (ConvoyLeg), 30 (ConvoyLeg), 17 (ConvoyLeg), 28 | PASSED (laptop and online) | Main.java, line 7 — a barrier of 2, as in the guided example:<br>        CyclicBarrier barrier = new CyclicBarrier(2);  // 2 in the convoy<br><br>Main.java, lines 9-10 — the two vehicles in the convoy, with NYB 321 back and BUS 789 gone:<br>        legs.add(new ConvoyLeg("NXA 123", 300, barrier));<br>        legs.add(new ConvoyLeg("NYB 321", 100, barrier)); | PASSED (laptop and online) | OK; sample changed (no timing) |
 
+## Upload check
+
+A real upload into a throwaway local class (local app in offline mode on this branch, local Supabase): accepted.
+The teacher received all 8 guided examples and all 8 answer keys. A student with Steps 1–7 passed received all 8
+guided examples and no answer key. The class and both test accounts were deleted afterwards. For this check only,
+`previousModuleId` was removed, because the throwaway class had no Week 15.
+
+## Printed module and lesson plan
+
+- PDF: pages 1–9 are your module; yellow stamps on Steps 3, 5, 6 and 7 point to the appendix (pages A-1 to A-9),
+  which prints each step's discussion, guided example and own task, and the new code for Steps 3, 5, 6 and 7. No
+  answer key is printed. Page 6's challenge 2 (change the delays to get a new order) no longer works with the fixed
+  order, so it now asks students to predict that the output stays the same. Page 7's time plan says Thursday is
+  Steps 7 and 8. The "Page n of 8" labels are kept: your module still has 8 numbered pages (with page 3B); the
+  appendix pages are numbered A-1 to A-9.
+- Word plan: Wednesday is Runnable, CountDownLatch and CyclicBarrier (Steps 4–6, slip /20 with 2.4); Thursday is
+  Semaphore only (Steps 7–8, slip /15); every Student Activity row lists the three-part order. Check the rewritten
+  Step 5 and Step 7 homework/enrichment ideas, and the commit messages `week16-day3-runnable-latch-barrier` and
+  `week16-day4-semaphore`.
+
 ## Not checked
 
-- Not uploaded to CodeShare, and not uploaded into a throwaway local class (only CodeShare's upload checker was run).
 - The hosted site and its online runner. The online runs used this branch's runner files served on the laptop.
-- The PDF and the Word lesson plan were changed by a second, lower-cost model and then checked by eye (see the pull
-  request).
+- The Word file was viewed after LibreOffice converted it to PDF, not in Microsoft Word.

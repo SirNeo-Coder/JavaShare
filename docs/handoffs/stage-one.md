@@ -1656,3 +1656,5 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   online. Needs teacher approval and a runner redeploy by the teacher.
 - CodeRabbit: #122 and #123 skipped (automatic reviews off), no findings.
 - Next: teacher reviews the report and PR; decides on the CKB-125 fix. Three-part file goes to a test class only.
+- 2026-11-15 (later): PDF pages 6–7 corrected (challenge 2, Thursday time plan); Word plan reference fix; real upload into
+  a throwaway local class passed (teacher 8 answer keys, student 0). Still open: teacher decision on CKB-125.
