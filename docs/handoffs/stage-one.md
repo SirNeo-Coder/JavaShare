@@ -1629,6 +1629,9 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   guided examples and own tasks were run on laptop Java and the online runner (CheerpJ); all pass. Upload rules and
   a real local upload pass; students get the guided code, never the answer key. Only `activity` changed.
 - For a separate test class only, never the current class (teacher, 2026-11-15).
-- Found: CKB-119. Online, the current Week 15 Step 1 task can never pass. The current module is unchanged and the
-  teacher must decide. Steps 1, 2 (adjusted for CKB-119/CKB-073) and 7 are marked NEEDS TEACHER REVIEW in the report.
+- Found: the old Step 1 task could never pass online; fixed in #120 (CKB-123, renumbered from CKB-119). Every guided
+  example now equals the current task. Step 2's own task avoids CKB-073; Step 7 is NEEDS TEACHER REVIEW in the report.
 - Not pushed (teacher said not to). Next: the teacher reviews the report; do not start another week.
+- 2026-11-15: branch rebased on main after #114, #116-#120, on top of local `docs/renumber-ckb-123` (duplicate CKB-119 →
+  CKB-123; pushing that branch was not approved yet). Dropped this branch's duplicate records (CKB-118 → main's CKB-121,
+  CKB-119 → CKB-123). The three-part file still differs from the current module only in its tasks.

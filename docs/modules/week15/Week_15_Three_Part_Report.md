@@ -7,9 +7,8 @@ File: `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` (built 2026-1
 - **Upload this file only to a separate test class. Never upload it to your current class.** Every own task has a
   new id, so your current students' Week 15 completions would no longer count, and Week 16 would lock for them.
 - Upload it only after the guided-example app change is live. An older server does not know `guided`.
-- **Step 1, current module (CKB-119):** online, creating fleet.txt a second time answers `true`, but the task expects
-  `Created again? false`. Offline, the laptop runner blocks file programs. So no student can pass the current Step 1
-  task. This three-part file avoids it; the module your class uses now still has it.
+- **Step 1 (CKB-123, fixed by #120):** the old task (create fleet.txt twice) could never pass online. Since #120 the
+  current Step 1 task makes trips.txt, which is exactly this file's Step 1 guided example.
 - Steps 7 and 8 already had `-v2` ids, so their new ids end in `-v3`.
 
 ## How each step was checked
@@ -20,7 +19,7 @@ File: `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` (built 2026-1
   `System.in`), Week 14 (`List`/`ArrayList`) and earlier Week 15 steps, each found in those modules first.
 - **Guided result:** the guided code was run (step files and data files copied into a temporary folder outside the
   app) with laptop Java and with the online runner (CheerpJ). The output had to match the guided expected output
-  exactly. Steps 2-10 use the revised file's tested answer and output. Step 1 does not (see CKB-119).
+  exactly. Every guided example is the current task (as fixed by #120), with its tested answer and output.
 - **Own task result:** the answer was run the same two ways. Its output is the task's expected output, and it differs
   from the guided output on every step.
 - Upload rules: passed. A real upload into a throwaway local class: passed. Students receive the guided code but never
@@ -29,7 +28,7 @@ File: `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` (built 2026-1
 
 | Step | New task id | Discussion lines checked | Guided result | Own task answer | Own task result | Status |
 |---|---|---|---|---|---|---|
-| 1 | `java-2-w15-d1-s1-alter-v2` | 6, 8, 10, 9, 11, 17 | PASSED | Main.java, lines 12-13 — the two lines added after line 11 ("Created now?"), inside the try, with fares.txt in place of trips.txt:<br>            File fares = new File("fares.txt");<br>            System.out.println("Created fares.txt? " + fares.createNewFile()); | PASSED | NEEDS TEACHER REVIEW: Not the current task. Creating fleet.txt twice should print Created again? false, but the online Java runner prints true (CKB-119), so students could never pass it online. Guided now makes trips.txt; the own task makes fares.txt. Please check. |
+| 1 | `java-2-w15-d1-s1-alter-v2` | 6, 8, 10, 9, 11, 17 | PASSED | Main.java, lines 12-13 — the two lines added after line 11 ("Created now?"), inside the try, with fares.txt in place of trips.txt:<br>            File fares = new File("fares.txt");<br>            System.out.println("Created fares.txt? " + fares.createNewFile()); | PASSED | OK: the guided example is now the current task (#120); the own task makes fares.txt instead. |
 | 2 | `java-2-w15-d1-s2-alter-v2` | 7, 11, 20, 24, 26 | PASSED | Main.java, lines 26-29 — replace line 26 with the guided lines, but with the saved names first:<br>        String[] left = folder.list();<br>        System.out.println("Delete trips.txt? " + trips.delete());<br>        System.out.println("Delete the folder? " + folder.delete());<br>        System.out.println("Left inside: " + Arrays.toString(left)); | PASSED | OK |
 | 3 | `java-2-w15-d2-s3-alter-v2` | 9, 10, 12, 14, 18, 26 | PASSED | Main.java, line 7 — the counter:<br>        int spaces = 0;<br><br>Main.java, lines 14-15 — look for a space instead of a comma:<br>                } else if (ch == ' ') {<br>                    spaces++;<br><br>Main.java, line 26 — the label:<br>        System.out.println("Spaces in the file: " + spaces);<br><br>(Line 13 stays as in the sample: no newlines++ there.) | PASSED | OK |
 | 4 | `java-2-w15-d2-s4-alter-v2` | 9, 10, 11, 16, 21, 26, 35 | PASSED | Main.java, lines 26-29 — replace line 26 with these four lines (the guided lines with "Jeepney" in place of "Bus"):<br>                    String[] part = line.split(",");<br>                    if (part[0].equals("Jeepney")) {<br>                        fleet.add(toVehicle(line));<br>                    } | PASSED | OK |
