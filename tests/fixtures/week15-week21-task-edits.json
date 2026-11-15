@@ -9,13 +9,8 @@
   "java-2-w15-d1-s2": [
     {
       "path": "Main.java",
-      "from": "System.out.println(\"Delete it again? \" + old.delete());",
-      "to": "System.out.println(\"Delete it again? \" + old.delete());\n        System.out.println(\"Delete trips.txt? \" + trips.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());"
-    },
-    {
-      "path": "Main.java",
-      "from": "Arrays.toString(folder.list())",
-      "to": "Arrays.toString(folder.list() == null ? new String[0] : folder.list())"
+      "from": "        System.out.println(\"Left inside: \" + Arrays.toString(folder.list()));",
+      "to": "        System.out.println(\"Delete trips.txt? \" + trips.delete());\n        String[] left = folder.list();\n        System.out.println(\"Delete the folder? \" + folder.delete());\n        System.out.println(\"Left inside: \" + Arrays.toString(left));"
     }
   ],
   "java-2-w15-d2-s3": [
@@ -43,22 +38,22 @@
   "java-2-w15-d2-s4": [
     {
       "path": "Main.java",
-      "from": "fleet.add(toVehicle(line));",
-      "to": "Vehicle vehicle = toVehicle(line);\n                    if (vehicle instanceof Bus) fleet.add(vehicle);"
+      "from": "                    fleet.add(toVehicle(line));",
+      "to": "                    String[] part = line.split(\",\");\n                    if (part[0].equals(\"Bus\")) {\n                        fleet.add(toVehicle(line));\n                    }"
     }
   ],
   "java-2-w15-d3-s5": [
     {
       "path": "Main.java",
       "from": "total = total + sc.nextDouble();\n                count++;",
-      "to": "double fare = sc.nextDouble();\n                if (fare >= 15.00) {\n                    total = total + fare;\n                    count++;\n                }"
+      "to": "double fare = sc.nextDouble();\n                if (fare > 13.00) {\n                    total = total + fare;\n                    count++;\n                }"
     }
   ],
   "java-2-w15-d3-s6": [
     {
       "path": "Main.java",
-      "from": "!line.trim().isEmpty()",
-      "to": "line.startsWith(\"Tricycle,\")"
+      "from": "            if (!line.trim().isEmpty()) {",
+      "to": "            String[] part = line.split(\",\");\n            if (part[0].equals(\"Tricycle\")) {"
     }
   ],
   "java-2-w15-d4-s7": [
@@ -85,8 +80,8 @@
   "java-2-w15-d4-s10": [
     {
       "path": "Main.java",
-      "from": "String[] part = line.split(\",\");\n                count++;",
-      "to": "String[] part = line.split(\",\");\n                if (!part[0].equals(\"Bus\")) {\n                    line = in.readLine();\n                    continue;\n                }\n                count++;"
+      "from": "                count++;\n                report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");",
+      "to": "                if (part[0].equals(\"Bus\")) {\n                    count++;\n                    report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");\n                }"
     }
   ],
   "java-2-w16-d2-s1": [
