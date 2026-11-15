@@ -218,6 +218,18 @@
       "to": "            Thread.currentThread().interrupt();\n"
     }
   ],
+  "java-2-w16-d4-s8": [
+    {
+      "path": "Main.java",
+      "from": "new Semaphore(1);        // 1 boarding bay only",
+      "to": "new Semaphore(2);        // 2 boarding bays"
+    },
+    {
+      "path": "Main.java",
+      "from": "{12, 6, 30, 15}",
+      "to": "{12, 6, 60, 15}"
+    }
+  ],
   "java-2-w17-d1-s1": [
     {
       "path": "TerminalPanel.java",

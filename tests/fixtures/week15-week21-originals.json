@@ -80,7 +80,7 @@
     "notice": "File exercises retain real disk access and the original file setup. CodeShare classroom file access/persistence is not supported by this update. Verify these exercises in a separate desktop Java folder; do not treat this JSON as classroom-ready."
   },
   "16": {
-    "original": "0e7596411999cfdae8a1b1974e7d81ee8a8dea2803f240176ff1b18cdd14c150",
+    "original": "3ec261c2cbc06557d327025df8414b86e0f570831df2ce33e7f2762778ee314e",
     "originalFile": "d987498479ed8cd0c038bef5ee20abb12696ec9119f407f4f63db8551d75c523",
     "originalStepFiles": {
       "java-2-w16-d2-s1": [
@@ -108,6 +108,22 @@
       "java-2-w16-d4-s7": [
         "LoadingBay.java",
         "Main.java"
+      ],
+      "java-2-w16-d4-s8": [
+        "BayBoarding.java",
+        "Main.java",
+        "LoadingBay.java",
+        "Bus.java",
+        "InvalidDistanceException.java",
+        "Jeepney.java",
+        "OverloadException.java",
+        "Tricycle.java",
+        "Vehicle.java",
+        "VehicleNotFoundException.java",
+        "DispatchThread.java",
+        "BoardingTask.java",
+        "ReadyReport.java",
+        "ConvoyLeg.java"
       ]
     },
     "originalStarterCount": 8,
