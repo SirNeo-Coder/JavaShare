@@ -1528,7 +1528,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   the app does not produce); seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
 
-## Group card showed Teacher Demo's code — 2026-11-15 (CKB-118)
+## Group card showed Teacher Demo's code — 2026-11-15 (CKB-122, first numbered CKB-118)
 
 - Branch: `fix/group-view-double-load`, from main `974fee7`. Teacher reported the `teacher-live-help` browser test's group
   subtest timing out offline; plan approved.
@@ -1541,6 +1541,7 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - Open, not changed: a reload started by a live event (e.g. a group update) that lands after a card click can still reset
   the editor. It is rarer than this case and would need its own fix.
 - Next: the teacher merges the PR; check CodeRabbit on it at the start of the next piece of work.
+
 ## Live Classroom name and header buttons — 2026-11-15 (CKB-118)
 
 Branch `fix/live-classroom-header`. Both approved by the teacher.
@@ -1563,6 +1564,8 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
 - Done (CKB-120, approved): at 900 px and narrower **End session** / **Stop sharing** stay visible (681–900 px the button
   alone, the teacher's choice; phones keep the label). Layout test 22/22 (6 cases failed without the fix); real app
   offline at 850 and 600 px, light and dark, clicking **End session** ended the session. `npm test` 469/469.
+- Next: the teacher reviews and merges the PR; check CodeRabbit on it at the start of the next piece of work.
+## Sample-first browser test step tab — 2026-11-15 (CKB-121, first numbered CKB-118)
 - CodeRabbit on #115 (2 nitpicks, both valid test gaps, fixed with approval; no app bug): the layout test now covers the
   class session box with its step count and 950 px, and checks **Present this code** / **Lesson library** too. 41/41;
   hiding **Lesson library** failed 40 cases. `npm test` 469/469.
@@ -1574,6 +1577,18 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   clicks the worksheet step tab with `dispatchEvent("click")`; the tab stays folded after an earlier scroll (as CKB-107).
 - Tested: that browser test offline 5/5 (three runs) and online 5/5, shown failing before; `npm test` 467/467;
   `npm run build:all`; lint 0 errors. Not run: `npm run classroom:offline` itself (no app change).
-- `feature/guided-example` also adds CKB-118 (as "investigating") and its index row; when it next takes main, keep main's
-  resolved versions. Teacher declined (for now) unfolding the tabs when the worksheet moves to the next step by itself.
+- `feature/guided-example` also adds this case as CKB-118 (as "investigating") and its index row; when it next takes main,
+  keep main's resolved CKB-121 file and row and drop its CKB-118 copy. Teacher declined (for now) unfolding the tabs when the worksheet moves to the next step by itself.
 - Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
+
+## Duplicate CKB-118 renumbered — 2026-11-15
+
+- Branch `docs/renumber-ckb-121`. Three records on main shared CKB-118 (#115, #116 and #117 were numbered in parallel).
+  Teacher chose: the header-buttons record keeps CKB-118; the sample-first test record is now CKB-121 and the group-card
+  record CKB-122 (case files, index rows, prompt-map rows, handoff headings, the verification note, and the comments in
+  `app/page.tsx`, `tests/module-sample-first.browser.mjs`, `tests/teacher-live-help.browser.mjs`). No behaviour change.
+- Checked: no link left to the old file names; `npm run kb:search` finds CKB-122; `npm test` 469/469; `npm run build:all`;
+  lint 0 errors (8 older warnings).
+- Before numbering a new case, check `origin/main` and open PRs for the highest CKB number, not only the local checkout.
+- Next: the teacher merges this PR and #118.
+

@@ -1,4 +1,4 @@
-# CKB-118 — Choosing a group soon after Groups showed Teacher Demo's code under the group's name
+# CKB-122 — Choosing a group soon after Groups showed Teacher Demo's code under the group's name
 
 - Status: resolved (branch `fix/group-view-double-load`)
 - First recorded: 2026-11-15

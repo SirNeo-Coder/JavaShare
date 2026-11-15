@@ -52,7 +52,7 @@ for (const mode of (process.env.SAMPLE_BROWSER_MODE ? [process.env.SAMPLE_BROWSE
       const openStep = async (step, expected = step.files.find((f) => f.path === "Main.java").content) => {
         await page.mouse.move(1100, 20);
         await page.getByRole("button", { name: "Module", exact: true }).hover();
-        // The step tabs fold away once the worksheet has scrolled down; Playwright cannot unfold them (CKB-118, CKB-107).
+        // The step tabs fold away once the worksheet has scrolled down; Playwright cannot unfold them (CKB-121, CKB-107).
         await worksheet.getByRole("button", { name: new RegExp(`Step ${step.number}$`) }).dispatchEvent("click");
         const opening = page.waitForResponse((response) => response.url().includes("/progress/activity?stepId=") && response.request().method() === "GET");
         await worksheet.getByRole("button", { name: "Work in code editor", exact: true }).click();
