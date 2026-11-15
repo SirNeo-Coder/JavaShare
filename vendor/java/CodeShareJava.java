@@ -100,7 +100,11 @@ public final class CodeShareJava {
             if ("true".equals(System.getProperty("codeshare.browser"))) running();
             try (URLClassLoader loader = new URLClassLoader(new URL[]{new File(directory).toURI().toURL()}, CodeShareJava.class.getClassLoader())) {
                 Class<?> entry = Class.forName(mainClass, true, loader);
-                entry.getMethod("main", String[].class).invoke(null, (Object)new String[0]);
+                // Online, CheerpJ calls this from its own thread ("Thread-0"); real Java runs main() on "main" (CKB-125).
+                String caller = Thread.currentThread().getName();
+                Thread.currentThread().setName("main");
+                try { entry.getMethod("main", String[].class).invoke(null, (Object)new String[0]); }
+                finally { Thread.currentThread().setName(caller); }
             }
             success = errors.bytes.size() == 0;
         } catch (Throwable error) {

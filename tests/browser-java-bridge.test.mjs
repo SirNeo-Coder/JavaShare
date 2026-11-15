@@ -63,3 +63,19 @@ test("browser bridge: flat browser strings become distinct source folders, inclu
   assert.deepEqual(run(files, "app.Main", "", true), { success: true, output: "leftright\n" });
   assert.equal(run([["../Main.java", ""]], "Main", "", true).success, false);
 });
+
+// Online, CheerpJ calls the bridge from its own thread, "Thread-0"; the student's main() must still run on "main"
+// like real Java, and the caller keeps its own name afterwards (CKB-125, Week 16 Steps 1-2).
+test("browser bridge: main() runs on a thread named main even when called from another thread (CKB-125)", () => {
+  const base = mkdtempSync(join(tmpdir(), "codeshare-bridge-thread-"));
+  try {
+    writeFileSync(join(base, "Main.java"), 'public class Main { public static void main(String[] args) { System.out.println("main() runs on thread: " + Thread.currentThread().getName()); } }');
+    writeFileSync(join(base, "Caller.java"), `public class Caller { public static void main(String[] args) throws Exception {
+      Thread t = new Thread(() -> System.out.print(CodeShareJava.run(args[0], "Main", "", args[1]) + "|" + Thread.currentThread().getName()), "Thread-0");
+      t.start(); t.join(); } }`);
+    execFileSync("javac", ["-cp", jar, "-d", base, join(base, "Caller.java")]);
+    const [json, after] = execFileSync("java", ["-cp", `${jar}:${base}`, "Caller", join(base, "Main.java"), join(base, "classes")], { encoding: "utf8", timeout: 15000 }).split("|");
+    assert.deepEqual(JSON.parse(json), { success: true, output: "main() runs on thread: main\n" });
+    assert.equal(after, "Thread-0", "the caller's own thread name comes back");
+  } finally { rmSync(base, { recursive: true, force: true }); }
+});
