@@ -1,7 +1,7 @@
 import { paperPerformanceTask, personalProjectFiles, type PersonalMedia, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
-import { activityStateId, activityTask, activityAccess, checkModuleRun, checkableStep, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, checkModuleRun, checkStateId, checkStdin, checkableStep, guidedStateId, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
 import { fileLanguage, javaProjectPath, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
@@ -1706,16 +1706,15 @@ export async function runSupabaseModuleActivity(
   const { content, step, progress: beforeRun, moduleVersion } = await requireModuleActivity(user, classroomId, moduleId, stepId);
   if (step.language !== "java") throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java only");
   if (beforeRun.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "This module project changed in another tab. Reopen the activity before running");
-  const sample = samplePending(content, step, beforeRun.step_states);
-  const result = await execute(files, (sample ? step : activityTask(step)).stdin ?? "");
+  const result = await execute(files, checkStdin(content, step, beforeRun.step_states));
   if (result.mode === "demo") throw new SupabaseRepositoryError(503, "Java execution is unavailable here. Run this activity in offline classroom mode");
-  const { check, sampleMatched, passed } = checkModuleRun(content, step, beforeRun.step_states, files, result);
-  if (!passed) return { ...result, passed, check, sampleMatched, progress: moduleProgressView(beforeRun, content) };
-  const stateId = check === "sample" ? sampleStateId(step) : activityStateId(step);
+  const { check, sampleMatched, guidedMatched, passed } = checkModuleRun(content, step, beforeRun.step_states, files, result);
+  if (!passed) return { ...result, passed, check, sampleMatched, guidedMatched, progress: moduleProgressView(beforeRun, content) };
+  const stateId = checkStateId(check, step);
   const progress = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
     const states = { ...row.step_states, [stateId]: "pass" as const };
-    if (check === "sample") return { step_states: states };
+    if (check !== "task") return { step_states: states };
     if (!content.sampleFirst || !step.activity?.id) return { project_files: files, step_states: states };
     const key = activityStateId(step);
     const history = row.activity_projects ?? {};
@@ -1730,7 +1729,7 @@ export async function runSupabaseModuleActivity(
       },
     };
   }, "Could not save the completed module activity");
-  return { ...result, passed, check, sampleMatched, progress: moduleProgressView(progress, content), module: studentModuleView(content, progress.step_states, moduleVersion) };
+  return { ...result, passed, check, sampleMatched, guidedMatched, progress: moduleProgressView(progress, content), module: studentModuleView(content, progress.step_states, moduleVersion) };
 }
 
 // Browser results are practice evidence, explicitly approved by the teacher, not grades.
@@ -1741,21 +1740,22 @@ export async function recordSupabaseModuleActivityResult(
 ) {
   const { content, step, progress: beforeRun } = await requireModuleActivity(user, classroomId, moduleId, stepId);
   if (step.language !== "java") throw new SupabaseRepositoryError(400, "Automatic activity checking currently supports Java only");
-  const { check, sampleMatched, passed } = checkModuleRun(content, step, beforeRun.step_states, beforeRun.project_files, result);
+  const { check, sampleMatched, guidedMatched, passed } = checkModuleRun(content, step, beforeRun.step_states, beforeRun.project_files, result);
   if (content.sampleFirst && step.activity?.id && beforeRun.activity_projects?.activeKey !== activityStateId(step)) throw new SupabaseRepositoryError(409, "Open this step in the code editor before running it");
-  const stateId = check === "sample" ? sampleStateId(step) : activityStateId(step);
+  const stateId = checkStateId(check, step);
   const progress = await updateModuleProgressWithMerge(user, classroomId, moduleId, (row) => {
     // A changed project must not receive a result from an earlier run.
     if (row.updated_at !== updatedAt) throw new SupabaseRepositoryError(409, "The project changed while running. Run the current files again");
     return { step_states: { ...row.step_states, [stateId]: row.step_states[stateId] === "pass" || passed ? "pass" : "fail" } };
   }, "Could not save the activity result");
-  return { ...result, passed, check, sampleMatched, progress: moduleProgressView(progress, content) };
+  return { ...result, passed, check, sampleMatched, guidedMatched, progress: moduleProgressView(progress, content) };
 }
 
 export type ModuleCheckpoint = {
   stepId: string; updatedAt: string; moduleVersion: string; completionId: string;
   files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[];
   sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[] };
+  guided?: { files: ModuleFile[]; success: boolean; output: string };
 };
 
 export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, classroomId: string, moduleId: string, checkpoint: ModuleCheckpoint) {
@@ -1774,6 +1774,12 @@ export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, 
   if (samplePending(content, step, progress.step_states) && (!checkpoint.sample || !matchesSample(checkpoint.sample, step) || !webChecksPass(step.webChecks, checkpoint.sample.checks) || (mediaStep && !mediaLinesPass(step.mediaChecks, checkpoint.sample.media)) || !unchangedSample(checkpoint.sample.files, step.files))) {
     throw new SupabaseRepositoryError(400, "Run the supplied sample unchanged before completing this task");
   }
+  // The guided example passes on this device first, like the sample; the server checks its evidence here.
+  const guided = step.activity?.guided;
+  if (guided && progress.step_states[activityStateId(step)] !== "pass" && progress.step_states[guidedStateId(step)] !== "pass"
+    && (!checkpoint.guided || !matchesActivityOutput(checkpoint.guided, guided.expectedOutput))) {
+    throw new SupabaseRepositoryError(400, "Run the guided example before completing this task");
+  }
   const key = activityStateId(step);
   const sameFiles = (files: ModuleFile[] | undefined) => files?.length === checkpoint.files.length && unchangedSample(files, checkpoint.files);
   const accepted = (row: ModuleProgressRow) => row.activity_projects?.checkpoints?.[key]?.id === checkpoint.completionId
@@ -1787,7 +1793,8 @@ export async function completeSupabaseModuleActivity(user: SupabaseSessionUser, 
   const projects: ActivityProjects = { ...history, activeKey: key, drafts,
     ...(!history.beforeSampleFiles && !history.activeKey && progress.project_files.length ? { beforeSampleFiles: progress.project_files } : {}),
     checkpoints: { ...history.checkpoints, [key]: { id: checkpoint.completionId, moduleVersion } } };
-  const states = { ...progress.step_states, [key]: "pass", ...(content.sampleFirst && step.activity?.id ? { [sampleStateId(step)]: "pass" } : {}) };
+  const states = { ...progress.step_states, [key]: "pass", ...(content.sampleFirst && step.activity?.id ? { [sampleStateId(step)]: "pass" } : {}),
+    ...(guided ? { [guidedStateId(step)]: "pass" } : {}) };
   const { data, error } = await getSupabaseAdmin().rpc("codeshare_complete_module_activity", {
     p_classroom_id: classroomId, p_student_id: user.id, p_module_id: moduleId,
     p_progress_version: checkpoint.updatedAt, p_module_version: moduleVersion,

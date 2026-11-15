@@ -14,6 +14,22 @@ export function samplePending(module: { sampleFirst?: boolean }, step: { id: str
   return Boolean(module.sampleFirst && step.activity?.id && states[activityStateId(step)] !== "pass" && states[sampleStateId(step)] !== "pass");
 }
 
+// Guided example (teacher, 2026-11-15): after the sample, before the own task. Its pass is practice
+// evidence only, like the sample's: it never completes the step or opens the next one.
+export type Guided = { instruction: string; code: string; expectedOutput: string; stdin?: string; discussion?: string };
+export function guidedStateId(step: { activity?: { id?: string } }) { return `guided:${step.activity?.id}`; }
+
+export function guidedPending(module: { sampleFirst?: boolean }, step: { id: string; activity?: { id?: string; guided?: Guided } }, states: Record<string, string>) {
+  return Boolean(step.activity?.guided && !samplePending(module, step, states) && states[activityStateId(step)] !== "pass" && states[guidedStateId(step)] !== "pass");
+}
+
+// The run's typed input follows what this run is checked as.
+export function checkStdin(module: { sampleFirst?: boolean }, step: { id: string; stdin?: string; activity?: { id?: string; stdin?: string; guided?: Guided } }, states: Record<string, string>) {
+  if (samplePending(module, step, states)) return step.stdin ?? "";
+  if (guidedPending(module, step, states)) return step.activity!.guided!.stdin ?? "";
+  return (step.activity?.id ? step.activity.stdin : step.stdin) ?? "";
+}
+
 export type ActivityProjects = { activeKey?: string; drafts?: Record<string, ModuleFile[]>; beforeSampleFiles?: ModuleFile[]; checkpoints?: Record<string, { id: string; moduleVersion: string }> };
 
 export function activityTask(step: { instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string;
@@ -152,13 +168,20 @@ export const mediaLinesPass = (checks?: MediaCheck[], lines?: string[]) => media
 export function checkModuleRun(module: { sampleFirst?: boolean },
   step: Pick<ActivityStep, "id" | "activity" | "instruction" | "files" | "expectedOutput" | "expectedError" | "stdin" | "webChecks" | "mediaChecks">,
   states: Record<string, string>, files: ModuleFile[], result: { success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[] }) {
-  const check = samplePending(module, step, states) ? "sample" as const : "task" as const;
+  const check = samplePending(module, step, states) ? "sample" as const : guidedPending(module, step, states) ? "guided" as const : "task" as const;
   // Page-element checks belong to the step's own sample, never to an alteration task.
   const pageChecks = webChecksPass(step.webChecks, result.checks);
   // Media steps (Media checks: in the expected output) also follow the media rule.
   const media = !teacherCheckedStep(step) || mediaLinesPass(step.mediaChecks, result.media);
   const sampleMatched = matchesSample(result, step) && pageChecks && media;
+  const guided = step.activity?.guided;
+  const guidedMatched = Boolean(guided) && matchesActivityOutput(result, guided!.expectedOutput);
   const passed = check === "sample" ? sampleMatched && unchangedSample(files, step.files)
+    : check === "guided" ? guidedMatched
     : matchesActivityOutput(result, activityTask(step).expectedOutput) && (Boolean(step.activity?.id) || pageChecks) && media;
-  return { check, sampleMatched, passed };
+  return { check, sampleMatched, guidedMatched, passed };
+}
+
+export function checkStateId(check: "sample" | "guided" | "task", step: { id: string; activity?: { id?: string } }) {
+  return check === "sample" ? sampleStateId(step) : check === "guided" ? guidedStateId(step) : activityStateId(step);
 }

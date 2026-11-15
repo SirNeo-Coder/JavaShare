@@ -774,7 +774,8 @@ app.post("/api/classrooms/:classroomId/modules/:moduleId/progress/complete", req
     const evidence = z.object({ files: web ? webModuleFiles : javaFiles, success: z.boolean(), output: z.string().max(70000), checks: checks.optional(),
       media: z.array(z.string().max(1000)).max(100).optional() });
     const checkpoint = evidence.extend({ stepId: z.string().trim().min(1).max(100), updatedAt: z.string().datetime({ offset: true }),
-      moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional() }).parse(req.body);
+      moduleVersion: z.string().datetime({ offset: true }), completionId: z.string().uuid(), sample: evidence.optional(),
+      guided: z.object({ files: javaFiles, success: z.boolean(), output: z.string().max(70000) }).optional() }).parse(req.body);
     return res.json(await stepDone(req.params.classroomId, await completeSupabaseModuleActivity(req.user!, req.params.classroomId, req.params.moduleId, checkpoint)));
   } catch (error) { next(error); }
 });

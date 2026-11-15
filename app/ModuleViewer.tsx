@@ -47,7 +47,8 @@ async function runFiles(files: ModuleFile[], stdin = "") {
 export type ModuleFile = { path: string; content: string };
 export type StepBlock = {
   locked?: boolean;
-  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string; solution?: { lines: string; note?: string } };
+  activity?: { id?: string; instruction: string; files: ModuleFile[]; expectedOutput: string; stdin?: string; solution?: { lines: string; note?: string };
+    guided?: { discussion?: string; instruction: string; code: string; expectedOutput: string; stdin?: string } };
   part?: string;
   type: "step";
   id: string;
@@ -135,7 +136,7 @@ function renderInline(text: string, keyPrefix: string) {
   });
 }
 
-function Markdown({ markdown }: { markdown: string }) {
+export function Markdown({ markdown }: { markdown: string }) {
   const paragraphs = markdown.split(/\n{2,}/);
   return (
     <>
@@ -238,6 +239,11 @@ export function ModuleMediaFiles<T>({ base, files, note, onChange }: { base: str
   </section>;
 }
 
+// Line numbers beside the worksheet's sample code match the code editor's, so "Look at line 26" points at the same line.
+function NumberedCode({ content }: { content: string }) {
+  return <pre className="numbered-code"><code>{content.split("\n").map((line, index) => <span key={index}>{line}{"\n"}</span>)}</code></pre>;
+}
+
 function StepView({ step, status, role, printed = false, sampleFirst = false, onStart, support = [], media = {}, mediaLoading = false }: {
   step: StepBlock; status?: StepStatus; role: "teacher" | "student"; printed?: boolean; sampleFirst?: boolean; onStart?: () => Promise<void>;
   support?: ModuleFile[]; media?: Record<string, string>; mediaLoading?: boolean;
@@ -266,8 +272,13 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     <div className="module-step-head"><b>Step {step.number}</b>{status && <span className={`status-chip ${status === "pass" ? "done" : ""}`}>{status === "pass" ? "Completed" : "Try again"}</span>}</div>
     <Markdown markdown={step.instruction} />
     {task && <b>Sample code</b>}
-    <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><pre><code>{file.content}</code></pre></div>)}</div>
+    <div className="printed-sample">{step.files.map((file) => <div key={file.path}><small>{file.path}</small><NumberedCode content={file.content} /></div>)}</div>
     <b>{task ? "Sample output" : "Output (expected):"}</b><pre className="printed-output">{step.expectedOutput}</pre>
+    {task?.guided && <div className="paper-instructions module-guided">
+      {task.guided.discussion && <><b>Discussion</b><Markdown markdown={task.guided.discussion} /></>}
+      <b>Guided example</b><Markdown markdown={task.guided.instruction} /><pre><code>{task.guided.code}</code></pre>
+      <b>Expected guided output</b><pre className="printed-output">{task.guided.expectedOutput}</pre>
+    </div>}
     {task && <div className="paper-instructions"><b>Your task</b><Markdown markdown={task.instruction} /><b>Expected task output</b><pre className="printed-output">{task.expectedOutput}</pre></div>}
     {role === "teacher" && task?.solution && <details className="answer-key"><summary>Answer key (teacher only)</summary>
       <p className="module-preview-note">Only your teacher account sees this. It is never sent to a student.</p>

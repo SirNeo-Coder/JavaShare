@@ -4,8 +4,9 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
-import { activityAccess, activityStateId, activityTask, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles } from "../backend/src/module-activities.ts";
+import { activityAccess, activityStateId, activityTask, checkModuleRun, checkStdin, guidedPending, guidedStateId, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles } from "../backend/src/module-activities.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
+import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
 const first = fixture.lessons[0].blocks[0];
@@ -555,5 +556,122 @@ test("module answer key: the teacher receives it, the student never does", needs
     assert.ok(!JSON.stringify(studentView).includes("ANSWER-KEY-MARKER"), "no student view may carry the answer key");
     const prepared = await prepare(first.id);
     assert.ok(!JSON.stringify(prepared).includes("ANSWER-KEY-MARKER"), "opening the task never loads the answer into the student project");
+  });
+});
+
+// Guided example (teacher, 2026-11-15): sample, then guided example, then the own task. Only the own task completes.
+function guidedModule() {
+  const content = structuredClone(fixture); content.id = "java-2-w99-guided"; content.sampleFirst = true;
+  content.lessons.forEach((lesson, i) => { lesson.id = `guided-lesson-${i}`; lesson.exitSlip.id = `guided-slip-${i}`; lesson.blocks[0].id = `guided-step-${i}`; lesson.blocks[0].activity.id = `guided-task-${i}`; });
+  content.lessons[0].blocks[0].activity.guided = { discussion: "Look at line 1. GUIDED-DISCUSSION", instruction: "Change the capacity to 22.",
+    code: "public int getCapacity() { return 22; }", expectedOutput: "Capacity: 22", stdin: "guided input" };
+  content.lessons[0].blocks[0].activity.stdin = "task input";
+  content.lessons[0].blocks[0].activity.solution = { lines: "Jeepney.java - GUIDED-ANSWER-KEY return 25;" };
+  return content;
+}
+const withCapacity = (files, n) => files.map((f) => f.path === "Jeepney.java" ? { ...f, content: f.content.replace(/return \d+/, `return ${n}`) } : f);
+
+test("guided example: upload refuses a missing expected output, a missing task id, the task's own output, and a web step", () => {
+  assert.equal(courseModule.safeParse(guidedModule()).success, true);
+  const refused = (change, message) => {
+    const content = guidedModule(); change(content.lessons[0].blocks[0]);
+    const result = courseModule.safeParse(content);
+    assert.equal(result.success, false); assert.match(result.error.issues.map((issue) => issue.message).join(" "), message);
+  };
+  refused((step) => { step.activity.guided.expectedOutput = "  \n"; }, /needs its expected output/);
+  refused((step) => { delete step.activity.guided.expectedOutput; }, /expectedOutput|Required|expected/i);
+  refused((step) => { delete step.activity.id; delete step.activity.solution; }, /needs the task's own activity.id/);
+  refused((step) => { step.activity.guided.expectedOutput = "Capacity: 25"; }, /must differ/);
+  refused((step) => { step.activity.guided.expectedOutput = "Capacity: 25\r\n"; }, /must differ/);
+  refused((step) => { step.language = "html"; step.files = [{ path: "index.html", content: "<p>x</p>" }]; step.activity.files = []; }, /Java steps only/);
+  const collision = guidedModule(); collision.lessons[1].blocks[0].id = "guided:guided-task-0";
+  assert.equal(courseModule.safeParse(collision).success, false, "guided:<task id> is a progress key");
+});
+
+test("guided example: unlocks after the sample, before the own task, and never completes or opens the next step", () => {
+  const content = courseModule.parse(guidedModule());
+  const step = content.lessons[0].blocks[0], next = content.lessons[1].blocks[0];
+  const sampleFiles = mergeProjectFiles(content.starterFiles, step.files);
+  const run = (states, files, output) => checkModuleRun(content, step, states, files, { success: true, output });
+  let states = {};
+  assert.equal(guidedPending(content, step, states), false, "the sample comes first");
+  assert.equal(run(states, sampleFiles, "Capacity: 22").check, "sample");
+  assert.equal(checkStdin(content, step, states), "");
+  states = { [sampleStateId(step)]: "pass" };
+  assert.equal(guidedPending(content, step, states), true);
+  assert.equal(checkStdin(content, step, states), "guided input");
+  const guidedRun = run(states, withCapacity(sampleFiles, 22), "Capacity: 22");
+  assert.deepEqual([guidedRun.check, guidedRun.passed], ["guided", true]);
+  assert.equal(run(states, withCapacity(sampleFiles, 25), "Capacity: 25").passed, false, "the own task's output cannot pass the guided example");
+  states[guidedStateId(step)] = "pass";
+  const access = activityAccess(content, states);
+  assert.ok(!access.openStepIds.includes(activityStateId(next)), "a guided pass never opens the next step");
+  assert.equal(states[activityStateId(step)], undefined);
+  assert.equal(checkStdin(content, step, states), "task input");
+  const stillGuided = run(states, withCapacity(sampleFiles, 22), "Capacity: 22");
+  assert.deepEqual([stillGuided.check, stillGuided.passed, stillGuided.guidedMatched], ["task", false, true]);
+  assert.equal(run(states, withCapacity(sampleFiles, 25), "Capacity: 25").passed, true);
+  assert.ok(activityAccess(content, { ...states, [activityStateId(step)]: "pass" }).openStepIds.includes(activityStateId(next)));
+  assert.equal(guidedPending(content, step, { [activityStateId(step)]: "pass" }), false, "an existing completion skips the guided gate");
+});
+
+test("guided example: a module without guided behaves as before", () => {
+  const content = guidedModule(); delete content.lessons[0].blocks[0].activity.guided;
+  const parsed = courseModule.parse(content), step = parsed.lessons[0].blocks[0];
+  const states = { [sampleStateId(step)]: "pass" };
+  assert.equal(guidedPending(parsed, step, states), false);
+  assert.equal(checkStdin(parsed, step, states), "task input");
+  const result = checkModuleRun(parsed, step, states, [], { success: true, output: "Capacity: 25" });
+  assert.deepEqual([result.check, result.passed, result.guidedMatched], ["task", true, false]);
+  assert.equal(checkModuleRun(parsed, step, {}, mergeProjectFiles(parsed.starterFiles, step.files), { success: true, output: "Capacity: 20" }).check, "sample");
+});
+
+test("guided example: the student keeps the guided code but never the answer key", () => {
+  const step = courseModule.parse(guidedModule()).lessons[0].blocks[0];
+  const student = stepWithoutAnswerKey(step);
+  assert.equal(student.activity.solution, undefined);
+  assert.deepEqual(student.activity.guided, step.activity.guided);
+});
+
+test("guided example: device evidence survives a reload only for the same step and the right output", () => {
+  const step = courseModule.parse(guidedModule()).lessons[0].blocks[0];
+  const current = { files: [], moduleVersion: "v1", stateId: activityStateId(step) };
+  const guided = { files: [], success: true, output: "Capacity: 22" };
+  assert.deepEqual(restoreModuleDraft({ ...current, guided }, current, step, false).guided, guided);
+  assert.equal(restoreModuleDraft({ ...current, guided: { ...guided, output: "Capacity: 25" } }, current, step, false).guided, undefined);
+  assert.equal(restoreModuleDraft({ ...current, guided, moduleVersion: "v0" }, current, step, false).guided, undefined);
+});
+
+test("guided example: real offline Java saves guided:<id> only, then the own task completes", needsLocal, async () => {
+  await withClass(async ({ upload, request, cookies }) => {
+    const content = guidedModule();
+    await upload(content);
+    const step = content.lessons[0].blocks[0], next = content.lessons[1].blocks[0];
+    const open = (stepId) => request("/progress/activity", { stepId }, cookies[1], content.id);
+    const go = async (files, updatedAt) => { await delay(1550); return (await request("/progress/run", { stepId: step.id, files, updatedAt }, cookies[1], content.id)).json(); };
+    let p = await (await open(step.id)).json();
+    let r = await go(p.projectFiles, p.updatedAt);
+    assert.deepEqual([r.check, r.passed], ["sample", true]);
+    r = await go(withCapacity(r.progress.projectFiles, 25), r.progress.updatedAt);
+    assert.deepEqual([r.check, r.passed], ["guided", false], "the own task cannot be done before the guided example");
+    r = await go(withCapacity(r.progress.projectFiles, 22), r.progress.updatedAt);
+    assert.deepEqual([r.check, r.passed], ["guided", true]);
+    assert.equal(r.progress.stepStates[guidedStateId(step)], "pass");
+    assert.equal(r.progress.stepStates[activityStateId(step)], undefined, "a guided pass is not Completed");
+    assert.equal(r.progress.percent, p.percent, "a guided pass never counts toward module completion");
+    assert.equal((await open(next.id)).status, 403, "a guided pass never opens the next step");
+    p = r.progress;
+    r = await go(withCapacity(p.projectFiles, 22), p.updatedAt);
+    assert.deepEqual([r.check, r.passed, r.guidedMatched], ["task", false, true]);
+    r = await go(withCapacity(r.progress.projectFiles, 25), r.progress.updatedAt);
+    assert.deepEqual([r.check, r.passed], ["task", true]);
+    assert.equal(r.progress.stepStates[activityStateId(step)], "pass");
+    assert.ok(r.progress.percent > p.percent);
+    assert.equal((await open(next.id)).status, 200);
+    const studentView = await (await request("", undefined, cookies[1], content.id)).json();
+    assert.equal(studentView.lessons[0].blocks[0].activity.guided.code, step.activity.guided.code, "students see the guided code");
+    assert.ok(!JSON.stringify(studentView).includes("GUIDED-ANSWER-KEY"), "the answer key stays hidden");
+    const teacherView = await (await request("", undefined, cookies[0], content.id)).json();
+    assert.match(teacherView.lessons[0].blocks[0].activity.solution.lines, /GUIDED-ANSWER-KEY/);
   });
 });

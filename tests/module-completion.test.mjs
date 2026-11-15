@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
-import { activityStateId, sampleStateId } from "../backend/src/module-activities.ts";
+import { activityStateId, guidedStateId, sampleStateId } from "../backend/src/module-activities.ts";
 
 let local;
 try {
@@ -134,6 +134,24 @@ test("completion-only modules: read-only preparation, small summaries and guarde
       response = await call(`${errorBase}/progress/complete`, cookies[1], "POST", errorPayload);
       assert.equal(response.status, 200, await response.clone().text());
       assert.equal((await response.json()).progress.stepStates[sampleStateId(step)], "pass");
+    });
+
+    await t.test("online, the own task completes only with guided example evidence from the device", async () => {
+      const guided = structuredClone(content); guided.id += "-guided";
+      guided.lessons[0].blocks[0].activity.guided = { instruction: "Change the capacity to 22.", code: "return 22;", expectedOutput: "Capacity: 22" };
+      assert.equal((await call(`/api/classrooms/${classes[0]}/modules`, cookies[0], "POST", guided)).status, 201);
+      const guidedBase = `/api/classrooms/${classes[0]}/modules/${guided.id}`;
+      const opened = await (await call(`${guidedBase}/progress/activity?stepId=${step.id}`)).json();
+      const guidedPayload = { ...payload, completionId: randomUUID(), moduleVersion: opened.moduleVersion, updatedAt: opened.updatedAt,
+        sample: { ...sample, files: opened.projectFiles }, guided: { files: opened.projectFiles, success: true, output: "Capacity: 22" } };
+      for (const missing of [{ ...guidedPayload, guided: undefined }, { ...guidedPayload, guided: { ...guidedPayload.guided, output: "Capacity: 25" } }, { ...guidedPayload, guided: { ...guidedPayload.guided, success: false } }]) {
+        const response = await call(`${guidedBase}/progress/complete`, cookies[1], "POST", missing);
+        assert.equal(response.status, 400, await response.text());
+      }
+      const response = await call(`${guidedBase}/progress/complete`, cookies[1], "POST", guidedPayload);
+      assert.equal(response.status, 200, await response.clone().text());
+      const states = (await response.json()).progress.stepStates;
+      assert.equal(states[activityStateId(step)], "pass"); assert.equal(states[guidedStateId(step)], "pass");
     });
 
     await t.test("module updates, stale projects and live restrictions keep existing successful work intact", async () => {

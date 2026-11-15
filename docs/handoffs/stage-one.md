@@ -1603,3 +1603,37 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
 - Before numbering a new case, check `origin/main` and open PRs for the highest CKB number, not only the local checkout.
 - Next: the teacher merges this PR and #118.
 
+## Guided example: three-part module steps, Stage B (app) — 2026-11-15
+
+- Branch: `feature/guided-example`. Teacher approved Stage A (plan) and these choices: discussion always on the
+  worksheet, in the editor after Sample verified; Stage C uses the revised Week 15 tasks as guided examples; line
+  numbers beside the worksheet's sample code; the three-part Week 15 file goes to a separate test class only.
+- Done (Stage B): optional `activity.guided` (schema, run checks, offline save as `guided:<id>`, online device
+  evidence checked at completion, worksheet and editor panel, line numbers). Docs: `docs/course-format.md`
+  "Guided example", `workflow-state.md`, AGENTS.md rule.
+- Tests: 6 new in `tests/module-activities.test.mjs` (upload refusals, unlock order, old module unchanged, answer key
+  hidden, device evidence, real offline Java), 1 new in `tests/module-completion.test.mjs` (online completion needs
+  guided evidence). Shown failing with the guided gate removed, passing restored. New browser test
+  `tests/module-guided.browser.mjs` passes offline (3022, laptop javac) and online (3020 + runner 3021, CheerpJ).
+  `npm test` 474/474, `npm run build:all`, lint 0 errors (8 older warnings).
+- Found, not fixed: `tests/module-sample-first.browser.mjs` failed its Step 2 click on main too; recorded and fixed separately as CKB-121 (#116).
+- Not pushed: the teacher said not to push in this job. Committed locally on `feature/guided-example`.
+- Next: the teacher tries it on the laptop and approves Stage B; then Stage C builds
+  `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` and its report. CodeRabbit: #111 no findings;
+  #112/#113 not reviewed (automatic reviews off for repos under 10 stars).
+
+## Guided example, Stage C (Week 15 three-part file) — 2026-11-15
+
+- Branch: `feature/guided-example`. The teacher approved Stage B ("continue").
+- Done: `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` and `Week_15_Three_Part_Report.md`. All 10
+  guided examples and own tasks were run on laptop Java and the online runner (CheerpJ); all pass. Upload rules and
+  a real local upload pass; students get the guided code, never the answer key. Only `activity` changed.
+- For a separate test class only, never the current class (teacher, 2026-11-15).
+- Found: the old Step 1 task could never pass online; fixed in #120 (CKB-123, renumbered from CKB-119). Every guided
+  example now equals the current task. Step 2's own task avoids CKB-073; the teacher approved Step 7's own task (2026-11-15), so every step is OK.
+- Not pushed (teacher said not to). Next: the teacher reviews the report; do not start another week.
+- 2026-11-15: branch rebased on main after #114, #116-#120, on top of local `docs/renumber-ckb-123` (duplicate CKB-119 →
+  CKB-123; pushing that branch was not approved yet). Dropped this branch's duplicate records (CKB-118 → main's CKB-121,
+  CKB-119 → CKB-123). The three-part file still differs from the current module only in its tasks.
+- 2026-11-15: teacher approved pushing; PRs opened for `docs/renumber-ckb-123` and `feature/guided-example` (stacked on it,
+  opened against main). Next: the teacher merges the renumber PR first, then the guided PR; check CodeRabbit on both.

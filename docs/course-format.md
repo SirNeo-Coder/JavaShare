@@ -218,6 +218,53 @@ and unordered collection iteration must be checked on each supported runner befo
 Do not change a task's requirement without a new stable activity id; sample-key collisions are
 rejected at upload, alongside existing step/task/lesson/exit-slip collisions.
 
+## Guided example (approved 2026-11-15)
+
+A task (`activity` with its own `id`) may carry an optional `guided` part. The step then teaches in three
+parts: the sample, a guided example with its code shown, and the student's own task.
+
+| Field | Meaning |
+|---|---|
+| `discussion` | Optional markdown. The teacher's walk through the step's `Main.java`, for example "Look at line 26." The worksheet always shows it after **Sample output**; the code editor shows it after **Sample verified**. |
+| `instruction` | Markdown: what to change, which line to replace or add after, "run, you should get this result". |
+| `code` | Plain text: the lines the student types. Shown to students. |
+| `expectedOutput` | The real output after typing the guided code. Required; must differ from the task's `expectedOutput`. |
+| `stdin` | Optional typed input for the guided run (default empty). |
+
+Order: **Sample verified** → **Guided example verified** → own task → **Completed**. The guided run is
+checked like a task run (successful execution, exact output) but its pass is saved as
+`guided:<activity.id>`, never as `task:<activity.id>`: it does not complete the step, open the next
+step or count toward module completion. Online it stays on the device, like sample verification, and
+the server checks it again when the own task's completion is sent. Offline (laptop Java) the server
+saves it. The student's code stays in the editor after the guided run. A step already completed
+skips the guided gate. Java steps only for now. The upload is refused when `guided` has no expected
+output, the task has no `id`, the guided expected output equals the task's (ignoring Windows line
+endings and one final line break), or the step is not Java. `solution` stays teacher-only; `guided`
+is sent to students. Changing an own task's requirement still needs a new `-v2` id.
+
+The worksheet shows line numbers beside the sample code, counted the same way as the code editor, so
+"Look at line 26" points at the same line in both.
+
+```json
+"activity": {
+  "id": "java-2-w15-d2-s4-alter-v2",
+  "guided": {
+    "discussion": "Look at line 26. `fleet.add(toVehicle(line));` The method `toVehicle` is our own. It is at line 9 of this same file.",
+    "instruction": "Now we edit Main so it shows only the bus. Replace line 26 with these lines, then run. You should get this result.",
+    "code": "String[] part = line.split(\",\");\nif (part[0].equals(\"Bus\")) {\n    fleet.add(toVehicle(line));\n}",
+    "expectedOutput": "Loaded 1 vehicles\nBUS 789",
+    "stdin": ""
+  },
+  "instruction": "Now do it on your own. From bus, show only the jeepneys.",
+  "files": [],
+  "expectedOutput": "Loaded 1 vehicles\nNXA 123",
+  "stdin": "",
+  "solution": { "lines": "Main.java, line 27 \u2014 check Jeepney instead of Bus:\n                    if (part[0].equals(\"Jeepney\")) {", "note": "Only the Jeepney line passes the if." }
+}
+```
+
+(The outputs above are shortened to show the shape; a real module copies the full output of a real run.)
+
 ## Resume and exercise quality (2026-10-21)
 
 The student worksheet and Module project action choose the next unfinished step from server-saved

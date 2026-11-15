@@ -360,3 +360,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   answer in the module" applies only to the printed (PDF) module, which never prints an answer.
 - Upload answer-bearing modules only after the app change is live; an older server would send them
   to students.
+
+## Guided example (agreed 2026-11-15)
+
+- A Java task may carry `activity.guided`: an optional discussion of the step's code, an instruction, the code
+  shown to students, its expected output and optional input. The worksheet always shows the discussion after
+  the sample output; the code editor shows it after Sample verified. Sample code shows line numbers.
+- Order: Sample verified, then Guided example verified, then the own task. A guided pass never completes a step,
+  opens the next one or counts toward module completion; the student's code stays in the editor.
+- Guided evidence is saved like sample evidence (device online, `guided:<task id>` offline); no new table.
+  Upload refuses a guided example without expected output, without a task id, with the task's own output, or
+  on a non-Java step. The answer key stays teacher-only. Modules without `guided` are unchanged.
+- The three-part Week 15 file is for a separate test class only, never the teacher's current class.

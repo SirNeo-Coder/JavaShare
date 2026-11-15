@@ -1,21 +1,25 @@
-import { matchesSample, unchangedSample, webChecksPass, type ModuleFile, type WebCheck, type WebCheckSeen } from "../backend/src/module-activities.ts";
+import { matchesActivityOutput, matchesSample, unchangedSample, webChecksPass, type ModuleFile, type WebCheck, type WebCheckSeen } from "../backend/src/module-activities.ts";
 
 export type ModuleDeviceDraft = {
   files: ModuleFile[]; moduleVersion?: string; stateId?: string;
   sample?: { files: ModuleFile[]; success: boolean; output: string; checks?: WebCheckSeen[]; media?: string[] };
+  guided?: { files: ModuleFile[]; success: boolean; output: string };
   pending?: Record<string, unknown>;
   backups?: { files: ModuleFile[]; moduleVersion?: string; stateId?: string }[];
 };
 
 export function restoreModuleDraft(draft: ModuleDeviceDraft | null, current: Pick<ModuleDeviceDraft, "files" | "moduleVersion" | "stateId">,
-  step: { files: ModuleFile[]; expectedOutput: string; expectedError?: string; webChecks?: WebCheck[] }, needsSample: boolean): ModuleDeviceDraft {
+  step: { files: ModuleFile[]; expectedOutput: string; expectedError?: string; webChecks?: WebCheck[]; activity?: { guided?: { expectedOutput: string } } }, needsSample: boolean): ModuleDeviceDraft {
   if (!draft) return current;
   const sameActivity = Boolean(current.moduleVersion) && draft.moduleVersion === current.moduleVersion && draft.stateId === current.stateId;
   const sample = sameActivity && draft.sample && matchesSample(draft.sample, step) && webChecksPass(step.webChecks, draft.sample.checks) && unchangedSample(draft.sample.files, step.files) ? draft.sample : undefined;
   if (!sameActivity || (needsSample && !sample && !unchangedSample(draft.files, step.files))) {
     return { ...current, backups: [...(draft.backups ?? []), { files: draft.files, moduleVersion: draft.moduleVersion, stateId: draft.stateId }] };
   }
-  return { ...draft, sample };
+  // Guided evidence is kept only while it still matches this step's guided output; an old draft without it is unchanged.
+  const { guided, ...rest } = draft;
+  const keep = guided && step.activity?.guided && matchesActivityOutput(guided, step.activity.guided.expectedOutput);
+  return { ...rest, sample, ...(keep ? { guided } : {}) };
 }
 
 const STORE = "codeshare-module-device-v1";
