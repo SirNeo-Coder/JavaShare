@@ -1630,8 +1630,10 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   a real local upload pass; students get the guided code, never the answer key. Only `activity` changed.
 - For a separate test class only, never the current class (teacher, 2026-11-15).
 - Found: the old Step 1 task could never pass online; fixed in #120 (CKB-123, renumbered from CKB-119). Every guided
-  example now equals the current task. Step 2's own task avoids CKB-073; Step 7 is NEEDS TEACHER REVIEW in the report.
+  example now equals the current task. Step 2's own task avoids CKB-073; the teacher approved Step 7's own task (2026-11-15), so every step is OK.
 - Not pushed (teacher said not to). Next: the teacher reviews the report; do not start another week.
 - 2026-11-15: branch rebased on main after #114, #116-#120, on top of local `docs/renumber-ckb-123` (duplicate CKB-119 →
   CKB-123; pushing that branch was not approved yet). Dropped this branch's duplicate records (CKB-118 → main's CKB-121,
   CKB-119 → CKB-123). The three-part file still differs from the current module only in its tasks.
+- 2026-11-15: teacher approved pushing; PRs opened for `docs/renumber-ckb-123` and `feature/guided-example` (stacked on it,
+  opened against main). Next: the teacher merges the renumber PR first, then the guided PR; check CodeRabbit on both.
