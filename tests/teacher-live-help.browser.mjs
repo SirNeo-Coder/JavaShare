@@ -127,9 +127,19 @@ test("teacher live help: watch and edit a student's projects only while selected
     });
 
     await t.test("group: read-only while no member is online, then the teacher's typing reaches online members unsaved", async () => {
+      // Groups loads the class list twice; hold the first answer back so it lands after the card click,
+      // where it used to put Teacher Demo's file under the group's name (CKB-118).
+      let released; const held = new Promise((resolve) => { released = resolve; }); let holding = true;
+      await teacherPage.route(/\/api\/bootstrap\?view=groups/, async (route) => {
+        if (!holding) return route.continue();
+        holding = false; const response = await route.fetch();
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await route.fulfill({ response }); released();
+      });
       await teacherPage.getByRole("button", { name: "Students / projects", exact: true }).hover();
       await teacherPage.getByRole("button", { name: /^Groups/ }).click();
       await teacherPage.locator(".team-select").filter({ hasText: "Live group" }).click();
+      await held; await teacherPage.waitForTimeout(300); await teacherPage.unrouteAll();
       await waitForEditor(teacherPage, /"Group"/);
       await teacherPage.getByText("Editing opens when a group member is online").waitFor();
       assert.equal(await teacherPage.getByRole("textbox", { name: "Java source code editor", exact: true }).getAttribute("readonly"), "");
