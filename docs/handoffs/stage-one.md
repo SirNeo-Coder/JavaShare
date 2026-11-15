@@ -1510,3 +1510,13 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   `fix/leave-class-clears-live-view`. No new test (the case needs a student listed before Teacher Demo Workspace, which
   the app does not produce); seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
+
+## Sample-first browser test step tab — 2026-11-15 (CKB-118)
+
+- Branch `fix/sample-first-step-tab` (from `main` at `d775f87`). Approved test-only fix: `tests/module-sample-first.browser.mjs`
+  clicks the worksheet step tab with `dispatchEvent("click")`; the tab stays folded after an earlier scroll (as CKB-107).
+- Tested: that browser test offline 5/5 (three runs) and online 5/5, shown failing before; `npm test` 467/467;
+  `npm run build:all`; lint 0 errors. Not run: `npm run classroom:offline` itself (no app change).
+- `feature/guided-example` also adds CKB-118 (as "investigating") and its index row; when it next takes main, keep main's
+  resolved versions. Teacher declined (for now) unfolding the tabs when the worksheet moves to the next step by itself.
+- Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
