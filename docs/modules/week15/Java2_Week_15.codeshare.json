@@ -142,14 +142,14 @@
           "checkYourself": "Run Step 1 a **second** time. Predict first: what will `Exists before?` and `Created now?` say? (The file is already there, so `createNewFile()` refuses and returns **false**. It does not erase the file.)"
         ,
           "activity": {
-            "id": "java-2-w15-d1-s1-alter-v1",
+            "id": "java-2-w15-d1-s1-alter-v3",
             "solution": {
-              "lines": "Main.java, line 12 — add one line after the \"Created now?\" line, inside the same try:\n            System.out.println(\"Created again? \" + report.createNewFile());",
-              "note": "createNewFile() makes the file only if it is not there yet, and answers true only when it made one. The first call makes fleet.txt and prints true; the second call finds the file already there, so it makes nothing and prints false. That is why Created again? false appears and Size in bytes stays 0."
+              "lines": "Main.java, lines 12-13 — add two lines after the \"Created now?\" line, inside the same try:\n            File trips = new File(\"trips.txt\");\n            System.out.println(\"Created trips.txt? \" + trips.createNewFile());",
+              "note": "new File(\"trips.txt\") is only a name, like line 6. createNewFile() then makes the real, empty file and answers true, because trips.txt was not there yet. fleet.txt is not touched again, so the lines after it stay the same and Size in bytes stays 0."
             },
-            "instruction": "Right now the program makes fleet.txt once and prints Created now? true.\nMake it try to create the same file a second time and print the answer. Start with no fleet.txt in the folder.\nWhere: in main, inside the try, right after the line that prints \"Created now? \".\nHint: System.out.println(\"Created again? \" + report.______());",
+            "instruction": "Right now the program makes one file, fleet.txt, and prints Created now? true.\nMake a second file named trips.txt, create it, and print the answer.\nWhere: in main, inside the try, right after the line that prints \"Created now? \".\nHint: File trips = new File(\"______\"); then System.out.println(\"Created trips.txt? \" + trips.______());",
             "files": [],
-            "expectedOutput": "File name: fleet.txt\nExists before? false\nCreated now? true\nCreated again? false\nExists after? true\nIs a file? true\nSize in bytes: 0",
+            "expectedOutput": "File name: fleet.txt\nExists before? false\nCreated now? true\nCreated trips.txt? true\nExists after? true\nIs a file? true\nSize in bytes: 0",
             "stdin": ""
           }
         },

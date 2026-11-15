@@ -1528,6 +1528,17 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   the app does not produce); seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.
 
+## Week 15 Step 1 task fix (CKB-119) — 2026-11-15
+
+- Branch: `fix/week15-step1-createnewfile`. Teacher approved; done before any more guided-example work
+  (`feature/guided-example` waits, not pushed; it also adds CKB-118/CKB-119 records, so rebase it on this first).
+- Done: Step 1's task creates trips.txt instead of fleet.txt twice, new id `java-2-w15-d1-s1-alter-v3`, new answer
+  key; task-edit fixture updated. The same change went into the teacher's own (untracked)
+  `docs/modules/week15/Java2_Week_15.revised.codeshare.json`, which is byte-identical to the module file.
+- Tests: new `tests/week15-java8.browser.mjs` (all Week 15 samples and task answers in the real online runner),
+  failing with the old task, 21/21 with the fix on both files.
+- Teacher, after merge and deploy: correct Step 1 in the printed PDF/Word by hand, then re-upload Week 15 to the
+  class. Students re-run the Step 1 sample once (new task id); other completions stay.
 ## Group card showed Teacher Demo's code — 2026-11-15 (CKB-122, first numbered CKB-118)
 
 - Branch: `fix/group-view-double-load`, from main `974fee7`. Teacher reported the `teacher-live-help` browser test's group

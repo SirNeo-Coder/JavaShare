@@ -3,7 +3,7 @@
     {
       "path": "Main.java",
       "from": "System.out.println(\"Created now? \" + made);",
-      "to": "System.out.println(\"Created now? \" + made);\n            System.out.println(\"Created again? \" + report.createNewFile());"
+      "to": "System.out.println(\"Created now? \" + made);\n            File trips = new File(\"trips.txt\");\n            System.out.println(\"Created trips.txt? \" + trips.createNewFile());"
     }
   ],
   "java-2-w15-d1-s2": [
