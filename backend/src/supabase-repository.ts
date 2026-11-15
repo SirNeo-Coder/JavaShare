@@ -403,7 +403,7 @@ export async function bootstrapFromSupabase(user: SupabaseSessionUser, teacherVi
     const isGroup = team.owner_id === null;
     return {
       id: team.id, slug: team.slug,
-      name: user.role === "student" && !isGroup ? project?.title || "My Practice Code" : team.name,
+      name: user.role === "student" && !isGroup ? project?.title || "My Practice Code" : team.slug === "teacher-demo" ? "Live Classroom" : team.name,
       isGroup, isTeacherWorkspace: team.slug === "teacher-demo", leaderId: team.leader_id, myLeaderVoteId: voteResult.data.find((vote) => vote.team_id === team.id)?.candidate_id || null, chatMuted: Boolean(team.chat_muted), editingLocked: Boolean(team.editing_locked),
       members: members.map((member) => { const permission = permissionResult.data.find((item) => item.team_id === team.id && item.user_id === member.id); return { id: member.id, name: member.name, email: member.email, photoUrl: member.photoUrl || null, isLeader: member.id === team.leader_id, chatMuted: Boolean(permission?.chat_muted), editingLocked: Boolean(permission?.editing_locked) }; }),
       completed,
@@ -723,7 +723,7 @@ export async function setSupabaseLiveShare(user: SupabaseSessionUser, classroomI
     fail(projectError, "Could not load presentation project");
     const { data: team, error: teamError } = project ? await db.from("teams").select("slug").eq("id", project.team_id).maybeSingle() : { data: null, error: null };
     fail(teamError, "Could not load presentation workspace");
-    if (!project || team?.slug !== "teacher-demo") throw new SupabaseRepositoryError(400, "Only the Teacher Demo Workspace can be presented");
+    if (!project || team?.slug !== "teacher-demo") throw new SupabaseRepositoryError(400, "Only the Live Classroom can be presented");
   }
   const { error } = await db.from("classrooms").update({ live_share_project_id: projectId }).eq("id", classroomId);
   fail(error, "Could not update sharing state");

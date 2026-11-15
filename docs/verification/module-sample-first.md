@@ -2,6 +2,16 @@
 
 Verified 2026-10-21 on branch `codex/module-sample-first`, based on `codex/earlet-hover-dismiss` (PR #26, stacked on PR #25). No hosted SQL, deployment, merge, or settings changes.
 
+## Re-verification 2026-11-15 (CKB-121)
+
+The step-switch subtests timed out on the folded worksheet step tab (worksheet fold, CKB-101/CKB-107). Test-only fix on
+branch `fix/sample-first-step-tab` from main `d775f87`: `openStep` clicks the step tab with `dispatchEvent("click")`.
+
+- FAIL before — unchanged script: offline 3/5, online 2/5 (both step-switch subtests).
+- PASS after — offline 5/5 three runs in a row (3022); online 5/5 (app on 3030 with runner 3031, because another session
+  held 3020/3021; only the base address of a temporary copy changed).
+- PASS — `npm run build:all`; `npm run lint` 0 errors, 10 warnings; `npm test` 467/467.
+
 ## Re-verification 2026-10-28 (CKB-077)
 
 The browser script had gone stale against later approved changes (Week 14's Week 13 prerequisite,

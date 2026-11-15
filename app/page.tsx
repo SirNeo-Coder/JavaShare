@@ -353,6 +353,9 @@ export default function Home() {
   const teacherPhotoInputRef = useRef<HTMLInputElement | null>(null);
   const photoStudentIdRef = useRef<string | null>(null);
   const loadedWorkspaceKeyRef = useRef("");
+  // Only the newest class-list load may change the screen: an older answer arriving after a card click
+  // would put the first card's file under the clicked card (CKB-122).
+  const workspaceLoadRef = useRef(0);
   const promptedGroupActivityRef = useRef("");
   const team = data?.teams[activeTeam];
   const javaConsole = useJavaConsole(setOutput, team?.project?.id);
@@ -551,6 +554,7 @@ export default function Home() {
   const loadWorkspace = useCallback(
     async (viewOverride?: "students" | "groups") => {
       if (!user || user.passwordResetRequired) return;
+      const load = ++workspaceLoadRef.current;
       try {
         const view = viewOverride || teacherWorkspaceView;
         const params = new URLSearchParams();
@@ -558,6 +562,7 @@ export default function Home() {
         if (enteredClassroomId) params.set("classroomId", enteredClassroomId);
         const query = params.toString();
         const next = await api<Bootstrap>(`/api/bootstrap${query ? `?${query}` : ""}`);
+        if (load !== workspaceLoadRef.current) return;
         if (!enteredClassroomId && !next.needsJoin) {
           const destination = studentEntryClassroom(next.user, next.classrooms, rememberedStudentClassroom(next.user.id), choosingStudentClass);
           if (destination) {
@@ -614,6 +619,7 @@ export default function Home() {
         setSubmitted(Boolean(selectedTeam?.completed));
         setSyncStatus("Your work is saved");
       } catch (error) {
+        if (load !== workspaceLoadRef.current) return;
         const message =
           error instanceof Error ? error.message : "Backend unavailable";
         if (message === "Sign in required" || message === "Session expired") {
@@ -2669,7 +2675,7 @@ export default function Home() {
                   <small>Students follow your worksheet</small>
                 </span>
                 <SessionStepDone classroomId={session.classroomId} revision={sessionStepRevision} />
-                <button type="button" onClick={() => void setClassSessionState({ active: false })}>End session</button>
+                <button type="button" className="secondary" onClick={() => void setClassSessionState({ active: false })}>End session</button>
               </div>
             )}
             {user.role === "teacher" && sharedStep && (
@@ -2678,7 +2684,7 @@ export default function Home() {
                   <b>Shared with class</b>
                   <small>Week {sharedStep.week} · Step {sharedStep.step.number}</small>
                 </span>
-                <button type="button" onClick={() => void shareStep(null)}>Stop sharing</button>
+                <button type="button" className="secondary" onClick={() => void shareStep(null)}>Stop sharing</button>
               </div>
             )}
             {team.isTeacherWorkspace ? (
