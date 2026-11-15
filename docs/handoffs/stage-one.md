@@ -1637,3 +1637,22 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   CKB-119 → CKB-123). The three-part file still differs from the current module only in its tasks.
 - 2026-11-15: teacher approved pushing; PRs opened for `docs/renumber-ckb-123` and `feature/guided-example` (stacked on it,
   opened against main). Next: the teacher merges the renumber PR first, then the guided PR; check CodeRabbit on both.
+
+## Week 16 three-part file — 2026-11-15
+
+- Branch: `content/week16-three-part` (from `main` after #122). Teacher's request: build all of Week 16 in the three-part
+  shape from the approved 2026-11-08 source (Day 3 Semaphore only); Steps 7–8 first (classroom observation, Wednesday
+  18 November); fix the timing in Steps 3, 5, 6, 7; update the PDF and Word plan; do not upload; do not change Week 15
+  or `/home/ireneo/Documents/COT 2/`.
+- Done: `docs/modules/week16/Java2_Week_16.codeshare.json` and `Java_Threads_Module.pdf` replaced by the approved
+  source (test fixtures follow it). `Java2_Week_16.threepart.codeshare.json` and `Week_16_Three_Part_Report.md` built.
+  Steps 3, 5, 6, 7 now print results after `join()`/`await()` in list order (CKB-126). Own tasks are `-v2`.
+- Tests: `tests/week16-three-part.test.mjs` (upload checker, 63 discussion quotes, answer-key lines, laptop runs; both
+  line checks shown failing with a wrong number), laptop 5/5 under full CPU load; `tests/week16-three-part.browser.mjs`
+  online: Steps 3–8 3/3. `npm test` 489/489, lint 0 errors (8 older warnings), `npm run build:all` passes.
+- Found (CKB-125, open): online, `main()` runs on a thread named `Thread-0`, so Week 16 Steps 1–2 (current file too)
+  can never pass online. One-line bridge fix (`Thread.currentThread().setName("main")` around the `invoke` in
+  `vendor/java/CodeShareJava.java`, then `node scripts/build-java-bridge.mjs`) tried in a scratch copy only: 24/24
+  online. Needs teacher approval and a runner redeploy by the teacher.
+- CodeRabbit: #122 and #123 skipped (automatic reviews off), no findings.
+- Next: teacher reviews the report and PR; decides on the CKB-125 fix. Three-part file goes to a test class only.
