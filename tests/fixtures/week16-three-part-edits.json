@@ -1,0 +1,175 @@
+{
+  "java-2-w16-d2-s1": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "new DispatchThread(jeep, 5)",
+        "to": "new DispatchThread(jeep, 3)"
+      },
+      {
+        "path": "Main.java",
+        "from": "Collected after 5 trips: P",
+        "to": "Collected after 3 trips: P"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "new DispatchThread(jeep, 5)",
+        "to": "new DispatchThread(jeep, 4)"
+      },
+      {
+        "path": "Main.java",
+        "from": "Collected after 5 trips: P",
+        "to": "Collected after 4 trips: P"
+      }
+    ]
+  },
+  "java-2-w16-d2-s2": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "        wrong.run();                       // WRONG: just a normal method call\n",
+        "to": "        wrong.start();                     // now a real new thread\n        try {\n            wrong.join();\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "        wrong.run();                       // WRONG: just a normal method call\n",
+        "to": "        wrong.start();                     // now a real new thread\n        try {\n            wrong.join();\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n"
+      },
+      {
+        "path": "Main.java",
+        "from": "        right.start();                     // RIGHT: starts a new thread\n        try {\n            right.join();\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n",
+        "to": "        right.run();                       // now just a normal method call\n"
+      }
+    ]
+  },
+  "java-2-w16-d2-s3": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": ", 5));",
+        "to": ", 2));"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": ", 5));",
+        "to": ", 3));"
+      }
+    ]
+  },
+  "java-2-w16-d3-s4": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "new int[] {2, 2, 1}",
+        "to": "new int[] {1, 1, 1}"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "new int[] {2, 2, 1}",
+        "to": "new int[] {2, 1, 1}"
+      }
+    ]
+  },
+  "java-2-w16-d3-s5": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "CountDownLatch(4);      // wait for 4 reports",
+        "to": "CountDownLatch(3);      // wait for 3 reports"
+      },
+      {
+        "path": "Main.java",
+        "from": "        reports.add(new ReadyReport(\"BUS 789\", 300, latch));\n",
+        "to": ""
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "CountDownLatch(4);      // wait for 4 reports",
+        "to": "CountDownLatch(3);      // wait for 3 reports"
+      },
+      {
+        "path": "Main.java",
+        "from": "        reports.add(new ReadyReport(\"NXA 123\", 400, latch));\n",
+        "to": ""
+      }
+    ]
+  },
+  "java-2-w16-d4-s6": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "CyclicBarrier(3);  // 3 in the convoy",
+        "to": "CyclicBarrier(2);  // 2 in the convoy"
+      },
+      {
+        "path": "Main.java",
+        "from": "        legs.add(new ConvoyLeg(\"NYB 321\", 100, barrier));\n",
+        "to": ""
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "CyclicBarrier(3);  // 3 in the convoy",
+        "to": "CyclicBarrier(2);  // 2 in the convoy"
+      },
+      {
+        "path": "Main.java",
+        "from": "        legs.add(new ConvoyLeg(\"BUS 789\", 200, barrier));\n",
+        "to": ""
+      }
+    ]
+  },
+  "java-2-w16-d4-s7": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "new Semaphore(2);                 // 2 bays only",
+        "to": "new Semaphore(1);                 // 1 bay only"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "new Semaphore(2);                 // 2 bays only",
+        "to": "new Semaphore(3);                 // 3 bays"
+      }
+    ]
+  },
+  "java-2-w16-d4-s8": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "new Semaphore(1);        // 1 boarding bay only",
+        "to": "new Semaphore(2);        // 2 boarding bays"
+      },
+      {
+        "path": "Main.java",
+        "from": "{12, 6, 30, 15}",
+        "to": "{12, 6, 60, 15}"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "new Semaphore(1);        // 1 boarding bay only",
+        "to": "new Semaphore(2);        // 2 boarding bays"
+      },
+      {
+        "path": "Main.java",
+        "from": "{12, 6, 30, 15}",
+        "to": "{12, 6, 30, 25}"
+      }
+    ]
+  }
+}
