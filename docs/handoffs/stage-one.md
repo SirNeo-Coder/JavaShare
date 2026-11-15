@@ -1658,3 +1658,11 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
 - Next: teacher reviews the report and PR; decides on the CKB-125 fix. Three-part file goes to a test class only.
 - 2026-11-15 (later): PDF pages 6–7 corrected (challenge 2, Thursday time plan); Word plan reference fix; real upload into
   a throwaway local class passed (teacher 8 answer keys, student 0). Still open: teacher decision on CKB-125.
+## Guided example display and Week 15 note (CKB-124) — 2026-11-15
+
+- Branch: `fix/week15-guided-display`. Teacher tried the three-part Week 15 in a test class and approved three fixes.
+- Done: worksheet guided code in the Sample code box (no grey bars); Step 1 discussion points in line order; Step 1's
+  "Run Step 1 a second time" note now says each CodeShare run starts in an empty folder (module file, three-part file
+  and the teacher's untracked revised copy, still byte-identical to the module file).
+- Next: the teacher merges, re-uploads Week 15 (current class: revised or module file; test class: three-part file),
+  and corrects the same note in the printed PDF by hand.
