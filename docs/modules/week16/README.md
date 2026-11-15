@@ -2,6 +2,11 @@
 
 Alteration output avoids elapsed-time and thread-order checks. Original samples are unchanged; Steps 3, 5, 6 and 7 still contain timing/order assumptions and may not verify reliably. This JSON needs sample review before classroom rollout.
 
+`Java2_Week_16.codeshare.json` is the teacher's approved Week 16 of 2026-11-08 (Day 3 Semaphore only).
+`Java2_Week_16.threepart.codeshare.json` is the three-part version (sample + discussion, guided example, own task)
+whose Steps 3, 5, 6 and 7 no longer depend on thread timing (CKB-126); see `Week_16_Three_Part_Report.md`.
+Online, Steps 1 and 2 cannot pass until the runner names the main thread `main` (CKB-125).
+
 The JSON preserves all original lesson text, code, sample outputs, ids, liplets and rubrics.
 It adds 7 separately identified alteration tasks, sample-first verification,
 the preceding-module link and missing upload fields. The original non-code Week 20 work stays intact.

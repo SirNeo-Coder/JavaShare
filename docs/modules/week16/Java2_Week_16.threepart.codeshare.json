@@ -1,0 +1,1226 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "java-2",
+  "week": 16,
+  "id": "java-2-w16",
+  "title": "Self-Paced Module: Java Threads and Concurrency Tools",
+  "continues": "Week 15 — File Handling",
+  "starterFiles": [
+    {
+      "path": "Bus.java",
+      "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+    },
+    {
+      "path": "InvalidDistanceException.java",
+      "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Jeepney.java",
+      "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+    },
+    {
+      "path": "Main.java",
+      "content": "import java.io.BufferedReader;\nimport java.io.File;\nimport java.io.FileReader;\nimport java.io.FileWriter;\nimport java.io.IOException;\nimport java.io.StringWriter;\n\npublic class Main {\n    public static void main(String[] args) {\n        StringWriter report = new StringWriter();   // a \"file\" that lives in memory\n        report.write(\"DAILY FLEET REPORT\\n\");\n        int count = 0;\n        try (BufferedReader in = new BufferedReader(new FileReader(\"fleet_backup.txt\"))) {\n            String line = in.readLine();\n            while (line != null) {\n                String[] part = line.split(\",\");\n                count++;\n                report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");\n                line = in.readLine();\n            }\n        } catch (IOException e) {\n            System.out.println(\"Cannot read: \" + e.getMessage());\n        }\n        report.write(\"Total vehicles: \" + count + \"\\n\");\n\n        String text = report.toString();     // everything written so far\n        System.out.print(text);              // 1) show it on screen\n        try (FileWriter out = new FileWriter(\"report.txt\")) {\n            out.write(text);                 // 2) save the SAME text\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        File saved = new File(\"report.txt\");\n        System.out.println(\"report.txt size: \" + saved.length() + \" bytes\");\n    }\n}\n"
+    },
+    {
+      "path": "OverloadException.java",
+      "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+    },
+    {
+      "path": "Tricycle.java",
+      "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+    },
+    {
+      "path": "Vehicle.java",
+      "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+    },
+    {
+      "path": "VehicleNotFoundException.java",
+      "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "java-2-w16-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "One Terminal, Many Dispatchers: Threads with Thread, start(), and join()",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain what a thread is, how it differs from a process, and why a program must call start() and not run().",
+        "affective": "Value other people's time by letting independent work happen together instead of making everyone wait in one line.",
+        "psychomotor": "Write DispatchThread, start three threads, join them, and print the results in a fixed order; show the difference between start() and run()."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Where we left off:** your folder should already have `Vehicle.java`, `Jeepney.java`, `Tricycle.java`, `Bus.java`, `OverloadException.java`, `InvalidDistanceException.java`, and `VehicleNotFoundException.java`. Save a copy of `Main.java` as `Main_week15.txt`. (There was no class on Monday, November 2, All Souls' Day.)\n\n**The problem this week fixes:** every program so far does **one thing at a time**. If it waits for a slow job, everything else waits too. Java can do many things at once with **threads**.\n\n**No internet needed.** Keep every class in its own file, all in one folder. Compile with `javac *.java`, run with `java Main`. Threads finish at different times, so every program this week prints its results **after** the threads finish, in a fixed order. The output is the same on every computer, even a slow one."
+        },
+        {
+          "type": "definition",
+          "term": "Process and thread",
+          "markdown": "A **process** is a program that is running, with its own memory. A **thread** is one line of work **inside** a process. Every Java program starts with one thread, called `main`. Your program can start more threads; they run **at the same time** and **share** the process's memory. Threads of the same process can see the same objects; two different processes cannot."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The **terminal** is the process: one building, one logbook, one set of vehicles. The **dispatchers** are the threads. With one dispatcher (`main`), every job waits for the one before it. With three, one can load passengers, one can collect fares, one can call the next jeepney, all in the same terminal. The risk: two dispatchers writing in the same line of the logbook at once. So this week, **each thread uses only its own data**."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "Process",
+            "Thread"
+          ],
+          "rows": [
+            [
+              "What it is",
+              "a whole program that is running",
+              "one line of work inside a process"
+            ],
+            [
+              "Memory",
+              "has its own; other processes cannot see it",
+              "shares the process's memory with its sibling threads"
+            ],
+            [
+              "In the terminal",
+              "the whole terminal and its logbook",
+              "one dispatcher working in that terminal"
+            ],
+            [
+              "In Java",
+              "java Main starts one",
+              "main is the first; start() makes more"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d2-s1",
+          "number": 1,
+          "instruction": "Make a new file `DispatchThread.java` and replace `Main.java`. The thread's job: collect 5 trips of fares, 0.1 second per trip. To make your own worker, write a class that **extends Thread** and **overrides** `run()`; call `start()`, never `run()` yourself; `join()` makes the caller wait until the thread is finished.",
+          "language": "java",
+          "files": [
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"main() runs on thread: \" + Thread.currentThread().getName());\n        Vehicle jeep = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        DispatchThread t = new DispatchThread(jeep, 5);\n\n        System.out.println(\"Before start(): \" + t.getState());\n        t.start();                         // a NEW thread begins run()\n        try {\n            t.join();                      // main waits here until t is finished\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n        System.out.println(\"After join(): \" + t.getState());\n        System.out.println(t.getName() + \" ran on thread: \" + t.getRanOn());\n        System.out.println(\"Collected after 5 trips: P\" + t.getCollected());\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "main() runs on thread: main\nBefore start(): NEW\nAfter join(): TERMINATED\nNXA 123 ran on thread: NXA 123\nCollected after 5 trips: P75.0",
+          "checkYourself": "(1) Change the 5 in `new DispatchThread(jeep, 5)` to 10 and predict the collected amount. (P150.0, because each trip adds P15.00; the printed text still says 5 trips, so fix that string.) (2) Why must `t.join()` be inside `try` and `catch (InterruptedException e)`? (`join()` and `sleep()` can throw this **checked** exception, as in Week 13.)",
+          "activity": {
+            "id": "java-2-w16-d2-s1-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 3. `Thread.currentThread().getName()` asks Java, \"Which thread is running this line?\" It answers main. Every Java program starts with one thread called main.\n- Look at line 1 of DispatchThread.java. `public class DispatchThread extends Thread` is our own worker class. As you remember from Week 12, extends means the child gets everything the parent has, so a DispatchThread can do everything a Thread can.\n- Look at line 8 of DispatchThread.java. `super(vehicle.getPlateNumber());` passes the plate up to Thread as the thread's name. As you remember from Week 12, super(...) calls the parent's constructor.\n- Look at line 14 of DispatchThread.java. `public void run()` is the job the thread does. It overrides Thread's own run(). Line 17 adds one fare per trip with `vehicle.quoteFare(5)` from Vehicle.java, and line 19, `Thread.sleep(100)`, makes each trip take 0.1 second.\n- Look at line 5. `new DispatchThread(jeep, 5)` makes a worker for the jeepney with 5 trips. This is the line the guided example changes.\n- Look at line 7. `t.getState()` says NEW: the thread exists, but it has not started.\n- Look at line 8. `t.start();` begins a new thread, and that new thread runs run().\n- Look at line 10. `t.join();` makes main wait until the worker is finished. It sits inside a try, because join() can throw InterruptedException. As you remember from Week 13, a checked exception must be caught or declared.\n- Look at line 14. After join(), the state is TERMINATED: run() has ended.\n- Look at line 16. `t.getCollected()` is read only after join(), so the total is complete: 5 trips x P15.00 = P75.0.",
+              "instruction": "Now we make the jeepney run three trips. Change line 5 to the first line below, and line 16 to the second line. Then run. You should get this result.",
+              "code": "        DispatchThread t = new DispatchThread(jeep, 3);\n        System.out.println(\"Collected after 3 trips: P\" + t.getCollected());",
+              "expectedOutput": "main() runs on thread: main\nBefore start(): NEW\nAfter join(): TERMINATED\nNXA 123 ran on thread: NXA 123\nCollected after 3 trips: P45.0",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. Make the jeepney run four trips, and change the label to match.",
+            "files": [],
+            "expectedOutput": "main() runs on thread: main\nBefore start(): NEW\nAfter join(): TERMINATED\nNXA 123 ran on thread: NXA 123\nCollected after 4 trips: P60.0",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, line 5 — four trips:\n        DispatchThread t = new DispatchThread(jeep, 4);\n\nMain.java, line 16 — the label:\n        System.out.println(\"Collected after 4 trips: P\" + t.getCollected());",
+              "note": "Each trip adds P15.00, the jeepney's fare for 5 km (Jeepney.java), so 4 trips collect P60.0. main reads the total only after join(), so it is complete."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Look closely:** the thread is `NEW` before `start()` and `TERMINATED` after its `run()` ended. It was named by the plate number: `super(...)` passes the name up to `Thread`, just as `Jeepney`'s constructor passes values up to `Vehicle` in Week 12."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Thread state",
+            "What it means",
+            "When you see it"
+          ],
+          "rows": [
+            [
+              "NEW",
+              "The Thread object exists; start() was not called yet.",
+              "Step 1, before start()"
+            ],
+            [
+              "RUNNABLE",
+              "Started: running, or waiting its turn on the processor.",
+              "just after start()"
+            ],
+            [
+              "TIMED_WAITING",
+              "Paused for a set time, e.g. inside Thread.sleep(100).",
+              "each trip in Step 1"
+            ],
+            [
+              "WAITING",
+              "Paused with no time limit, e.g. join() or await() with no wait time.",
+              "main, inside join()"
+            ],
+            [
+              "TERMINATED",
+              "The run() method has finished. It cannot be started again.",
+              "Step 1, after join()"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d2-s2",
+          "number": 2,
+          "instruction": "Replace `Main.java`. The first worker is started the **wrong** way, the second the **right** way.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle trike = new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\");\n        Vehicle bus = new Bus(\"BUS 789\", \"Aling Rosa\", 50);\n\n        DispatchThread wrong = new DispatchThread(trike, 2);\n        wrong.run();                       // WRONG: just a normal method call\n        System.out.println(wrong.getName() + \" ran on thread: \" + wrong.getRanOn());\n\n        DispatchThread right = new DispatchThread(bus, 2);\n        right.start();                     // RIGHT: starts a new thread\n        try {\n            right.join();\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n        System.out.println(right.getName() + \" ran on thread: \" + right.getRanOn());\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "TRC 456 ran on thread: main\nBUS 789 ran on thread: BUS 789",
+          "activity": {
+            "id": "java-2-w16-d2-s2-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 6. `new DispatchThread(trike, 2)` is the DispatchThread from Step 1, with 2 trips. Its thread name is the plate, TRC 456.\n- Look at line 7. `wrong.run();` is only an ordinary method call. No new thread starts, so main does the whole job itself. This is the line the guided example changes.\n- Look at line 8. `wrong.getRanOn()` gives main, because main ran the job. getRanOn() is at line 27 of DispatchThread.java, and line 15 of that file saves the name of the thread that ran it.\n- Look at line 11. `right.start();` starts a real new thread, named BUS 789.\n- Look at line 13. `right.join();` waits for that thread to finish before line 17 prints.\n- Look at line 17. `right.getRanOn()` gives BUS 789, the new thread's own name.",
+              "instruction": "Now we fix the tricycle worker. Replace line 7 with these lines, so it starts the right way and main waits for it. Then run. You should get this result.",
+              "code": "        wrong.start();                     // now a real new thread\n        try {\n            wrong.join();\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }",
+              "expectedOutput": "TRC 456 ran on thread: TRC 456\nBUS 789 ran on thread: BUS 789",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. Keep the tricycle fixed. Make the bus worker the wrong one: call run() in place of start() and its join().",
+            "files": [],
+            "expectedOutput": "TRC 456 ran on thread: TRC 456\nBUS 789 ran on thread: main",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, lines 7-12 — the tricycle stays fixed, as in the guided example:\n        wrong.start();                     // now a real new thread\n        try {\n            wrong.join();\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n\nMain.java, line 16 — replace right.start() and its try and catch (lines 16-21 after the guided example) with:\n        right.run();                       // now just a normal method call",
+              "note": "run() called directly is a normal method call, so main does the bus's job itself and the bus reports main. The tricycle still starts its own thread, named TRC 456."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Read it carefully:** the tricycle \"ran on thread: **main**\". `wrong.run()` is only an ordinary method call: the main thread did the whole job itself and nothing ran at the same time. The bus ran on a thread named **BUS 789**, a real new thread."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d2-s3",
+          "number": 3,
+          "instruction": "Replace `Main.java`. Start all three **first**, then join all three. The results print **after** the joins, so they always come out in the same order.",
+          "language": "java",
+          "files": [
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<DispatchThread> crew = new ArrayList<>();\n        crew.add(new DispatchThread(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"), 5));\n        crew.add(new DispatchThread(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"), 5));\n        crew.add(new DispatchThread(new Bus(\"BUS 789\", \"Aling Rosa\", 50), 5));\n\n        for (DispatchThread t : crew) {\n            t.start();                     // all three run AT THE SAME TIME\n        }\n        for (DispatchThread t : crew) {\n            try {\n                t.join();                  // wait for each one to finish\n            } catch (InterruptedException e) {\n                System.out.println(\"main was interrupted\");\n            }\n        }\n\n        double total = 0;\n        for (DispatchThread t : crew) {    // results in a FIXED order, after join\n            System.out.println(t.getName() + \": P\" + t.getCollected());\n            total = total + t.getCollected();\n        }\n        System.out.println(\"Total collected: P\" + total);\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "NXA 123: P75.0\nTRC 456: P350.0\nBUS 789: P137.5\nTotal collected: P562.5",
+          "checkYourself": "In `DispatchThread`, change `sleep(100)` to `sleep(300)` and run. Predict the totals. (**The same.** Each worker now takes about 1.5 s, but a slower trip changes how long the program runs, not what it collects.) Change it back.",
+          "activity": {
+            "id": "java-2-w16-d2-s3-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 6. `List<DispatchThread> crew = new ArrayList<>();` As you remember from Week 14, a List grows as we add to it. Here it holds three workers.\n- Look at line 7. `new DispatchThread(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"), 5)` gives the jeepney's worker 5 trips. Lines 8 and 9 do the same for the tricycle and the bus. The guided example changes the 5 on these three lines.\n- Look at line 12. `t.start();` sits inside the first for loop, so all three workers start before any join. All three run at the same time.\n- Look at line 16. `t.join();` In the second loop, main waits for each worker. Only after all three have finished does main go on.\n- Look at line 24. `t.getCollected()` is read after every join, in the list's order. That is why the output is the same every time, even on a slow computer.\n- Look at line 27. `\"Total collected: P\" + total` shows the three added together: P75.0 + P350.0 + P137.5 = P562.5.",
+              "instruction": "Now every worker makes two trips. Change the 5 to 2 on lines 7, 8 and 9, as shown below. Then run. You should get this result.",
+              "code": "        crew.add(new DispatchThread(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"), 2));\n        crew.add(new DispatchThread(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"), 2));\n        crew.add(new DispatchThread(new Bus(\"BUS 789\", \"Aling Rosa\", 50), 2));",
+              "expectedOutput": "NXA 123: P30.0\nTRC 456: P140.0\nBUS 789: P55.0\nTotal collected: P225.0",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. Every worker makes three trips.",
+            "files": [],
+            "expectedOutput": "NXA 123: P45.0\nTRC 456: P210.0\nBUS 789: P82.5\nTotal collected: P337.5",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, lines 7-9 — three trips for each worker:\n        crew.add(new DispatchThread(new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"), 3));\n        crew.add(new DispatchThread(new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"), 3));\n        crew.add(new DispatchThread(new Bus(\"BUS 789\", \"Aling Rosa\", 50), 3));",
+              "note": "One trip collects P15.00 (jeepney), P70.00 (tricycle) and P27.50 (bus) for 5 km. Three trips: P45.0, P210.0 and P82.5, total P337.5. The joins finish before any result is read."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Look closely:** each worker needs 5 x 0.1 s = 0.5 s. Done one after another, the three would take about 1.5 s. Started together they finish in about 0.5 s. **Try this, then undo it:** delete the second `for` loop of Step 3 (the one with `join()`) and run. The totals print too early; on our computer: NXA 123: P15.0, TRC 456: P70.0, BUS 789: P27.5, Total P112.5. Your numbers may differ, but far below the real totals."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "#",
+            "Rule",
+            "Why"
+          ],
+          "rows": [
+            [
+              "1",
+              "Call start(), never run(), to begin a thread.",
+              "Only start() makes a new line of work (Step 2)."
+            ],
+            [
+              "2",
+              "join() every thread before you read its results.",
+              "Without it, main may read the answer before the thread has finished."
+            ],
+            [
+              "3",
+              "Each thread changes only its own data.",
+              "Two threads changing one variable at the same time can give wrong answers. You will learn the fix in a later lesson."
+            ],
+            [
+              "4",
+              "Always handle InterruptedException.",
+              "sleep, join, await and acquire all throw it (checked exception, Week 13)."
+            ]
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w16-d2-slip",
+        "points": 20,
+        "afterStep": "java-2-w16-d2-s3",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a thread? How is a thread different from a process? Use the terminal analogy or your own words."
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 2, the tricycle \"ran on thread: main\" but the bus ran on thread BUS 789. What did the code do differently?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Write the method or state: a) begins a new thread; b) waits until a thread ends; c) state before `start()`; d) state after `run()` ends."
+          },
+          {
+            "id": "1.4",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "`DispatchThread` says `extends Thread` and `@Override public void run()`. Which two ideas from Week 12 is that? Why must `join()` be inside `try / catch` (Week 13)?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w16-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Job Orders, Roll Calls and Convoys: Runnable, CountDownLatch, and CyclicBarrier",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe what a Runnable is, how a CountDownLatch makes one thread wait for several others, and how a CyclicBarrier makes a group wait for each other again and again.",
+        "affective": "Show responsibility by making sure every job reports back, even when something goes wrong.",
+        "psychomotor": "Write a Runnable job and give it to a Thread; write ReadyReport and use a CountDownLatch so main waits for four reports; write ConvoyLeg with a CyclicBarrier used at two stops."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Runnable",
+          "markdown": "An **interface**: a promise that a class has certain methods. This one has just one, `void run()`. A class that **implements Runnable** describes **a job**. To get it done, hand the job to a `Thread`: `new Thread(job, \"name\")`. This is the usual way, because the job class can still extend another class, but a class can extend only one parent, and `Thread` would use it up."
+        },
+        {
+          "type": "analogy",
+          "markdown": "`extends Thread` is like hiring a person **who comes with one job fixed to them**. `Runnable` is writing the job on a **work order** (\"load these groups of passengers\") and giving it to any available worker. The worker is the `Thread`, the order is the `Runnable`."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "extends Thread",
+            "implements Runnable"
+          ],
+          "rows": [
+            [
+              "You write",
+              "a worker class with run()",
+              "a job class with run(), then new Thread(job)"
+            ],
+            [
+              "To start it",
+              "worker.start()",
+              "new Thread(job).start()"
+            ],
+            [
+              "Can the class extend another class?",
+              "No (it already extends Thread)",
+              "Yes"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d3-s4",
+          "number": 4,
+          "instruction": "Make `BoardingTask.java`, then replace `Main.java`. It uses Week 13's `board()` and `OverloadException`: each job catches its **own** exception.",
+          "language": "java",
+          "files": [
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {   // a JOB, not a thread\n    private Vehicle vehicle;\n    private int[] groups;                  // passengers arriving, group by group\n    private String result = \"not run yet\";\n\n    public BoardingTask(Vehicle vehicle, int[] groups) {\n        this.vehicle = vehicle;\n        this.groups = groups;\n    }\n\n    @Override\n    public void run() {\n        try {\n            for (int g : groups) {\n                vehicle.board(g);          // Week 13: may throw OverloadException\n                Thread.sleep(50);\n            }\n            result = \"all boarded\";\n        } catch (OverloadException e) {\n            result = \"stopped: \" + e.getMessage();\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "public class Main {\n    public static void main(String[] args) {\n        Vehicle jeep = new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\");\n        Vehicle trike = new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\");\n\n        BoardingTask jeepJob = new BoardingTask(jeep, new int[] {5, 8, 6});\n        BoardingTask trikeJob = new BoardingTask(trike, new int[] {2, 2, 1});\n\n        Thread t1 = new Thread(jeepJob, \"Jeep loader\");  // job -> Thread\n        Thread t2 = new Thread(trikeJob, \"Trike loader\");\n        t1.start();\n        t2.start();\n        try {\n            t1.join();\n            t2.join();\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n        System.out.println(t1.getName() + \": \" + jeepJob.getResult());\n        System.out.println(t2.getName() + \": \" + trikeJob.getResult());\n        jeep.showInfo();\n        trike.showInfo();\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Jeep loader: all boarded\nTrike loader: stopped: TRC 456 is full! Capacity 4, but 5 tried to ride.\nNXA 123 | Driver: Mang Ramon | Passengers: 19/20\nTRC 456 | Driver: Kuya Ben | Passengers: 4/4",
+          "checkYourself": "Change the jeepney's groups to `{5, 8, 8}` and run. Predict the first line. (`Jeep loader: stopped: NXA 123 is full! Capacity 20, but 21 tried to ride.` and the jeepney then shows 13/20, because the last group was refused.) Change it back.",
+          "activity": {
+            "id": "java-2-w16-d3-s4-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 1 of BoardingTask.java. `public class BoardingTask implements Runnable` says BoardingTask is a job, not a thread. Runnable is an interface with one method, run().\n- Look at line 15 of BoardingTask.java. `vehicle.board(g);` is board() from Vehicle.java. As you remember from Week 13, board() throws our own OverloadException when too many riders try to board.\n- Look at line 19 of BoardingTask.java. `catch (OverloadException e)` The job catches its own problem and saves it in result. It does not stop the other job.\n- Look at line 6. `new int[] {5, 8, 6}` are the jeepney's groups: 5 + 8 + 6 = 19, and it has 20 seats.\n- Look at line 7. `new int[] {2, 2, 1}` are the tricycle's groups. After 2 + 2 = 4, the last group of 1 would make 5 on a 4-seat tricycle, so board() refuses it. This is the line the guided example changes.\n- Look at line 9. `new Thread(jeepJob, \"Jeep loader\")` hands the job to a Thread and gives the thread a name.\n- Look at line 19. `jeepJob.getResult()` is read only after both joins, on lines 14 and 15.\n- Look at line 21. `jeep.showInfo()` comes from Vehicle.java. It shows 19/20 for the jeepney; line 22 shows 4/4 for the tricycle.",
+              "instruction": "Now the tricycle takes smaller groups. Replace line 7 with this line. Then run. You should get this result.",
+              "code": "        BoardingTask trikeJob = new BoardingTask(trike, new int[] {1, 1, 1});",
+              "expectedOutput": "Jeep loader: all boarded\nTrike loader: all boarded\nNXA 123 | Driver: Mang Ramon | Passengers: 19/20\nTRC 456 | Driver: Kuya Ben | Passengers: 3/4",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. Give the tricycle groups of 2, 1 and 1. Do 4 riders fit in 4 seats?",
+            "files": [],
+            "expectedOutput": "Jeep loader: all boarded\nTrike loader: all boarded\nNXA 123 | Driver: Mang Ramon | Passengers: 19/20\nTRC 456 | Driver: Kuya Ben | Passengers: 4/4",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, line 7 — groups of 2, 1 and 1:\n        BoardingTask trikeJob = new BoardingTask(trike, new int[] {2, 1, 1});",
+              "note": "board() refuses only when the riders would be MORE than the seats. 2 + 1 + 1 = 4 is not more than 4, so every group boards and the tricycle shows 4/4."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Look closely:** the trike's job stopped when 5 people tried to ride a 4-seat tricycle (Week 13's `OverloadException`), but the jeepney's job was not affected. A job that catches its own problems cannot hurt the others."
+        },
+        {
+          "type": "definition",
+          "term": "CountDownLatch",
+          "markdown": "Starts with a number, such as 4. Each worker calls `countDown()` when it is done, which lowers the number by 1. A thread that calls `await()` **waits until the number is 0**, then goes on. A latch is **one-shot**: once at 0, it cannot be reset."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The dispatcher says, \"We leave when **4** vehicles report ready.\" Each driver radios in when ready. The dispatcher keeps a tally: 4, 3, 2, 1, 0. At 0 she blows the whistle. It does not matter **who** reports first, only that all 4 have."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d3-s5",
+          "number": 5,
+          "instruction": "Make `ReadyReport.java`, then replace `Main.java`. The vehicles take different times to get ready: 400, 100, 300, and 200 milliseconds.",
+          "language": "java",
+          "files": [
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\n\npublic class ReadyReport implements Runnable {\n    private String plate;\n    private int delayMs;                   // ms to get ready\n    private CountDownLatch latch;\n    private String status = \"not ready\";\n\n    public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n        this.plate = plate;\n        this.delayMs = delayMs;\n        this.latch = latch;\n    }\n\n    @Override\n    public void run() {\n        try {\n            Thread.sleep(delayMs);\n            status = \"ready\";\n        } catch (InterruptedException e) {\n            status = \"interrupted\";\n        } finally {\n            latch.countDown();             // count goes down by 1, no matter what\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getStatus() { return status; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.concurrent.CountDownLatch;\n\npublic class Main {\n    public static void main(String[] args) {\n        CountDownLatch latch = new CountDownLatch(4);      // wait for 4 reports\n        List<ReadyReport> reports = new ArrayList<>();\n        reports.add(new ReadyReport(\"NXA 123\", 400, latch));\n        reports.add(new ReadyReport(\"TRC 456\", 100, latch));\n        reports.add(new ReadyReport(\"BUS 789\", 300, latch));\n        reports.add(new ReadyReport(\"NYB 321\", 200, latch));\n\n        System.out.println(\"Dispatcher waits. Reports still needed: \" + latch.getCount());\n        for (ReadyReport r : reports) {\n            new Thread(r).start();\n        }\n        try {\n            latch.await();                 // main stops here until the count is 0\n        } catch (InterruptedException e) {\n            System.out.println(\"Dispatcher was interrupted\");\n        }\n        for (ReadyReport r : reports) {    // results in a FIXED order, after await\n            System.out.println(r.getPlate() + \" reports: \" + r.getStatus());\n        }\n        System.out.println(\"Reports still needed: \" + latch.getCount());\n        System.out.println(\"All vehicles ready. Dispatch begins!\");\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {   // a JOB, not a thread\n    private Vehicle vehicle;\n    private int[] groups;                  // passengers arriving, group by group\n    private String result = \"not run yet\";\n\n    public BoardingTask(Vehicle vehicle, int[] groups) {\n        this.vehicle = vehicle;\n        this.groups = groups;\n    }\n\n    @Override\n    public void run() {\n        try {\n            for (int g : groups) {\n                vehicle.board(g);          // Week 13: may throw OverloadException\n                Thread.sleep(50);\n            }\n            result = \"all boarded\";\n        } catch (OverloadException e) {\n            result = \"stopped: \" + e.getMessage();\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getResult() { return result; }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Dispatcher waits. Reports still needed: 4\nNXA 123 reports: ready\nTRC 456 reports: ready\nBUS 789 reports: ready\nNYB 321 reports: ready\nReports still needed: 0\nAll vehicles ready. Dispatch begins!",
+          "checkYourself": "Change `new CountDownLatch(4)` to `(5)` and run. Only 4 jobs call `countDown()`, so the count stops at 1 and the program **never ends**. Press Ctrl+C to stop it, then change it back.",
+          "activity": {
+            "id": "java-2-w16-d3-s5-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 7. `new CountDownLatch(4)` starts the count at 4: main will wait for 4 reports. The guided example changes this number.\n- Look at line 9. `reports.add(new ReadyReport(\"NXA 123\", 400, latch));` Lines 9 to 12 put four jobs in a List, each with its own time to get ready: 400, 100, 300 and 200 ms. All four share the same latch.\n- Look at line 16. `new Thread(r).start();` hands each ReadyReport job to a new thread, as in Step 4.\n- Look at line 19 of ReadyReport.java. `status = \"ready\";` The job saves its own result. It does not print, because the threads finish at different times and their prints could come in any order.\n- Look at line 23 of ReadyReport.java. `latch.countDown();` lowers the count by 1. It sits in finally, so the count goes down even if the job fails. As you remember from Week 13, finally always runs.\n- Look at line 19. `latch.await();` main stops here until the count reaches 0.\n- Look at line 24. `r.getStatus()` is read after await(), in the list's order, so the output never changes.\n- Look at line 26. `latch.getCount()` is now 0.",
+              "instruction": "Now BUS 789 is not coming. Replace line 7 with this line, so main waits for 3 reports. Then delete line 11, the BUS 789 line: `reports.add(new ReadyReport(\"BUS 789\", 300, latch));` Run. You should get this result.",
+              "code": "        CountDownLatch latch = new CountDownLatch(3);      // wait for 3 reports",
+              "expectedOutput": "Dispatcher waits. Reports still needed: 3\nNXA 123 reports: ready\nTRC 456 reports: ready\nNYB 321 reports: ready\nReports still needed: 0\nAll vehicles ready. Dispatch begins!",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. Still wait for 3 reports, but this time NXA 123 is the one not coming. Put the BUS 789 line back, and leave out NXA 123.",
+            "files": [],
+            "expectedOutput": "Dispatcher waits. Reports still needed: 3\nTRC 456 reports: ready\nBUS 789 reports: ready\nNYB 321 reports: ready\nReports still needed: 0\nAll vehicles ready. Dispatch begins!",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, line 7 — wait for 3 reports, as in the guided example:\n        CountDownLatch latch = new CountDownLatch(3);      // wait for 3 reports\n\nMain.java, lines 9-11 — the three vehicles left, with BUS 789 back and NXA 123 gone:\n        reports.add(new ReadyReport(\"TRC 456\", 100, latch));\n        reports.add(new ReadyReport(\"BUS 789\", 300, latch));\n        reports.add(new ReadyReport(\"NYB 321\", 200, latch));",
+              "note": "The latch counts 3 reports and exactly 3 jobs call countDown(), so await() returns. The list now holds TRC 456, BUS 789 and NYB 321, so they print in that order."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Read it carefully:** the vehicles get ready in order of **speed** (TRC 100 ms first, NXA 400 ms last), not the order the threads were started. The jobs do not print; main prints every report after `await()`, in the list's order, so the output is the same every time. `countDown()` sits in `finally` (Week 13) so the count goes down even if something goes wrong in the job. Without it, `await()` could wait forever."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Time",
+            "What happens",
+            "Latch count"
+          ],
+          "rows": [
+            [
+              "0 ms",
+              "main creates CountDownLatch(4), starts 4 threads, and calls await()",
+              "4"
+            ],
+            [
+              "100 ms",
+              "TRC 456 reports, then countDown()",
+              "3"
+            ],
+            [
+              "200 / 300 ms",
+              "NYB 321 reports; then BUS 789 reports",
+              "2, then 1"
+            ],
+            [
+              "400 ms",
+              "NXA 123 reports; the count reaches 0, so await() returns",
+              "0, go!"
+            ]
+          ]
+        },
+        {
+          "type": "definition",
+          "term": "CyclicBarrier",
+          "markdown": "A `CyclicBarrier(3)` makes a group of **3** threads wait at a meeting point. Each calls `await()`. When the **3rd** arrives, all three are released together, and the barrier is **ready to use again**. `await()` gives back a number: **0 for the last thread to arrive**. Difference from a latch: here the **workers wait for each other**, and the barrier can be reused."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Three jeepneys travel as a **convoy**. At every stop they wait for each other, and leave only when all three have arrived. At the next stop they wait for each other again. One barrier, reused."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d4-s6",
+          "number": 6,
+          "instruction": "Make `ConvoyLeg.java`, then replace `Main.java`. It also needs `BrokenBarrierException`, a checked exception that `await()` can throw.",
+          "language": "java",
+          "files": [
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\n\npublic class ConvoyLeg implements Runnable {\n    private String plate;\n    private int delayMs;\n    private CyclicBarrier barrier;\n    private String lastStop = \"not left yet\";\n\n    public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n        this.plate = plate;\n        this.delayMs = delayMs;\n        this.barrier = barrier;\n    }\n\n    // drive to a stop, then wait there until the whole convoy has arrived\n    private void driveTo(String stop) throws InterruptedException, BrokenBarrierException {\n        Thread.sleep(delayMs);\n        int stillComing = barrier.await(); // wait for the others\n        if (stillComing == 0) {            // 0 = the LAST one to arrive\n            System.out.println(\"-- All here at \" + stop + \". The convoy moves on together!\");\n        }\n        lastStop = stop;\n    }\n\n    @Override\n    public void run() {\n        try {\n            driveTo(\"Monumento\");\n            driveTo(\"Recto\");              // the SAME barrier is used again\n        } catch (InterruptedException | BrokenBarrierException e) {\n            lastStop = \"left the convoy\";\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getLastStop() { return lastStop; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.concurrent.CyclicBarrier;\n\npublic class Main {\n    public static void main(String[] args) {\n        CyclicBarrier barrier = new CyclicBarrier(3);  // 3 in the convoy\n        List<ConvoyLeg> legs = new ArrayList<>();\n        legs.add(new ConvoyLeg(\"NXA 123\", 300, barrier));\n        legs.add(new ConvoyLeg(\"NYB 321\", 100, barrier));\n        legs.add(new ConvoyLeg(\"BUS 789\", 200, barrier));\n\n        List<Thread> convoy = new ArrayList<>();\n        for (ConvoyLeg leg : legs) {\n            convoy.add(new Thread(leg));\n        }\n        for (Thread t : convoy) {\n            t.start();\n        }\n        try {\n            for (Thread t : convoy) {\n                t.join();\n            }\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n        for (ConvoyLeg leg : legs) {       // results in a FIXED order, after join\n            System.out.println(leg.getPlate() + \" reached \" + leg.getLastStop());\n        }\n        System.out.println(\"Convoy finished.\");\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {   // a JOB, not a thread\n    private Vehicle vehicle;\n    private int[] groups;                  // passengers arriving, group by group\n    private String result = \"not run yet\";\n\n    public BoardingTask(Vehicle vehicle, int[] groups) {\n        this.vehicle = vehicle;\n        this.groups = groups;\n    }\n\n    @Override\n    public void run() {\n        try {\n            for (int g : groups) {\n                vehicle.board(g);          // Week 13: may throw OverloadException\n                Thread.sleep(50);\n            }\n            result = \"all boarded\";\n        } catch (OverloadException e) {\n            result = \"stopped: \" + e.getMessage();\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\n\npublic class ReadyReport implements Runnable {\n    private String plate;\n    private int delayMs;                   // ms to get ready\n    private CountDownLatch latch;\n    private String status = \"not ready\";\n\n    public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n        this.plate = plate;\n        this.delayMs = delayMs;\n        this.latch = latch;\n    }\n\n    @Override\n    public void run() {\n        try {\n            Thread.sleep(delayMs);\n            status = \"ready\";\n        } catch (InterruptedException e) {\n            status = \"interrupted\";\n        } finally {\n            latch.countDown();             // count goes down by 1, no matter what\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getStatus() { return status; }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "-- All here at Monumento. The convoy moves on together!\n-- All here at Recto. The convoy moves on together!\nNXA 123 reached Recto\nNYB 321 reached Recto\nBUS 789 reached Recto\nConvoy finished.",
+          "checkYourself": "Change `CyclicBarrier(3)` to `(4)`. Only 3 vehicles exist, so all three wait at Monumento **forever** (Ctrl+C to stop). Change it back.",
+          "activity": {
+            "id": "java-2-w16-d4-s6-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 7. `new CyclicBarrier(3)` is a meeting point for 3 threads. The guided example changes this number.\n- Look at line 9. `legs.add(new ConvoyLeg(\"NXA 123\", 300, barrier));` Lines 9 to 11 put three convoy jobs in a List. All three share the same barrier.\n- Look at line 15. `convoy.add(new Thread(leg));` gives each job its own thread, as in Step 4.\n- Look at line 18 of ConvoyLeg.java. `Thread.sleep(delayMs);` is the drive to the stop: 300, 100 or 200 ms.\n- Look at line 19 of ConvoyLeg.java. `barrier.await()` makes the vehicle wait until all 3 have arrived. It gives back 0 to the last one to arrive.\n- Look at line 21 of ConvoyLeg.java. `System.out.println(\"-- All here at \" + stop + \". The convoy moves on together!\");` Only the last to arrive prints it, so it prints once for each stop.\n- Look at line 30 of ConvoyLeg.java. `driveTo(\"Recto\");` uses the same barrier again. That is the cyclic part: the barrier is ready again after every meeting.\n- Look at line 17 of ConvoyLeg.java. `throws InterruptedException, BrokenBarrierException` As you remember from Week 13, throws passes checked exceptions to the caller. run() catches both at line 31.\n- Look at line 28. `leg.getLastStop()` is read after every join, in the list's order, so the output never changes.",
+              "instruction": "Now only NXA 123 and BUS 789 travel. Replace line 7 with this line, for a barrier of 2. Then delete line 10, the NYB 321 line: `legs.add(new ConvoyLeg(\"NYB 321\", 100, barrier));` Run. You should get this result.",
+              "code": "        CyclicBarrier barrier = new CyclicBarrier(2);  // 2 in the convoy",
+              "expectedOutput": "-- All here at Monumento. The convoy moves on together!\n-- All here at Recto. The convoy moves on together!\nNXA 123 reached Recto\nBUS 789 reached Recto\nConvoy finished.",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. Keep the barrier of 2, but this time NXA 123 travels with NYB 321. Put the NYB 321 line back, and leave out BUS 789.",
+            "files": [],
+            "expectedOutput": "-- All here at Monumento. The convoy moves on together!\n-- All here at Recto. The convoy moves on together!\nNXA 123 reached Recto\nNYB 321 reached Recto\nConvoy finished.",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, line 7 — a barrier of 2, as in the guided example:\n        CyclicBarrier barrier = new CyclicBarrier(2);  // 2 in the convoy\n\nMain.java, lines 9-10 — the two vehicles in the convoy, with NYB 321 back and BUS 789 gone:\n        legs.add(new ConvoyLeg(\"NXA 123\", 300, barrier));\n        legs.add(new ConvoyLeg(\"NYB 321\", 100, barrier));",
+              "note": "The barrier waits for 2 and exactly 2 vehicles travel, so it opens at each stop. The list holds NXA 123 and NYB 321, so they print in that order."
+            }
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Check your folder after Step 6",
+            ""
+          ],
+          "rows": [
+            [
+              "Classes",
+              "Main.java + last week's 7 class files + DispatchThread, BoardingTask, ReadyReport, ConvoyLeg"
+            ]
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w16-d3-slip",
+        "points": 20,
+        "afterStep": "java-2-w16-d4-s6",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a `Runnable`? How do you get a Runnable job done (Step 4)? Give one reason it is often better than `extends Thread`."
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 4, the tricycle's job stopped with an `OverloadException`, but the jeepney's job finished normally. Why did one stopped job not stop the other?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 5, `latch.countDown()` is inside `finally`. Which Week 13 idea is this? What could happen to `await()` if it were not there and a job failed?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "How is a `CyclicBarrier(3)` different from a `CountDownLatch(3)`? Say who waits and whether it can be used again."
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w16-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Loading Bays: Sharing Limited Places with Semaphore",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Explain how a Semaphore uses permits with acquire() and release(), and choose between CountDownLatch, CyclicBarrier, and Semaphore for a given situation.",
+        "affective": "Practice fairness by letting limited resources, such as loading bays, be shared in turn.",
+        "psychomotor": "Write LoadingBay with a Semaphore of two permits, and BayBoarding, which always gives its bay back even when a vehicle is refused."
+      },
+      "blocks": [
+        {
+          "type": "definition",
+          "term": "Semaphore",
+          "markdown": "A `Semaphore(2)` holds **2 permits**. `acquire()` takes one permit, or **waits** if none is left. `release()` gives one back. So at most 2 threads are in the protected part at once. `availablePermits()` tells how many are free. Put `release()` in `finally` so a permit is never lost."
+        },
+        {
+          "type": "analogy",
+          "markdown": "The terminal has **2 loading bays**. A vehicle that arrives takes a bay if one is free; otherwise it waits in line. When a vehicle leaves, it frees its bay for the next one. The permits are the bays."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "CountDownLatch",
+            "CyclicBarrier",
+            "Semaphore"
+          ],
+          "rows": [
+            [
+              "Picture it as",
+              "a tally to reach 0",
+              "a meeting point for a group",
+              "a fixed number of bays"
+            ],
+            [
+              "Who waits?",
+              "the thread that calls await()",
+              "every thread that arrives",
+              "whoever finds no free permit"
+            ],
+            [
+              "Use again?",
+              "No, one-shot",
+              "Yes, automatically",
+              "Yes, acquire and release"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d4-s7",
+          "number": 7,
+          "instruction": "Make `LoadingBay.java`, then replace `Main.java`. Four vehicles arrive 100 ms apart, but there are only 2 bays and loading takes 400 ms.",
+          "language": "java",
+          "files": [
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\n\npublic class LoadingBay implements Runnable {\n    private String plate;\n    private int arriveMs;                  // when this vehicle reaches the terminal\n    private Semaphore bays;\n    private String result = \"not run yet\";\n\n    public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n        this.plate = plate;\n        this.arriveMs = arriveMs;\n        this.bays = bays;\n    }\n\n    @Override\n    public void run() {\n        try {\n            Thread.sleep(arriveMs);\n            bays.acquire();                // take a bay, or WAIT until one is free\n            try {\n                Thread.sleep(400);         // loading takes time\n                result = \"loaded, then left the bay\";\n            } finally {\n                bays.release();            // give the bay back, always\n            }\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.concurrent.Semaphore;\n\npublic class Main {\n    public static void main(String[] args) {\n        Semaphore bays = new Semaphore(2);                 // 2 bays only\n        System.out.println(\"Free bays at the start: \" + bays.availablePermits());\n        List<LoadingBay> jobs = new ArrayList<>();\n        jobs.add(new LoadingBay(\"NXA 123\", 0, bays));\n        jobs.add(new LoadingBay(\"TRC 456\", 100, bays));\n        jobs.add(new LoadingBay(\"BUS 789\", 200, bays));\n        jobs.add(new LoadingBay(\"NYB 321\", 300, bays));\n\n        List<Thread> line = new ArrayList<>();\n        for (LoadingBay job : jobs) {\n            line.add(new Thread(job));\n        }\n        for (Thread t : line) {\n            t.start();\n        }\n        for (Thread t : line) {\n            try {\n                t.join();\n            } catch (InterruptedException e) {\n                System.out.println(\"main was interrupted\");\n            }\n        }\n        for (LoadingBay job : jobs) {      // results in a FIXED order, after join\n            System.out.println(job.getPlate() + \": \" + job.getResult());\n        }\n        System.out.println(\"All loaded. Free bays: \" + bays.availablePermits());\n    }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {   // a JOB, not a thread\n    private Vehicle vehicle;\n    private int[] groups;                  // passengers arriving, group by group\n    private String result = \"not run yet\";\n\n    public BoardingTask(Vehicle vehicle, int[] groups) {\n        this.vehicle = vehicle;\n        this.groups = groups;\n    }\n\n    @Override\n    public void run() {\n        try {\n            for (int g : groups) {\n                vehicle.board(g);          // Week 13: may throw OverloadException\n                Thread.sleep(50);\n            }\n            result = \"all boarded\";\n        } catch (OverloadException e) {\n            result = \"stopped: \" + e.getMessage();\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\n\npublic class ReadyReport implements Runnable {\n    private String plate;\n    private int delayMs;                   // ms to get ready\n    private CountDownLatch latch;\n    private String status = \"not ready\";\n\n    public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n        this.plate = plate;\n        this.delayMs = delayMs;\n        this.latch = latch;\n    }\n\n    @Override\n    public void run() {\n        try {\n            Thread.sleep(delayMs);\n            status = \"ready\";\n        } catch (InterruptedException e) {\n            status = \"interrupted\";\n        } finally {\n            latch.countDown();             // count goes down by 1, no matter what\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getStatus() { return status; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\n\npublic class ConvoyLeg implements Runnable {\n    private String plate;\n    private int delayMs;\n    private CyclicBarrier barrier;\n    private String lastStop = \"not left yet\";\n\n    public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n        this.plate = plate;\n        this.delayMs = delayMs;\n        this.barrier = barrier;\n    }\n\n    // drive to a stop, then wait there until the whole convoy has arrived\n    private void driveTo(String stop) throws InterruptedException, BrokenBarrierException {\n        Thread.sleep(delayMs);\n        int stillComing = barrier.await(); // wait for the others\n        if (stillComing == 0) {            // 0 = the LAST one to arrive\n            System.out.println(\"-- All here at \" + stop + \". The convoy moves on together!\");\n        }\n        lastStop = stop;\n    }\n\n    @Override\n    public void run() {\n        try {\n            driveTo(\"Monumento\");\n            driveTo(\"Recto\");              // the SAME barrier is used again\n        } catch (InterruptedException | BrokenBarrierException e) {\n            lastStop = \"left the convoy\";\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getLastStop() { return lastStop; }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "Free bays at the start: 2\nNXA 123: loaded, then left the bay\nTRC 456: loaded, then left the bay\nBUS 789: loaded, then left the bay\nNYB 321: loaded, then left the bay\nAll loaded. Free bays: 2",
+          "checkYourself": "Add `System.out.println(plate + \" is loading\");` just after `bays.acquire();` in `LoadingBay.java` and run it a few times. These lines come from four threads, so on a busy computer they could come in a different order. That is why the checked results print after `join()`. Remove the line again.",
+          "activity": {
+            "id": "java-2-w16-d4-s7-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 7. `new Semaphore(2)` makes 2 permits, one for each loading bay. The guided example changes this number.\n- Look at line 8. `bays.availablePermits()` tells how many bays are free: 2 at the start.\n- Look at line 10. `jobs.add(new LoadingBay(\"NXA 123\", 0, bays));` Lines 10 to 13 make four jobs from LoadingBay.java. They arrive 0, 100, 200 and 300 ms after the start, and all four share the same bays.\n- Look at line 19 of LoadingBay.java. `bays.acquire();` takes a bay. If both bays are busy, the thread waits here. BUS 789 arrives at 200 ms, while NXA 123 and TRC 456 are still loading, so it waits.\n- Look at line 21 of LoadingBay.java. `Thread.sleep(400);` Loading takes 0.4 second.\n- Look at line 24 of LoadingBay.java. `bays.release();` gives the bay back. It sits in finally, so the bay always comes back. As you remember from Week 13, finally always runs.\n- Look at line 30. `job.getResult()` is read after every join, in the list's order. The vehicles load in turns, but the output never changes.\n- Look at line 32. `bays.availablePermits()` is 2 again: every bay came back.",
+              "instruction": "Now the terminal has only one bay. Replace line 7 with this line. Then run. The vehicles now load one at a time, so the run takes longer. You should get this result.",
+              "code": "        Semaphore bays = new Semaphore(1);                 // 1 bay only",
+              "expectedOutput": "Free bays at the start: 1\nNXA 123: loaded, then left the bay\nTRC 456: loaded, then left the bay\nBUS 789: loaded, then left the bay\nNYB 321: loaded, then left the bay\nAll loaded. Free bays: 1",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. The terminal opens a third bay.",
+            "files": [],
+            "expectedOutput": "Free bays at the start: 3\nNXA 123: loaded, then left the bay\nTRC 456: loaded, then left the bay\nBUS 789: loaded, then left the bay\nNYB 321: loaded, then left the bay\nAll loaded. Free bays: 3",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, line 7 — three bays:\n        Semaphore bays = new Semaphore(3);                 // 3 bays",
+              "note": "A Semaphore(3) holds 3 permits, so 3 vehicles can load at once. Every acquire() is matched by a release() in finally, so all 3 bays are free again at the end."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**What happens inside** (not printed, because the order could change on a slow computer): NXA 123 (0 ms) and TRC 456 (100 ms) take the 2 bays. BUS 789 (200 ms) and NYB 321 (300 ms) find **Free bays: 0**, so they wait at `acquire()`. When NXA 123 leaves (400 ms), BUS 789 takes its bay. When TRC 456 leaves (500 ms), NYB 321 takes that one. At no time are more than 2 vehicles loading."
+        },
+        {
+          "type": "text",
+          "markdown": "**PART F — A bay that always comes back.** In real terminals, some vehicles are turned away: too many riders, or a problem with the trip. If a vehicle takes a bay and is refused, the bay must still be given back, or the vehicles behind it wait forever. `release()` in `finally` (Week 13) makes sure every permit returns."
+        },
+        {
+          "type": "step",
+          "id": "java-2-w16-d4-s8",
+          "number": 8,
+          "instruction": "Make `BayBoarding.java`, then replace `Main.java`. It reuses last week's vehicles and Week 13's `OverloadException`. The terminal has only **1** boarding bay, and the tricycle (4 seats) is asked to take 6 riders.",
+          "language": "java",
+          "files": [
+            {
+              "path": "BayBoarding.java",
+              "content": "import java.util.concurrent.Semaphore;\n\npublic class BayBoarding implements Runnable {\n    private Vehicle vehicle;\n    private int riders;                     // riders who want to board\n    private Semaphore bays;\n    private String result = \"not run yet\";\n\n    public BayBoarding(Vehicle vehicle, int riders, Semaphore bays) {\n        this.vehicle = vehicle;\n        this.riders = riders;\n        this.bays = bays;\n    }\n\n    @Override\n    public void run() {\n        try {\n            bays.acquire();                 // take a bay, or WAIT\n            try {\n                vehicle.board(riders);      // may throw OverloadException\n                Thread.sleep(200);          // boarding takes time\n                result = \"boarded \" + riders;\n            } catch (OverloadException e) {\n                result = \"refused: \" + e.getMessage();\n            } finally {\n                bays.release();             // ALWAYS give the bay back\n            }\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Main.java",
+              "content": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.concurrent.Semaphore;\n\npublic class Main {\n    public static void main(String[] args) {\n        Semaphore bays = new Semaphore(1);        // 1 boarding bay only\n        Vehicle[] fleet = {\n            new Jeepney(\"NXA 123\", \"Mang Ramon\", \"Monumento-Divisoria\"),\n            new Tricycle(\"TRC 456\", \"Kuya Ben\", \"Bagong Silang TODA\"),\n            new Bus(\"BUS 789\", \"Aling Rosa\", 50),\n            new Jeepney(\"NYB 321\", \"Mang Tonyo\", \"Sangandaan-Recto\")\n        };\n        int[] riders = {12, 6, 30, 15};\n        List<BayBoarding> jobs = new ArrayList<>();\n        List<Thread> line = new ArrayList<>();\n        for (int i = 0; i < fleet.length; i++) {\n            jobs.add(new BayBoarding(fleet[i], riders[i], bays));\n            line.add(new Thread(jobs.get(i), fleet[i].getPlateNumber()));\n        }\n        for (Thread t : line) {\n            t.start();\n        }\n        try {\n            for (Thread t : line) {\n                t.join();\n            }\n        } catch (InterruptedException e) {\n            System.out.println(\"main was interrupted\");\n        }\n        for (int i = 0; i < line.size(); i++) {   // fixed order\n            System.out.println(line.get(i).getName() + \": \" + jobs.get(i).getResult());\n        }\n        System.out.println(\"Free bays: \" + bays.availablePermits());\n    }\n}\n"
+            },
+            {
+              "path": "LoadingBay.java",
+              "content": "import java.util.concurrent.Semaphore;\n\npublic class LoadingBay implements Runnable {\n    private String plate;\n    private int arriveMs;                  // when this vehicle reaches the terminal\n    private Semaphore bays;\n    private String result = \"not run yet\";\n\n    public LoadingBay(String plate, int arriveMs, Semaphore bays) {\n        this.plate = plate;\n        this.arriveMs = arriveMs;\n        this.bays = bays;\n    }\n\n    @Override\n    public void run() {\n        try {\n            Thread.sleep(arriveMs);\n            bays.acquire();                // take a bay, or WAIT until one is free\n            try {\n                Thread.sleep(400);         // loading takes time\n                result = \"loaded, then left the bay\";\n            } finally {\n                bays.release();            // give the bay back, always\n            }\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "Bus.java",
+              "content": "public class Bus extends Vehicle {\n    private int seats;\n\n    public Bus(String plateNumber, String driverName, int seats) {\n        super(plateNumber, driverName);\n        this.seats = seats;\n    }\n\n    public int getSeats() { return seats; }\n\n    @Override\n    public double computeFare(double km) {\n        return 15.00 + (km * 2.50);\n    }\n\n    @Override\n    public int getCapacity() { return seats; }\n}\n"
+            },
+            {
+              "path": "InvalidDistanceException.java",
+              "content": "public class InvalidDistanceException extends RuntimeException {\n    public InvalidDistanceException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Jeepney.java",
+              "content": "public class Jeepney extends Vehicle {\n    private String route;\n\n    public Jeepney(String plateNumber, String driverName, String route) {\n        super(plateNumber, driverName);\n        this.route = route;\n    }\n\n    public String getRoute() { return route; }\n\n    @Override\n    public double computeFare(double km) {\n        double extra = Math.max(0, km - 4) * 2.00;\n        return 13.00 + extra;\n    }\n\n    @Override\n    public int getCapacity() { return 20; }\n}\n"
+            },
+            {
+              "path": "OverloadException.java",
+              "content": "public class OverloadException extends Exception {\n    public OverloadException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "Tricycle.java",
+              "content": "public class Tricycle extends Vehicle {\n    private String toda;\n\n    public Tricycle(String plateNumber, String driverName, String toda) {\n        super(plateNumber, driverName);\n        this.toda = toda;\n    }\n\n    public String getToda() { return toda; }\n\n    @Override\n    public double computeFare(double km) {\n        return 20.00 + (km * 10.00);\n    }\n\n    @Override\n    public int getCapacity() { return 4; }\n}\n"
+            },
+            {
+              "path": "Vehicle.java",
+              "content": "public abstract class Vehicle {\n    private String plateNumber;\n    private String driverName;\n    private int passengers;\n\n    public Vehicle(String plateNumber, String driverName) {\n        this.plateNumber = plateNumber;\n        this.driverName = driverName;\n        this.passengers = 0;\n    }\n\n    public String getPlateNumber() { return plateNumber; }\n    public String getDriverName()  { return driverName; }\n    public int getPassengers()     { return passengers; }\n\n    // WEDNESDAY: the setter now THROWS instead of only printing\n    public void setPassengers(int passengers) {\n        if (passengers < 0) {\n            throw new IllegalArgumentException(\"Passengers cannot be negative: \" + passengers);\n        }\n        this.passengers = passengers;\n    }\n\n    // THURSDAY: user-defined checked exception\n    public void board(int count) throws OverloadException {\n        if (passengers + count > getCapacity()) {\n            throw new OverloadException(plateNumber + \" is full! Capacity \"\n                + getCapacity() + \", but \" + (passengers + count) + \" tried to ride.\");\n        }\n        passengers = passengers + count;\n    }\n\n    // THURSDAY: user-defined unchecked exception\n    public double quoteFare(double km) {\n        if (km <= 0) {\n            throw new InvalidDistanceException(\"Distance must be more than 0 km, got \" + km);\n        }\n        return computeFare(km);\n    }\n\n    public abstract double computeFare(double km);\n    public abstract int getCapacity();\n\n    public void showInfo() {\n        System.out.println(plateNumber + \" | Driver: \" + driverName\n            + \" | Passengers: \" + passengers + \"/\" + getCapacity());\n    }\n}\n"
+            },
+            {
+              "path": "VehicleNotFoundException.java",
+              "content": "public class VehicleNotFoundException extends Exception {\n    public VehicleNotFoundException(String message) {\n        super(message);\n    }\n}\n"
+            },
+            {
+              "path": "DispatchThread.java",
+              "content": "public class DispatchThread extends Thread {      // a Thread that does dispatch work\n    private Vehicle vehicle;\n    private int trips;\n    private double collected = 0;\n    private String ranOn = \"not run yet\";\n\n    public DispatchThread(Vehicle vehicle, int trips) {\n        super(vehicle.getPlateNumber());   // the thread's name is the plate\n        this.vehicle = vehicle;\n        this.trips = trips;\n    }\n\n    @Override\n    public void run() {                    // the job this thread does\n        ranOn = Thread.currentThread().getName();\n        for (int i = 1; i <= trips; i++) {\n            collected = collected + vehicle.quoteFare(5);\n            try {\n                Thread.sleep(100);         // one trip takes time (0.1 second)\n            } catch (InterruptedException e) {\n                return;                    // stop early if interrupted\n            }\n        }\n    }\n\n    public double getCollected() { return collected; }\n    public String getRanOn() { return ranOn; }\n}\n"
+            },
+            {
+              "path": "BoardingTask.java",
+              "content": "public class BoardingTask implements Runnable {   // a JOB, not a thread\n    private Vehicle vehicle;\n    private int[] groups;                  // passengers arriving, group by group\n    private String result = \"not run yet\";\n\n    public BoardingTask(Vehicle vehicle, int[] groups) {\n        this.vehicle = vehicle;\n        this.groups = groups;\n    }\n\n    @Override\n    public void run() {\n        try {\n            for (int g : groups) {\n                vehicle.board(g);          // Week 13: may throw OverloadException\n                Thread.sleep(50);\n            }\n            result = \"all boarded\";\n        } catch (OverloadException e) {\n            result = \"stopped: \" + e.getMessage();\n        } catch (InterruptedException e) {\n            result = \"interrupted\";\n        }\n    }\n\n    public String getResult() { return result; }\n}\n"
+            },
+            {
+              "path": "ReadyReport.java",
+              "content": "import java.util.concurrent.CountDownLatch;\n\npublic class ReadyReport implements Runnable {\n    private String plate;\n    private int delayMs;                   // ms to get ready\n    private CountDownLatch latch;\n    private String status = \"not ready\";\n\n    public ReadyReport(String plate, int delayMs, CountDownLatch latch) {\n        this.plate = plate;\n        this.delayMs = delayMs;\n        this.latch = latch;\n    }\n\n    @Override\n    public void run() {\n        try {\n            Thread.sleep(delayMs);\n            status = \"ready\";\n        } catch (InterruptedException e) {\n            status = \"interrupted\";\n        } finally {\n            latch.countDown();             // count goes down by 1, no matter what\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getStatus() { return status; }\n}\n"
+            },
+            {
+              "path": "ConvoyLeg.java",
+              "content": "import java.util.concurrent.BrokenBarrierException;\nimport java.util.concurrent.CyclicBarrier;\n\npublic class ConvoyLeg implements Runnable {\n    private String plate;\n    private int delayMs;\n    private CyclicBarrier barrier;\n    private String lastStop = \"not left yet\";\n\n    public ConvoyLeg(String plate, int delayMs, CyclicBarrier barrier) {\n        this.plate = plate;\n        this.delayMs = delayMs;\n        this.barrier = barrier;\n    }\n\n    // drive to a stop, then wait there until the whole convoy has arrived\n    private void driveTo(String stop) throws InterruptedException, BrokenBarrierException {\n        Thread.sleep(delayMs);\n        int stillComing = barrier.await(); // wait for the others\n        if (stillComing == 0) {            // 0 = the LAST one to arrive\n            System.out.println(\"-- All here at \" + stop + \". The convoy moves on together!\");\n        }\n        lastStop = stop;\n    }\n\n    @Override\n    public void run() {\n        try {\n            driveTo(\"Monumento\");\n            driveTo(\"Recto\");              // the SAME barrier is used again\n        } catch (InterruptedException | BrokenBarrierException e) {\n            lastStop = \"left the convoy\";\n        }\n    }\n\n    public String getPlate() { return plate; }\n    public String getLastStop() { return lastStop; }\n}\n"
+            }
+          ],
+          "run": "Main.java",
+          "expectedOutput": "NXA 123: boarded 12\nTRC 456: refused: TRC 456 is full! Capacity 4, but 6 tried to ride.\nBUS 789: boarded 30\nNYB 321: boarded 15\nFree bays: 1",
+          "checkYourself": "Move `bays.release();` out of `finally` to just after `Thread.sleep(200);` and run. TRC 456's bay never comes back, so the others wait **forever** (press **Stop**). Put it back in `finally`.",
+          "activity": {
+            "id": "java-2-w16-d4-s8-alter-v2",
+            "guided": {
+              "discussion": "- Look at line 7. `new Semaphore(1)` gives the terminal only 1 boarding bay. The guided example changes this number.\n- Look at line 8. `Vehicle[] fleet = {` is an array of last week's vehicles: a Jeepney, a Tricycle, a Bus and another Jeepney. As you remember from Week 12, one Vehicle array can hold every kind of Vehicle.\n- Look at line 14. `int[] riders = {12, 6, 30, 15};` says how many riders each vehicle tries to board, in the same order as the fleet. The guided example changes one of these numbers.\n- Look at line 18. `new BayBoarding(fleet[i], riders[i], bays)` makes one job for each vehicle. Line 19 gives each job a thread named by its plate.\n- Look at line 18 of BayBoarding.java. `bays.acquire();` takes the bay, or waits until it is free.\n- Look at line 20 of BayBoarding.java. `vehicle.board(riders);` As you remember from Week 13, board() throws OverloadException when the riders are more than the seats. TRC 456 has 4 seats and 6 riders, so it is refused.\n- Look at line 26 of BayBoarding.java. `bays.release();` is in finally, so even the refused tricycle gives the bay back.\n- Look at line 32. `jobs.get(i).getResult()` is read after every join, in a fixed order, so the output never changes.\n- Look at line 34. `bays.availablePermits()` is back to 1.",
+              "instruction": "Now the terminal opens a second bay, and BUS 789 tries to board 60 riders. Replace line 7 with the first line below, and line 14 with the second line. Then run. You should get this result.",
+              "code": "        Semaphore bays = new Semaphore(2);        // 2 boarding bays\n        int[] riders = {12, 6, 60, 15};",
+              "expectedOutput": "NXA 123: boarded 12\nTRC 456: refused: TRC 456 is full! Capacity 4, but 6 tried to ride.\nBUS 789: refused: BUS 789 is full! Capacity 50, but 60 tried to ride.\nNYB 321: boarded 15\nFree bays: 2",
+              "stdin": ""
+            },
+            "instruction": "Now do it on your own. Keep the two bays. Put BUS 789 back to 30 riders, and make NYB 321 try to board 25 riders.",
+            "files": [],
+            "expectedOutput": "NXA 123: boarded 12\nTRC 456: refused: TRC 456 is full! Capacity 4, but 6 tried to ride.\nBUS 789: boarded 30\nNYB 321: refused: NYB 321 is full! Capacity 20, but 25 tried to ride.\nFree bays: 2",
+            "stdin": "",
+            "solution": {
+              "lines": "Main.java, line 7 — two bays, as in the guided example:\n        Semaphore bays = new Semaphore(2);        // 2 boarding bays\n\nMain.java, line 14 — BUS 789 back to 30, NYB 321 tries 25:\n        int[] riders = {12, 6, 30, 25};",
+              "note": "NYB 321 is a Jeepney with 20 seats, so 25 riders throw OverloadException and it is refused, like the tricycle. release() is in finally, so both bays come back: Free bays: 2."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Read it carefully:** TRC 456 was refused, yet `Free bays` is back to **1**, because `release()` is in `finally`. The results print after every `join()`, in a fixed order, so the output never changes."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Check your folder after Step 8",
+            ""
+          ],
+          "rows": [
+            [
+              "Classes",
+              "Main.java + last week's 7 class files + DispatchThread, BoardingTask, ReadyReport, ConvoyLeg, LoadingBay, BayBoarding"
+            ]
+          ]
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "unreported exception InterruptedException; must be caught or declared to be thrown",
+              "means": "Thread.sleep(), join(), await() or acquire() was used outside a try.",
+              "fix": "Put it inside try { } catch (InterruptedException e) { }."
+            },
+            {
+              "see": "cannot find symbol ... symbol: class CountDownLatch",
+              "means": "A missing import.",
+              "fix": "Add import java.util.concurrent.CountDownLatch; (or CyclicBarrier, Semaphore)."
+            },
+            {
+              "see": "no suitable constructor found for Thread(Jeepney) ... Jeepney cannot be converted to Runnable",
+              "means": "You gave new Thread(...) an object whose class does not implement Runnable.",
+              "fix": "Pass a job from a class that says implements Runnable."
+            },
+            {
+              "see": "Exception in thread \"main\" java.lang.IllegalThreadStateException",
+              "means": "The same Thread object had start() called twice. A thread can run only once.",
+              "fix": "Make a new Thread object for each run."
+            },
+            {
+              "see": "ran on thread: main when you expected the worker's name",
+              "means": "You called run() instead of start(). Nothing ran at the same time.",
+              "fix": "Call start() (Step 2)."
+            },
+            {
+              "see": "Exception in thread \"Bad trip\" InvalidDistanceException: ... and the program carries on",
+              "means": "An unchecked exception inside one thread stops only that thread. main keeps going.",
+              "fix": "Catch the exception inside run(), like Step 4."
+            },
+            {
+              "see": "The lines stop, but the program never ends",
+              "means": "An await() is waiting for a count or a group that never fills: e.g. CountDownLatch(5) but only 4 countDown() calls.",
+              "fix": "Press Ctrl+C. Match the number to the real count of threads; use finally for countDown()."
+            }
+          ]
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w16-d4-slip",
+        "points": 15,
+        "afterStep": "java-2-w16-d4-s8",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a `Semaphore`? Using `Semaphore(2)` and the loading bays, say what `acquire()`, `release()`, and `availablePermits()` do."
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, NYB 321 arrived when `Free bays` was 0. When did it start loading, and what made that possible?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 7, the four threads are kept in a List of Threads named `line` and started with a `for` loop. Which earlier week taught this? Why is it handy here, and why is `release()` inside `finally`?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "java-2-w16-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "Many Helpers at Once: Threads Performance Task and Presentation",
+      "hours": 3,
+      "objectives": {
+        "cognitive": "Justify the choice of threads and of waiting tools in their own program.",
+        "affective": "Show respect for classmates' work by testing each other's programs fairly and giving helpful feedback during presentations.",
+        "psychomotor": "Build, test four ways, and present a program with three or more helper threads, a latch, and a second tool, without crashing or hanging."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "Today you finish and present the **Performance Task**: give your own program helpers that work at the same time. Run it four ways before you present, then answer the Friday exit slip."
+        }
+      ],
+      "exitSlip": {
+        "id": "java-2-w16-d5-slip",
+        "points": 20,
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Name two of your helpers (threads). Write the line of your code that starts one of them, and the line that waits for it or for all of them."
+          },
+          {
+            "id": "4.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "You used a `CountDownLatch` and a second tool (`Semaphore` or `CyclicBarrier`). Defend each choice. What would go wrong if you swapped them?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school canteen has 3 cashiers who serve students at the same time, and the canteen opens only when all 3 are ready. Which of this week's tools would you use for each need, and why?"
+          },
+          {
+            "id": "4.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your programs before this week, where one thing happened at a time, with now. What can your program do now that it could not before? What part was hardest?"
+          }
+        ],
+        "afterStep": "java-2-w16-d5"
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "java-2-w16-pt",
+    "title": "Performance Task: Make Your Program Do Many Things at Once",
+    "markdown": "Open your own program from your Four Pillars Performance Task (your sari-sari store, pets, gadgets, school personnel, or shapes theme). Give it **helpers that work at the same time**, and make them wait for each other the right way. Start on Thursday after the Thursday exit slip; finish and present on Friday.\n\n**Reuse this week's code.** Your helper class works like `BoardingTask` (Step 4) or `DispatchThread` (Step 1); the latch like Step 5; the barrier like Step 6; the semaphore like Step 7. The example shows only the latch: **you must add a second tool.**\n\n**Example (sari-sari store, two cashiers):**\n\n- Ana rang up Bread P12\n- Ben rang up Soap P18\n- Ana rang up Rice P55\n- Ben rang up Coffee P9\n- Ana's total: P67 / Ben's total: P27 / Store total: P94\n\n**Testing tip:** run your program at least four ways: (1) normally; (2) three times in a row: the totals must be identical; (3) change one sleep time: the order of messages changes, but the totals do not; (4) give one helper bad data: it must be caught and the others must still finish. No run may end in `Exception in thread \"main\"`, and none may hang.\n\n**Plan before you type** (show your teacher): for each helper, write its name, whether it is a Thread or a Runnable, its job, its own data, and which tool joins it in, and why.",
+    "steps": [
+      "In Projects, click **Personal performance-task project**. Your own program opens.",
+      "On paper, for each helper write its name, whether it is a Thread or a Runnable, its job, its own data, and which tool waits for it, and why. Show your teacher.",
+      "Add a helper class file. Copy **Step 4 · BoardingTask.java** (Runnable) or **Step 1 · DispatchThread.java** (Thread), paste it, and change it for your theme. Give each helper a name that is printed.",
+      "In `main`, make at least 3 helpers and begin each with `start()`, never `run()`, like **Step 2 · Main.java**. Each helper changes only its own data.",
+      "Use `Thread.sleep()` to show that work takes time, and handle every `InterruptedException`.",
+      "Add a `CountDownLatch`: `countDown()` in `finally` inside each helper, and `await()` in `main`, like **Step 5 · ReadyReport.java**. **Sample code · Cashier.java** shows the store example.",
+      "Add a second tool that fits your story: a `Semaphore`, like **Step 7 · LoadingBay.java**, or a `CyclicBarrier`, like **Step 6 · ConvoyLeg.java**.",
+      "Print the results after everyone has finished, in a fixed order, like **Step 3 · Main.java**.",
+      "Give one helper bad data and catch it inside its `run()`. The other helpers must still finish.",
+      "Test four ways: normally; three times in a row (same totals); with one sleep time changed (order changes, totals do not); with bad data in one helper. No run may crash or hang.",
+      "Add a comment on each part, for example `// LATCH: store opens when both cashiers finish`.",
+      "Tick each item in the **Performance task checklist**, then click **Submit this version**."
+    ],
+    "checklist": [
+      "At least 3 helper objects from your theme, each doing its own job on its own thread",
+      "Helpers built with extends Thread or implements Runnable; each has a name that is printed",
+      "Threads begin with start() (never run())",
+      "Each thread changes only its own data, no shared variable",
+      "A CountDownLatch, with countDown() in finally, and await() in main",
+      "A second tool: Semaphore or CyclicBarrier, with a story that fits your theme",
+      "Thread.sleep() shows work takes time; every InterruptedException is handled",
+      "Results are printed after everyone has finished, in a fixed order",
+      "Bad data in one helper is caught inside its run(); the others still finish",
+      "A comment on each part, e.g. // LATCH: store opens when both cashiers finish"
+    ],
+    "exampleFiles": [
+      {
+        "path": "Cashier.java",
+        "content": "import java.util.concurrent.CountDownLatch;\n\npublic class Cashier implements Runnable {\n    private String name;\n    private String[] items;\n    private int[] prices;\n    private int startDelay;\n    private CountDownLatch done;\n    private int total = 0;\n\n    public Cashier(String name, String[] items, int[] prices,\n                   int startDelay, CountDownLatch done) {\n        this.name = name;\n        this.items = items;\n        this.prices = prices;\n        this.startDelay = startDelay;\n        this.done = done;\n    }\n\n    @Override\n    public void run() {\n        try {\n            Thread.sleep(startDelay);\n            for (int i = 0; i < items.length; i++) {\n                total += prices[i];\n                System.out.println(name + \" rang up \" + items[i] + \" P\" + prices[i]);\n                Thread.sleep(200);\n            }\n        } catch (InterruptedException e) {\n            System.out.println(name + \" was interrupted\");\n        } finally {\n            done.countDown();\n        }\n    }\n\n    public int getTotal() { return total; }\n}\n"
+      },
+      {
+        "path": "Main.java",
+        "content": "import java.util.concurrent.CountDownLatch;\n\npublic class Main {\n    public static void main(String[] args) {\n        CountDownLatch done = new CountDownLatch(2);\n        Cashier ana = new Cashier(\"Ana\", new String[] {\"Bread\", \"Rice\"},\n                new int[] {12, 55}, 0, done);\n        Cashier ben = new Cashier(\"Ben\", new String[] {\"Soap\", \"Coffee\"},\n                new int[] {18, 9}, 100, done);\n        new Thread(ana, \"Ana's counter\").start();\n        new Thread(ben, \"Ben's counter\").start();\n        try {\n            done.await();\n        } catch (InterruptedException e) {\n            System.out.println(\"Closing early\");\n        }\n        System.out.println(\"Ana's total: P\" + ana.getTotal());\n        System.out.println(\"Ben's total: P\" + ben.getTotal());\n        System.out.println(\"Store total: P\" + (ana.getTotal() + ben.getTotal()));\n    }\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "Main.java",
+        "content": "public class Main {\n    public static void main(String[] args) {\n        // Continue your own performance-task project; follow the original module requirements.\n    }\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce your theme and your helpers. (30 sec)",
+      "Run it and show the output. (1 min)",
+      "Prove it live: run it again; change a sleep; break it on purpose. (2 min)",
+      "Point to the code for a thread, the latch, and the second tool. (1 min)",
+      "Answer questions. (30 sec)"
+    ],
+    "questionsToPrepare": [
+      "Why start() and not run()?",
+      "What does your latch count? What if the number is too big?",
+      "Why is countDown() in finally?",
+      "Why print the totals after the threads finish?",
+      "What could go wrong if two threads changed one variable?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Threads: 3+ helpers started with start(); named; finish before results are shown",
+        "points": 8
+      },
+      {
+        "criterion": "Design: Thread or Runnable used correctly; each thread keeps its own data",
+        "points": 8
+      },
+      {
+        "criterion": "Tools: latch used correctly; a second tool that fits the story",
+        "points": 10
+      },
+      {
+        "criterion": "Results: same correct totals on every run, in a fixed order",
+        "points": 6
+      },
+      {
+        "criterion": "Errors: InterruptedException and bad data handled; no crash, no hang",
+        "points": 8
+      },
+      {
+        "criterion": "Presentation and Q&A: proves each part live; explains choices with own code",
+        "points": 10
+      }
+    ],
+    "totalPoints": 50
+  },
+  "previousModuleId": "java-2-w15",
+  "sampleFirst": true
+}
