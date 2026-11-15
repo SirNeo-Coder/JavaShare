@@ -107,6 +107,12 @@ for (const content of modules) {
         // Week 15 steps supply the .txt data files their programs read (CKB-088).
         assert.ok(step.files.every((file) => file.path.endsWith(".java") || (content.week === 15 && file.path.endsWith(".txt"))));
         delete step.activity;
+        // The only approved change to original Week 15 text: Step 1's note now says each CodeShare run starts in an
+        // empty folder (CKB-124). Put the original back so every other original value is still checked.
+        if (step.id === "java-2-w15-d1-s1") {
+          assert.match(step.checkYourself, /every run starts in an empty folder/);
+          step.checkYourself = "Run Step 1 a **second** time. Predict first: what will `Exists before?` and `Created now?` say? (The file is already there, so `createNewFile()` refuses and returns **false**. It does not erase the file.)";
+        }
         step.files = before.originalStepFiles[step.id].map((path) => {
           const file = step.files.find((file) => file.path === path) ?? before.relocated.find((entry) => entry.step === step.id && entry.file.path === path)?.file;
           assert.ok(file, `${step.id}: original file ${path} lost`);
@@ -212,4 +218,22 @@ test("Week 15: no sample, task or personal example uses append mode (CKB-089)", 
 // Week 15 runs online only for now: the laptop runner still refuses file access (teacher, 2026-10-30).
 test("Week 15: the laptop runner still blocks file access", async () => {
   await assert.rejects(executeLocallyResult(steps(modules[0])[0].files, ""), /blocks file, network, process, and system-control APIs/);
+});
+
+// The three-part Week 15 file (teacher, 2026-11-15): only the tasks differ from the module, and every discussion
+// point starts "Look at line N." with a real line of that step's Main.java, in line order (CKB-124).
+test("Week 15 three-part: only tasks differ from the module; discussion lines are real and in order", () => {
+  const week15 = curriculum.find((content) => content.week === 15);
+  const threePart = load("../docs/modules/week15/Java2_Week_15.threepart.codeshare.json");
+  const withoutTasks = (content) => { const copy = structuredClone(content); for (const step of steps(copy)) delete step.activity; return copy; };
+  assert.deepEqual(withoutTasks(threePart), withoutTasks(week15));
+  courseModule.parse(threePart);
+  for (const step of steps(threePart)) {
+    const main = step.files.find((file) => file.path === "Main.java").content.split("\n");
+    const points = step.activity.guided.discussion.split("\n").filter(Boolean);
+    assert.ok(points.length >= 4 && points.length <= 7, `${step.id}: 4 to 7 points`);
+    const lines = points.map((point) => Number(point.match(/^- Look at line (\d+)\. /)?.[1]));
+    assert.ok(lines.every((line) => line >= 1 && main[line - 1]?.trim()), `${step.id}: every point names a non-blank line of Main.java`);
+    assert.deepEqual(lines, [...lines].sort((a, b) => a - b), `${step.id}: points in line order`);
+  }
 });

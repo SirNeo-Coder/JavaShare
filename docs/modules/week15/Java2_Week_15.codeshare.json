@@ -139,7 +139,7 @@
           ],
           "run": "Main.java",
           "expectedOutput": "File name: fleet.txt\nExists before? false\nCreated now? true\nExists after? true\nIs a file? true\nSize in bytes: 0",
-          "checkYourself": "Run Step 1 a **second** time. Predict first: what will `Exists before?` and `Created now?` say? (The file is already there, so `createNewFile()` refuses and returns **false**. It does not erase the file.)"
+          "checkYourself": "Run Step 1 a **second** time. Predict first: what will `Exists before?` and `Created now?` say? (In CodeShare every run starts in an empty folder, so fleet.txt is not there yet: you get **false** and **true** again. On a computer that keeps its files, the second run says **true** and **false**, because `createNewFile()` refuses a file that is already there. It does not erase the file.)"
         ,
           "activity": {
             "id": "java-2-w15-d1-s1-alter-v3",
