@@ -1563,7 +1563,11 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
 - Done (CKB-120, approved): at 900 px and narrower **End session** / **Stop sharing** stay visible (681–900 px the button
   alone, the teacher's choice; phones keep the label). Layout test 22/22 (6 cases failed without the fix); real app
   offline at 850 and 600 px, light and dark, clicking **End session** ended the session. `npm test` 469/469.
-- Next: the teacher reviews and merges the PR; check CodeRabbit on it at the start of the next piece of work.
+- CodeRabbit on #115 (2 nitpicks, both valid test gaps, fixed with approval; no app bug): the layout test now covers the
+  class session box with its step count and 950 px, and checks **Present this code** / **Lesson library** too. 41/41;
+  hiding **Lesson library** failed 40 cases. `npm test` 469/469.
+- #115 merged 2026-11-15 before this commit, so it is on `test/header-layout-coderabbit`. Next: the teacher merges that PR.
+
 ## Sample-first browser test step tab — 2026-11-15 (CKB-118)
 
 - Branch `fix/sample-first-step-tab` (from `main` at `d775f87`). Approved test-only fix: `tests/module-sample-first.browser.mjs`
