@@ -1658,3 +1658,12 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
 - Next: teacher reviews the report and PR; decides on the CKB-125 fix. Three-part file goes to a test class only.
 - 2026-11-15 (later): PDF pages 6–7 corrected (challenge 2, Thursday time plan); Word plan reference fix; real upload into
   a throwaway local class passed (teacher 8 answer keys, student 0). Still open: teacher decision on CKB-125.
+
+## Online main thread name (CKB-125) — 2026-11-15
+
+- Branch `fix/online-main-thread-name`, stacked on `content/week16-three-part` (PR #124). Teacher approved the fix.
+- Done: `vendor/java/CodeShareJava.java` names the calling thread `main` around the student's `main()` and restores it;
+  `codeshare-runner.jar` rebuilt with `node scripts/build-java-bridge.mjs`.
+- Tests: new bridge test (call from `Thread-0`) shown failing before, passing after; bridge tests 6/6; Week 16 three-part
+  online 24/24 and Week 15 online 21/21 with this branch's runner.
+- Next: teacher merges #124 first, then this PR; Cloudflare's `codeshare-java` Worker redeploys from `main`.
