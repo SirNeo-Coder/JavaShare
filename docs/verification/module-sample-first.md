@@ -2,7 +2,7 @@
 
 Verified 2026-10-21 on branch `codex/module-sample-first`, based on `codex/earlet-hover-dismiss` (PR #26, stacked on PR #25). No hosted SQL, deployment, merge, or settings changes.
 
-## Re-verification 2026-11-15 (CKB-118)
+## Re-verification 2026-11-15 (CKB-121)
 
 The step-switch subtests timed out on the folded worksheet step tab (worksheet fold, CKB-101/CKB-107). Test-only fix on
 branch `fix/sample-first-step-tab` from main `d775f87`: `openStep` clicks the step tab with `dispatchEvent("click")`.

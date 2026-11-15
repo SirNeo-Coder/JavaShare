@@ -354,7 +354,7 @@ export default function Home() {
   const photoStudentIdRef = useRef<string | null>(null);
   const loadedWorkspaceKeyRef = useRef("");
   // Only the newest class-list load may change the screen: an older answer arriving after a card click
-  // would put the first card's file under the clicked card (CKB-118).
+  // would put the first card's file under the clicked card (CKB-122).
   const workspaceLoadRef = useRef(0);
   const promptedGroupActivityRef = useRef("");
   const team = data?.teams[activeTeam];

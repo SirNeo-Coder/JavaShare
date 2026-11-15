@@ -1,4 +1,4 @@
-# CKB-118 — Sample-first browser test cannot click the worksheet's Step 2 button
+# CKB-121 — Sample-first browser test cannot click the worksheet's Step 2 button
 
 - Status: resolved
 - First recorded: 2026-11-15
