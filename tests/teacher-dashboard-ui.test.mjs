@@ -27,3 +27,18 @@ test("teacher dashboard: avatar styles cannot override the existing classroom av
   assert.doesNotMatch(dashboardCss, /\.teacher-avatar\b/);
   assert.match(dashboardCss, /\.teacher-progress-avatar\b/);
 });
+
+test("workspace header: session boxes cannot push Present this code behind the Code editor (CKB-118)", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /\.team-header \{[^}]*grid-auto-flow:column/, "header items stay on one line");
+  assert.match(css, /\.classroom-workspace \.main-area \{[^}]*grid-template-rows:auto minmax\(66px,auto\)/, "header row grows instead of spilling under the editor");
+});
+
+test("workspace header: End session and Stop sharing use the header button style (CKB-119)", () => {
+  const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  for (const label of ["End session", "Stop sharing"]) {
+    const button = page.split("\n").find((line) => line.includes(`>${label}</button>`));
+    assert.ok(button, `${label} button found`);
+    assert.match(button, /className="secondary"/, `${label} must look like Present this code and Lesson library`);
+  }
+});

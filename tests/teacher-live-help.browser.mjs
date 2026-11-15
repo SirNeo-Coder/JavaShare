@@ -117,7 +117,7 @@ test("teacher live help: watch and edit a student's projects only while selected
 
     await t.test("selecting another card stops the student's live sending", async () => {
       await teacherPage.getByRole("button", { name: "Students / projects", exact: true }).hover();
-      await teacherPage.locator(".team-select").filter({ hasText: "Teacher Demo" }).click();
+      await teacherPage.locator(".team-select").filter({ hasText: "Live Classroom" }).click();
       await teacherPage.getByText(/^Live: /).waitFor({ state: "detached" });
       await student.waitForTimeout(1500);
       const sent = moduleFrames.length;
