@@ -1505,6 +1505,23 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
   restored. All seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
   #108 was merged first, so this fix is on `fix/reselect-live-view-frozen`, PR #109. Next: the teacher merges #109;
   check CodeRabbit on #109 at the start of the next piece of work.
+
+## Week 15 beginner task instructions — 2026-11-15
+
+- Branch: `docs/week15-beginner-instructions`, PR #114. Teacher asked for every Week 15 task instruction to be rewritten
+  for beginners (what it does now, what to change, where, hint) and each teacher answer to match.
+- Done: `docs/modules/week15/Java2_Week_15.codeshare.json` now has the new instructions and answers; only activity
+  instructions and answers changed (script-checked). Answers for Steps 2, 4, 6 and 10 use only Java already shown this
+  week (no `null`/`? :`, `instanceof`, `startsWith` or `continue`); Step 5 uses `fare > 13.00` because `>=` is never
+  shown, so the task reads "bigger than P13.00" (teacher approved this wording). First drafted as a separate
+  `.revised` copy; teacher approved swapping it in. `tests/fixtures/week15-week21-task-edits.json` updated for Steps 2,
+  4, 5, 6 and 10 to match.
+- Tested: `week15-week21-modules.test.mjs` 51/51, which also runs every Week 15 answer through the laptop runner. With the
+  old fixture the answer-line test fails (shown), with the new one it passes. `npm test` 466/466, `npm run build:all`,
+  lint 0 errors (8 older warnings).
+- CodeRabbit on #114: no review — the bot says the repository gets no automatic reviews (fewer than 10 stars); ticking
+  **Trigger review** on the PR asks for one.
+- Next: the teacher merges #114, then re-uploads Week 15 so classes get the new wording. Nothing in progress.
 - CodeRabbit on #109 (Minor, valid, fixed with approval): **Class home** now clears the watched student's live view, so
   coming back into the class can never reuse an old one. #109 was merged first, so this is on
   `fix/leave-class-clears-live-view`. No new test (the case needs a student listed before Teacher Demo Workspace, which
