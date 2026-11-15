@@ -276,7 +276,7 @@ function StepView({ step, status, role, printed = false, sampleFirst = false, on
     <b>{task ? "Sample output" : "Output (expected):"}</b><pre className="printed-output">{step.expectedOutput}</pre>
     {task?.guided && <div className="paper-instructions module-guided">
       {task.guided.discussion && <><b>Discussion</b><Markdown markdown={task.guided.discussion} /></>}
-      <b>Guided example</b><Markdown markdown={task.guided.instruction} /><pre><code>{task.guided.code}</code></pre>
+      <b>Guided example</b><Markdown markdown={task.guided.instruction} /><div className="printed-sample"><pre><code>{task.guided.code}</code></pre></div>
       <b>Expected guided output</b><pre className="printed-output">{task.guided.expectedOutput}</pre>
     </div>}
     {task && <div className="paper-instructions"><b>Your task</b><Markdown markdown={task.instruction} /><b>Expected task output</b><pre className="printed-output">{task.expectedOutput}</pre></div>}

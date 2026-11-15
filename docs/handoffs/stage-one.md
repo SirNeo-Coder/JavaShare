@@ -1637,3 +1637,12 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   CKB-119 → CKB-123). The three-part file still differs from the current module only in its tasks.
 - 2026-11-15: teacher approved pushing; PRs opened for `docs/renumber-ckb-123` and `feature/guided-example` (stacked on it,
   opened against main). Next: the teacher merges the renumber PR first, then the guided PR; check CodeRabbit on both.
+
+## Guided example display and Week 15 note (CKB-124) — 2026-11-15
+
+- Branch: `fix/week15-guided-display`. Teacher tried the three-part Week 15 in a test class and approved three fixes.
+- Done: worksheet guided code in the Sample code box (no grey bars); Step 1 discussion points in line order; Step 1's
+  "Run Step 1 a second time" note now says each CodeShare run starts in an empty folder (module file, three-part file
+  and the teacher's untracked revised copy, still byte-identical to the module file).
+- Next: the teacher merges, re-uploads Week 15 (current class: revised or module file; test class: three-part file),
+  and corrects the same note in the printed PDF by hand.
