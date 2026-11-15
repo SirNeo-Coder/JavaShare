@@ -2669,7 +2669,7 @@ export default function Home() {
                   <small>Students follow your worksheet</small>
                 </span>
                 <SessionStepDone classroomId={session.classroomId} revision={sessionStepRevision} />
-                <button type="button" onClick={() => void setClassSessionState({ active: false })}>End session</button>
+                <button type="button" className="secondary" onClick={() => void setClassSessionState({ active: false })}>End session</button>
               </div>
             )}
             {user.role === "teacher" && sharedStep && (
@@ -2678,7 +2678,7 @@ export default function Home() {
                   <b>Shared with class</b>
                   <small>Week {sharedStep.week} · Step {sharedStep.step.number}</small>
                 </span>
-                <button type="button" onClick={() => void shareStep(null)}>Stop sharing</button>
+                <button type="button" className="secondary" onClick={() => void shareStep(null)}>Stop sharing</button>
               </div>
             )}
             {team.isTeacherWorkspace ? (
