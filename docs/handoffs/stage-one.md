@@ -1522,3 +1522,8 @@ The teacher's full instructions are in their file `CodeShare_Stage_One_Prompt.md
 - CodeRabbit on #114: no review — the bot says the repository gets no automatic reviews (fewer than 10 stars); ticking
   **Trigger review** on the PR asks for one.
 - Next: the teacher merges #114, then re-uploads Week 15 so classes get the new wording. Nothing in progress.
+- CodeRabbit on #109 (Minor, valid, fixed with approval): **Class home** now clears the watched student's live view, so
+  coming back into the class can never reuse an old one. #109 was merged first, so this is on
+  `fix/leave-class-clears-live-view`. No new test (the case needs a student listed before Teacher Demo Workspace, which
+  the app does not produce); seven related browser tests, `npm test` 466/466, `npm run build:all`, lint 0 errors.
+  Next: the teacher merges this PR; check CodeRabbit on it at the start of the next piece of work.

@@ -271,6 +271,9 @@ evidence, checked by the server against its own expected output and the saved ve
   rejection). `expectedError` and Program input do not apply to web steps.
 - **Result.** A checklist with one line per check (**Page text matches** or **Console output
   matches**), ticked or crossed; a cross shows **Required output** and **Your output** side by side.
+  Under it a **Console** box lists every line `console.log` printed in that run, whatever the run file
+  (2026-11-12, CKB-117): students never use the browser's own console. A page that printed nothing
+  shows no box; a `.js` run that printed nothing says so. Web personal projects show the same box.
 - **No internet.** The page runs under the same no-internet rule as the teacher viewer, like the
   course-building checker: links, scripts, pictures, fonts and `fetch` to other sites do not load.
   Pictures and fonts can only be embedded in the file (`data:`).
@@ -444,6 +447,17 @@ evidence, checked by the server against its own expected output and the saved ve
   file** (W3C CSS Syntax: what is still open at the end is closed automatically and then thrown away), which is page text as
   soon as one of those rules changed letters. `Resume/Week_10/test_checker.py` runs every sample and task answer at 696, 760,
   800, 899, 901 and 1000 px and fails if any output differs.
+- **JavaScript console lines (checked 2026-11-12, .NET 2 Game Week 1).** In CodeShare's page window and the teacher's
+  checker alike: a `.js` run file compares only its console lines, on an empty page, so that file must not touch the page
+  (`document.getElementById(...)` finds nothing there and the run fails); an `.html` run file compares only the page text and
+  ignores console lines, even from its own script. So a step whose task changes a `console.log` runs the `.js` file, and from
+  the DOM weeks on a step that changes the page runs the page. `console.log("Health:", 100)` prints `Health: 100`: several
+  values on one line with one space, text without its quotes, a number as written. A comment-only change leaves the output
+  exactly as it was, so a comment task must also change a printed line. `<script src="game.js">` works at the end of body or
+  in head; a misspelt `src` gives no error and prints nothing; an unquoted `src` prints nothing in CodeShare although a browser
+  runs it (CKB-094). A missing quote (`Invalid or unexpected token`) or bracket (`missing ) after argument list`) is a
+  SyntaxError: the run fails and nothing prints; `Console.log` fails with `Console is not defined` after the lines above it
+  have printed; a `*/` closing too late hides statements with no error at all.
 - **Personal performance-task project (2026-10-29).** When every `performanceTask.starterFiles`
   path ends in `.html`, `.css` or `.js`, the personal project is a web project: it keeps web files and
   `.txt` backups (Java files are refused), runs `index.html` in the same no-internet preview, and has

@@ -44,6 +44,10 @@ student's live card is blank after going back and forth, check `chooseTeam` keep
 
 ## History
 
+- 2026-11-12 — CodeRabbit on PR #109 (Minor, valid, unlikely): leaving the class kept the watched student's live view, which
+  reselecting the same first-listed student could reuse; **Class home** now clears it. No browser test: the app lists
+  Teacher Demo Workspace first, so the case cannot be set up; related browser tests rerun.
+
 - 2026-11-12 — CodeRabbit on PR #108 (Major, valid): the reselected view froze; fixed with the teacher's approval.
 
 - 2026-11-12 — Teacher reported it while testing CKB-114, then asked to keep their edits; approved. Built and tested.
