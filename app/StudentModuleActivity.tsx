@@ -31,7 +31,10 @@ export type ModuleLiveLink = {
   onFile: (path: string, content: string, editable: boolean) => void;
   onEdit: (path: string, content: string) => void;
   onCursor: (offset: number) => void;
+  // The student's run state for the watching teacher's right panel (teacher, 2026-11-20, CKB-132).
+  onRun?: (run: LiveRun) => void;
 };
+export type LiveRun = { output: string; status: string; result?: string; tone?: "passed" | "retry"; checks?: string };
 
 type RunCheck = { check: "sample" | "guided" | "task"; passed: boolean; sampleMatched: boolean; guidedMatched?: boolean; success: boolean; syncPending?: boolean };
 
@@ -74,11 +77,15 @@ export function previewMatch(result: { success: boolean; output: string }, sampl
     : task?.guided && matchesActivityOutput(result, task.guided.expectedOutput) ? "guided"
     : matchesSample(result, sample) ? "sample" : "none";
 }
-export function PreviewRunFeedback({ match, passed = [], hasGuided = false, hasTask = false }: { match: PreviewMatch | null; passed?: PreviewMatch[]; hasGuided?: boolean; hasTask?: boolean }) {
+const matchText = (match: PreviewMatch) => match === "task" ? "Matches Expected task output." : match === "guided" ? "Matches Expected guided output." : match === "sample" ? "Matches Expected sample output." : "Differs from the expected output.";
+function previewChecks(passed: PreviewMatch[], hasGuided: boolean, hasTask: boolean) {
   const checks: [PreviewMatch, string][] = [["sample", "Sample, unchanged code"], ...(hasGuided ? [["guided", "Guided example"] as [PreviewMatch, string]] : []), ...(hasTask ? [["task", "Your task"] as [PreviewMatch, string]] : [])];
+  return checks.map(([key, label]) => `${passed.includes(key) ? "✓" : "○"} ${label}`);
+}
+export function PreviewRunFeedback({ match, passed = [], hasGuided = false, hasTask = false }: { match: PreviewMatch | null; passed?: PreviewMatch[]; hasGuided?: boolean; hasTask?: boolean }) {
   return <div className={`module-run-feedback ${!match ? "ready" : match === "none" ? "retry" : "passed"}`} role="status" aria-live="polite">
-    {match && <strong>{match === "task" ? "Matches Expected task output." : match === "guided" ? "Matches Expected guided output." : match === "sample" ? "Matches Expected sample output." : "Differs from the expected output."}</strong>}
-    <ul className="preview-checks" aria-label="Checks in this practice">{checks.map(([key, label]) => <li key={key}>{passed.includes(key) ? "✓" : "○"} {label}</li>)}</ul>
+    {match && <strong>{matchText(match)}</strong>}
+    <ul className="preview-checks" aria-label="Checks in this practice">{previewChecks(passed, hasGuided, hasTask).map((line) => <li key={line}>{line}</li>)}</ul>
     <p>Practice only — not saved, and no step is marked Completed.</p>
   </div>;
 }
@@ -302,6 +309,18 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
     setSuccessfulFiles(null);
   };
   useImperativeHandle(ref, () => ({ save, files: () => files, applyEdit }));
+  // The watching teacher sees the same output and result as this screen; sent only when it changes.
+  const sentRun = useRef("");
+  useEffect(() => {
+    if (review || !live?.onRun) return;
+    const text = web ? webResult ? [webResult.error, webResult.output].filter(Boolean).join("\n") : "" : output;
+    const run: LiveRun = { output: text.slice(0, 20000), status: runMessage ?? status,
+      ...(preview ? { ...(practice ? { result: matchText(practice), tone: practice === "none" ? "retry" as const : "passed" as const } : {}), checks: previewChecks(practicePassed, Boolean(guided), Boolean(activity.task)).join("   ") }
+        : lastCheck ? { result: status, tone: lastCheck.passed && !lastCheck.syncPending ? "passed" as const : "retry" as const } : {}) };
+    if (sentRun.current === JSON.stringify(run)) return;
+    sentRun.current = JSON.stringify(run);
+    live.onRun(run);
+  });
   // A new snapshot only when the open file or editability changes; typing travels as edits.
   const sentFile = useRef("");
   useEffect(() => {

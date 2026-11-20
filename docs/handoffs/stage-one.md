@@ -1,4 +1,8 @@
 > Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
+> Live student output (2026-11-20): selecting a student now shows their Actual output, status and result in the
+> teacher's right panel (CKB-132), branch `feature/live-student-output`, approved with merge. PR #130 (guided check)
+> merged on request. Still open: students not following the teacher's page online (awaiting teacher's answer).
+
 > Preview guided check (2026-11-20): teacher's preview and students' class step now tick three checks (Sample,
 > Guided example, Your task) and show the guided example (CKB-131), branch `fix/preview-guided-check`, approved with
 > merge. PR #129 (obvious sample lock) merged on request. Still open: students not following the teacher's page online.
