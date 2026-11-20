@@ -1,4 +1,8 @@
 > Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
+> Preview guided check (2026-11-20): teacher's preview and students' class step now tick three checks (Sample,
+> Guided example, Your task) and show the guided example (CKB-131), branch `fix/preview-guided-check`, approved with
+> merge. PR #129 (obvious sample lock) merged on request. Still open: students not following the teacher's page online.
+
 > Obvious sample lock (2026-11-20): online, students and the teacher (live help) could not type in Week 15 until
 > the sample ran. Diagnosed as the sample-first lock (CKB-054); teacher chose to make it obvious (CKB-130). Branch
 > `fix/obvious-sample-lock`. Editor notice for student and teacher live view; lock rules unchanged. PR #128

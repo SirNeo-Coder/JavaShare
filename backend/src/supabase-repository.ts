@@ -566,7 +566,8 @@ export async function supabaseSharedStepPayload(user: SupabaseSessionUser, class
   const { id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput } = step;
   return { active: true as const, moduleId: content.id, moduleTitle: content.title, week: content.week, course: content.course, starterFiles: content.starterFiles,
     step: { type: "step" as const, id, number, instruction, language, run, files, expectedOutput, expectedError, stdin, webChecks, mediaChecks, includeMediaOutput },
-    task: step.activity && { instruction: step.activity.instruction, expectedOutput: step.activity.expectedOutput } };
+    // The guided example is practice for students too (teacher, 2026-11-20, CKB-131); never the answer key.
+    task: step.activity && { instruction: step.activity.instruction, expectedOutput: step.activity.expectedOutput, guided: step.activity.guided } };
 }
 
 export async function setSupabaseSharedStep(user: SupabaseSessionUser, classroomId: string, share: { moduleId: string; stepId: string } | null) {

@@ -524,7 +524,10 @@ expected output; the class step still saves nothing. Only this class's students.
 page, starts or stops a share, and whenever a student finishes a task (or the teacher marks a step done); it never re-reads on a timer.
 A teacher's **Module preview** run and a student's **Class step** run show a banner above Actual output:
 **Matches Expected task output.**, **Matches Expected sample output.** or **Differs from the expected output.**, with
-"Practice only — not saved, and no step is marked Completed." (CKB-128).
+"Practice only — not saved, and no step is marked Completed." (CKB-128). It also lists three checks that tick as
+each run matches during that preview: **Sample, unchanged code**, **Guided example** (only when the step has one, with
+**Matches Expected guided output.**) and **Your task**. The preview and the class step show the step's discussion and
+guided example with **Expected guided output** (CKB-131, 2026-11-20).
 With the worksheet closed after **Work in code editor**, it counts the **Shared with class** step instead, so the teacher can keep watching while coding (CKB-108). It is hidden when neither a worksheet page nor a shared step is open, and on the **Performance task** page. The student list is unchanged.
 
 ## Subject-specific shared module sets (approved 2026-10-22)

@@ -143,7 +143,7 @@ type SharedStep = { moduleId: string; moduleTitle: string; week: number; course:
 // The step's sample with the module's starter files, as students get it; never saved.
 function stepPreview(module: CourseModule, step: StepBlock, classroomId: string, userId: string, shared = false, task: StudentActivity["task"] = step.activity): StudentActivity {
   return { kind: "preview", shared, module, classroomId, moduleId: module.id, moduleTitle: shared ? `Week ${module.week} · Step ${step.number}` : module.title, stepId: step.id, stateId: "", studentId: userId,
-    instruction: step.instruction, expectedOutput: step.expectedOutput, stdin: step.stdin ?? "", task: task && { instruction: task.instruction, expectedOutput: task.expectedOutput },
+    instruction: step.instruction, expectedOutput: step.expectedOutput, stdin: step.stdin ?? "", task: task && { instruction: task.instruction, expectedOutput: task.expectedOutput, guided: task.guided },
     progress: { moduleId: module.id, projectFiles: mergeProjectFiles(module.starterFiles ?? [], step.files), performanceProjectFiles: [], percent: 0, updatedAt: "", stepStates: {}, performanceTask: {} } };
 }
 type LiveShare = {
