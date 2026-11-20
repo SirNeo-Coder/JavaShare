@@ -19,7 +19,7 @@ const content = JSON.parse(readFileSync(new URL("./fixtures/student-activity.cod
 content.id = `step-done-browser-${randomUUID().slice(0, 6)}`; content.week = 60; content.title = "Step done week 60";
 const stepOne = content.lessons[0].blocks[0];
 
-test("class session step count: Step 1 · 0/2 done, a student's finished run makes it 1/2 live, Work in code editor keeps it, hover lists Done and Not yet", async () => {
+test("class session step count: online students only; a saved pass or a matching class-step run counts live; preview runs show a match banner", async () => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.PREVIEW_BASE_URL || "http://localhost:3062";
   const users = []; let classId;
@@ -43,6 +43,13 @@ test("class session step count: Step 1 · 0/2 done, a student's finished run mak
     const page = await teacher.newPage(); page.setDefaultTimeout(30000);
     const errors = []; page.on("pageerror", (error) => errors.push(error.message));
     const reads = []; page.on("request", (request) => { if (request.url().endsWith("/session/step-progress")) reads.push(Date.now()); });
+    // Only students online count (teacher, 2026-11-20, CKB-129): both students have CodeShare open.
+    const studentPages = [];
+    for (const context of [ana, ben]) {
+      const student = await context.newPage(); student.setDefaultTimeout(30000); student.on("pageerror", (error) => errors.push(error.message));
+      await student.goto("/"); await student.locator(".classroom-workspace").waitFor(); studentPages.push(student);
+    }
+    const [anaPage, benPage] = studentPages;
     await page.goto("/");
     await page.locator("header").filter({ hasText: "Step done browser" }).getByRole("button", { name: "Open class", exact: true }).click();
     await page.getByRole("button", { name: "Enter classroom" }).click();
@@ -75,10 +82,29 @@ test("class session step count: Step 1 · 0/2 done, a student's finished run mak
     }
     await page.waitForTimeout(2000);
     assert.equal(await chip.getByRole("button").innerText(), "Step 1 · 1/2 done", "the count stays in the code editor");
-    const benPrepared = await (await ben.request.post(`${base}/activity`, { data: { stepId: stepOne.id } })).json();
-    const benRun = await (await ben.request.post(`${base}/run`, { data: { stepId: stepOne.id, files: benPrepared.projectFiles, updatedAt: benPrepared.updatedAt } })).json();
-    assert.equal(benRun.passed, true);
+
+    // The teacher's own preview run says whether it matched (CKB-128).
+    const footer = (p) => p.locator("footer.actionbar").filter({ hasText: "Return to class project" });
+    const banner = (p) => p.locator(".student-module-project .module-run-feedback");
+    await footer(page).getByRole("button", { name: /Run code/ }).click();
+    await banner(page).filter({ hasText: "Matches Expected sample output." }).waitFor();
+    assert.match(await banner(page).innerText(), /Practice only — not saved/);
+
+    // Ben's class-step run with the task output: green banner on his screen, and he counts as done, with nothing saved.
+    await benPage.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Class step"));
+    const benEditor = benPage.locator(".student-module-project").getByRole("textbox", { name: "Java source code editor", exact: true });
+    await benEditor.fill((await benEditor.inputValue()).replace("v.getCapacity()", "(v.getCapacity() + 1)"));
+    await footer(benPage).getByRole("button", { name: /Run code/ }).click();
+    await banner(benPage).filter({ hasText: "Differs from the expected output." }).waitFor();
+    assert.equal(await chip.getByRole("button").innerText(), "Step 1 · 1/2 done", "a differing run does not count");
+    await benPage.waitForTimeout(1600); // the laptop runner refuses runs less than 1.5 seconds apart
+    await benEditor.fill((await benEditor.inputValue()).replace("(v.getCapacity() + 1)", "25"));
+    await footer(benPage).getByRole("button", { name: /Run code/ }).click();
+    await banner(benPage).filter({ hasText: "Matches Expected task output." }).waitFor();
+    assert.match(await banner(benPage).getAttribute("class"), /passed/);
     await chip.getByRole("button", { name: "Step 1 · 2/2 done" }).waitFor();
+    const benSaved = await admin.from("module_progress").select("step_states").eq("classroom_id", classId).eq("student_id", users[2].id).maybeSingle();
+    assert.ok(!benSaved.data || !Object.values(benSaved.data.step_states).includes("pass"), "the class step saves nothing");
 
     const list = chip.getByRole("tooltip");
     assert.equal(await list.isVisible(), false, "the names stay hidden until hover");
@@ -86,6 +112,10 @@ test("class session step count: Step 1 · 0/2 done, a student's finished run mak
     await list.waitFor({ state: "visible" });
     assert.equal((await list.innerText()).replace(/\n+/g, "\n"), "Done (2)\nAna Done\nBen Notyet\nNot yet (0)\nNobody yet");
     if (process.env.STEP_DONE_SCREENSHOT) await page.screenshot({ path: process.env.STEP_DONE_SCREENSHOT });
+
+    // Ana closes CodeShare: she leaves the count, though her saved pass remains.
+    await anaPage.close();
+    await chip.getByRole("button", { name: "Step 1 · 1/1 done" }).waitFor();
 
     // No timer: nothing re-reads while nobody finishes.
     const quiet = reads.length;

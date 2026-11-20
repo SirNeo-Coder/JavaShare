@@ -316,6 +316,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .classroom-workspace .workspace-mode { margin:0 -24px; padding-left:24px; padding-right:24px; }
 .classroom-workspace .team-header { padding:8px 12px; }
 .classroom-workspace .editor-card { grid-template-rows:38px 36px minmax(0,1fr) 29px; }
+.classroom-workspace .editor-card:has(> .editor-lock) { grid-template-rows:38px 36px auto minmax(0,1fr) 29px; }
 .classroom-workspace .right-panel { grid-template-rows:38px 36px minmax(0,1fr) auto; }
 .classroom-workspace .editor-card,.classroom-workspace .right-panel { border:1px solid #45516b; border-radius:7px; background:#0d1425; color:#c6d1e5; box-shadow:0 2px 6px #0c16312b; }
 .classroom-workspace .workspace-card-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 14px; background:#151e33; border-bottom:1px solid #28334b; font-size:10px; color:#95a6c2; }
@@ -636,6 +637,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .module-run-feedback p { margin:5px 0 0; }
 .module-run-feedback.passed { border-color:#387d65; background:#153e32; color:#d7ffeb; }
 .module-run-feedback.retry { border-color:#ad7930; background:#463313; color:#ffe9b8; }
+.editor-lock { flex:none; margin:0; padding:10px 14px; border-bottom:1px solid #ad7930; background:#463313; color:#ffe9b8; font-size:15px; font-weight:700; }
 .module-before-sample { margin-top:12px; font-size:12px; }
 /* Web module steps: one line per check, the differences side by side, then the sandboxed page. */
 .web-checks { flex:none; padding:10px 16px; font-size:13px; }

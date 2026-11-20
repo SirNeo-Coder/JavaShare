@@ -1,4 +1,20 @@
 > Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
+> Obvious sample lock (2026-11-20): online, students and the teacher (live help) could not type in Week 15 until
+> the sample ran. Diagnosed as the sample-first lock (CKB-054); teacher chose to make it obvious (CKB-130). Branch
+> `fix/obvious-sample-lock`. Editor notice for student and teacher live view; lock rules unchanged. PR #128
+> (preview banner, online step count) was merged on the teacher's request. Still open: students not following the
+> teacher's page online. Locally offline they follow; waiting on whether the bar still showed Class session (30-minute
+> inactivity end) and whether the hosted site runs current code.
+
+> Preview banner and online step count (2026-11-20): teacher reported no sign that a Module preview run matched,
+> no green banner on the class step, and **Step 1 · 0/20 done** in the real class. Approved: practice-only match
+> banner for preview and class-step runs (CKB-128); count only online students, Done = saved pass or a matching
+> class-step run reported over presence, nothing saved (CKB-129). Teacher also decided three-part Week 15 is now
+> used in the real class (AGENTS.md updated). Branch `fix/session-step-done-online`. Tested: `npm test` all pass,
+> `build:all`, lint 0 errors; `tests/session-step-done.browser.mjs` offline (laptop Java) passes; unit tests shown
+> failing with each fix removed. Not run: online (CheerpJ) browser check, hosted site. Open, not yet diagnosed:
+> teacher reports students in the session did not follow the teacher's Week 15 worksheet page.
+
 > **MODULE PROGRESS** and step tabs coming back on any scroll up, even mid-page; approved showing them
 > only at the top. Branch `fix/worksheet-fold-top-only` from main (PR #93 merged; its CodeRabbit
 > findings were all already fixed). `foldOnScroll` in `app/ModuleViewer.tsx` now unfolds only within

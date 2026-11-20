@@ -664,7 +664,8 @@ export async function getSupabaseSessionStepProgress(user: SupabaseSessionUser, 
   ]);
   fail(error, "Could not load class progress");
   const passed = new Set(data.filter((row) => row.step_states[activityStateId(step)] === "pass").map((row) => row.student_id));
-  const names = (done: boolean) => students.filter((student) => passed.has(student.id) === done).map((student) => student.name);
+  // Ids too: the teacher's page counts only students online now, and adds their unsaved class-step passes (CKB-129).
+  const names = (done: boolean) => students.filter((student) => passed.has(student.id) === done).map(({ id, name }) => ({ id, name }));
   return { step: { moduleId, stepId: step.id, number: step.number }, done: names(true), notDone: names(false) };
 }
 

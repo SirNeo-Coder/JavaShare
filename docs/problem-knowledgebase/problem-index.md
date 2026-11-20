@@ -4,6 +4,9 @@ Search symptoms, user wording, features, and test language here first.
 
 | Case | Symptom and search terms | Root-cause class | Status | Evidence |
 | --- | --- | --- | --- | --- |
+| [CKB-130](cases/CKB-130-sample-lock-not-obvious.md) | student can't type, could not edit the editor, teacher can't edit student's code in live help, eventually editable | sample-first lock and run lock only explained in a small status line | resolved on `fix/obvious-sample-lock` | lock-note unit test shown failing; offline browser student + teacher |
+| [CKB-129](cases/CKB-129-step-count-online-and-class-step.md) | Step 1 · 0/20 done, Nobody yet, done student not counting, count offline students | count read only saved passes of the current task id; class step never saved | resolved on `fix/session-step-done-online` | online-filter unit test shown failing; offline browser 1/1 |
+| [CKB-128](cases/CKB-128-preview-run-no-result-banner.md) | teacher preview no notification code right, class step no green banner | preview runs never compared; banner hidden for previews | resolved on `fix/session-step-done-online` | preview-match unit test shown failing; offline browser |
 | [CKB-067](cases/CKB-067-error-sample-draft-reload.md) | verified expected error lost on reload, alteration read-only | execution success used as verification | resolved locally | draft unit mutation and online/offline browser |
 | [CKB-068](cases/CKB-068-stale-device-draft-evidence.md) | corrected lesson restores old code/evidence or wrong step | missing draft identity/version; stale lesson with fresh progress | resolved locally | draft unit mutation and teacher-correction browser |
 | [CKB-069](cases/CKB-069-completion-banner-before-sync.md) | Completed banner while sync fails | local pass displayed before server acceptance | resolved locally | feedback mutation and browser retry |
