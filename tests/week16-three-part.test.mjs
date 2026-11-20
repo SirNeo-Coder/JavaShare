@@ -19,18 +19,21 @@ const solved = (step, kind) => step.files.map((file) => ({ ...file, content: edi
   .reduce((text, edit) => { assert.ok(text.includes(edit.from), `${step.id} ${kind}: missing ${edit.from}`); return text.replaceAll(edit.from, edit.to); }, file.content) }));
 const linesOf = (files, path) => files.find((file) => file.path === path)?.content.split("\n");
 
-test("Week 16 three-part: uploads, keeps ids, lessons and slips, and gives every own task a new id", () => {
+test("Week 16 three-part: uploads as five days, Monday to Friday, with ten steps and a liplet every day", () => {
   courseModule.parse(content);
-  assert.equal(steps(content).length, 8);
-  for (const [index, step] of steps(content).entries()) {
-    const before = steps(source)[index];
-    assert.equal(step.id, before.id);
-    assert.equal(step.activity.id, before.activity.id.replace(/-alter-v1$/, "-alter-v2"));
+  assert.deepEqual(content.lessons.map((lesson) => lesson.dayLabel), ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]);
+  assert.deepEqual(steps(content).map((step) => step.number), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  for (const lesson of content.lessons) assert.ok(lesson.exitSlip.questions.length >= 3, `${lesson.id} has a liplet`);
+  // The eight earlier steps keep their step ids (saved progress), with new -v2 own tasks; the two new steps are -v1.
+  const earlier = steps(source).map((step) => step.id);
+  for (const step of steps(content)) {
+    const kept = earlier.includes(step.id);
+    assert.equal(step.activity.id, `${step.id}-alter-${kept ? "v2" : "v1"}`);
     assert.deepEqual(step.activity.files, []);
     assert.ok(step.activity.solution.lines && step.activity.guided.discussion);
   }
-  assert.deepEqual(content.lessons.map((lesson) => [lesson.id, lesson.exitSlip]), source.lessons.map((lesson) => [lesson.id, lesson.exitSlip]));
-  assert.deepEqual([content.starterFiles, content.performanceTask, content.previousModuleId], [source.starterFiles, source.performanceTask, source.previousModuleId]);
+  assert.deepEqual(steps(content).filter((step) => earlier.includes(step.id)).map((step) => step.id), earlier);
+  assert.deepEqual([content.starterFiles, content.previousModuleId], [source.starterFiles, source.previousModuleId]);
 });
 
 test("Week 16 three-part: every discussion quote sits on the line it names", () => {
@@ -46,8 +49,8 @@ test("Week 16 three-part: every discussion quote sits on the line it names", () 
 
 test("Week 16 three-part: guided lines and answer-key lines sit where they say", () => {
   for (const step of steps(content)) {
-    const guided = linesOf(solved(step, "guided"), "Main.java");
-    for (const line of step.activity.guided.code.split("\n")) assert.ok(guided.includes(line), `${step.id}: guided line not in the guided file: ${line}`);
+    const guided = solved(step, "guided").flatMap((file) => file.content.split("\n"));
+    for (const line of step.activity.guided.code.split("\n")) assert.ok(guided.includes(line), `${step.id}: guided line not in the guided files: ${line}`);
     const own = solved(step, "own");
     for (const block of step.activity.solution.lines.split("\n\n")) {
       const [heading, ...quoted] = block.split("\n");
