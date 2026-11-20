@@ -334,7 +334,10 @@ What teachers and students can do today. Keep this page current when their use o
   readable under **Work saved before sample loading**. The previous week and personal drafts and
   submissions are never changed by module sample loading.
 - The sample editor stays read-only until the student presses **Run code** and verifies the
-  unchanged supplied sources and sample result. **Sample verified — now complete Your task.**
+  unchanged supplied sources and sample result. The editor itself says so: **🔒 Locked — press ▶ Run code to check
+  the sample first. Then you can edit.**; during any run, **⏳ Loading Java or running — the editor unlocks when the
+  run finishes.** The teacher's live view of that student shows **🔒 Locked — the student must press ▶ Run code to
+  check the sample first. Then you both can edit.** (2026-11-20, CKB-130) **Sample verified — now complete Your task.**
   saves verification without completing the task, advancing its percentage, or opening the next step.
   A sample with an explicit `expectedError` verifies the declared exception and shows
   **Expected error observed**; it cannot earn task completion.

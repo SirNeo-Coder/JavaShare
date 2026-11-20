@@ -2818,6 +2818,7 @@ export default function Home() {
             {studentLiveView ? <section className="editor-card student-module-project" aria-label="Student live project">
               <div className="workspace-card-heading"><b>Live: {studentLiveView.studentName} · {studentLiveView.kind === "performance" ? "Personal project" : studentLiveView.kind === "preview" ? "Class step" : "Module project"} · {studentLiveView.moduleTitle}</b><span>{fileLanguage(studentLiveView.path) === "java" ? "Java" : "Web page"}</span></div>
               <div className="file-tabs"><button type="button" className="file-tab active">{studentLiveView.path}</button></div>
+              {!studentLiveView.editable && <p className="editor-lock" role="status">🔒 Locked — the student must press ▶ Run code to check the sample first. Then you both can edit.</p>}
               <CodeEditor value={studentLiveView.content} onChange={editModuleLive} onCursorChange={moveModuleCursor} remoteCursors={moduleCursors} readOnly={!studentLiveView.editable} language={fileLanguage(studentLiveView.path)} />
               <div className="editor-status"><span>{studentLiveView.path}</span><span>{studentLiveView.editable ? studentLiveView.kind === "preview" ? "Your changes appear on the student's screen. A class step is never saved." : "Your changes appear on the student's screen. Their Save work or a successful run keeps them." : "Read-only until the student runs the unchanged sample."}</span></div>
             </section> : <section className="editor-card">
