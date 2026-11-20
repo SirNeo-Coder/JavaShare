@@ -98,6 +98,10 @@ first in `main`", so a student's own Swing program runs (and can be submitted) i
 
 ## Not checked
 
+- Week 17 still carries the older copies of the Week 16 helper classes (`BoardingTask`, `ConvoyLeg`, `DispatchThread`, `LoadingBay`,
+  `ReadyReport`) from its source; Week 16's three-part file changed them. This week never calls them, and every Week 17 step
+  compiles with the copies it carries. Not changed here (Week 16 and the starter files were out of scope).
+
 - A real upload into a local class (Week 16 had one). The answer-key removal for students is the app's tested
   general rule (`tests/module-activities.test.mjs`), not re-run with this file.
 - The hosted site and its online runner. The online runs used this branch's runner files served on the laptop.

@@ -374,3 +374,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - The three-part Week 15 file is for a separate test class only, never the teacher's current class.
 - Week 16's three-part file is the real Week 16 (teacher, 2026-11-20): five days, Monday to Friday (Nov 23–27),
   ten steps, a liplet every day. Students who already did Week 16 redo it; their old task passes do not count.
+- Week 17's three-part file is the real Week 17 (teacher, 2026-11-20): five days, Monday to Friday (Nov 30–Dec 4),
+  ten steps, a liplet every day. Students who already did Week 17 redo it; their old task passes do not count.
+  Its GUI programs start with two no-screen lines and print what their Swing controls show (CKB-127).
