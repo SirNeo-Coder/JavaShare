@@ -22,7 +22,7 @@ export type StudentActivity = {
   classroomId: string; moduleId: string; moduleTitle: string; stepId: string; stateId: string; studentId: string;
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
   // A preview's alteration task, shown under the sample to read (teacher, 2026-11-11).
-  task?: { instruction: string; expectedOutput: string };
+  task?: { instruction: string; expectedOutput: string; guided?: NonNullable<NonNullable<StepBlock["activity"]>["guided"]> };
 };
 export type ModuleEditorHandle = { save: () => Promise<void>; files: () => ModuleFile[]; applyEdit: (activityKey: string, path: string, edit: (content: string) => string) => void };
 // Teacher live help: the open file, typing and cursor go to the watching teacher; their cursor comes back.
@@ -67,14 +67,18 @@ export function editorLockNote(pendingSample: boolean, running: boolean, web: bo
 }
 
 // A preview or class-step run is compared on this device only: nothing is saved or completed (CKB-128).
-type PreviewMatch = "task" | "sample" | "none";
-export function previewMatch(result: { success: boolean; output: string }, sample: Parameters<typeof matchesSample>[1], task?: { expectedOutput: string }): PreviewMatch {
-  return task && matchesActivityOutput(result, task.expectedOutput) ? "task" : matchesSample(result, sample) ? "sample" : "none";
+// The guided example is checked too, with a tick for each of the three during this preview (teacher, 2026-11-20, CKB-131).
+type PreviewMatch = "task" | "guided" | "sample" | "none";
+export function previewMatch(result: { success: boolean; output: string }, sample: Parameters<typeof matchesSample>[1], task?: { expectedOutput: string; guided?: { expectedOutput: string } }): PreviewMatch {
+  return task && matchesActivityOutput(result, task.expectedOutput) ? "task"
+    : task?.guided && matchesActivityOutput(result, task.guided.expectedOutput) ? "guided"
+    : matchesSample(result, sample) ? "sample" : "none";
 }
-export function PreviewRunFeedback({ match }: { match: PreviewMatch | null }) {
-  if (!match) return null;
-  return <div className={`module-run-feedback ${match === "none" ? "retry" : "passed"}`} role="status" aria-live="polite">
-    <strong>{match === "task" ? "Matches Expected task output." : match === "sample" ? "Matches Expected sample output." : "Differs from the expected output."}</strong>
+export function PreviewRunFeedback({ match, passed = [], hasGuided = false, hasTask = false }: { match: PreviewMatch | null; passed?: PreviewMatch[]; hasGuided?: boolean; hasTask?: boolean }) {
+  const checks: [PreviewMatch, string][] = [["sample", "Sample, unchanged code"], ...(hasGuided ? [["guided", "Guided example"] as [PreviewMatch, string]] : []), ...(hasTask ? [["task", "Your task"] as [PreviewMatch, string]] : [])];
+  return <div className={`module-run-feedback ${!match ? "ready" : match === "none" ? "retry" : "passed"}`} role="status" aria-live="polite">
+    {match && <strong>{match === "task" ? "Matches Expected task output." : match === "guided" ? "Matches Expected guided output." : match === "sample" ? "Matches Expected sample output." : "Differs from the expected output."}</strong>}
+    <ul className="preview-checks" aria-label="Checks in this practice">{checks.map(([key, label]) => <li key={key}>{passed.includes(key) ? "✓" : "○"} {label}</li>)}</ul>
     <p>Practice only — not saved, and no step is marked Completed.</p>
   </div>;
 }
@@ -199,15 +203,17 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
   const [stepStates, setStepStates] = useState(activity.progress.stepStates);
   const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
   const [practice, setPractice] = useState<PreviewMatch | null>(null);
+  const [practicePassed, setPracticePassed] = useState<PreviewMatch[]>([]);
   // The step counts as done when its task output matches, or its sample output for a step without a task.
   const comparePreview = (result: { success: boolean; output: string }) => {
     const match = previewMatch(result, { expectedOutput: activity.expectedOutput, expectedError: step?.expectedError, files: step?.files }, activity.task);
     setPractice(match);
+    if (match !== "none") setPracticePassed((current) => current.includes(match) ? current : [...current, match]);
     if (match === (activity.task ? "task" : "sample")) onPracticePass?.();
   };
   const pendingSample = !personal && !preview && Boolean(step && samplePending(activity.module, step, stepStates));
-  const guided = !personal && !preview ? step?.activity?.guided : undefined;
-  const pendingGuided = Boolean(guided && step && guidedPending(activity.module, step, stepStates));
+  const guided = preview ? activity.task?.guided : !personal ? step?.activity?.guided : undefined;
+  const pendingGuided = !preview && Boolean(guided && step && guidedPending(activity.module, step, stepStates));
   const completed = !personal && stepStates[activity.stateId] === "pass";
   // The web result list judges a run by what it was checked as: a verified sample stays ticked against the
   // sample, not re-judged against the task that opens right after it (CKB-083).
@@ -496,7 +502,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
         <div className="workspace-card-heading"><b>Console</b><span aria-live="polite">{status}</span></div>
         <div className="module-activity-details">
           <b>{personal ? "Your performance task" : pendingSample ? "Run the sample first" : pendingGuided ? "Guided example" : task ? "Your task" : "Module sample"}</b><p>{pendingSample ? `The sample and supporting classes are loaded. Press Run code before editing. After verification, this editor opens for ${guided ? "the Guided example" : "Your task"}.` : pendingGuided ? "Read the discussion, type the guided example into your code, then Run code. It does not complete this step." : activity.instruction}</p>
-          {guided && !pendingSample && <details className="module-guided" open={pendingGuided}><summary>Discussion and guided example</summary>
+          {guided && !pendingSample && <details className="module-guided" open={pendingGuided || preview}><summary>Discussion and guided example</summary>
             {guided.discussion && <><b>Discussion</b><Markdown markdown={guided.discussion} /></>}
             <b>Guided example</b><Markdown markdown={guided.instruction} /><pre>{guided.code}</pre>
             {!pendingGuided && <><b>Expected guided output</b><pre>{guided.expectedOutput}</pre></>}
@@ -521,7 +527,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
         {personal && !review && <p role="status">{successfulFiles === JSON.stringify(files) ? "Run succeeded — ready to submit this version." : "Run the current files successfully before submitting."} Submission records progress, not a grade or teacher approval.</p>}
-        {preview && !teacherChecked && <PreviewRunFeedback match={practice} />}
+        {preview && !teacherChecked && <PreviewRunFeedback match={practice} passed={practicePassed} hasGuided={Boolean(guided)} hasTask={Boolean(activity.task)} />}
         {!personal && !preview && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} pendingGuided={pendingGuided} hasGuided={Boolean(guided)} expectedError={web ? undefined : step?.expectedError} />}
         {web ? <>
           <JavaRunProgress message={runMessage} />

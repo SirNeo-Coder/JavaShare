@@ -18,6 +18,9 @@ const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { pers
 const content = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
 content.id = `step-done-browser-${randomUUID().slice(0, 6)}`; content.week = 60; content.title = "Step done week 60";
 const stepOne = content.lessons[0].blocks[0];
+// A guided example, the third practice check (CKB-131); a guided example needs the task's own id.
+stepOne.activity.id = `step-done-task-${randomUUID().slice(0, 6)}`;
+stepOne.activity.guided = { instruction: "Print a capacity of 30.", code: "System.out.println(\"Capacity: \" + 30);", expectedOutput: "Capacity: 30", stdin: "" };
 
 test("class session step count: online students only; a saved pass or a matching class-step run counts live; preview runs show a match banner", async () => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
@@ -66,7 +69,12 @@ test("class session step count: online students only; a saved pass or a matching
     const base = `/api/classrooms/${classId}/modules/${content.id}/progress`;
     const prepared = await (await ana.request.post(`${base}/activity`, { data: { stepId: stepOne.id } })).json();
     const before = reads.length;
-    const run = await (await ana.request.post(`${base}/run`, { data: { stepId: stepOne.id, files: prepared.projectFiles, updatedAt: prepared.updatedAt } })).json();
+    // A step with a guided example: the guided run comes first, then the task (saved pass).
+    const anaFiles = (capacity) => prepared.projectFiles.map((file) => file.path === "Main.java" ? { ...file, content: file.content.replace("v.getCapacity()", capacity) } : file);
+    const guidedRun = await (await ana.request.post(`${base}/run`, { data: { stepId: stepOne.id, files: anaFiles("30"), updatedAt: prepared.updatedAt } })).json();
+    assert.equal(guidedRun.check, "guided"); assert.equal(guidedRun.passed, true);
+    await page.waitForTimeout(1600);
+    const run = await (await ana.request.post(`${base}/run`, { data: { stepId: stepOne.id, files: anaFiles("25"), updatedAt: guidedRun.progress.updatedAt } })).json();
     assert.equal(run.passed, true, JSON.stringify(run).slice(0, 300));
     await chip.getByRole("button", { name: "Step 1 · 1/2 done" }).waitFor();
     assert.equal(reads.length, before + 1, "one re-read for one finished task");
@@ -89,6 +97,7 @@ test("class session step count: online students only; a saved pass or a matching
     await footer(page).getByRole("button", { name: /Run code/ }).click();
     await banner(page).filter({ hasText: "Matches Expected sample output." }).waitFor();
     assert.match(await banner(page).innerText(), /Practice only — not saved/);
+    assert.match(await banner(page).innerText(), /✓ Sample, unchanged code[\s\S]*○ Guided example[\s\S]*○ Your task/);
 
     // Ben's class-step run with the task output: green banner on his screen, and he counts as done, with nothing saved.
     await benPage.waitForFunction(() => document.querySelector(".student-module-project .workspace-card-heading b")?.textContent?.startsWith("Class step"));
@@ -98,10 +107,20 @@ test("class session step count: online students only; a saved pass or a matching
     await banner(benPage).filter({ hasText: "Differs from the expected output." }).waitFor();
     assert.equal(await chip.getByRole("button").innerText(), "Step 1 · 1/2 done", "a differing run does not count");
     await benPage.waitForTimeout(1600); // the laptop runner refuses runs less than 1.5 seconds apart
-    await benEditor.fill((await benEditor.inputValue()).replace("(v.getCapacity() + 1)", "25"));
+    // The guided example reaches the class step and is its own check (CKB-131).
+    await benPage.locator(".student-module-project .module-guided").getByText("Print a capacity of 30.").waitFor();
+    await benEditor.fill((await benEditor.inputValue()).replace("(v.getCapacity() + 1)", "30"));
+    await footer(benPage).getByRole("button", { name: /Run code/ }).click();
+    await banner(benPage).filter({ hasText: "Matches Expected guided output." }).waitFor();
+    assert.match(await banner(benPage).innerText(), /✓ Guided example/);
+    assert.equal(await chip.getByRole("button").innerText(), "Step 1 · 1/2 done", "the guided example alone does not count as done");
+    await benPage.waitForTimeout(1600);
+    await benEditor.fill((await benEditor.inputValue()).replace("+ 30)", "+ 25)"));
     await footer(benPage).getByRole("button", { name: /Run code/ }).click();
     await banner(benPage).filter({ hasText: "Matches Expected task output." }).waitFor();
     assert.match(await banner(benPage).getAttribute("class"), /passed/);
+    const ticks = await banner(benPage).locator(".preview-checks").innerText();
+    assert.match(ticks, /○ Sample, unchanged code/); assert.match(ticks, /✓ Guided example/); assert.match(ticks, /✓ Your task/);
     await chip.getByRole("button", { name: "Step 1 · 2/2 done" }).waitFor();
     const benSaved = await admin.from("module_progress").select("step_states").eq("classroom_id", classId).eq("student_id", users[2].id).maybeSingle();
     assert.ok(!benSaved.data || !Object.values(benSaved.data.step_states).includes("pass"), "the class step saves nothing");

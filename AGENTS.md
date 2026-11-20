@@ -374,6 +374,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Guided evidence is saved like sample evidence (device online, `guided:<task id>` offline); no new table.
   Upload refuses a guided example without expected output, without a task id, with the task's own output, or
   on a non-Java step. The answer key stays teacher-only. Modules without `guided` are unchanged.
+- Preview and class step (teacher, 2026-11-20): the teacher's Module preview and the students' class step show the guided
+  example too, and runs tick three practice checks — Sample (unchanged code), Guided example, Your task. Nothing is saved.
 - The three-part Week 15 file was tested in a separate class first; from 2026-11-20 the teacher uses it in the
   current class (teacher's decision). Its task ids differ, so earlier Week 15 task passes do not count toward it.
 - Week 16's three-part file is the real Week 16 (teacher, 2026-11-20): five days, Monday to Friday (Nov 23–27),

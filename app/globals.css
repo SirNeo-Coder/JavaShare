@@ -636,6 +636,7 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .module-run-feedback strong { display:block; font-size:16px; }
 .module-run-feedback p { margin:5px 0 0; }
 .module-run-feedback.passed { border-color:#387d65; background:#153e32; color:#d7ffeb; }
+.preview-checks { margin:6px 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:4px 16px; font-weight:600; }
 .module-run-feedback.retry { border-color:#ad7930; background:#463313; color:#ffe9b8; }
 .editor-lock { flex:none; margin:0; padding:10px 14px; border-bottom:1px solid #ad7930; background:#463313; color:#ffe9b8; font-size:15px; font-weight:700; }
 .module-before-sample { margin-top:12px; font-size:12px; }

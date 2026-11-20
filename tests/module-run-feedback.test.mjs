@@ -55,12 +55,13 @@ test("preview feedback: task, sample and differing runs each get a banner that n
   assert.match(banner("sample"), /Matches Expected sample output/);
   assert.match(banner("none"), /module-run-feedback retry/); assert.match(banner("none"), /Differs from the expected output/);
   for (const match of ["task", "sample", "none"]) { assert.match(banner(match), /not saved/); assert.doesNotMatch(banner(match), /Completed —|unlocked/); }
-  assert.equal(banner(null), "");
+  assert.doesNotMatch(banner(null), /Matches|Differs/, "before a run only the unticked checks show");
 });
 
-test("preview feedback: the teacher's preview shows no banner before its first run", () => {
+test("preview feedback: the teacher's preview shows unticked checks and no result before its first run", () => {
   const html = renderToStaticMarkup(createElement(Editor, { activity: { kind: "preview", classroomId: "c", moduleId: "m", moduleTitle: "Preview", stepId: "one", stateId: "", instruction: "", expectedOutput: "SAMPLE", stdin: "", task: { instruction: "Do it", expectedOutput: "TASK" }, progress: { projectFiles: [], performanceTask: {}, stepStates: {}, updatedAt: "" } }, onChecked() {}, onClose() {} }));
-  assert.match(html, /Preview — not saved/); assert.doesNotMatch(html, /module-run-feedback/, "no banner before any run");
+  assert.match(html, /Preview — not saved/); assert.doesNotMatch(html, /Matches|Differs/, "no result before any run");
+  assert.match(html, /○ Sample, unchanged code/); assert.match(html, /○ Your task/); assert.doesNotMatch(html, /Guided example<\/li>/, "no guided tick without a guided example");
 });
 
 // CKB-130: the editor itself says why it is locked, so neither student nor teacher is left guessing.
@@ -73,4 +74,17 @@ test("editor lock: sample-first and running say why the editor is read-only; an 
   const step = { type: "step", id: "one", files: [{ path: "Main.java", content: "SAMPLE" }], expectedOutput: "OUT", activity: { id: "alt" } };
   const html = renderToStaticMarkup(createElement(Editor, { activity: { kind: "module", module: { sampleFirst: true, lessons: [{ blocks: [step] }] }, classroomId: "c", moduleId: "m", moduleTitle: "Lock", stepId: "one", stateId: "task:alt", instruction: "", expectedOutput: "TASK", stdin: "", progress: { projectFiles: step.files, performanceTask: {}, stepStates: {}, updatedAt: "" } }, onChecked() {}, onClose() {} }));
   assert.match(html, /class="editor-lock" role="status">🔒 Locked — press ▶ Run code/);
+});
+
+// CKB-131: the guided example is the third preview check, ticked like the sample and the task.
+test("preview feedback: guided example output matches as guided, and each check stays ticked", () => {
+  const { previewMatch, PreviewRunFeedback } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  const sample = { expectedOutput: "SAMPLE" }, task = { expectedOutput: "TASK", guided: { expectedOutput: "GUIDED" } };
+  assert.equal(previewMatch({ success: true, output: "GUIDED" }, sample, task), "guided");
+  assert.equal(previewMatch({ success: true, output: "TASK" }, sample, task), "task");
+  assert.equal(previewMatch({ success: true, output: "SAMPLE" }, sample, task), "sample");
+  assert.equal(previewMatch({ success: false, output: "GUIDED" }, sample, task), "none");
+  const html = renderToStaticMarkup(createElement(PreviewRunFeedback, { match: "guided", passed: ["sample", "guided"], hasGuided: true, hasTask: true }));
+  assert.match(html, /Matches Expected guided output/);
+  assert.match(html, /✓ Sample, unchanged code/); assert.match(html, /✓ Guided example/); assert.match(html, /○ Your task/);
 });
