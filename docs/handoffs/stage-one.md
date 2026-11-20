@@ -1,4 +1,11 @@
 > Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
+> Obvious sample lock (2026-11-20): online, students and the teacher (live help) could not type in Week 15 until
+> the sample ran. Diagnosed as the sample-first lock (CKB-054); teacher chose to make it obvious (CKB-130). Branch
+> `fix/obvious-sample-lock`. Editor notice for student and teacher live view; lock rules unchanged. PR #128
+> (preview banner, online step count) was merged on the teacher's request. Still open: students not following the
+> teacher's page online. Locally offline they follow; waiting on whether the bar still showed Class session (30-minute
+> inactivity end) and whether the hosted site runs current code.
+
 > Preview banner and online step count (2026-11-20): teacher reported no sign that a Module preview run matched,
 > no green banner on the class step, and **Step 1 · 0/20 done** in the real class. Approved: practice-only match
 > banner for preview and class-step runs (CKB-128); count only online students, Done = saved pass or a matching

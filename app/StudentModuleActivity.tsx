@@ -59,6 +59,13 @@ export function ModuleRunFeedback({ result, completed, pendingSample, pendingGui
   </div>;
 }
 
+// Why the editor is read-only, shown in the editor itself (teacher, 2026-11-20, CKB-130): sample-first steps lock it
+// until the unchanged sample runs, and every run locks it until it finishes (online, Java may take a while to load).
+export function editorLockNote(pendingSample: boolean, running: boolean, web: boolean) {
+  if (running) return `⏳ ${web ? "Running your page" : "Loading Java or running"} — the editor unlocks when the run finishes.`;
+  return pendingSample ? "🔒 Locked — press ▶ Run code to check the sample first. Then you can edit." : null;
+}
+
 // A preview or class-step run is compared on this device only: nothing is saved or completed (CKB-128).
 type PreviewMatch = "task" | "sample" | "none";
 export function previewMatch(result: { success: boolean; output: string }, sample: Parameters<typeof matchesSample>[1], task?: { expectedOutput: string }): PreviewMatch {
@@ -477,6 +484,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
           {files.map((file) => <button type="button" key={file.path} className={`file-tab ${path === file.path ? "active" : ""}`} onClick={() => setPath(file.path)}>{file.path}</button>)}
           {!review && <button type="button" className="add-file" aria-label={`Add ${personal ? "personal" : "module"} ${web ? "web" : "Java"} file`} disabled={busy || pendingSample} onClick={() => setAddingFile(true)}>＋</button>}
         </div>
+        {!review && editorLockNote(pendingSample, busy && Boolean(runMessage), web) && <p className="editor-lock" role="status">{editorLockNote(pendingSample, busy && Boolean(runMessage), web)}</p>}
         <CodeEditor value={files.find((file) => file.path === path)?.content ?? ""} language={web ? fileLanguage(path) : path.endsWith(".txt") ? "text" : "java"} readOnly={review || busy || pendingSample || !deviceReady} files={files.map((file) => file.content)} remoteCursors={live?.cursors} onCursorChange={live?.onCursor} onChange={(content) => { changeFiles(files.map((file) => file.path === path ? { ...file, content } : file)); live?.onEdit(path, content); }} />
         <div className="editor-status"><span>{path}</span><span>{review ? "Frozen submitted files" : preview ? "Preview only — nothing is saved" : dirty ? "Unsaved changes — click Save work" : personal ? "Your project is saved" : "Saved on this device"}</span></div>
         {personal && !review && <div className="module-step-actions"><button type="button" disabled={busy} onClick={renameFile}>Rename file</button><button type="button" disabled={busy || files.length < 2} onClick={() => {

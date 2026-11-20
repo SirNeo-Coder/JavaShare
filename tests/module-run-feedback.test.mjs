@@ -62,3 +62,15 @@ test("preview feedback: the teacher's preview shows no banner before its first r
   const html = renderToStaticMarkup(createElement(Editor, { activity: { kind: "preview", classroomId: "c", moduleId: "m", moduleTitle: "Preview", stepId: "one", stateId: "", instruction: "", expectedOutput: "SAMPLE", stdin: "", task: { instruction: "Do it", expectedOutput: "TASK" }, progress: { projectFiles: [], performanceTask: {}, stepStates: {}, updatedAt: "" } }, onChecked() {}, onClose() {} }));
   assert.match(html, /Preview — not saved/); assert.doesNotMatch(html, /module-run-feedback/, "no banner before any run");
 });
+
+// CKB-130: the editor itself says why it is locked, so neither student nor teacher is left guessing.
+test("editor lock: sample-first and running say why the editor is read-only; an open editor says nothing", () => {
+  const { editorLockNote } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  assert.equal(editorLockNote(true, false, false), "🔒 Locked — press ▶ Run code to check the sample first. Then you can edit.");
+  assert.match(editorLockNote(true, true, false), /Loading Java or running — the editor unlocks when the run finishes/);
+  assert.match(editorLockNote(false, true, true), /Running your page/);
+  assert.equal(editorLockNote(false, false, false), null);
+  const step = { type: "step", id: "one", files: [{ path: "Main.java", content: "SAMPLE" }], expectedOutput: "OUT", activity: { id: "alt" } };
+  const html = renderToStaticMarkup(createElement(Editor, { activity: { kind: "module", module: { sampleFirst: true, lessons: [{ blocks: [step] }] }, classroomId: "c", moduleId: "m", moduleTitle: "Lock", stepId: "one", stateId: "task:alt", instruction: "", expectedOutput: "TASK", stdin: "", progress: { projectFiles: step.files, performanceTask: {}, stepStates: {}, updatedAt: "" } }, onChecked() {}, onClose() {} }));
+  assert.match(html, /class="editor-lock" role="status">🔒 Locked — press ▶ Run code/);
+});
