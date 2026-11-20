@@ -40,3 +40,25 @@ test("module feedback: local passes wait for server acceptance even after an ear
     assert.match(render({ result: { ...result, syncPending: false }, completed: true }), /Completed — next activity unlocked/);
   }
 });
+
+// CKB-128: a teacher preview or class-step run says whether it matched, without saving or completing anything.
+test("preview feedback: task, sample and differing runs each get a banner that never claims Completed", () => {
+  const { previewMatch, PreviewRunFeedback } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  const sample = { expectedOutput: "SAMPLE" }, task = { expectedOutput: "TASK" };
+  assert.equal(previewMatch({ success: true, output: "TASK\n" }, sample, task), "task");
+  assert.equal(previewMatch({ success: true, output: "SAMPLE" }, sample, task), "sample");
+  assert.equal(previewMatch({ success: true, output: "other" }, sample, task), "none");
+  assert.equal(previewMatch({ success: false, output: "TASK" }, sample, task), "none", "a failed or stopped run never matches");
+  assert.equal(previewMatch({ success: true, output: "SAMPLE" }, sample), "sample", "a step without a task matches its sample");
+  const banner = (match) => renderToStaticMarkup(createElement(PreviewRunFeedback, { match }));
+  assert.match(banner("task"), /module-run-feedback passed/); assert.match(banner("task"), /Matches Expected task output/);
+  assert.match(banner("sample"), /Matches Expected sample output/);
+  assert.match(banner("none"), /module-run-feedback retry/); assert.match(banner("none"), /Differs from the expected output/);
+  for (const match of ["task", "sample", "none"]) { assert.match(banner(match), /not saved/); assert.doesNotMatch(banner(match), /Completed —|unlocked/); }
+  assert.equal(banner(null), "");
+});
+
+test("preview feedback: the teacher's preview shows no banner before its first run", () => {
+  const html = renderToStaticMarkup(createElement(Editor, { activity: { kind: "preview", classroomId: "c", moduleId: "m", moduleTitle: "Preview", stepId: "one", stateId: "", instruction: "", expectedOutput: "SAMPLE", stdin: "", task: { instruction: "Do it", expectedOutput: "TASK" }, progress: { projectFiles: [], performanceTask: {}, stepStates: {}, updatedAt: "" } }, onChecked() {}, onClose() {} }));
+  assert.match(html, /Preview — not saved/); assert.doesNotMatch(html, /module-run-feedback/, "no banner before any run");
+});

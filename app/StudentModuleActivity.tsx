@@ -8,7 +8,7 @@ import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { Markdown, ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
-import { checkModuleRun, checkStdin, guidedPending, guidedStateId, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
+import { checkModuleRun, checkStdin, guidedPending, guidedStateId, matchesActivityOutput, matchesSample, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
 import { WebCheckList, WebConsole, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
@@ -56,6 +56,19 @@ export function ModuleRunFeedback({ result, completed, pendingSample, pendingGui
     {result?.check === "sample" && result.passed && <p>Sample verification is saved. This step stays open until your alteration matches Expected task output.</p>}
     {result?.check === "guided" && result.passed && <p>Guided example verification is kept. It does not complete this step: only Your task does. Your code stays in the editor.</p>}
     {result && !result.passed && <p>{completed ? "This task was completed earlier. Your saved completion remains." : "Progress has not advanced. Compare Actual output with the expected output above."}</p>}
+  </div>;
+}
+
+// A preview or class-step run is compared on this device only: nothing is saved or completed (CKB-128).
+type PreviewMatch = "task" | "sample" | "none";
+export function previewMatch(result: { success: boolean; output: string }, sample: Parameters<typeof matchesSample>[1], task?: { expectedOutput: string }): PreviewMatch {
+  return task && matchesActivityOutput(result, task.expectedOutput) ? "task" : matchesSample(result, sample) ? "sample" : "none";
+}
+export function PreviewRunFeedback({ match }: { match: PreviewMatch | null }) {
+  if (!match) return null;
+  return <div className={`module-run-feedback ${match === "none" ? "retry" : "passed"}`} role="status" aria-live="polite">
+    <strong>{match === "task" ? "Matches Expected task output." : match === "sample" ? "Matches Expected sample output." : "Differs from the expected output."}</strong>
+    <p>Practice only — not saved, and no step is marked Completed.</p>
   </div>;
 }
 
@@ -124,8 +137,8 @@ function firstPath(list: ModuleFile[], web: boolean, run = "index.html") {
     : list.find((file) => /(?:^|\/)Main\.java$/.test(file.path)))?.path ?? list[0]?.path ?? "";
 }
 
-export default function StudentModuleActivity({ activity, ref, onChecked, onClose, live, share }: {
-  activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onClose: () => void; live?: ModuleLiveLink;
+export default function StudentModuleActivity({ activity, ref, onChecked, onPracticePass, onClose, live, share }: {
+  activity: StudentActivity; ref: Ref<ModuleEditorHandle>; onChecked: () => void; onPracticePass?: () => void; onClose: () => void; live?: ModuleLiveLink;
   share?: { shared: boolean; toggle: (on: boolean) => Promise<void> };
 }) {
   const review = activity.kind === "review";
@@ -178,6 +191,13 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const [submittedAt, setSubmittedAt] = useState(personal ? activity.progress.performanceTask.own?.submittedAt : undefined);
   const [stepStates, setStepStates] = useState(activity.progress.stepStates);
   const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
+  const [practice, setPractice] = useState<PreviewMatch | null>(null);
+  // The step counts as done when its task output matches, or its sample output for a step without a task.
+  const comparePreview = (result: { success: boolean; output: string }) => {
+    const match = previewMatch(result, { expectedOutput: activity.expectedOutput, expectedError: step?.expectedError, files: step?.files }, activity.task);
+    setPractice(match);
+    if (match === (activity.task ? "task" : "sample")) onPracticePass?.();
+  };
   const pendingSample = !personal && !preview && Boolean(step && samplePending(activity.module, step, stepStates));
   const guided = !personal && !preview ? step?.activity?.guided : undefined;
   const pendingGuided = Boolean(guided && step && guidedPending(activity.module, step, stepStates));
@@ -280,13 +300,17 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
   const run = async () => {
     if (busyRef.current || !deviceReady || mediaLoading) return;
     busyRef.current = true; setBusy(true); setError("");
-    setLastCheck(null); setSuccessfulFiles(null); setWebResult(null);
+    setLastCheck(null); setPractice(null); setSuccessfulFiles(null); setWebResult(null);
     setRunMessage(personal ? "Saving your project…" : "Saving your code on this device…");
     try {
       if (review && web) { setRunMessage("Running the page…"); setWebResult(await webPage.run(files, "index.html", [], await personalPage())); return; }
       if (review) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, stdin, () => setStdin("")); return; }
-      if (preview && web) { setRunMessage("Running the page…"); setWebResult(await webPage.run(files, step!.run, step!.webChecks, hasMedia ? { files: media, include: Boolean(step!.includeMediaOutput) } : undefined)); return; }
-      if (preview) { setRunMessage("Java is loading or running… Please wait."); await javaConsole.run(files, checkInput); return; }
+      if (preview && web) {
+        setRunMessage("Running the page…");
+        const result = await webPage.run(files, step!.run, step!.webChecks, hasMedia ? { files: media, include: Boolean(step!.includeMediaOutput) } : undefined);
+        setWebResult(result); comparePreview(result); return;
+      }
+      if (preview) { setRunMessage("Java is loading or running… Please wait."); comparePreview(await javaConsole.run(files, checkInput)); return; }
       if (!personal) await saveDeviceDraft();
       else {
         progress.current = await api<Progress>(projectPath, { method: "PUT", body: JSON.stringify({ files, updatedAt: progress.current.updatedAt }) });
@@ -489,6 +513,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onClos
           {error && <p className="module-error" role="alert">{error}</p>}
         </div>
         {personal && !review && <p role="status">{successfulFiles === JSON.stringify(files) ? "Run succeeded — ready to submit this version." : "Run the current files successfully before submitting."} Submission records progress, not a grade or teacher approval.</p>}
+        {preview && !teacherChecked && <PreviewRunFeedback match={practice} />}
         {!personal && !preview && !teacherChecked && <ModuleRunFeedback result={lastCheck} completed={completed} pendingSample={pendingSample} pendingGuided={pendingGuided} hasGuided={Boolean(guided)} expectedError={web ? undefined : step?.expectedError} />}
         {web ? <>
           <JavaRunProgress message={runMessage} />

@@ -51,7 +51,8 @@ test("session step count: real routes count only this class's passes of the foll
     };
     const classId = await makeClass(teacher, [users[1], users[2]]);
     const elsewhere = await makeClass(otherTeacher, [users[4], users[2]]);
-    const count = async (cookie = teacher) => (await call(`/api/classes/${classId}/session/step-progress`, cookie)).json();
+    const raw = async (cookie = teacher) => (await call(`/api/classes/${classId}/session/step-progress`, cookie)).json();
+    const count = async (cookie) => { const result = await raw(cookie); return result.step ? { ...result, done: result.done.map((s) => s.name), notDone: result.notDone.map((s) => s.name) } : result; };
     const follow = (lesson, step) => call(`/api/classes/${classId}/session`, teacher, "PUT", { active: true, follow: { moduleId: fixture.id, page: `${lesson.id}:${step.id}`, stepId: step.id } });
     const pass = async (classroomId, user, states) => assert.equal((await admin.from("module_progress").upsert({ classroom_id: classroomId, student_id: user.id, module_id: fixture.id, step_states: states, performance_task: {}, project_files: [] }, { onConflict: "student_id,classroom_id,module_id" })).error, null);
 
@@ -72,6 +73,7 @@ test("session step count: real routes count only this class's passes of the foll
       await pass(elsewhere, users[4], { [stepOne.id]: "pass" });
       await pass(elsewhere, users[2], { [stepOne.id]: "pass" }); // Ben is in both classes
       assert.deepEqual(await count(), { step: { moduleId: fixture.id, stepId: stepOne.id, number: 1 }, done: ["Ana Done"], notDone: ["Ben Notyet"] });
+      assert.deepEqual((await raw()).done, [{ id: users[1].id, name: "Ana Done" }], "ids let the teacher's page count only online students");
     });
     await t.test("an alteration task counts its task pass, never the sample check", async () => {
       const content = structuredClone(fixture);

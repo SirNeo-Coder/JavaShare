@@ -220,6 +220,10 @@ export default function Home() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [liveShare, setLiveShare] = useState<LiveShare>({ active: false });
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
+  // Class steps this student ran with the expected output, and every student's list as the teacher sees it (CKB-129).
+  // ponytail: kept for this page load only; a reload clears it until the student runs the step correctly again.
+  const practiceDoneRef = useRef<string[]>([]);
+  const [practiceDone, setPracticeDone] = useState<Record<string, string[]>>({});
   const [remoteCursors, setRemoteCursors] = useState<RemoteCursor[]>([]);
   const [activityOpen, setActivityOpen] = useState(false);
   const [activityTitle, setActivityTitle] = useState("");
@@ -1131,16 +1135,18 @@ export default function Home() {
         };
         const classChannel = await join(`class:${classroomId}`, userId);
         if (cancelled) return;
-        classChannel.on("presence", { event: "sync" }, () =>
-          setOnlineUserIds(Object.keys(classChannel.presenceState())),
-        );
+        classChannel.on("presence", { event: "sync" }, () => {
+          const state = classChannel.presenceState<{ done?: string[] }>();
+          setOnlineUserIds(Object.keys(state));
+          setPracticeDone(Object.fromEntries(Object.entries(state).map(([id, metas]) => [id, metas.flatMap((meta) => meta.done ?? [])])));
+        });
         classChannel.subscribe((status) => {
           if (status !== "SUBSCRIBED") {
             classChannelRef.current = null;
             return;
           }
           classChannelRef.current = classChannel;
-          void classChannel.track({ online: true });
+          void classChannel.track({ online: true, done: practiceDoneRef.current });
           refreshLiveShareRef.current?.();
         });
         const teamChannel = await join(`team:${teamId}`);
@@ -2674,7 +2680,7 @@ export default function Home() {
                   <b>Class session</b>
                   <small>Students follow your worksheet</small>
                 </span>
-                <SessionStepDone classroomId={session.classroomId} revision={sessionStepRevision} />
+                <SessionStepDone classroomId={session.classroomId} revision={sessionStepRevision} online={onlineUserIds} practiceDone={practiceDone} />
                 <button type="button" className="secondary" onClick={() => void setClassSessionState({ active: false })}>End session</button>
               </div>
             )}
@@ -2780,6 +2786,12 @@ export default function Home() {
             key={`${currentModuleProject.kind}:${currentModuleProject.moduleId}:${currentModuleProject.stepId}:${currentModuleProject.progress.updatedAt}`}
             activity={currentModuleProject} ref={moduleEditorRef}
             onChecked={() => setModuleProgressRevision((revision) => revision + 1)}
+            onPracticePass={user.role === "student" && currentModuleProject.shared ? () => {
+              const key = `${currentModuleProject.moduleId}:${currentModuleProject.stepId}`;
+              if (practiceDoneRef.current.includes(key)) return;
+              practiceDoneRef.current = [...practiceDoneRef.current, key];
+              void classChannelRef.current?.track({ online: true, done: practiceDoneRef.current });
+            } : undefined}
             onClose={() => { if (currentModuleProject.shared) { leftShareRef.current = `${currentModuleProject.moduleId}:${currentModuleProject.stepId}`; void returnFromSharedStep(); } else setModuleActivity(null); }}
             share={user.role === "teacher" && currentModuleProject.kind === "preview" ? {
               shared: sharedStep?.moduleId === currentModuleProject.moduleId && sharedStep.step.id === currentModuleProject.stepId,
