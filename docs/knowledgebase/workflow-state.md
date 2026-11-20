@@ -514,9 +514,14 @@ code** come in a second slice.
 
 Next to **End session**, the teacher sees how many students have finished the step the class is on, for
 example **Step 1 · 3/20 done** (approved 2026-11-11). Hovering over it, or moving the keyboard focus to it,
-lists **Done** and **Not yet** by name. It counts a step's task (or the step itself when it has no separate
-task), never the sample check, and only this class's students. It updates when the teacher turns to another
+lists **Done** and **Not yet** by name. Only students online right now are counted and listed (teacher,
+2026-11-20, CKB-129). A student is **Done** with a saved pass of the step's task (or the step itself when it has no
+separate task), never the sample check, or with a class-step run this page load whose output matched that task's
+expected output; the class step still saves nothing. Only this class's students. It updates when the teacher turns to another
 page, starts or stops a share, and whenever a student finishes a task (or the teacher marks a step done); it never re-reads on a timer.
+A teacher's **Module preview** run and a student's **Class step** run show a banner above Actual output:
+**Matches Expected task output.**, **Matches Expected sample output.** or **Differs from the expected output.**, with
+"Practice only — not saved, and no step is marked Completed." (CKB-128).
 With the worksheet closed after **Work in code editor**, it counts the **Shared with class** step instead, so the teacher can keep watching while coding (CKB-108). It is hidden when neither a worksheet page nor a shared step is open, and on the **Performance task** page. The student list is unchanged.
 
 ## Subject-specific shared module sets (approved 2026-10-22)

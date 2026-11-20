@@ -294,6 +294,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   the teacher's page for reading only. Closing the worksheet stops following.
 - During a session the teacher's **Work in code editor** also shares that step with the class (no
   button). This replaces "students do not see it" from 2026-11-09 only while a session runs.
+- Step count (teacher, 2026-11-20): **Step N · X/Y done** counts only students online now. Done means a saved pass
+  of the step's task, or a class-step run whose output matched it during this page load (reported on the class live
+  channel; nothing saved). Preview and class-step runs show a practice-only match banner.
 - Agreed for the second slice, not yet built: students may edit the shared step; a correct task run
   is credited as Completed even in a locked week (earlier unfinished weeks stay unfinished);
   everyone moves with the teacher's step; unfinished steps leave the student's own work unchanged;
@@ -371,6 +374,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Guided evidence is saved like sample evidence (device online, `guided:<task id>` offline); no new table.
   Upload refuses a guided example without expected output, without a task id, with the task's own output, or
   on a non-Java step. The answer key stays teacher-only. Modules without `guided` are unchanged.
-- The three-part Week 15 file is for a separate test class only, never the teacher's current class.
+- The three-part Week 15 file was tested in a separate class first; from 2026-11-20 the teacher uses it in the
+  current class (teacher's decision). Its task ids differ, so earlier Week 15 task passes do not count toward it.
 - Week 16's three-part file is the real Week 16 (teacher, 2026-11-20): five days, Monday to Friday (Nov 23–27),
   ten steps, a liplet every day. Students who already did Week 16 redo it; their old task passes do not count.
