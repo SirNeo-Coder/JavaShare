@@ -4,6 +4,7 @@ Search symptoms, user wording, features, and test language here first.
 
 | Case | Symptom and search terms | Root-cause class | Status | Evidence |
 | --- | --- | --- | --- | --- |
+| [CKB-132](cases/CKB-132-live-help-student-output.md) | see the console and output of student when I click them, not just their code, live student view shows teacher's own console | live help sent code only, never run output | resolved on `feature/live-student-output` | live-output browser check shown failing with sending removed |
 | [CKB-131](cases/CKB-131-preview-guided-check.md) | no check for the guided sample, guided code says not the expected outcome, need three checks in preview | preview compared only task and sample; class step omitted the guided example | resolved on `fix/preview-guided-check` | guided-match unit test shown failing; offline browser |
 | [CKB-130](cases/CKB-130-sample-lock-not-obvious.md) | student can't type, could not edit the editor, teacher can't edit student's code in live help, eventually editable | sample-first lock and run lock only explained in a small status line | resolved on `fix/obvious-sample-lock` | lock-note unit test shown failing; offline browser student + teacher |
 | [CKB-129](cases/CKB-129-step-count-online-and-class-step.md) | Step 1 · 0/20 done, Nobody yet, done student not counting, count offline students | count read only saved passes of the current task id; class step never saved | resolved on `fix/session-step-done-online` | online-filter unit test shown failing; offline browser 1/1 |

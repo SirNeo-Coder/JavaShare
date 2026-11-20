@@ -17,7 +17,7 @@ import { moduleProjectForClass } from "./moduleActivityState";
 import { activityStateId, activityTask, checkableStep, mergeProjectFiles, webPerformanceTask } from "../backend/src/module-activities";
 import { fileLanguage } from "../backend/src/file-paths";
 import SessionStepDone from "./SessionStepDone";
-import StudentModuleActivity, { JavaRunProgress, RunBox, type StudentActivity, type ModuleEditorHandle } from "./StudentModuleActivity";
+import StudentModuleActivity, { JavaRunProgress, RunBox, type StudentActivity, type ModuleEditorHandle, type LiveRun } from "./StudentModuleActivity";
 import { PerformanceTaskSteps, type CourseModule, type StepBlock, type Progress } from "./ModuleViewer";
 import { retainLiveDismissals } from "./liveClasses";
 import ModuleAccessNotice from "./ModuleAccessNotice";
@@ -338,6 +338,9 @@ export default function Home() {
   const teacherWatchingRef = useRef(false);
   const [studentWatched, setStudentWatched] = useState(false);
   const [moduleLive, setModuleLive] = useState<ModuleLive | null>(null);
+  // The watched student's latest run (CKB-132): kept on the student's device and sent with each snapshot.
+  const moduleRunRef = useRef<LiveRun | null>(null);
+  const [moduleRun, setModuleRun] = useState<LiveRun | null>(null);
   const [moduleCursors, setModuleCursors] = useState<RemoteCursor[]>([]);
   const [sendModuleOperation] = useState(() =>
     throttle(() => {
@@ -1077,7 +1080,12 @@ export default function Home() {
       moduleMirrorRef.current = live.kind ? { path: live.path, content: live.content, base: null } : null;
       moduleActivityKeyRef.current = live.kind ? live.activity : "";
       setModuleLive(live.kind ? live : null);
+      setModuleRun(null);
       setModuleCursors([]);
+    });
+    onModule("team:module-run", (run: LiveRun & { studentId: string; activity: string }) => {
+      if (user?.role !== "teacher" || !liveRef.current.team?.members.some((member) => member.id === run.studentId) || run.activity !== moduleActivityKeyRef.current) return;
+      setModuleRun(run);
     });
     onModule("team:module-operation", (operation: FileOperation & { activity?: string }) => {
       const mirror = moduleMirrorRef.current;
@@ -1494,6 +1502,11 @@ export default function Home() {
     void teamChannelRef.current?.send({ type: "broadcast", event: "team:module-live", payload: mirror && moduleActivity && kind
       ? { kind, activity: liveActivityKey(moduleActivity), moduleTitle: moduleActivity.moduleTitle, path: mirror.path, content: mirror.content, editable: moduleEditableRef.current, studentId: user.id, studentName: user.name }
       : { kind: null, studentId: user.id } });
+    if (mirror && moduleActivity && kind && moduleRunRef.current) sendModuleRun(moduleRunRef.current);
+  }
+  function sendModuleRun(run: LiveRun) {
+    if (!user || !moduleActivity || !shareModuleLive(user.role, team, teacherWatchingRef.current)) return;
+    void teamChannelRef.current?.send({ type: "broadcast", event: "team:module-run", payload: { ...run, studentId: user.id, activity: liveActivityKey(moduleActivity) } });
   }
   function editModuleLive(content: string) {
     const mirror = moduleMirrorRef.current;
@@ -2799,6 +2812,7 @@ export default function Home() {
             } : undefined}
             live={user.role === "student" && liveProjectKind(currentModuleProject) ? {
               cursors: moduleCursors,
+              onRun: (run) => { moduleRunRef.current = run; sendModuleRun(run); },
               onFile: (path, content, editable) => {
                 moduleMirrorRef.current = { path, content, base: null };
                 moduleActivityKeyRef.current = liveActivityKey(currentModuleProject);
@@ -2927,7 +2941,13 @@ export default function Home() {
                 {user.role === "teacher" && team.isGroup && !teamOnline && <span>Editing opens when a group member is online</span>}
               </div>
             </section>}
-            <aside className="right-panel">
+            {studentLiveView ? <aside className="right-panel module-activity-console" aria-label="Student live output">
+              <div className="workspace-card-heading"><b>Live output: {studentLiveView.studentName}</b><span aria-live="polite">{moduleRun?.status ?? "Waiting for the student's screen"}</span></div>
+              {moduleRun?.checks || moduleRun?.result ? <div className={`module-run-feedback ${moduleRun.tone ?? "ready"}`} role="status">
+                {moduleRun.result && <strong>{moduleRun.result}</strong>}{moduleRun.checks && <p>{moduleRun.checks}</p>}
+              </div> : null}
+              <div className="console"><b>Actual output</b><pre aria-label="Student program output">{moduleRun ? moduleRun.output || "No output yet." : "No run yet."}</pre></div>
+            </aside> : <aside className="right-panel">
               <JavaRunnerBrand /><div className="workspace-card-heading"><b><span aria-hidden="true">›_</span> Console</b><span className="terminal-status">● Terminal</span></div>
               <div className="panel-tabs">
                 <button
@@ -3109,7 +3129,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-            </aside>
+            </aside>}
           </div>
           <footer className="actionbar">
             <div>

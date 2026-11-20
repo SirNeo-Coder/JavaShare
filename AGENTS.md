@@ -269,6 +269,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   never saved to the server by this feature.
 - During a class session (agreed 2026-11-12) a student on the shared class step shows that step live
   (**Live: <name> · Class step**); the teacher may type in it. Like the class step, nothing is saved.
+- While a student is selected, the teacher's right panel shows **Live output: <name>**: that student's Actual output,
+  status and run result (and class-step ticks), live after each run (teacher, 2026-11-20). Same one-person channel,
+  only while selected, never saved.
 - Selecting a group lets the teacher type in the group's shared code while a member is online;
   members' Save work keeps it. The teacher never auto-saves into group files.
 

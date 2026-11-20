@@ -16,7 +16,7 @@ const content = JSON.parse(readFileSync(new URL("./fixtures/student-activity.cod
 Object.assign(content, { id: `sample-lock-${randomUUID().slice(0, 6)}`, week: 61, title: "Sample lock week 61", sampleFirst: true });
 content.lessons.forEach((lesson, index) => lesson.blocks.filter((block) => block.activity).forEach((block) => { block.activity.id = `sample-lock-task-${index}`; }));
 
-test("sample lock notice: student and teacher live view say the editor is locked until the sample runs, then it goes", async () => {
+test("sample lock notice: student and teacher live view say the editor is locked until the sample runs, then it goes; the teacher sees the student's output", async () => {
   const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
   const baseURL = process.env.PREVIEW_BASE_URL || "http://localhost:3062";
   const users = []; let classId;
@@ -63,6 +63,12 @@ test("sample lock notice: student and teacher live view say the editor is locked
     await lock(studentPage).waitFor({ state: "detached" });
     await lock(teacherPage).waitFor({ state: "detached" });
     assert.equal(await studentPage.locator(".student-module-project").getByRole("textbox", { name: "Java source code editor", exact: true }).isEditable(), true);
+    // CKB-132: the teacher's right panel shows the watched student's output and status, live.
+    const panel = teacherPage.getByRole("complementary", { name: "Student live output" });
+    await panel.getByText("Live output: Lock Student").waitFor();
+    await teacherPage.waitForFunction(() => document.querySelector('[aria-label="Student program output"]')?.textContent?.includes("Capacity: 20"));
+    await panel.locator(".module-run-feedback.passed").getByText(/^Sample verified/).waitFor();
+    if (process.env.SAMPLE_LOCK_SCREENSHOT) await teacherPage.screenshot({ path: `${process.env.SAMPLE_LOCK_SCREENSHOT}-output.png` });
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();
