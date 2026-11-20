@@ -1,5 +1,10 @@
 # Week 17 step additions
 
+`Java2_Week_17.threepart.codeshare.json` is the real Week 17 from 2026-11-20: 10 steps over Monday 30 November to
+Friday 4 December, each in three parts (sample + discussion, guided example, own task). Its GUI samples print what
+their real Swing controls show, built without a screen (CKB-127); see `Week_17_Three_Part_Report.md`.
+`Java2_Week_17.codeshare.json` is the older six-step copy, kept as the source.
+
 Console checks exercise component state, layout or event behavior without opening a window. The message No display: GUI not opened. alone never completes an alteration. Check the actual interface on a school computer; browser GUI rendering and interaction remain unverified.
 
 The JSON preserves all original lesson text, code, sample outputs, ids, liplets and rubrics.

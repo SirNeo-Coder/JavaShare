@@ -1685,3 +1685,18 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   eight earlier steps unchanged; slips renumbered 1.x–5.x. PDF rebuilt from the JSON (19 pages); Word plan Monday filled.
 - Tests: `tests/week16-three-part.test.mjs` 14/14 (laptop 3/3 under full CPU load); online CheerpJ 60/60 (2 runs).
 - Next: teacher reviews and merges, then uploads `Java2_Week_16.threepart.codeshare.json` to the class.
+
+## Week 17 three-part file (CKB-127) — 2026-11-20
+
+- Branch: `content/week17-three-part` (from `main` after #125). Teacher's request: rebuild all of Week 17 (Swing) in the
+  three-part shape, 10 steps over Monday 30 November to Friday 4 December, a liplet every day; real console output
+  instead of "No display"; no timing; update the PDF and Word plan; do not upload; do not change Weeks 15–16,
+  `Java 2026` or `COT 2`. Teacher approved: the repo copy as source, and new Steps 2, 4, 8, 10 (labels from a Jeepney,
+  two buttons one listener, SwingWorker, JComboBox).
+- Done: `Java2_Week_17.threepart.codeshare.json` (it is the real Week 17; students redo it), `Week_17_Three_Part_Report.md`,
+  PDF stamps + appendix A-1–A-15, Word plan. GUI `Main.java` files start with two no-screen lines (CKB-127); Steps 7–8
+  wait with `join()`/latch. Built by `build17.py` in the session scratchpad (not in the repo).
+- Tests: `tests/week17-three-part.test.mjs` (86 quotes, answer-key lines, both shown failing with a wrong number;
+  laptop 5/5 under 12-core load); `tests/week17-three-part.browser.mjs` online 90/90.
+- Not done: real upload into a local class; runner-side no-screen properties (would need approval).
+- Next: teacher reviews the report and PR, then uploads after the guided-example app version is live.
