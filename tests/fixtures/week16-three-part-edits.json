@@ -171,5 +171,37 @@
         "to": "{12, 6, 30, 25}"
       }
     ]
+  },
+  "java-2-w16-d1-s2": {
+    "guided": [
+      {
+        "path": "StateWatcher.java",
+        "from": "        seenInside = getState().toString();   // what the thread sees while it runs",
+        "to": "        seenInside = getState() + \", alive? \" + isAlive();"
+      }
+    ],
+    "own": [
+      {
+        "path": "StateWatcher.java",
+        "from": "        seenInside = getState().toString();   // what the thread sees while it runs",
+        "to": "        seenInside = getState() + \", on thread \" + Thread.currentThread().getName();"
+      }
+    ]
+  },
+  "java-2-w16-d5-s10": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "{12, 6, 30, 15}",
+        "to": "{12, 4, 30, 15}"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "{12, 6, 30, 15}",
+        "to": "{22, 4, 30, 15}"
+      }
+    ]
   }
 }

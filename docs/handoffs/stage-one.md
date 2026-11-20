@@ -1675,3 +1675,13 @@ Branch `fix/live-classroom-header`. Both approved by the teacher.
   and the teacher's untracked revised copy, still byte-identical to the module file).
 - Next: the teacher merges, re-uploads Week 15 (current class: revised or module file; test class: three-part file),
   and corrects the same note in the printed PDF by hand.
+
+## Week 16 as five days, ten steps — 2026-11-20
+
+- Branch `content/week16-five-days`. Teacher: Week 16 runs Mon–Fri, Nov 23–27, ten steps, three parts each, a liplet
+  every day; the three-part file becomes the real Week 16 and students who already did Week 16 redo it (AGENTS.md rule).
+- Done: Monday lesson (`java-2-w16-d1`) with Step 1 and new Step 2 (StateWatcher); Tuesday Steps 3–4 with new 2.x
+  questions; Wednesday 5–7, Thursday 8–9; Friday new Step 10 (TripJob: Semaphore + CountDownLatch). Step ids of the
+  eight earlier steps unchanged; slips renumbered 1.x–5.x. PDF rebuilt from the JSON (19 pages); Word plan Monday filled.
+- Tests: `tests/week16-three-part.test.mjs` 14/14 (laptop 3/3 under full CPU load); online CheerpJ 60/60 (2 runs).
+- Next: teacher reviews and merges, then uploads `Java2_Week_16.threepart.codeshare.json` to the class.
