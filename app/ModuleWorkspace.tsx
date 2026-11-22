@@ -10,7 +10,8 @@ import type { ModuleAccessBlock } from "../backend/src/module-prerequisites";
 import WorkspaceDrawer from "./WorkspaceDrawer";
 import { isFreshDeviceRecord, moduleRecordKey, readDeviceRecord, writeDeviceRecord } from "./moduleDeviceStore";
 
-export type ClassFollow = { moduleId: string; page: string; stepId: string | null };
+// shared: the teacher is in Work in code editor; the shared step's page ("step:<id>") opens only when the student opens Module (CKB-133).
+export type ClassFollow = { moduleId: string; page: string; stepId: string | null; shared?: boolean };
 
 export default function ModuleWorkspace({ classroomId, studentId, role, browserOpen, projectsOpen, onBrowserChange, onProjectsChange, onStartActivity, onSelectModule, progressRevision = 0, closeSignal = 0, follow = null, onFollowChange }: {
   onSelectModule?: (module: CourseModule) => void; closeSignal?: number;
@@ -32,9 +33,10 @@ export default function ModuleWorkspace({ classroomId, studentId, role, browserO
   if (closeSignal !== closedSignal) { setClosedSignal(closeSignal); setOpen(false); }
   // Following opens the teacher's module and page over whatever the student has open; it stops when the teacher closes theirs.
   const [followedId, setFollowedId] = useState<string | null>(null);
-  if ((follow?.moduleId ?? null) !== followedId) {
-    setFollowedId(follow?.moduleId ?? null);
-    if (follow) { setSelection((current) => ({ id: follow.moduleId, visit: (current?.visit ?? 0) + 1 })); setOpen(true); setHoverPreview(false); }
+  const followKey = follow ? `${follow.moduleId}:${follow.shared ? "shared" : "page"}` : null;
+  if (followKey !== followedId) {
+    setFollowedId(followKey);
+    if (follow) { setSelection((current) => ({ id: follow.moduleId, visit: (current?.visit ?? 0) + 1 })); setOpen(!follow.shared); setHoverPreview(false); }
     else setOpen(false);
   }
   const followedModule = follow?.moduleId;

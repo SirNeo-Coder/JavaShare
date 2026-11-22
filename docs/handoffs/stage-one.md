@@ -1,4 +1,8 @@
 > Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
+> Class module kept while coding (2026-11-23): with the teacher in Work in code editor, students' Module now opens
+> the shared step's module at that step, past prerequisites, also after a refresh (CKB-133), branch
+> `fix/session-module-sync`, approved with merge. PR #131 (live student output) merged. Not verified online.
+
 > Live student output (2026-11-20): selecting a student now shows their Actual output, status and result in the
 > teacher's right panel (CKB-132), branch `feature/live-student-output`, approved with merge. PR #130 (guided check)
 > merged on request. Still open: students not following the teacher's page online (awaiting teacher's answer).

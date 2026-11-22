@@ -585,11 +585,17 @@ export async function setSupabaseSharedStep(user: SupabaseSessionUser, classroom
 // interaction ends it. Students follow the worksheet page the teacher has open and may read that module through
 // the teacher's page, whatever their own progress. Reading only: runs, saves and completion keep their own rules.
 const CLASS_SESSION_IDLE_MS = 30 * 60000;
-type ClassSessionRow = Pick<ClassroomRow, "session_started_at" | "session_seen_at" | "session_module_id" | "session_page" | "session_step_id">;
+type ClassSessionRow = Pick<ClassroomRow, "session_started_at" | "session_seen_at" | "session_module_id" | "session_page" | "session_step_id"> & { shared_module_id: string | null; shared_step_id: string | null };
 function classSessionActive(row: Pick<ClassroomRow, "session_seen_at">, now = Date.now()) {
   return Boolean(row.session_seen_at) && Date.parse(row.session_seen_at!) > now - CLASS_SESSION_IDLE_MS;
 }
-const classSessionColumns = "session_started_at,session_seen_at,session_module_id,session_page,session_step_id";
+const classSessionColumns = "session_started_at,session_seen_at,session_module_id,session_page,session_step_id,shared_module_id,shared_step_id";
+// What students follow: the teacher's open worksheet page, or with it closed (Work in code editor) the shared step's page,
+// so the class module stays open past prerequisites while the teacher codes (teacher, 2026-11-23, CKB-133).
+function sessionFollow(row: ClassSessionRow) {
+  if (row.session_module_id && row.session_page) return { moduleId: row.session_module_id, page: row.session_page, stepId: row.session_step_id };
+  return row.shared_module_id && row.shared_step_id ? { moduleId: row.shared_module_id, page: `step:${row.shared_step_id}`, stepId: row.shared_step_id, shared: true } : null;
+}
 const noClassSession = { session_started_at: null, session_seen_at: null, session_module_id: null, session_page: null, session_step_id: null };
 
 // Ending also stops the shared step. seenAt: end only the session that was read, never one the teacher just renewed.
@@ -614,7 +620,7 @@ export async function supabaseClassSession(user: SupabaseSessionUser, classroomI
   if (!row.session_seen_at) return { active: false as const, ended: false };
   if (!classSessionActive(row)) return { active: false as const, ended: await endClassSession(classroomId, row.session_seen_at) };
   return { active: true as const, ended: false, endsAt: Date.parse(row.session_seen_at) + CLASS_SESSION_IDLE_MS,
-    follow: row.session_module_id && row.session_page ? { moduleId: row.session_module_id, page: row.session_page, stepId: row.session_step_id } : null };
+    follow: sessionFollow(row) };
 }
 
 // follow: the teacher's open worksheet page (null = closed); left out = unchanged.
@@ -689,7 +695,8 @@ async function readFollowedProgress(user: SupabaseSessionUser, classroomId: stri
 async function classSessionFollow(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
   if (user.role !== "student") return null;
   const row = await loadClassSession(classroomId);
-  return classSessionActive(row) && row.session_module_id === moduleId ? { stepId: row.session_step_id, page: row.session_page } : null;
+  const follow = classSessionActive(row) ? sessionFollow(row) : null;
+  return follow?.moduleId === moduleId ? { stepId: follow.stepId, page: follow.page } : null;
 }
 
 export async function supabaseLiveSharePayload(user: SupabaseSessionUser, classroomId: string) {

@@ -1884,8 +1884,10 @@ export default function Home() {
     const shared = next.active ? next : null;
     sharedKeyRef.current = shared ? `${shared.moduleId}:${shared.step.id}` : "";
     setSharedStep(shared);
-    // Every share re-read (own share, live event, reconnect) also re-reads the session step count (CKB-110).
+    // Every share re-read (own share, live event, reconnect) also re-reads the session step count (CKB-110), and the
+    // session itself: with the teacher's worksheet closed, students follow the shared step's module (CKB-133).
     setSessionStepRevision((revision) => revision + 1);
+    void refreshClassSessionRef.current();
     if (user.role !== "student") return;
     if (!shared) { leftShareRef.current = ""; if (moduleActivity?.shared) await returnFromSharedStep(); return; }
     await followSharedStep(shared);
