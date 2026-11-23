@@ -387,3 +387,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Week 17's three-part file is the real Week 17 (teacher, 2026-11-20): five days, Monday to Friday (Nov 30–Dec 4),
   ten steps, a liplet every day. Students who already did Week 17 redo it; their old task passes do not count.
   Its GUI programs start with two no-screen lines and print what their Swing controls show (CKB-127).
+
+## Module editor (agreed 2026-11-23)
+
+- Teachers edit a shared module in the app: **Curriculum → Edit module**. Built in three stages, one pull request each,
+  tested by the teacher before the next: 1 wording; 2 sample code and supplied files (the teacher answer must still pass
+  the checker before saving); 3 adding, removing or reordering steps and tasks and editing checks (changed tasks get new
+  question ids automatically, shown before saving; old results kept without credit).
+- Before saving, warn that the change reaches every class in that subject; never change students' work, completions or
+  submissions; show a student preview; keep earlier versions with Restore.
+- Saving never writes `docs/modules`; **Download module file** gives the saved module so the teacher replaces the
+  week's file. The PDF and Word lesson plan are never changed; the save warning reminds the teacher to update them.

@@ -3,6 +3,7 @@ import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } f
 import { createHash, randomBytes } from "node:crypto";
 import { activityStateId, activityTask, activityAccess, checkModuleRun, checkStateId, checkStdin, checkableStep, guidedStateId, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
+import { onlyWordingChanged } from "./module-wording.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
 import { fileLanguage, javaProjectPath, mediaPathType, moduleWebPathError, projectPathError } from "./file-paths.ts";
 
@@ -2286,11 +2287,73 @@ export async function uploadSupabaseModule(user: SupabaseSessionUser, classroomI
   const db = getSupabaseAdmin();
   if (!classroom.module_subject) throw new SupabaseRepositoryError(400, "Choose Java or Net MVC for this class before uploading modules.");
   if (!subjectAccepts(classroom.module_subject, content)) throw new SupabaseRepositoryError(400, "This module belongs to a different subject. Java classes accept Java modules; Net MVC classes accept .NET modules.");
+  const { data: before, error: beforeError } = await db.from("subject_modules").select("content")
+    .eq("teacher_id", user.id).eq("subject", classroom.module_subject).eq("module_id", content.id).maybeSingle();
+  fail(beforeError, "Could not load module");
+  if (before) await keepModuleVersion(user.id, classroom.module_subject, content.id, before.content, "upload");
   const { data, error } = await db.from("subject_modules")
     .upsert({ teacher_id: user.id, subject: classroom.module_subject, module_id: content.id, content }, { onConflict: "teacher_id,subject,module_id" })
     .select("*").single();
   fail(error, "Could not save module");
   return courseModuleSummary(data as CourseModuleRow, classroom, user.role);
+}
+
+// Module editor (teacher, 2026-11-23): the old content is kept before every upload, edit or restore.
+async function keepModuleVersion(teacherId: string, subject: ModuleSubject, moduleId: string, content: unknown, replacedBy: "upload" | "edit" | "restore") {
+  const { error } = await getSupabaseAdmin().from("subject_module_versions").insert({ teacher_id: teacherId, subject, module_id: moduleId, content, replaced_by: replacedBy });
+  fail(error, "Could not keep the earlier version of this module");
+}
+
+async function editableModule(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  const classroom = await teacherClassroom(user, classroomId);
+  if (!classroom.module_subject) throw new SupabaseRepositoryError(400, "Choose Java or Net MVC for this class before editing modules.");
+  const { data, error } = await getSupabaseAdmin().from("subject_modules").select("content,updated_at")
+    .eq("teacher_id", user.id).eq("subject", classroom.module_subject).eq("module_id", moduleId).maybeSingle();
+  fail(error, "Could not load module");
+  if (!data) throw new SupabaseRepositoryError(404, "Module not found");
+  return { subject: classroom.module_subject, row: data as { content: CourseModule; updated_at: string } };
+}
+
+export async function getSupabaseModuleEditor(user: SupabaseSessionUser, classroomId: string, moduleId: string) {
+  const { subject, row } = await editableModule(user, classroomId, moduleId);
+  const db = getSupabaseAdmin();
+  const [classes, versions] = await Promise.all([
+    db.from("classrooms").select("name").eq("teacher_id", user.id).eq("module_subject", subject).order("name"),
+    db.from("subject_module_versions").select("id,replaced_by,created_at,content->>title").eq("teacher_id", user.id).eq("subject", subject).eq("module_id", moduleId).order("created_at", { ascending: false }),
+  ]);
+  fail(classes.error, "Could not load your classes");
+  fail(versions.error, "Could not load earlier versions");
+  return { content: row.content, updatedAt: row.updated_at, subject, classNames: (classes.data as { name: string }[]).map((item) => item.name),
+    versions: (versions.data as { id: string; replaced_by: string; created_at: string; title: string }[]).map((item) => ({ id: item.id, replacedBy: item.replaced_by, savedAt: item.created_at, title: item.title })) };
+}
+
+async function replaceSharedModule(user: SupabaseSessionUser, subject: ModuleSubject, moduleId: string, before: { content: CourseModule; updated_at: string }, content: CourseModule, expectedUpdatedAt: string, replacedBy: "edit" | "restore") {
+  const stale = new SupabaseRepositoryError(409, "This module changed since you opened the editor. Reopen it before saving.");
+  if (before.updated_at !== expectedUpdatedAt) throw stale;
+  // ponytail: two saves at the same instant can leave one extra unchanged copy in the versions list; harmless.
+  await keepModuleVersion(user.id, subject, moduleId, before.content, replacedBy);
+  const { data, error } = await getSupabaseAdmin().from("subject_modules").update({ content })
+    .eq("teacher_id", user.id).eq("subject", subject).eq("module_id", moduleId).eq("updated_at", expectedUpdatedAt).select("updated_at").maybeSingle();
+  fail(error, "Could not save module");
+  if (!data) throw stale;
+  return { updatedAt: (data as { updated_at: string }).updated_at };
+}
+
+export async function editSupabaseModuleWording(user: SupabaseSessionUser, classroomId: string, moduleId: string, content: CourseModule, expectedUpdatedAt: string) {
+  const { subject, row } = await editableModule(user, classroomId, moduleId);
+  if (!onlyWordingChanged(row.content, content)) throw new SupabaseRepositoryError(400, "Only wording can change in the module editor for now. Ids, code, expected output, points, answers and steps must stay the same.");
+  return replaceSharedModule(user, subject, moduleId, row, content, expectedUpdatedAt, "edit");
+}
+
+export async function restoreSupabaseModuleVersion(user: SupabaseSessionUser, classroomId: string, moduleId: string, versionId: string, expectedUpdatedAt: string) {
+  const { subject, row } = await editableModule(user, classroomId, moduleId);
+  const { data, error } = await getSupabaseAdmin().from("subject_module_versions").select("content")
+    .eq("id", versionId).eq("teacher_id", user.id).eq("subject", subject).eq("module_id", moduleId).maybeSingle();
+  fail(error, "Could not load the earlier version");
+  if (!data) throw new SupabaseRepositoryError(404, "Earlier version not found");
+  const parsed = courseModule.safeParse(data.content);
+  if (!parsed.success || parsed.data.id !== moduleId || !subjectAccepts(subject, parsed.data)) throw new SupabaseRepositoryError(400, "This earlier version no longer matches the module format, so it cannot be restored.");
+  return replaceSharedModule(user, subject, moduleId, row, parsed.data, expectedUpdatedAt, "restore");
 }
 
 export async function listSupabaseModules(user: SupabaseSessionUser, classroomId: string) {

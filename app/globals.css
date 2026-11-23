@@ -680,3 +680,21 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .module-access-notice { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem; margin: .75rem 0; border: 2px solid #d6a13c; border-radius: .75rem; background: var(--surface); color: var(--ink); }
 .module-access-notice strong { flex: 1; min-width: 12rem; }
 .module-access-notice button { padding: .6rem .9rem; border: 1px solid currentColor; border-radius: .4rem; font-weight: 700; }
+
+/* Module editor (wording stage): teacher-only, inside the teacher class home. */
+.module-editor { display:grid; gap:14px; max-width:960px; }
+.module-editor .teacher-back { justify-self:start; margin:0; }
+.module-editor h2 { margin:0; }
+.module-editor-note { margin:0; color:#52605e; }
+.module-editor-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; position:sticky; top:0; z-index:2; padding:10px 0; background:#f4f7f7; }
+.module-editor-actions button:not(.teacher-primary), .module-editor-versions button { padding:11px 14px; border:1px solid var(--teacher-line); border-radius:8px; background:white; color:var(--teacher-ink); }
+.module-editor-actions .teacher-primary { align-self:auto; }
+.module-editor-actions span { color:#805961; font-size:12px; }
+.module-editor-group { display:grid; gap:10px; padding:14px; border:1px solid var(--teacher-line); border-radius:10px; background:white; }
+.module-editor-group legend { padding:0 6px; font-weight:700; }
+.module-editor-group label { display:grid; gap:4px; }
+.module-editor-group span { font-size:12px; color:#52605e; }
+.module-editor-group textarea { width:100%; padding:8px; border:1px solid var(--teacher-line); border-radius:6px; background:white; color:var(--teacher-ink); font:inherit; resize:vertical; }
+.module-editor-preview { min-height:520px; height:70vh; display:grid; border:1px solid var(--teacher-line); border-radius:10px; overflow:hidden; background:white; }
+.module-editor-versions { display:grid; gap:8px; padding:0; list-style:none; }
+.module-editor-versions li { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:10px 12px; border:1px solid var(--teacher-line); border-radius:8px; background:white; }

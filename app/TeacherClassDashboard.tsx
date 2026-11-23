@@ -5,6 +5,7 @@ import Link from "next/link";
 import { api } from "./apiClient";
 import ModuleViewer from "./ModuleViewer";
 import ModuleSharing from "./ModuleSharing";
+import ModuleEditor from "./ModuleEditor";
 import TeacherWebProjects from "./TeacherWebProjects";
 import type { LiveClassroom } from "./liveClasses";
 import type { getSupabaseTeacherClassProgress } from "../backend/src/supabase-repository";
@@ -54,6 +55,7 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
   const [sort, setSort] = useState("week");
   const [studentId, setStudentId] = useState<string | null>(null);
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [webStudent, setWebStudent] = useState<Student | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -74,7 +76,7 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
 
   const refresh = () => { setLoading(true); setRevision((current) => current + 1); };
   const navigate = (next: Section) => {
-    setSection(next); setStudentId(null); setPreviewId(null); setSearch(""); setFilter("all");
+    setSection(next); setStudentId(null); setPreviewId(null); setEditId(null); setSearch(""); setFilter("all");
     heading.current?.focus();
   };
   const upload = async (file: File) => {
@@ -142,7 +144,7 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
             catch (error) { setError(error instanceof Error ? error.message : "Could not open personal submission"); }
             finally { setBusy(false); }
           }}>Review personal submission</button>}
-          {!forStudent && <><p className="teacher-card-caption"><b>{module.completedStudents}/{totals?.students ?? 0}</b> students finished</p><button className="teacher-card-action" onClick={() => { setPreviewId(module.moduleId); heading.current?.focus(); }}>View module details <span aria-hidden="true">›</span></button><button className="teacher-delete-link" onClick={(event) => { deleteTrigger.current = event.currentTarget; setError(""); setDeleteId(module.moduleId); }} disabled={busy || sharingSubject === undefined}>Delete module</button></>}
+          {!forStudent && <><p className="teacher-card-caption"><b>{module.completedStudents}/{totals?.students ?? 0}</b> students finished</p><button className="teacher-card-action" onClick={() => { setPreviewId(module.moduleId); heading.current?.focus(); }}>View module details <span aria-hidden="true">›</span></button>{sharingSubject && <button className="teacher-card-action" onClick={() => { setEditId(module.moduleId); heading.current?.focus(); }}>Edit module <span aria-hidden="true">›</span></button>}<button className="teacher-delete-link" onClick={(event) => { deleteTrigger.current = event.currentTarget; setError(""); setDeleteId(module.moduleId); }} disabled={busy || sharingSubject === undefined}>Delete module</button></>}
         </div>
       </article>;
     })}
@@ -160,13 +162,13 @@ export default function TeacherClassDashboard({ classroom, name, onClasses, onEn
     <div className="teacher-main">
       <header className="teacher-dashboard-bar"><span>{classroom.name}{(classroom.hasActivity || classroom.hasLiveShare || classroom.hasSession) && <b className="teacher-status finished">Live now</b>}</span><div><button onClick={refresh} disabled={loading}>{loading ? "Refreshing…" : "Refresh"}</button><button onClick={onEnter}>Enter classroom <span aria-hidden="true">↗</span></button></div></header>
       <section className="teacher-page" aria-busy={loading}>
-        <div className="teacher-page-heading"><div><span className="teacher-eyebrow">{classroom.subject || "YOUR CLASS"} · {section === "Curriculum" ? `${totals?.modules ?? 0} MODULES` : "SAVED MODULE PROGRESS"}</span><h1 ref={heading} tabIndex={-1}>{title}</h1><p>{selectedStudent ? selectedStudent.email : section === "Curriculum" ? "Manage shared subject modules and monitor this class’s completion." : "Track how your students are moving through their modules."}</p></div>{section === "Curriculum" && !previewId && <button className="teacher-primary" onClick={() => uploadInput.current?.click()} disabled={busy || loading || !sharingSubject}>+ {busy ? "Uploading…" : "Add module"}</button>}</div>
-        {section === "Curriculum" && !previewId && <ModuleSharing classroomId={classroom.id} onReady={setSharingSubject} onChanged={refresh} />}
+        <div className="teacher-page-heading"><div><span className="teacher-eyebrow">{classroom.subject || "YOUR CLASS"} · {section === "Curriculum" ? `${totals?.modules ?? 0} MODULES` : "SAVED MODULE PROGRESS"}</span><h1 ref={heading} tabIndex={-1}>{title}</h1><p>{selectedStudent ? selectedStudent.email : section === "Curriculum" ? "Manage shared subject modules and monitor this class’s completion." : "Track how your students are moving through their modules."}</p></div>{section === "Curriculum" && !previewId && !editId && <button className="teacher-primary" onClick={() => uploadInput.current?.click()} disabled={busy || loading || !sharingSubject}>+ {busy ? "Uploading…" : "Add module"}</button>}</div>
+        {section === "Curriculum" && !previewId && !editId && <ModuleSharing classroomId={classroom.id} onReady={setSharingSubject} onChanged={refresh} />}
         <input ref={uploadInput} type="file" accept=".json" aria-label="Upload module" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file); }} />
         {error && <div className="teacher-load-error" role="alert">{error} <button onClick={refresh} disabled={loading}>Try again</button></div>}
         {loading && !data && <p role="status">Loading class progress…</p>}
         {data && <>
-          {previewId ? <ModuleViewer key={previewId} role="teacher" classroomId={classroom.id} initialModuleId={previewId} embedded onClose={() => { setPreviewId(null); refresh(); }} /> : selectedStudent ? <>
+          {editId ? <ModuleEditor key={editId} classroomId={classroom.id} moduleId={editId} onClose={() => { setEditId(null); refresh(); }} /> : previewId ? <ModuleViewer key={previewId} role="teacher" classroomId={classroom.id} initialModuleId={previewId} embedded onClose={() => { setPreviewId(null); refresh(); }} /> : selectedStudent ? <>
             <button className="teacher-back" onClick={() => { setStudentId(null); heading.current?.focus(); }}>← Back to students</button>
             <div className="teacher-student-summary"><span className="teacher-progress-avatar">{initials(selectedStudent.name)}</span><div><h2>{selectedStudent.completedModules} of {data.modules.length} modules complete</h2><p>Completion records practice checks, exit-slip checkboxes, and task submissions.</p><Meter percent={selectedStudent.averagePercent} label="Overall progress" /></div><button onClick={() => setWebStudent(selectedStudent)}>View web projects</button></div>
             <h2 className="teacher-list-title">Learning modules</h2>{data.modules.length ? moduleCards(selectedStudent) : <p className="teacher-empty">No modules uploaded for this class yet.</p>}

@@ -27,6 +27,9 @@ import {
   getSupabaseModuleSharing,
   setSupabaseModuleSubject,
   shareSupabaseModule,
+  getSupabaseModuleEditor,
+  editSupabaseModuleWording,
+  restoreSupabaseModuleVersion,
   getSupabaseModuleProgress,
   prepareSupabaseModuleActivity,
   completeSupabaseModuleActivity,
@@ -666,6 +669,29 @@ app.patch("/api/classrooms/:classroomId/active-module", requireAuth, requireTeac
   try {
     const { moduleId } = z.object({ moduleId: z.string().trim().min(1).max(100).nullable() }).parse(req.body);
     return res.json(await setSupabaseClassroomActiveModule(req.user!, String(req.params.classroomId), moduleId));
+  } catch (error) { next(error); }
+});
+
+// Module editor (teacher, 2026-11-23): wording-only edits of a shared module, its earlier versions and restore.
+app.get("/api/classrooms/:classroomId/modules/:moduleId/editor", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try { return res.json(await getSupabaseModuleEditor(req.user!, String(req.params.classroomId), String(req.params.moduleId))); }
+  catch (error) { next(error); }
+});
+
+app.put("/api/classrooms/:classroomId/modules/:moduleId/wording", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { expectedUpdatedAt, content } = z.object({ expectedUpdatedAt: z.string().datetime({ offset: true }), content: z.unknown() }).parse(req.body);
+    const parsed = courseModule.safeParse(content);
+    if (!parsed.success) return res.status(400).json({ error: `This module doesn't match the expected format: ${parsed.error.issues[0].message} (at ${parsed.error.issues[0].path.join(".") || "top level"})` });
+    return res.json(await editSupabaseModuleWording(req.user!, String(req.params.classroomId), String(req.params.moduleId), parsed.data, expectedUpdatedAt));
+  } catch (error) { next(error); }
+});
+
+app.post("/api/classrooms/:classroomId/modules/:moduleId/versions/:versionId/restore", requireAuth, requireTeacher, async (req: AuthedRequest, res, next) => {
+  try {
+    const { expectedUpdatedAt } = z.object({ expectedUpdatedAt: z.string().datetime({ offset: true }) }).parse(req.body);
+    const versionId = z.string().uuid().parse(req.params.versionId);
+    return res.json(await restoreSupabaseModuleVersion(req.user!, String(req.params.classroomId), String(req.params.moduleId), versionId, expectedUpdatedAt));
   } catch (error) { next(error); }
 });
 

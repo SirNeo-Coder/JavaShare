@@ -116,3 +116,10 @@ routes in `routes.ts`, frozen snapshot/run evidence in `supabase-repository.ts`;
 `page`, `ModuleWorkspace` and `ModuleViewer`. CKB-067; tests in `personal-performance`,
 `browser-java-progress`, `module-activities`, `weekly-java-project-ui`, and actual screens in
 `personal-performance.browser.mjs`. No new migration or dependency.
+
+Module editor, wording stage (2026-11-23): **Curriculum → Edit module** (`app/ModuleEditor.tsx`, opened from
+`app/TeacherClassDashboard.tsx`) edits wording fields listed by `wordingFields` in `backend/src/module-wording.ts`;
+server routes in `routes.ts`, `getSupabaseModuleEditor` / `editSupabaseModuleWording` /
+`restoreSupabaseModuleVersion` / `keepModuleVersion` in `supabase-repository.ts`; table `subject_module_versions`
+(migration `20261123000100_subject_module_versions.sql`); tests `tests/module-editor.test.mjs`; CKB-134; handoff
+`docs/handoffs/module-editor.md`.
