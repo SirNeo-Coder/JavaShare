@@ -13,7 +13,7 @@ AGENTS.md, "Module editor (agreed 2026-11-23)".
 
 ## Stage 1 — wording (branch `feature/module-editor-wording`)
 
-Status: built, tested, pull request opened for the teacher to test. Not merged.
+Status: built, tested, pull request #133 opened for the teacher to test. Not merged. CodeRabbit: check at the start of the next stage.
 
 - **Curriculum → Edit module** (classes with a subject) with wording text boxes, **Preview as student** (no answer key),
   **Save changes** (warning names every class in the subject, student work unchanged, PDF/Word reminder),
