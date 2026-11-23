@@ -512,7 +512,9 @@ text; later steps stay locked, and nothing can be run, saved, submitted or recor
 the teacher closes the worksheet, the students' worksheets close too.
 
 During a session the teacher's **Work in code editor** also does **Share with class** (below), so
-every student gets the step in their editor. **End session**, or 30 minutes without the teacher using
+every student gets the step in their editor. With the teacher's worksheet closed for it, the shared step's module stays the class module (2026-11-23,
+CKB-133): a student who opens **Module** gets it at the shared step's page, read-only with page buttons off, even a week
+they have not reached; the worksheet does not open over the class step by itself; a refresh brings back both. **End session**, or 30 minutes without the teacher using
 CodeShare, ends the session and any shared step; students return to their own work. Works online and
 offline. Credit for tasks done in the session, everyone moving with the teacher's step, and **Show
 code** come in a second slice.

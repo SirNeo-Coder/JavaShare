@@ -296,7 +296,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   page, with no page buttons, even a week they have not reached: the server opens that module up to
   the teacher's page for reading only. Closing the worksheet stops following.
 - During a session the teacher's **Work in code editor** also shares that step with the class (no
-  button). This replaces "students do not see it" from 2026-11-09 only while a session runs.
+  button). While the worksheet is closed for it (agreed 2026-11-23), that module stays the class module: a student who
+  opens **Module** sees it at the shared step's page, read-only, past prerequisites, also after a refresh. This replaces "students do not see it" from 2026-11-09 only while a session runs.
 - Step count (teacher, 2026-11-20): **Step N · X/Y done** counts only students online now. Done means a saved pass
   of the step's task, or a class-step run whose output matched it during this page load (reported on the class live
   channel; nothing saved). Preview and class-step runs show a practice-only match banner.

@@ -443,7 +443,8 @@ export function ModuleContent({ module, classroomId, role, paged = false, worksh
     const totalPages = pages.length + Number(hasTask);
     const resumeStep = moduleResumeStep(module, progress.stepStates);
     const resumePage = resumeStep ? pages.findIndex((page) => page.step?.id === resumeStep.id) : totalPages - 1;
-    const followed = followPage === undefined ? -1 : followPage === "task" ? pages.length : pages.findIndex((page) => page.key === followPage);
+    const followed = followPage === undefined ? -1 : followPage === "task" ? pages.length
+      : followPage.startsWith("step:") ? pages.findIndex((page) => page.step?.id === followPage.slice(5)) : pages.findIndex((page) => page.key === followPage);
     const currentPage = Math.max(0, Math.min(followed >= 0 ? followed : paperPage ?? (role === "student" ? resumePage : 0), totalPages - 1));
     const following = followPage !== undefined;
     const current = pages[currentPage];
