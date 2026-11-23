@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { api } from "./apiClient";
 import { ModuleContent, type CourseModule as ViewerModule } from "./ModuleViewer";
 import type { CourseModule } from "../backend/src/course-module-schema";
-import { getWording, setWording, wordingFields } from "../backend/src/module-wording";
+import { setWording } from "../backend/src/module-wording";
+import ModuleEditPage from "./ModuleEditPage";
 
 type Editor = { content: CourseModule; updatedAt: string; subject: "java" | "net-mvc"; classNames: string[];
   versions: { id: string; replacedBy: string; savedAt: string; title: string }[] };
@@ -30,6 +31,7 @@ export default function ModuleEditor({ classroomId, moduleId, onClose }: { class
   const [editor, setEditor] = useState<Editor | null>(null);
   const [draft, setDraft] = useState<CourseModule | null>(null);
   const [preview, setPreview] = useState(false);
+  const [page, setPage] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [revision, setRevision] = useState(0);
@@ -62,12 +64,11 @@ export default function ModuleEditor({ classroomId, moduleId, onClose }: { class
 
   if (!editor || !draft) return <section className="module-editor"><button className="teacher-back" onClick={onClose}>← Back to modules</button>{message ? <p role="alert">{message}</p> : <p role="status">Loading module editor…</p>}</section>;
   const changed = JSON.stringify(draft) !== JSON.stringify(editor.content);
-  const fields = wordingFields(draft);
-  const groups = [...new Set(fields.map((field) => field.group))];
+  const pages = ["Overview", ...draft.lessons.map((lesson, index) => lesson.dayLabel || `Lesson ${index + 1}`), ...(draft.performanceTask ? ["Performance task"] : [])];
   return <section className="module-editor" aria-label={`Edit ${editor.content.title}`}>
     <button className="teacher-back" onClick={() => { if (!changed || window.confirm("Leave without saving your changes?")) onClose(); }}>← Back to modules</button>
     <h2>Edit module: {editor.content.title}</h2>
-    <p className="module-editor-note">Wording only for now. Ids, code, expected output, points and answers stay the same, so students keep their work and completions. Shared with every {subjectName(editor.subject)} class: {editor.classNames.join(", ")}.</p>
+    <p className="module-editor-note">Wording only for now, so students keep their work and completions. Shared with every {subjectName(editor.subject)} class: {editor.classNames.join(", ")}.</p>
     <div className="module-editor-actions">
       <button onClick={() => setPreview((value) => !value)}>{preview ? "Back to editing" : "Preview as student"}</button>
       <button className="teacher-primary" onClick={save} disabled={busy || !changed}>{busy ? "Saving…" : "Save changes"}</button>
@@ -76,13 +77,9 @@ export default function ModuleEditor({ classroomId, moduleId, onClose }: { class
     </div>
     {message && <p role="status" className="module-editor-message">{message}</p>}
     {preview ? <div className="module-editor-preview"><ModuleContent module={{ ...studentPreview(draft), availability: { openLessonIds: [], performanceTaskOpen: true } } as ViewerModule} classroomId={classroomId} role="teacher" worksheet /></div>
-      : groups.map((group) => <fieldset key={group} className="module-editor-group"><legend>{group}</legend>
-        {fields.filter((field) => field.group === group).map((field) => {
-          const value = getWording(draft, field.path);
-          return <label key={field.path.join(".")}><span>{field.label}</span>
-            <textarea value={value} rows={Math.min(12, Math.max(1, value.split("\n").length + (value.length > 90 ? 1 : 0)))} onChange={(event) => setDraft(setWording(draft, field.path, event.target.value))} /></label>;
-        })}
-      </fieldset>)}
+      : <><nav className="worksheet-tabs module-edit-tabs" aria-label="Module pages">{pages.map((name, index) => <button key={index} type="button" aria-current={page === index ? "page" : undefined} onClick={() => setPage(index)}>{name}</button>)}</nav>
+        <p className="module-editor-note">Click any wording to change it. Greyed parts (code, outputs, answers, points) cannot change yet.</p>
+        <ModuleEditPage module={draft} page={page} onChange={(path, text) => setDraft((current) => current && setWording(current, path, text))} /></>}
     <h3>Earlier versions</h3>
     {editor.versions.length ? <ul className="module-editor-versions">{editor.versions.map((version) => <li key={version.id}>
       <span>Kept {when(version.savedAt)} before {version.replacedBy === "upload" ? "an upload" : version.replacedBy === "edit" ? "an edit" : "a restore"} · {version.title}</span>

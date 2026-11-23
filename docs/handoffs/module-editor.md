@@ -10,10 +10,13 @@ AGENTS.md, "Module editor (agreed 2026-11-23)".
   week's file (2026-11-23).
 - The PDF and Word lesson plan are never changed by CodeShare; the save warning carries a reminder line (2026-11-23).
 - Restore can bring back any earlier version, with the same checks as an upload (stated in the plan, not objected to).
+- Option A (2026-11-23): edit on a worksheet-looking page, as a **separate editing copy** (`app/ModuleEditPage.tsx`), so
+  the student worksheet code is untouched. Chosen after seeing mockups of A and B (side by side).
 
 ## Stage 1 — wording (branch `feature/module-editor-wording`)
 
-Status: built, tested, pull request #133 opened for the teacher to test. Not merged. CodeRabbit: check at the start of the next stage.
+Status: merged (PR #133). Live migration applied by the teacher 2026-11-23 after an "Unexpected server error" (CKB-135).
+CodeRabbit posted only its skip notice.
 
 - **Curriculum → Edit module** (classes with a subject) with wording text boxes, **Preview as student** (no answer key),
   **Save changes** (warning names every class in the subject, student work unchanged, PDF/Word reminder),
@@ -27,6 +30,18 @@ Status: built, tested, pull request #133 opened for the teacher to test. Not mer
 - Not tested: the Cloudflare (online) build in the browser; the edited worksheet as seen by a real student account in
   the browser (Week 17 needs Week 16 first) — the automated test covers the student read through the server instead.
 - Live site: the teacher applies the migration in the Supabase SQL Editor before deploying (steps in the PR).
+
+## Stage 1b — worksheet-style editing page (branch `feature/module-editor-page-edit`)
+
+Status: built and tested; pull request opened for the teacher to test.
+
+- The text-box list is replaced by tabs (Overview, each day, Performance task) and the paper page; click wording to edit
+  in place with B / I / code buttons; greyed code, outputs, answers and points. Preview, save, versions, download unchanged.
+- Pale text in dark theme in the editor and its preview fixed (CKB-136).
+- Evidence: `tests/module-editor.test.mjs` adds the drift test (every clickable spot equals the server's wording list, all
+  week files; shown failing with **Check yourself** removed), the B/I/code test and the dark-theme colour test (shown
+  failing). Offline-mode browser, dark theme, Week 14: edit, code button, click away, save (only that one edit saved),
+  preview, restore.
 
 ## Next
 

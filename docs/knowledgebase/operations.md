@@ -45,7 +45,8 @@ Never commit filled-in env files or keys.
 - `npx supabase migration up --local` applies new migrations to the local database without erasing it.
 - Module editor adds `20261123000100_subject_module_versions.sql` (one new table). Locally applied with
   `npx supabase migration up --local` by the assistant; the teacher applies it to the hosted project (SQL Editor)
-  before the new app goes live.
+  before the new app goes live. Applied to the hosted project by the teacher on 2026-11-23 (SQL Editor: "Success. No rows
+  returned"), after the deploy, which caused CKB-135 until then.
 - Class session adds `20261111000100_class_session.sql` (five nullable `classrooms` columns). Applied to the hosted project by the teacher on 2026-11-10 (SQL Editor: "Success. No rows returned"); locally `npx supabase migration up --local` (done by the assistant).
 - Share with class adds `20261110000100_classroom_shared_step.sql` (two nullable `classrooms` columns). Applied to the hosted project by the teacher on 2026-11-10 (SQL Editor: "Success. No rows returned"); locally `npx supabase migration up --local`. Only local application was performed by the assistant.
 
