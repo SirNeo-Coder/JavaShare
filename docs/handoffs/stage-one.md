@@ -1,3 +1,10 @@
+> Preview ticks kept (2026-11-24): the teacher's Sample and Guided ticks vanished after watching a student and
+> clicking **Back to Week N · Step M** (CKB-137), branch `fix/preview-ticks-kept`, approved. Tested: `npm test`
+> 520/520, `build:all`, lint 0 errors (8 old warnings); `tests/session-step-done.browser.mjs` and
+> `tests/class-step-live-help.browser.mjs` offline pass, the first shown failing with the fix removed. Not run: hosted
+> site. Still open: the teacher saw the same on a student's class step with no clicks; not reproduced offline or
+> online (local CheerpJ). Note: `next build` sometimes stops on npm's security-advisory check; retry passes.
+
 > Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
 > Class module kept while coding (2026-11-23): with the teacher in Work in code editor, students' Module now opens
 > the shared step's module at that step, past prerequisites, also after a refresh (CKB-133), branch

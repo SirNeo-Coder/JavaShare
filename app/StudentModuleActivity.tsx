@@ -23,8 +23,10 @@ export type StudentActivity = {
   instruction: string; expectedOutput: string; stdin: string; progress: Progress;
   // A preview's alteration task, shown under the sample to read (teacher, 2026-11-11).
   task?: { instruction: string; expectedOutput: string; guided?: NonNullable<NonNullable<StepBlock["activity"]>["guided"]> };
+  // The preview's practice ticks, kept with its code while the teacher watches a student (CKB-137).
+  practicePassed?: PreviewMatch[];
 };
-export type ModuleEditorHandle = { save: () => Promise<void>; files: () => ModuleFile[]; applyEdit: (activityKey: string, path: string, edit: (content: string) => string) => void };
+export type ModuleEditorHandle = { save: () => Promise<void>; files: () => ModuleFile[]; practicePassed: () => PreviewMatch[]; applyEdit: (activityKey: string, path: string, edit: (content: string) => string) => void };
 // Teacher live help: the open file, typing and cursor go to the watching teacher; their cursor comes back.
 export type ModuleLiveLink = {
   cursors: ComponentProps<typeof CodeEditor>["remoteCursors"];
@@ -71,7 +73,7 @@ export function editorLockNote(pendingSample: boolean, running: boolean, web: bo
 
 // A preview or class-step run is compared on this device only: nothing is saved or completed (CKB-128).
 // The guided example is checked too, with a tick for each of the three during this preview (teacher, 2026-11-20, CKB-131).
-type PreviewMatch = "task" | "guided" | "sample" | "none";
+export type PreviewMatch = "task" | "guided" | "sample" | "none";
 export function previewMatch(result: { success: boolean; output: string }, sample: Parameters<typeof matchesSample>[1], task?: { expectedOutput: string; guided?: { expectedOutput: string } }): PreviewMatch {
   return task && matchesActivityOutput(result, task.expectedOutput) ? "task"
     : task?.guided && matchesActivityOutput(result, task.guided.expectedOutput) ? "guided"
@@ -210,7 +212,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
   const [stepStates, setStepStates] = useState(activity.progress.stepStates);
   const [lastCheck, setLastCheck] = useState<RunCheck | null>(null);
   const [practice, setPractice] = useState<PreviewMatch | null>(null);
-  const [practicePassed, setPracticePassed] = useState<PreviewMatch[]>([]);
+  const [practicePassed, setPracticePassed] = useState<PreviewMatch[]>(activity.practicePassed ?? []);
   // The step counts as done when its task output matches, or its sample output for a step without a task.
   const comparePreview = (result: { success: boolean; output: string }) => {
     const match = previewMatch(result, { expectedOutput: activity.expectedOutput, expectedError: step?.expectedError, files: step?.files }, activity.task);
@@ -308,7 +310,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
     setFiles((current) => current.map((file) => file.path === editPath ? { ...file, content: edit(file.content) } : file));
     setSuccessfulFiles(null);
   };
-  useImperativeHandle(ref, () => ({ save, files: () => files, applyEdit }));
+  useImperativeHandle(ref, () => ({ save, files: () => files, practicePassed: () => practicePassed, applyEdit }));
   // The watching teacher sees the same output and result as this screen; sent only when it changes.
   const sentRun = useRef("");
   useEffect(() => {
