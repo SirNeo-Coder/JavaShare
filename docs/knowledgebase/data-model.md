@@ -57,3 +57,12 @@ clears it; only an accepted successful run sets it. `own` retains files/status/s
 always snapshots the saved project after verifying its run evidence; a new id and omitted review
 reset only that module's review. Class/student/module scope and conditional merge writes remain.
 No new table, column, migration or renamed data. Existing sample snapshots remain stored.
+
+## Module editor versions (2026-11-23)
+
+Migration `20261123000100_subject_module_versions.sql` adds `subject_module_versions`: a copy of a shared module's
+`content` kept just before an upload, an editor save or a restore replaces it (`replaced_by`: `upload`, `edit`,
+`restore`), keyed by `teacher_id`, `subject`, `module_id`, `created_at`. Row-level security on; only the server role can
+read or write. No foreign key to `subject_modules`, so earlier versions survive a module deletion. Student tables are
+not touched; `subject_modules.updated_at` still changes on each save, which is the module version students' completion
+checkpoints compare (a student mid-step is asked to reopen the module; their device draft is kept).

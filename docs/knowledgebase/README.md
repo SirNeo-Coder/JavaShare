@@ -25,6 +25,7 @@ A compact map of CodeShare: where behaviour lives and how the parts fit. It poin
 | Has this problem happened before? | [../problem-knowledgebase/README.md](../problem-knowledgebase/README.md) |
 | Where the current stage stands | [../handoffs/stage-one.md](../handoffs/stage-one.md) |
 | Net MVC web module steps (Slices 1–3) | [../handoffs/web-module-steps.md](../handoffs/web-module-steps.md) |
+| Module editor (Stages 1–3) | [../handoffs/module-editor.md](../handoffs/module-editor.md) |
 
 ## Usage rule
 

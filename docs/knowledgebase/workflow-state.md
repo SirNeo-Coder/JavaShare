@@ -654,3 +654,19 @@ save or run (counted across all personal files; renamed or moved lines do not co
 text above the code still says Unsaved changes / Your project is saved. Run code shows "Saving
 your project…" while it saves personal files to the server; the module project keeps "Saving your
 code on this device…". Module project and teacher review buttons are unchanged.
+
+## Module editor, Stage 1: wording (approved 2026-11-23)
+
+- **Curriculum → Edit module** (classes with a subject only) lists the module's wording in text boxes, grouped by day:
+  module title, day titles and objectives, discussion text, definitions, notes, tables, step instructions, **Check
+  yourself**, **Your task**, guided-example discussion and instruction, liplet questions and performance-task wording.
+  Ids, code, expected output, points, answers and the list of steps cannot change; the server refuses them too.
+- **Preview as student** shows the edited worksheet without the answer key, before saving.
+- **Save changes** warns that the change reaches every class in that subject (naming them), that students' work,
+  completions and submissions are not changed, and that the printed PDF and Word lesson plan are not updated.
+- **Download module file** gives the saved module as `<module id>.codeshare.json` to replace the week's file in
+  `docs/modules`; CodeShare never writes that folder itself.
+- **Earlier versions** lists the copies kept before every upload, edit or restore; **Restore** brings one back and keeps
+  the replaced one, so a restore can be undone.
+- Question ids never change in this stage, so a reworded task keeps students' earlier credit. A student partway
+  through a step is asked to reopen the module when they next save a completion; their device draft is kept.

@@ -129,6 +129,12 @@ cards open their explanation. Existing routes, database identities and saved wor
 - `PATCH /api/classrooms/:classroomId/module-subject`: owner assigns `java` or `net-mvc` once.
 - `POST /api/classrooms/:classroomId/modules/:moduleId/share`: shares a saved class upload;
   `expectedUpdatedAt` is required when explicitly replacing a shared version.
+- Module editor (2026-11-23, teacher only, own subject modules): `GET .../modules/:moduleId/editor` returns the saved
+  `content`, `updatedAt`, `subject`, the teacher's class names in that subject and earlier `versions`;
+  `PUT .../modules/:moduleId/wording` `{content, expectedUpdatedAt}` saves only wording (`onlyWordingChanged` in
+  `module-wording.ts`; anything else 400, out-of-date 409); `POST .../modules/:moduleId/versions/:versionId/restore`
+  `{expectedUpdatedAt}` restores an earlier version. Each keeps the replaced content in `subject_module_versions`
+  first, as does `POST .../modules` when it replaces a module.
 - Existing module list/read/upload/delete routes resolve the selected teacher/subject library;
   legacy unassigned classes keep their old read behavior. Dashboard and progress-summary reads
   use the same resolver. Availability remains class-specific for older clients.
