@@ -33,7 +33,7 @@ CodeRabbit posted only its skip notice.
 
 ## Stage 1b — worksheet-style editing page (branch `feature/module-editor-page-edit`)
 
-Status: built and tested; pull request opened for the teacher to test.
+Status: built and tested; pull request #134 opened for the teacher to test. Not merged.
 
 - The text-box list is replaced by tabs (Overview, each day, Performance task) and the paper page; click wording to edit
   in place with B / I / code buttons; greyed code, outputs, answers and points. Preview, save, versions, download unchanged.
