@@ -118,7 +118,8 @@ routes in `routes.ts`, frozen snapshot/run evidence in `supabase-repository.ts`;
 `personal-performance.browser.mjs`. No new migration or dependency.
 
 Module editor, wording stage (2026-11-23): **Curriculum → Edit module** (`app/ModuleEditor.tsx`, opened from
-`app/TeacherClassDashboard.tsx`) edits wording fields listed by `wordingFields` in `backend/src/module-wording.ts`;
+`app/TeacherClassDashboard.tsx`; the worksheet-style editing copy is `app/ModuleEditPage.tsx`, separate from the student
+worksheet code; CKB-135, CKB-136) edits wording fields listed by `wordingFields` in `backend/src/module-wording.ts`;
 server routes in `routes.ts`, `getSupabaseModuleEditor` / `editSupabaseModuleWording` /
 `restoreSupabaseModuleVersion` / `keepModuleVersion` in `supabase-repository.ts`; table `subject_module_versions`
 (migration `20261123000100_subject_module_versions.sql`); tests `tests/module-editor.test.mjs`; CKB-134; handoff

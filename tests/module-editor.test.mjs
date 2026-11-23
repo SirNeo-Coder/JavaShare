@@ -52,6 +52,36 @@ test("module editor screen: save warning names classes, keeps student work and r
   assert.equal(step(withAnswer).activity.solution.lines, "Main.java line 3", "the draft itself keeps the answer");
 });
 
+test("module editing page: every clickable spot is exactly the wording the server allows, in every week file", async () => {
+  const { require: tsxRequire } = await import("tsx/cjs/api");
+  const { createElement } = await import("react");
+  const { renderToStaticMarkup } = await import("react-dom/server");
+  const { default: ModuleEditPage } = tsxRequire("../app/ModuleEditPage.tsx", import.meta.url);
+  const files = readdirSync(new URL("../docs/modules", import.meta.url), { recursive: true }).filter((path) => path.endsWith(".codeshare.json"));
+  for (const [name, week] of [["fixture", fixture], ...files.map((path) => [path, courseModule.parse(JSON.parse(readFileSync(new URL(`../docs/modules/${path}`, import.meta.url))))])]) {
+    const html = renderToStaticMarkup(createElement(ModuleEditPage, { module: week, page: 0, onChange() {} }));
+    const shown = new Set([...html.matchAll(/data-path="([^"]+)"/g)].map((match) => match[1]));
+    const allowed = new Set(wordingFields(week).map((field) => field.path.join(".")));
+    assert.deepEqual([...shown].filter((path) => !allowed.has(path)), [], `${name}: clickable spots the server would refuse`);
+    assert.deepEqual([...allowed].filter((path) => !shown.has(path)), [], `${name}: wording with no clickable spot`);
+  }
+});
+
+test("module editing page: B, I and code buttons wrap the selected words and keep the rest exact", async () => {
+  const { require: tsxRequire } = await import("tsx/cjs/api");
+  const { wrapSelection } = tsxRequire("../app/ModuleEditPage.tsx", import.meta.url);
+  assert.deepEqual(wrapSelection("Save Main.java now", 5, 14, "`"), { text: "Save `Main.java` now", start: 6, end: 15 });
+  assert.deepEqual(wrapSelection("very important", 5, 14, "**"), { text: "very **important**", start: 7, end: 16 });
+  assert.equal(wrapSelection("abc", 3, 3, "*").text, "abc**", "nothing selected inserts an empty pair at the cursor");
+});
+
+test("module editor: worksheet text stays dark on its white paper in dark theme (CKB-136)", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const rule = css.match(/^\.module-editor \{([^}]*)\}/m)?.[1] ?? "";
+  assert.match(rule, /--ink:#17292b/, "the editor resets the text colour the worksheet text blocks use");
+  assert.match(css, /\.module-text-block \{[^}]*color:var\(--ink\)/, "text blocks still take their colour from --ink");
+});
+
 let local;
 try {
   const output = execFileSync("npx", ["--no-install", "supabase", "status", "-o", "env"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });

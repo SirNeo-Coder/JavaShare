@@ -657,9 +657,12 @@ code on this device…". Module project and teacher review buttons are unchanged
 
 ## Module editor, Stage 1: wording (approved 2026-11-23)
 
-- **Curriculum → Edit module** (classes with a subject only) lists the module's wording in text boxes, grouped by day:
-  module title, day titles and objectives, discussion text, definitions, notes, tables, step instructions, **Check
-  yourself**, **Your task**, guided-example discussion and instruction, liplet questions and performance-task wording.
+- **Curriculum → Edit module** (classes with a subject only) shows the module as worksheet paper with tabs (Overview,
+  each day, Performance task). Clicking any wording turns it into a text box in place (showing `**bold**`/`` `code` ``
+  marks, with **B**, **I** and **code** buttons); clicking away shows it formatted again (Option A, 2026-11-23). Editable:
+  module title, day titles and objectives (teacher only), discussion text, definitions, notes, tables, step instructions,
+  **Check yourself**, **Your task**, guided-example discussion and instruction, liplet questions and performance-task
+  wording. Code, outputs, answers and points show greyed.
   Ids, code, expected output, points, answers and the list of steps cannot change; the server refuses them too.
 - **Preview as student** shows the edited worksheet without the answer key, before saving.
 - **Save changes** warns that the change reaches every class in that subject (naming them), that students' work,

@@ -123,7 +123,7 @@ function isStepBlock(block: Block): block is StepBlock {
 
 // docs/course-format.md's markdown subset only: **bold**, *italic*, `code`, [text](link), "- "
 // bullets, blank lines between paragraphs. No HTML, so this never uses dangerouslySetInnerHTML.
-function renderInline(text: string, keyPrefix: string) {
+export function renderInline(text: string, keyPrefix: string) {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g);
   return parts.filter(Boolean).map((part, index) => {
     const key = `${keyPrefix}-${index}`;
