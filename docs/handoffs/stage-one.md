@@ -1,3 +1,9 @@
+> .NET 1 three-part weeks, Stage 1 (2026-11-24): guided example allowed on web (HTML, CSS, JavaScript) steps (CKB-138),
+> branch `feature/web-guided-example`, approved. Upload accepts it on Java and web steps; completion accepts web guided
+> evidence. .NET 1 files now live only in `docs/modules/dotnet1/` (AGENTS.md). Found and reported, not fixed: web preview
+> and class step list ✗ Page text matches under a green banner (CKB-139, awaiting teacher). Teacher decisions: Week 1 is
+> uploaded live but no class uses .NET, so `-v2` ids reset nobody; Week 1 PDF and Word DLL are updated only after the
+> teacher approves the three-part module. Next: Stage 2 (three-part Week 1) after the teacher approves Stage 1's PR.
 > Preview ticks kept (2026-11-24): the teacher's Sample and Guided ticks vanished after watching a student and
 > clicking **Back to Week N · Step M** (CKB-137), branch `fix/preview-ticks-kept`, approved. Tested: `npm test`
 > 520/520, `build:all`, lint 0 errors (8 old warnings); `tests/session-step-done.browser.mjs` and

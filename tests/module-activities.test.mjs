@@ -571,7 +571,7 @@ function guidedModule() {
 }
 const withCapacity = (files, n) => files.map((f) => f.path === "Jeepney.java" ? { ...f, content: f.content.replace(/return \d+/, `return ${n}`) } : f);
 
-test("guided example: upload refuses a missing expected output, a missing task id, the task's own output, and a web step", () => {
+test("guided example: upload refuses a missing expected output, a missing task id, the task's own output, and a C# step", () => {
   assert.equal(courseModule.safeParse(guidedModule()).success, true);
   const refused = (change, message) => {
     const content = guidedModule(); change(content.lessons[0].blocks[0]);
@@ -583,7 +583,7 @@ test("guided example: upload refuses a missing expected output, a missing task i
   refused((step) => { delete step.activity.id; delete step.activity.solution; }, /needs the task's own activity.id/);
   refused((step) => { step.activity.guided.expectedOutput = "Capacity: 25"; }, /must differ/);
   refused((step) => { step.activity.guided.expectedOutput = "Capacity: 25\r\n"; }, /must differ/);
-  refused((step) => { step.language = "html"; step.files = [{ path: "index.html", content: "<p>x</p>" }]; step.activity.files = []; }, /Java steps only/);
+  refused((step) => { step.language = "csharp"; step.files = [{ path: "Program.cs", content: "class P {}" }]; step.activity.files = []; }, /works on Java and web/);
   const collision = guidedModule(); collision.lessons[1].blocks[0].id = "guided:guided-task-0";
   assert.equal(courseModule.safeParse(collision).success, false, "guided:<task id> is a progress key");
 });

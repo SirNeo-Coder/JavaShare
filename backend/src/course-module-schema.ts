@@ -2,6 +2,7 @@
 // a plain-English error instead of corrupting a class. Keep this in sync with that doc.
 import { z } from "zod";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, javaProjectPath } from "./file-paths.ts";
+import { webStep } from "./module-activities.ts";
 
 const file = z.object({ path: z.string().trim().min(1).max(200), content: z.string().max(200000) });
 
@@ -136,8 +137,8 @@ export const courseModule = z.object({
   { message: "A task answer (activity.solution) needs the task's own activity.id - without it the worksheet would never show the answer" })
   .refine((module) => steps(module).every((step) => !step.activity?.guided || Boolean(step.activity.id)),
     { message: "A guided example (activity.guided) needs the task's own activity.id" })
-  .refine((module) => steps(module).every((step) => !step.activity?.guided || step.language === "java"),
-    { message: "A guided example (activity.guided) works on Java steps only for now" })
+  .refine((module) => steps(module).every((step) => !step.activity?.guided || step.language === "java" || webStep(step)),
+    { message: "A guided example (activity.guided) works on Java and web (HTML, CSS, JavaScript) steps only" })
   .refine((module) => steps(module).every((step) => !step.activity?.guided || step.activity.guided.expectedOutput.trim() !== ""),
     { message: "A guided example (activity.guided) needs its expected output" })
   .refine((module) => steps(module).every((step) => !step.activity?.guided

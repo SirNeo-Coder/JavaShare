@@ -338,6 +338,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   their own resume as the personal performance task (no home address, phone, birth date or ID
   numbers). All student work is done inside CodeShare, like Java: never tell students to use VS
   Code, open files in Chrome, or keep local folders. The old Weeks 1–3 materials are not used.
+- .NET 1 module files (teacher, 2026-11-24): Weeks 1–10 and the course project live only in `docs/modules/dotnet1/`
+  (`week01`–`week10`, `project`). The copies in `Documents/Java 2026/Net Files` are old: never use or change them.
 - Page window (agreed 2026-10-30): **Run code** on a web step or web personal project shows the page in
   a floating window with its checks; it closes (Close, Esc, a click beside it) only after the run is
   checked, and **Show page** reopens it. Links and frames open the project's own `.html` pages there,
@@ -377,7 +379,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   opens the next one or counts toward module completion; the student's code stays in the editor.
 - Guided evidence is saved like sample evidence (device online, `guided:<task id>` offline); no new table.
   Upload refuses a guided example without expected output, without a task id, with the task's own output, or
-  on a non-Java step. The answer key stays teacher-only. Modules without `guided` are unchanged.
+  on a step that is neither Java nor web. The answer key stays teacher-only. Modules without `guided` are unchanged.
+- Web steps too (teacher, 2026-11-24): an HTML, CSS or JavaScript step may carry `activity.guided`, in the same order,
+  checked by its visible page text (or console lines) like a web task; page checks stay with the sample. Web runs are
+  in the browser, so the guided pass stays on the device until the own task completes, online and offline.
 - Preview and class step (teacher, 2026-11-20): the teacher's Module preview and the students' class step show the guided
   example too, and runs tick three practice checks — Sample (unchanged code), Guided example, Your task. Nothing is saved.
 - The three-part Week 15 file was tested in a separate class first; from 2026-11-20 the teacher uses it in the
