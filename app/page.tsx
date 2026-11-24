@@ -2486,7 +2486,7 @@ export default function Home() {
                       try {
                         await moduleEditorRef.current?.save();
                         const files = moduleActivity.kind === "preview" && user.role === "teacher" ? moduleEditorRef.current?.files() : undefined;
-                        if (files) setTeacherPreview({ ...moduleActivity, progress: { ...moduleActivity.progress, projectFiles: files } });
+                        if (files) setTeacherPreview({ ...moduleActivity, practicePassed: moduleEditorRef.current?.practicePassed(), progress: { ...moduleActivity.progress, projectFiles: files } });
                         setModuleActivity(null); chooseTeam(index);
                       }
                       catch (error) { notify(error instanceof Error ? error.message : "Could not save module project"); }
