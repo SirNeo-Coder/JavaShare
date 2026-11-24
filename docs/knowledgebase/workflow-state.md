@@ -533,7 +533,8 @@ A teacher's **Module preview** run and a student's **Class step** run show a ban
 "Practice only — not saved, and no step is marked Completed." (CKB-128). It also lists three checks that tick as
 each run matches during that preview: **Sample, unchanged code**, **Guided example** (only when the step has one, with
 **Matches Expected guided output.**) and **Your task**. The preview and the class step show the step's discussion and
-guided example with **Expected guided output** (CKB-131, 2026-11-20).
+guided example with **Expected guided output** (CKB-131, 2026-11-20). On web steps the page's check list beside the code compares with what the
+run matched (or, for no match, the next unticked check), so it agrees with the banner (CKB-139, 2026-11-24).
 With the worksheet closed after **Work in code editor**, it counts the **Shared with class** step instead, so the teacher can keep watching while coding (CKB-108). It is hidden when neither a worksheet page nor a shared step is open, and on the **Performance task** page. The student list is unchanged.
 
 ## Subject-specific shared module sets (approved 2026-10-22)

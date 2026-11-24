@@ -1,3 +1,8 @@
+> Web check list target (2026-11-24): on web steps the check list beside the code now compares with what the run was
+> checked as, in own work, Module preview and class step (CKB-139), branch `fix/web-checklist-target` (stacked on
+> `feature/web-guided-example`, PR #136). Teacher chose: a run matching nothing compares with the next unticked check.
+> Next: Stage 2 (three-part .NET 1 Week 1) after PR #136 is approved.
+
 > .NET 1 three-part weeks, Stage 1 (2026-11-24): guided example allowed on web (HTML, CSS, JavaScript) steps (CKB-138),
 > branch `feature/web-guided-example`, approved. Upload accepts it on Java and web steps; completion accepts web guided
 > evidence. .NET 1 files now live only in `docs/modules/dotnet1/` (AGENTS.md). Found and reported, not fixed: web preview

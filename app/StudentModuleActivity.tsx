@@ -84,6 +84,15 @@ function previewChecks(passed: PreviewMatch[], hasGuided: boolean, hasTask: bool
   const checks: [PreviewMatch, string][] = [["sample", "Sample, unchanged code"], ...(hasGuided ? [["guided", "Guided example"] as [PreviewMatch, string]] : []), ...(hasTask ? [["task", "Your task"] as [PreviewMatch, string]] : [])];
   return checks.map(([key, label]) => `${passed.includes(key) ? "✓" : "○"} ${label}`);
 }
+// The web check list compares with what the run was checked as (CKB-139): in a preview or class step, the check the
+// run matched, or else the next unticked one; in the student's own work, the sample, guided example or task.
+type ListTarget = "sample" | "guided" | "task";
+export function webListTarget(preview: boolean, check: ListTarget, practice: PreviewMatch | null, passed: PreviewMatch[], hasGuided: boolean, hasTask: boolean): ListTarget {
+  if (!preview) return check;
+  if (practice && practice !== "none") return practice;
+  const order: ListTarget[] = ["sample", ...(hasGuided ? ["guided" as const] : []), ...(hasTask ? ["task" as const] : [])];
+  return order.find((key) => !passed.includes(key)) ?? order[order.length - 1];
+}
 export function PreviewRunFeedback({ match, passed = [], hasGuided = false, hasTask = false }: { match: PreviewMatch | null; passed?: PreviewMatch[]; hasGuided?: boolean; hasTask?: boolean }) {
   return <div className={`module-run-feedback ${!match ? "ready" : match === "none" ? "retry" : "passed"}`} role="status" aria-live="polite">
     {match && <strong>{matchText(match)}</strong>}
@@ -225,8 +234,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
   const pendingGuided = !preview && Boolean(guided && step && guidedPending(activity.module, step, stepStates));
   const completed = !personal && stepStates[activity.stateId] === "pass";
   // The web result list judges a run by what it was checked as: a verified sample stays ticked against the
-  // sample, not re-judged against the task that opens right after it (CKB-083).
-  const shownAsSample = preview || (lastCheck ? lastCheck.check === "sample" : pendingSample);
+  // sample, not re-judged against the task that opens right after it (CKB-083); the guided example too (CKB-139).
+  const listTarget = webListTarget(preview, lastCheck ? lastCheck.check : pendingSample ? "sample" : pendingGuided ? "guided" : "task",
+    practice, practicePassed, Boolean(guided), Boolean(activity.task));
   const checkInput = step && (pendingSample || pendingGuided) ? checkStdin(activity.module, step, stepStates) : activity.stdin;
   const [successfulFiles, setSuccessfulFiles] = useState<string | null>(null);
   const [savedFiles, setSavedFiles] = useState(JSON.stringify(files));
@@ -498,8 +508,9 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
   // Shown in the floating page window while it is open, otherwise in the side panel. A personal page that printed nothing
   // and raised no error shows no panel, so it keeps the window's full width (CKB-112, CKB-117).
   const webResults = personal ? (webResult?.error || webResult?.lines?.length) ? <>{webResult.error && <p className="module-error" role="alert">{webResult.error}</p>}<WebConsole result={webResult} /></> : null
-    : <WebCheckList result={webResult} expected={shownAsSample ? step?.expectedOutput ?? "" : activity.expectedOutput} teacherChecked={teacherChecked}
-      webChecks={shownAsSample || !step?.activity?.id ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />;
+    : <WebCheckList result={webResult} teacherChecked={teacherChecked}
+      expected={listTarget === "sample" ? step?.expectedOutput ?? "" : listTarget === "guided" ? guided?.expectedOutput ?? "" : preview ? activity.task?.expectedOutput ?? "" : activity.expectedOutput}
+      webChecks={listTarget === "sample" || (!preview && !step?.activity?.id) ? step?.webChecks : undefined} mediaChecks={hasMedia ? step?.mediaChecks ?? [] : undefined} />;
 
   return <>
     <div className="content-grid student-module-project" onKeyDown={(event) => {
