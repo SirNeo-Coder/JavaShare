@@ -1,3 +1,11 @@
+> .NET 1 Week 1 three-part, Stage 2 (2026-11-24): `docs/modules/dotnet1/week01/DotNet1_Week_01.threepart.codeshare.json`,
+> branch `content/dotnet1-week01-three-part` (stacked on PR #136 and #137, both still open). 9 steps: sample + line-by-line
+> discussion, guided example (the old verified task), own task with a new `-alter-v2` id and a teacher-only answer key.
+> Teacher approved Steps 7 and 8's own tasks; Step 6's own task moved before Sports so page text can tell the lists apart.
+> Tested: teacher's checker (samples, guided, answers), `tests/dotnet1-week01-three-part.test.mjs`, real CodeShare walk
+> of all 9 steps offline and online settings. Report: `Week_01_Three_Part_Report.md`. Next: teacher reviews the module;
+> then the Week 1 PDF and Word DLL; upload after #136 is live (steps in the report).
+
 > Web check list target (2026-11-24): on web steps the check list beside the code now compares with what the run was
 > checked as, in own work, Module preview and class step (CKB-139), branch `fix/web-checklist-target` (stacked on
 > `feature/web-guided-example`, PR #136). Teacher chose: a run matching nothing compares with the next unticked check.

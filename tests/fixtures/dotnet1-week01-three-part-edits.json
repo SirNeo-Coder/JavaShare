@@ -1,0 +1,146 @@
+{
+ "dotnet-1-r01-d1-s1": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "  a senior high school student in the ICT strand.</p>",
+    "to": "  a senior high school student in the ICT strand.</p>\n  <p>I like making simple web pages.</p>"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "  a senior high school student in the ICT strand.</p>",
+    "to": "  a senior high school student in the ICT strand.</p>\n  <p>My favourite subject is ICT.</p>"
+   }
+  ]
+ },
+ "dotnet-1-r01-d1-s2": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "    <li>Making slide presentations</li>",
+    "to": "    <li>Making slide presentations</li>\n    <li>Fixing simple computer problems</li>"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "    <li>Help a classmate with HTML.</li>",
+    "to": "    <li>Help a classmate with HTML.</li>\n    <li>Finish every module step.</li>"
+   }
+  ]
+ },
+ "dotnet-1-r01-d2-s3": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "  My science poster was about H<sub>2</sub>O.</p>",
+    "to": "  My science poster was about H<sub>2</sub>O.</p>\n  <p>I can type <strong>35 words per minute</strong>.</p>"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "  My science poster was about H<sub>2</sub>O.</p>",
+    "to": "  My science poster was about H<sub>2</sub>O.</p>\n  <p>I finished <mark>12 HTML exercises</mark>.</p>"
+   }
+  ]
+ },
+ "dotnet-1-r01-d2-s4": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "Wednesday  Drawing</pre>",
+    "to": "Wednesday  Drawing\nFriday     Basketball</pre>"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "Wednesday  Drawing</pre>",
+    "to": "Wednesday  Drawing\nSaturday   Volleyball</pre>"
+   }
+  ]
+ },
+ "dotnet-1-r01-d3-s5": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "    <li>Watching science videos</li>",
+    "to": "    <li>Watching science videos</li>\n    <li>Playing the guitar</li>"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "    <li>Drawing comics</li>",
+    "to": "    <li>Taking photos</li>\n    <li>Drawing comics</li>"
+   }
+  ]
+ },
+ "dotnet-1-r01-d3-s6": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "        <li>Chess</li>",
+    "to": "        <li>Chess</li>\n        <li>Volleyball</li>"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "    <li>Watching science videos</li>",
+    "to": "    <li>Watching science videos</li>\n    <li>Gardening</li>"
+   }
+  ]
+ },
+ "dotnet-1-r01-d4-s7": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "  <!-- Add my photo here in Week 2 ->",
+    "to": "  <!-- Add my photo here in Week 2 -->"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "  a senior high school student in the <em>ICT strand</em>.</p>",
+    "to": "  a senior high school student in the <em>ICT strand</em>.</p> -->"
+   }
+  ]
+ },
+ "dotnet-1-r01-d4-s8": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "    Typing documents\n    Making slide presentations",
+    "to": "    <li>Typing documents</li>\n    <li>Making slide presentations</li>"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "    Typing documents\n    Making slide presentations",
+    "to": "    <li>Making slide presentations</li>\n    <li>Typing documents</li>"
+   }
+  ]
+ },
+ "dotnet-1-r01-d5-s9": {
+  "guided": [
+   {
+    "path": "index.html",
+    "from": "Wednesday  Drawing</pre>\n",
+    "to": "Wednesday  Drawing</pre>\n  <p><em>Thank you for reading my resume.</em></p>\n"
+   }
+  ],
+  "own": [
+   {
+    "path": "index.html",
+    "from": "Wednesday  Drawing</pre>\n",
+    "to": "Wednesday  Drawing</pre>\n  <p><strong>I am ready to present.</strong></p>\n"
+   }
+  ]
+ }
+}
