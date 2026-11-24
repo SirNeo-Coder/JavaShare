@@ -388,7 +388,7 @@
               "expectedOutput": "First line: Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nNewline characters in the file: 4",
               "stdin": ""
             },
-            "instruction": "Now do it on your own. Count the spaces in fleet.txt instead of the line breaks. Name the counter spaces and print \"Spaces in the file: \". Do not edit fleet.txt.",
+            "instruction": "Now do it on your own. Count the spaces in fleet.txt instead of the line breaks: take out the `newlines++;` line you added, and count a space where the comma part used to be. Name the counter spaces and print \"Spaces in the file: \". Do not edit fleet.txt.",
             "files": [],
             "expectedOutput": "First line: Jeepney,NXA 123,Mang Ramon,Monumento-Divisoria\nSpaces in the file: 10",
             "stdin": "",
@@ -893,7 +893,7 @@
               "expectedOutput": "--- trip_log.txt ---\nBUS 789 left Caloocan\nNYB 321 left Sangandaan",
               "stdin": ""
             },
-            "instruction": "Now do it on your own. Keep the old Tricycle line, but put it last: the two new trips come first, then the old line.",
+            "instruction": "Now do it on your own. Put back the line you deleted, but last: the two new trips come first, then the old Tricycle line.",
             "files": [],
             "expectedOutput": "--- trip_log.txt ---\nBUS 789 left Caloocan\nNYB 321 left Sangandaan\nTRC 456 left Bagong Silang",
             "stdin": "",

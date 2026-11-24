@@ -62,8 +62,23 @@ test("Week 17 three-part: guided lines and answer-key lines sit where they say",
       const [, path, from, to] = heading.match(/^(\S+\.java), lines? (\d+)(?:-(\d+))?/);
       assert.deepEqual(linesOf(own, path).slice(from - 1, to ?? from), quoted, `${step.id}: ${heading}`);
     }
+    // Your task starts from the guided code still in the editor (CKB-143): changing it as the wording says gives the answer.
+    const fromGuided = solved(step, "guided").map((file) => ({ ...file, content: edits[step.id].fromGuided.filter((edit) => edit.path === file.path)
+      .reduce((text, edit) => { assert.equal(text.split(edit.from).length, 2, `${step.id} fromGuided: ${edit.from} must appear once`); return text.replace(edit.from, edit.to); }, file.content) }));
+    assert.deepEqual(fromGuided, own, `${step.id}: changing the guided code as Your task says gives the answer`);
+    taskLinesSitInEditor(step, solved(step, "guided"));
   }
 });
+
+// A "line N" in Your task is read in the editor after the guided example (CKB-142, CKB-143): it must point at the same
+// line there as in the sample, or at a guided line itself. Without "of X.java" it means the file the guided example edits.
+function taskLinesSitInEditor(step, guided) {
+  for (const [, n, path = edits[step.id].guided[0].path] of step.activity.instruction.matchAll(/line (\d+)(?: of (\w+\.java))?/g)) {
+    const sampleLine = linesOf(step.files, path)[n - 1], editorLine = linesOf(guided, path)[n - 1];
+    assert.ok(editorLine === sampleLine || step.activity.guided.code.split("\n").includes(editorLine),
+      `${step.id}: Your task's line ${n} of ${path} moved after the guided example (sample: ${sampleLine?.trim()}; editor: ${editorLine?.trim()})`);
+  }
+}
 
 test("Week 17 three-part: sample, guided example and own task give their exact output on laptop Java", async (t) => {
   for (const step of steps(content)) {

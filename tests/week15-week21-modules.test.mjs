@@ -237,3 +237,40 @@ test("Week 15 three-part: only tasks differ from the module; discussion lines ar
     assert.deepEqual(lines, [...lines].sort((a, b) => a - b), `${step.id}: points in line order`);
   }
 });
+
+// Three-part Week 15 tasks start from the guided code still in the editor (CKB-143). The fixture holds the guided edits
+// (the old verified tasks), the own-task answer from the sample, and the edits Your task describes from the guided code.
+const threePartEdits = load("./fixtures/week15-three-part-edits.json");
+const edited = (files, list) => files.map((file) => ({ ...file, content: list.filter((edit) => edit.path === file.path)
+  .reduce((text, edit) => { assert.ok(text.includes(edit.from), `missing ${edit.from}`); return text.replaceAll(edit.from, edit.to); }, file.content) }));
+
+test("Week 15 three-part: guided lines and Your task's line numbers sit where they say; Your task starts from the guided code", () => {
+  const threePart = load("../docs/modules/week15/Java2_Week_15.threepart.codeshare.json");
+  for (const step of steps(threePart)) {
+    const fixture = threePartEdits[step.id], main = (files) => files.find((file) => file.path === "Main.java").content.split("\n");
+    const guided = edited(step.files, fixture.guided), own = edited(step.files, fixture.own);
+    // A guided example that only deletes lines shows them as they stand in the sample.
+    const shown = /^Now we [^.]*\. Delete lines? [\d to]+, shown below/.test(step.activity.guided.instruction) ? main(step.files) : main(guided);
+    for (const line of step.activity.guided.code.split("\n")) assert.ok(shown.includes(line), `${step.id}: guided line not in its file: ${line}`);
+    assert.deepEqual(edited(guided, fixture.fromGuided), own, `${step.id}: changing the guided code as Your task says gives the answer`);
+    for (const [, n] of step.activity.instruction.matchAll(/line (\d+)/g)) {
+      const sampleLine = main(step.files)[n - 1], editorLine = main(guided)[n - 1];
+      assert.ok(editorLine === sampleLine || step.activity.guided.code.split("\n").includes(editorLine), `${step.id}: Your task's line ${n} moved after the guided example`);
+    }
+  }
+});
+
+test("Week 15 three-part: sample, guided example and own task give their exact output, run alone as CodeShare runs them", async (t) => {
+  const threePart = load("../docs/modules/week15/Java2_Week_15.threepart.codeshare.json");
+  for (const step of steps(threePart)) {
+    await t.test(`Step ${step.number}`, async () => {
+      const fixture = threePartEdits[step.id];
+      const sample = await freshRun(step.files);
+      assert.equal(matchesSample(sample, step), true, sample.output);
+      const guided = await freshRun(edited(step.files, fixture.guided));
+      assert.equal(matchesActivityOutput(guided, step.activity.guided.expectedOutput), true, guided.output);
+      const own = await freshRun(edited(step.files, fixture.own));
+      assert.equal(matchesActivityOutput(own, step.activity.expectedOutput), true, own.output);
+    });
+  }
+});

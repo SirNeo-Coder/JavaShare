@@ -1,3 +1,9 @@
+> Java own tasks start from the guided code (2026-11-25, CKB-143): 7 Your task lines reworded (Week 15 Steps 3 and 8;
+> Week 17 Steps 1, 5, 6, 7, 10) so they say what to do with the guided change; Week 16 needed nothing. Outputs, answer
+> keys and ids unchanged. Week 17 PDF pages A-2, A-8, A-9, A-10, A-14 carry the new wording. Tests: continuity
+> (`fromGuided`) and the Your-task line-number rule for Weeks 15 and 17; Week 15 three-part runs through the Java bridge.
+> Branch `content/java-own-from-guided`, approved. Week 17 Word plan's five own-task lines updated too (teacher
+> approved; Week 15's plan prints no own tasks). PR #144. Teacher re-uploads the Week 15 and Week 17 three-part files after merge (Week 17 before Nov 30).
 > .NET 1 Week 2 three-part (2026-11-25): `docs/modules/dotnet1/week02/DotNet1_Week_02.threepart.codeshare.json`, branch
 > `content/dotnet1-week02-three-part`, approved (three parts although every step is a media step). Guided examples on
 > media steps tested for the first time: all 9 steps pass on Cloudflare's runtime (8787) with media; offline they are
