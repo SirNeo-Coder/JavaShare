@@ -400,7 +400,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d2-s3-alter-v2",
-            "instruction": "Now do it on your own. Change the paragraph you added in the guided example: it now says I finished 12 HTML exercises. Highlight the words 12 HTML exercises with the element from line 16 instead of strong.",
+            "instruction": "Now do it on your own. Change the paragraph you added in the guided example: it now says I finished 12 HTML exercises. Highlight the words 12 HTML exercises with the element on line 16 of the sample in the discussion, instead of strong.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nI finished 12 HTML exercises.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.",
             "guided": {

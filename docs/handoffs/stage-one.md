@@ -1,3 +1,7 @@
+> Week 1 line references (2026-11-24, CKB-142): Step 3's "line 16" moved after the guided line; reworded to count in the
+> sample; test rule added. Branch `content/dotnet1-week01-line-refs`, approved. Teacher re-uploads Week 1 after merge.
+> Next: Week 2 three-part (plan given; waiting on the media/offline question) and saving the reusable prompt with it.
+
 > Week 1 own tasks start from the guided code (2026-11-24, CKB-141): all 9 Your task lines now say what to do with the
 > guided line; outputs, answer keys, `-v2` ids unchanged; PDF step guide rebuilt. Branch `content/dotnet1-week01-own-from-guided`,
 > approved. Teacher must re-upload Week 1 (threepart file) on the live site after merge.

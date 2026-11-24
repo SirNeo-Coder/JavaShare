@@ -94,6 +94,12 @@ who followed it failed (Step 2: the guided skill was still there). The wording n
 answer keys and `-v2` ids are unchanged. **Upload the corrected file again** over the one on the live site (steps below);
 no student work resets. Printed step guide (pages 9–17) rebuilt; the DLL does not quote these lines.
 
+## Correction (2026-11-24, CKB-142)
+
+Step 3's Your task said "the element from line 16"; after the guided line on line 14 that is line 17 in the student's
+editor. It now says "the element on line 16 of the sample in the discussion". A test checks every line number in Your
+task against the editor after the guided example. Upload the file again (wording only); step guide page 11 rebuilt.
+
 ## Upload steps (after #136 and this pull request are merged and the site is updated)
 
 1. Sign in to CodeShare as the teacher and open a class whose subject is Net MVC.
