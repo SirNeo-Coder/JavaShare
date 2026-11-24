@@ -1,0 +1,1106 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 2,
+  "id": "dotnet-1-r02",
+  "title": "Self-Paced Module: Multimedia and Tables",
+  "continues": "Week 1 — HTML fundamentals, paragraphs and lists",
+  "previousModuleId": "dotnet-1-r01",
+  "sampleFirst": true,
+  "starterFiles": [
+    {
+      "path": "index.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "dotnet-1-r02-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Show and Tell: Juan's Picture and Education Table",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe the img, audio and video elements and the table elements, attributes and values used on a resume page.",
+        "affective": "Respect privacy and permission when choosing pictures for a resume.",
+        "psychomotor": "Add Juan's profile picture and an education table in CodeShare and run both."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Every step has three parts: run the sample unchanged and read its discussion, type the guided example and run it, then do Your task on your own, starting from the guided code. The guided example never completes a step; only Your task does. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample into index.html; **Run code** shows the page in the page window and checks it. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks: the Tab title, the Visible page text, then Media checks, one line for each picture, sound and video. Pictures, sound, video, alt text and list markers are not page text. In a table, each row is one line and a tab separates its cells. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** Juan's finished Week 1 page carries forward in your module project. Every step this week grows the same index.html; the boxes show only the lines a step adds or changes, and where they go."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 2 starts here:** Juan's Week 1 page is all words: no picture, sound or video, and his schools would be one long sentence."
+        },
+        {
+          "type": "definition",
+          "term": "Multimedia and tables",
+          "markdown": "img shows a picture, audio plays sound and video plays a video; each names its file with src. alt describes a picture for people who cannot see it. A table shows data in rows and columns: tr is a row, th a heading cell, td a data cell, caption the table's title; thead holds the heading rows and tbody the data rows."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A school bulletin board shows a poster with a caption under it, and a printed class schedule is a grid of rows and columns. img is the poster; a table is the grid."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Element and attributes",
+            "Use it for",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "img src alt width height",
+              "A picture; alt describes it",
+              "Nothing; Media checks: image decoded"
+            ],
+            [
+              "audio src controls",
+              "Sound with a play button",
+              "Nothing; Media checks: playback advanced"
+            ],
+            [
+              "video src controls width",
+              "A video with a play button",
+              "Nothing; Media checks: playback advanced"
+            ],
+            [
+              "src=\"images/name.ending\"",
+              "images/, audio/ or video/, then the exact file name",
+              "The file name starts its Media checks line"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d1-s1",
+          "number": 1,
+          "instruction": "Juan's Week 1 page carries forward. This step replaces the photo comment under his name with his profile picture. Press Work in code editor, then Run code without changing anything: the picture shows in the page window and Media checks says image decoded.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nMedia checks:\nimages/juan_profile.svg: image decoded",
+          "checkYourself": "Find the alt text in the output. It is not there: alt is read aloud or shown only when the picture cannot load.",
+          "webChecks": [
+            {
+              "selector": "img",
+              "count": 1
+            },
+            {
+              "selector": "img",
+              "attribute": "alt",
+              "value": "Drawing of Juan Dela Cruz smiling"
+            },
+            {
+              "selector": "img",
+              "attribute": "width",
+              "value": "160"
+            },
+            {
+              "selector": "img",
+              "attribute": "height",
+              "value": "160"
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d1-s1-alter-v2",
+            "instruction": "Now do it on your own. Change the sentence you added in the guided example so it starts with a label, like a caption: Picture: a drawing of me, not a photo.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nPicture: a drawing of me, not a photo.\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nMedia checks:\nimages/juan_profile.svg: image decoded",
+            "guided": {
+              "discussion": "- Look at line 8. `<h1>Juan Dela Cruz</h1>` is Week 1's heading. The picture goes right under it.\n- Look at line 9. `<img src=\"images/juan_profile.svg\"` uses `img` to show a picture. Like `br` in Week 1, it has no closing tag.\n- Look at line 9. `src=\"images/juan_profile.svg\"` names the file: the folder `images`, then the file `juan_profile.svg`. Every letter and capital must match the uploaded file.\n- Look at line 9. `alt=\"Drawing of Juan Dela Cruz smiling\"` describes the picture for screen readers, and shows if the picture fails. It is not page text.\n- Look at line 9. `width=\"160\" height=\"160\"` set the picture's size in pixels.\n- Look at line 10. `<p>Hello! I am <strong>Juan Dela Cruz</strong>,` is Week 1's introduction, now after the picture.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Juan adds a sentence about his picture that everyone can read. Put this line on **line 10**, right after the `img` line. Then run. You should get this result.",
+              "code": "  <p>My profile picture is a drawing, not a photo.</p>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nMy profile picture is a drawing, not a photo.\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nMedia checks:\nimages/juan_profile.svg: image decoded"
+            },
+            "solution": {
+              "lines": "index.html, line 10:\n  <p>Picture: a drawing of me, not a photo.</p>",
+              "note": "The same `p` element after the `img`, with new words, so the page text changes. The picture's alt text stays as it is."
+            }
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Element",
+            "Use it for",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "table",
+              "The whole table",
+              "Its rows, one line each"
+            ],
+            [
+              "caption",
+              "The table's title; first inside table",
+              "One line above the rows"
+            ],
+            [
+              "thead / tbody",
+              "The heading rows / the data rows",
+              "Nothing of their own"
+            ],
+            [
+              "tr",
+              "One row",
+              "One line"
+            ],
+            [
+              "th / td",
+              "A heading cell / a data cell",
+              "The cell's words, a tab between cells (→ on paper)"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d1-s2",
+          "number": 2,
+          "instruction": "This step adds Juan's education table: a caption, a header row in thead with three th cells, and two rows of td cells in tbody. Run it unchanged first.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nMedia checks:\nimages/juan_profile.svg: image decoded",
+          "checkYourself": "Count the lines the table makes in the output: the caption, then one line for each tr.",
+          "webChecks": [
+            {
+              "selector": "table",
+              "count": 1
+            },
+            {
+              "selector": "caption",
+              "count": 1
+            },
+            {
+              "selector": "thead th",
+              "count": 3
+            },
+            {
+              "selector": "th",
+              "attribute": "scope",
+              "value": "col"
+            },
+            {
+              "selector": "tbody tr",
+              "count": 2
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d1-s2-alter-v2",
+            "instruction": "Now do it on your own. Change the row you added in the guided example into a kindergarten row: Kindergarten, Sample Kindergarten School and K.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nKindergarten\tSample Kindergarten School\tK\nMedia checks:\nimages/juan_profile.svg: image decoded",
+            "guided": {
+              "discussion": "- Look at line 56. `<table>` starts a table. It closes on line 77 with `</table>`.\n- Look at line 57. `<caption>Schools of Juan Dela Cruz</caption>` is the table's title: the first line of its page text.\n- Look at line 58. `<thead>` holds the header row.\n- Look at line 60. `<th scope=\"col\">Level</th>` is a header cell. `scope=\"col\"` says it heads its column.\n- Look at line 65. `<tbody>` holds the data rows. It closes on line 76.\n- Look at line 66. `<tr>` starts one table row. Each `tr` is one line of the page text.\n- Look at line 67. `<td>Senior high</td>` is a data cell. The cells of one row sit on one line of the output, in the order you type them.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Juan adds his elementary school. Put these five lines on **lines 76 to 80**, after the Junior high row and before `</tbody>`. Then run. You should get this result.",
+              "code": "      <tr>\n        <td>Elementary</td>\n        <td>Sample Elementary School</td>\n        <td>1 to 6</td>\n      </tr>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nElementary\tSample Elementary School\t1 to 6\nMedia checks:\nimages/juan_profile.svg: image decoded"
+            },
+            "solution": {
+              "lines": "index.html, lines 76-80:\n      <tr>\n        <td>Kindergarten</td>\n        <td>Sample Kindergarten School</td>\n        <td>K</td>\n      </tr>",
+              "note": "The same `tr` with three `td` cells, in the same place, with new values, so the new last row of the table changes."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r02-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r02-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do the img, audio and video elements do, and which attribute names the file in each?"
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, why is the alt text not in the output, and why does the picture still need it?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 2, each tr became one line of the output. How is this like each li in Week 1's lists?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r02-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Hear and See Juan: Adding and Checking Sound and Video",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the src, alt, controls and width attributes and how CodeShare checks pictures, sound and video.",
+        "affective": "Value describing sound and video for classmates who cannot hear or see them.",
+        "psychomotor": "Add and check Juan's sound greeting and video, then describe each one on the page."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Monday's page has a picture but no sound or video, and a file's content means nothing to a reader who cannot see or hear it."
+        },
+        {
+          "type": "definition",
+          "term": "Media attributes",
+          "markdown": "src names the file exactly: images/, audio/ or video/, then its name, such as images/juan_profile.svg. controls shows the play button; width and height set the size in pixels; loop plays again from the start; muted starts silent. Text inside audio or video is only for very old browsers, so describe each file in a p."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A barangay announcement played on a speaker also gets a written notice, for people who did not hear it. Sound and video on a page need a written description too."
+        },
+        {
+          "type": "text",
+          "markdown": "**Media steps:** every step this week shows Juan's picture, sound and video, files your teacher adds under Media files. Online, CodeShare checks them automatically; Run code waits on Loading media… until they are on this device. Offline, media cannot load yet: the step shows Checked by your teacher for now, and your teacher presses Mark done."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Juan's media file",
+            "What it is",
+            "Made how"
+          ],
+          "rows": [
+            [
+              "images/juan_profile.svg",
+              "A drawing of Juan, 320 × 320",
+              "Drawn as an SVG on the teacher's laptop; not a photo"
+            ],
+            [
+              "audio/greeting.wav",
+              "Three rising notes, about 1 second",
+              "Generated on the teacher's laptop"
+            ],
+            [
+              "video/juan_intro.webm",
+              "Three title cards ending with his name, about 4 seconds, no sound",
+              "Drawn and recorded on the teacher's laptop"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d2-s3",
+          "number": 3,
+          "instruction": "This step adds Juan's sound greeting: an audio element whose src names the file and whose controls attribute shows a play button. Run it unchanged, then press play in the page window.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nSound greeting\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced",
+          "checkYourself": "Remove controls and run: the player disappears, but the output stays the same. Restore controls.",
+          "webChecks": [
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "audio[controls]",
+              "count": 1
+            },
+            {
+              "selector": "audio[loop]",
+              "count": 0
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d2-s3-alter-v2",
+            "instruction": "Now do it on your own. Change the sentence you added in the guided example so it starts with a label: Sound: three rising notes.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nSound greeting\nSound: three rising notes.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced",
+            "guided": {
+              "discussion": "- Look at line 77. `</table>` ends Monday's table. The sound comes after it.\n- Look at line 78. `<h2>Sound greeting</h2>` is a section heading, like Week 1's.\n- Look at line 79. `<audio src=\"audio/greeting.wav\" controls></audio>` uses `audio` to play a sound. `src` names the file in the `audio` folder; `controls` shows a play button.\n- The sound has no page text. Its line in **Media checks** says whether the file plays. People who cannot hear it need words: that is today's change.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Press play and listen. Then put this line on **line 80**, after the `audio` line, to describe the sound in words. Then run. You should get this result.",
+              "code": "  <p>I heard three rising notes.</p>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nSound greeting\nI heard three rising notes.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced"
+            },
+            "solution": {
+              "lines": "index.html, line 80:\n  <p>Sound: three rising notes.</p>",
+              "note": "The same description after the `audio`, written as a labelled caption, so the page text changes."
+            }
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d2-s4",
+          "number": 4,
+          "instruction": "This step adds Juan's short video: a video element with src, controls and width=\"320\". Run it unchanged, then play the video in the page window and watch its timer.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Change width=\"320\" to width=\"200\" and run: the video gets smaller, the output stays the same. Restore 320.",
+          "webChecks": [
+            {
+              "selector": "video",
+              "count": 1
+            },
+            {
+              "selector": "video[controls]",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "attribute": "width",
+              "value": "320"
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d2-s4-alter-v2",
+            "instruction": "Now do it on your own. Change the sentence you added in the guided example so it starts with a label: Video: about 4 seconds, ending with my name.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nSound greeting\nVideo introduction\nVideo: about 4 seconds, ending with my name.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+            "guided": {
+              "discussion": "- Look at line 79. `<audio src=\"audio/greeting.wav\" controls></audio>` is Tuesday's sound, from Step 3.\n- Look at line 80. `<h2>Video introduction</h2>` is the video's heading.\n- Look at line 81. `<video src=\"video/juan_intro.webm\"` uses `video` to play a short movie. Its file is in the `video` folder.\n- Look at line 81. `controls width=\"320\"` shows play buttons and sets the width in pixels, like `width` on the picture in Step 1.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Play the video and watch its timer and its last picture. Then put this line on **line 82**, after the `video` line. Then run. You should get this result.",
+              "code": "  <p>The video runs about 4 seconds and ends with my name.</p>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nSound greeting\nVideo introduction\nThe video runs about 4 seconds and ends with my name.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+            },
+            "solution": {
+              "lines": "index.html, line 82:\n  <p>Video: about 4 seconds, ending with my name.</p>",
+              "note": "The same description after the `video`, written as a labelled caption, so the page text changes."
+            }
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Try this in Step 3 or 4, then restore it",
+            "On the page",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "Remove controls",
+              "The player disappears",
+              "The same"
+            ],
+            [
+              "Add loop and muted",
+              "Plays again from the start; starts silent",
+              "The same"
+            ],
+            [
+              "Change width=\"320\" to width=\"200\"",
+              "The video gets smaller",
+              "The same"
+            ],
+            [
+              "Change images/juan_profile.svg to images/juan_profile.png",
+              "The picture disappears",
+              "Media checks: image failed to decode"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: find the mistake in each src.** (a) images/juan profile.svg (b) Images/juan_profile.svg (c) juan_profile.svg (d) images/juan_profile.png. Answers: a space; a capital I; no images/ at the start; the wrong ending."
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: describe each file in one sentence** for a classmate who cannot see or hear it: Juan's picture, his greeting and his video. Then compare with the sentences the tasks of Steps 1, 3 and 4 add."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r02-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r02-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Steps 3 and 4, what do the controls and width attributes do?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Why does each sound and video on Juan's page need a sentence that describes it?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "A barangay announcement is played on a speaker. Who would miss it, and how does a written notice help, as on Juan's page?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Write how the src of each file starts (images/, audio/ or video/): (a) juan_profile.svg, (b) greeting.wav, (c) juan_intro.webm; and (d) the attribute that shows a play button. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r02-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Organise Juan's Data: Table Headings, Rows and Spans",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain th, td, caption, thead and tbody and the scope, colspan and rowspan attributes and their values.",
+        "affective": "Organise data clearly so that readers can compare it quickly.",
+        "psychomotor": "Build Juan's award row with colspan and a skill table with row groups and rowspan."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Monday's table lists Juan's schools, but an award line or a group of skills cannot yet stretch across cells."
+        },
+        {
+          "type": "definition",
+          "term": "Table attributes",
+          "markdown": "scope tells which cells a th labels: col for its column, row for its row, rowgroup for the rows of its tbody. colspan makes a cell cover more than one column and rowspan more than one row; both are whole numbers and both start at 1."
+        },
+        {
+          "type": "analogy",
+          "markdown": "On a jeepney fare matrix, one heading can cover several columns, and one route can cover several rows. colspan and rowspan do the same in a table."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Attribute",
+            "Values",
+            "Example"
+          ],
+          "rows": [
+            [
+              "scope (on th)",
+              "col, row, rowgroup, colgroup",
+              "scope=\"col\" labels its column"
+            ],
+            [
+              "colspan",
+              "A whole number; 1 if left out",
+              "colspan=\"3\" covers three columns"
+            ],
+            [
+              "rowspan",
+              "A whole number; 1 if left out",
+              "rowspan=\"2\" covers two rows"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d3-s5",
+          "number": 5,
+          "instruction": "This step adds an award row to the Education table. It has one td with colspan=\"3\", so the cell covers all three columns. Run it unchanged first.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Change colspan=\"3\" to colspan=\"1\" and run: the award squeezes into the first column; the output is the same. Restore 3.",
+          "webChecks": [
+            {
+              "selector": "td[colspan]",
+              "count": 1
+            },
+            {
+              "selector": "td[colspan]",
+              "attribute": "colspan",
+              "value": "3"
+            },
+            {
+              "selector": "tbody tr",
+              "count": 3
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d3-s5-alter-v2",
+            "instruction": "Now do it on your own. Change the award row you added in the guided example into two cells: Award: Best science poster in a cell that covers two columns, then Grade 11 in its own cell.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nAward: Best science poster\tGrade 11\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+            "guided": {
+              "discussion": "- Look at line 60. `<th scope=\"col\">Level</th>` is the first of three header cells (lines 60 to 62), so the table has three columns.\n- Look at line 76. `<tr>` starts the award row.\n- Look at line 77. `<td colspan=\"3\">Award: With honors, Grade 10</td>` has `colspan=\"3\"`: one cell covers all three columns.\n- Look at line 78. `</tr>` ends the row. A row's cells must add up to the table's columns: here 3.\n- Look at line 79. `</tbody>` closes the data rows.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Juan adds a second award. Put these three lines on **lines 79 to 81**, after the first award row and before `</tbody>`. Then run. You should get this result.",
+              "code": "      <tr>\n        <td colspan=\"3\">Award: Best science poster, Grade 11</td>\n      </tr>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nAward: Best science poster, Grade 11\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+            },
+            "solution": {
+              "lines": "index.html, lines 79-82:\n      <tr>\n        <td colspan=\"2\">Award: Best science poster</td>\n        <td>Grade 11</td>\n      </tr>",
+              "note": "`colspan=\"2\"` plus one plain cell still makes three columns. Two cells on one row show on one line of the output, in order."
+            }
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Row in Juan's tables",
+            "Its line in the output (→ marks a tab)",
+            "Cells"
+          ],
+          "rows": [
+            [
+              "Award row (one td, colspan=\"3\")",
+              "Award: With honors, Grade 10",
+              "1"
+            ],
+            [
+              "First Computer row (th rowspan=\"2\", two td)",
+              "Computer → Typing documents → Good",
+              "3"
+            ],
+            [
+              "Second Computer row (two td; Computer covers it)",
+              "Making slide presentations → Very good",
+              "2"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: sketch it first.** Before Step 6, draw the Skill levels table on paper: four rows and three columns. Shade Computer across its two rows and Art across its two rows, then check with Run code."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d3-s6",
+          "number": 6,
+          "instruction": "This step adds a Skill levels table. Each area is a tbody (a row group); its th has scope=\"rowgroup\" and rowspan=\"2\", so Computer and Art each cover two rows. This is Juan's finished Week 2 page.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Find Making slide presentations in the output: its line has two cells, because Computer above it covers both rows.",
+          "webChecks": [
+            {
+              "selector": "table",
+              "count": 2
+            },
+            {
+              "selector": "tbody",
+              "count": 3
+            },
+            {
+              "selector": "th[rowspan]",
+              "count": 2
+            },
+            {
+              "selector": "th[rowspan]",
+              "attribute": "rowspan",
+              "value": "2"
+            },
+            {
+              "selector": "th[rowspan]",
+              "attribute": "scope",
+              "value": "rowgroup"
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d3-s6-alter-v2",
+            "instruction": "Now do it on your own. Undo the guided example: Computer goes back to two rows. Add a third skill to Art instead: Making clay models, at level Learning. Change Art's rowspan to match.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nMaking clay models\tLearning\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+            "guided": {
+              "discussion": "- Look at line 91. `<tbody>` starts the first row group: Computer skills. A table may have several `tbody` groups.\n- Look at line 93. `<th scope=\"rowgroup\" rowspan=\"2\">Computer</th>` is the group's header cell. `rowspan=\"2\"` makes it cover two rows; `scope=\"rowgroup\"` says it heads the whole group.\n- Look at line 97. `<tr>` starts the group's second row. It has only two `td` cells, because Computer already covers this row.\n- Look at line 101. `</tbody>` ends the Computer group.\n- Look at line 104. `<th scope=\"rowgroup\" rowspan=\"2\">Art</th>` heads the second group the same way.\n- Look at line 109. `<td>Painting posters</td>` is Art's second skill.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Juan adds a third Computer skill. Change **line 93** to the first line below (rowspan 3). Then put the next four lines on **lines 100 to 103**, after Very good, so a new row starts. Then run. You should get this result.",
+              "code": "        <th scope=\"rowgroup\" rowspan=\"3\">Computer</th>\n      </tr>\n      <tr>\n        <td>Fixing simple computer problems</td>\n        <td>Learning</td>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nFixing simple computer problems\tLearning\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+            },
+            "solution": {
+              "lines": "index.html, line 104:\n        <th scope=\"rowgroup\" rowspan=\"3\">Art</th>\n\nindex.html, lines 111-114:\n      </tr>\n      <tr>\n        <td>Making clay models</td>\n        <td>Learning</td>",
+              "note": "Computer's rowspan goes back to 2 and its extra row is removed. Art's `th` covers 3 rows, and a new row with two `td` cells comes after Painting posters."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r02-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r02-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do th, td and caption mean, and what does scope=\"col\" tell a screen reader?"
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 5, why does the award row have only one cell? What does colspan=\"3\" do?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 6, Computer covers two rows. Why is rowspan better than typing Computer twice?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r02-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Repair Juan's Media and Tables, then Start Your Own",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Locate broken media file names and table structure by comparing the output and Media checks with the code.",
+        "affective": "Show patience and care when checking every name and tag.",
+        "psychomotor": "Diagnose three broken media paths, repair a broken table row and begin the personal resume additions."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Browsers show no error for a wrong file name or a broken table: the picture just disappears, or a row jumps out of its table."
+        },
+        {
+          "type": "definition",
+          "term": "Repairing media and tables",
+          "markdown": "A file loads only when src matches its start (images/, audio/ or video/), name, capital and small letters and ending exactly. Words in a table row must be inside td or th; otherwise the browser moves them out of the table."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A text message sent to a number with one wrong digit never arrives. A src with one wrong letter is the same."
+        },
+        {
+          "type": "note",
+          "markdown": "**Juan's finished Week 2 page** is the sample of Step 6 and Step 9. Steps 7 and 8 break one part of it on purpose."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d4-s7",
+          "number": 7,
+          "instruction": "Broken on purpose: Juan's finished page, but three src values do not match the uploaded files. Run it unchanged: the page text is complete, but Media checks shows that all three files fail.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/Juan_Profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.mp3\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"videos/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/Juan_Profile.svg: image failed to decode\naudio/greeting.mp3: playback failed\nvideos/juan_intro.webm: playback failed",
+          "checkYourself": "Compare each src with the real names: images/juan_profile.svg, audio/greeting.wav and video/juan_intro.webm.",
+          "webChecks": [
+            {
+              "selector": "img",
+              "attribute": "src",
+              "value": "images/Juan_Profile.svg"
+            },
+            {
+              "selector": "audio",
+              "attribute": "src",
+              "value": "audio/greeting.mp3"
+            },
+            {
+              "selector": "video",
+              "attribute": "src",
+              "value": "videos/juan_intro.webm"
+            }
+          ],
+          "includeMediaOutput": true,
+          "mediaChecks": [
+            {
+              "src": "images/Juan_Profile.svg",
+              "state": "broken"
+            },
+            {
+              "src": "audio/greeting.mp3",
+              "state": "broken"
+            },
+            {
+              "src": "videos/juan_intro.webm",
+              "state": "broken"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r02-d4-s7-alter-v2",
+            "instruction": "Now do it on your own. Change the note you added in the guided example so it diagnoses the broken sound file instead of the picture. Keep it in the same place and leave the src values broken.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nBroken: audio/greeting.mp3 should be audio/greeting.wav.\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/Juan_Profile.svg: image failed to decode\naudio/greeting.mp3: playback failed\nvideos/juan_intro.webm: playback failed",
+            "guided": {
+              "discussion": "- Look at line 9. `src=\"images/Juan_Profile.svg\"` has capital J and P, but the uploaded file is `juan_profile.svg`. Capitals count.\n- Look at line 115. `src=\"audio/greeting.mp3\"` names an mp3 file, but the uploaded sound is `greeting.wav`.\n- Look at line 117. `src=\"videos/juan_intro.webm\"` uses the folder `videos`, but the folder is `video`.\n- The page text is complete: a broken file shows no error. Only **Media checks** tells you: each file says failed.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Diagnose before repairing. Leave the three broken src values as they are (Step 8 starts with them repaired). Put this line on **line 10**, right after the `img` line. Then run. You should get this result.",
+              "code": "  <p>Broken: images/Juan_Profile.svg should be images/juan_profile.svg.</p>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nBroken: images/Juan_Profile.svg should be images/juan_profile.svg.\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/Juan_Profile.svg: image failed to decode\naudio/greeting.mp3: playback failed\nvideos/juan_intro.webm: playback failed"
+            },
+            "solution": {
+              "lines": "index.html, line 10:\n  <p>Broken: audio/greeting.mp3 should be audio/greeting.wav.</p>",
+              "note": "The same note, now naming the sound: the src says greeting.mp3, the uploaded file is greeting.wav. The src values stay broken, so Media checks still shows three failures."
+            }
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: the media are repaired, but the Junior high row lost its td tags. Run it unchanged: the row's words jump out of the table and show above its caption, on one line.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        Junior high\n        Sample Junior High School\n        7 to 10\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nJunior high Sample Junior High School 7 to 10\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Compare with the Senior high row: every value of a row needs its own td.",
+          "webChecks": [
+            {
+              "selector": "table:first-of-type td",
+              "count": 4
+            },
+            {
+              "selector": "table:first-of-type tbody tr",
+              "count": 3
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d4-s8-alter-v2",
+            "instruction": "Now do it on your own. Keep the cells you repaired in the guided example, but put the rows in time order: move the whole Junior high row above the Senior high row.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nJunior high\tSample Junior High School\t7 to 10\nSenior high\tSample Senior High School\t11 to 12\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+            "guided": {
+              "discussion": "- Look at line 66. `<tr>` starts the Senior high row: its values sit in `td` cells (lines 67 to 69).\n- Look at line 71. `<tr>` starts the Junior high row.\n- Look at line 72. `Junior high` has no `td` tags. Text in a row but not in a cell does not belong to the table.\n- Look at line 74. `7 to 10` has no `td` either. The browser moves all three values out of the table, so they show above the caption, on one line.\n- The browser shows no error. Read the page text: words above the caption mean a row lost its cells.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Repair the Junior high row. Replace **lines 72 to 74** with these three lines. Then run. The row goes back into the table.",
+              "code": "        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+            },
+            "solution": {
+              "lines": "index.html, lines 66-75:\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>",
+              "note": "The order of the `tr` rows is the order on the page. The whole Junior high row (its `tr`, three `td` cells and `</tr>`) now comes first."
+            }
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "A picture is missing; Media checks says image failed to decode.",
+              "means": "src does not match the file: its start, name, capital letters or ending.",
+              "fix": "Copy the exact name, such as images/juan_profile.svg."
+            },
+            {
+              "see": "Media checks says playback failed.",
+              "means": "The sound or video src has a wrong start, name or ending.",
+              "fix": "Match audio/greeting.wav or video/juan_intro.webm exactly."
+            },
+            {
+              "see": "A row's words show above the table's caption, on one line.",
+              "means": "The words are inside tr but not inside td.",
+              "fix": "Put each value in its own td."
+            },
+            {
+              "see": "The output has no alt text and nothing for the sound or video.",
+              "means": "Pictures, sound, video and alt are not page text.",
+              "fix": "Describe each one in a p."
+            },
+            {
+              "see": "Checked by your teacher for now.",
+              "means": "The media are not uploaded yet, or CodeShare runs offline.",
+              "fix": "Online: the teacher adds Media files. Offline: the teacher presses Mark done."
+            },
+            {
+              "see": "Run code stays off and says Loading media…",
+              "means": "This device is still loading the step's media.",
+              "fix": "Wait; Run code comes on when they have loaded."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what will the output show?** After Juan's award row, add (a) a new tr with one td that holds Grade 12; (b) the words Grade 12 inside a tr but with no td; (c) change the award's colspan=\"3\" to colspan=\"2\". Answers: (a) a new line Grade 12 after the award line; (b) Grade 12 above the caption; (c) the same output. Undo each change."
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r02-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r02-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What must the src of a media file match exactly?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, why did the picture, sound and video all fail although the files were uploaded?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 8, words without td jumped out of the table. How is this like Week 1's skills without li?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r02-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 2: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the picture and the table of one's own resume page.",
+        "affective": "Present one's own work honestly, with permitted pictures, and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the resume with its picture and table in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's page is finished, but your own resume still needs its picture and its table."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your page, play its media, read its output and point to the code that makes each part. No new HTML today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A job fair booth: you show your resume, play your short video and answer questions."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r02-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 2 page: the same code as Step 6. Run it and play its media before you present. Friday adds no new HTML.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Read the output from top to bottom: does every table have its caption, and every media file a Media checks line?",
+          "webChecks": [
+            {
+              "selector": "h2",
+              "count": 10
+            },
+            {
+              "selector": "table",
+              "count": 2
+            },
+            {
+              "selector": "caption",
+              "count": 2
+            },
+            {
+              "selector": "img",
+              "count": 1
+            },
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r02-d5-s9-alter-v2",
+            "instruction": "Now do it on your own. Change the credit you added in the guided example to: Media: all made for this module. Keep it small.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia: all made for this module.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+            "guided": {
+              "discussion": "- Look at line 9. `<img src=\"images/juan_profile.svg\"` is Monday's picture.\n- Look at line 57. `<caption>Schools of Juan Dela Cruz</caption>` is Monday's table title.\n- Look at line 77. `<td colspan=\"3\">Award: With honors, Grade 10</td>` is Wednesday's colspan cell.\n- Look at line 93. `<th scope=\"rowgroup\" rowspan=\"2\">Computer</th>` is Wednesday's rowspan group header.\n- Look at line 115. `<audio src=\"audio/greeting.wav\" controls></audio>` is Tuesday's sound.\n- Look at line 117. `<video src=\"video/juan_intro.webm\" controls width=\"320\"></video>` is Tuesday's video: the last line before `</body>`.\n- The output ends with **Media checks:**, one line per picture, sound or video: whether the file loaded. Media are not page text.",
+              "instruction": "Before presenting, Juan adds an honest media credit. Put this line on **line 118**, after the `video` line and before `</body>`. Then run. You should get this result.",
+              "code": "  <p><small>Picture, sound and video: made for this module.</small></p>",
+              "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nPicture, sound and video: made for this module.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+            },
+            "solution": {
+              "lines": "index.html, line 118:\n  <p><small>Media: all made for this module.</small></p>",
+              "note": "The same small credit after the video, with new words, so the page text changes."
+            }
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r02-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r02-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to your picture's src and alt, and to one th in your table. Say what each one does."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend one choice: why does your table use th for its headings and a caption for its title?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school library wants a page with a picture of its reading corner and a table of its opening hours from Monday to Friday. Write the img and the first two rows of the table in HTML."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your Week 1 resume with this week's. What can a reader see or hear now that they could not before?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r02-pt",
+    "title": "My Resume, Week 2: Picture and Table",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your Week 1 resume carries forward: add this week's parts to it.\n\nAdd a picture and a table. The picture is your own photo (optional, with only you in it) or a picture your teacher gives you. Online, add it under Media files in your personal project: in images, with a name of letters, numbers, - and _ only, such as my_photo.jpg, at most 5 MB. Offline, Media files are not available yet: write the img now; the picture shows once the file is added online. Then add an education or skills table with a caption, th headings and at least two rows.\n\nUse only safe details: no home address, phone number, birth date, ID numbers or personal social-media accounts, and no other people in your picture. Run code until the page runs with no error, then press Submit this version. Saving or running is not submitting.\n\nThursday: 0–60 minutes, repairs and the Thursday strip; 60–120 minutes, plan on paper, show the teacher, then start. Friday: 0–30 minutes, finish and run; 30–105 minutes, five-minute presentations; 105–120 minutes, Friday strip and Submit this version.",
+    "checklist": [
+      "Keep your Week 1 page: your name in h1, your introduction and your lists.",
+      "Add one img with src in images/, an alt that describes it, and width and height.",
+      "Use your own photo (only you in it) or your teacher's picture, added under Media files online.",
+      "Write a visible sentence that describes your picture.",
+      "Add an education or skills table with a caption.",
+      "Put the headings in th with scope=\"col\", inside thead.",
+      "Add at least two rows of td inside tbody.",
+      "Use colspan or rowspan once, for example an award row.",
+      "No home address, phone number, birth date, ID numbers or social media; no other people in the picture.",
+      "Run code shows no error; press Submit this version, then present."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n</head>\n<body>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name</h1>\n  <img src=\"images/my_picture.jpg\" alt=\"Describe your picture here\" width=\"160\" height=\"160\">\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n  <h2>Education</h2>\n  <table>\n    <caption>My schools</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Write a level here</td>\n        <td>Write a school here</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your page (30 seconds).",
+      "Press Run code and show your picture and table in the page window (1 minute).",
+      "Change one colspan or rowspan, run, show the table change, then restore it (2 minutes).",
+      "Point to your img's src and alt, and to your caption and th cells (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "Why does your picture need alt text and a visible description?",
+      "What must your src match, and where did you add the file?",
+      "Which cells are th and which are td, and why?",
+      "What does your colspan or rowspan change?",
+      "Why did you choose this picture, and is it safe to share?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Picture: correct src, alt and size; permitted and safe",
+        "points": 10
+      },
+      {
+        "criterion": "Visible description of the picture",
+        "points": 6
+      },
+      {
+        "criterion": "Table structure: caption, thead, th with scope, tbody",
+        "points": 10
+      },
+      {
+        "criterion": "Rows, and one colspan or rowspan used correctly",
+        "points": 8
+      },
+      {
+        "criterion": "Safe and honest personal details",
+        "points": 6
+      },
+      {
+        "criterion": "Presentation and explanation",
+        "points": 10
+      }
+    ],
+    "totalPoints": 50
+  }
+}
