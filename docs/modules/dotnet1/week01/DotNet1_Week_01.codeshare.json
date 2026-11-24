@@ -1,0 +1,977 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 1,
+  "id": "dotnet-1-r01",
+  "title": "Self-Paced Module: HTML Fundamentals, Paragraphs and Lists",
+  "sampleFirst": true,
+  "starterFiles": [],
+  "lessons": [
+    {
+      "id": "dotnet-1-r01-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Meet HTML: Juan Dela Cruz's First Resume Page",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the role and versions of HTML and the parts of a page: doctype, html, head, title, body, elements, attributes and values.",
+        "affective": "Show care for privacy by putting only safe, made-up details on a sample resume page.",
+        "psychomotor": "Run Juan's first resume page in CodeShare's code editor and add a paragraph to its body."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Run every sample unchanged first, then do its small task. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample into index.html; **Run code** shows the page in the page window and checks it. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks: the Tab title, then the Visible page text. List numbers and bullets, bold and highlights are drawn on the page but are not page text; page checks look at them instead. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** This is the first week, so your module project starts empty. Step 1 creates index.html; every later step grows the same page."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 1 starts here:** Plain words with no HTML run together: a name, an introduction and skills typed in body appear on one line."
+        },
+        {
+          "type": "definition",
+          "term": "HTML",
+          "markdown": "HTML (HyperText Markup Language) gives a web page its meaning and structure: headings, paragraphs and lists. CSS, from Week 4, changes how it looks. A web editor is where you write HTML; in this course it is CodeShare's code editor, and Run code shows the page in the page window."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A printed resume has a name at the top, a short introduction and lists. HTML labels each part so the browser, and a screen reader, know which part is which."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "When",
+            "HTML"
+          ],
+          "rows": [
+            [
+              "1990–1995",
+              "The first HTML; many revisions and additions in its first five years."
+            ],
+            [
+              "1997",
+              "HTML 3.2, then HTML4 the same year (W3C)."
+            ],
+            [
+              "2000",
+              "XHTML 1.0: HTML4 rewritten in the stricter XML style."
+            ],
+            [
+              "2004 onward",
+              "Work on HTML5 begins, led by browser makers (WHATWG)."
+            ],
+            [
+              "2019 to today",
+              "W3C and WHATWG agree on one HTML: the HTML Living Standard. The doctype line means today's HTML."
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d1-s1",
+          "number": 1,
+          "instruction": "Open Step 1 and press Work in code editor: CodeShare puts Juan's first page in index.html. Press Run code without changing anything. Then read the code from the top: the doctype, html with lang=\"en\", head with meta and title, and body with h1 and p.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <p>Hello! I am Juan Dela Cruz,\n  a senior high school student in the ICT strand.</p>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.",
+          "checkYourself": "Point to the head and the body. Which line shows on the page, and which only names the tab?",
+          "webChecks": [
+            {
+              "selector": "html",
+              "attribute": "lang",
+              "value": "en"
+            },
+            {
+              "selector": "meta[charset]",
+              "count": 1
+            },
+            {
+              "selector": "title",
+              "count": 1
+            },
+            {
+              "selector": "h1",
+              "count": 1
+            },
+            {
+              "selector": "p",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d1-s1-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nIn body, on a new line after the introduction paragraph, add a second paragraph: <p>I like making simple web pages.</p>. Run code. A paragraph shows on the page only when it is inside body.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI like making simple web pages."
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Part of the page",
+            "What it does"
+          ],
+          "rows": [
+            [
+              "doctype line",
+              "Says the page uses today's HTML. Always the first line."
+            ],
+            [
+              "html with lang=\"en\"",
+              "Holds the whole page; lang says its language is English."
+            ],
+            [
+              "head",
+              "Information about the page; not shown on the page."
+            ],
+            [
+              "meta charset=\"utf-8\"",
+              "Lets the page show the letters of any language, such as ñ."
+            ],
+            [
+              "title",
+              "The name on the tab: the Tab title line of the output."
+            ],
+            [
+              "body",
+              "Everything shown on the page: the Visible page text."
+            ],
+            [
+              "h1, h2",
+              "Main heading (one per page) and section headings."
+            ],
+            [
+              "p",
+              "A paragraph. Line breaks and extra spaces in your code become one space."
+            ],
+            [
+              "comment",
+              "A note for people, starting with <!-- and ending with -->. Never shown."
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Syntax:** an element is an opening tag, its content and a closing tag. An attribute such as lang=\"en\" sits in the opening tag; \"en\" is its value. Elements nest: the inner one closes first. br and hr have no closing tag."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Element or attribute",
+            "Use it for",
+            "In the page text"
+          ],
+          "rows": [
+            [
+              "strong / em",
+              "Important words / stressed words",
+              "The words only"
+            ],
+            [
+              "b / i",
+              "Words set apart / a foreign word or term",
+              "The words only"
+            ],
+            [
+              "mark / small",
+              "Highlighted words / side comment, small print",
+              "The words only"
+            ],
+            [
+              "sub / sup",
+              "Lowered / raised characters",
+              "Joined: H2O, 1st"
+            ],
+            [
+              "br",
+              "A line break inside a paragraph",
+              "A new line"
+            ],
+            [
+              "hr",
+              "A change of topic (a line across)",
+              "Nothing"
+            ],
+            [
+              "pre",
+              "Text whose spaces must stay",
+              "Spaces and lines kept"
+            ],
+            [
+              "ul, ol, li",
+              "Bullet list, numbered list, one item",
+              "One line per item, no markers"
+            ],
+            [
+              "type, start, reversed (ol)",
+              "Marker kind 1 A a I i, first number, count down",
+              "Not in the page text"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d1-s2",
+          "number": 2,
+          "instruction": "This sample adds every kind of element you will practise this week: a comment, strong and em inside the introduction, a Skills list (ul) and a numbered Goals list (ol) with type=\"1\" and start=\"1\". Run it unchanged first.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"1\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.",
+          "checkYourself": "Change type=\"1\" to type=\"A\" and run: the page window shows A and B, but the page text stays the same. List numbers and bullets are not page text. Restore 1.",
+          "webChecks": [
+            {
+              "selector": "h2",
+              "count": 2
+            },
+            {
+              "selector": "strong",
+              "count": 1
+            },
+            {
+              "selector": "em",
+              "count": 1
+            },
+            {
+              "selector": "ul > li",
+              "count": 2
+            },
+            {
+              "selector": "ol",
+              "attribute": "type",
+              "value": "1"
+            },
+            {
+              "selector": "ol",
+              "attribute": "start",
+              "value": "1"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d1-s2-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nIn the Skills list, after Making slide presentations, add a third list item: <li>Fixing simple computer problems</li>. Run code. The new skill gets its own bullet; the bullet itself is not page text.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nSkills\nTyping documents\nMaking slide presentations\nFixing simple computer problems\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML."
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r01-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r01-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is HTML, and what is its role in a web page? Give one element from Step 1."
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Steps 1 and 2, why does the title show on the tab while h1 shows on the page?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Which line of Step 1 says the page uses today's HTML Living Standard, and why do browsers still show pages made with HTML4?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r01-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Format Juan's Introduction: Paragraph Formatting Elements",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain how b, strong, i, em, mark, small, sub, sup, br, hr and pre change a page and its page text.",
+        "affective": "Value clear and honest wording when describing one's own skills.",
+        "psychomotor": "Format Juan's introduction, motto and club schedule, then add one formatted line."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Monday's page cannot keep a line break or extra spaces: a three-line motto and a lined-up schedule run together."
+        },
+        {
+          "type": "definition",
+          "term": "Paragraph formatting elements",
+          "markdown": "Inside a paragraph, strong marks important words and em stresses words; b and i set words apart without extra importance; mark highlights; small is for side comments; sub and sup lower or raise characters. br breaks a line, hr marks a change of topic, and pre keeps spaces and line breaks exactly as typed."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A teacher's red pen marks what matters in an essay without changing the words. Formatting elements mark words the same way."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d2-s3",
+          "number": 3,
+          "instruction": "Juan's introduction gets more formatting: sup, sub, b, i, mark and small. Run the sample unchanged, then find the words of each element in the output.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"1\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.",
+          "checkYourself": "Which words look different in the page window but read the same in the output? sup and sub join their characters: 1st and H2O.",
+          "webChecks": [
+            {
+              "selector": "p",
+              "count": 4
+            },
+            {
+              "selector": "b",
+              "count": 1
+            },
+            {
+              "selector": "i",
+              "count": 1
+            },
+            {
+              "selector": "mark",
+              "count": 1
+            },
+            {
+              "selector": "small",
+              "count": 1
+            },
+            {
+              "selector": "sub",
+              "count": 1
+            },
+            {
+              "selector": "sup",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d2-s3-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAfter the paragraph about Juan's science poster, add: <p>I can type <strong>35 words per minute</strong>.</p>. Run code. strong marks the important words; the page text shows the words, not the bold.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nI can type 35 words per minute.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML."
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d2-s4",
+          "number": 4,
+          "instruction": "This step adds three things at the end of body: a motto with br line breaks, an hr line, and a Weekly clubs schedule inside pre. Work in code editor loads the whole page.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"1\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
+          "checkYourself": "Delete one space before Chess and run: Chess moves left in the output too. Restore it.",
+          "webChecks": [
+            {
+              "selector": "br",
+              "count": 2
+            },
+            {
+              "selector": "hr",
+              "count": 1
+            },
+            {
+              "selector": "pre",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d2-s4-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nInside pre, add a third club line just before the closing pre tag: type Friday, then 5 spaces, then Basketball, so Basketball lines up under Club, Chess and Drawing. Run code. pre keeps every space you type.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nFriday     Basketball"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: choose the element.** Which element fits (a) a warning that must not be missed, (b) the Filipino word Bayanihan, (c) the nd in 2nd, (d) a timetable whose columns must line up, (e) a new topic on the page? Answers: strong, i, sup, pre, hr."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r01-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r01-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "In Step 3, what do strong and em mean, and how are they different from b and i?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 4, why does pre keep the club schedule's spaces when a paragraph would squeeze them?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In a word processor you press Bold. Why does HTML prefer strong for words that are important?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Write the element for (a) a line break, (b) a change of topic, (c) highlighted words and (d) small print. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r01-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "List Juan's Skills and Interests: List Attributes and Values",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain unordered and ordered lists and the type, start and reversed attributes and their values.",
+        "affective": "Organise information so that classmates and future employers can read it quickly.",
+        "psychomotor": "Build Juan's skills, interests and goals lists, including a list inside a list."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's interests written in one paragraph with commas are hard to scan, and Monday's goals list is only numbers."
+        },
+        {
+          "type": "definition",
+          "term": "Lists",
+          "markdown": "ul groups items whose order does not matter (bullets); ol groups items whose order matters (numbers or letters). Each item is an li. On ol, type picks the markers (1, A, a, I, i), start picks the first number (always a whole number) and reversed counts down. A list can sit inside an li."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A jeepney signboard lists its stops in order: that is an ol. A sari-sari store sign lists what it sells in any order: that is a ul."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Attribute on ol",
+            "Values",
+            "Example"
+          ],
+          "rows": [
+            [
+              "type",
+              "1 (numbers, the default), A, a, I, i",
+              "type=\"A\" gives A, B, C"
+            ],
+            [
+              "start",
+              "A whole number, even with letters",
+              "start=\"3\" counts from 3"
+            ],
+            [
+              "reversed",
+              "No value needed",
+              "start=\"3\" reversed gives 3, 2, 1"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d3-s5",
+          "number": 5,
+          "instruction": "This step adds an Interests list after Skills and changes the Goals list to type=\"A\" (letters). Work in code editor loads the whole page.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
+          "checkYourself": "Change type=\"A\" to type=\"I\" and run: the markers become Roman numerals I and II; the output does not change. Restore A.",
+          "webChecks": [
+            {
+              "selector": "body > ul",
+              "count": 2
+            },
+            {
+              "selector": "body > ul:nth-of-type(2) > li",
+              "count": 3
+            },
+            {
+              "selector": "ol",
+              "attribute": "type",
+              "value": "A"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d3-s5-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAt the end of the Interests list, after Watching science videos, add: <li>Playing the guitar</li>. Run code. Keep type=\"A\" on the Goals list: its letters are not page text, so the sample's page check checked them.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nPlaying the guitar\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d3-s6",
+          "number": 6,
+          "instruction": "This step adds a list inside a list (Sports, inside Interests) and a countdown list with start=\"3\" and reversed after Goals. This is Juan's finished Week 1 page.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
+          "checkYourself": "Remove reversed and run: the countdown becomes 3, 4, 5. Restore reversed.",
+          "webChecks": [
+            {
+              "selector": "li > ul",
+              "count": 1
+            },
+            {
+              "selector": "li > ul > li",
+              "count": 2
+            },
+            {
+              "selector": "ol[reversed]",
+              "count": 1
+            },
+            {
+              "selector": "ol[reversed]",
+              "attribute": "start",
+              "value": "3"
+            },
+            {
+              "selector": "ol[type]",
+              "attribute": "type",
+              "value": "A"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d3-s6-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nIn the Sports list inside Interests, after Chess, add: <li>Volleyball</li>. Run code. The new item belongs to the inner list, so it stays under Sports.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nVolleyball\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r01-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r01-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is the difference between ul and ol? Give one of Juan's lists for each."
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 6, what do start=\"3\" and reversed do, and why are the numbers not in the output?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Juan's skills could be a paragraph with commas or a list. Which is easier for an employer to read, and why?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r01-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Repair Juan's Page, then Start Your Own Resume",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Locate structure and list errors by comparing the page text with the code.",
+        "affective": "Show patience and persistence when repairing a broken page.",
+        "psychomotor": "Repair a hidden page and a broken list, then begin the personal resume page."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Browsers show no error messages for HTML: a small typing mistake can hide or join text without any warning."
+        },
+        {
+          "type": "definition",
+          "term": "Repairing a page",
+          "markdown": "Browsers do not show HTML errors; they guess what you meant. A small mistake can hide or join text. Compare the output with the code, one line at a time, and fix the first wrong line first."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A missing period in a text message makes the next sentences run together. A missing closing tag or li does the same to a page."
+        },
+        {
+          "type": "note",
+          "markdown": "**Juan's finished Week 1 page** is the sample of Step 6 and Step 9. Steps 7 and 8 break one part of it on purpose."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d4-s7",
+          "number": 7,
+          "instruction": "Broken on purpose: Juan's finished page with one changed line. The comment under the heading ends with one dash instead of two. Run it unchanged: only the heading shows, because the comment never ends and hides everything after it.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 ->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz",
+          "checkYourself": "Count the dashes: a comment starts with <!-- and ends with -->.",
+          "webChecks": [
+            {
+              "selector": "h1",
+              "count": 1
+            },
+            {
+              "selector": "p",
+              "count": 0
+            },
+            {
+              "selector": "ul",
+              "count": 0
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d4-s7-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the comment under the heading: change its end from -> to --> (two dashes). Run code. The whole page comes back, and the comment itself stays hidden.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: Juan's finished page, but the two skills lost their li tags. Run it unchanged: both skills run together on one line.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    Typing documents\n    Making slide presentations\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents Making slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
+          "checkYourself": "Compare with Step 6: every item of a list needs its own li.",
+          "webChecks": [
+            {
+              "selector": "body > ul:nth-of-type(1) > li",
+              "count": 0
+            },
+            {
+              "selector": "body > ul:nth-of-type(2) > li",
+              "count": 4
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d4-s8-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the Skills list: put each skill inside its own list item, <li>Typing documents</li> and <li>Making slide presentations</li>. Run code. Each skill is on its own line again.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing"
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "Only the heading shows; everything below it is gone.",
+              "means": "A comment ends with -> instead of -->, so it never ends.",
+              "fix": "End every comment with -->."
+            },
+            {
+              "see": "Two skills run together on one line.",
+              "means": "The words are inside ul but not inside li.",
+              "fix": "Put each item in its own li."
+            },
+            {
+              "see": "The motto's three lines join into one line.",
+              "means": "A line break in the code is only a space.",
+              "fix": "Add br where the line must break."
+            },
+            {
+              "see": "The club columns no longer line up.",
+              "means": "The schedule is outside pre, so extra spaces collapse.",
+              "fix": "Keep it inside pre; count the spaces."
+            },
+            {
+              "see": "The whole page is in the Tab title and the page is blank.",
+              "means": "The closing title tag is missing.",
+              "fix": "Close title before the closing head tag."
+            },
+            {
+              "see": "The output has no numbers or bullets.",
+              "means": "List markers are drawn, not page text.",
+              "fix": "Nothing to fix; look at the page window."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r01-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r01-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a closing tag, and what is an HTML comment?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, why did one missing dash hide almost the whole page?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 8 the skills ran together on one line. How is this like Tuesday's motto without br?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r01-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 1: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the structure, formatting and lists of one's own resume page.",
+        "affective": "Present one's own work honestly and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the personal info page in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's page is finished, but your own resume page is not yet."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your page, read its output from top to bottom, and point to the code that makes each part. No new HTML today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A job fair booth: you show your resume, explain it and answer questions."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r01-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 1 page: the same code as Step 6. Run it before you present. Friday adds no new HTML.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
+          "checkYourself": "Read the output from top to bottom: is every heading followed by its paragraph or list?",
+          "webChecks": [
+            {
+              "selector": "h1",
+              "count": 1
+            },
+            {
+              "selector": "h2",
+              "count": 6
+            },
+            {
+              "selector": "body > ul",
+              "count": 2
+            },
+            {
+              "selector": "ol",
+              "count": 2
+            },
+            {
+              "selector": "pre",
+              "count": 1
+            },
+            {
+              "selector": "hr",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r01-d5-s9-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nBefore you present, add a closing line after the Weekly clubs schedule: <p><em>Thank you for reading my resume.</em></p>. Run code. Then present your own resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nThank you for reading my resume."
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r01-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r01-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to one formatting element and one list attribute in your own resume. Say what each one does."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend one choice: why is one of your lists ordered and another unordered?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The barangay youth council needs a page with the three steps to join a clean-up drive and the things to bring. Write both lists in HTML."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare Juan's Step 1 page with your finished resume. What can you do now that you could not do on Monday?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r01-pt",
+    "title": "My Resume, Week 1: Personal Info Page",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your own resume starts there; it carries forward every week until Week 10.\n\nBuild a simple personal info page about yourself: your name as the main heading, a short introduction paragraph, and lists of your skills and interests. Use only safe details: your name, school, strand, skills, interests and achievements. Never put your home address, phone number, birth date, ID numbers or personal social-media accounts on the page.\n\nUse this week's HTML: at least two paragraph formatting elements, a br or an hr, a bullet list and one numbered list that uses type, start or reversed. Run code until the page runs with no error, then press Submit this version. Saving or running is not submitting.\n\nThursday: 0–60 minutes, repairs and the Thursday strip; 60–120 minutes, plan on paper, show the teacher, then start. Friday: 0–30 minutes, finish and run; 30–105 minutes, five-minute presentations; 105–120 minutes, Friday strip and Submit this version.",
+    "checklist": [
+      "Keep the doctype, html lang=\"en\", head with meta charset and your own title, and body.",
+      "Put your name in one h1.",
+      "Write a short introduction paragraph about yourself (safe details only).",
+      "Use at least two formatting elements for their meaning, such as strong, em, mark or small.",
+      "Use a br inside a paragraph or an hr between two topics.",
+      "List at least three skills in a ul.",
+      "List at least three interests.",
+      "Add one ol (for example, your goals) that uses type, start or reversed.",
+      "No home address, phone number, birth date, ID numbers or social-media accounts.",
+      "Run code shows no error; press Submit this version, then present."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <!-- Add my photo here in Week 2 -->\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n</body>\n</html>"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n</head>\n<body>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name</h1>\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n</body>\n</html>"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your page (30 seconds).",
+      "Press Run code and show your page in the page window (1 minute).",
+      "Change one ol attribute (type, start or reversed), run, show the markers change, then restore it (2 minutes).",
+      "Point to your head, body, one formatting element and one list in the code (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "Which part of your page is in head, and which is in body?",
+      "Why did you use strong (or em) on those words?",
+      "What does your ol attribute change, and why is it not in the page text?",
+      "Why are your skills in an unordered list?",
+      "Which details did you leave out to stay safe, and why?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Page structure: doctype, head, title and body",
+        "points": 8
+      },
+      {
+        "criterion": "Name heading and a clear introduction",
+        "points": 8
+      },
+      {
+        "criterion": "Formatting elements used for their meaning",
+        "points": 8
+      },
+      {
+        "criterion": "Lists with correct items and an ol attribute",
+        "points": 10
+      },
+      {
+        "criterion": "Safe and honest personal details",
+        "points": 6
+      },
+      {
+        "criterion": "Presentation and explanation",
+        "points": 10
+      }
+    ],
+    "totalPoints": 50
+  }
+}

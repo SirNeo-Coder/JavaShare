@@ -1,0 +1,1040 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 3,
+  "id": "dotnet-1-r03",
+  "title": "Self-Paced Module: Links, Frames and Forms",
+  "continues": "Week 2 — Multimedia and tables",
+  "previousModuleId": "dotnet-1-r02",
+  "sampleFirst": true,
+  "starterFiles": [
+    {
+      "path": "index.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "dotnet-1-r03-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Open the Doors: Juan's Links, Second Page and Contact Form",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe the a, iframe and form elements and the href, src, label and input parts of a resume site.",
+        "affective": "Value clear link text that tells readers where a link goes.",
+        "psychomotor": "Add Juan's navigation links, his projects page and a first contact form in CodeShare and run them."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Run every sample unchanged first, then do its small task. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample pages into the editor tabs; **Run code** shows the step's run page in the page window and checks it, and its links open the project's other pages there. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks for the step's run page: the Tab title, the Visible page text, then, on Steps 1 and 9, Media checks. Link text, labels, button words and every option of a select are page text; href, src, typed words, placeholders and the text of a framed page are not. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** Juan's finished Week 2 page carries forward in your module project as index.html. This week adds projects.html and contact.html. Each step names the pages it adds or changes and its run page; the boxes show only the lines a step adds or changes, and where they go."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 3 starts here:** Juan's Week 2 resume is one long page: a reader cannot go to another page, see one page inside another, or send Juan a message."
+        },
+        {
+          "type": "definition",
+          "term": "Links, frames and forms",
+          "markdown": "A link (a) takes the reader to another page: href names the page, and the words inside a are the link text. An iframe shows another page inside this page: src names that page. A form holds boxes where a visitor enters data: label names a box, input is a one-line box, and button sends the form."
+        },
+        {
+          "type": "analogy",
+          "markdown": "At a school open house, the directory board points you to rooms (links), the office window lets you see inside without going in (a frame), and the guard's visitor logbook has labelled lines to fill in (a form)."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Code",
+            "What it does",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "`<a href=\"projects.html\">Projects</a>`",
+              "A link that opens projects.html",
+              "Projects (the link text only)"
+            ],
+            [
+              "`<nav>` … `</nav>`",
+              "Groups the main links of a page",
+              "Its link text, on one line"
+            ],
+            [
+              "A link to a page the project does not have",
+              "The page window says the project has no page with that name",
+              "The link text, as usual"
+            ],
+            [
+              "A link to the internet (https://…)",
+              "Does not open in CodeShare: class has no internet",
+              "The link text, as usual"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Juan's page",
+            "What it holds",
+            "Run in steps"
+          ],
+          "rows": [
+            [
+              "index.html",
+              "His resume, with his picture, sound and video",
+              "1 and 9"
+            ],
+            [
+              "projects.html",
+              "His school projects, and contact.html in a frame",
+              "3 and 5"
+            ],
+            [
+              "contact.html",
+              "The contact form prototype; it sends nowhere",
+              "2, 4, 6, 7 and 8"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Code",
+            "What it does",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "`<form>`",
+              "Holds the boxes and the button; with no action it sends nowhere",
+              "Nothing of its own"
+            ],
+            [
+              "`<label for=\"visitor\">`",
+              "Names a box; for matches the box's id",
+              "The label text"
+            ],
+            [
+              "`<input type=\"text\" id=\"visitor\" name=\"visitor\">`",
+              "A one-line box; name names its data",
+              "Nothing; typed words are not page text"
+            ],
+            [
+              "`<button type=\"submit\">`",
+              "The send button",
+              "Its words"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Media steps:** Steps 1 and 9 run index.html, with Juan's picture, sound and video, files your teacher adds under Media files. Online, CodeShare checks them automatically; Run code waits on Loading media… until they are on this device. Offline, these two steps show Checked by your teacher for now, and your teacher presses Mark done. Steps 2 to 8 run projects.html or contact.html and are checked automatically; on those steps, Home in the page window shows Juan's picture missing and his sound and video silent, because media load only on media steps."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d1-s1",
+          "number": 1,
+          "instruction": "Juan's Week 2 page carries forward. This step adds a navigation bar of three links at the top of index.html and a second page, projects.html. Press Work in code editor, then Run code without changing anything. In the page window, click Projects: projects.html opens. Click Contact: CodeShare says this project has no page named contact.html yet; Step 2 makes it.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home</li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay</li>\n  </ul>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Find the link text in the output: Home | Projects | Contact. The href values are not there.",
+          "webChecks": [
+            {
+              "selector": "nav",
+              "count": 1
+            },
+            {
+              "selector": "nav a",
+              "count": 3
+            },
+            {
+              "selector": "a[href=\"projects.html\"]",
+              "count": 1
+            },
+            {
+              "selector": "a[href=\"contact.html\"]",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r03-d1-s1-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nA link can sit inside a sentence. In index.html, on a new line after the paragraph that ends with ICT strand, add: <p>Read about my school work on my <a href=\"projects.html\">projects page</a>.</p>. Run code, then click projects page in the page window.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nRead about my school work on my projects page.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d1-s2",
+          "number": 2,
+          "instruction": "This step adds Juan's contact page with a form prototype: one labelled text box and a Send message button. The form has no action, so it sends nowhere. Run it unchanged, then type your name in the box in the page window.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\">\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nSend message",
+          "checkYourself": "Type in the box and run again: the output stays the same. What you type is not page text; the label is.",
+          "webChecks": [
+            {
+              "selector": "form",
+              "count": 1
+            },
+            {
+              "selector": "form[action]",
+              "count": 0
+            },
+            {
+              "selector": "label[for=\"visitor\"]",
+              "count": 1
+            },
+            {
+              "selector": "input#visitor",
+              "attribute": "type",
+              "value": "text"
+            },
+            {
+              "selector": "input#visitor",
+              "attribute": "name",
+              "value": "visitor"
+            },
+            {
+              "selector": "button[type=\"submit\"]",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r03-d1-s2-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a second labelled box. In contact.html, after the Your name paragraph, add a p with <label for=\"school\">Your school</label><br> and <input type=\"text\" id=\"school\" name=\"school\">, each on its own line, as in Your name. Run code.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour school\nSend message"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Try this in Step 1 or 2, then undo it",
+            "In the page window",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "Remove the a tags around Projects; keep the word",
+              "Projects no longer opens a page",
+              "The same"
+            ],
+            [
+              "Change href=\"projects.html\" to href=\"Projects.html\"",
+              "Projects opens nothing: this project has no page named Projects.html",
+              "The same"
+            ],
+            [
+              "Type your name in the Your name box",
+              "Your name shows in the box",
+              "The same"
+            ],
+            [
+              "Add placeholder=\"Type your name\" to the input",
+              "A grey hint shows in the empty box",
+              "The same"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what will the output show?** (a) a link whose text is My projects; (b) a label Your school with its box; (c) a box with the placeholder Your school; (d) a button whose words are Send message. Answers: (a) My projects; (b) Your school; (c) nothing; (d) Send message."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r03-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r03-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do the a, iframe and form elements do, and which attribute names the page in a and in iframe?"
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, the output shows Home | Projects | Contact but no href. Why is the link text page text and the href not?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 2, the label is in the output but what you typed is not. How is this like Week 2's alt text?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r03-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "There and Back: Linking Juan's Pages Both Ways",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain how the pages of one project link to each other both ways with href values that name a page.",
+        "affective": "Respect readers' time by giving every page a way back.",
+        "psychomotor": "Link Juan's three pages both ways with the same navigation bar and test every link in the page window."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Monday's links go one way only: projects.html has no way back, and contact.html has no links at all."
+        },
+        {
+          "type": "definition",
+          "term": "Links between pages",
+          "markdown": "href=\"projects.html\" opens projects.html, a page of the same project. Two pages are linked both ways when each has a link to the other. A navigation bar (nav) is the same group of links at the top of every page. Link text says where the link goes; never write click here."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A jeepney signboard names both ends of its route, so riders know they can go there and come back. Pages linked both ways are a route with a way back."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d2-s3",
+          "number": 3,
+          "instruction": "This step gives projects.html the same navigation bar, so Home on the projects page leads back to index.html: the two pages are now linked both ways. Run it unchanged, then click Home in the page window.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home</li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay</li>\n  </ul>\n</body>\n</html>"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home\nComic strip for Filipino class: Bayanihan in our barangay",
+          "checkYourself": "Click Projects on the projects page: the same page opens again. A link may lead to its own page.",
+          "webChecks": [
+            {
+              "selector": "nav a",
+              "count": 3
+            },
+            {
+              "selector": "a[href=\"index.html\"]",
+              "count": 1
+            },
+            {
+              "selector": "a[href=\"contact.html\"]",
+              "count": 1
+            },
+            {
+              "selector": "h1",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r03-d2-s3-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a second way back. In projects.html, on a new line after the closing </ul> tag, add: <p><a href=\"index.html\">Back to my resume</a></p>. Run code, then click Back to my resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home\nComic strip for Filipino class: Bayanihan in our barangay\nBack to my resume"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d2-s4",
+          "number": 4,
+          "instruction": "This step gives contact.html the navigation bar too. Now every page links to every other page. Run it unchanged, then use the links to visit all three pages.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\">\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nSend message",
+          "checkYourself": "In the page window, go Home → Projects → Contact → Home. Which link did you click on each page?",
+          "webChecks": [
+            {
+              "selector": "nav a",
+              "count": 3
+            },
+            {
+              "selector": "a",
+              "count": 3
+            },
+            {
+              "selector": "a[href=\"projects.html\"]",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r03-d2-s4-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nPut two links in one sentence. In contact.html, after the paragraph This form is a prototype: it sends nowhere., add: <p>Before you write, read <a href=\"index.html\">my resume</a> and <a href=\"projects.html\">my projects</a>.</p>. Run code.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nBefore you write, read my resume and my projects.\nYour name\nSend message"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: which page opens?** On projects.html, (a) Home, (b) Contact, (c) a link with href=\"Index.html\", (d) a link with href=\"https://example.com\". Answers: (a) index.html; (b) contact.html; (c) nothing: the page window says this project has no page named Index.html, because capital letters count; (d) nothing: links outside the project do not open in CodeShare."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r03-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r03-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does it mean that two pages are linked both ways? Name the link that does it in Step 3."
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "Why should link text say where the link goes instead of click here?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "A jeepney signboard names both ends of its route. How is Juan's navigation bar like it?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Write the href that opens each of Juan's pages: (a) his resume, (b) his projects, (c) his contact form; and (d) the element that groups the main links of a page. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r03-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "A Page in a Page and a Form with Labels: Frames and Fields",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the iframe attributes and the label, input, select and textarea fields with their type, name, id, for, required and placeholder attributes.",
+        "affective": "Ask visitors only for the data that is needed, with honest labels.",
+        "psychomotor": "Show Juan's contact page in a frame and build his labelled contact form."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** The pages are linked, but a reader must leave the projects page to reach the form, and the form asks only for a name."
+        },
+        {
+          "type": "definition",
+          "term": "Frames and form fields",
+          "markdown": "On an iframe, src names the page to show, title tells screen readers what it holds, and width and height set its size in pixels (300 by 150 if left out). In a form, a label's for matches the id of its box; name names the data; type=\"email\" expects an email address; required means the box may not be empty; placeholder is a hint inside the box; select holds a list of option choices; textarea is a box of several lines."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A barangay bulletin board pins a copy of a notice inside a frame. A barangay clearance request has labelled blanks, a list of purposes to choose from and a space for remarks."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "iframe attribute",
+            "In Step 5",
+            "What it does"
+          ],
+          "rows": [
+            [
+              "src",
+              "contact.html",
+              "Names the page to show inside"
+            ],
+            [
+              "title",
+              "Contact form of Juan Dela Cruz",
+              "Tells screen readers what the frame holds"
+            ],
+            [
+              "width, height",
+              "420, 360",
+              "Size in pixels; 300 by 150 if left out"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d3-s5",
+          "number": 5,
+          "instruction": "This step shows contact.html inside projects.html with an iframe. src names the page to show; title says what the frame holds; width and height set its size. Run it unchanged: the contact page appears in a box on the projects page.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home</li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home\nComic strip for Filipino class: Bayanihan in our barangay\nSend me a message",
+          "checkYourself": "Look for Contact Juan in the output: it is not there. The framed page's text belongs to contact.html, not to this page.",
+          "webChecks": [
+            {
+              "selector": "iframe",
+              "count": 1
+            },
+            {
+              "selector": "iframe",
+              "attribute": "title",
+              "value": "Contact form of Juan Dela Cruz"
+            },
+            {
+              "selector": "iframe",
+              "attribute": "width",
+              "value": "420"
+            },
+            {
+              "selector": "iframe",
+              "attribute": "height",
+              "value": "360"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r03-d3-s5-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nA frame shows a page inside a page; a link opens it on its own. In projects.html, on a new line after the iframe, add: <p><a href=\"contact.html\">Open the contact form on its own page</a></p>. Run code, then click the new link.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home\nComic strip for Filipino class: Bayanihan in our barangay\nSend me a message\nOpen the contact form on its own page"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Code",
+            "What it does",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "type=\"email\"",
+              "A box for an email address",
+              "Nothing"
+            ],
+            [
+              "required",
+              "The box may not be empty when the form is sent",
+              "Nothing"
+            ],
+            [
+              "placeholder=\"Type your name\"",
+              "A grey hint inside the box",
+              "Nothing"
+            ],
+            [
+              "`<select>` with `<option>`",
+              "A list of choices",
+              "Every option, one line each"
+            ],
+            [
+              "`<textarea rows=\"4\">` … `</textarea>`",
+              "A box of 4 lines",
+              "Nothing"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d3-s6",
+          "number": 6,
+          "instruction": "This step grows the form: Your name gets a placeholder and required; Your email is an email box; Topic is a select list of choices; Message is a textarea with 4 rows. Every box has a label whose for matches its id. Run it unchanged, then click each label in the page window: it puts the cursor in its box.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "Find School project and Art club in the output: every option of a select is page text. The placeholder is not.",
+          "webChecks": [
+            {
+              "selector": "input[type=\"email\"]",
+              "count": 1
+            },
+            {
+              "selector": "input[required]",
+              "count": 2
+            },
+            {
+              "selector": "input#visitor",
+              "attribute": "placeholder",
+              "value": "Type your name"
+            },
+            {
+              "selector": "label",
+              "count": 4
+            },
+            {
+              "selector": "label[for=\"message\"]",
+              "count": 1
+            },
+            {
+              "selector": "select#topic option",
+              "count": 2
+            },
+            {
+              "selector": "textarea",
+              "attribute": "rows",
+              "value": "4"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r03-d3-s6-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a third choice to the Topic list. In contact.html, after <option>Art club</option>, add: <option>Science fair</option>. Run code, then open the Topic list in the page window.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nScience fair\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: page text or not?** Sort these: a label, a placeholder, what a visitor types, a button's words, an option of a select, the text of a framed page, an iframe's title. Answers: page text: the label, the button's words and the option; not page text: the placeholder, the typed words, the framed page's text and the title."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r03-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r03-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do src, title, width and height do on an iframe?"
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 5, why is Contact Juan not in the projects page's output although it shows in the frame?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 6, every option of the Topic list is in the output, but the placeholder is not. Name two other things from Weeks 1 to 3 that are not page text."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r03-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Repair Juan's Links and Form, then Start Your Own",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Locate a missing quote and an unclosed textarea by comparing the output with the code.",
+        "affective": "Show patience and care when checking every quote and tag.",
+        "psychomotor": "Repair a broken link and a broken form, then begin the personal resume additions."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Browsers show no error for a missing quote or a missing closing tag: words just vanish from the page."
+        },
+        {
+          "type": "definition",
+          "term": "Repairing links and forms",
+          "markdown": "An attribute value runs from its opening quote to the next quote, so a missing quote swallows the code after it. A textarea needs its closing tag; until it is closed, everything after it becomes the box's text."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A text message that opens a quotation mark and never closes it makes everything after it look like part of the quote. A missing quote in HTML does the same."
+        },
+        {
+          "type": "note",
+          "markdown": "**Juan's finished Week 3 site:** index.html of Step 1, projects.html of Step 5 and contact.html of Step 6. Steps 7 and 8 break contact.html on purpose."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d4-s7",
+          "number": 7,
+          "instruction": "Broken on purpose: the Contact link in the navigation bar lost the closing quote of its href. Run it unchanged: Contact, the heading Contact Juan and the prototype sentence vanish, and Your name joins the navigation line.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html>Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Your name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "An attribute value runs to the next quote. Find where the href of Contact should end.",
+          "webChecks": [
+            {
+              "selector": "nav a",
+              "count": 3
+            },
+            {
+              "selector": "h1",
+              "count": 0
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r03-d4-s7-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the link: put back the closing quote, so the link reads <a href=\"contact.html\">Contact</a>. Run code. The heading and the sentence come back.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: the link is repaired, but the textarea lost its closing tag. Run it unchanged: the Send message button vanishes, because everything after an open textarea becomes the box's text.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\">\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage",
+          "checkYourself": "Open the page window: the message box holds the code that should come after it.",
+          "webChecks": [
+            {
+              "selector": "textarea",
+              "count": 1
+            },
+            {
+              "selector": "button",
+              "count": 0
+            },
+            {
+              "selector": "form",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r03-d4-s8-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the form: close the textarea right after its opening tag, so the line reads <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>. Run code. The Send message button comes back.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "A link's word and the heading after it vanish; the next words join the link's line.",
+              "means": "An href lost its closing quote.",
+              "fix": "Put the quote back: href=\"contact.html\">."
+            },
+            {
+              "see": "Everything after the message box vanishes.",
+              "means": "The textarea has no </textarea>.",
+              "fix": "Close it right after its opening tag."
+            },
+            {
+              "see": "The page window says: This project has no page named Projects.html.",
+              "means": "The href does not match the page's name exactly; capital letters count.",
+              "fix": "Copy the name exactly: projects.html."
+            },
+            {
+              "see": "Links outside this project do not open in CodeShare.",
+              "means": "The href leads to the internet.",
+              "fix": "In class, link only to the project's own pages."
+            },
+            {
+              "see": "What you typed in a box, or a placeholder, is not in the output.",
+              "means": "Typed words and placeholders are not page text.",
+              "fix": "Check the labels; the page checks look at the boxes."
+            },
+            {
+              "see": "The framed page's words are not in the output.",
+              "means": "A frame's page is a different page.",
+              "fix": "Run that page in its own step, or open it with a link."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what will the output show?** On contact.html, (a) remove the closing quote of href=\"index.html\"; (b) change for=\"message\" to for=\"mesage\"; (c) delete the closing textarea tag. Answers: (a) the first line becomes Projects | Contact; (b) the same output, but clicking Message no longer selects its box; (c) Send message disappears. Undo each change."
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r03-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r03-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do the two quotes around an attribute value mark?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, why did the heading Contact Juan vanish when only one quote was missing?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 8, an open textarea swallowed the button. How is this like Week 1's comment without -->?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r03-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 3: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the second page, the frame and the contact form of one's own resume.",
+        "affective": "Present one's own work honestly and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the resume with its linked pages, frame and form in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's site is finished, but your own resume still needs its second page, its frame and its contact form."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your site, visit every page with its links, type in your form and point to the code that makes each part. No new HTML today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A school open house: you walk visitors from room to room, show the posters in each, and hand out a sign-up sheet."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r03-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 3 site: index.html as in Step 1, projects.html as in Step 5 and contact.html as in Step 6. Run it, play its media and visit all three pages before you present. Friday adds no new HTML.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home</li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Start at Home and use only the links: can you reach every page, and come back?",
+          "webChecks": [
+            {
+              "selector": "nav a",
+              "count": 3
+            },
+            {
+              "selector": "img",
+              "count": 1
+            },
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "count": 1
+            },
+            {
+              "selector": "table",
+              "count": 2
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r03-d5-s9-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nBefore you present, add an honest note at the end of index.html, on a new line before </body>: <p>My contact form is a prototype: it sends nowhere and keeps no one's details.</p>. Run code. Then present your own resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMy contact form is a prototype: it sends nowhere and keeps no one's details.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r03-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r03-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to your second page's link back to index.html, your iframe's src and title, and one label's for with its matching id."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend one choice: why does your contact form send nowhere, and why is that safe for a class resume?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school library wants a page with a link to its rules page, the rules page shown in a frame, and a form with a labelled box for a book title. Write the a, the iframe and the form in HTML."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your Week 2 resume with this week's. What can a visitor do now that they could not before?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r03-pt",
+    "title": "My Resume, Week 3: Pages, Frame and Form",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your Week 2 resume carries forward: add this week's parts to it.\n\nAdd a second page and a contact page with ＋ (Create a new file): for example projects.html and contact.html. Link the pages with the same navigation bar, show contact.html in a frame on your second page, and build a contact form, following the requirements below. The form has no action: it is a prototype that sends nowhere, and the page says so.\n\nUse only safe details: no home address, phone number, birth date, ID numbers or personal social-media accounts. Run code until index.html runs with no error, visit every page with your links, then press Submit this version. Saving or running is not submitting. Pictures, sound and video stay online only (Media files).\n\nThursday: 0–60 minutes, repairs and the Thursday strip; 60–120 minutes, plan on paper, show the teacher, then start. Friday: 0–30 minutes, finish and run; 30–105 minutes, five-minute presentations; 105–120 minutes, Friday strip and Submit this version.",
+    "checklist": [
+      "Keep your Week 2 resume: name, introduction, lists, picture and table.",
+      "Add a second page (for example projects.html) with ＋ Create a new file, with its own title and h1.",
+      "Put the same nav of links at the top of every page: Home, your second page and Contact.",
+      "Check that index.html and your second page link both ways, and that every link text says where it goes.",
+      "On your second page, show contact.html in an iframe with a title, width and height.",
+      "On contact.html, build a form with at least two labelled boxes: each label's for matches its box's id, and each box has a name.",
+      "Make one box required, and add a Send message button.",
+      "Write on the page that the form is a prototype and sends nowhere; give the form no action.",
+      "No home address, phone number, birth date, ID numbers or social media.",
+      "Run code shows no error; visit every page with your links; press Submit this version, then present."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home</li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name</h1>\n  <img src=\"images/my_picture.jpg\" alt=\"Describe your picture here\" width=\"160\" height=\"160\">\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n  <h2>Education</h2>\n  <table>\n    <caption>My schools</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Write a level here</td>\n        <td>Write a school here</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Projects</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>My Projects</h1>\n  <ul>\n    <li>Write a school project here</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"My contact form\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Me</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Me</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" required>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your site (30 seconds).",
+      "Press Run code, then use only your links to visit every page (1 minute).",
+      "Click each label to show that it selects its box, and type in your form (2 minutes).",
+      "Point to one href, your iframe's src and title, and one label's for with its id (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "Which link leads back from your second page to index.html?",
+      "Why is the framed page's text not in your second page's output?",
+      "How does a label know which box it names?",
+      "Why does your form send nowhere, and what would a real form need?",
+      "Which details did you leave out of your resume to keep it safe?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Second page with its own title and h1",
+        "points": 6
+      },
+      {
+        "criterion": "Links both ways, the same navigation bar, clear link text",
+        "points": 10
+      },
+      {
+        "criterion": "Frame of the contact page with title, width and height",
+        "points": 8
+      },
+      {
+        "criterion": "Form: labels matched to ids, names, one required box, a button; sends nowhere",
+        "points": 12
+      },
+      {
+        "criterion": "Safe and honest personal details",
+        "points": 6
+      },
+      {
+        "criterion": "Presentation and explanation",
+        "points": 8
+      }
+    ],
+    "totalPoints": 50
+  }
+}

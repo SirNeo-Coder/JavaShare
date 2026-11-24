@@ -1,0 +1,1397 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 6,
+  "id": "dotnet-1-r06",
+  "title": "Self-Paced Module: Box Model, List and Link Styling",
+  "continues": "Week 5 — Text, font, colour, gradient and opacity",
+  "previousModuleId": "dotnet-1-r05",
+  "sampleFirst": true,
+  "starterFiles": [
+    {
+      "path": "index.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+    },
+    {
+      "path": "projects.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+    },
+    {
+      "path": "contact.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+    },
+    {
+      "path": "styles.css",
+      "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "dotnet-1-r06-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Every Element Is a Box: The Box Model, Lists and Links",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Name the four layers of the box model and what list-style-type and the link states change.",
+        "affective": "Value pages that give readers room and make every link easy to find.",
+        "psychomotor": "Space Juan's section headings and turn his navigation into a list in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Run every sample unchanged first, then do its small task. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample files into the editor tabs; **Run code** shows the step's run page in the page window and checks it, and its links open the project's other pages there. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks for the step's run page: the Tab title, the Visible page text, then, on Steps 1, 5 and 9, Media checks. Padding, borders, margins, bullets and link colours are not page text; page checks read them. CSS that puts words on one line or on separate lines (display) or changes letters (text-transform) changes the page text. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** Juan's finished Week 5 site (three pages and styles.css) carries forward in your module project. Each step loads its run page and every file it needs; boxes show only new or changed lines."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 6 starts here:** Juan's site has readable text and a gradient header, but his sections run into each other and his navigation is a plain line of blue links."
+        },
+        {
+          "type": "definition",
+          "term": "The box model, lists and links",
+          "markdown": "Every element is a box of four layers, inside out: content (words or a picture), padding (space inside the border), the border (a line around the padding) and margin (space outside, between boxes). A border needs a width, a style and a colour. list-style-type sets each list item's marker (disc, square, upper-roman or none). A link can be styled for each state: :link, :visited, :hover, :focus and :active."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A gift for the class Christmas party: the gift is the content, the crumpled paper around it is padding, the box is the border, and the space between boxes on the table is margin."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Layer, inside out",
+            "In Juan's h2 rule",
+            "It is",
+            "The page check reads"
+          ],
+          "rows": [
+            [
+              "Content",
+              "the heading's words",
+              "what the box holds",
+              "font-size 24px"
+            ],
+            [
+              "Padding",
+              "`padding-bottom: 0.25em;`",
+              "space inside the border",
+              "padding-bottom 6px"
+            ],
+            [
+              "Border",
+              "`border-bottom: 2px solid #8a1c55;`",
+              "a line around the padding",
+              "solid, rgb(138, 28, 85)"
+            ],
+            [
+              "Margin",
+              "`margin-top: 1.5em;`",
+              "space outside, between boxes",
+              "margin-top 36px"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Media steps:** Steps 1, 5 and 9 run index.html, with Juan's picture, sound and video, files your teacher adds under Media files. Online, CodeShare checks them automatically; Run code waits on Loading media… until they are on this device. Offline, these three steps show Checked by your teacher for now, and your teacher presses Mark done. The other steps run projects.html or contact.html and are checked automatically."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d1-s1",
+          "number": 1,
+          "instruction": "Juan's Week 5 site carries forward. Every element is a box: content, padding, border, margin. This step gives every h2 a 2px solid maroon line under it (border-bottom), room above that line (padding-bottom: 0.25em) and space above the heading (margin-top: 1.5em), so each section stands apart. Run it unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Spacing is not page text; the page checks read solid, maroon, 6px (0.25 × 24px) and 36px.",
+          "webChecks": [
+            {
+              "selector": "h2",
+              "style": "border-bottom-style",
+              "value": "solid"
+            },
+            {
+              "selector": "h2",
+              "style": "border-bottom-color",
+              "value": "rgb(138, 28, 85)"
+            },
+            {
+              "selector": "h2",
+              "style": "padding-bottom",
+              "value": "6px"
+            },
+            {
+              "selector": "h2",
+              "style": "margin-top",
+              "value": "36px"
+            },
+            {
+              "selector": "img",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r06-d1-s1-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nOne box rule spaces every section. In index.html, just before <h2>Sound greeting</h2>, add a new section: <h2>Volunteer work</h2> and <p>Tree planting with my school's science club.</p>. Run code: the new heading gets the same line and space, and both lines appear in the output.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nVolunteer work\nTree planting with my school's science club.\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Property",
+            "Example",
+            "It changes",
+            "Page text?"
+          ],
+          "rows": [
+            [
+              "list-style-type",
+              "`list-style-type: none;`",
+              "The marker: disc, circle, square, decimal, upper-roman, none",
+              "No: markers are not page text"
+            ],
+            [
+              "list-style-position",
+              "`list-style-position: inside;`",
+              "Marker inside or outside the box",
+              "No"
+            ],
+            [
+              "display on li",
+              "`display: inline;`",
+              "Puts list items on one line",
+              "Yes: the line breaks change"
+            ],
+            [
+              "color on a:link",
+              "`color: #13305c;`",
+              "A link's colour",
+              "No"
+            ],
+            [
+              "text-decoration",
+              "`text-decoration: none;`",
+              "Removes the underline",
+              "No"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d1-s2",
+          "number": 2,
+          "instruction": "A navigation bar is a list of links. This step turns Juan's nav into a ul with one li per link on all three pages, and a nav ul rule removes the bullets (list-style-type: none) and the list's indent (margin: 0; padding: 0;). nav ul is a descendant selector: a ul inside nav. Run projects.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message",
+          "checkYourself": "HOME, PROJECTS and CONTACT now stand on three lines: list items are blocks. The bullets are gone, but bullets were never page text.",
+          "webChecks": [
+            {
+              "selector": "nav li",
+              "count": 3
+            },
+            {
+              "selector": "nav ul",
+              "style": "list-style-type",
+              "value": "none"
+            },
+            {
+              "selector": "nav ul",
+              "style": "padding-left",
+              "value": "0px"
+            },
+            {
+              "selector": "nav li",
+              "style": "display",
+              "value": "list-item"
+            },
+            {
+              "selector": "nav a",
+              "style": "color",
+              "value": "rgb(0, 0, 238)"
+            },
+            {
+              "selector": "iframe",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r06-d1-s2-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nPut the list on one line. In styles.css, after the nav ul rule, add a new rule: nav li { display: inline; }. Run code: HOME PROJECTS CONTACT is one line again, now made from a list.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Try this in Step 1, then undo it",
+            "In the page window",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "Change `solid` to `dashed`",
+              "A dashed line under each heading",
+              "The same"
+            ],
+            [
+              "Delete `solid` (2px #8a1c55 is left)",
+              "No line at all: no style, no border",
+              "The same"
+            ],
+            [
+              "Change `0.25em` to `1em`",
+              "More room between heading and line",
+              "The same"
+            ],
+            [
+              "Change `1.5em` to `0`",
+              "Headings move up close to the text above",
+              "The same"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what does the page check read?** On Juan's 24px h2: (a) padding-bottom: 0.5em; (b) margin-top: 1em; (c) the border-bottom-style of border-bottom: 3px dotted #8a1c55; (d) the border-bottom-style of border-bottom: 2px #8a1c55. Answers: (a) 12px; (b) 24px; (c) dotted; (d) none: a border with no style shows nothing."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r06-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r06-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "Name the four layers of the box model, from the inside out."
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, every h2 got a border, padding and margin, but the output stayed the same. Why?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Week 3, Juan's nav was one line with | between the links. In Step 2 it became three lines. Why?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r06-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Room to Breathe: Padding, Borders, Margins and box-sizing",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain padding, border and margin values in em and px, and what box-sizing: border-box does to a width.",
+        "affective": "Appreciate tidy spacing that helps classmates read and fill in forms.",
+        "psychomotor": "Put Juan's nav on one line and give his badges, frame and form boxes padding, borders and margins."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's headings have room and his navigation is a list, but each link sits on its own line, and his badges, frame and form boxes use the browser's plain spacing."
+        },
+        {
+          "type": "definition",
+          "term": "Padding, borders, margins and box-sizing",
+          "markdown": "One value sets all four sides; two values set top and bottom, then left and right; four go clockwise from the top. padding-bottom or margin-top sets one side. border-style can be solid, dashed or dotted; a border with no style shows nothing. width sets the content's width, so padding and border are added to it, unless box-sizing: border-box counts them inside. Page checks read every size in px: 0.25em of a 24px heading is 6px."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Seats in a jeepney: each passenger (content) has a little room on the seat (padding), the seat's edge is the border, and the space between two passengers is margin, the wider of what each one wants, not both added."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "You write",
+            "It means",
+            "The page check reads"
+          ],
+          "rows": [
+            [
+              "`padding: 0.25em 0.5em;` on a 12px badge",
+              "top and bottom 0.25em, left and right 0.5em",
+              "padding-top 3px, padding-left 6px"
+            ],
+            [
+              "`margin: 1em 0;` on 16px text",
+              "top and bottom 1em, left and right 0",
+              "margin-top 16px, margin-left 0px"
+            ],
+            [
+              "`border: 2px solid #13305c;`",
+              "the same line on all four sides",
+              "border-top-style solid, border-top-color rgb(19, 48, 92)"
+            ],
+            [
+              "`box-sizing: border-box; width: 300px; padding: 4px;`",
+              "300px wide, padding and border inside",
+              "width 300px, box-sizing border-box"
+            ],
+            [
+              "`width: 50%;`",
+              "half the space it sits in",
+              "a px value that changes with the window"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d2-s3",
+          "number": 3,
+          "instruction": "display: inline-block keeps the nav items on one line, and margin-right puts 0.5em after each. The badges get padding (0.25em top and bottom, 0.5em left and right) and a 1px orange border; the frame gets a solid navy border instead of the browser's grey one, with space above it. Run it unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message",
+          "checkYourself": "Only the nav line changed in the output. The badges' 12px text makes 0.25em only 3px.",
+          "webChecks": [
+            {
+              "selector": "nav li",
+              "style": "display",
+              "value": "inline-block"
+            },
+            {
+              "selector": "nav li",
+              "style": "margin-right",
+              "value": "8px"
+            },
+            {
+              "selector": ".badge",
+              "style": "padding-top",
+              "value": "3px"
+            },
+            {
+              "selector": ".badge",
+              "style": "padding-left",
+              "value": "6px"
+            },
+            {
+              "selector": ".badge",
+              "style": "border-top-style",
+              "value": "solid"
+            },
+            {
+              "selector": "iframe",
+              "style": "border-top-style",
+              "value": "solid"
+            },
+            {
+              "selector": "iframe",
+              "style": "border-top-color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "iframe",
+              "style": "margin-top",
+              "value": "8px"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r06-d2-s3-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nWrite a box of your own. In projects.html, after the projects list's closing </ul>, add <p class=\"note\">Each project took about two weeks.</p>. At the end of styles.css, add a .note rule with three declarations: border: 1px solid #13305c; padding: 0.5em; margin: 1em 0;. Run code: the sentence sits in a navy box and appears in the output.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nEach project took about two weeks.\nSend me a message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d2-s4",
+          "number": 4,
+          "instruction": "width sets the width of a box's content, so padding and border usually make it wider. box-sizing: border-box counts the padding and the border inside the width: every form box is exactly 300px wide, with 4px of padding and a grey border. A comma lists several selectors for one rule. Run contact.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "Without box-sizing: border-box the boxes would be 310px wide (300 + 4 + 4 + 1 + 1), but the width check still reads 300px; so the page check reads box-sizing itself.",
+          "webChecks": [
+            {
+              "selector": "input",
+              "style": "box-sizing",
+              "value": "border-box"
+            },
+            {
+              "selector": "textarea",
+              "style": "box-sizing",
+              "value": "border-box"
+            },
+            {
+              "selector": "input",
+              "style": "width",
+              "value": "300px"
+            },
+            {
+              "selector": "input",
+              "style": "padding-top",
+              "value": "4px"
+            },
+            {
+              "selector": "input",
+              "style": "border-top-color",
+              "value": "rgb(85, 85, 85)"
+            },
+            {
+              "selector": "label",
+              "count": 4
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r06-d2-s4-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nOne rule sizes every box. In contact.html, after the paragraph with the email box, add a new paragraph: <p><label for=\"school\">Your school</label><br><input type=\"text\" id=\"school\" name=\"school\"></p>. Run code: Your school appears in the output, and its box is 300px wide like the others.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nYour school\nTopic\nSchool project\nArt club\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**Sizes that follow the window or the zoom:** a % width or margin: auto turns into px from the window's size, which differs between screens. The page window also follows your text-size setting, and a border is drawn in whole screen dots, so 2px can read 1.74px. Page checks never read a border's width."
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: margins between two boxes.** A list with margin-bottom: 20px sits above a heading with margin-top: 30px. How much space is between them? Answer: 30px, not 50px: top and bottom margins that meet become one, the larger. Padding never does this."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r06-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r06-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is the difference between padding and margin?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 4, why is each form box exactly 300px wide with box-sizing: border-box, and 310px without it?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 3, padding: 0.25em on the 12px badges reads 3px. How is this like Week 5's 1.1em label reading 17.6px?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Name the property for (a) space inside the border; (b) space outside the border; (c) the bullet of a list item; (d) a width that includes padding and border. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r06-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Bullets and Link States: Styling Lists and Links",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe list-style-type, list-style-position and the order of the link states :link, :visited, :hover, :active.",
+        "affective": "Respect keyboard and mouse users alike by making focus as visible as hover.",
+        "psychomotor": "Style Juan's skill lists and links, with link colours that reach 4.5:1."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's sections and boxes are spaced, but his lists use the browser's plain bullets and numbers, and his links are still browser blue."
+        },
+        {
+          "type": "definition",
+          "term": "List and link styling",
+          "markdown": "list-style-type: none removes bullets; list-style-position: inside puts the marker inside the box. A CSS list style beats a list's type attribute. Write link states in the order :link, :visited, :focus, :hover, :active (LoVe Fears HAte); Juan writes :focus together with :hover, so keyboard users see it too. A more specific selector wins: nav a:link beats a:link."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A mall directory: the shops are a list, a pointer lights up the shop under your finger like :hover, and shops you already visited could be ticked like :visited."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "State, in this order",
+            "Juan's rule (body links)",
+            "When it applies",
+            "Can a page check see it?"
+          ],
+          "rows": [
+            [
+              ":link",
+              "`color: #13305c;`",
+              "a link not visited yet",
+              "Yes: checks read this style"
+            ],
+            [
+              ":visited",
+              "`color: #551a8b;`",
+              "a page already visited",
+              "No: browsers hide it for privacy"
+            ],
+            [
+              ":hover, :focus",
+              "`background-color: #fff3c4;`",
+              "under the mouse; reached with Tab",
+              "No: a check has no mouse"
+            ],
+            [
+              ":active",
+              "`color: #8a1c55;`",
+              "while it is being clicked",
+              "No"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d3-s5",
+          "number": 5,
+          "instruction": "List properties change each item's marker. The Skills list gets class=\"skills\": square bullets inside the box, no indent. The next-skills list gets class=\"next\": Roman numbers, so its reversed count reads III, II, I. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "The output did not change: bullets and numbers are not page text. Goals this term keeps its A and B: its type=\"A\" still works.",
+          "webChecks": [
+            {
+              "selector": ".skills",
+              "style": "list-style-type",
+              "value": "square"
+            },
+            {
+              "selector": ".skills",
+              "style": "list-style-position",
+              "value": "inside"
+            },
+            {
+              "selector": ".skills",
+              "style": "padding-left",
+              "value": "0px"
+            },
+            {
+              "selector": ".next",
+              "style": "list-style-type",
+              "value": "upper-roman"
+            },
+            {
+              "selector": "ol[type]",
+              "style": "list-style-type",
+              "value": "upper-alpha"
+            },
+            {
+              "selector": "img",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r06-d3-s5-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nThe class reaches every item. In index.html, at the end of the Skills list, after Making slide presentations, add <li>Spacing pages with CSS</li>. Run code: the new skill has a square bullet and appears in the output.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nSpacing pages with CSS\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d3-s6",
+          "number": 6,
+          "instruction": "A link has states: :link (not visited yet), :visited, :hover (mouse), :focus (Tab key) and :active (being clicked). Write them in this order: a later rule wins. Juan's links are navy; nav links are white on navy and turn maroon under the mouse or keyboard. projects.html gets a link to the full contact page. Run it unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "Hover over a nav link in the page window: it turns maroon. The page checks read only the plain link style; no check can see :hover or :visited.",
+          "webChecks": [
+            {
+              "selector": "nav a",
+              "style": "color",
+              "value": "rgb(255, 255, 255)"
+            },
+            {
+              "selector": "nav a",
+              "style": "background-color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "nav a",
+              "style": "padding-left",
+              "value": "12px"
+            },
+            {
+              "selector": "nav a",
+              "style": "text-decoration-line",
+              "value": "none"
+            },
+            {
+              "selector": "p a",
+              "style": "color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "p a",
+              "style": "text-decoration-line",
+              "value": "underline"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r06-d3-s6-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nMake a button-like link. In projects.html, just before </body>, add <p class=\"more\"><a href=\"index.html\">Back to my resume</a></p>. At the end of styles.css, add a rule for .more a:link, .more a:visited with color: #ffffff; background-color: #8a1c55; padding: 0.25em 0.5em; text-decoration: none;. Run code: Back to my resume appears, white on maroon (8.8:1).",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message\nPrefer a full page? Open the contact form.\nBack to my resume"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: page text or not?** (a) .skills { list-style-type: decimal; }; (b) nav li { display: block; }; (c) nav a:visited { color: #551a8b; } on the navy bar; (d) the three li tags typed on one line with no spaces. Answers: (a) not page text: numbers never are; (b) page text: the nav falls onto three lines; (c) not page text, and purple on navy is 1.1:1, unreadable; (d) page text: HOMEPROJECTSCONTACT."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r06-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r06-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "Name the four link states in the order they must be written."
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 5, the Skills list has square bullets, but the output does not show them. Why?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 6, nav a:link beats a:link. Which Week 4 idea about selectors explains it?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r06-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "When the Spacing Breaks: Spacing Repairs, then Start Your Own",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Locate a missing semicolon or brace and an invalid spacing value in a stylesheet.",
+        "affective": "Show patience and care when a whole layout breaks because of one character.",
+        "psychomotor": "Repair Juan's nav bar and broken h2 rule, then begin the personal spacing, lists and links."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Browsers show no error for broken CSS: one missing character can pull a nav bar apart or switch off every rule after it."
+        },
+        {
+          "type": "definition",
+          "term": "Spacing repairs",
+          "markdown": "A browser skips a value it cannot read and shows no error: a number with no unit (padding: 10), a space before the unit (1.5 em), a misspelt property (pading) or a negative padding. A missing ; skips that declaration and the next one; a missing } switches off every rule after it. When two top and bottom margins meet, only the larger one counts."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A row of jeepney seats held by one bolt: lose the bolt (one ; or }) and the whole row slides off its rail."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Text on background (Juan's site)",
+            "Ratio",
+            "Needs"
+          ],
+          "rows": [
+            [
+              "Juan's name (h1), white on the gradient",
+              "8.8:1",
+              "3:1 (large)"
+            ],
+            [
+              "Body text and list items",
+              "15.9:1",
+              "4.5:1"
+            ],
+            [
+              "Paragraphs and labels",
+              "12.6:1",
+              "4.5:1"
+            ],
+            [
+              "h2 headings, maroon",
+              "8.8:1",
+              "3:1 (large)"
+            ],
+            [
+              "My motto heading, green (inline)",
+              "5.1:1",
+              "3:1 (large)"
+            ],
+            [
+              "Form note, red",
+              "8.1:1",
+              "4.5:1"
+            ],
+            [
+              "Badges on their yellow gradient",
+              "12.3:1",
+              "4.5:1"
+            ],
+            [
+              "Small print at opacity 0.75",
+              "5.7:1",
+              "4.5:1"
+            ],
+            [
+              "Nav links, white on navy",
+              "13.0:1",
+              "4.5:1"
+            ],
+            [
+              "Nav links under the mouse or keyboard, white on maroon",
+              "8.8:1",
+              "4.5:1"
+            ],
+            [
+              "Links, navy",
+              "13.0:1",
+              "4.5:1"
+            ],
+            [
+              "Visited links, purple",
+              "11.0:1",
+              "4.5:1"
+            ],
+            [
+              "Links under the mouse, navy on light yellow",
+              "11.7:1",
+              "4.5:1"
+            ],
+            [
+              "Visited links under the mouse, purple on light yellow",
+              "9.9:1",
+              "4.5:1"
+            ],
+            [
+              "Links being clicked, maroon on light yellow",
+              "7.9:1",
+              "4.5:1"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Pick from these: link colour",
+            "Background",
+            "Ratio",
+            "Normal text?"
+          ],
+          "rows": [
+            [
+              "`#ffffff`",
+              "`#13305c`",
+              "13.0:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#8a1c55`",
+              "8.8:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#2e7d32`",
+              "5.1:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#b45309`",
+              "5.0:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#222222`",
+              "15.9:1",
+              "Yes"
+            ],
+            [
+              "`#13305c`",
+              "`#ffffff`",
+              "13.0:1",
+              "Yes"
+            ],
+            [
+              "`#8a1c55`",
+              "`#ffffff`",
+              "8.8:1",
+              "Yes"
+            ],
+            [
+              "`#551a8b`",
+              "`#ffffff`",
+              "11.0:1",
+              "Yes"
+            ],
+            [
+              "`#0000ee`",
+              "`#ffffff`",
+              "9.3:1",
+              "Yes"
+            ],
+            [
+              "`#13305c`",
+              "`#fff3c4`",
+              "11.7:1",
+              "Yes"
+            ],
+            [
+              "`#551a8b`",
+              "`#fff3c4`",
+              "9.8:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#888888`",
+              "3.5:1",
+              "Large text only"
+            ],
+            [
+              "`#ffcc00`",
+              "`#ffffff`",
+              "1.5:1",
+              "No"
+            ],
+            [
+              "`#551a8b`",
+              "`#13305c`",
+              "1.1:1",
+              "No"
+            ],
+            [
+              "`#0000ee`",
+              "`#13305c`",
+              "1.3:1",
+              "No"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d4-s7",
+          "number": 7,
+          "instruction": "Broken on purpose: the nav li rule lost the semicolon after margin-right: 0.5em. The browser reads margin-right: 0.5em display: inline-block as one value it cannot use and skips both. Run it unchanged: the nav bar falls onto three lines.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "The page check finds display: list-item and no margin. One character moved three words.",
+          "webChecks": [
+            {
+              "selector": "nav li",
+              "style": "display",
+              "value": "list-item"
+            },
+            {
+              "selector": "nav li",
+              "style": "margin-right",
+              "value": "0px"
+            },
+            {
+              "selector": "nav a",
+              "style": "background-color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "nav ul",
+              "style": "list-style-type",
+              "value": "none"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r06-d4-s7-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the nav bar: put back the semicolon, so the line reads margin-right: 0.5em;. Run code: HOME PROJECTS CONTACT is one line again.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message\nPrefer a full page? Open the contact form."
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: the h2 rule lost its closing }. contact.html has no h2, but every rule after h2 is now read inside it, so none of them works: the nav loses its capitals, bullets and bar, the labels are plain and the boxes lose their size. Run contact.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome\nProjects\nContact\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "Home, Projects and Contact are back in small letters on three lines: the nav rules after h2 stopped.",
+          "webChecks": [
+            {
+              "selector": "nav",
+              "style": "text-transform",
+              "value": "none"
+            },
+            {
+              "selector": "nav ul",
+              "style": "list-style-type",
+              "value": "disc"
+            },
+            {
+              "selector": "label",
+              "style": "font-weight",
+              "value": "400"
+            },
+            {
+              "selector": "input",
+              "style": "box-sizing",
+              "value": "content-box"
+            },
+            {
+              "selector": "h1",
+              "style": "text-transform",
+              "value": "uppercase"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r06-d4-s8-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nClose the rule: after margin-top: 1.5em; in the h2 rule, put back the }. Run code: the nav reads HOME PROJECTS CONTACT on one line, and the labels and boxes are styled again.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "A padding, margin or border you wrote has no effect.",
+              "means": "The value is invalid, so the whole declaration is skipped: a number with no unit (padding: 10), a space before the unit (1.5 em), a misspelt property (pading) or a negative padding.",
+              "fix": "Write the unit right after the number (10px, 1.5em) and spell the property exactly; padding is never negative."
+            },
+            {
+              "see": "A border does not show.",
+              "means": "It has no style: border: 2px #13305c; reads style none.",
+              "fix": "Add a style: border: 2px solid #13305c;."
+            },
+            {
+              "see": "The nav bar falls onto three lines.",
+              "means": "display was skipped: the ; before it is missing, or display is misspelt.",
+              "fix": "End every declaration with ;: margin-right: 0.5em;."
+            },
+            {
+              "see": "Every rule after one point stops: the nav loses its capitals and its bullets come back.",
+              "means": "A } is missing, so the rest of the file is read inside that rule.",
+              "fix": "Close every rule with } before the next selector."
+            },
+            {
+              "see": "The nav words run together: HOMEPROJECTSCONTACT.",
+              "means": "The li tags are typed on one line with no space between them.",
+              "fix": "Put each li on its own line."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what will the page window show?** In styles.css, (a) write padding: 10 in the .badge rule; (b) misspell margin-right as margn-right in the nav li rule; (c) write margin-top: 1.5 em in the h2 rule. Answers: each value is skipped with no error: (a) the badges lose their padding; (b) the nav items touch; (c) the headings get the browser's own top margin. The output is the same. Undo each change."
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r06-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r06-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does a browser do with padding: 10 or pading: 10px?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, why did the nav bar fall onto three lines when only one ; was missing?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 8, a missing } in the h2 rule broke contact.html, which has no h2. How is it like Week 5's missing )?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r06-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 6: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the spacing, lists and links of one's own resume.",
+        "affective": "Present one's own work honestly and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the resume with spaced sections, a styled list and a nav bar in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's site is spaced and his nav bar works; your own resume still needs its own spacing, lists and links."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your site, visit every page with your nav bar, point to your padding, border and margin, your list styles and your link states, and show the contrast of your link colours from the chart. No new HTML or CSS today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A barangay fiesta booth: the judges first check that every sign can be read and every path leads somewhere, then look at the decorations."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r06-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 6 site: the pages as in Step 6 (index.html as in Step 5) and styles.css as in Step 6. Run it, play its media and visit all three pages with the nav bar before you present. Friday adds no new HTML or CSS.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Visit every page with the nav bar: does every section have room, and can you read every link?",
+          "webChecks": [
+            {
+              "selector": "h2",
+              "style": "border-bottom-style",
+              "value": "solid"
+            },
+            {
+              "selector": "nav li",
+              "style": "display",
+              "value": "inline-block"
+            },
+            {
+              "selector": "nav a",
+              "style": "color",
+              "value": "rgb(255, 255, 255)"
+            },
+            {
+              "selector": ".skills",
+              "style": "list-style-type",
+              "value": "square"
+            },
+            {
+              "selector": "img",
+              "count": 1
+            },
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r06-d5-s9-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nBefore you present, add one more link. In index.html, after the video element, add <p>Questions? <a href=\"contact.html\">Send me a message</a>.</p>. Run code: the sentence ends the page with a navy link that opens contact.html in the page window. Then present your own resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nQuestions? Send me a message.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r06-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r06-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to one padding, one border and one margin in your styles.css, your nav list rules and your link state rules."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend your link colours: how do you know every visitor can read them in every state?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school library wants a page with a nav bar of three links and a book list with square bullets. Write its nav ul, nav li and nav a:link rules and name the colour pair you would check."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Which change this week made your resume easiest to move around in, and how do you know?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r06-pt",
+    "title": "My Resume, Week 6: Spaced Sections, Styled Lists and a Nav Bar",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your Week 5 site carries forward: change your nav into a list on every page and add this week's rules to your own styles.css.\n\nGive your sections padding, a border and margins; give one box with a width box-sizing: border-box; turn your nav into a list of links on one line; style your skills list; write link states in order with colours from the contrast chart. Use only fonts and colours already on the computer: nothing named in url().\n\nUse only safe details: no home address, phone number, birth date, ID numbers or personal social-media accounts. Run code until index.html runs with no error, visit every page with your nav bar, then press Submit this version. Saving or running is not submitting. Pictures, sound and video stay online only (Media files).\n\nThursday: 0–60 minutes, repairs and the Thursday strip; 60–120 minutes, plan on paper, show the teacher, then start. Friday: 0–30 minutes, finish and run; 30–105 minutes, five-minute presentations; 105–120 minutes, Friday strip and Submit this version.",
+    "checklist": [
+      "Keep your Week 5 site: every page, the frame, the form and styles.css linked from every page.",
+      "Give your section headings (or other boxes) padding, a border with a width, style and colour, and a margin.",
+      "Give one box that has a width box-sizing: border-box.",
+      "Turn your nav into a ul of links on every page, each li on its own line in the code.",
+      "Remove the nav list's bullets and indent, and put its items on one line with display: inline-block.",
+      "Style your skills list with list-style-type (list-style-position if you like).",
+      "Write link states in order: :link, :visited, then :hover with :focus, then :active.",
+      "Choose link colours from the chart: 4.5:1 or more in every state, also on your nav bar's background.",
+      "Only fonts and colours already on the computer; nothing in url(). No address, phone, birth date, ID numbers or social media.",
+      "Run code shows no error; visit every page with your nav bar; press Submit this version, then present."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name</h1>\n  <img src=\"images/my_picture.jpg\" alt=\"Describe your picture here\" width=\"160\" height=\"160\">\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n  <h2>Education</h2>\n  <table>\n    <caption>My schools</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Write a level here</td>\n        <td>Write a school here</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Projects</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>My Projects</h1>\n  <ul>\n    <li>Write a school project here</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"My contact form\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Me</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Me</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" required>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* My resume: one stylesheet for all my pages */\n\n/* Text: a font list ending in a generic family, space between lines, dark grey text */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: #222222;\n}\n\n/* Element selector: every h1, a gradient header with white text (8.8:1 or more) */\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n}\n\n/* Class selector: every element with class=\"highlight\" */\n.highlight {\n  background-color: #fff3c4;\n}\n\n/* ID selector: only the element with id=\"about\" */\n#about {\n  font-style: italic;\n}\n\n/* Box model: room and a line under every section heading */\nh2 {\n  border-bottom: 2px solid #13305c;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\n\n/* Lists: the nav list with no bullets and no indent, its items on one line */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Lists: square bullets for my skills */\n.skills {\n  list-style-type: square;\n}\n\n/* Links in nav, in state order: white on navy (13.0:1), maroon under the mouse or the keyboard (8.8:1) */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your site (30 seconds).",
+      "Press Run code and visit every page with your nav bar (1 minute).",
+      "Change one padding, border or margin in styles.css, run again and show the change; then undo it (2 minutes).",
+      "Point to your box rules, your nav list rules and your link states (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "What is the difference between padding and margin?",
+      "Why are spacing and bullets not in the output?",
+      "Why must :link and :visited come before :hover?",
+      "How do you know your link colours can be read in every state?",
+      "Which details did you leave out of your resume to keep it safe?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Padding, a full border and margins on sections",
+        "points": 10
+      },
+      {
+        "criterion": "box-sizing on a box with a width",
+        "points": 4
+      },
+      {
+        "criterion": "A nav bar made from a list on every page",
+        "points": 8
+      },
+      {
+        "criterion": "A styled skills list",
+        "points": 6
+      },
+      {
+        "criterion": "Link states in order, colours at 4.5:1",
+        "points": 10
+      },
+      {
+        "criterion": "Safe and honest personal details",
+        "points": 6
+      },
+      {
+        "criterion": "Presentation: explains spacing, lists and links",
+        "points": 6
+      }
+    ],
+    "totalPoints": 50
+  }
+}

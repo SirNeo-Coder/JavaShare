@@ -1,0 +1,110 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Week 08 practice tasks</title><link rel="stylesheet" href="tasks.css"></head><body class="r3 r7"><div class="page"><div class="grid"><section class="task"><h3>My presentation notes (Friday)</h3><table class="t"><tr><th>Part</th><th>What I will say or show</th></tr><tr><td>Introduce (30 s)</td><td class="write"></td></tr><tr><td>Run code, mouse over, then Tab (1 min)</td><td class="write"></td></tr><tr><td>Change a pseudo-class or pseudo-element (2 min)</td><td class="write"></td></tr><tr><td>Point to my hover, focus and pseudo-element rules (1 min)</td><td class="write"></td></tr><tr><td>Question (30 s)</td><td class="write"></td></tr></table></section><section class="task"><h3>Colour pairs checked for contrast (pick from these)</h3><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:0"><div><table class="t"><tr><th>Pick from these: text colour</th><th>Background</th><th>Ratio</th><th>Normal text?</th></tr><tr><td>#222222</td><td>#fff3c4</td><td>14.2:1</td><td>Yes</td></tr><tr><td>#13305c</td><td>#fff3c4</td><td>11.7:1</td><td>Yes</td></tr><tr><td>#8a1c55</td><td>#fff3c4</td><td>7.9:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#8a1c55</td><td>8.8:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#13305c</td><td>13.0:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#2e7d32</td><td>5.1:1</td><td>Yes</td></tr></table></div><div><table class="t"><tr><th>Pick from these: text colour</th><th>Background</th><th>Ratio</th><th>Normal text?</th></tr><tr><td>#2e7d32</td><td>#ffffff</td><td>5.1:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#b45309</td><td>5.0:1</td><td>Yes</td></tr><tr><td>#222222</td><td>#ffe08a</td><td>12.3:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#555555</td><td>7.4:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#888888</td><td>3.5:1</td><td>Large text only</td></tr><tr><td>#ffcc00</td><td>#ffffff</td><td>1.5:1</td><td>No</td></tr></table></div></div></section><section class="task"><h3>Starter stylesheet (only for a student with no Week 7 work)</h3><p class="small"><b>styles.css</b></p><pre class="out" style="column-count:2;column-gap:10pt">/* My resume: one stylesheet for all my pages */
+
+/* Text: a font list ending in a generic family, space between lines, dark grey text */
+body {
+  font-family: Verdana, Tahoma, sans-serif;
+  line-height: 1.5;
+  color: #222222;
+}
+
+/* Element selector: every h1, a gradient header with white text (8.8:1 or more) */
+h1 {
+  font-family: Georgia, &quot;Times New Roman&quot;, serif;
+  color: #ffffff;
+  background-image: linear-gradient(to right, #13305c, #8a1c55);
+  text-align: center;
+}
+
+/* Class selector: every element with class=&quot;highlight&quot; */
+.highlight {
+  background-color: #fff3c4;
+}
+
+/* ID selector: only the element with id=&quot;about&quot; */
+#about {
+  font-style: italic;
+}
+
+/* Box model: room and a line under every section heading */
+h2 {
+  border-bottom: 2px solid #13305c;
+  padding-bottom: 0.25em;
+  margin-top: 1.5em;
+}
+
+/* Lists: the nav list with no bullets and no indent, its items on one line */
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+nav li {
+  margin-right: 0.5em;
+  display: inline-block;
+}
+
+/* Lists: square bullets for my skills */
+.skills {
+  list-style-type: square;
+}
+
+/* Links in nav, in state order: white on navy (13.0:1), maroon under the mouse or the keyboard (8.8:1) */
+nav a:link, nav a:visited {
+  color: #ffffff;
+  background-color: #13305c;
+  padding: 0.25em 0.75em;
+  text-decoration: none;
+}
+nav a:hover, nav a:focus {
+  background-color: #8a1c55;
+}
+
+/* Position: my h1 is the reference box; the ribbon sits in its top-right corner, above it (14.2:1) */
+h1 {
+  position: relative;
+}
+.ribbon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  padding: 0 0.5em;
+  font-size: 12px;
+  color: #222222;
+  background-color: #fff3c4;
+}
+
+/* Float: my gallery&#x27;s figures side by side, each picture the same size; every section starts below them */
+.gallery figure {
+  float: left;
+  width: 170px;
+  margin: 0 12px 12px 0;
+}
+.gallery img {
+  width: 160px;
+  height: 110px;
+}
+.gallery figcaption {
+  text-align: center;
+}
+h2 {
+  clear: both;
+}
+
+/* Hover and focus: my links turn light yellow under the mouse and the keyboard alike; the keyboard also gets an outline (8.8:1) */
+a:hover, a:focus {
+  background-color: #fff3c4;
+}
+a:focus-visible {
+  outline: 3px solid #8a1c55;
+  outline-offset: 2px;
+}
+
+/* A pseudo-class: my first skill in bold. A pseudo-element: a star before each section heading (decoration only) */
+.skills li:first-child {
+  font-weight: bold;
+}
+h2::before {
+  content: &quot;★ &quot;;
+}
+</pre></section></div><div class="foot">.NET 1 · Week 08 · Practice tasks · Page 13 · Keep this page with your module</div></div></body></html>

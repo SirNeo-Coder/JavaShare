@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     ".open-next/**",
     ".wrangler/**",
     "next-env.d.ts",
+    // The teacher's module files and checker tools, not CodeShare's own code (teacher, 2026-11-24).
+    "docs/modules/**",
   ]),
 ]);
 

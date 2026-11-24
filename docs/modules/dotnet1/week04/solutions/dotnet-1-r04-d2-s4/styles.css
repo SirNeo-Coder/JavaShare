@@ -1,0 +1,17 @@
+/* Juan Dela Cruz's resume: one stylesheet for all three pages */
+
+/* Element selectors: every body, h1, h2 and nav */
+body {
+  font-family: Georgia, serif;
+}
+h1 {
+  color: #13305c;
+  text-transform: uppercase;
+}
+h2 {
+  color: #8a1c55;
+}
+nav {
+  font-weight: bold;
+  text-transform: uppercase;
+}

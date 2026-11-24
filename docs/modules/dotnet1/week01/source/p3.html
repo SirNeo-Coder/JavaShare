@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"><title>Week 1 page 3</title></head><body><main class="page p3"><h2><span class="day">TUESDAY</span> Format Juan's Introduction: Paragraph Formatting Elements</h2><div class="objectives"><p><b>Know:</b> Explain how b, strong, i, em, mark, small, sub, sup, br, hr and pre change a page and its page text.</p><p><b>Value:</b> Value clear and honest wording when describing one's own skills.</p><p><b>Do:</b> Format Juan's introduction, motto and club schedule, then add one formatted line.</p></div><div class="text"><b>Today's starting point:</b> Monday's page cannot keep a line break or extra spaces: a three-line motto and a lined-up schedule run together.</div><div class="text"><b>Paragraph formatting elements.</b> Inside a paragraph, strong marks important words and em stresses words; b and i set words apart without extra importance; mark highlights; small is for side comments; sub and sup lower or raise characters. br breaks a line, hr marks a change of topic, and pre keeps spaces and line breaks exactly as typed.</div><div class="analogy"><b>ANALOGY</b> A teacher's red pen marks what matters in an essay without changing the words. Formatting elements mark words the same way.</div><div class="cols"><div><section data-step="dotnet-1-r01-d2-s3"><h3>STEP 3 · index.html</h3><p class="instruction">Juan's introduction gets more formatting: sup, sub, b, i, mark and small. Run the sample unchanged, then find the words of each element in the output.</p><pre class="code" data-code="dotnet-1-r01-d2-s3" data-kind="full">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Resume of Juan Dela Cruz&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Juan Dela Cruz&lt;/h1&gt;
+  &lt;!-- Add my photo here in Week 2 --&gt;
+  &lt;p&gt;Hello! I am &lt;strong&gt;Juan Dela Cruz&lt;/strong&gt;,
+  a senior high school student in the &lt;em&gt;ICT strand&lt;/em&gt;.&lt;/p&gt;
+  &lt;p&gt;I am in Grade 11, 1&lt;sup&gt;st&lt;/sup&gt; semester.
+  My science poster was about H&lt;sub&gt;2&lt;/sub&gt;O.&lt;/p&gt;
+  &lt;p&gt;&lt;b&gt;Favourite tool:&lt;/b&gt; CodeShare.
+  &lt;i&gt;Bayanihan&lt;/i&gt; is my favourite word.&lt;/p&gt;
+  &lt;p&gt;&lt;mark&gt;Open to group projects.&lt;/mark&gt;
+  &lt;small&gt;Sample resume for practice only.&lt;/small&gt;&lt;/p&gt;
+  &lt;h2&gt;Skills&lt;/h2&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Typing documents&lt;/li&gt;
+    &lt;li&gt;Making slide presentations&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;h2&gt;Goals this term&lt;/h2&gt;
+  &lt;ol type="1" start="1"&gt;
+    &lt;li&gt;Build my resume page.&lt;/li&gt;
+    &lt;li&gt;Help a classmate with HTML.&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre><p class="small"><b>Output (page text)</b></p><pre class="out" data-output="dotnet-1-r01-d2-s3"><span class="ln">Tab title: Resume of Juan Dela Cruz</span><span class="ln">Visible page text:</span><span class="ln">Juan Dela Cruz</span><span class="ln">Hello! I am Juan Dela Cruz, a senior high school student in the ICT strand.</span><span class="ln">I am in Grade 11, 1st semester. My science poster was about H2O.</span><span class="ln">Favourite tool: CodeShare. Bayanihan is my favourite word.</span><span class="ln">Open to group projects. Sample resume for practice only.</span><span class="ln">Skills</span><span class="ln">Typing documents</span><span class="ln">Making slide presentations</span><span class="ln">Goals this term</span><span class="ln">Build my resume page.</span><span class="ln">Help a classmate with HTML.</span></pre><p class="small"><b>Check yourself:</b> Which words look different in the page window but read the same in the output? sup and sub join their characters: 1st and H2O. <b>Your task:</b> page 9, Step 3.</p></section></div><div><section data-step="dotnet-1-r01-d2-s4"><h3>STEP 4 · index.html</h3><p class="instruction">This step adds three things at the end of body: a motto with br line breaks, an hr line, and a Weekly clubs schedule inside pre. Work in code editor loads the whole page.</p><p class="small"><b>New lines at the end of body</b></p><pre class="code" data-code="dotnet-1-r01-d2-s4" data-kind="fragment">  &lt;h2&gt;My motto&lt;/h2&gt;
+  &lt;p&gt;Learn a little every day,&lt;br&gt;
+  share what you know,&lt;br&gt;
+  and help others grow.&lt;/p&gt;
+  &lt;hr&gt;
+  &lt;h2&gt;Weekly clubs&lt;/h2&gt;
+  &lt;pre&gt;Day        Club
+Monday     Chess
+Wednesday  Drawing&lt;/pre&gt;</pre><p class="small"><b>Output (page text)</b></p><pre class="out" data-output="dotnet-1-r01-d2-s4"><span class="ln">Tab title: Resume of Juan Dela Cruz</span><span class="ln">Visible page text:</span><span class="ln">Juan Dela Cruz</span><span class="ln">Hello! I am Juan Dela Cruz, a senior high school student in the ICT strand.</span><span class="ln">I am in Grade 11, 1st semester. My science poster was about H2O.</span><span class="ln">Favourite tool: CodeShare. Bayanihan is my favourite word.</span><span class="ln">Open to group projects. Sample resume for practice only.</span><span class="ln">Skills</span><span class="ln">Typing documents</span><span class="ln">Making slide presentations</span><span class="ln">Goals this term</span><span class="ln">Build my resume page.</span><span class="ln">Help a classmate with HTML.</span><span class="ln">My motto</span><span class="ln">Learn a little every day,</span><span class="ln">share what you know,</span><span class="ln">and help others grow.</span><span class="ln">Weekly clubs</span><span class="ln">Day        Club</span><span class="ln">Monday     Chess</span><span class="ln">Wednesday  Drawing</span></pre><p class="small"><b>Check yourself:</b> Delete one space before Chess and run: Chess moves left in the output too. Restore it. <b>Your task:</b> page 9, Step 4.</p></section></div></div><div class="note"><b>Practice: choose the element.</b> Which element fits (a) a warning that must not be missed, (b) the Filipino word Bayanihan, (c) the nd in 2nd, (d) a timetable whose columns must line up, (e) a new topic on the page? Answers: strong, i, sup, pre, hr.</div><div class="liplet"><b>LIPLET · TUESDAY</b> Stop here and answer the <b>TUESDAY strip (middle of page 7)</b>, in pen. Tear it off and submit it.</div><footer class="foot">.NET 1 · Week 01 · HTML fundamentals, paragraphs and lists · Page 3 of 11</footer></main></body></html>

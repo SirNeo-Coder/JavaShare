@@ -1,0 +1,27 @@
+/* resume-template.css - a small template your teacher supplies with this module.
+   It is plain CSS you can read: a grid of cards, a card and capital letters. Nothing is loaded from the internet. */
+
+/* A grid of cards: as many columns as fit, each one at least 240px wide */
+.t-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+/* A card with a light border around it */
+.t-card {
+  border: 1px solid #555555;
+  padding: 8px;
+}
+
+/* Capital letters for a heading */
+.t-caps {
+  text-transform: uppercase;
+}
+
+/* On a page 900px wide or narrower the cards stand one under the other */
+@media (max-width: 900px) {
+  .t-grid {
+    grid-template-columns: 1fr;
+  }
+}

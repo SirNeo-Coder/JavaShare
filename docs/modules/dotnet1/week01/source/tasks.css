@@ -1,0 +1,16 @@
+@page{size:8.5in 13in;margin:.4in .5in .35in}*{box-sizing:border-box}
+body{margin:0;color:#111;font-family:Georgia,'DejaVu Serif',serif;font-size:9.8pt;line-height:1.22}
+h1{font-size:17pt;line-height:1.12;color:#13305c;margin:0 0 2pt}h3{font-size:9.6pt;color:#b45309;margin:0 0 3pt}
+p{margin:2pt 0 4pt}code{font-family:'DejaVu Sans Mono',monospace;font-size:8pt}.sub,.small{font-size:8.5pt;line-height:1.18}
+.page{height:12.22in;position:relative;padding-bottom:15pt;display:flow-root}.foot{position:absolute;bottom:0;left:0;right:0;text-align:right;
+font-size:7.6pt;color:#555;border-top:.5pt solid #aaa;padding-top:2pt}.day{font-size:8.6pt;color:#b45309}
+.note{padding:4pt 6pt;margin:4pt 0;border:.7pt solid #bbb;border-left:2.5pt solid #b45309;background:white;font-size:9pt;line-height:1.2}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8pt 10pt;align-items:start;margin-top:6pt}
+.task{border:.7pt solid #13305c;padding:5pt 6pt}.instruction{font-size:8.8pt;line-height:1.18}
+.out{font-family:'DejaVu Sans Mono',monospace;font-size:7.4pt;line-height:1.1;white-space:pre-wrap;overflow-wrap:anywhere;
+border:.6pt solid #aaa;border-left:2.5pt solid #2e7d32;padding:3pt 5pt;margin:2pt 0 0;background:white}
+.ln{display:block;padding-left:1.4em;text-indent:-1.4em}
+.t{width:100%;border-collapse:collapse;font-size:8.6pt;line-height:1.17;margin:8pt 0 0}.t th{background:#f1f3f5;color:#13305c;text-align:left}
+.t th,.t td{border:.6pt solid #aaa;padding:4pt;vertical-align:top}
+.ticks{list-style:none;padding-left:0;margin:2pt 0}.ticks li{margin:0 0 4pt}
+.w2 .grid{grid-template-columns:1fr}.w2 .out{font-size:8pt;line-height:1.12}.t .write{height:20pt}
