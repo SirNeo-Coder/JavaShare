@@ -1,5 +1,6 @@
 // Real local browser check (CKB-140): on a web step, a long result in the side panel scrolls on its own and never
 // squeezes the task text above it to a sliver or runs past the panel. Week 1 Step 9 has the longest page text.
+// Java panels keep their old layout: the task-text minimum is for web results only (CodeRabbit, PR #140).
 // Local Supabase only. Env: WEB_SCROLL_BASE_URL (default http://localhost:3072, offline classroom settings),
 // CODESHARE_PLAYWRIGHT_MODULE, PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
 import assert from "node:assert/strict";
@@ -16,6 +17,9 @@ assert.ok(["localhost", "127.0.0.1"].includes(new URL(local.API_URL).hostname));
 const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 const content = JSON.parse(readFileSync(new URL("../docs/modules/dotnet1/week01/DotNet1_Week_01.threepart.codeshare.json", import.meta.url)));
 content.id = `scroll-${randomUUID().slice(0, 8)}`; content.title = `Scroll check ${content.id.slice(-4)}`;
+const java = JSON.parse(readFileSync(new URL("./fixtures/student-activity.codeshare.json", import.meta.url)));
+java.id = `scroll-java-${randomUUID().slice(0, 6)}`; java.title = `Scroll Java ${java.id.slice(-4)}`;
+java.lessons[0].blocks[0].instruction = Array.from({ length: 12 }, (_, i) => `Line ${i + 1} of a long task text that wraps in the panel.`).join("\n");
 const steps = content.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
 const last = steps.at(-1);
 
@@ -78,6 +82,47 @@ test("web step side panel: a long result scrolls; the task text keeps its room; 
     assert.ok(box.yours.bottom <= box.checks.bottom + 1 && box.yours.bottom > box.checks.top, "scrolled down, the end of Your output is in view");
     assert.ok(box.show.bottom <= box.panel.bottom + 1, "Show page stays inside the panel");
     assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+    if (classroomId) await admin.from("classrooms").delete().eq("id", classroomId);
+    for (const user of users) await admin.auth.admin.deleteUser(user.id);
+  }
+});
+
+test("Java step side panel on a short screen: long task text still shrinks, so the console stays inside the panel", async () => {
+  const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH });
+  const baseURL = process.env.WEB_SCROLL_BASE_URL || "http://localhost:3072";
+  const users = []; let classroomId;
+  try {
+    const password = randomUUID();
+    for (const role of ["teacher", "student"]) {
+      const { data, error } = await admin.auth.admin.createUser({ email: `scroll-java-${randomUUID()}@example.test`, password, email_confirm: true, user_metadata: { name: `Scroll ${role}` } });
+      assert.equal(error, null); users.push(data.user);
+      assert.equal((await admin.from("profiles").update({ role }).eq("id", data.user.id)).error, null);
+    }
+    const teacher = await browser.newContext({ baseURL });
+    assert.equal((await teacher.request.post("/api/auth/login", { data: { email: users[0].email, password } })).status(), 200);
+    const created = await teacher.request.post("/api/classes", { data: { subject: "Java", name: `Scroll Java ${randomUUID().slice(0, 6)}` } });
+    assert.equal(created.status(), 201); classroomId = (await created.json()).id;
+    assert.equal((await teacher.request.post(`/api/classrooms/${classroomId}/modules`, { data: java })).status(), 201);
+    assert.equal((await admin.from("classroom_members").insert({ classroom_id: classroomId, user_id: users[1].id })).error, null);
+    const student = await browser.newContext({ baseURL, viewport: { width: 1366, height: Number(process.env.JAVA_SCROLL_HEIGHT || 500) } });
+    assert.equal((await student.request.post("/api/auth/login", { data: { email: users[1].email, password } })).status(), 200);
+    const tab = await student.newPage(); tab.setDefaultTimeout(20000);
+    await tab.goto("/"); await tab.locator(".classroom-workspace").waitFor();
+    await tab.getByRole("button", { name: "Module", exact: true }).hover();
+    await tab.locator("#classroom-modules .module-catalog-card").filter({ hasText: java.title }).getByRole("button").first().click();
+    await tab.locator(".module-activity-console .console").waitFor();
+    await tab.mouse.move(700, 20);
+    // After a run the banner is taller: the space the console needs is tightest then.
+    await tab.getByRole("button", { name: /Run code/ }).click();
+    await tab.waitForFunction(() => /Completed|Not completed|differs|Try again/i.test(document.querySelector(".module-run-feedback")?.textContent ?? ""), null, { timeout: 60000 });
+    const box = await tab.evaluate(() => {
+      const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+      return { panel: rect(".module-activity-console"), details: rect(".module-activity-details"), console: rect(".module-activity-console .console") };
+    });
+    await tab.screenshot({ path: "/tmp/codeshare-java-panel-short.png" });
+    assert.ok(box.console.bottom <= box.panel.bottom + 1, `the Java console ends inside the panel (console ${Math.round(box.console.bottom)}, panel ${Math.round(box.panel.bottom)}, task text ${Math.round(box.details.height)}px)`);
   } finally {
     await browser.close();
     if (classroomId) await admin.from("classrooms").delete().eq("id", classroomId);
