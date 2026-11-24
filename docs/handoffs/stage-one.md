@@ -1,3 +1,10 @@
+> Java own tasks start from the guided code (2026-11-25, CKB-143): 7 Your task lines reworded (Week 15 Steps 3 and 8;
+> Week 17 Steps 1, 5, 6, 7, 10) so they say what to do with the guided change; Week 16 needed nothing. Outputs, answer
+> keys and ids unchanged. Week 17 PDF pages A-2, A-8, A-9, A-10, A-14 carry the new wording. Tests: continuity
+> (`fromGuided`) and the Your-task line-number rule for Weeks 15 and 17; Week 15 three-part runs through the Java bridge.
+> Branch `content/java-own-from-guided`, approved. Open: Week 17 Word plan still has the old wording for Steps 1 and 10
+> (asked the teacher). Teacher re-uploads the Week 15 and Week 17 three-part files after merge (Week 17 before Nov 30).
+
 > Week 1 line references (2026-11-24, CKB-142): Step 3's "line 16" moved after the guided line; reworded to count in the
 > sample; test rule added. Branch `content/dotnet1-week01-line-refs`, approved. Teacher re-uploads Week 1 after merge.
 > Next: Week 2 three-part (plan given; waiting on the media/offline question) and saving the reusable prompt with it.

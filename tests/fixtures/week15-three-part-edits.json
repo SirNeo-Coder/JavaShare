@@ -1,0 +1,282 @@
+{
+  "java-2-w15-d1-s1": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "System.out.println(\"Created now? \" + made);",
+        "to": "System.out.println(\"Created now? \" + made);\n            File trips = new File(\"trips.txt\");\n            System.out.println(\"Created trips.txt? \" + trips.createNewFile());"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "System.out.println(\"Created now? \" + made);",
+        "to": "System.out.println(\"Created now? \" + made);\n            File fares = new File(\"fares.txt\");\n            System.out.println(\"Created fares.txt? \" + fares.createNewFile());"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "            File trips = new File(\"trips.txt\");\n            System.out.println(\"Created trips.txt? \" + trips.createNewFile());",
+        "to": "            File fares = new File(\"fares.txt\");\n            System.out.println(\"Created fares.txt? \" + fares.createNewFile());"
+      }
+    ]
+  },
+  "java-2-w15-d1-s2": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "        System.out.println(\"Left inside: \" + Arrays.toString(folder.list()));",
+        "to": "        System.out.println(\"Delete trips.txt? \" + trips.delete());\n        String[] left = folder.list();\n        System.out.println(\"Delete the folder? \" + folder.delete());\n        System.out.println(\"Left inside: \" + Arrays.toString(left));"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "        System.out.println(\"Left inside: \" + Arrays.toString(folder.list()));",
+        "to": "        String[] left = folder.list();\n        System.out.println(\"Delete trips.txt? \" + trips.delete());\n        System.out.println(\"Delete the folder? \" + folder.delete());\n        System.out.println(\"Left inside: \" + Arrays.toString(left));"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "        System.out.println(\"Delete trips.txt? \" + trips.delete());\n        String[] left = folder.list();\n",
+        "to": "        String[] left = folder.list();\n        System.out.println(\"Delete trips.txt? \" + trips.delete());\n"
+      }
+    ]
+  },
+  "java-2-w15-d2-s3": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "commas",
+        "to": "newlines"
+      },
+      {
+        "path": "Main.java",
+        "from": "firstDone = true;",
+        "to": "newlines++;\n                    firstDone = true;"
+      },
+      {
+        "path": "Main.java",
+        "from": "} else if (ch == ',') {\n                    newlines++;\n                }",
+        "to": "}"
+      },
+      {
+        "path": "Main.java",
+        "from": "Commas in the file: ",
+        "to": "Newline characters in the file: "
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "} else if (ch == ',') {",
+        "to": "} else if (ch == ' ') {"
+      },
+      {
+        "path": "Main.java",
+        "from": "commas",
+        "to": "spaces"
+      },
+      {
+        "path": "Main.java",
+        "from": "Commas in the file: ",
+        "to": "Spaces in the file: "
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "newlines++;\n                    firstDone = true;",
+        "to": "firstDone = true;"
+      },
+      {
+        "path": "Main.java",
+        "from": "// the first line has ended\n                }",
+        "to": "// the first line has ended\n                } else if (ch == ' ') {\n                    newlines++;\n                }"
+      },
+      {
+        "path": "Main.java",
+        "from": "newlines",
+        "to": "spaces"
+      },
+      {
+        "path": "Main.java",
+        "from": "Newline characters in the file: ",
+        "to": "Spaces in the file: "
+      }
+    ]
+  },
+  "java-2-w15-d2-s4": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "                    fleet.add(toVehicle(line));",
+        "to": "                    String[] part = line.split(\",\");\n                    if (part[0].equals(\"Bus\")) {\n                        fleet.add(toVehicle(line));\n                    }"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "                    fleet.add(toVehicle(line));",
+        "to": "                    String[] part = line.split(\",\");\n                    if (part[0].equals(\"Jeepney\")) {\n                        fleet.add(toVehicle(line));\n                    }"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "part[0].equals(\"Bus\")",
+        "to": "part[0].equals(\"Jeepney\")"
+      }
+    ]
+  },
+  "java-2-w15-d3-s5": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "total = total + sc.nextDouble();\n                count++;",
+        "to": "double fare = sc.nextDouble();\n                if (fare > 13.00) {\n                    total = total + fare;\n                    count++;\n                }"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "total = total + sc.nextDouble();\n                count++;",
+        "to": "double fare = sc.nextDouble();\n                if (fare > 20.00) {\n                    total = total + fare;\n                    count++;\n                }"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "fare > 13.00",
+        "to": "fare > 20.00"
+      }
+    ]
+  },
+  "java-2-w15-d3-s6": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "            if (!line.trim().isEmpty()) {",
+        "to": "            String[] part = line.split(\",\");\n            if (part[0].equals(\"Tricycle\")) {"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "            if (!line.trim().isEmpty()) {",
+        "to": "            String[] part = line.split(\",\");\n            if (part[0].equals(\"Jeepney\")) {"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "part[0].equals(\"Tricycle\")",
+        "to": "part[0].equals(\"Jeepney\")"
+      }
+    ]
+  },
+  "java-2-w15-d4-s7": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "out.write(\"NXA 123 left Monumento\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        try (FileWriter out = new FileWriter(\"trip_log.txt\")) {   // same file again\n",
+        "to": "out.write(\"NXA 123 left Monumento\\n\");\n"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "out.write(\"NXA 123 left Monumento\\n\");\n        } catch (IOException e) {\n            System.out.println(\"Cannot write: \" + e.getMessage());\n        }\n        try (FileWriter out = new FileWriter(\"trip_log.txt\")) {   // same file again\n",
+        "to": "out.write(\"NXA 123 left Monumento\\n\");\n"
+      },
+      {
+        "path": "Main.java",
+        "from": "out.write(\"TRC 456 left Bagong Silang\\n\");\n",
+        "to": "out.write(\"TRC 456 left Bagong Silang\\n\");\n            out.write(\"NYB 321 left Sangandaan\\n\");\n"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "out.write(\"TRC 456 left Bagong Silang\\n\");\n",
+        "to": "out.write(\"TRC 456 left Bagong Silang\\n\");\n            out.write(\"NYB 321 left Sangandaan\\n\");\n"
+      }
+    ]
+  },
+  "java-2-w15-d4-s8": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "            out.write(old);                                 // keep what was there\n",
+        "to": ""
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "            out.write(old);                                 // keep what was there\n",
+        "to": ""
+      },
+      {
+        "path": "Main.java",
+        "from": "out.write(\"NYB 321 left Sangandaan\\n\");\n",
+        "to": "out.write(\"NYB 321 left Sangandaan\\n\");\n            out.write(old);\n"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "out.write(\"NYB 321 left Sangandaan\\n\");\n",
+        "to": "out.write(\"NYB 321 left Sangandaan\\n\");\n            out.write(old);\n"
+      }
+    ]
+  },
+  "java-2-w15-d4-s9": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "new Tricycle(\"TRC 654\", \"Mang Lito\", \"Bagong Silang TODA\")",
+        "to": "new Bus(\"BUS 654\", \"Mang Lito\", 30)"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "new Tricycle(\"TRC 654\", \"Mang Lito\", \"Bagong Silang TODA\")",
+        "to": "new Jeepney(\"NXC 654\", \"Mang Lito\", \"Malabon-Divisoria\")"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "new Bus(\"BUS 654\", \"Mang Lito\", 30)",
+        "to": "new Jeepney(\"NXC 654\", \"Mang Lito\", \"Malabon-Divisoria\")"
+      }
+    ]
+  },
+  "java-2-w15-d4-s10": {
+    "guided": [
+      {
+        "path": "Main.java",
+        "from": "                count++;\n                report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");",
+        "to": "                if (part[0].equals(\"Bus\")) {\n                    count++;\n                    report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");\n                }"
+      }
+    ],
+    "own": [
+      {
+        "path": "Main.java",
+        "from": "                count++;\n                report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");",
+        "to": "                if (part[0].equals(\"Tricycle\")) {\n                    count++;\n                    report.write(count + \". \" + part[1] + \" (\" + part[0] + \") - \" + part[2] + \"\\n\");\n                }"
+      }
+    ],
+    "fromGuided": [
+      {
+        "path": "Main.java",
+        "from": "part[0].equals(\"Bus\")",
+        "to": "part[0].equals(\"Tricycle\")"
+      }
+    ]
+  }
+}

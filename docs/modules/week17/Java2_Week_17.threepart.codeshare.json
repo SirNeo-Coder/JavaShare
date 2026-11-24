@@ -249,7 +249,7 @@
               "expectedOutput": "Built on the EDT: true\nControls on the panel: 3\nLabel 1: NXA 123 | Mang Ramon\nLabel 2: Monumento-Divisoria\nLabel 3: Capacity: 20\nNo screen: the window stays closed.",
               "stdin": ""
             },
-            "instruction": "Now do it on your own. Add the same Capacity: 20 sign, but put it first on the panel, before the plate sign. Hint: `add()` can take a second value, the position.",
+            "instruction": "Now do it on your own. Move the Capacity: 20 sign you added so it comes first on the panel, before the plate sign. Hint: `add()` can take a second value, the position.",
             "files": [],
             "expectedOutput": "Built on the EDT: true\nControls on the panel: 3\nLabel 1: Capacity: 20\nLabel 2: NXA 123 | Mang Ramon\nLabel 3: Monumento-Divisoria\nNo screen: the window stays closed.",
             "stdin": "",
@@ -929,7 +929,7 @@
               "expectedOutput": "NXA 123 / 5 km -> NXA 123: P15.00\ntrc 456 / 2 km -> TRC 456: P40.00\nZZZ / 5 km -> Unknown plate: ZZZ\nBUS 789 / abc km -> Not a number: abc\nBUS 789 / 4 km -> BUS 789: P25.00",
               "stdin": ""
             },
-            "instruction": "Now do it on your own. Do the same for the unknown-plate message: show the plate that was typed and suggest NXA 123, like this: No vehicle ZZZ. Try NXA 123.",
+            "instruction": "Now do it on your own. Put line 21 back to the number message Enter a number for km. Then do the same for the unknown-plate message: show the plate that was typed and suggest NXA 123, like this: No vehicle ZZZ. Try NXA 123.",
             "files": [],
             "expectedOutput": "NXA 123 / 5 km -> NXA 123: P15.00\ntrc 456 / 2 km -> TRC 456: P40.00\nZZZ / 5 km -> No vehicle ZZZ. Try NXA 123.\nBUS 789 / abc km -> Enter a number for km.\nBUS 789 / 4 km -> BUS 789: P25.00",
             "stdin": "",
@@ -1050,7 +1050,7 @@
               "expectedOutput": "NXA 123: P15.00\nTRC 456: P40.00\nBUS 789: P35.00\nNYB 321: P17.00\nNXA 123: P15.00\nVehicleNotFoundException: Unknown plate: ZZZ\nNumberFormatException: For input string: \"abc\"\nInvalidDistanceException: Use a finite km above 0.\nInvalidDistanceException: Use a finite km above 0.\nInvalidDistanceException: Use a finite km above 0.",
               "stdin": ""
             },
-            "instruction": "Now do it on your own. Send the tricycle 3 km instead of 2. Work out the fare first: P20 plus P10 for each km.",
+            "instruction": "Now do it on your own. Put the bus back to 4 km, and send the tricycle 3 km instead of 2. Work out the fare first: P20 plus P10 for each km.",
             "files": [],
             "expectedOutput": "NXA 123: P15.00\nTRC 456: P50.00\nBUS 789: P25.00\nNYB 321: P17.00\nNXA 123: P15.00\nVehicleNotFoundException: Unknown plate: ZZZ\nNumberFormatException: For input string: \"abc\"\nInvalidDistanceException: Use a finite km above 0.\nInvalidDistanceException: Use a finite km above 0.\nInvalidDistanceException: Use a finite km above 0.",
             "stdin": "",
@@ -1248,7 +1248,7 @@
               "expectedOutput": "Before: Not checked\nRight after the click: Checking... | button on: false\nAfter the worker: Ready: NXA 123 | worker on the EDT: false | button on: true",
               "stdin": ""
             },
-            "instruction": "Now do it on your own. Ask the same question, SwingUtilities.isEventDispatchThread(), but inside the queued update on line 22 of ReadyTask.java, so the sign shows: Ready: NXA 123 | update on the EDT: true",
+            "instruction": "Now do it on your own. Put line 14 of ReadyTask.java back to \"Ready: NXA 123\". Ask the same question, SwingUtilities.isEventDispatchThread(), inside the queued update on line 22 instead, so the sign shows: Ready: NXA 123 | update on the EDT: true",
             "files": [],
             "expectedOutput": "Before: Not checked\nRight after the click: Checking... | button on: false\nAfter the worker: Ready: NXA 123 | update on the EDT: true | button on: true",
             "stdin": "",
@@ -1981,7 +1981,7 @@
               "expectedOutput": "Plates in the list: 5\nNXA 123: P17.00\nTRC 456: P80.00\nBUS 789: P30.00\nNYB 321: P17.00\nUnknown plate: ZZZ 999",
               "stdin": ""
             },
-            "instruction": "Now do it on your own. Add the same ZZZ 999 plate, but put it first in the list.",
+            "instruction": "Now do it on your own. Move the ZZZ 999 plate you added to the front of the list.",
             "files": [],
             "expectedOutput": "Plates in the list: 5\nUnknown plate: ZZZ 999\nNXA 123: P17.00\nTRC 456: P80.00\nBUS 789: P30.00\nNYB 321: P17.00",
             "stdin": "",

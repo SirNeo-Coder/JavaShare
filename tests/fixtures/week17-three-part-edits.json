@@ -13,6 +13,13 @@
     "from": "    add(new JLabel(\"Monumento-Divisoria\"));",
     "to": "    add(new JLabel(\"Monumento-Divisoria\"));\n    add(new JLabel(\"Capacity: 20\"), 0);"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "    add(new JLabel(\"Capacity: 20\"));",
+    "to": "    add(new JLabel(\"Capacity: 20\"), 0);"
+   }
   ]
  },
  "java-2-w17-d1-s2": {
@@ -24,6 +31,18 @@
    }
   ],
   "own": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "    route.setText(jeep.getRoute());",
+    "to": "    route.setText(jeep.getRoute() + \" | seats: \" + jeep.getCapacity());"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "jeep.getDriverName() + \" | seats: \" + jeep.getCapacity());",
+    "to": "jeep.getDriverName());"
+   },
    {
     "path": "TerminalPanel.java",
     "from": "    route.setText(jeep.getRoute());",
@@ -45,6 +64,13 @@
     "from": "    result.setText(\"Plate: \" + plate.getText().trim());",
     "to": "    result.setText(\"Characters: \" + plate.getText().length());"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "plate.getText().trim().length()",
+    "to": "plate.getText().length()"
+   }
   ]
  },
  "java-2-w17-d2-s4": {
@@ -61,6 +87,13 @@
     "from": "      result.setText(\"Plate: \" + plate.getText().trim());",
     "to": "      if (plate.getText().trim().isEmpty()) {\n        result.setText(\"Type a plate first\");\n        plate.setText(\"NXA 123\");\n      } else {\n        result.setText(\"Plate: \" + plate.getText().trim());\n      }"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "        result.setText(\"Type a plate first\");\n",
+    "to": "        result.setText(\"Type a plate first\");\n        plate.setText(\"NXA 123\");\n"
+   }
   ]
  },
  "java-2-w17-d3-s3": {
@@ -72,6 +105,18 @@
    }
   ],
   "own": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());",
+    "to": "    } catch (VehicleNotFoundException ex) {\n      result.setText(\"No vehicle \" + plate.getText().trim() + \". Try NXA 123.\");"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "      result.setText(\"Not a number: \" + km.getText());",
+    "to": "      result.setText(\"Enter a number for km.\");"
+   },
    {
     "path": "TerminalPanel.java",
     "from": "    } catch (VehicleNotFoundException ex) {\n      result.setText(ex.getMessage());",
@@ -93,6 +138,18 @@
     "from": "{\"TRC 456\", \"2\"}",
     "to": "{\"TRC 456\", \"3\"}"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "FareCheck.java",
+    "from": "{\"BUS 789\", \"8\"}",
+    "to": "{\"BUS 789\", \"4\"}"
+   },
+   {
+    "path": "FareCheck.java",
+    "from": "{\"TRC 456\", \"2\"}",
+    "to": "{\"TRC 456\", \"3\"}"
+   }
   ]
  },
  "java-2-w17-d4-s5": {
@@ -104,6 +161,18 @@
    }
   ],
   "own": [
+   {
+    "path": "ReadyTask.java",
+    "from": "        status.setText(outcome);",
+    "to": "        status.setText(outcome + \" | update on the EDT: \" + SwingUtilities.isEventDispatchThread());"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "ReadyTask.java",
+    "from": "      message = \"Ready: NXA 123 | worker on the EDT: \" + SwingUtilities.isEventDispatchThread();",
+    "to": "      message = \"Ready: NXA 123\";"
+   },
    {
     "path": "ReadyTask.java",
     "from": "        status.setText(outcome);",
@@ -124,6 +193,13 @@
     "path": "ReadyWorker.java",
     "from": "    return \"Ready: NXA 123\";",
     "to": "    return FareService.quote(\"ZZZ\", \"4\");"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "ReadyWorker.java",
+    "from": "FareService.quote(\"BUS 789\", \"4\")",
+    "to": "FareService.quote(\"ZZZ\", \"4\")"
    }
   ]
  },
@@ -151,6 +227,13 @@
     "from": "{\"2\",\"0\",\"abc\"}",
     "to": "{\"1000\",\"0\",\"abc\"}"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "ThemeCheck.java",
+    "from": "{\"3\",\"0\",\"abc\"}",
+    "to": "{\"1000\",\"0\",\"abc\"}"
+   }
   ]
  },
  "java-2-w17-d5-s10": {
@@ -162,6 +245,18 @@
    }
   ],
   "own": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "{\"NXA 123\",",
+    "to": "{\"ZZZ 999\", \"NXA 123\","
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "TerminalPanel.java",
+    "from": "\"NYB 321\", \"ZZZ 999\"});",
+    "to": "\"NYB 321\"});"
+   },
    {
     "path": "TerminalPanel.java",
     "from": "{\"NXA 123\",",

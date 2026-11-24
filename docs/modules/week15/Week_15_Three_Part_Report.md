@@ -38,3 +38,10 @@ File: `docs/modules/week15/Java2_Week_15.threepart.codeshare.json` (built 2026-1
 | 8 | `java-2-w15-d4-s8-alter-v3` | 8, 22, 32, 33, 34, 39 | PASSED | Main.java, line 33 — move  out.write(old);  from before the two new trips to after them:<br>            out.write("BUS 789 left Caloocan\n");<br>            out.write("NYB 321 left Sangandaan\n");<br>            out.write(old); | PASSED | OK |
 | 9 | `java-2-w15-d4-s9-alter-v2` | 10, 22, 24, 33, 52, 57, 67 | PASSED | Main.java, line 52 — replace the extra vehicle with a Jeepney:<br>        fleet.add(new Jeepney("NXC 654", "Mang Lito", "Malabon-Divisoria")); | PASSED | OK |
 | 10 | `java-2-w15-d4-s10-alter-v2` | 10, 16, 17, 18, 26, 34 | PASSED | Main.java, lines 17-20 — replace lines 17-18 with these lines (the guided lines with "Tricycle"):<br>                if (part[0].equals("Tricycle")) {<br>                    count++;<br>                    report.write(count + ". " + part[1] + " (" + part[0] + ") - " + part[2] + "\n");<br>                } | PASSED | OK |
+
+## Update 2026-11-25: own tasks start from the guided code (CKB-143)
+
+The guided code stays in the editor, so Steps 3 and 8 now say what to do with it: Step 3 takes out the `newlines++;`
+line and counts a space where the comma part was; Step 8 puts the deleted `out.write(old);` back, last. Outputs, answer
+keys and ids are unchanged. `tests/week15-week21-modules.test.mjs` now runs every sample, guided example and own answer
+through the CodeShare Java bridge and checks the own task from the guided code.
