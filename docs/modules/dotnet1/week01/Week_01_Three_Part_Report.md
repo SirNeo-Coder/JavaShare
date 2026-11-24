@@ -20,7 +20,9 @@ performance task and Week 1 start (no previous module).
    line by line ("Look at line N"), names the tag or attribute and ties it to an earlier step.
 2. **Guided example:** the exact code and the line to put it on. It is the old Week 1 task, whose output was already
    verified. Guided example verified never completes the step.
-3. **Your task:** the same kind of change with one thing different and no code given. Only this gives Completed.
+3. **Your task:** the same kind of change with one thing different and no code given. It starts from the guided code
+   still in the editor: the wording says what to do with the guided line (change, move, take out, undo, swap; CKB-141).
+   Only this gives Completed.
    Its page text differs from the guided example's on every step.
 
 | Step | Own-task id | Discussion lines | Guided example | Your task (one thing different) | Answer key (teacher only) |
@@ -84,6 +86,13 @@ The complete solved pages are in `solutions/<step id>/index.html` (guided exampl
   converting it to PDF with LibreOffice, not in Microsoft Word.
 - `tests/dotnet1-week01-three-part.test.mjs` checks every printed step page against the module file (numbered sample,
   guided code, both outputs) and that no answer line or note is printed (shown failing with an answer put on page 9).
+
+## Correction (2026-11-24, CKB-141)
+
+The first version's Your task wording started from the sample, but the guided code stays in the editor, so a student
+who followed it failed (Step 2: the guided skill was still there). The wording now starts from the guided code; outputs,
+answer keys and `-v2` ids are unchanged. **Upload the corrected file again** over the one on the live site (steps below);
+no student work resets. Printed step guide (pages 9–17) rebuilt; the DLL does not quote these lines.
 
 ## Upload steps (after #136 and this pull request are merged and the site is updated)
 

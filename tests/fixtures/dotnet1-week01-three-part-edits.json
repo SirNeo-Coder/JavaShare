@@ -13,6 +13,13 @@
     "from": "  a senior high school student in the ICT strand.</p>",
     "to": "  a senior high school student in the ICT strand.</p>\n  <p>My favourite subject is ICT.</p>"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>I like making simple web pages.</p>",
+    "to": "  <p>My favourite subject is ICT.</p>"
+   }
   ]
  },
  "dotnet-1-r01-d1-s2": {
@@ -24,6 +31,18 @@
    }
   ],
   "own": [
+   {
+    "path": "index.html",
+    "from": "    <li>Help a classmate with HTML.</li>",
+    "to": "    <li>Help a classmate with HTML.</li>\n    <li>Finish every module step.</li>"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "\n    <li>Fixing simple computer problems</li>",
+    "to": ""
+   },
    {
     "path": "index.html",
     "from": "    <li>Help a classmate with HTML.</li>",
@@ -45,6 +64,13 @@
     "from": "  My science poster was about H<sub>2</sub>O.</p>",
     "to": "  My science poster was about H<sub>2</sub>O.</p>\n  <p>I finished <mark>12 HTML exercises</mark>.</p>"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>I can type <strong>35 words per minute</strong>.</p>",
+    "to": "  <p>I finished <mark>12 HTML exercises</mark>.</p>"
+   }
   ]
  },
  "dotnet-1-r01-d2-s4": {
@@ -61,6 +87,13 @@
     "from": "Wednesday  Drawing</pre>",
     "to": "Wednesday  Drawing\nSaturday   Volleyball</pre>"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "Friday     Basketball</pre>",
+    "to": "Saturday   Volleyball</pre>"
+   }
   ]
  },
  "dotnet-1-r01-d3-s5": {
@@ -72,6 +105,18 @@
    }
   ],
   "own": [
+   {
+    "path": "index.html",
+    "from": "    <li>Drawing comics</li>",
+    "to": "    <li>Taking photos</li>\n    <li>Drawing comics</li>"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "\n    <li>Playing the guitar</li>",
+    "to": ""
+   },
    {
     "path": "index.html",
     "from": "    <li>Drawing comics</li>",
@@ -93,6 +138,18 @@
     "from": "    <li>Watching science videos</li>",
     "to": "    <li>Watching science videos</li>\n    <li>Gardening</li>"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "\n        <li>Volleyball</li>",
+    "to": ""
+   },
+   {
+    "path": "index.html",
+    "from": "    <li>Watching science videos</li>",
+    "to": "    <li>Watching science videos</li>\n    <li>Gardening</li>"
+   }
   ]
  },
  "dotnet-1-r01-d4-s7": {
@@ -104,6 +161,18 @@
    }
   ],
   "own": [
+   {
+    "path": "index.html",
+    "from": "  a senior high school student in the <em>ICT strand</em>.</p>",
+    "to": "  a senior high school student in the <em>ICT strand</em>.</p> -->"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <!-- Add my photo here in Week 2 -->",
+    "to": "  <!-- Add my photo here in Week 2 ->"
+   },
    {
     "path": "index.html",
     "from": "  a senior high school student in the <em>ICT strand</em>.</p>",
@@ -125,6 +194,13 @@
     "from": "    Typing documents\n    Making slide presentations",
     "to": "    <li>Making slide presentations</li>\n    <li>Typing documents</li>"
    }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "    <li>Typing documents</li>\n    <li>Making slide presentations</li>",
+    "to": "    <li>Making slide presentations</li>\n    <li>Typing documents</li>"
+   }
   ]
  },
  "dotnet-1-r01-d5-s9": {
@@ -140,6 +216,13 @@
     "path": "index.html",
     "from": "Wednesday  Drawing</pre>\n",
     "to": "Wednesday  Drawing</pre>\n  <p><strong>I am ready to present.</strong></p>\n"
+   }
+  ],
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p><em>Thank you for reading my resume.</em></p>",
+    "to": "  <p><strong>I am ready to present.</strong></p>"
    }
   ]
  }

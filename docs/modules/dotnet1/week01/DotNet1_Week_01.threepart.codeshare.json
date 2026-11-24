@@ -118,7 +118,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d1-s1-alter-v2",
-            "instruction": "Now do it on your own. Add a second paragraph in the same place, but this one says: My favourite subject is ICT.",
+            "instruction": "Now do it on your own. Change the words of the paragraph you added in the guided example to: My favourite subject is ICT.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nMy favourite subject is ICT.",
             "guided": {
@@ -282,7 +282,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d1-s2-alter-v2",
-            "instruction": "Now do it on your own. Add a third goal, Finish every module step., to the Goals this term list, after Help a classmate with HTML. It becomes goal number 3.",
+            "instruction": "Now do it on your own. Take the skill you added in the guided example out of Skills. Instead, add a third goal, Finish every module step., to Goals this term, after Help a classmate with HTML. It becomes goal number 3.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nFinish every module step.",
             "guided": {
@@ -400,7 +400,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d2-s3-alter-v2",
-            "instruction": "Now do it on your own. In the same place, add a paragraph that says I finished 12 HTML exercises. This time highlight the words 12 HTML exercises with the element from line 16.",
+            "instruction": "Now do it on your own. Change the paragraph you added in the guided example: it now says I finished 12 HTML exercises. Highlight the words 12 HTML exercises with the element from line 16 instead of strong.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nI finished 12 HTML exercises.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.",
             "guided": {
@@ -446,7 +446,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d2-s4-alter-v2",
-            "instruction": "Now do it on your own. Add a Saturday club, Volleyball, instead. Line Volleyball up under Club like the other clubs. Hint: count the letters of Saturday.",
+            "instruction": "Now do it on your own. Change the club line you added in the guided example to a Saturday club, Volleyball. Line Volleyball up under Club like the other clubs. Hint: count the letters of Saturday.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nSaturday   Volleyball",
             "guided": {
@@ -584,7 +584,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d3-s5-alter-v2",
-            "instruction": "Now do it on your own. Add Taking photos as the **first** interest, before Drawing comics.",
+            "instruction": "Now do it on your own. Move the interest you added in the guided example to the top of the Interests list, before Drawing comics, and change it to Taking photos.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nTaking photos\nDrawing comics\nCooking with my family\nWatching science videos\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
             "guided": {
@@ -640,7 +640,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d3-s6-alter-v2",
-            "instruction": "Now do it on your own. Add Gardening as an interest of its own, in the outer Interests list: after Watching science videos and before the Sports item.",
+            "instruction": "Now do it on your own. Move the sport you added in the guided example out of the Sports list into the outer Interests list, after Watching science videos and before the Sports item, and change it to Gardening.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nGardening\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
             "guided": {
@@ -746,7 +746,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d4-s7-alter-v2",
-            "instruction": "Now do it on your own. Leave line 9 as it is. This time, end the comment right after the introduction paragraph, so the comment hides the introduction on purpose.",
+            "instruction": "Now do it on your own. Undo your repair on line 9: put back the one-dash `->`. This time, end the comment right after the introduction paragraph, so the comment hides the introduction on purpose.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
             "guided": {
@@ -788,7 +788,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d4-s8-alter-v2",
-            "instruction": "Now do it on your own. Repair the Skills list the same way, but list Making slide presentations first.",
+            "instruction": "Now do it on your own. Keep the `li` lines you repaired in the guided example, but swap them so Making slide presentations comes first.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nMaking slide presentations\nTyping documents\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing",
             "guided": {
@@ -941,7 +941,7 @@
           ],
           "activity": {
             "id": "dotnet-1-r01-d5-s9-alter-v2",
-            "instruction": "Now do it on your own. Add a different closing line in the same place: I am ready to present. Make the whole sentence important with the element from line 10.",
+            "instruction": "Now do it on your own. Change the closing line you added in the guided example to: I am ready to present. Use the element from line 10 instead of em.",
             "files": [],
             "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nI am ready to present.",
             "guided": {

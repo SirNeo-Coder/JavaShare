@@ -1,3 +1,7 @@
+> Week 1 own tasks start from the guided code (2026-11-24, CKB-141): all 9 Your task lines now say what to do with the
+> guided line; outputs, answer keys, `-v2` ids unchanged; PDF step guide rebuilt. Branch `content/dotnet1-week01-own-from-guided`,
+> approved. Teacher must re-upload Week 1 (threepart file) on the live site after merge.
+
 > Web results scroll (2026-11-24): on web steps the right panel's check list now scrolls on its own and the task text keeps
 > at least 100 px (CKB-140), branch `fix/web-results-scroll`, approved. The teacher's CKB-139-looking screenshots were from
 > tabs loaded before the fix went live (live site checked: it serves the fixed code); advised Ctrl+Shift+R.
