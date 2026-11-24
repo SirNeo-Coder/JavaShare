@@ -1,3 +1,7 @@
+> Web results scroll (2026-11-24): on web steps the right panel's check list now scrolls on its own and the task text keeps
+> at least 100 px (CKB-140), branch `fix/web-results-scroll`, approved. The teacher's CKB-139-looking screenshots were from
+> tabs loaded before the fix went live (live site checked: it serves the fixed code); advised Ctrl+Shift+R.
+
 > .NET 1 Week 1 PDF and DLL (2026-11-24): branch `content/dotnet1-week01-print` (on top of PR #138). Teacher approved
 > rewriting pages 9–11: the PDF is now 17 pages, a step guide with one step per page (numbered sample, discussion, guided
 > example, Your task, no answer); DLL's five activity lines name the three parts and new pages. Built with

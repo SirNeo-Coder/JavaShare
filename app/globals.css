@@ -642,6 +642,9 @@ html[data-theme="dark"] .module-step-output { background:#0d1524; color:#e1e8f5;
 .module-before-sample { margin-top:12px; font-size:12px; }
 /* Web module steps: one line per check, the differences side by side, then the sandboxed page. */
 .web-checks { flex:none; padding:10px 16px; font-size:13px; }
+/* In the side panel a long result scrolls instead of squeezing the task above it (CKB-140). */
+.module-activity-console>.web-checks { flex:0 1 auto; min-height:min(120px,25%); overflow:auto; }
+.module-activity-console:has(>.web-checks)>.module-activity-details { min-height:min(100px,25%); } /* web results only; Java unchanged */
 .web-checks ul { margin:0; padding:0; list-style:none; }
 .web-checks li.passed span { color:#3aa57c; }
 .web-checks li.failed span { color:#d9534f; }
