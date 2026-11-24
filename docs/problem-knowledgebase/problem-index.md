@@ -4,6 +4,7 @@ Search symptoms, user wording, features, and test language here first.
 
 | Case | Symptom and search terms | Root-cause class | Status | Evidence |
 | --- | --- | --- | --- | --- |
+| [CKB-140](cases/CKB-140-web-results-squeeze-task-panel.md) | console not visible, output occupies the entire area, make it scrollable, task text squeezed | web check list never shrank or scrolled; task text squeezed | resolved on `fix/web-results-scroll` | scroll browser test shown failing with old CSS |
 | [CKB-139](cases/CKB-139-web-practice-checklist-vs-sample.md) | red cross under green banner, Page text matches cross in preview, class step web page | check list target fixed as sample in preview, task in own work; guided never a target | resolved on `fix/web-checklist-target` | target unit test and offline browser shown failing |
 | [CKB-138](cases/CKB-138-guided-example-web-steps.md) | guided example web step, works on Java steps only for now, .NET three-part | upload and completion route accepted guided only for Java | resolved on `feature/web-guided-example` | upload and offline-route tests shown failing; offline browser |
 | [CKB-137](cases/CKB-137-preview-ticks-lost-watching-student.md) | sample and guided check cleared, ticks reset after error, ○ Sample ○ Guided ✓ Your task, live classroom | Back to Week reopened the teacher's preview without its ticks | teacher side resolved on `fix/preview-ticks-kept`; student side not reproduced | browser check shown failing with the fix removed |

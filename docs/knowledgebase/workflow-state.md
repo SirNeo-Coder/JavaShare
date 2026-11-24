@@ -127,6 +127,8 @@ What teachers and students can do today. Keep this page current when their use o
   it once the run is checked and a completed task is saved to CodeShare (CKB-087); **Show page** opens it again. Links to the project's own pages and
   frames of them work inside the window; a missing page says **This project has no page named …**, an
   internet link says **Links outside this project do not open in CodeShare.** Checks use the run file.
+  Closed, the checks show in the editor's right panel; a long result scrolls there and the task text above keeps its
+  room (CKB-140, 2026-11-24).
 - **Module media (2026-10-29, online):** in **View module details**, **Media files** → **Add media
   files** stores a module's pictures, sound and video once (Cloudflare R2), shared by the teacher's
   classes in that subject; **Remove** deletes one. Once a module has media files, its media steps
