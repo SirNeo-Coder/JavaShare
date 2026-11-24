@@ -7,7 +7,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { require as tsxRequire } from "tsx/cjs/api";
 import { buildPreview, embedMedia, projectPath, webPageOutput, webRunResult } from "../app/webPreview.ts";
-import { activityStateId, checkModuleRun, checkableStep, sampleStateId, matchesActivityOutput, mediaCheckLines, mediaLinesPass, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
+import { activityStateId, checkModuleRun, checkableStep, guidedStateId, sampleStateId, matchesActivityOutput, mediaCheckLines, mediaLinesPass, matchesSample, mergeProjectFiles, sourcePath, teacherCheckedStep, unchangedSample, webCheckLines, webChecksPass, webPerformanceTask, webStep } from "../backend/src/module-activities.ts";
 import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
 import { MEDIA_LIMIT, mediaPathType, moduleWebPathError } from "../backend/src/file-paths.ts";
 import { buildTeacherPreview } from "../app/teacherWebPreview.ts";
@@ -220,6 +220,42 @@ const sampleFirstWeek = (id, previousModuleId) => ({
 // The task answers, kept outside the module like the teacher's solutions/ folders.
 const sampleFirstAnswer = (step) => step.run === "app.js" ? [{ path: "app.js", content: "console.log(\"Total: \" + (2 + 3 + 4));" }]
   : [{ path: "index.html", content: step.files[0].content.replace("<li>Pandesal</li>", "<li>Pandesal</li><li>Banana</li>") }];
+
+// Guided example on web steps (teacher, 2026-11-24, CKB-138): page step 1 adds Mango, its own task adds Banana.
+const guidedWeek = (id) => {
+  const week = sampleFirstWeek(id);
+  week.lessons[0].blocks[0].activity.guided = { discussion: "Look at line 8.", instruction: "Add Mango after Pandesal.", code: "<li>Mango</li>",
+    expectedOutput: "Tab title: Canteen\nVisible page text:\nCanteen\nPandesal\nMango" };
+  return week;
+};
+const guidedAnswer = (step) => [{ path: "index.html", content: step.files[0].content.replace("<li>Pandesal</li>", "<li>Pandesal</li><li>Mango</li>") }];
+
+test("guided example on web steps: upload accepts it on HTML and JavaScript steps, still refuses C#; Java is unchanged", () => {
+  const week = guidedWeek("gw-upload");
+  week.lessons[1].blocks[0].activity.guided = { instruction: "Add 1.", code: "+ 1", expectedOutput: "Total: 6" };
+  assert.equal(courseModule.safeParse(week).success, true, JSON.stringify(courseModule.safeParse(week).error?.issues));
+  const csharp = guidedWeek("gw-csharp");
+  Object.assign(csharp.lessons[0].blocks[0], { language: "csharp", run: undefined, files: [{ path: "Program.cs", content: "class P {}" }] });
+  assert.match(JSON.stringify(courseModule.safeParse(csharp).error?.issues), /works on Java and web/);
+  const java = guidedWeek("gw-java");
+  Object.assign(java.lessons[0].blocks[0], { language: "java", run: undefined, webChecks: undefined, files: [{ path: "Main.java", content: "public class Main { public static void main(String[] a) { System.out.println(1); } }" }] });
+  assert.equal(courseModule.safeParse(java).success, true, "Java guided examples are still accepted");
+});
+
+test("guided example on web steps: sample, then guided, then the own task, each checked by page text; guided never completes", () => {
+  const week = guidedWeek("gw-check"), step = week.lessons[0].blocks[0];
+  const pageRun = (text) => ({ success: true, output: `Tab title: Canteen\nVisible page text:\n${text}`, checks: [{ count: 1 }] });
+  assert.equal(checkModuleRun(week, step, {}, step.files, pageRun("Canteen\nPandesal")).check, "sample");
+  const afterSample = { [sampleStateId(step)]: "pass" };
+  const guided = checkModuleRun(week, step, afterSample, guidedAnswer(step), pageRun("Canteen\nPandesal\nMango"));
+  assert.deepEqual([guided.check, guided.passed], ["guided", true]);
+  assert.equal(checkModuleRun(week, step, afterSample, sampleFirstAnswer(step), pageRun("Canteen\nPandesal\nBanana")).passed, false, "the own task's page does not pass the guided example");
+  assert.equal(checkModuleRun(week, step, afterSample, guidedAnswer(step), { ...pageRun("Canteen\nPandesal\nMango"), success: false }).passed, false, "an uncaught error fails the guided run");
+  const afterGuided = { ...afterSample, [guidedStateId(step)]: "pass" };
+  const again = checkModuleRun(week, step, afterGuided, guidedAnswer(step), pageRun("Canteen\nPandesal\nMango"));
+  assert.deepEqual([again.check, again.passed, again.guidedMatched], ["task", false, true], "the guided page alone never completes the step");
+  assert.deepEqual([checkModuleRun(week, step, afterGuided, sampleFirstAnswer(step), pageRun("Canteen\nPandesal\nBanana")).passed], [true]);
+});
 
 const webPersonalStep = { instruction: "Run the page.", language: "html", run: "index.html", files: [{ path: "index.html", content: page("Canteen", "<p>Menu</p>") }], expectedOutput: "Tab title: Canteen\nVisible page text:\nMenu" };
 const javaPersonalStep = { instruction: "Run it.", language: "java", files: [{ path: "Main.java", content: "public class Main { public static void main(String[] a) { System.out.println(1); } }" }], expectedOutput: "1" };
@@ -647,6 +683,27 @@ test("web steps offline (real routes): web completions are accepted, media steps
       const opened = await call(route(weekB, `/activity?stepId=${weekB.lessons[0].blocks[0].id}`), cookies[1]);
       assert.equal(opened.status, 200, await opened.clone().text());
       assert.deepEqual((await opened.json()).projectFiles.find((file) => file.path === "app.js")?.content, sampleFirstAnswer(a2)[0].content, "the module project carries forward from the previous week");
+    });
+
+    await t.test("offline, a web step with a guided example completes only with guided page evidence (CKB-138)", async () => {
+      const week = guidedWeek(`gwo-${randomUUID().slice(0, 8)}`), [g1, g2] = week.lessons.map((item) => item.blocks[0]);
+      assert.equal((await call(`/api/classrooms/${classroomId}/modules`, cookies[0], "POST", week)).status, 201);
+      const route = (path) => `/api/classrooms/${classroomId}/modules/${week.id}/progress${path}`;
+      const view = await (await call(route(`/activity?stepId=${g1.id}`), cookies[1])).json();
+      const guided = { files: mergeProjectFiles(view.projectFiles, guidedAnswer(g1)), success: true, output: g1.activity.guided.expectedOutput };
+      const payload = { stepId: g1.id, updatedAt: view.updatedAt, moduleVersion: view.moduleVersion, completionId: randomUUID(),
+        files: mergeProjectFiles(view.projectFiles, sampleFirstAnswer(g1)), success: true, output: g1.activity.expectedOutput,
+        sample: { files: mergeProjectFiles(view.projectFiles, g1.files), success: true, output: g1.expectedOutput, checks: passingChecks(g1) }, guided };
+      for (const missing of [{ guided: undefined }, { guided: { ...guided, output: g1.activity.expectedOutput } }, { guided: { ...guided, success: false } }]) {
+        const response = await call(route("/complete"), cookies[1], "POST", { ...payload, completionId: randomUUID(), ...missing });
+        assert.equal(response.status, 400); assert.match(await response.text(), /Run the guided example/);
+      }
+      assert.equal((await call(route(`/activity?stepId=${g2.id}`), cookies[1])).status, 403, "the next step waits for the own task, not the guided example");
+      const done = await call(route("/complete"), cookies[1], "POST", payload);
+      assert.equal(done.status, 200, await done.clone().text());
+      const states = (await done.json()).progress.stepStates;
+      assert.equal(states[activityStateId(g1)], "pass"); assert.equal(states[guidedStateId(g1)], "pass"); assert.equal(states[sampleStateId(g1)], "pass");
+      assert.equal((await call(route(`/activity?stepId=${g2.id}`), cookies[1])).status, 200);
     });
 
     await t.test("teacher class progress shows the web percentage and the media step as done", async () => {

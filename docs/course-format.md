@@ -237,9 +237,11 @@ checked like a task run (successful execution, exact output) but its pass is sav
 step or count toward module completion. Online it stays on the device, like sample verification, and
 the server checks it again when the own task's completion is sent. Offline (laptop Java) the server
 saves it. The student's code stays in the editor after the guided run. A step already completed
-skips the guided gate. Java steps only for now. The upload is refused when `guided` has no expected
-output, the task has no `id`, the guided expected output equals the task's (ignoring Windows line
-endings and one final line break), or the step is not Java. `solution` stays teacher-only; `guided`
+skips the guided gate. Java and web steps (2026-11-24): on a web step the guided run is checked by its
+visible page text (or console lines) like a web task, page checks stay with the sample, and `stdin` is
+not used; its pass stays on the device until the own task completes, online and offline. The upload is
+refused when `guided` has no expected output, the task has no `id`, the guided expected output equals
+the task's (ignoring Windows line endings and one final line break), or the step is neither Java nor web. `solution` stays teacher-only; `guided`
 is sent to students. Changing an own task's requirement still needs a new `-v2` id.
 
 The worksheet shows line numbers beside the sample code, counted the same way as the code editor, so

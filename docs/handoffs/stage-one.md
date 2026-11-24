@@ -1,3 +1,10 @@
+> .NET 1 three-part weeks, Stage 1 (2026-11-24): guided example allowed on web (HTML, CSS, JavaScript) steps (CKB-138),
+> branch `feature/web-guided-example`, approved. Upload accepts it on Java and web steps; completion accepts web guided
+> evidence. .NET 1 files now live only in `docs/modules/dotnet1/` (AGENTS.md). Found and reported, not fixed: web preview
+> and class step list ✗ Page text matches under a green banner (CKB-139, awaiting teacher). Teacher decisions: Week 1 is
+> uploaded live but no class uses .NET, so `-v2` ids reset nobody; Week 1 PDF and Word DLL are updated only after the
+> teacher approves the three-part module. Next: Stage 2 (three-part Week 1) after the teacher approves Stage 1's PR.
+
 > Worksheet strip only at the top (2026-11-11): teacher reported the Module worksheet's note,
 > Class module kept while coding (2026-11-23): with the teacher in Work in code editor, students' Module now opens
 > the shared step's module at that step, past prerequisites, also after a refresh (CKB-133), branch

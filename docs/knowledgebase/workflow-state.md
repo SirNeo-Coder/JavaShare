@@ -137,12 +137,14 @@ What teachers and students can do today. Keep this page current when their use o
   percentage move as for Java. Steps whose expected output lists **Media checks** show **Checked by
   your teacher for now**; the teacher presses **Mark done** under **Checked by you** on the student's
   module card (**Students → student**).
-- **Guided example (2026-11-15, Java steps):** a task whose module file carries `activity.guided` teaches in
+- **Guided example (2026-11-15, Java steps; web steps from 2026-11-24):** a task whose module file carries `activity.guided` teaches in
   three parts. The worksheet shows line numbers beside **Sample code**, then **Discussion**, **Guided example** (with
   its code) and **Expected guided output**, then **Your task**. In the code editor, after **Sample verified — now
   do the Guided example.**, the panel shows **Guided example** with the discussion and code; a matching run gives
   **Guided example verified — now do Your task on your own.** and keeps the student's code. Only the own task gives
   **Completed**. Online the guided pass stays on the device until the task is completed; offline the server saves it.
+  Web (HTML, CSS, JavaScript) steps work the same way from 2026-11-24 (CKB-138): the guided run is checked by its
+  visible page text in the page window, and its pass stays on the device until the task is completed, online and offline.
 - **Net MVC weeks in the Java workflow (2026-10-29):** a web step opens with its sample read-only and
   **First, run the sample unchanged.**; **▶ Run code** shows **Sample verified — now complete Your task.**
   with the sample's ticks; the student makes the change in **Your task** and runs again for **Completed —

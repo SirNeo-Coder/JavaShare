@@ -4,6 +4,8 @@ Search symptoms, user wording, features, and test language here first.
 
 | Case | Symptom and search terms | Root-cause class | Status | Evidence |
 | --- | --- | --- | --- | --- |
+| [CKB-139](cases/CKB-139-web-practice-checklist-vs-sample.md) | red cross under green banner, Page text matches cross in preview, class step web page | page check list compares with the sample, not the matched target (suspected) | open | none yet |
+| [CKB-138](cases/CKB-138-guided-example-web-steps.md) | guided example web step, works on Java steps only for now, .NET three-part | upload and completion route accepted guided only for Java | resolved on `feature/web-guided-example` | upload and offline-route tests shown failing; offline browser |
 | [CKB-136](cases/CKB-136-editor-pale-text-dark-theme.md) | pale text in Preview as student, washed out discussion, grey bars over code names, module editor dark theme | editor never reset the dark theme's light text colour for white paper | resolved on `feature/module-editor-page-edit` | colour test shown failing; dark-theme browser check |
 | [CKB-135](cases/CKB-135-edit-module-migration-missing.md) | Edit module Unexpected server error, editor 500 on the live site | live database missing the new table; migration not applied before deploy | repaired by the teacher (migration applied) | `to_regclass` NULL before, Edit module opens after |
 | [CKB-134](cases/CKB-134-wording-check-key-order.md) | module editor Save changes refused, Only wording can change, edit module wording 400 | compared JSON text; the database reorders fields | resolved on `feature/module-editor-wording` before delivery | real-save test failed before the fix; wording check broken on purpose shown failing |
