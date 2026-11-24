@@ -114,4 +114,4 @@ The guided code stays in the editor, so Steps 1, 5, 6, 7 and 10 now say what to 
 added; put line 21, the bus's 4 km or line 14 back). Outputs, answer keys and ids are unchanged. The printed module's
 pages A-2, A-8, A-9, A-10 and A-14 carry the new wording (pages A-9 and A-10 move the rest of the step down one line).
 The PDF's hidden text layer under those pages still holds the old sentences, so a text search can find both; the page
-prints only the new one. The Word plan still has the old wording for Steps 1 and 10.
+prints only the new one. The Word plan's five own-task lines (Steps 1, 5, 6, 7, 10) carry the new wording too.

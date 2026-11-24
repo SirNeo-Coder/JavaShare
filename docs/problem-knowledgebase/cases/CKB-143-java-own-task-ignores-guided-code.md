@@ -30,8 +30,8 @@ change", worded from the sample, and no check applied the own task to the guided
 ## Durable solution
 
 Teacher approved (2026-11-25) new wording for the 7 tasks; each says what to do with the guided change (move it, put it
-back, take it out). Expected outputs, answer keys and task ids are unchanged. The Week 17 printed module carries the new
-wording on its five pages. Week 15's printed module prints no own tasks.
+back, take it out). Expected outputs, answer keys and task ids are unchanged. The Week 17 printed module (five pages) and Word
+lesson plan (five own-task lines) carry the new wording. Week 15's printed module prints no own tasks.
 
 ## Regression proof
 
