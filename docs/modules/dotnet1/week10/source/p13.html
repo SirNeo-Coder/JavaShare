@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Week 10 practice tasks</title><link rel="stylesheet" href="tasks.css"></head><body class="r3 r7 r9"><div class="page"><div class="grid"><section class="task"><h3>My presentation notes (Friday)</h3><table class="t"><tr><th>Part</th><th>What I will say or show</th></tr><tr><td>Introduce (30 s)</td><td class="write"></td></tr><tr><td>Run code, resize the browser window (1 min)</td><td class="write"></td></tr><tr><td>Change my columns or my breakpoint (2 min)</td><td class="write"></td></tr><tr><td>Point to my grid, my pictures and my query (1 min)</td><td class="write"></td></tr><tr><td>Question (30 s)</td><td class="write"></td></tr></table></section><section class="task"><h3>Colour pairs checked for contrast (pick from these)</h3><div class="grid" style="grid-template-columns:1fr 1fr;margin-top:0"><div><table class="t"><tr><th>Pick from these: text colour</th><th>Background</th><th>Ratio</th><th>Normal text?</th></tr><tr><td>#222222</td><td>#fff3c4</td><td>14.2:1</td><td>Yes</td></tr><tr><td>#13305c</td><td>#fff3c4</td><td>11.7:1</td><td>Yes</td></tr><tr><td>#8a1c55</td><td>#fff3c4</td><td>7.9:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#8a1c55</td><td>8.8:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#13305c</td><td>13.0:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#2e7d32</td><td>5.1:1</td><td>Yes</td></tr></table></div><div><table class="t"><tr><th>Pick from these: text colour</th><th>Background</th><th>Ratio</th><th>Normal text?</th></tr><tr><td>#2e7d32</td><td>#ffffff</td><td>5.1:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#b45309</td><td>5.0:1</td><td>Yes</td></tr><tr><td>#222222</td><td>#ffe08a</td><td>12.3:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#555555</td><td>7.4:1</td><td>Yes</td></tr><tr><td>#ffffff</td><td>#888888</td><td>3.5:1</td><td>Large text only</td></tr><tr><td>#ffcc00</td><td>#ffffff</td><td>1.5:1</td><td>No</td></tr></table></div></div></section><section class="task"><h3>resume-template.css (your teacher's local template, in your project)</h3><pre class="out" style="column-count:2;column-gap:10pt">/* resume-template.css - a small template your teacher supplies with this module.
+   It is plain CSS you can read: a grid of cards, a card and capital letters. Nothing is loaded from the internet. */
+
+/* A grid of cards: as many columns as fit, each one at least 240px wide */
+.t-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+/* A card with a light border around it */
+.t-card {
+  border: 1px solid #555555;
+  padding: 8px;
+}
+
+/* Capital letters for a heading */
+.t-caps {
+  text-transform: uppercase;
+}
+
+/* On a page 900px wide or narrower the cards stand one under the other */
+@media (max-width: 900px) {
+  .t-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</pre></section><section class="task"><h3>Starter stylesheet: the rules Week 10 adds (only for a student with no Week 9 work; CodeShare gives you the whole file)</h3><pre class="out" style="column-count:2;column-gap:10pt">/* Grid view: my gallery in as many columns as fit, each at least 220px wide */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+/* Responsive pictures and video: never wider than the box they are in, and the height follows the width */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Media query: at 900px and narrower my gallery stands in one column */
+@media (max-width: 900px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+}</pre></section><section class="task"><h3>What you built in ten weeks</h3><table class="t"><tr><th>Week</th><th>What it added to the resume</th></tr><tr><td>1</td><td>The page itself: headings, paragraphs, formatting and lists</td></tr><tr><td>2</td><td>A picture, a sound, a video and tables</td></tr><tr><td>3</td><td>A second and third page, links, a frame and a contact form</td></tr><tr><td>4</td><td>styles.css linked from every page: element, class and id rules</td></tr><tr><td>5</td><td>Fonts, sizes, colours, a gradient and opacity</td></tr><tr><td>6</td><td>Padding, borders, margins, list styling and link states</td></tr><tr><td>7</td><td>A sticky nav, a ribbon, a floated picture and a gallery</td></tr><tr><td>8</td><td>Hover and focus states, and pseudo-elements</td></tr><tr><td>9</td><td>Flexbox and a media query</td></tr><tr><td>10</td><td>Grid view, pictures and video that fit, and a local template</td></tr></table></section></div><div class="foot">.NET 1 · Week 10 · Practice tasks · Page 13 · Keep this page with your module</div></div></body></html>

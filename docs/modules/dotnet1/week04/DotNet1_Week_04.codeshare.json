@@ -1,0 +1,1112 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 4,
+  "id": "dotnet-1-r04",
+  "title": "Self-Paced Module: CSS Fundamentals and Selectors",
+  "continues": "Week 3 — Links, frames and forms",
+  "previousModuleId": "dotnet-1-r03",
+  "sampleFirst": true,
+  "starterFiles": [
+    {
+      "path": "index.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+    },
+    {
+      "path": "projects.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home</li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+    },
+    {
+      "path": "contact.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "dotnet-1-r04-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Dress Up the Resume: What CSS Is, Its Rules and Its Three Types",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe what CSS does, the parts of a CSS rule and the three places CSS can be written.",
+        "affective": "Value readable, consistent styling that respects every reader.",
+        "psychomotor": "Write Juan's first internal and inline CSS rules in CodeShare and run them."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Run every sample unchanged first, then do its small task. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample files into the editor tabs; **Run code** shows the step's run page in the page window and checks it, and its links open the project's other pages there. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks for the step's run page: the Tab title, the Visible page text, then, on Steps 1, 3 and 9, Media checks. Colours, fonts, sizes and backgrounds are not page text; CodeShare checks them with page checks. CSS that changes letters (text-transform) or hides an element (display: none) does change the page text. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** Juan's finished Week 3 site carries forward in your module project: index.html, projects.html and contact.html. This week adds styles.css. Each step loads its run page and every file that page needs, even when unchanged; the boxes show only the lines a step adds or changes, and where they go."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 4 starts here:** Juan's site has words, lists, a picture, tables, links and a form, but every page shows the browser's plain black text in its default font."
+        },
+        {
+          "type": "definition",
+          "term": "CSS",
+          "markdown": "CSS (Cascading Style Sheets) sets how HTML elements look: colours, fonts, sizes and spacing. HTML says what the content is; CSS says how it looks. A rule is a selector and a declaration block: h1 { color: #13305c; }. Each declaration is a property, a colon, a value and a semicolon. CSS can be written in three places: inline (a style attribute on one element), internal (a style element in head) or external (a .css file the page links). A selector can name an element (h2), a class (.badge) or an id (#form-note)."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A school uniform rule names who it is for (Grade 11 students: the selector) and what they wear (white polo: a property and its value). A note pinned to one student is inline; a rule posted in one classroom is internal; the school handbook every room follows is external."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "CSS type",
+            "Where it is written",
+            "Example",
+            "It styles"
+          ],
+          "rows": [
+            [
+              "Inline",
+              "A style attribute on one element",
+              "`<p style=\"color: #9b1c1c;\">`",
+              "That element only"
+            ],
+            [
+              "Internal",
+              "A style element in head",
+              "`<style> h1 { color: #13305c; } </style>`",
+              "This page only"
+            ],
+            [
+              "External",
+              "A .css file, linked in head",
+              "`<link rel=\"stylesheet\" href=\"styles.css\">`",
+              "Every page that links it"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Part",
+            "In h1 { color: #13305c; }",
+            "What it does"
+          ],
+          "rows": [
+            [
+              "Selector",
+              "`h1`",
+              "Picks the elements to style"
+            ],
+            [
+              "Declaration block",
+              "`{` … `}`",
+              "Holds the declarations"
+            ],
+            [
+              "Property and value",
+              "`color` and `#13305c`",
+              "What to change, and its new setting; # and six digits name a colour"
+            ],
+            [
+              "Colon and semicolon",
+              "`:` and `;`",
+              "The colon joins a property to its value; the semicolon ends each declaration"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Selector",
+            "Written",
+            "Matches"
+          ],
+          "rows": [
+            [
+              "Element (type)",
+              "`h2`",
+              "Every h2"
+            ],
+            [
+              "Class",
+              "`.badge`",
+              "Every element with class=\"badge\""
+            ],
+            [
+              "ID",
+              "`#form-note`",
+              "The one element with id=\"form-note\""
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Media steps:** Steps 1, 3 and 9 run index.html, with Juan's picture, sound and video, files your teacher adds under Media files. Online, CodeShare checks them automatically; Run code waits on Loading media… until they are on this device. Offline, these three steps show Checked by your teacher for now, and your teacher presses Mark done. Steps 2 and 4 to 8 run projects.html or contact.html and are checked automatically."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d1-s1",
+          "number": 1,
+          "instruction": "Juan's Week 3 site carries forward. This step gives index.html its first CSS: an internal style sheet, a style element in head with three rules. Each rule names a selector (body, h1, h2) and, in braces, a property, a colon, a value and a semicolon. Run it unchanged: Juan's name turns navy, the headings maroon and the font changes.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <style>\n    body {\n      font-family: Georgia, serif;\n    }\n    h1 {\n      color: #13305c;\n    }\n    h2 {\n      color: #8a1c55;\n    }\n  </style>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2>My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Look at the output: it is the same as Juan's Week 3 page. Colours and fonts are not page text; the page checks read them.",
+          "webChecks": [
+            {
+              "selector": "body",
+              "style": "font-family",
+              "value": "Georgia, serif"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "h2",
+              "style": "color",
+              "value": "rgb(138, 28, 85)"
+            },
+            {
+              "selector": "h2",
+              "count": 10
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r04-d1-s1-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nSome CSS changes the letters, so you can see it in the output. In the style element, before </style>, add a fourth rule on three lines like the others: small { text-transform: uppercase; }. Run code: the small note at the end of the fourth paragraph turns into capitals.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. SAMPLE RESUME FOR PRACTICE ONLY.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d1-s2",
+          "number": 2,
+          "instruction": "Inline CSS: a style attribute on one element holds declarations for that element only. This step makes the prototype sentence of contact.html red and bold. Run it unchanged: only that sentence changes.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p style=\"color: #9b1c1c; font-weight: bold;\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "The h1 Contact Juan stays black: an inline style never reaches another element.",
+          "webChecks": [
+            {
+              "selector": "p[style]",
+              "count": 1
+            },
+            {
+              "selector": "p",
+              "style": "color",
+              "value": "rgb(155, 28, 28)"
+            },
+            {
+              "selector": "p",
+              "style": "font-weight",
+              "value": "700"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(0, 0, 0)"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r04-d1-s2-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nGive one more element an inline style. In contact.html, change <h1>Contact Juan</h1> to <h1 style=\"text-transform: uppercase;\">Contact Juan</h1>. Run code: the heading turns into capitals; nothing else changes.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Try this in Step 1 or 2, then undo it",
+            "In the page window",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "Change #13305c to #2e7d32 in the h1 rule",
+              "Juan's name turns green",
+              "The same"
+            ],
+            [
+              "Delete the colon after color in the h1 rule",
+              "Juan's name is black again",
+              "The same"
+            ],
+            [
+              "Add text-transform: uppercase; to the h2 rule",
+              "Every h2 heading is in capitals",
+              "The headings are in capitals"
+            ],
+            [
+              "In Step 2, add display: none; to the style attribute",
+              "The sentence disappears",
+              "The sentence is gone"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: page text or not?** (a) h1 { color: #13305c; }; (b) h2 { text-transform: uppercase; }; (c) body { font-family: Georgia, serif; }; (d) a style attribute with display: none;. Answers: (a) not page text: the name only changes colour; (b) page text: the headings turn into capitals; (c) not page text; (d) page text: the element's words disappear."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r04-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r04-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is CSS? In h1 { color: #13305c; }, name the selector, the property and the value."
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, the colours changed but the output stayed the same. Why are colours not page text?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 2, an inline style made one sentence bold. How is that different from Week 1's strong, which also makes words bold?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r04-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Inline, Internal, External: Moving Juan's Styles into One Stylesheet",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain which rule wins when inline, internal and external CSS set the same property.",
+        "affective": "Appreciate one tidy shared stylesheet that classmates can read and change.",
+        "psychomotor": "Move Juan's rules into styles.css and link it from all three pages."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Monday's styles stay where they were written: the style element styles only index.html, and the inline style only one sentence."
+        },
+        {
+          "type": "definition",
+          "term": "Which rule wins",
+          "markdown": "When two rules give one element different values for the same property, an inline style wins over rules in a style element or a stylesheet. Between two rules of the same kind, the later one wins, so the order of the style element and the link line matters. An external stylesheet is one .css file; each page links it with a link element in head: rel=\"stylesheet\" and href=\"styles.css\", each value in quotes."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A class adviser's instruction to one student beats the rule posted in the room, and a newer memo on the same topic replaces an older one."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "When two rules set the same property on one element",
+            "The winner (checked in CodeShare)"
+          ],
+          "rows": [
+            [
+              "An inline style and a rule in a style element or stylesheet",
+              "The inline style"
+            ],
+            [
+              "Two rules of the same kind, for example two h1 rules",
+              "The later one"
+            ],
+            [
+              "A style element after the link line, both with an h1 rule",
+              "The style element (it is later)"
+            ],
+            [
+              "The link line after a style element, both with an h1 rule",
+              "The stylesheet (it is later)"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d2-s3",
+          "number": 3,
+          "instruction": "This step adds a nav rule to the style element (bold, capitals) and gives the My motto heading an inline style. The h2 rule says maroon, but the inline style says green. Run it unchanged: the navigation reads HOME | PROJECTS | CONTACT, and My motto is green.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <style>\n    body {\n      font-family: Georgia, serif;\n    }\n    h1 {\n      color: #13305c;\n    }\n    h2 {\n      color: #8a1c55;\n    }\n    nav {\n      font-weight: bold;\n      text-transform: uppercase;\n    }\n  </style>\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Find HOME | PROJECTS | CONTACT in the output: text-transform changed the page text. Which colour won on My motto?",
+          "webChecks": [
+            {
+              "selector": "nav",
+              "style": "text-transform",
+              "value": "uppercase"
+            },
+            {
+              "selector": "nav",
+              "style": "font-weight",
+              "value": "700"
+            },
+            {
+              "selector": "h2",
+              "style": "color",
+              "value": "rgb(138, 28, 85)"
+            },
+            {
+              "selector": "h2[style]",
+              "count": 1
+            },
+            {
+              "selector": "h2[style]",
+              "style": "color",
+              "value": "rgb(46, 125, 50)"
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r04-d2-s3-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nInline CSS beats internal CSS. In index.html, change the opening <nav> tag to <nav style=\"text-transform: none;\">. Run code: the navigation is back to Home | Projects | Contact, although the style element still says uppercase.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d2-s4",
+          "number": 4,
+          "instruction": "External CSS: one .css file that every page links. This step moves the rules from index.html's style element into a new file, styles.css, and puts the same link line in the head of all three pages. Run projects.html unchanged: it now has Juan's navy name, maroon heading and capital navigation too.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home</li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p style=\"color: #9b1c1c; font-weight: bold;\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home\nComic strip for Filipino class: Bayanihan in our barangay\nSend me a message",
+          "checkYourself": "Click Home and Contact in the page window: every page now shares the same styles. The inline green My motto and the inline red sentence stay.",
+          "webChecks": [
+            {
+              "selector": "nav",
+              "style": "text-transform",
+              "value": "uppercase"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "h2",
+              "style": "color",
+              "value": "rgb(138, 28, 85)"
+            },
+            {
+              "selector": "body",
+              "style": "font-family",
+              "value": "Georgia, serif"
+            },
+            {
+              "selector": "iframe",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r04-d2-s4-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nOne stylesheet styles every page that links it. In styles.css, add a second declaration to the h1 rule, after the colour: text-transform: uppercase;. Run code: the heading reads PROJECTS OF JUAN DELA CRUZ. Click Home and Contact: their h1s changed too.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home\nComic strip for Filipino class: Bayanihan in our barangay\nSend me a message"
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**Quotes in the link line:** write href=\"styles.css\" with its quotes. Without quotes a browser may still find the file, but CodeShare does not, and the page shows no style."
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: which colour wins?** (a) an h1 rule in a style element says navy, the h1's style attribute says maroon; (b) styles.css says navy, then a style element after the link line says green; (c) a style element says green, then the link line to styles.css says navy. Answers: (a) maroon: inline wins; (b) green: the later rule wins; (c) navy: now the stylesheet is later."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r04-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r04-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What are inline, internal and external CSS? Write where each one is written."
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 3, the My motto heading is green although the h2 rule says maroon. Why?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 4, one styles.css styles three pages. How is this like Week 3's navigation bar on every page?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Name (a) the attribute that holds inline CSS; (b) the element that holds internal CSS; (c) the element that links an external stylesheet; (d) the attribute that names the stylesheet file. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r04-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Pick Exactly What to Style: Class and ID Selectors",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Distinguish element, class and ID selectors and tell which one wins on the same element.",
+        "affective": "Choose class and id names that say what they mean.",
+        "psychomotor": "Style Juan's project badges with a class and his contact note with an ID."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Element selectors style every h1 or every nav. Juan wants to style only some elements: two project badges, one sentence."
+        },
+        {
+          "type": "definition",
+          "term": "Class and ID selectors",
+          "markdown": "A class selector starts with a dot: .badge matches every element with class=\"badge\", and many elements may share a class. An ID selector starts with #: #form-note matches the one element with id=\"form-note\"; an id is used only once on a page. Class and id names are case-sensitive. On one element an ID rule beats a class rule, and a class rule beats an element rule."
+        },
+        {
+          "type": "analogy",
+          "markdown": "At a school program, \"Grade 11, stand\" calls every student in the grade (an element), \"Science club members, stand\" calls a group that can be anywhere (a class), and \"the student in seat 12, stand\" calls one person (an id)."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "On one element, these rules set its colour",
+            "The winner"
+          ],
+          "rows": [
+            [
+              "p (element) and .note (class)",
+              ".note: a class beats an element"
+            ],
+            [
+              ".note (class) and #motto (ID)",
+              "#motto: an ID beats a class"
+            ],
+            [
+              "#motto (ID) and a style attribute",
+              "The style attribute: inline beats an ID"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d3-s5",
+          "number": 5,
+          "instruction": "A class selector starts with a dot and matches every element with that class. This step adds a .badge rule to styles.css and gives two span elements class=\"badge\", one after each project. Run it unchanged: both badges are small, yellow and in capitals.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p style=\"color: #9b1c1c; font-weight: bold;\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message",
+          "checkYourself": "Find SOLO WORK and GROUP WORK in the output: the class rule's text-transform changed them. In the code they are in small letters.",
+          "webChecks": [
+            {
+              "selector": ".badge",
+              "count": 2
+            },
+            {
+              "selector": ".badge",
+              "style": "background-color",
+              "value": "rgb(255, 243, 196)"
+            },
+            {
+              "selector": ".badge",
+              "style": "font-size",
+              "value": "12px"
+            },
+            {
+              "selector": ".badge",
+              "style": "text-transform",
+              "value": "uppercase"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r04-d3-s5-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nA class can be used again and again. In projects.html, after the comic strip item, add a third project: <li>Slide deck for Oral Communication: My dream job <span class=\"badge\">solo work</span></li>. Run code: the new line ends with SOLO WORK in capitals, because the class matched.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSlide deck for Oral Communication: My dream job SOLO WORK\nSend me a message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d3-s6",
+          "number": 6,
+          "instruction": "An ID selector starts with # and matches the one element with that id. This step moves the inline style of the prototype sentence into styles.css as #form-note, and adds a p rule that makes every paragraph dark grey. Run it unchanged: the sentence is still red and bold.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "The p rule says dark grey, but the sentence is red: an ID rule beats an element rule.",
+          "webChecks": [
+            {
+              "selector": "#form-note",
+              "count": 1
+            },
+            {
+              "selector": "#form-note",
+              "style": "color",
+              "value": "rgb(155, 28, 28)"
+            },
+            {
+              "selector": "#form-note",
+              "style": "font-weight",
+              "value": "700"
+            },
+            {
+              "selector": "form p",
+              "style": "color",
+              "value": "rgb(51, 51, 51)"
+            },
+            {
+              "selector": "p[style]",
+              "count": 0
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r04-d3-s6-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAn id names exactly one element. In contact.html, change <button type=\"submit\"> to <button type=\"submit\" id=\"send\">. At the end of styles.css, add: #send { text-transform: uppercase; } on three lines. Run code: the button reads SEND MESSAGE.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSEND MESSAGE"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: which colour wins?** A paragraph has class c and id i. The rules are p navy, .c maroon and #i red. (a) as written; (b) with a style attribute that says orange; (c) without the id. Answers: (a) red: an ID beats a class and an element; (b) orange: inline beats them all; (c) maroon: a class beats an element."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r04-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r04-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do .badge and #form-note match?"
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 6, the prototype sentence is red although the p rule says dark grey. Which rule wins, and why?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 5, the badges show in capitals in the output. Name another CSS property from this week that changes page text, and one that does not."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r04-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Repair Juan's Styles that Do Not Apply, then Start Your Own",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Locate a missing semicolon and a misspelt class by comparing the page with the stylesheet.",
+        "affective": "Show patience and care when checking every character of a rule.",
+        "psychomotor": "Repair two rules that do not apply, then begin the personal stylesheet."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Browsers show no error for a broken CSS rule: the rule just does not apply, and part of the page looks plain again."
+        },
+        {
+          "type": "definition",
+          "term": "Repairing CSS",
+          "markdown": "A browser skips any declaration it cannot read and shows no error. A missing semicolon joins two declarations into one unreadable declaration, so both are skipped; a missing colon loses that one declaration; a missing closing brace can stop every rule after it. A selector that does not match the HTML exactly (a misspelt class, a wrong capital letter, a missing dot) styles nothing."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A text message with a missing period runs two sentences together and the reader skips both; a misspelt name reaches nobody. A missing semicolon or a misspelt class does the same to a rule."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d4-s7",
+          "number": 7,
+          "instruction": "Broken on purpose: in styles.css, the nav rule lost the semicolon after bold. Run it unchanged: the navigation is back in small letters and is not bold, but the other rules still work.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "One missing semicolon joins two declarations into one the browser cannot read, so both are skipped.",
+          "webChecks": [
+            {
+              "selector": "nav",
+              "style": "font-weight",
+              "value": "400"
+            },
+            {
+              "selector": "nav",
+              "style": "text-transform",
+              "value": "none"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "#form-note",
+              "style": "color",
+              "value": "rgb(155, 28, 28)"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r04-d4-s7-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the rule: put back the semicolon, so the line reads font-weight: bold;. Run code. The navigation reads HOME | PROJECTS | CONTACT again.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: styles.css is repaired, but on projects.html the second badge's class is misspelt bagde. Run it unchanged: group work stays in small letters with no yellow, because no rule matches bagde.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"bagde\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay group work\nSend me a message",
+          "checkYourself": "Compare the class in the HTML with the selector in styles.css letter by letter.",
+          "webChecks": [
+            {
+              "selector": ".badge",
+              "count": 1
+            },
+            {
+              "selector": "span",
+              "count": 2
+            },
+            {
+              "selector": ".badge",
+              "style": "text-transform",
+              "value": "uppercase"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r04-d4-s8-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the class: spell it badge, so it matches .badge in styles.css. Run code. The line ends with GROUP WORK.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message"
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "The navigation lost both its bold and its capitals.",
+              "means": "A declaration lost its semicolon, so it and the next one are skipped.",
+              "fix": "Put the ; back: font-weight: bold;."
+            },
+            {
+              "see": "Only one property of a rule does nothing.",
+              "means": "The colon between that property and its value is missing.",
+              "fix": "Write property: value;."
+            },
+            {
+              "see": "Every rule after one point stops working.",
+              "means": "A rule lost its closing }.",
+              "fix": "Close each rule with } on its own line."
+            },
+            {
+              "see": "A class rule styles nothing.",
+              "means": "The class in the HTML and the selector differ (spelling, a capital letter) or the dot is missing.",
+              "fix": "Copy the name exactly: class=\"badge\" and .badge."
+            },
+            {
+              "see": "An ID rule styles nothing.",
+              "means": "The id and the # selector differ.",
+              "fix": "Match id=\"form-note\" and #form-note exactly."
+            },
+            {
+              "see": "No style from styles.css works on the page.",
+              "means": "The link line's href does not name the file exactly (style.css, Styles.css), the file is missing, or the href has no quotes.",
+              "fix": "Write href=\"styles.css\" exactly, in quotes, and check the file tab."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what will the output show?** In styles.css, (a) delete the colon in text-transform: uppercase of the nav rule; (b) delete the closing } of the h2 rule; (c) write .Badge instead of .badge. Answers: (a) the navigation in small letters, still bold in the page window; (b) the navigation in small letters, and every rule after it stops working; (c) both badges in small letters, because class names are case-sensitive. Undo each change."
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r04-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r04-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does the semicolon do in a CSS declaration?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, why did the navigation lose both its bold and its capitals when only one semicolon was missing?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 8, a misspelt class matched nothing. How is it like Week 3's link with href=\"Projects.html\"?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r04-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 4: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain each CSS type and each selector in one's own stylesheet.",
+        "affective": "Present one's own work honestly and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the resume with its own external stylesheet in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's site is styled, but your own resume still needs its own stylesheet."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your site, visit every page with its links, change one value in styles.css to show it changes every page, and point to each rule type. No new CSS today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A school fair booth: one design is used on every poster, and the presenter explains why each colour was chosen."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r04-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 4 site: index.html as in Step 4, projects.html as in Step 5, and contact.html and styles.css as in Step 6. Run it, play its media and visit all three pages before you present. Friday adds no new CSS.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Visit every page with the links: do they share the same colours, font and navigation?",
+          "webChecks": [
+            {
+              "selector": "nav",
+              "style": "text-transform",
+              "value": "uppercase"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(19, 48, 92)"
+            },
+            {
+              "selector": "h2[style]",
+              "style": "color",
+              "value": "rgb(46, 125, 50)"
+            },
+            {
+              "selector": "p",
+              "style": "color",
+              "value": "rgb(51, 51, 51)"
+            },
+            {
+              "selector": "img",
+              "count": 1
+            },
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r04-d5-s9-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nBefore you present, show that a class works on any page that links styles.css. At the end of index.html, on a new line before </body>, add: <p>This resume is styled by <span class=\"badge\">styles.css</span>.</p>. Run code. Then present your own resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nThis resume is styled by STYLES.CSS.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r04-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r04-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to your link line, one element rule, your class rule with its class attribute, and your ID rule with its id."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend one choice: why did you put your styles in an external stylesheet instead of inline styles?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school library wants every heading navy, one notice red and all book labels in capitals. Write the three rules: an element rule, an ID rule and a class rule."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Compare your Week 3 resume with this week's. What changed for a visitor, and what stayed the same in the page text?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r04-pt",
+    "title": "My Resume, Week 4: My Own Stylesheet",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your Week 3 site carries forward: add this week's parts to it.\n\nAdd styles.css with ＋ (Create a new file) and link it from every page with a link element in head: rel=\"stylesheet\" and href=\"styles.css\", each value in quotes. Write element, class and ID rules there, following the requirements below, with a comment above each rule that names its type. Use only colours and fonts already on the computer: no pictures or fonts named inside CSS.\n\nUse only safe details: no home address, phone number, birth date, ID numbers or personal social-media accounts. Run code until index.html runs with no error, visit every page with your links, then press Submit this version. Saving or running is not submitting. Pictures, sound and video stay online only (Media files).\n\nThursday: 0–60 minutes, repairs and the Thursday strip; 60–120 minutes, plan on paper, show the teacher, then start. Friday: 0–30 minutes, finish and run; 30–105 minutes, five-minute presentations; 105–120 minutes, Friday strip and Submit this version.",
+    "checklist": [
+      "Keep your Week 3 site: every page, the navigation bar, the frame and the form.",
+      "Add styles.css with ＋ Create a new file; the name is exactly styles.css.",
+      "In head of every page, add the link element with rel=\"stylesheet\" and href=\"styles.css\", in quotes.",
+      "Write at least three element rules, for example body, h1 and nav, with colours that are easy to read.",
+      "Write one class rule and give that class to at least two elements.",
+      "Write one ID rule and give that id to exactly one element.",
+      "Above each rule, write a comment that names its type: element, class or ID selector.",
+      "Use only colours and fonts already on the computer; nothing named in CSS url().",
+      "No home address, phone number, birth date, ID numbers or social media.",
+      "Run code shows no error; visit every page; press Submit this version, then present and explain inline, internal and external CSS."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name</h1>\n  <img src=\"images/my_picture.jpg\" alt=\"Describe your picture here\" width=\"160\" height=\"160\">\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n  <h2>Education</h2>\n  <table>\n    <caption>My schools</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Write a level here</td>\n        <td>Write a school here</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Projects</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>My Projects</h1>\n  <ul>\n    <li>Write a school project here</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"My contact form\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Me</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Me</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" required>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* My resume: one stylesheet for all my pages */\n\n/* Element selector: every h1 */\nh1 {\n  color: #13305c;\n}\n\n/* Class selector: every element with class=\"highlight\" */\n.highlight {\n  background-color: #fff3c4;\n}\n\n/* ID selector: only the element with id=\"about\" */\n#about {\n  font-style: italic;\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your site (30 seconds).",
+      "Press Run code and visit every page with your links (1 minute).",
+      "Change one value in styles.css, run again and show every page change; then undo it (2 minutes).",
+      "Point to one element rule, your class rule with its class attribute and your ID rule with its id (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "How are inline, internal and external CSS different?",
+      "Why does one change in styles.css change every page?",
+      "On one element, which wins: an ID rule or a class rule?",
+      "Why may a class be used many times but an id only once?",
+      "Which details did you leave out of your resume to keep it safe?"
+    ],
+    "rubric": [
+      {
+        "criterion": "External stylesheet linked from every page",
+        "points": 10
+      },
+      {
+        "criterion": "Element rules with readable colours",
+        "points": 8
+      },
+      {
+        "criterion": "A class used by two or more elements, and one ID used once",
+        "points": 12
+      },
+      {
+        "criterion": "Comments that name each rule type",
+        "points": 6
+      },
+      {
+        "criterion": "Safe and honest personal details",
+        "points": 6
+      },
+      {
+        "criterion": "Presentation: explains inline, internal and external CSS and each selector",
+        "points": 8
+      }
+    ],
+    "totalPoints": 50
+  }
+}

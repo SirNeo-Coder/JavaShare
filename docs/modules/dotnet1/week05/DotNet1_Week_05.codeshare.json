@@ -1,0 +1,1285 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 5,
+  "id": "dotnet-1-r05",
+  "title": "Self-Paced Module: Text, Font, Colour, Gradient and Opacity",
+  "continues": "Week 4 — CSS fundamentals and selectors",
+  "previousModuleId": "dotnet-1-r04",
+  "sampleFirst": true,
+  "starterFiles": [
+    {
+      "path": "index.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+    },
+    {
+      "path": "projects.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+    },
+    {
+      "path": "contact.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+    },
+    {
+      "path": "styles.css",
+      "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Georgia, serif;\n}\nh1 {\n  color: #13305c;\n}\nh2 {\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "dotnet-1-r05-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Make It Look Right: Text, Font, Colour, Gradients and Opacity",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe what the font-family, color, background-image gradient and opacity properties change on a page.",
+        "affective": "Value text that every reader, including readers with low vision, can read.",
+        "psychomotor": "Give Juan's site font lists and a gradient header in styles.css and run it in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Run every sample unchanged first, then do its small task. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample files into the editor tabs; **Run code** shows the step's run page in the page window and checks it, and its links open the project's other pages there. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks for the step's run page: the Tab title, the Visible page text, then, on Steps 1, 6 and 9, Media checks. Fonts, sizes, spacing, colours, gradients and opacity are not page text; CodeShare checks them with page checks. Only CSS that changes letters (text-transform) or hides an element changes the page text; faded or invisible words stay. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** Juan's finished Week 4 site carries forward in your module project: index.html, projects.html, contact.html and styles.css. This week changes only styles.css. Each step loads its run page and every file that page needs; the boxes show only the rules a step adds or changes."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 5 starts here:** Juan's site has one stylesheet, but his text uses the browser's plain fonts and spacing, and his name is plain navy text on white."
+        },
+        {
+          "type": "definition",
+          "term": "Text, font, colour, gradient and opacity",
+          "markdown": "Text and font properties set how words look. font-family names a list of fonts tried in order, ending in a generic family (serif, sans-serif or monospace) that every computer has; font-size, font-weight and font-style set size, boldness and slant. color sets the text colour, written as a name (white), a hex code (#ffffff) or rgb(255, 255, 255). A gradient is a background image that blends colours: background-image: linear-gradient(to right, #13305c, #8a1c55). opacity fades a whole element, from 1 (solid) to 0 (invisible)."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A Foundation Day tarpaulin: the letters, their size and their colours are chosen so people can read it from far away; a blended background looks good only if every word still stands out."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Property",
+            "Example from Juan's styles.css",
+            "It changes",
+            "Page text?"
+          ],
+          "rows": [
+            [
+              "font-family",
+              "`font-family: Verdana, Tahoma, sans-serif;`",
+              "The font: the first one the computer has",
+              "No"
+            ],
+            [
+              "font-size, font-weight, font-style",
+              "`font-size: 1.1em;` `font-weight: bold;` `font-style: italic;`",
+              "Size, boldness, slant",
+              "No"
+            ],
+            [
+              "color",
+              "`color: #ffffff;`",
+              "The text colour",
+              "No"
+            ],
+            [
+              "text-transform",
+              "`text-transform: uppercase;`",
+              "Capital or small letters",
+              "Yes"
+            ],
+            [
+              "background-image",
+              "`background-image: linear-gradient(to right, #13305c, #8a1c55);`",
+              "A gradient behind the element",
+              "No"
+            ],
+            [
+              "opacity",
+              "`opacity: 0.75;`",
+              "Fades the whole element",
+              "No: faded words stay"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Media steps:** Steps 1, 6 and 9 run index.html, with Juan's picture, sound and video, files your teacher adds under Media files. Online, CodeShare checks them automatically; Run code waits on Loading media… until they are on this device. Offline, these three steps show Checked by your teacher for now, and your teacher presses Mark done. The other steps run projects.html or contact.html and are checked automatically."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d1-s1",
+          "number": 1,
+          "instruction": "Juan's Week 4 site carries forward; this week changes only styles.css. A font-family value is a list: the browser uses the first font the computer has and ends with a generic family (serif, sans-serif or monospace), which every computer has. This step gives body a sans-serif list and the h1 and h2 headings a serif list. Run it unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #13305c;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "The output is the same as Juan's Week 4 page: fonts are not page text. The page checks read the font lists.",
+          "webChecks": [
+            {
+              "selector": "body",
+              "style": "font-family",
+              "value": "Verdana, Tahoma, sans-serif"
+            },
+            {
+              "selector": "h1",
+              "style": "font-family",
+              "value": "Georgia, \"Times New Roman\", serif"
+            },
+            {
+              "selector": "h2",
+              "style": "font-family",
+              "value": "Georgia, \"Times New Roman\", serif"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(19, 48, 92)"
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r05-d1-s1-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nText properties can change letters too. In styles.css, add a second declaration to the h2 rule, after the colour: text-transform: capitalize;. Run code: every h2 starts each word with a capital, so Goals this term reads Goals This Term.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJuan Dela Cruz\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals This Term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I Will Learn Next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy Motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly Clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill Levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound Greeting\nVideo Introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d1-s2",
+          "number": 2,
+          "instruction": "A gradient is a background image that blends colours. This step makes Juan's name a header: white text (#ffffff) on a gradient from navy to maroon, background-image: linear-gradient(to right, #13305c, #8a1c55). Run projects.html unchanged: the h1 is white on the gradient; the framed contact page gets the same header.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message",
+          "checkYourself": "White text needs a dark background: on the white page it could not be read. The output has not changed.",
+          "webChecks": [
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(255, 255, 255)"
+            },
+            {
+              "selector": "h1",
+              "style": "background-image",
+              "value": "linear-gradient(to right, rgb(19, 48, 92), rgb(138, 28, 85))"
+            },
+            {
+              "selector": "h1",
+              "style": "font-family",
+              "value": "Georgia, \"Times New Roman\", serif"
+            },
+            {
+              "selector": "iframe",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r05-d1-s2-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nWrite a gradient of your own. In projects.html, after the closing </ul>, add <p class=\"banner\">More projects are coming soon.</p>. At the end of styles.css, add a .banner rule with three declarations: color: #ffffff; background-image: linear-gradient(to right, #8a1c55, #13305c); text-transform: uppercase;. Run code: the new line reads MORE PROJECTS ARE COMING SOON., white on a maroon-to-navy gradient; the capitals prove the rule matched.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nProjects of Juan Dela Cruz\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nMORE PROJECTS ARE COMING SOON.\nSend me a message"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Try this in Step 2, then undo it",
+            "In the page window",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "Change `to right` to `to bottom`",
+              "Navy at the top, maroon at the bottom",
+              "The same"
+            ],
+            [
+              "Write `radial-gradient(circle, #8a1c55, #13305c)`",
+              "Maroon in the middle, navy outside",
+              "The same"
+            ],
+            [
+              "Change `#ffffff` to `white`",
+              "No change: they are one colour",
+              "The same"
+            ],
+            [
+              "Add `opacity: 0;` to the h1 rule",
+              "The header disappears",
+              "The name is still there"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: page text or not?** (a) h1 { font-family: Georgia, serif; }; (b) h2 { text-transform: uppercase; }; (c) small { opacity: 0; }; (d) h1 { color: #ffffff; } with no gradient. Answers: (a) not page text; (b) page text: the headings turn into capitals; (c) not page text: the words vanish from the page window but stay in the output; (d) not page text, and white on white cannot be read: 1:1."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r05-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r05-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do font-family, color and background-image: linear-gradient(...) each change?"
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, the fonts changed but the output stayed the same. Why?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Week 4, Juan's h1 was navy text on white. In Step 2 it is white text. Why does white text need the gradient behind it?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r05-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Easy to Read: Font Sizes, Spacing and Alignment",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain how font-size in em, line-height, letter-spacing and text-align make text easier to read.",
+        "affective": "Appreciate room on a page that helps classmates read without strain.",
+        "psychomotor": "Space and align Juan's header and size his form labels in em."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's header has a gradient, but its words sit on the left, close together, and his paragraph lines are tight."
+        },
+        {
+          "type": "definition",
+          "term": "Readable text",
+          "markdown": "font-size can be written in px, in em (times the parent's size: 1.1em of 16px is 17.6px) or in rem (times the page's base size). line-height sets the space each line takes (1.5 is one and a half times the font size); letter-spacing adds space between letters; text-align places lines left, center or right; text-decoration draws or removes lines such as underline. Page checks read sizes in px and colours in rgb()."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A teacher writing on the whiteboard leaves space between lines and centres the title, so the back row can read it."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Property",
+            "In Juan's styles.css",
+            "The page check reads"
+          ],
+          "rows": [
+            [
+              "line-height",
+              "`line-height: 1.5;` on body",
+              "24px (1.5 × 16px)"
+            ],
+            [
+              "letter-spacing",
+              "`letter-spacing: 2px;` on h1",
+              "2px"
+            ],
+            [
+              "text-align",
+              "`text-align: center;` on h1",
+              "center (without it: start)"
+            ],
+            [
+              "font-size in em",
+              "`font-size: 1.1em;` on label",
+              "17.6px (1.1 × 16px)"
+            ],
+            [
+              "text-decoration",
+              "`text-decoration: underline;`",
+              "underline (none for no line)"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d2-s3",
+          "number": 3,
+          "instruction": "Readable text has room. This step gives body a line-height of 1.5 (each line takes one and a half times the font size) and turns the h1 into a centred header: capitals, 2px between letters and a line-height of 2, which makes the gradient band taller. Run it unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message",
+          "checkYourself": "Find PROJECTS OF JUAN DELA CRUZ in the output: text-transform changed the page text, but centring and spacing did not.",
+          "webChecks": [
+            {
+              "selector": "body",
+              "style": "line-height",
+              "value": "24px"
+            },
+            {
+              "selector": "h1",
+              "style": "text-align",
+              "value": "center"
+            },
+            {
+              "selector": "h1",
+              "style": "letter-spacing",
+              "value": "2px"
+            },
+            {
+              "selector": "h1",
+              "style": "line-height",
+              "value": "64px"
+            },
+            {
+              "selector": "h1",
+              "style": "text-transform",
+              "value": "uppercase"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r05-d2-s3-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nCentre and space a subtitle. In projects.html, under the h1, add <p class=\"subtitle\">School projects, Grade 11</p>. In styles.css, after the nav rule, add a .subtitle rule: text-align: center; letter-spacing: 1px; text-transform: uppercase;. Run code: SCHOOL PROJECTS, GRADE 11 appears under the header.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nPROJECTS OF JUAN DELA CRUZ\nSCHOOL PROJECTS, GRADE 11\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d2-s4",
+          "number": 4,
+          "instruction": "Sizes can be written in em: 1.1em is 1.1 times the parent's size, so 16px becomes 17.6px. This step makes every label bold and 1.1em, and the form note italic. Run contact.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-color: #fff3c4;\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "The page check reads the label size in px: 17.6px. The h1 reads CONTACT JUAN because of Step 3's capitals.",
+          "webChecks": [
+            {
+              "selector": "label",
+              "count": 4
+            },
+            {
+              "selector": "label",
+              "style": "font-weight",
+              "value": "700"
+            },
+            {
+              "selector": "label",
+              "style": "font-size",
+              "value": "17.6px"
+            },
+            {
+              "selector": "#form-note",
+              "style": "font-style",
+              "value": "italic"
+            },
+            {
+              "selector": "h1",
+              "style": "background-image",
+              "value": "linear-gradient(to right, rgb(19, 48, 92), rgb(138, 28, 85))"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r05-d2-s4-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nOne rule reaches every label. In styles.css, add a third declaration to the label rule: text-transform: uppercase;. Run code: YOUR NAME, YOUR EMAIL, TOPIC and MESSAGE are in capitals; the select's options are not.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYOUR NAME\nYOUR EMAIL\nTOPIC\nSchool project\nArt club\nMESSAGE\nSend message"
+          }
+        },
+        {
+          "type": "text",
+          "markdown": "**Fonts and pictures in CSS:** use only fonts already on the computer, and end every list with serif, sans-serif or monospace. The page window loads nothing named in url(), so no @font-face and no picture backgrounds; a gradient needs no file."
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what does the page check read?** (a) font-size: 1.5em in 16px text; (b) line-height: 2 on 16px text; (c) letter-spacing: 3px; (d) no text-align. Answers: (a) 24px; (b) 32px; (c) 3px; (d) start."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r05-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r05-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do line-height, letter-spacing and text-align change?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 3, the h1 shows in capitals in the output, but its centring and spacing do not. Why?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 4, a label of 1.1em reads 17.6px. Which element's size does em multiply, and how is this like a paragraph taking its colour from body?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Name the property for (a) space between lines; (b) space between letters; (c) centring a line; (d) slanted letters. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r05-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Colour with Care: Colour Values, Gradients and Opacity",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Write one colour as a name, a hex code and rgb(), and tell what a gradient and opacity do to contrast.",
+        "affective": "Choose colours with care so that meaning never depends on colour alone.",
+        "psychomotor": "Apply rgb() text colour, a badge gradient and faded small print to Juan's site."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's text is readable, but his colours were picked one at a time, and the small print looks as strong as the rest."
+        },
+        {
+          "type": "definition",
+          "term": "Colours, gradients and opacity",
+          "markdown": "A hex colour is # and six digits (00 to ff for red, green and blue); rgb() gives the same three numbers from 0 to 255, and rgba() adds an alpha from 0 (transparent) to 1 (solid). linear-gradient() runs in a direction (to right; to bottom when none is given) through colours separated by commas; radial-gradient() spreads from the centre. opacity fades the element and everything in it, so its text loses contrast."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Mixing paint for a school mural: two colours blended across a wall make a gradient; adding water thins the paint until the wall shows through, like opacity."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Written as",
+            "White",
+            "Juan's dark grey",
+            "Note"
+          ],
+          "rows": [
+            [
+              "Name",
+              "`white`",
+              "—",
+              "Only some colours have names"
+            ],
+            [
+              "Hex",
+              "`#ffffff`",
+              "`#222222`",
+              "# and six digits: two each for red, green, blue"
+            ],
+            [
+              "rgb()",
+              "`rgb(255, 255, 255)`",
+              "`rgb(34, 34, 34)`",
+              "Each 0 to 255; page checks show this form"
+            ],
+            [
+              "rgba()",
+              "`rgba(255, 255, 255, 0.5)`",
+              "`rgba(34, 34, 34, 0.5)`",
+              "The fourth number: 0 transparent, 1 solid"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d3-s5",
+          "number": 5,
+          "instruction": "A colour can be written three ways: a name (white), a hex code (#222222) or rgb(red, green, blue), each from 0 to 255. This step gives body a dark grey written as rgb(34, 34, 34), and replaces the badges' flat yellow with a gradient from light yellow to gold. With no direction, a gradient runs from top to bottom. Run it unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message",
+          "checkYourself": "Paragraphs stay #333333: the p rule beats the colour they would get from body. The page check shows every colour in rgb() form.",
+          "webChecks": [
+            {
+              "selector": "body",
+              "style": "color",
+              "value": "rgb(34, 34, 34)"
+            },
+            {
+              "selector": "li",
+              "style": "color",
+              "value": "rgb(34, 34, 34)"
+            },
+            {
+              "selector": "p",
+              "style": "color",
+              "value": "rgb(51, 51, 51)"
+            },
+            {
+              "selector": ".badge",
+              "style": "background-image",
+              "value": "linear-gradient(rgb(255, 243, 196), rgb(255, 224, 138))"
+            },
+            {
+              "selector": ".badge",
+              "style": "background-color",
+              "value": "rgba(0, 0, 0, 0)"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r05-d3-s5-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nThe badge gradient reaches every badge. In projects.html, after the solo work badge, add a space and a second badge: <span class=\"badge\">best poster</span>. Run code: the first project ends with SOLO WORK BEST POSTER.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK BEST POSTER\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d3-s6",
+          "number": 6,
+          "instruction": "opacity fades a whole element, from 1 (solid) to 0 (invisible). This step fades Juan's small print to 0.75. Faded text loses contrast: #333333 at 0.75 on white looks like #666666, still 5.7:1. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "The faded words are still in the output. Even opacity: 0 or a transparent colour leaves them in the page text.",
+          "webChecks": [
+            {
+              "selector": "small",
+              "style": "opacity",
+              "value": "0.75"
+            },
+            {
+              "selector": "small",
+              "style": "color",
+              "value": "rgb(51, 51, 51)"
+            },
+            {
+              "selector": "h1",
+              "style": "text-transform",
+              "value": "uppercase"
+            },
+            {
+              "selector": "h2[style]",
+              "style": "color",
+              "value": "rgb(46, 125, 50)"
+            },
+            {
+              "selector": "img",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r05-d3-s6-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nOpacity fades words but keeps them. In index.html, after the paragraph that ends with Sample resume for practice only., add <p><small>Updated every Friday.</small></p>. Run code: Updated every Friday. is faded in the page window and appears in the output.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nUpdated every Friday.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what happens?** (a) linear-gradient(#fff3c4, #ffe08a) with no direction; (b) opacity: 0.4 on #333333 small print; (c) color: rgb(255, 255, 255) on Juan's h1. Answers: (a) light yellow at the top, gold at the bottom; (b) it looks like #adadad, only 2.2:1, too faint; (c) the same white as #ffffff."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r05-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r05-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "Write white three ways: as a name, as a hex code and with rgb()."
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 6, the small print is faded but still in the output. Why, and what does fading do to its contrast?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 5, the badges' gradient replaced Week 4's background-color. Why is a gradient written with background-image?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r05-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "Can Everyone Read It? Contrast and Gradient Repairs, then Start Your Own",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Judge whether a text and background pair reaches 4.5:1 and locate a missing bracket or semicolon.",
+        "affective": "Show patience and respect for every reader when checking contrast.",
+        "psychomotor": "Repair Juan's broken gradient and unreadable heading, then begin the personal styling."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Browsers show no error for broken CSS, and a page can have every word right and still be unreadable to the eye."
+        },
+        {
+          "type": "definition",
+          "term": "Readable contrast",
+          "markdown": "Contrast compares the lightness of text and its background, from 1:1 (none) to 21:1 (black on white). Normal text needs at least 4.5:1; large text (24px, or about 19px bold) at least 3:1. On a gradient, check the text against every colour of the gradient. A browser skips a declaration it cannot read and shows no error; a missing ) can switch off every rule after it."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A jeepney signboard with dark letters on a dark board cannot be read at night, however nice the colours; one missing bracket is like tape over the rest of the signboard."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Text on background (Juan's site)",
+            "Ratio",
+            "Needs"
+          ],
+          "rows": [
+            [
+              "Juan's name (h1), white on the gradient",
+              "8.8:1",
+              "3:1 (large)"
+            ],
+            [
+              "Body text and list items",
+              "15.9:1",
+              "4.5:1"
+            ],
+            [
+              "Paragraphs and labels",
+              "12.6:1",
+              "4.5:1"
+            ],
+            [
+              "h2 headings, maroon",
+              "8.8:1",
+              "3:1 (large)"
+            ],
+            [
+              "My motto heading, green (inline)",
+              "5.1:1",
+              "3:1 (large)"
+            ],
+            [
+              "Form note, red",
+              "8.1:1",
+              "4.5:1"
+            ],
+            [
+              "Badges on their yellow gradient",
+              "12.3:1",
+              "4.5:1"
+            ],
+            [
+              "Small print at opacity 0.75",
+              "5.7:1",
+              "4.5:1"
+            ],
+            [
+              "Navigation links (browser blue)",
+              "9.4:1",
+              "4.5:1"
+            ],
+            [
+              "Visited links (browser purple)",
+              "11.0:1",
+              "4.5:1"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Pick from these: text colour",
+            "Background",
+            "Ratio",
+            "Normal text?"
+          ],
+          "rows": [
+            [
+              "`#222222`",
+              "`#ffffff`",
+              "15.9:1",
+              "Yes"
+            ],
+            [
+              "`#333333`",
+              "`#ffffff`",
+              "12.6:1",
+              "Yes"
+            ],
+            [
+              "`#13305c`",
+              "`#ffffff`",
+              "13.0:1",
+              "Yes"
+            ],
+            [
+              "`#8a1c55`",
+              "`#ffffff`",
+              "8.8:1",
+              "Yes"
+            ],
+            [
+              "`#2e7d32`",
+              "`#ffffff`",
+              "5.1:1",
+              "Yes"
+            ],
+            [
+              "`#b45309`",
+              "`#ffffff`",
+              "5.0:1",
+              "Yes"
+            ],
+            [
+              "`#888888`",
+              "`#ffffff`",
+              "3.5:1",
+              "Large text only"
+            ],
+            [
+              "`#ffcc00`",
+              "`#ffffff`",
+              "1.5:1",
+              "No"
+            ],
+            [
+              "`#ffffff`",
+              "`#13305c`",
+              "13.0:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#8a1c55`",
+              "8.8:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#2e7d32`",
+              "5.1:1",
+              "Yes"
+            ],
+            [
+              "`#ffffff`",
+              "`#ffe08a`",
+              "1.2:1",
+              "No"
+            ],
+            [
+              "`#222222`",
+              "`#fff3c4`",
+              "14.2:1",
+              "Yes"
+            ],
+            [
+              "`#222222`",
+              "`#13305c`",
+              "1.2:1",
+              "No"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d4-s7",
+          "number": 7,
+          "instruction": "Broken on purpose: the closing bracket ) of the h1's gradient is missing. The browser reads the rest of the file as part of that value, so every later rule stops. Run it unchanged: no gradient, the white name vanishes on the white page, and the navigation and badges are in small letters.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55;\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHome | Projects | Contact\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home solo work\nComic strip for Filipino class: Bayanihan in our barangay group work\nSend me a message",
+          "checkYourself": "The name is still in the output, although no one can see it: white on white is 1:1.",
+          "webChecks": [
+            {
+              "selector": "h1",
+              "style": "background-image",
+              "value": "none"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(255, 255, 255)"
+            },
+            {
+              "selector": "h1",
+              "style": "text-align",
+              "value": "start"
+            },
+            {
+              "selector": "nav",
+              "style": "text-transform",
+              "value": "none"
+            },
+            {
+              "selector": ".badge",
+              "style": "text-transform",
+              "value": "none"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r05-d4-s7-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the gradient: put back the closing bracket, so the line ends #8a1c55);. Run code. The navigation reads HOME | PROJECTS | CONTACT and the badges SOLO WORK and GROUP WORK again.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nPROJECTS OF JUAN DELA CRUZ\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: the h1 rule lost the semicolon after color: #ffffff. That declaration and the next one are skipped, so the heading is dark grey on the dark gradient, about 1.2:1, and in small letters. Run contact.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nContact Juan\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "Measure before you repair: #222222 on #13305c is 1.2:1, far below 4.5:1. The gradient still works.",
+          "webChecks": [
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(34, 34, 34)"
+            },
+            {
+              "selector": "h1",
+              "style": "text-transform",
+              "value": "none"
+            },
+            {
+              "selector": "h1",
+              "style": "background-image",
+              "value": "linear-gradient(to right, rgb(19, 48, 92), rgb(138, 28, 85))"
+            },
+            {
+              "selector": "#form-note",
+              "style": "font-style",
+              "value": "italic"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r05-d4-s8-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the contrast: put back the semicolon, so the line reads color: #ffffff;. Run code. The heading reads CONTACT JUAN, white on the gradient (8.8:1 or more).",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message"
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "The gradient or a colour is gone; white words vanish on the white page.",
+              "means": "The value is invalid: a missing comma between colours, a misspelt direction (to rigth) or a colour without #. The whole declaration is skipped.",
+              "fix": "linear-gradient(to right, #13305c, #8a1c55): commas between parts, # before each colour."
+            },
+            {
+              "see": "The gradient and every rule after it stop working.",
+              "means": "A ( has no closing ), so the rest of the file is read as part of that value.",
+              "fix": "Close the bracket: #8a1c55);."
+            },
+            {
+              "see": "A heading is dark on the dark gradient and lost its capitals.",
+              "means": "The ; after its color is missing, so that declaration and the next are skipped.",
+              "fix": "End color: #ffffff; with its ;."
+            },
+            {
+              "see": "Words cannot be seen, but they are still in the output.",
+              "means": "Their colour is too close to the background, transparent, or at opacity 0.",
+              "fix": "Pick a pair of 4.5:1 or more from the contrast chart."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what will the page window show?** In styles.css, (a) write to rigth in the h1 gradient; (b) write 13305c without #; (c) delete the comma between the gradient's colours. Answers: in all three the gradient is gone and the white name vanishes on the white page; every other rule still works and the output is the same. Undo each change."
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r05-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r05-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What is a contrast ratio, and which ratio does normal text need?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, why did the navigation lose its capitals when only one ) was missing?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 8, a missing semicolon made the heading unreadable. How is it like Week 4's Step 7?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r05-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 5: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the fonts, colours, gradient and contrast of one's own resume.",
+        "affective": "Present one's own work honestly and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the resume with readable text and a gradient header in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's site is readable and colourful; your own resume still needs its own fonts, colours and gradient header."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your site, visit every page, point to your font lists, colours and gradient, and show the contrast of your header from the contrast chart. No new HTML or CSS today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A barangay poster contest: the judges first check that every word can be read, then look at the colours."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r05-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 5 site: the three pages as in Week 4 and styles.css as in Step 6. Run it, play its media and visit all three pages before you present. Friday adds no new HTML or CSS.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Visit every page with the links: can you read every word on every background?",
+          "webChecks": [
+            {
+              "selector": "h1",
+              "style": "background-image",
+              "value": "linear-gradient(to right, rgb(19, 48, 92), rgb(138, 28, 85))"
+            },
+            {
+              "selector": "h1",
+              "style": "color",
+              "value": "rgb(255, 255, 255)"
+            },
+            {
+              "selector": "body",
+              "style": "font-family",
+              "value": "Verdana, Tahoma, sans-serif"
+            },
+            {
+              "selector": "small",
+              "style": "opacity",
+              "value": "0.75"
+            },
+            {
+              "selector": "img",
+              "count": 1
+            },
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r05-d5-s9-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nBefore you present, reuse a class on another page. In index.html, after the video element, add <p class=\"badge\">Thank you for reading my resume.</p>. Run code: THANK YOU FOR READING MY RESUME. ends the page on a yellow gradient. Then present your own resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME | PROJECTS | CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nSound greeting\nVideo introduction\nTHANK YOU FOR READING MY RESUME.\nMedia checks:\nimages/juan_profile.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r05-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r05-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to your two font lists, your gradient header rule and one text and background pair with its contrast ratio."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend your header colours: how do you know every visitor can read them?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school library wants a reading-month page: a dark green header with white words. Write its h1 rule with a font list, a colour and a gradient, and name the pairs you would check."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Which change this week made your resume easiest to read, and how do you know?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r05-pt",
+    "title": "My Resume, Week 5: Readable Text and a Gradient Header",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your Week 4 site carries forward: add this week's rules to your own styles.css.\n\nGive your text font lists, a size, spacing and alignment; choose text colours from the contrast chart; give your h1 a gradient header whose text reaches 4.5:1 against every colour of the gradient; use opacity once without making text hard to read. Use only fonts and colours already on the computer: no @font-face and nothing named in url().\n\nUse only safe details: no home address, phone number, birth date, ID numbers or personal social-media accounts. Run code until index.html runs with no error, visit every page with your links, then press Submit this version. Saving or running is not submitting. Pictures, sound and video stay online only (Media files).\n\nThursday: 0–60 minutes, repairs and the Thursday strip; 60–120 minutes, plan on paper, show the teacher, then start. Friday: 0–30 minutes, finish and run; 30–105 minutes, five-minute presentations; 105–120 minutes, Friday strip and Submit this version.",
+    "checklist": [
+      "Keep your Week 4 site: every page, the navigation, the frame, the form and styles.css linked from every page.",
+      "Give body one font-family list and your headings another, each ending in serif, sans-serif or monospace.",
+      "Set a font-size (in em or px) and a line-height that leaves room between lines.",
+      "Use text-align and letter-spacing (or text-decoration) on at least one element.",
+      "Choose text colours from the contrast chart: at least 4.5:1 for normal text.",
+      "Give your h1 a linear-gradient background, with text at 4.5:1 or more against every gradient colour.",
+      "Use opacity once, on a picture or on text that keeps 4.5:1.",
+      "Colour never carries meaning alone: the words say it too.",
+      "Only fonts and colours already on the computer; nothing in url(). No address, phone, birth date, ID numbers or social media.",
+      "Run code shows no error; visit every page; press Submit this version, then present your fonts, colours and contrast."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name</h1>\n  <img src=\"images/my_picture.jpg\" alt=\"Describe your picture here\" width=\"160\" height=\"160\">\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul>\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n  <h2>Education</h2>\n  <table>\n    <caption>My schools</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Write a level here</td>\n        <td>Write a school here</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Projects</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>My Projects</h1>\n  <ul>\n    <li>Write a school project here</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"My contact form\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Me</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav><a href=\"index.html\">Home</a> | <a href=\"projects.html\">Projects</a> | <a href=\"contact.html\">Contact</a></nav>\n  <h1>Contact Me</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" required>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* My resume: one stylesheet for all my pages */\n\n/* Text: a font list ending in a generic family, space between lines, dark grey text */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: #222222;\n}\n\n/* Element selector: every h1, a gradient header with white text (8.8:1 or more) */\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n}\n\n/* Class selector: every element with class=\"highlight\" */\n.highlight {\n  background-color: #fff3c4;\n}\n\n/* ID selector: only the element with id=\"about\" */\n#about {\n  font-style: italic;\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your site (30 seconds).",
+      "Press Run code and visit every page with your links (1 minute).",
+      "Change one font or colour in styles.css, run again and show the change; then undo it (2 minutes).",
+      "Point to your font lists, your gradient rule and one contrast ratio (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "Why does every font list end in serif, sans-serif or monospace?",
+      "Why are fonts and colours not in the output?",
+      "How do you know your header text can be read on every part of the gradient?",
+      "What does opacity do to the contrast of text?",
+      "Which details did you leave out of your resume to keep it safe?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Font lists ending in a generic family, a size and a line-height",
+        "points": 8
+      },
+      {
+        "criterion": "Text spacing and alignment",
+        "points": 6
+      },
+      {
+        "criterion": "Text colours at 4.5:1 or more",
+        "points": 8
+      },
+      {
+        "criterion": "A gradient header with readable text",
+        "points": 10
+      },
+      {
+        "criterion": "Opacity without losing readability; colour never alone",
+        "points": 6
+      },
+      {
+        "criterion": "Safe and honest personal details",
+        "points": 6
+      },
+      {
+        "criterion": "Presentation: explains fonts, colours, gradient and contrast",
+        "points": 6
+      }
+    ],
+    "totalPoints": 50
+  }
+}

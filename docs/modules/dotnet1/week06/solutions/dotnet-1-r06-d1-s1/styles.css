@@ -1,0 +1,58 @@
+/* Juan Dela Cruz's resume: one stylesheet for all three pages */
+
+/* Element selectors: every body, h1, h2 and nav */
+body {
+  font-family: Verdana, Tahoma, sans-serif;
+  line-height: 1.5;
+  color: rgb(34, 34, 34);
+}
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #ffffff;
+  text-transform: uppercase;
+  background-image: linear-gradient(to right, #13305c, #8a1c55);
+  text-align: center;
+  letter-spacing: 2px;
+  line-height: 2;
+}
+h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #8a1c55;
+  border-bottom: 2px solid #8a1c55;
+  padding-bottom: 0.25em;
+  margin-top: 1.5em;
+}
+nav {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Class selector: every element with class="badge" */
+.badge {
+  background-image: linear-gradient(#fff3c4, #ffe08a);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* Element selector: every paragraph */
+p {
+  color: #333333;
+}
+
+/* Element selector: every label */
+label {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/* Element selector: small print, faded with opacity */
+small {
+  opacity: 0.75;
+}
+
+/* ID selector: only the element with id="form-note" */
+#form-note {
+  color: #9b1c1c;
+  font-weight: bold;
+  font-style: italic;
+}

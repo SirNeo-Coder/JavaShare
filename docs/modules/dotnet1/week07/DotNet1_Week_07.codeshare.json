@@ -1,0 +1,1170 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 7,
+  "id": "dotnet-1-r07",
+  "title": "Self-Paced Module: Position, Z-index, Float and an Image Gallery",
+  "continues": "Week 6 — Box model, list and link styling",
+  "previousModuleId": "dotnet-1-r06",
+  "sampleFirst": true,
+  "starterFiles": [
+    {
+      "path": "index.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+    },
+    {
+      "path": "projects.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz</h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+    },
+    {
+      "path": "contact.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+    },
+    {
+      "path": "styles.css",
+      "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "dotnet-1-r07-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Out of the Flow: Position, Z-index, Float and a Gallery",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Name the five position values and explain what float, clear and z-index do.",
+        "affective": "Value pages where nothing important is covered or hidden.",
+        "psychomotor": "Place a ribbon on Juan's projects header and float his first gallery pictures in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Run every sample unchanged first, then do its small task. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample files into the editor tabs; **Run code** shows the step's run page in the page window and checks it, and its links open the project's other pages there. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks for the step's run page: the Tab title, the Visible page text, then, on Steps 2, 4, 5, 6 and 9, Media checks. position, offsets, z-index and float are not page text; page checks read them. But a box taken out of the flow with position: absolute or float becomes a block, so its words get their own line. Captions are page text; alt is not. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** Juan's finished Week 6 site (three pages and styles.css) carries forward in your module project. Each step loads its run page and every file it needs; boxes show only new or changed lines."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 7 starts here:** Juan's site is spaced and has a nav bar, but every box sits in the normal flow, one under another: nothing overlaps, nothing sits side by side."
+        },
+        {
+          "type": "definition",
+          "term": "Position, z-index, float and a gallery",
+          "markdown": "position chooses how a box is placed: static (the normal flow), relative (moved from its own place), absolute (placed from its nearest positioned ancestor), fixed (from the window) or sticky (normal until you scroll, then held). top, right, bottom and left give the distances. z-index decides which positioned box is on top. float: left or right moves a box to one side so the next content wraps beside it; clear starts a box below the floats. A gallery is a set of figures, each an img with its figcaption."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A bulletin board: most papers are pinned in rows (the normal flow), a sticky note is stuck on top of one corner (absolute, with a higher z-index), and a photo pinned at the left lets the paper's words run beside it (float)."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "position",
+            "It places the box",
+            "Its words in the output",
+            "A page check reads"
+          ],
+          "rows": [
+            [
+              "static (normal)",
+              "in the normal flow; top and left do nothing",
+              "where they were",
+              "static; a top you set, with no effect"
+            ],
+            [
+              "relative",
+              "moved from its own place; its space stays",
+              "where they were",
+              "top as written: 8px"
+            ],
+            [
+              "absolute",
+              "from the nearest positioned ancestor; its space closes",
+              "on their own line",
+              "the sides you set in px"
+            ],
+            [
+              "fixed",
+              "from the window; stays while you scroll",
+              "on their own line",
+              "never checked: follows the window"
+            ],
+            [
+              "sticky",
+              "normal until you scroll, then held at top",
+              "where they were",
+              "never checked: follows scrolling"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Part",
+            "Juan's code",
+            "Page text?"
+          ],
+          "rows": [
+            [
+              "figure",
+              "`<figure>` … `</figure>`",
+              "no: it groups the picture and its caption"
+            ],
+            [
+              "img",
+              "`src`, `alt`, `width=\"160\" height=\"110\"`",
+              "no: alt is read aloud by screen readers, not shown"
+            ],
+            [
+              "figcaption",
+              "`<figcaption>Science poster: …</figcaption>`",
+              "yes: its own line"
+            ],
+            [
+              ".gallery img",
+              "`width: 160px; height: 110px;`",
+              "no: every picture the same size"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Media steps:** Steps 2, 4, 5, 6 and 9 run index.html, with Juan's picture, sound, video and gallery pictures, files your teacher adds under Media files. Online, CodeShare checks them automatically; Run code waits on Loading media… until they are on this device. Offline, these five steps show Checked by your teacher for now, and your teacher presses Mark done. Steps 1, 3, 7 and 8 run projects.html and are checked automatically."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d1-s1",
+          "number": 1,
+          "instruction": "Juan's Week 6 site carries forward. position: absolute takes an element out of the page's flow and places it by top, right, bottom and left, measured from its nearest positioned ancestor. The h1 gets position: relative, so it becomes that ancestor; the new ribbon sits 8px from the h1's top-right corner, and z-index: 1 keeps it above the h1. Run projects.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "ICT STRAND now has its own line in the output: an absolutely positioned element becomes a block. It keeps the h1's capitals.",
+          "webChecks": [
+            {
+              "selector": ".ribbon",
+              "style": "position",
+              "value": "absolute"
+            },
+            {
+              "selector": ".ribbon",
+              "style": "top",
+              "value": "8px"
+            },
+            {
+              "selector": ".ribbon",
+              "style": "right",
+              "value": "8px"
+            },
+            {
+              "selector": ".ribbon",
+              "style": "z-index",
+              "value": "1"
+            },
+            {
+              "selector": "h1",
+              "style": "position",
+              "value": "relative"
+            },
+            {
+              "selector": ".ribbon",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r07-d1-s1-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nOffsets choose the corner. In projects.html, inside the h1 after the first ribbon, add a second one: <span class=\"ribbon left\">Grade 11</span>. At the end of styles.css, add a .left rule: right: auto; left: 8px;. Run code: GRADE 11 appears on its own line and sits in the top-left corner.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nGRADE 11\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message\nPrefer a full page? Open the contact form."
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Try this in Step 1, then undo it",
+            "In the page window",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "Delete `position: relative;` from the h1 rule",
+              "The ribbon jumps to the top-right corner of the whole page, over the nav",
+              "The same"
+            ],
+            [
+              "Change `top: 8px;` to `bottom: 8px;`",
+              "The ribbon moves to the h1's bottom-right corner",
+              "The same"
+            ],
+            [
+              "Change `z-index: 1;` to `z-index: -1;`",
+              "The ribbon hides behind the h1's gradient",
+              "The same"
+            ],
+            [
+              "Change `absolute` to `relative`",
+              "The ribbon goes back into the title's line, moved 8px",
+              "ICT STRAND joins the title's line"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d1-s2",
+          "number": 2,
+          "instruction": "An image gallery is a set of pictures with captions. Each figure holds an img and its figcaption. float: left takes each figure out of the flow and puts it at the left, so the next figure sits beside it; a px width keeps them the same size. clear: both on h2 makes every heading start below the floats. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Each caption is its own line in the output, and the two new pictures have Media checks lines; alt is not page text.",
+          "webChecks": [
+            {
+              "selector": ".gallery figure",
+              "style": "float",
+              "value": "left"
+            },
+            {
+              "selector": ".gallery figure",
+              "style": "width",
+              "value": "170px"
+            },
+            {
+              "selector": ".gallery figure",
+              "style": "margin-right",
+              "value": "12px"
+            },
+            {
+              "selector": "h2",
+              "style": "clear",
+              "value": "both"
+            },
+            {
+              "selector": "figcaption",
+              "count": 2
+            },
+            {
+              "selector": "img",
+              "count": 3
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r07-d1-s2-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a third picture. In index.html, inside the gallery after the comic strip's </figure>, add a figure with <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\"> and <figcaption>Certificate: With honors, Grade 10</figcaption>. Run code: it floats beside the others, and its caption and Media checks line appear in the output.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what does the page check read?** (a) z-index: 3 on a span with no position; (b) top: 8px on Juan's ribbon; (c) the ribbon's position when the ; after absolute is missing; (d) left on Juan's ribbon, which sets only top and right. Answers: (a) 3, but it does nothing; (b) 8px; (c) static; (d) a px value that changes with the window, so it is never checked."
+        },
+        {
+          "type": "text",
+          "markdown": "**Values that follow the window:** a side you did not set (left on Juan's ribbon), anything fixed, and a sticky box's place while you scroll change with the window's size, and CodeShare's page window is not the same size on every screen. Page checks read only the sides you set in px; set picture sizes in px, never %."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r07-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r07-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "Name the five values of position."
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1, the ribbon got position: absolute, and ICT STRAND moved to its own line in the output. Why?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Week 6, display: inline-block put nav items on one line. In Step 2, float: left puts figures side by side. How are they alike?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r07-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Placing and Stacking: Sticky, Z-index and Text Wrap",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain how top, right, bottom and left place relative, absolute and sticky elements, and which z-index wins.",
+        "affective": "Appreciate a layout that keeps the navigation reachable for every reader.",
+        "psychomotor": "Keep Juan's nav on top with sticky and z-index, and wrap his introduction around his floated picture."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's ribbon and first gallery pictures are placed, but his nav scrolls away, and his picture sits alone above his introduction."
+        },
+        {
+          "type": "definition",
+          "term": "Placing and stacking",
+          "markdown": "relative moves a box but keeps its old space; absolute removes the box from the flow, so the next content moves up. Page checks read top, right, bottom and left as you wrote them in px; a side you did not set reads a px value that follows the window. A higher z-index paints on top, but only on a positioned box: z-index on a static box reads its value and does nothing. A floated picture lets text wrap around it."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A jeepney's signboard stays at the top of the windshield while the road moves past (sticky), and a sticker on the glass is always in front of the board (a higher z-index)."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "You write",
+            "The page check reads",
+            "Why"
+          ],
+          "rows": [
+            [
+              "`top: 8px;` on an absolute ribbon",
+              "top 8px",
+              "as written"
+            ],
+            [
+              "no left on that ribbon",
+              "left: a px value, different on every screen",
+              "it follows the window: never check it"
+            ],
+            [
+              "`top: 1em;` on a relative span in the 32px h1",
+              "top 32px",
+              "em turns into px"
+            ],
+            [
+              "`z-index: 2;` on a static span",
+              "z-index 2",
+              "read as written, but it does nothing"
+            ],
+            [
+              "`top: 0;` on the sticky nav",
+              "top 0px",
+              "never checked: sticky follows scrolling"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d2-s3",
+          "number": 3,
+          "instruction": "position: sticky keeps the nav in its place until you scroll, then holds it at top: 0. Juan's h1 is positioned too and comes later in the page, so without a z-index it would slide over the nav: z-index: 2 keeps the nav on top, and a white background hides what scrolls under it. float: right sends each badge to the right edge of its line. Run projects.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay\nGROUP WORK\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "Scroll the page window: the nav stays on top. SOLO WORK and GROUP WORK now have their own lines: a floated element becomes a block.",
+          "webChecks": [
+            {
+              "selector": "nav",
+              "style": "position",
+              "value": "sticky"
+            },
+            {
+              "selector": "nav",
+              "style": "z-index",
+              "value": "2"
+            },
+            {
+              "selector": "nav",
+              "style": "background-color",
+              "value": "rgb(255, 255, 255)"
+            },
+            {
+              "selector": ".badge",
+              "style": "float",
+              "value": "right"
+            },
+            {
+              "selector": ".badge",
+              "style": "display",
+              "value": "block"
+            },
+            {
+              "selector": "iframe",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r07-d2-s3-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nFloat another badge. In projects.html, at the end of the projects list, add <li>Tree planting map for the science club <span class=\"badge\">club work</span></li>. Run code: the new project appears, and its badge floats to the right edge on its own line in the output: CLUB WORK.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay\nGROUP WORK\nTree planting map for the science club\nCLUB WORK\nSend me a message\nPrefer a full page? Open the contact form."
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d2-s4",
+          "number": 4,
+          "instruction": "Float wraps text. Juan's picture gets class=\"profile\"; float: left puts it at the left, and his introduction wraps beside it. The margin keeps 1em of space on its right and 0.5em below. Every h2 has clear: both, so no heading can start beside the picture. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "The output did not change: a picture has no page text, and the paragraphs keep their own lines.",
+          "webChecks": [
+            {
+              "selector": ".profile",
+              "style": "float",
+              "value": "left"
+            },
+            {
+              "selector": ".profile",
+              "style": "margin-right",
+              "value": "16px"
+            },
+            {
+              "selector": ".profile",
+              "style": "margin-bottom",
+              "value": "8px"
+            },
+            {
+              "selector": "h2",
+              "style": "clear",
+              "value": "both"
+            },
+            {
+              "selector": "img",
+              "count": 3
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r07-d2-s4-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nFloat a word element. In styles.css, in the small rule, after opacity: 0.75;, add float: right;. Run code: the small print moves to the right edge, and in the output Sample resume for practice only. is now on its own line.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects.\nSample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "You write",
+            "In the page window",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "`float: left;` on a picture",
+              "text wraps on its right",
+              "the same: a picture has no page text"
+            ],
+            [
+              "`float: right;` on a span or small",
+              "it moves to the right edge",
+              "its words get their own line"
+            ],
+            [
+              "`float: left;` on each figure",
+              "figures side by side",
+              "each caption on its own line"
+            ],
+            [
+              "`clear: both;` on h2",
+              "the heading starts below the floats",
+              "the same"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: page text or not?** (a) float: right on Juan's small print; (b) float: left on his picture; (c) z-index: 5 on the nav; (d) position: absolute on the badges. Answers: (a) page text: the small print gets its own line; (b) not page text; (c) not page text; (d) page text: each badge gets its own line."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r07-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r07-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does z-index decide, and on which boxes does it work?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 3, why does the nav need z-index: 2 to stay above Juan's h1?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 4, the picture floats but the output did not change. In Step 3, the badges floated and the output changed. Why?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Name the property for (a) a box that stays at the top while you scroll; (b) the distance from a corner; (c) text wrapping beside a picture; (d) a heading that starts below floated pictures. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r07-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "Pictures in a Row: An Image Gallery with Captions",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Describe how figure, img and figcaption build a gallery, and why captions are page text but alt is not.",
+        "affective": "Respect the people and work shown in pictures by describing them honestly.",
+        "psychomotor": "Build Juan's gallery with equal picture sizes, captions and a positioned tag."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's gallery pictures have different sizes and plain captions."
+        },
+        {
+          "type": "definition",
+          "term": "Image gallery",
+          "markdown": "A gallery is a row of figures; each figure groups an img (src, alt, width, height) with its figcaption. Float the figures left with a px width and give every picture the same size in px. Captions are page text; alt is not, but screen readers read it."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A school yearbook page: pictures of the same size in a row, each with its caption underneath."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d3-s5",
+          "number": 5,
+          "instruction": "Every gallery picture gets the same size, 160px by 110px, and a thin grey border; each caption is centred in 13px text. The certificate joins the gallery. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Only the new caption and its Media checks line changed in the output: sizes, borders and centring are not page text.",
+          "webChecks": [
+            {
+              "selector": ".gallery figcaption",
+              "style": "font-size",
+              "value": "13px"
+            },
+            {
+              "selector": ".gallery figcaption",
+              "style": "text-align",
+              "value": "center"
+            },
+            {
+              "selector": ".gallery img",
+              "style": "border-top-style",
+              "value": "solid"
+            },
+            {
+              "selector": ".gallery img",
+              "style": "border-top-color",
+              "value": "rgb(85, 85, 85)"
+            },
+            {
+              "selector": "figure",
+              "count": 3
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r07-d3-s5-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a fourth picture. In index.html, after the certificate's </figure>, add a figure with <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\"> and <figcaption>Tree planting with the science club</figcaption>. Run code: the new picture gets the same size, border and caption style.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d3-s6",
+          "number": 6,
+          "instruction": "Each figure gets position: relative, so a tag inside it is placed from the figure's corner. The tag New sits 4px from the top-left corner of the tree-planting picture; z-index: 1 keeps it above the picture. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "New is its own line in the output, above its caption.",
+          "webChecks": [
+            {
+              "selector": ".gallery figure",
+              "style": "position",
+              "value": "relative"
+            },
+            {
+              "selector": ".tag",
+              "style": "position",
+              "value": "absolute"
+            },
+            {
+              "selector": ".tag",
+              "style": "top",
+              "value": "4px"
+            },
+            {
+              "selector": ".tag",
+              "style": "left",
+              "value": "4px"
+            },
+            {
+              "selector": ".tag",
+              "style": "z-index",
+              "value": "1"
+            },
+            {
+              "selector": ".tag",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r07-d3-s6-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nTag another picture. In index.html, in the certificate's figure, before its img, add <span class=\"tag\">Award</span>. Run code: Award sits in the certificate's top-left corner and appears on its own line above the certificate's caption.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nAward\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: what changes the output?** (a) a new figcaption; (b) a new alt text; (c) width: 120px on the pictures; (d) the tag's position: absolute deleted. Answers: (a) a new line; (b) nothing; (c) nothing; (d) New gains a space after it."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r07-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r07-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What do figure and figcaption do in a gallery?"
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 5, the pictures got sizes and borders, but only the new caption changed in the output. Why?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 6, the tag uses position: absolute inside a figure with position: relative. How is it like Step 1's ribbon?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r07-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "When Boxes Overlap or Float Away: Repairs, then Start Your Own",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Locate a missing semicolon or a misspelt value in a position or float rule.",
+        "affective": "Show patience and care when one character moves a whole box.",
+        "psychomotor": "Repair Juan's ribbon and floating badges, then begin the personal gallery and positioned element."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Browsers show no error for broken CSS: one missing character can leave a ribbon in the wrong place or stop badges from floating."
+        },
+        {
+          "type": "definition",
+          "term": "Overlap and float repairs",
+          "markdown": "A browser skips a value it cannot read and shows no error: a missing ; skips that declaration and the next one; a misspelt value (rigth) skips only that one."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A poster with one pin missing slides to the wrong place; a sign written in the wrong spelling is ignored by everyone."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d4-s7",
+          "number": 7,
+          "instruction": "Broken on purpose: the .ribbon rule lost the semicolon after position: absolute, so the browser skips position and top. The ribbon stays in the title's line instead of the corner. Run projects.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ ICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay\nGROUP WORK\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "The page check finds position: static and top: auto, and z-index still reads 1: on a static element it does nothing.",
+          "webChecks": [
+            {
+              "selector": ".ribbon",
+              "style": "position",
+              "value": "static"
+            },
+            {
+              "selector": ".ribbon",
+              "style": "top",
+              "value": "auto"
+            },
+            {
+              "selector": ".ribbon",
+              "style": "z-index",
+              "value": "1"
+            },
+            {
+              "selector": "h1",
+              "style": "position",
+              "value": "relative"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r07-d4-s7-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nRepair the ribbon: put back the semicolon, so the line reads position: absolute;. Run code: the ribbon is back in the corner, and ICT STRAND is on its own line again.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay\nGROUP WORK\nSend me a message\nPrefer a full page? Open the contact form."
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: float: rigth is not a value, so the browser skips it and the badges stay right after each project's name. Run projects.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: rigth;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home SOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay GROUP WORK\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "SOLO WORK and GROUP WORK are back at the end of their projects' lines. The page check finds float: none.",
+          "webChecks": [
+            {
+              "selector": ".badge",
+              "style": "float",
+              "value": "none"
+            },
+            {
+              "selector": ".badge",
+              "style": "display",
+              "value": "inline"
+            },
+            {
+              "selector": ".badge",
+              "style": "text-transform",
+              "value": "uppercase"
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r07-d4-s8-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nSpell the value: float: right;. Run code: the badges float to the right edge again and each has its own line in the output.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSOLO WORK\nComic strip for Filipino class: Bayanihan in our barangay\nGROUP WORK\nSend me a message\nPrefer a full page? Open the contact form."
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "A badge or tag jumps to the top corner of the whole page, over the nav.",
+              "means": "Its parent has no position, so absolute is measured from the page itself.",
+              "fix": "Give the parent position: relative;."
+            },
+            {
+              "see": "z-index changes nothing; the page check still reads your number.",
+              "means": "The box is static: z-index works only on a positioned box.",
+              "fix": "Add position: relative (or absolute) to that box."
+            },
+            {
+              "see": "The ribbon sits in the title's line; its words share the title's line in the output.",
+              "means": "position was skipped: the ; after it is missing, or the value is misspelt.",
+              "fix": "End every declaration with ;: position: absolute;."
+            },
+            {
+              "see": "The badges stay beside the project names; their words share the line in the output.",
+              "means": "float was skipped: its value is misspelt (rigth).",
+              "fix": "Use left, right or none, spelt exactly."
+            },
+            {
+              "see": "The text after the gallery runs up beside the pictures.",
+              "means": "Nothing clears the floats.",
+              "fix": "Give the next element clear: both;."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice:** in styles.css, (a) delete position: relative; from the h1 rule; (b) write float: center in the .badge rule. Answers: (a) the ribbon flies to the page's top-right corner, over the nav; the output is the same; (b) the badges stay beside the project names (center is not a float value). Undo each change."
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r07-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r07-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does a browser do with float: rigth?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 7, why did the ribbon move into the title's line when only one ; was missing?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 7, z-index still read 1. Why did the ribbon not stay on top of anything?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r07-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 7: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain the gallery and the positioned element of one's own resume.",
+        "affective": "Present one's own work honestly and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the resume with a gallery and a positioned element in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's gallery and ribbon work; your own resume still needs its own gallery and positioned element."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your site, show your gallery and its captions, point to your float, clear and position rules, scroll to show what stays on top, and say why each caption and alt describes its picture honestly. No new HTML or CSS today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A barangay exhibit: each project has its picture and label, and the visitors' guide stays where everyone can see it."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r07-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 7 site: index.html as in Step 6, projects.html as in Step 1 and styles.css as in Step 6. Run it, look at the gallery and the floated picture, scroll under the nav, and visit all three pages before you present. Friday adds no new HTML or CSS.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Scroll every page: does the nav stay on top, and does every picture have its caption?",
+          "webChecks": [
+            {
+              "selector": ".gallery figure",
+              "style": "float",
+              "value": "left"
+            },
+            {
+              "selector": ".tag",
+              "style": "position",
+              "value": "absolute"
+            },
+            {
+              "selector": ".profile",
+              "style": "float",
+              "value": "left"
+            },
+            {
+              "selector": "nav",
+              "style": "position",
+              "value": "sticky"
+            },
+            {
+              "selector": "figure",
+              "count": 4
+            },
+            {
+              "selector": "img",
+              "count": 5
+            },
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r07-d5-s9-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nBefore you present, add a picture credit below the gallery. In index.html, after the gallery's closing </div>, add <p class=\"credits\">Every gallery picture is a drawing made for this sample resume.</p>. At the end of styles.css, add .credits { clear: both; }, so it starts below the pictures. Run code: the sentence appears after the last caption. Then present your own resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTyping documents\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nEvery gallery picture is a drawing made for this sample resume.\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r07-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r07-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to your gallery's figure rule, your clear, and your positioned element's rules in your styles.css."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend your captions and alt text: how do they help a visitor who cannot see the pictures?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school library wants a page of book covers in rows with titles under them and a NEW tag on the newest book. Write the HTML for one book and the CSS for the row and the tag."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Which change this week made your resume look most finished, and how do you know?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r07-pt",
+    "title": "My Resume, Week 7: A Picture Gallery and a Positioned Element",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your Week 6 site carries forward: add this week's gallery to index.html and this week's rules to your own styles.css.\n\nAdd a gallery of three or more of your projects, certificates or activities on index.html, and one positioned element, such as a ribbon in your h1. Pictures are your own (only you or no people in them) or your teacher's. Online, add each under Media files in images, named with letters, numbers, - and _ only (my_poster.jpg), at most 5 MB and 10 files. Offline, Media files are not available yet: write the figures and captions now: Run code still succeeds, and each picture shows only its alt text and a small broken-picture icon until its file is added online.\n\nUse only safe details: no home address, phone number, birth date, ID numbers or personal social-media accounts, and no other people in any picture. Run code until index.html runs with no error, then press Submit this version. Saving or running is not submitting.\n\nThursday: 0–60 minutes, repairs and the Thursday strip; 60–120 minutes, plan on paper, show the teacher, then start. Friday: 0–30 minutes, finish and run; 30–105 minutes, five-minute presentations; 105–120 minutes, Friday strip and Submit this version.",
+    "checklist": [
+      "Keep your Week 6 site: every page, the nav bar and styles.css linked from every page.",
+      "On index.html, a gallery of three or more figures, each an img (src in images/, honest alt, width, height) and a figcaption.",
+      "Float the gallery's figures left with a width in px; give every picture the same size in px.",
+      "The heading or paragraph after the gallery has clear: both.",
+      "One positioned element: absolute inside a parent with position: relative, top and right (or left) in px, and a z-index.",
+      "Its text and background colours from the chart: 4.5:1 or more.",
+      "Nothing in url(); no address, phone, birth date, ID numbers, social media or other people in a picture.",
+      "Run code shows no error; online every picture shows; press Submit this version, then present."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p>Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  text-transform: uppercase;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: square bullets inside the box; Roman numbers */\n.skills {\n  list-style-type: square;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name <span class=\"ribbon\">Your strand</span></h1>\n  <img src=\"images/my_picture.jpg\" alt=\"Describe your picture here\" width=\"160\" height=\"160\">\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n  <h2>My gallery</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/my_project.jpg\" alt=\"Describe your project picture here\" width=\"160\" height=\"110\">\n      <figcaption>Write a caption here</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/my_certificate.jpg\" alt=\"Describe your certificate picture here\" width=\"160\" height=\"110\">\n      <figcaption>Write a caption here</figcaption>\n    </figure>\n  </div>\n  <h2>Education</h2>\n  <table>\n    <caption>My schools</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Write a level here</td>\n        <td>Write a school here</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Projects</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>My Projects</h1>\n  <ul>\n    <li>Write a school project here</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"My contact form\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Me</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Me</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" required>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* My resume: one stylesheet for all my pages */\n\n/* Text: a font list ending in a generic family, space between lines, dark grey text */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: #222222;\n}\n\n/* Element selector: every h1, a gradient header with white text (8.8:1 or more) */\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n}\n\n/* Class selector: every element with class=\"highlight\" */\n.highlight {\n  background-color: #fff3c4;\n}\n\n/* ID selector: only the element with id=\"about\" */\n#about {\n  font-style: italic;\n}\n\n/* Box model: room and a line under every section heading */\nh2 {\n  border-bottom: 2px solid #13305c;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\n\n/* Lists: the nav list with no bullets and no indent, its items on one line */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Lists: square bullets for my skills */\n.skills {\n  list-style-type: square;\n}\n\n/* Links in nav, in state order: white on navy (13.0:1), maroon under the mouse or the keyboard (8.8:1) */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Position: my h1 is the reference box; the ribbon sits in its top-right corner, above it (14.2:1) */\nh1 {\n  position: relative;\n}\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: my gallery's figures side by side, each picture the same size; every section starts below them */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n}\n.gallery img {\n  width: 160px;\n  height: 110px;\n}\n.gallery figcaption {\n  text-align: center;\n}\nh2 {\n  clear: both;\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your site (30 seconds).",
+      "Press Run code, show your gallery and scroll the page (1 minute).",
+      "Change one top, right, left or z-index value, run again and show the change; then undo it (2 minutes).",
+      "Point to your figure, float, clear and position rules (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "What is the difference between position: relative and position: absolute?",
+      "Why do your captions show in the output but your alt text does not?",
+      "What does clear: both do after your gallery?",
+      "Why does z-index need a positioned box?",
+      "How did you make sure no other people appear in your pictures?"
+    ],
+    "rubric": [
+      {
+        "criterion": "A gallery of three or more figures with captions",
+        "points": 12
+      },
+      {
+        "criterion": "Float layout with px sizes and clear",
+        "points": 8
+      },
+      {
+        "criterion": "A positioned element with a positioned parent, offsets and z-index",
+        "points": 10
+      },
+      {
+        "criterion": "Honest alt text and readable colours",
+        "points": 6
+      },
+      {
+        "criterion": "Safe pictures and details (no other people)",
+        "points": 8
+      },
+      {
+        "criterion": "Presentation: explains position, float and the gallery",
+        "points": 6
+      }
+    ],
+    "totalPoints": 50
+  }
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Contact Juan Dela Cruz</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+  <h1>Contact Juan</h1>
+  <p id="form-note">This form is a prototype: it sends nowhere.</p>
+  <form>
+    <p>
+      <label for="visitor">Your name</label><br>
+      <input type="text" id="visitor" name="visitor" placeholder="Type your name" required>
+    </p>
+    <p>
+      <label for="email">Your email</label><br>
+      <input type="email" id="email" name="email" required>
+    </p>
+    <p>
+      <label for="topic">Topic</label><br>
+      <select id="topic" name="topic">
+        <option>School project</option>
+        <option>Art club</option>
+      </select>
+    </p>
+    <p>
+      <label for="message">Message</label><br>
+      <textarea id="message" name="message" rows="4"></textarea>
+    </p>
+    <p>
+      <label for="class">Your class</label><br>
+      <input type="text" id="class" name="class" placeholder="Grade and section">
+    </p>
+    <p><button type="submit">Send message</button></p>
+  </form>
+</body>
+</html>

@@ -1,0 +1,165 @@
+/* Juan Dela Cruz's resume: one stylesheet for all three pages */
+
+/* Element selectors: every body, h1, h2 and nav */
+body {
+  font-family: Verdana, Tahoma, sans-serif;
+  line-height: 1.5;
+  color: rgb(34, 34, 34);
+}
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #ffffff;
+  text-transform: uppercase;
+  background-image: linear-gradient(to right, #13305c, #8a1c55);
+  text-align: center;
+  letter-spacing: 2px;
+  line-height: 2;
+  position: relative;
+}
+h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #8a1c55;
+  border-bottom: 2px solid #8a1c55;
+  padding-bottom: 0.25em;
+  margin-top: 1.5em;
+  clear: both;
+}
+nav {
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Descendant selector: the list inside nav */
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Each nav item on one line, space after it */
+nav li {
+  margin-right: 0.5em;
+  display: inline-block;
+}
+
+/* Link states, in this order: :link, :visited, :hover, :active */
+a:link {
+  color: #13305c;
+}
+a:visited {
+  color: #551a8b;
+}
+a:hover, a:focus {
+  background-color: #fff3c4;
+}
+a:active {
+  color: #8a1c55;
+}
+
+/* Nav links: white on navy; maroon under the mouse or keyboard */
+nav a:link, nav a:visited {
+  color: #ffffff;
+  background-color: #13305c;
+  padding: 0.25em 0.75em;
+  text-decoration: none;
+}
+nav a:hover, nav a:focus {
+  background-color: #8a1c55;
+}
+
+/* Class selector: every element with class="badge" */
+.badge {
+  background-image: linear-gradient(#fff3c4, #ffe08a);
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 0.25em 0.5em;
+  border: 1px solid #b45309;
+  float: right;
+}
+
+/* Lists: square bullets inside the box; Roman numbers */
+.skills {
+  list-style-type: square;
+  list-style-position: inside;
+  padding-left: 0;
+}
+.next {
+  list-style-type: upper-roman;
+}
+
+/* Element selector: every paragraph */
+p {
+  color: #333333;
+}
+
+/* Element selector: every label */
+label {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/* A comma lists several selectors: every form box 300px wide, padding and border included */
+input, select, textarea {
+  box-sizing: border-box;
+  width: 300px;
+  padding: 4px;
+  border: 1px solid #555555;
+}
+
+/* Element selector: small print, faded with opacity */
+small {
+  opacity: 0.75;
+}
+
+/* ID selector: only the element with id="form-note" */
+#form-note {
+  color: #9b1c1c;
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* The framed contact page: solid border, space above */
+iframe {
+  border: 2px solid #13305c;
+  margin-top: 0.5em;
+}
+
+/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */
+.ribbon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  padding: 0 0.5em;
+  font-size: 12px;
+  color: #222222;
+  background-color: #fff3c4;
+}
+
+/* Float: the gallery's figures sit side by side, left to right */
+.gallery figure {
+  float: left;
+  width: 170px;
+  margin: 0 12px 12px 0;
+}
+
+/* Float: Juan's picture on the left; the introduction wraps beside it */
+.profile {
+  float: left;
+  margin: 0 1em 0.5em 0;
+}
+
+/* Gallery: every picture the same size in px, a caption under it */
+.gallery img {
+  width: 160px;
+  height: 110px;
+  border: 1px solid #555555;
+}
+.gallery figcaption {
+  font-size: 13px;
+  text-align: center;
+}

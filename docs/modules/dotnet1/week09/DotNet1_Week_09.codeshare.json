@@ -1,0 +1,1139 @@
+{
+  "format": "codeshare-module",
+  "version": 1,
+  "course": "dotnet-1",
+  "week": 9,
+  "id": "dotnet-1-r09",
+  "title": "Self-Paced Module: Flexbox and Media Queries",
+  "continues": "Week 8 — Pseudo-classes and pseudo-elements",
+  "previousModuleId": "dotnet-1-r08",
+  "sampleFirst": true,
+  "starterFiles": [
+    {
+      "path": "index.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+    },
+    {
+      "path": "projects.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul>\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+    },
+    {
+      "path": "contact.html",
+      "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+    },
+    {
+      "path": "styles.css",
+      "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "dotnet-1-r09-d1",
+      "order": 1,
+      "dayLabel": "MONDAY",
+      "title": "Flex Containers and Flex Items: display: flex, flex-direction and gap",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain what display: flex does to a box's children, and what flex-direction and gap control.",
+        "affective": "Value a layout whose spacing is set in one place instead of on every item.",
+        "psychomotor": "Turn Juan's skills list and project list into flex containers in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**How to use this module:** Work in order, Monday to Friday. Run every sample unchanged first, then do its small task. Answer each day's exit slip after its last step."
+        },
+        {
+          "type": "text",
+          "markdown": "**Everything happens in CodeShare.** Open your class, then **Module**, this week and a step. **Work in code editor** loads the step's sample files into the editor tabs; **Run code** shows the step's run page in the page window and checks it, and its links open the project's other pages there. It works online and from the classroom laptop; no internet, installation, download or account is needed."
+        },
+        {
+          "type": "text",
+          "markdown": "**Reading the outputs:** an output box shows the page text CodeShare checks for the step's run page: the Tab title, the Visible page text, then, on Steps 1, 3, 4, 5, 8 and 9, Media checks. Flexbox and media queries move boxes, so most steps this week leave the output exactly as it was; Step 4 and Step 8 are the two that change it, because they change whether an item is a box of its own. Spaces count."
+        },
+        {
+          "type": "text",
+          "markdown": "**Where we start:** Juan's finished Week 8 site (three pages and styles.css) carries forward in your module project. Each step loads its run page and every file it needs; boxes show only new or changed lines."
+        },
+        {
+          "type": "text",
+          "markdown": "**Week 9 starts here:** Juan's skills, project cards and form fields each carry their own margin, so changing the spacing means editing every rule."
+        },
+        {
+          "type": "definition",
+          "term": "Flex containers and flex items",
+          "markdown": "display: flex on a box makes it a flex container, and every child becomes a flex item laid out in one direction. flex-direction: row puts the items across, column puts them one under the other, and gap sets the space between them in one place instead of a margin on each item. A flex item is a box of its own, so the output gives it its own line even when the page window shows the items side by side."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A jeepney bench: the passengers are the items and the bench is the container. The driver does not ask each passenger to leave a gap; the bench sets one spacing for everybody (gap), and the row either runs along the bench (row) or up the aisle (column)."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "You write it on",
+            "Property",
+            "What it does"
+          ],
+          "rows": [
+            [
+              "the container",
+              "`display: flex`",
+              "makes the box a flex container; every child becomes a flex item"
+            ],
+            [
+              "the container",
+              "`flex-direction: row`",
+              "the items run across the page (the default)"
+            ],
+            [
+              "the container",
+              "`flex-direction: column`",
+              "the items run one under the other"
+            ],
+            [
+              "the container",
+              "`gap: 0.5em`",
+              "one even space between the items, instead of a margin on each"
+            ],
+            [
+              "the container",
+              "`flex-wrap: wrap`",
+              "an item that does not fit moves to the next line"
+            ],
+            [
+              "the item",
+              "`width: 170px`",
+              "still works; `float` on a flex item is ignored"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "columns": [
+            "You write",
+            "In the page window",
+            "In the output",
+            "A page check reads"
+          ],
+          "rows": [
+            [
+              "`.skills { display: flex; flex-direction: column; }`",
+              "even gaps between the skills",
+              "no change: each skill already had its line",
+              "display flex, flex-direction column"
+            ],
+            [
+              "`nav ul { display: flex; }`",
+              "the links still side by side",
+              "three lines instead of one: each item is a box now",
+              "display flex"
+            ],
+            [
+              "`.gallery { display: flex; flex-wrap: wrap; }`",
+              "figures side by side, wrapping",
+              "no change: same captions, same order",
+              "display flex, flex-wrap wrap"
+            ],
+            [
+              "`gap: 12px` instead of a margin",
+              "the same spacing",
+              "no change",
+              "row-gap and column-gap"
+            ],
+            [
+              "`.skills li { display: inline; }`",
+              "the skills run together like words",
+              "both skills on one line",
+              "display inline"
+            ]
+          ]
+        },
+        {
+          "type": "text",
+          "markdown": "**Media steps:** Steps 1, 3, 4, 5, 8 and 9 run index.html, with Juan's picture, sound, video and gallery pictures, files your teacher adds under Media files. Online, CodeShare checks them automatically; Run code waits on Loading media… until they are on this device. Offline, these six steps show Checked by your teacher for now, and your teacher presses Mark done. Steps 2, 6 and 7 run projects.html or contact.html and are checked automatically. Step 3's task reuses a picture Juan already has, so there is no new media file this week."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d1-s1",
+          "number": 1,
+          "instruction": "Juan's Week 8 site carries forward. Flexbox arranges the boxes inside one box. You write display: flex on the container, and its children become its flex items. flex-direction: column puts them one under the other, and gap: 0.5em leaves an even space between them, with no margin to count. Juan's skills list is the container; each skill is an item. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "The skills still read one per line in the output, because a list item was already a box of its own: flexbox changed the spacing, not the page text. In the page window the gaps between the skills are now even.",
+          "webChecks": [
+            {
+              "selector": ".skills",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": ".skills",
+              "style": "flex-direction",
+              "value": "column"
+            },
+            {
+              "selector": ".skills",
+              "style": "list-style-type",
+              "value": "none"
+            },
+            {
+              "selector": ".skills li",
+              "count": 2
+            },
+            {
+              "selector": "img",
+              "count": 5
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r09-d1-s1-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a third flex item. In index.html, at the end of the skills list, after Making slide presentations, add <li>Making simple web pages</li>. Run code: it appears in the output as a new line, and in the page window flexbox gives it the same gap as the others by itself.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nMaking simple web pages\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Try this in Step 1, then undo it",
+            "In the page window",
+            "In the output"
+          ],
+          "rows": [
+            [
+              "Change `flex-direction: column` to `row`",
+              "the two skills sit side by side",
+              "no change: each item keeps its line"
+            ],
+            [
+              "Change `gap: 0.5em` to `gap: 2em`",
+              "much wider spaces",
+              "no change"
+            ],
+            [
+              "Delete the line `display: flex;`",
+              "the gap stops working",
+              "no change: a list item is still a box"
+            ],
+            [
+              "Add `display: inline;` to `.skills li`",
+              "the skills run together",
+              "both skills on one line: this one does change it"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d1-s2",
+          "number": 2,
+          "instruction": "A second flex container. The projects list gets class=\"project-list\", and .project-list makes it a flex container with flex-direction: column, a 0.5em gap, no bullets and no left padding. Each project is a flex item, so the gap replaces the spacing the bullets used to give. Run projects.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul class=\"project-list\">\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: the gallery's figures sit side by side, left to right */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSolo work\nComic strip for Filipino class: Bayanihan in our barangay\nGroup work\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "The two projects still read one per line, and each badge still sits on its own line because it floats right. The bullets are gone in the page window; the output never showed them.",
+          "webChecks": [
+            {
+              "selector": ".project-list",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": ".project-list",
+              "style": "flex-direction",
+              "value": "column"
+            },
+            {
+              "selector": ".project-list",
+              "style": "list-style-type",
+              "value": "none"
+            },
+            {
+              "selector": ".project-list li",
+              "count": 2
+            },
+            {
+              "selector": "iframe",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r09-d1-s2-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a third card. In projects.html, at the end of the projects list, add <li>Web page about our barangay <span class=\"badge\">solo work</span></li>. Run code: the new card and its badge Solo work appear in the output, and in the page window the flex container gives the card the same gap as the others.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSolo work\nComic strip for Filipino class: Bayanihan in our barangay\nGroup work\nWeb page about our barangay\nSolo work\nSend me a message\nPrefer a full page? Open the contact form."
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: does it change the output?** (a) display: flex on .skills; (b) gap: 2em instead of 0.5em; (c) flex-direction: row on .skills; (d) display: inline on .skills li. Answers: (a) no: a list item was already a box of its own; (b) no: spacing is not page text; (c) no: each item keeps its own line; (d) yes: the two skills run together on one line."
+        },
+        {
+          "type": "text",
+          "markdown": "**Page checks and the width of the window:** a page check reads a computed value, so it must be a value that is the same at every width. That is why no step from Step 5 on checks flex-direction on the nav list or on the project cards: those are the two values a media query changes. The checks read display, flex-wrap, the list style and the counts instead, and you test the width yourself by making the browser window narrower."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Monday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r09-d1-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r09-d1-s2",
+        "questions": [
+          {
+            "id": "1.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does display: flex do to the children of the box you write it on?"
+          },
+          {
+            "id": "1.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 1 the skills still read one per line in the output. Why did flexbox not change the page text?"
+          },
+          {
+            "id": "1.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Week 7 you spaced the gallery figures with a margin on each one. What does gap do instead?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r09-d2",
+      "order": 2,
+      "dayLabel": "TUESDAY",
+      "title": "Flexbox Instead of Float: The Gallery and the Nav Bar",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Compare float and flexbox for a row of boxes, and say why flex-wrap replaces clear.",
+        "affective": "Appreciate a simpler way to do what used to need several rules.",
+        "psychomotor": "Rebuild Juan's gallery and nav bar with flexbox and read what changed in the output."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's gallery still floats, which needs a margin on every figure and clear: both on every heading; his nav items are inline-block words."
+        },
+        {
+          "type": "definition",
+          "term": "Flexbox instead of float",
+          "markdown": "A float pulls one box out of the normal flow: the boxes after it wrap around it, every figure needs its own margin, and a heading needs clear: both to get below the row. A flex container arranges its items without taking them out of the flow: flex-wrap: wrap moves an item that does not fit onto the next line, gap spaces them, and nothing below needs clear. float is ignored on a flex item."
+        },
+        {
+          "type": "analogy",
+          "markdown": "Water poured around a stone in a stream takes the stone out of the flow and everything bends around it (float); chairs set out in rows for a programme leave the floor plan intact and simply start a new row when one fills up (flex-wrap)."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "",
+            "Float (Week 7)",
+            "Flexbox (this week)"
+          ],
+          "rows": [
+            [
+              "Written on",
+              "every box that moves: `.gallery figure`",
+              "the container only: `.gallery`"
+            ],
+            [
+              "Spacing between boxes",
+              "a margin on each box",
+              "one `gap` on the container"
+            ],
+            [
+              "A box that does not fit",
+              "drops below and may leave a hole",
+              "`flex-wrap: wrap` starts a clean next line"
+            ],
+            [
+              "What comes after it",
+              "needs `clear: both` on the headings",
+              "nothing: the container keeps its place in the flow"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d2-s3",
+          "number": 3,
+          "instruction": "Flexbox replaces float. In Week 7 each gallery figure floated left and needed its own margin, with clear: both on the headings. Now .gallery is the flex container: display: flex puts the figures side by side, gap: 12px spaces them, and flex-wrap: wrap moves a figure that does not fit to the next line. The figures keep their width and lose float and margin. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n\n/* Each nav item on one line, space after it */\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "The four captions still read one per line in the output, in the same order as in the HTML: flexbox moves boxes, it does not rewrite the page text.",
+          "webChecks": [
+            {
+              "selector": ".gallery",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": ".gallery",
+              "style": "flex-wrap",
+              "value": "wrap"
+            },
+            {
+              "selector": ".gallery figure",
+              "style": "float",
+              "value": "none"
+            },
+            {
+              "selector": ".gallery figure",
+              "count": 4
+            },
+            {
+              "selector": "img",
+              "count": 5
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r09-d2-s3-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nMake the row wrap. In index.html, after the gallery's last </figure>, add a fifth <figure> holding <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\"> and <figcaption>Tree planting: our second batch</figcaption>. Run code: the new caption is in the output, and the fifth figure wraps onto a second line.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME PROJECTS CONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nTree planting: our second batch\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d2-s4",
+          "number": 4,
+          "instruction": "A flex row for the nav bar. Until now each nav item was display: inline-block with a right margin, so the three items shared one line like words. Now nav ul is the flex container with flex-direction: row and gap: 0.5em, so each item is a box of its own in the row and the gap makes the space. nav li no longer needs its margin. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Flexbox puts the nav items in a row, so each one is a box of its own and gap makes the space */\nnav li {\n  margin-right: 0;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "This step does change the page text: HOME, PROJECTS and CONTACT are now three lines in the output instead of one. Each flex item is a box of its own, so the output gives it its own line even though the page window shows them side by side.",
+          "webChecks": [
+            {
+              "selector": "nav ul",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": "nav ul",
+              "style": "flex-direction",
+              "value": "row"
+            },
+            {
+              "selector": "nav li",
+              "style": "margin-right",
+              "value": "0px"
+            },
+            {
+              "selector": "nav li",
+              "count": 3
+            },
+            {
+              "selector": "nav a",
+              "count": 3
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r09-d2-s4-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a fourth item to the row. In index.html, in the nav list after the Contact item, add <li><a href=\"index.html\">Skills</a></li>. Run code: SKILLS appears in the output on its own line, in capitals because the nav rule makes every nav word a capital, and in the page window flexbox puts it in the row with the same gap.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nSKILLS\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: float or flexbox?** (a) which one needs clear: both on the headings; (b) which one needs a margin on every figure; (c) which one starts a new line with flex-wrap: wrap; (d) which one is ignored on a flex item. Answers: (a) float; (b) float; (c) flexbox; (d) float."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Tuesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r09-d2-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r09-d2-s4",
+        "questions": [
+          {
+            "id": "2.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does flex-wrap: wrap do when an item does not fit?"
+          },
+          {
+            "id": "2.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 4 the nav links went from one line to three in the output. Why?"
+          },
+          {
+            "id": "2.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Juan's headings needed clear: both while the gallery floated. Why do they not need it with flexbox?"
+          },
+          {
+            "id": "2.4",
+            "kind": "Identify",
+            "points": 5,
+            "prompt": "Name the property for (a) making a box a flex container; (b) across or down; (c) the space between items; (d) letting a row move an item to the next line. Each correct blank earns 1.25 points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r09-d3",
+      "order": 3,
+      "dayLabel": "WEDNESDAY",
+      "title": "One Page, Two Widths: Media Queries",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Read a media query and say which rules apply at which widths, and why a query must not change the page text.",
+        "affective": "Show concern for classmates whose only computer is a phone.",
+        "psychomotor": "Add two media queries to Juan's stylesheet and test them by making the browser window narrower."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's layout is the same at every width: on a narrow screen the nav bar is cramped and the cards waste the space beside them."
+        },
+        {
+          "type": "definition",
+          "term": "Media queries",
+          "markdown": "@media (max-width: 900px) { ... } wraps rules in a condition: the browser uses them only while the page is 900 pixels wide or narrower, and re-reads the condition whenever the width changes. The width is the page's, not the screen's, so a narrower browser window turns a query on: the page window follows the browser window, and you cannot drag the page window itself. A query may change how boxes sit, never the words on the page: a step's expected output must be the same at every width."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A folding sari-sari store: open on a wide pavement it spreads its goods in a row; on a narrow one it stacks them. Same goods, same words on the price list, different arrangement."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "You write",
+            "It applies while",
+            "Juan uses it for"
+          ],
+          "rows": [
+            [
+              "`@media (max-width: 900px)`",
+              "the page is 900px wide or narrower",
+              "the nav column and the row of project cards"
+            ],
+            [
+              "`@media (min-width: 901px)`",
+              "the page is wider than 900px",
+              "not used: the rules outside the query already cover it"
+            ],
+            [
+              "`@media (max-width: 900)`",
+              "never: a length needs its unit, so the query is dropped",
+              "the Thursday practice mistake"
+            ],
+            [
+              "the width",
+              "the page's width, not the screen's",
+              "a narrower browser window turns the query on"
+            ],
+            [
+              "rules inside a query",
+              "only how boxes sit, never the words",
+              "so a step's output is the same at every width"
+            ]
+          ]
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d3-s5",
+          "number": 5,
+          "instruction": "A media query gives a rule a condition. @media (max-width: 900px) { ... } means: use the rules inside only while the page is 900 pixels wide or narrower. Inside it, nav ul gets flex-direction: column, so on a narrow page the nav items stand one under the other and each one is easy to tap. Nothing outside the query changes. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Flexbox puts the nav items in a row, so each one is a box of its own and gap makes the space */\nnav li {\n  margin-right: 0;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n\n/* Media query: on a page 900px wide or narrower, the nav items stand one under the other */\n@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "On a module step the page sits beside its checks, and that page is narrower than 900 pixels, so the query is already on: the nav items stand in a column. The output is the same as Step 4's, because each nav item already had its own line there. A media query moves boxes; it must never change the page text, or a step could never pass.",
+          "webChecks": [
+            {
+              "selector": "nav ul",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": ".gallery",
+              "style": "flex-wrap",
+              "value": "wrap"
+            },
+            {
+              "selector": "nav li",
+              "count": 3
+            },
+            {
+              "selector": "img",
+              "count": 5
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r09-d3-s5-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd one more interest. In index.html, in the interests list after Watching science videos, add <li>Fixing our neighbours' phones</li>. Run code: it appears in the output before Sports, and the nav bar keeps its narrow-page column.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nFixing our neighbours' phones\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d3-s6",
+          "number": 6,
+          "instruction": "A media query can also turn a column into a row. The same condition, max-width: 900px, gives .project-list flex-direction: row and flex-wrap: wrap, so on a narrow page the project cards sit side by side and wrap instead of using one long column. Two queries with the same condition may live in the same stylesheet. Run projects.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul class=\"project-list\">\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Flexbox puts the nav items in a row, so each one is a box of its own and gap makes the space */\nnav li {\n  margin-right: 0;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n\n/* Media query: on a page 900px wide or narrower, the nav items stand one under the other */\n@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n\n/* Media query: on a narrow page the project cards sit side by side and wrap, to use the width that is left */\n@media (max-width: 900px) {\n  .project-list {\n    flex-direction: row;\n    flex-wrap: wrap;\n  }\n}\n"
+            }
+          ],
+          "run": "projects.html",
+          "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSolo work\nComic strip for Filipino class: Bayanihan in our barangay\nGroup work\nSend me a message\nPrefer a full page? Open the contact form.",
+          "checkYourself": "In the page window the two cards now sit side by side. The project lines in the output are the same as Step 2's: a flex item keeps its own line in the page text whether the row runs across or down. Only the nav bar reads differently, because Step 4 made it a flex row.",
+          "webChecks": [
+            {
+              "selector": ".project-list",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": ".project-list",
+              "style": "list-style-type",
+              "value": "none"
+            },
+            {
+              "selector": ".project-list li",
+              "count": 2
+            },
+            {
+              "selector": "iframe",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r09-d3-s6-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a third card to the row. In projects.html, at the end of the projects list, add <li>Poster for Nutrition Month <span class=\"badge\">class work</span></li>. Run code: the card and its badge Class work appear in the output, and in the page window it joins the row and wraps onto a second line when the three cards do not fit.",
+            "files": [],
+            "expectedOutput": "Tab title: Projects of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nPROJECTS OF JUAN DELA CRUZ\nICT STRAND\nTwo school projects I am proud of.\nScience poster: Saving water at home\nSolo work\nComic strip for Filipino class: Bayanihan in our barangay\nGroup work\nPoster for Nutrition Month\nClass work\nSend me a message\nPrefer a full page? Open the contact form."
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice: is the query on?** On a module step the page beside the checks is narrower than 900 pixels. (a) @media (max-width: 900px); (b) @media (max-width: 600px); (c) @media (max-width: 900); (d) the same query after you make the browser window wider than 900 pixels. Answers: (a) on; (b) off: the window is wider than 600; (c) never: the length has no unit, so the query is dropped; (d) off."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Wednesday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r09-d3-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r09-d3-s6",
+        "questions": [
+          {
+            "id": "3.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What does @media (max-width: 900px) mean?"
+          },
+          {
+            "id": "3.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 5 the nav items stand in a column in the page window but the output did not change. Why is that important?"
+          },
+          {
+            "id": "3.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "In Step 6 the same condition turns a column into a row. Which width uses the row, and which the column?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r09-d4",
+      "order": 4,
+      "dayLabel": "THURSDAY",
+      "title": "When a Flex Container Disappears: Repairs, then Start Your Own",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Recognise a layout whose flex container was removed, and tell display: inline from a flex item.",
+        "affective": "Show patience and care when three deleted lines change a whole layout.",
+        "psychomotor": "Repair Juan's skills list, then begin the personal flexbox and media query."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Three lines deleted from one rule can undo a whole layout, and the browser shows no error."
+        },
+        {
+          "type": "definition",
+          "term": "Layout repairs",
+          "markdown": "If display: flex is missing or misspelt, there is no flex container: gap does nothing, flex-direction does nothing, and the items fall back to their own display. display: inline on a list item makes it run together with the next one like words, which does change the page text. A media query with no units, @media (max-width: 900), is dropped whole."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A shelf with its brackets removed: nothing is missing from the books, but they are all in a heap."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d4-s7",
+          "number": 7,
+          "instruction": "Flexbox for a form. form becomes a flex container with flex-direction: column and gap: 0.75em, so every field is a flex item with the same space above and below it. The fields were already one under the other, but each carried its own paragraph margin; one gap now sets the spacing for all of them. Run contact.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Flexbox puts the nav items in a row, so each one is a box of its own and gap makes the space */\nnav li {\n  margin-right: 0;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n\n/* Media query: on a page 900px wide or narrower, the nav items stand one under the other */\n@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n\n/* Media query: on a narrow page the project cards sit side by side and wrap, to use the width that is left */\n@media (max-width: 900px) {\n  .project-list {\n    flex-direction: row;\n    flex-wrap: wrap;\n  }\n}\n\n/* Flexbox: the contact form's fields, one under the other, with an even gap between them */\nform {\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n}\n"
+            }
+          ],
+          "run": "contact.html",
+          "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nSend message",
+          "checkYourself": "The labels and the button still read one per line in the output, and in the page window the spaces between the fields are even.",
+          "webChecks": [
+            {
+              "selector": "form",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": "form",
+              "style": "flex-direction",
+              "value": "column"
+            },
+            {
+              "selector": "form p",
+              "count": 5
+            },
+            {
+              "selector": "label",
+              "count": 4
+            },
+            {
+              "selector": "button",
+              "count": 1
+            }
+          ],
+          "activity": {
+            "id": "dotnet-1-r09-d4-s7-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nAdd a sixth flex item. In contact.html, before the paragraph that holds the Send message button, add a paragraph laid out like the others: <p>, <label for=\"class\">Your class</label><br>, <input type=\"text\" id=\"class\" name=\"class\" placeholder=\"Grade and section\"> and </p>. Run code: Your class appears in the output above the button, and the flex container gives it the same gap as the other fields.",
+            "files": [],
+            "expectedOutput": "Tab title: Contact Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nCONTACT JUAN\nThis form is a prototype: it sends nowhere.\nYour name\nYour email\nTopic\nSchool project\nArt club\nMessage\nYour class\nSend message"
+          }
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d4-s8",
+          "number": 8,
+          "instruction": "Broken on purpose: Juan deleted the three flexbox lines from .skills and added .skills li { display: inline; } instead. With no flex container the items are no longer boxes of their own, and display: inline makes them run together like words. Run index.html unchanged.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Flexbox puts the nav items in a row, so each one is a box of its own and gap makes the space */\nnav li {\n  margin-right: 0;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n}\n.skills li {\n  display: inline;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n\n/* Media query: on a page 900px wide or narrower, the nav items stand one under the other */\n@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n\n/* Media query: on a narrow page the project cards sit side by side and wrap, to use the width that is left */\n@media (max-width: 900px) {\n  .project-list {\n    flex-direction: row;\n    flex-wrap: wrap;\n  }\n}\n\n/* Flexbox: the contact form's fields, one under the other, with an even gap between them */\nform {\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS Making slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "The skills now share one line in the output, ticks and all. The page checks find display: block on .skills and display: inline on each item.",
+          "webChecks": [
+            {
+              "selector": ".skills",
+              "style": "display",
+              "value": "block"
+            },
+            {
+              "selector": ".skills li",
+              "style": "display",
+              "value": "inline"
+            },
+            {
+              "selector": ".skills li",
+              "count": 2
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r09-d4-s8-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nPut the flex container back. In styles.css, delete the whole .skills li rule with display: inline, and add the three lines back at the end of the .skills rule: display: flex;, flex-direction: column; and gap: 0.5em;. Run code: the skills are one per line in the output again, with even gaps in the page window.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "errorGuide",
+          "rows": [
+            {
+              "see": "gap and flex-direction do nothing, and the items keep their old spacing.",
+              "means": "display: flex is missing or misspelt, so there is no flex container.",
+              "fix": "Write display: flex; on the container, not on the items."
+            },
+            {
+              "see": "The list items run together on one line, in the page window and in the output.",
+              "means": "display: inline on the items, with no flex container above them.",
+              "fix": "Delete that rule and put display: flex back on the container."
+            },
+            {
+              "see": "A whole media query does nothing at any width.",
+              "means": "A length has no unit: @media (max-width: 900) is dropped.",
+              "fix": "Write the unit: @media (max-width: 900px)."
+            },
+            {
+              "see": "The items are side by side when you wanted them stacked.",
+              "means": "flex-direction is row, which is what a flex container does by default.",
+              "fix": "Add flex-direction: column; to the container."
+            },
+            {
+              "see": "An item that does not fit squeezes the others instead of moving down.",
+              "means": "flex-wrap is missing, so the row never breaks.",
+              "fix": "Add flex-wrap: wrap; to the container."
+            }
+          ]
+        },
+        {
+          "type": "note",
+          "markdown": "**Practice:** in styles.css, (a) delete display: flex; from .skills but leave gap; (b) write @media (max-width: 900) with no px. Answers: (a) the gap does nothing and the output does not change; (b) the whole query is dropped, at every width. Undo each change."
+        },
+        {
+          "type": "note",
+          "markdown": "**Start My Resume now:** Projects, then Personal performance-task project. Plan on paper first and show the teacher."
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Thursday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r09-d4-slip",
+        "points": 15,
+        "afterStep": "dotnet-1-r09-d4-s8",
+        "questions": [
+          {
+            "id": "4.1",
+            "kind": "Define",
+            "points": 5,
+            "prompt": "What happens to gap and flex-direction when display: flex is missing?"
+          },
+          {
+            "id": "4.2",
+            "kind": "Explain",
+            "points": 5,
+            "prompt": "In Step 8 the two skills ended up on one line. Which declaration did that, and why does it change the output?"
+          },
+          {
+            "id": "4.3",
+            "kind": "Connect",
+            "points": 5,
+            "prompt": "Why is @media (max-width: 900), with no px, dropped completely?"
+          }
+        ]
+      }
+    },
+    {
+      "id": "dotnet-1-r09-d5",
+      "order": 5,
+      "dayLabel": "FRIDAY",
+      "title": "My Resume, Week 9: Performance Task and Presentation",
+      "hours": 2,
+      "objectives": {
+        "cognitive": "Explain one's own flex containers and media query, and what each changes at which width.",
+        "affective": "Present one's own work honestly and respect each presenter's time.",
+        "psychomotor": "Finish, run, submit and present the resume with flexbox and a media query in CodeShare."
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "markdown": "**Today's starting point:** Juan's layout answers the width of the page; your own resume still needs its flex containers and its media query."
+        },
+        {
+          "type": "definition",
+          "term": "Present with evidence",
+          "markdown": "Run your site, make the browser window narrow and wide, point to your flex containers and your media query, and say what each one changes and at which width. No new HTML or CSS today."
+        },
+        {
+          "type": "analogy",
+          "markdown": "A tricycle ramp that folds out only where the pavement is narrow: the rule is written once, and the condition decides."
+        },
+        {
+          "type": "step",
+          "id": "dotnet-1-r09-d5-s9",
+          "number": 9,
+          "instruction": "Juan's finished Week 9 site: five flex containers (the skills, the project cards, the gallery, the nav bar and the form) and two media queries. Run it, make the browser window narrower and wider, and visit all three pages before you present. Friday adds no new HTML or CSS.",
+          "language": "html",
+          "files": [
+            {
+              "path": "index.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+            },
+            {
+              "path": "projects.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul class=\"project-list\">\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+            },
+            {
+              "path": "contact.html",
+              "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+            },
+            {
+              "path": "styles.css",
+              "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Flexbox puts the nav items in a row, so each one is a box of its own and gap makes the space */\nnav li {\n  margin-right: 0;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n\n/* Media query: on a page 900px wide or narrower, the nav items stand one under the other */\n@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n\n/* Media query: on a narrow page the project cards sit side by side and wrap, to use the width that is left */\n@media (max-width: 900px) {\n  .project-list {\n    flex-direction: row;\n    flex-wrap: wrap;\n  }\n}\n\n/* Flexbox: the contact form's fields, one under the other, with an even gap between them */\nform {\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n}\n"
+            }
+          ],
+          "run": "index.html",
+          "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced",
+          "checkYourself": "Does the nav bar stand in a column and do the project cards sit side by side while the page is narrow? Does the output stay the same at every width?",
+          "webChecks": [
+            {
+              "selector": ".skills",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": ".skills",
+              "style": "flex-direction",
+              "value": "column"
+            },
+            {
+              "selector": ".gallery",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": "nav ul",
+              "style": "display",
+              "value": "flex"
+            },
+            {
+              "selector": "figure",
+              "count": 4
+            },
+            {
+              "selector": "img",
+              "count": 5
+            },
+            {
+              "selector": "audio",
+              "count": 1
+            },
+            {
+              "selector": "video",
+              "count": 1
+            }
+          ],
+          "includeMediaOutput": true,
+          "activity": {
+            "id": "dotnet-1-r09-d5-s9-alter-v1",
+            "instruction": "Work in code editor loads this step's sample the first time. Run it unchanged to verify the sample, then make the small change below and Run code again. Reopening a started step restores its saved edits; completed earlier steps keep their own saved files.\n\nBefore you present, add this week's skill. In index.html, at the end of the skills list, after Making slide presentations, add <li>Fitting a page to a phone screen</li>. Run code: it appears in the output and the flex container gives it its gap and its tick by itself. Then present your own resume.",
+            "files": [],
+            "expectedOutput": "Tab title: Resume of Juan Dela Cruz\nVisible page text:\nHOME\nPROJECTS\nCONTACT\nJUAN DELA CRUZ\nHello! I am Juan Dela Cruz, a senior high school student in the ICT strand.\nI am in Grade 11, 1st semester. My science poster was about H2O.\nFavourite tool: CodeShare. Bayanihan is my favourite word.\nOpen to group projects. Sample resume for practice only.\nSkills\nTYPING DOCUMENTS\nMaking slide presentations\nFitting a page to a phone screen\nInterests\nDrawing comics\nCooking with my family\nWatching science videos\nSports\nBasketball\nChess\nGoals this term\nBuild my resume page.\nHelp a classmate with HTML.\nSkills I will learn next\nStyling pages with CSS\nArranging page layouts\nMaking pages fit phones\nMy motto\nLearn a little every day,\nshare what you know,\nand help others grow.\nWeekly clubs\nDay        Club\nMonday     Chess\nWednesday  Drawing\nEducation\nSchools of Juan Dela Cruz\nLevel\tSchool\tGrades\nSenior high\tSample Senior High School\t11 to 12\nJunior high\tSample Junior High School\t7 to 10\nAward: With honors, Grade 10\nSkill levels\nHow well Juan does each skill\nArea\tSkill\tLevel\nComputer\tTyping documents\tGood\nMaking slide presentations\tVery good\nArt\tDrawing comics\tVery good\nPainting posters\tGood\nProjects and certificates\nScience poster: Saving water at home\nComic strip: Bayanihan in our barangay\nCertificate: With honors, Grade 10\nNew\nTree planting with the science club\nSound greeting\nVideo introduction\nMedia checks:\nimages/juan_profile.svg: image decoded\nimages/science_poster.svg: image decoded\nimages/comic_strip.svg: image decoded\nimages/honors_certificate.svg: image decoded\nimages/tree_planting.svg: image decoded\naudio/greeting.wav: playback advanced\nvideo/juan_intro.webm: playback advanced"
+          }
+        },
+        {
+          "type": "note",
+          "markdown": "Answer the Friday exit slip now."
+        }
+      ],
+      "exitSlip": {
+        "id": "dotnet-1-r09-d5-slip",
+        "points": 20,
+        "afterStep": "dotnet-1-r09-d5-s9",
+        "questions": [
+          {
+            "id": "5.1",
+            "kind": "Point",
+            "points": 5,
+            "prompt": "Point to each flex container and to the media query in your styles.css."
+          },
+          {
+            "id": "5.2",
+            "kind": "Evaluate",
+            "points": 5,
+            "prompt": "Defend your breakpoint: what is cramped above it, and what is better below it?"
+          },
+          {
+            "id": "5.3",
+            "kind": "Apply",
+            "points": 5,
+            "prompt": "The school library wants its book cards side by side on a wide page and one under the other on a narrow one. Write the container rule and the media query."
+          },
+          {
+            "id": "5.4",
+            "kind": "Reflect",
+            "points": 5,
+            "prompt": "Which part of your layout was easiest to change after flexbox, and how do you know?"
+          }
+        ]
+      }
+    }
+  ],
+  "performanceTask": {
+    "id": "dotnet-1-r09-pt",
+    "title": "My Resume, Week 9: Flexbox and a Media Query",
+    "markdown": "Start Thursday; finish and present Friday. In CodeShare open Projects, then Personal performance-task project. Your Week 8 site carries forward: add this week's rules to your own styles.css.\n\nTurn at least two boxes of your own site into flex containers: your skills list, your gallery, your nav bar or your form. On each one write display: flex, choose flex-direction, and set the spacing with gap instead of a margin on every item; add flex-wrap: wrap to any row that may run out of width. Then add at least one media query, @media (max-width: 900px), that makes your layout better on a narrow page: stack your nav items, or turn a column of cards into a wrapping row. Nothing inside the query may add, remove or re-letter a word: your output must be the same at every width. Your own project's page fills the page window, so whether your query is on depends on your browser window's width: make it narrower if the query is off, wider if it is already on. The page window follows the browser window and cannot be dragged on its own. Flexbox and media queries work the same online and offline; offline your gallery pictures still show only their alt text until you add them online.\n\nUse only safe details: no home address, phone number, birth date, ID numbers or personal social-media accounts, and no other people in any picture. Run code until index.html runs with no error, then press Submit this version. Saving or running is not submitting.\n\nThursday: 0–60 min, repairs and the strip; 60–120 min, plan on paper, show the teacher, then start. Friday: 0–30 min, finish and run; 30–105 min, presentations; 105–120 min, strip and Submit this version.",
+    "checklist": [
+      "Keep your Week 8 site: every page, the nav bar, the gallery, your states and decorations, and styles.css on every page.",
+      "At least two flex containers of your own, each with display: flex and a flex-direction you chose.",
+      "gap on every flex container, instead of a margin on each item.",
+      "flex-wrap: wrap on any row that could run out of width.",
+      "At least one media query, @media (max-width: 900px), that improves the narrow layout.",
+      "Nothing inside a media query adds, removes or re-letters a word: the output is the same at every width.",
+      "Nothing in url(); no address, phone, birth date, ID numbers, social media or other people in a picture.",
+      "Run code shows no error; resizing the browser window shows your query working; press Submit this version, then present."
+    ],
+    "exampleFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Resume of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Juan Dela Cruz</h1>\n  <img class=\"profile\" src=\"images/juan_profile.svg\" alt=\"Drawing of Juan Dela Cruz smiling\" width=\"160\" height=\"160\">\n  <p>Hello! I am <strong>Juan Dela Cruz</strong>,\n  a senior high school student in the <em>ICT strand</em>.</p>\n  <p>I am in Grade 11, 1<sup>st</sup> semester.\n  My science poster was about H<sub>2</sub>O.</p>\n  <p><b>Favourite tool:</b> CodeShare.\n  <i>Bayanihan</i> is my favourite word.</p>\n  <p><mark>Open to group projects.</mark>\n  <small>Sample resume for practice only.</small></p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Typing documents</li>\n    <li>Making slide presentations</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Drawing comics</li>\n    <li>Cooking with my family</li>\n    <li>Watching science videos</li>\n    <li>Sports\n      <ul>\n        <li>Basketball</li>\n        <li>Chess</li>\n      </ul>\n    </li>\n  </ul>\n  <h2>Goals this term</h2>\n  <ol class=\"goals\" type=\"A\" start=\"1\">\n    <li>Build my resume page.</li>\n    <li>Help a classmate with HTML.</li>\n  </ol>\n  <h2>Skills I will learn next</h2>\n  <ol class=\"next\" start=\"3\" reversed>\n    <li>Styling pages with CSS</li>\n    <li>Arranging page layouts</li>\n    <li>Making pages fit phones</li>\n  </ol>\n  <h2 style=\"color: #2e7d32;\">My motto</h2>\n  <p class=\"motto\">Learn a little every day,<br>\n  share what you know,<br>\n  and help others grow.</p>\n  <hr>\n  <h2>Weekly clubs</h2>\n  <pre>Day        Club\nMonday     Chess\nWednesday  Drawing</pre>\n  <h2>Education</h2>\n  <table>\n    <caption>Schools of Juan Dela Cruz</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n        <th scope=\"col\">Grades</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td colspan=\"3\">Award: With honors, Grade 10</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Skill levels</h2>\n  <table>\n    <caption>How well Juan does each skill</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Area</th>\n        <th scope=\"col\">Skill</th>\n        <th scope=\"col\">Level</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>\n        <td>Typing documents</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making slide presentations</td>\n        <td>Very good</td>\n      </tr>\n    </tbody>\n    <tbody>\n      <tr>\n        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>\n        <td>Drawing comics</td>\n        <td>Very good</td>\n      </tr>\n      <tr>\n        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n    </tbody>\n  </table>\n  <h2>Projects and certificates</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/science_poster.svg\" alt=\"Juan's science poster about saving water\" width=\"160\" height=\"110\">\n      <figcaption>Science poster: Saving water at home</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/comic_strip.svg\" alt=\"Three comic panels of a house being carried\" width=\"160\" height=\"110\">\n      <figcaption>Comic strip: Bayanihan in our barangay</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/honors_certificate.svg\" alt=\"Juan's certificate for finishing Grade 10 with honors\" width=\"160\" height=\"110\">\n      <figcaption>Certificate: With honors, Grade 10</figcaption>\n    </figure>\n    <figure>\n      <span class=\"tag\">New</span>\n      <img src=\"images/tree_planting.svg\" alt=\"Three young trees planted by the science club\" width=\"160\" height=\"110\">\n      <figcaption>Tree planting with the science club</figcaption>\n    </figure>\n  </div>\n  <h2>Sound greeting</h2>\n  <audio src=\"audio/greeting.wav\" controls></audio>\n  <h2>Video introduction</h2>\n  <video src=\"video/juan_intro.webm\" controls width=\"320\"></video>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Projects of Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Projects of Juan Dela Cruz <span class=\"ribbon\">ICT strand</span></h1>\n  <p>Two school projects I am proud of.</p>\n  <ul class=\"project-list\">\n    <li>Science poster: Saving water at home <span class=\"badge\">solo work</span></li>\n    <li>Comic strip for Filipino class: Bayanihan in our barangay <span class=\"badge\">group work</span></li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"Contact form of Juan Dela Cruz\" width=\"420\" height=\"360\"></iframe>\n  <p>Prefer a full page? <a href=\"contact.html\">Open the contact form</a>.</p>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Juan Dela Cruz</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Juan</h1>\n  <p id=\"form-note\">This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" placeholder=\"Type your name\" required>\n    </p>\n    <p>\n      <label for=\"email\">Your email</label><br>\n      <input type=\"email\" id=\"email\" name=\"email\" required>\n    </p>\n    <p>\n      <label for=\"topic\">Topic</label><br>\n      <select id=\"topic\" name=\"topic\">\n        <option>School project</option>\n        <option>Art club</option>\n      </select>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* Juan Dela Cruz's resume: one stylesheet for all three pages */\n\n/* Element selectors: every body, h1, h2 and nav */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: rgb(34, 34, 34);\n}\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  text-transform: uppercase;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n  letter-spacing: 2px;\n  line-height: 2;\n  position: relative;\n}\nh2 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #8a1c55;\n  border-bottom: 2px solid #8a1c55;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n  clear: both;\n}\nnav {\n  font-weight: bold;\n  text-transform: uppercase;\n  background-color: #ffffff;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n\n/* Descendant selector: the list inside nav */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Flexbox puts the nav items in a row, so each one is a box of its own and gap makes the space */\nnav li {\n  margin-right: 0;\n}\n\n/* Link states, in this order: :link, :visited, :hover, :active */\na:link {\n  color: #13305c;\n}\na:visited {\n  color: #551a8b;\n}\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:active {\n  color: #8a1c55;\n}\n\n/* Nav links: white on navy; maroon under the mouse or keyboard */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Class selector: every element with class=\"badge\" */\n.badge {\n  background-image: linear-gradient(#fff3c4, #ffe08a);\n  font-size: 12px;\n  padding: 0.25em 0.5em;\n  border: 1px solid #b45309;\n  float: right;\n}\n\n/* Lists: no bullets for the skills (a tick comes from ::before, below); Roman numbers. Flexbox: one skill under the other, with a gap */\n.skills {\n  list-style-type: none;\n  list-style-position: inside;\n  padding-left: 0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n.next {\n  list-style-type: upper-roman;\n}\n\n/* Element selector: every paragraph */\np {\n  color: #333333;\n}\n\n/* Element selector: every label */\nlabel {\n  font-weight: bold;\n  font-size: 1.1em;\n}\n\n/* A comma lists several selectors: every form box 300px wide, padding and border included */\ninput, select, textarea {\n  box-sizing: border-box;\n  width: 300px;\n  padding: 4px;\n  border: 1px solid #555555;\n}\n\n/* Element selector: small print, faded with opacity */\nsmall {\n  opacity: 0.75;\n}\n\n/* ID selector: only the element with id=\"form-note\" */\n#form-note {\n  color: #9b1c1c;\n  font-weight: bold;\n  font-style: italic;\n}\n\n/* The framed contact page: solid border, space above */\niframe {\n  border: 2px solid #13305c;\n  margin-top: 0.5em;\n}\n\n/* Position: the ribbon sits 8px from the top-right corner of its h1, above it */\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Flexbox instead of float: the figures sit side by side and wrap to the next line when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n.gallery figure {\n  width: 170px;\n  position: relative;\n}\n\n/* Float: Juan's picture on the left; the introduction wraps beside it */\n.profile {\n  float: left;\n  margin: 0 1em 0.5em 0;\n}\n\n/* Gallery: every picture the same size in px, a caption under it */\n.gallery img {\n  width: 160px;\n  height: 110px;\n  border: 1px solid #555555;\n}\n.gallery figcaption {\n  font-size: 13px;\n  text-align: center;\n}\n\n/* Position: a tag in the top-left corner of its figure, above the picture */\n.tag {\n  position: absolute;\n  top: 4px;\n  left: 4px;\n  z-index: 1;\n  padding: 0 0.4em;\n  font-size: 12px;\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Pseudo-classes: a skill under the mouse turns light yellow; the first skill, Juan's best, stands out */\n.skills li:hover {\n  background-color: #fff3c4;\n}\n.skills li:first-child {\n  font-weight: bold;\n  text-transform: uppercase;\n}\n\n/* Pseudo-element: only the first letter of each badge is a capital */\n.badge::first-letter {\n  text-transform: uppercase;\n}\n\n/* Pseudo-classes on the form: every box that must be filled has a maroon border */\ninput:required {\n  border-color: #8a1c55;\n}\n\n/* The box you click or Tab into gets a maroon outline */\ninput:focus, select:focus, textarea:focus {\n  outline: 3px solid #8a1c55;\n}\n\n/* The button: white on maroon under the mouse and the keyboard alike */\nbutton:hover, button:focus {\n  color: #ffffff;\n  background-color: #8a1c55;\n}\n\n/* Links: a maroon outline when the keyboard reaches a link, as easy to see as the hover colour */\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* Lists: the 1st, 3rd, 5th ... goal in maroon */\n.goals li:nth-child(odd) {\n  color: #8a1c55;\n}\n\n/* Pseudo-elements: a green tick before each skill, quotation marks around the motto */\n.skills li::before {\n  content: \"✓ \";\n  color: #2e7d32;\n  font-weight: bold;\n}\n.motto::before {\n  content: \"“\";\n}\n.motto::after {\n  content: \"”\";\n}\n\n/* A pseudo-element after a combinator: the paragraph right after an h1 starts with a maroon drop cap */\nh1 + p::first-letter {\n  float: left;\n  font-size: 2.6em;\n  line-height: 1;\n  color: #8a1c55;\n  margin-right: 4px;\n}\n\n/* Flexbox: Juan's project cards, one under the other; a media query turns them into a row on a narrow page */\n.project-list {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n  list-style-type: none;\n  padding-left: 0;\n}\n\n/* Media query: on a page 900px wide or narrower, the nav items stand one under the other */\n@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n\n/* Media query: on a narrow page the project cards sit side by side and wrap, to use the width that is left */\n@media (max-width: 900px) {\n  .project-list {\n    flex-direction: row;\n    flex-wrap: wrap;\n  }\n}\n\n/* Flexbox: the contact form's fields, one under the other, with an even gap between them */\nform {\n  display: flex;\n  flex-direction: column;\n  gap: 0.75em;\n}\n"
+      }
+    ],
+    "starterFiles": [
+      {
+        "path": "index.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Resume</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <!-- Safe details only: no home address, phone, birth date, ID numbers or social media. -->\n  <h1>Your Name <span class=\"ribbon\">Your strand</span></h1>\n  <img src=\"images/my_picture.jpg\" alt=\"Describe your picture here\" width=\"160\" height=\"160\">\n  <p>Write a short introduction about yourself here.</p>\n  <h2>Skills</h2>\n  <ul class=\"skills\">\n    <li>Write a skill here</li>\n  </ul>\n  <h2>Interests</h2>\n  <ul>\n    <li>Write an interest here</li>\n  </ul>\n  <h2>My gallery</h2>\n  <div class=\"gallery\">\n    <figure>\n      <img src=\"images/my_project.jpg\" alt=\"Describe your project picture here\" width=\"160\" height=\"110\">\n      <figcaption>Write a caption here</figcaption>\n    </figure>\n    <figure>\n      <img src=\"images/my_certificate.jpg\" alt=\"Describe your certificate picture here\" width=\"160\" height=\"110\">\n      <figcaption>Write a caption here</figcaption>\n    </figure>\n  </div>\n  <h2>Education</h2>\n  <table>\n    <caption>My schools</caption>\n    <thead>\n      <tr>\n        <th scope=\"col\">Level</th>\n        <th scope=\"col\">School</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Write a level here</td>\n        <td>Write a school here</td>\n      </tr>\n    </tbody>\n  </table>\n</body>\n</html>"
+      },
+      {
+        "path": "projects.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>My Projects</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>My Projects</h1>\n  <ul>\n    <li>Write a school project here</li>\n  </ul>\n  <h2>Send me a message</h2>\n  <iframe src=\"contact.html\" title=\"My contact form\" width=\"420\" height=\"360\"></iframe>\n</body>\n</html>"
+      },
+      {
+        "path": "contact.html",
+        "content": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Contact Me</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n  <nav>\n    <ul>\n      <li><a href=\"index.html\">Home</a></li>\n      <li><a href=\"projects.html\">Projects</a></li>\n      <li><a href=\"contact.html\">Contact</a></li>\n    </ul>\n  </nav>\n  <h1>Contact Me</h1>\n  <p>This form is a prototype: it sends nowhere.</p>\n  <form>\n    <p>\n      <label for=\"visitor\">Your name</label><br>\n      <input type=\"text\" id=\"visitor\" name=\"visitor\" required>\n    </p>\n    <p>\n      <label for=\"message\">Message</label><br>\n      <textarea id=\"message\" name=\"message\" rows=\"4\"></textarea>\n    </p>\n    <p><button type=\"submit\">Send message</button></p>\n  </form>\n</body>\n</html>"
+      },
+      {
+        "path": "styles.css",
+        "content": "/* My resume: one stylesheet for all my pages */\n\n/* Text: a font list ending in a generic family, space between lines, dark grey text */\nbody {\n  font-family: Verdana, Tahoma, sans-serif;\n  line-height: 1.5;\n  color: #222222;\n}\n\n/* Element selector: every h1, a gradient header with white text (8.8:1 or more) */\nh1 {\n  font-family: Georgia, \"Times New Roman\", serif;\n  color: #ffffff;\n  background-image: linear-gradient(to right, #13305c, #8a1c55);\n  text-align: center;\n}\n\n/* Class selector: every element with class=\"highlight\" */\n.highlight {\n  background-color: #fff3c4;\n}\n\n/* ID selector: only the element with id=\"about\" */\n#about {\n  font-style: italic;\n}\n\n/* Box model: room and a line under every section heading */\nh2 {\n  border-bottom: 2px solid #13305c;\n  padding-bottom: 0.25em;\n  margin-top: 1.5em;\n}\n\n/* Lists: the nav list with no bullets and no indent, its items on one line */\nnav ul {\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\nnav li {\n  margin-right: 0.5em;\n  display: inline-block;\n}\n\n/* Lists: square bullets for my skills */\n.skills {\n  list-style-type: square;\n}\n\n/* Links in nav, in state order: white on navy (13.0:1), maroon under the mouse or the keyboard (8.8:1) */\nnav a:link, nav a:visited {\n  color: #ffffff;\n  background-color: #13305c;\n  padding: 0.25em 0.75em;\n  text-decoration: none;\n}\nnav a:hover, nav a:focus {\n  background-color: #8a1c55;\n}\n\n/* Position: my h1 is the reference box; the ribbon sits in its top-right corner, above it (14.2:1) */\nh1 {\n  position: relative;\n}\n.ribbon {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  z-index: 1;\n  padding: 0 0.5em;\n  font-size: 12px;\n  color: #222222;\n  background-color: #fff3c4;\n}\n\n/* Float: my gallery's figures side by side, each picture the same size; every section starts below them */\n.gallery figure {\n  float: left;\n  width: 170px;\n  margin: 0 12px 12px 0;\n}\n.gallery img {\n  width: 160px;\n  height: 110px;\n}\n.gallery figcaption {\n  text-align: center;\n}\nh2 {\n  clear: both;\n}\n\n/* Hover and focus: my links turn light yellow under the mouse and the keyboard alike; the keyboard also gets an outline (8.8:1) */\na:hover, a:focus {\n  background-color: #fff3c4;\n}\na:focus-visible {\n  outline: 3px solid #8a1c55;\n  outline-offset: 2px;\n}\n\n/* A pseudo-class: my first skill in bold. A pseudo-element: a star before each section heading (decoration only) */\n.skills li:first-child {\n  font-weight: bold;\n}\nh2::before {\n  content: \"★ \";\n}\n\n/* Flexbox: my skills in a column, with one gap instead of a margin on each item */\n.skills {\n  display: flex;\n  flex-direction: column;\n  gap: 0.5em;\n}\n\n/* Flexbox instead of float: my gallery figures side by side, wrapping when they do not fit */\n.gallery {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 12px;\n}\n\n/* Flexbox for my nav bar: a row of items, with gap between them */\nnav ul {\n  display: flex;\n  flex-direction: row;\n  gap: 0.5em;\n}\n\n/* Media query: at 900px and narrower, my nav items stand one under the other */\n@media (max-width: 900px) {\n  nav ul {\n    flex-direction: column;\n  }\n}\n"
+      }
+    ],
+    "presentationOutline": [
+      "Introduce yourself and your site (30 seconds).",
+      "Press Run code, then make the browser window narrower and wider (1 minute).",
+      "Change one flex-direction or the breakpoint, run again and show the change; then undo it (2 minutes).",
+      "Point to each flex container and to your media query (1 minute).",
+      "Answer one question (30 seconds)."
+    ],
+    "questionsToPrepare": [
+      "What does display: flex do to a box's children?",
+      "Why is gap easier to change than a margin on each item?",
+      "What does your media query change, and at which width?",
+      "Why must a media query never change the words on the page?",
+      "Which of your rows needs flex-wrap?"
+    ],
+    "rubric": [
+      {
+        "criterion": "Two or more flex containers, each with a chosen flex-direction",
+        "points": 10
+      },
+      {
+        "criterion": "gap used instead of a margin on each item",
+        "points": 8
+      },
+      {
+        "criterion": "flex-wrap on a row that needs it",
+        "points": 6
+      },
+      {
+        "criterion": "A media query that improves the narrow layout",
+        "points": 12
+      },
+      {
+        "criterion": "The output is the same at every width; readable colours kept",
+        "points": 8
+      },
+      {
+        "criterion": "Presentation: resizes the browser window and explains one container",
+        "points": 6
+      }
+    ],
+    "totalPoints": 50
+  }
+}
