@@ -40,6 +40,10 @@ const content = {
 const [first, second] = content.lessons.map((item) => item.blocks[0]);
 const guidedPage = sample.replace("<li>Reading</li>", "<li>Reading</li><li>Chess</li>");
 const taskPage = sample.replace("<li>Reading</li>", "<li>Reading</li><li>Drawing</li>");
+const otherPage = sample.replace("<li>Reading</li>", "<li>Reading</li><li>Swimming</li>");
+// The page's check list beside the code (CKB-139): its lines and, when the page text differs, its Required output.
+const checkList = (where) => where.locator(".student-module-project .web-checks li").allTextContents();
+const required = (where) => where.locator(".student-module-project .web-check-compare pre").first().textContent();
 
 // Run opens the floating page window; it closes only after the run is checked.
 const closePageWindow = async (where) => {
@@ -107,8 +111,10 @@ test("guided example on a web step: sample, guided, own task; teacher preview ti
     await t.test("student: the own task's page does not pass the guided example; the guided page verifies it and completes nothing", async () => {
       await tab.waitForFunction(() => !document.querySelector(".student-module-project .editor-card textarea")?.readOnly);
       await editor.fill(taskPage); await run("Guided example not verified");
+      assert.equal(await required(tab), first.activity.guided.expectedOutput, "a failed guided run shows Expected guided output as Required output");
       await editor.fill(guidedPage); await run("Guided example verified — now do Your task on your own.");
       assert.equal(await editor.inputValue(), guidedPage, "the student's code stays in the editor");
+      assert.deepEqual(await checkList(tab), ["✓ Page text matches"], "the guided run is listed against the guided output (CKB-139)");
       const saved = await progress();
       assert.equal(saved.stepStates[activityStateId(first)], undefined, "a guided pass is not Completed");
       assert.equal((await student.request.post(`${progressPath}/activity`, { data: { stepId: second.id } })).status(), 403, "the next step stays locked");
@@ -147,8 +153,13 @@ test("guided example on a web step: sample, guided, own task; teacher preview ti
       };
       await previewRun(view, "Matches Expected sample output.");
       assert.match(await banner(view).innerText(), /✓ Sample, unchanged code[\s\S]*○ Guided example[\s\S]*○ Your task/);
+      assert.deepEqual(await checkList(view), ["✓ Page text matches", "✓ Page has 1 ul > li"], "the sample keeps its page check");
+      await teacherEditor.fill(otherPage); await previewRun(view, "Differs from the expected output.");
+      assert.equal(await required(view), first.activity.guided.expectedOutput, "a run matching nothing compares with the next unticked check");
       await teacherEditor.fill(guidedPage); await previewRun(view, "Matches Expected guided output.");
+      assert.deepEqual(await checkList(view), ["✓ Page text matches"], "a guided match is listed against the guided output (CKB-139)");
       await teacherEditor.fill(taskPage); await previewRun(view, "Matches Expected task output.");
+      assert.deepEqual(await checkList(view), ["✓ Page text matches"], "a task match is listed against the task output (CKB-139)");
       assert.match(await banner(view).locator(".preview-checks").innerText(), /✓ Sample, unchanged code[\s\S]*✓ Guided example[\s\S]*✓ Your task/);
       await view.screenshot({ path: "/tmp/codeshare-web-guided-preview.png" });
 
@@ -157,6 +168,7 @@ test("guided example on a web step: sample, guided, own task; teacher preview ti
       await tab.locator(".student-module-project .module-guided").getByText("Add Chess after Reading.").waitFor();
       await editor.fill(guidedPage); await previewRun(tab, "Matches Expected guided output.");
       assert.match(await banner(tab).innerText(), /✓ Guided example/);
+      assert.deepEqual(await checkList(tab), ["✓ Page text matches"], "the class step lists the guided run against the guided output (CKB-139)");
       await tab.screenshot({ path: "/tmp/codeshare-web-guided-class-step.png" });
       await view.close();
     });

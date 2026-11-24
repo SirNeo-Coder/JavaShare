@@ -88,3 +88,18 @@ test("preview feedback: guided example output matches as guided, and each check 
   assert.match(html, /Matches Expected guided output/);
   assert.match(html, /✓ Sample, unchanged code/); assert.match(html, /✓ Guided example/); assert.match(html, /○ Your task/);
 });
+
+// CKB-139: a web step's check list compares with what the run was checked as, never always the sample.
+test("web check list target: preview uses the matched check or the next unticked one; own work uses the run's check", () => {
+  const { webListTarget } = tsxRequire("../app/StudentModuleActivity.tsx", import.meta.url);
+  assert.equal(webListTarget(true, "task", "guided", ["sample", "guided"], true, true), "guided", "a guided match compares with the guided output");
+  assert.equal(webListTarget(true, "task", "task", ["task"], true, true), "task");
+  assert.equal(webListTarget(true, "task", "sample", ["sample"], true, true), "sample");
+  assert.equal(webListTarget(true, "task", "none", [], true, true), "sample", "nothing ticked yet: the sample comes first");
+  assert.equal(webListTarget(true, "task", "none", ["sample"], true, true), "guided", "after the sample, the guided example is next");
+  assert.equal(webListTarget(true, "task", "none", ["sample"], false, true), "task", "no guided example: the task is next");
+  assert.equal(webListTarget(true, "task", "none", ["sample", "guided", "task"], true, true), "task", "all ticked: the last check");
+  assert.equal(webListTarget(true, "task", null, [], false, false), "sample", "a step without a task compares with its sample");
+  assert.equal(webListTarget(false, "guided", null, [], true, true), "guided", "own work: a guided run compares with the guided output");
+  assert.equal(webListTarget(false, "sample", "guided", [], true, true), "sample", "own work ignores preview ticks");
+});
