@@ -121,6 +121,14 @@ test("class session step count: online students only; a saved pass or a matching
     assert.match(await banner(benPage).getAttribute("class"), /passed/);
     const ticks = await banner(benPage).locator(".preview-checks").innerText();
     assert.match(ticks, /○ Sample, unchanged code/); assert.match(ticks, /✓ Guided example/); assert.match(ticks, /✓ Your task/);
+    // Watching a student and coming back keeps the teacher's ticks with their code; the student's stay too (CKB-137).
+    await page.getByRole("button", { name: "Students / projects", exact: true }).hover();
+    await page.locator(".team-select").filter({ hasText: "Ben Notyet" }).click();
+    await page.getByRole("region", { name: "Student live project" }).waitFor();
+    await page.getByRole("button", { name: "Back to Week 60 · Step 1" }).click();
+    await banner(page).waitFor();
+    assert.match(await banner(page).locator(".preview-checks").innerText(), /✓ Sample, unchanged code/, "the teacher's sample tick survives watching a student");
+    assert.equal(await banner(benPage).locator(".preview-checks").innerText(), ticks, "the watched student's ticks are untouched");
     await chip.getByRole("button", { name: "Step 1 · 2/2 done" }).waitFor();
     const benSaved = await admin.from("module_progress").select("step_states").eq("classroom_id", classId).eq("student_id", users[2].id).maybeSingle();
     assert.ok(!benSaved.data || !Object.values(benSaved.data.step_states).includes("pass"), "the class step saves nothing");
