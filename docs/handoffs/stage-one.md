@@ -4,7 +4,8 @@
 > Teacher approved Steps 7 and 8's own tasks; Step 6's own task moved before Sports so page text can tell the lists apart.
 > Tested: teacher's checker (samples, guided, answers), `tests/dotnet1-week01-three-part.test.mjs`, real CodeShare walk
 > of all 9 steps offline and online settings. Report: `Week_01_Three_Part_Report.md`. Next: teacher reviews the module;
-> then the Week 1 PDF and Word DLL; upload after #136 is live (steps in the report).
+> then the Week 1 PDF and Word DLL; upload after #136 is live (steps in the report). PR #138 opened; lint now skips
+> `docs/modules/` (teacher approved: the teacher's checker scripts use require()).
 
 > Web check list target (2026-11-24): on web steps the check list beside the code now compares with what the run was
 > checked as, in own work, Module preview and class step (CKB-139), branch `fix/web-checklist-target` (stacked on
