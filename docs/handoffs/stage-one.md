@@ -1,3 +1,8 @@
+> .NET 1 Week 1 PDF and DLL (2026-11-24): branch `content/dotnet1-week01-print` (on top of PR #138). Teacher approved
+> rewriting pages 9–11: the PDF is now 17 pages, a step guide with one step per page (numbered sample, discussion, guided
+> example, Your task, no answer); DLL's five activity lines name the three parts and new pages. Built with
+> `build_step_pages.py` and `render_pdf.cjs` in the week folder. Next: teacher reviews the PDF and DLL; upload after merge.
+
 > .NET 1 Week 1 three-part, Stage 2 (2026-11-24): `docs/modules/dotnet1/week01/DotNet1_Week_01.threepart.codeshare.json`,
 > branch `content/dotnet1-week01-three-part` (stacked on PR #136 and #137, both still open). 9 steps: sample + line-by-line
 > discussion, guided example (the old verified task), own task with a new `-alter-v2` id and a teacher-only answer key.

@@ -75,3 +75,27 @@ test("Week 1 three-part: CodeShare's rule takes sample, then guided example, the
     assert.deepEqual([own.check, own.passed], ["task", true], `${step.id}: own task`);
   }
 });
+
+// The printed step guide (source/p9.html onward, built by build_step_pages.py) matches the module file and never
+// prints the answer key (teacher, 2026-11-11: the PDF module never prints an answer).
+test("Week 1 three-part: the printed step pages match the module file and never print an answer", () => {
+  const decode = (text) => text.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#x27;/g, "'").replace(/&amp;/g, "&");
+  const pageOf = (number) => readFileSync(new URL(`../docs/modules/dotnet1/week01/source/p${8 + number}.html`, import.meta.url), "utf8");
+  for (const step of steps(content)) {
+    const html = pageOf(step.number);
+    assert.ok(html.includes(`data-step="${step.id}"`), `${step.id}: printed on page ${8 + step.number}`);
+    const numbered = [...html.matchAll(/<span class="cl">(.*?)<\/span>/g)].map((m) => decode(m[1]));
+    assert.deepEqual(numbered.map((line) => line === " " ? "" : line), step.files[0].content.replace(/\n$/, "").split("\n"), `${step.id}: numbered sample`);
+    const outputs = [...html.matchAll(/<pre class="out">(.*?)<\/pre>/g)].map((m) => [...m[1].matchAll(/<span class="ln">(.*?)<\/span>/g)].map((l) => decode(l[1])).join("\n"));
+    assert.deepEqual(outputs, [step.activity.guided.expectedOutput, step.activity.expectedOutput], `${step.id}: guided and task outputs`);
+    const text = decode(html);
+    assert.ok(text.includes(step.activity.guided.code), `${step.id}: guided code`);
+    const [, ...answer] = step.activity.solution.lines.split("\n");
+    const shown = `${step.files[0].content}\n${step.activity.guided.code}`;
+    for (const line of answer.map((line) => line.trim()).filter((line) => !shown.includes(line))) {
+      assert.ok(!text.includes(line), `${step.id}: the answer line ${line} is printed`);
+    }
+    assert.ok(!text.replace(/\s+/g, "").includes(answer.join("").replace(/\s+/g, "")), `${step.id}: the answer is printed`);
+    assert.ok(!text.includes(step.activity.solution.note), `${step.id}: the answer note is printed`);
+  }
+});

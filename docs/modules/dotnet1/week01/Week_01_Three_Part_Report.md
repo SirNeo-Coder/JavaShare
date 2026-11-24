@@ -11,7 +11,7 @@ performance task and Week 1 start (no previous module).
   not count. No class uses the .NET subject yet (teacher, 2026-11-24), so nobody's work resets.
 - **Upload it only after the web guided-example app change (pull request #136) is live.** An older server refuses a
   guided example on a web step.
-- **The PDF module and the Word DLL are not updated yet.** They follow after you approve this file.
+- **The PDF module and the Word DLL are updated** (after your approval, 2026-11-24): see Printed module and lesson plan.
 - Nothing was uploaded. Weeks 2–10, the Java weeks and `Documents/Java 2026` are unchanged.
 
 ## How each step works
@@ -67,6 +67,23 @@ The complete solved pages are in `solutions/<step id>/index.html` (guided exampl
 - The hosted site. The online run used this branch's app on the laptop.
 - The teacher's Module preview and class step with this file. The general behaviour is covered by
   `tests/web-guided.browser.mjs`.
+
+## Printed module and lesson plan
+
+- **PDF (`DotNet1_HTML_Fundamentals_Lists_Module.pdf`), now 17 pages of 612 × 936 pt.** Pages 1–8 are unchanged except:
+  page 1's "How to use this module" explains the three parts; each step's last line points to its step-guide page;
+  every footer says "of 17". The old task pages 9–11 are now the **step guide, pages 9–17, one step per page**: the
+  step's full sample with line numbers (pages 1–6 print only parts of it, and the discussion counts lines from the top),
+  the discussion, the guided example with its code and expected output, and Your task with its expected output.
+  The check-yourself table (now with a Guided example verified column) is on page 9. **No answer is printed.**
+- Built from `source/` with `build_step_pages.py` (step pages from the module file) and `render_pdf.cjs` (Chromium,
+  your page size). Rendering the unchanged pages first gave exactly the text of your old PDF.
+- **Word DLL (`DotNet1_ILAW_Week_01.docx`), still 7 pages:** the five Student Activity lines now read "Sample, guided
+  example, then your task" with the step-guide pages (9–10, 11–12, 13–14, 15–16, 17), and the Friday scaffolding line
+  says the guided example adds a closing line and Your task adds a different one. Nothing else changed. Checked by
+  converting it to PDF with LibreOffice, not in Microsoft Word.
+- `tests/dotnet1-week01-three-part.test.mjs` checks every printed step page against the module file (numbered sample,
+  guided code, both outputs) and that no answer line or note is printed (shown failing with an answer put on page 9).
 
 ## Upload steps (after #136 and this pull request are merged and the site is updated)
 
