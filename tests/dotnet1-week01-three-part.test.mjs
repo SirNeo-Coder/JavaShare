@@ -56,6 +56,14 @@ test("Week 1 three-part: guided lines and answer-key lines sit where they say; t
       assert.equal(text.split(edit.from).length, 2, `${step.id} fromGuided: ${edit.from} must appear once`); return text.replace(edit.from, edit.to); }, guided[0].content);
     assert.equal(fromGuided, own[0].content, `${step.id}: changing the guided code as Your task says gives the answer page`);
     assert.match(step.activity.instruction, /guided example|your repair/, `${step.id}: Your task says what to do with the guided code`);
+    // A "line N" in Your task is read in the editor after the guided example (CKB-142): it must point at the same line
+    // there as in the sample, or at the guided line itself, unless the wording says it counts in the sample.
+    const sampleLines = linesOf(step.files), guidedLines = linesOf(guided);
+    for (const [, n, after] of step.activity.instruction.matchAll(/line (\d+)( of the sample)?/g)) {
+      const at = Number(n) - 1;
+      assert.ok(after || guidedLines[at] === sampleLines[at] || step.activity.guided.code.split("\n").includes(guidedLines[at]),
+        `${step.id}: Your task's line ${n} moved after the guided example (sample: ${sampleLines[at]?.trim()}; editor: ${guidedLines[at]?.trim()})`);
+    }
     const [, from, and] = step.activity.guided.instruction.match(/\*\*lines? (\d+)(?: and (\d+))?\*\*/);
     const code = step.activity.guided.code.split("\n");
     assert.deepEqual(linesOf(guided).slice(from - 1, from - 1 + code.length), code, `${step.id}: guided code is not at line ${from}`);

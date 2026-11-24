@@ -4,6 +4,7 @@ Search symptoms, user wording, features, and test language here first.
 
 | Case | Symptom and search terms | Root-cause class | Status | Evidence |
 | --- | --- | --- | --- | --- |
+| [CKB-142](cases/CKB-142-task-line-number-moves-after-guided.md) | continuity, line number moved, element from line 16, wrong line after guided example | Your task counted lines in the sample; the guided line moves lines down | resolved on `content/dotnet1-week01-line-refs` | line-reference rule shown failing on old Step 3 |
 | [CKB-141](cases/CKB-141-own-task-ignores-guided-code.md) | code editing continuity, own task did not say delete the skill, guided line still in editor | own-task wording started from the sample; the editor keeps the guided code | resolved on `content/dotnet1-week01-own-from-guided` | continuity test shown failing with the old Step 2 wording; real-app walk |
 | [CKB-140](cases/CKB-140-web-results-squeeze-task-panel.md) | console not visible, output occupies the entire area, make it scrollable, task text squeezed | web check list never shrank or scrolled; task text squeezed | resolved on `fix/web-results-scroll` | scroll browser test shown failing with old CSS |
 | [CKB-139](cases/CKB-139-web-practice-checklist-vs-sample.md) | red cross under green banner, Page text matches cross in preview, class step web page | check list target fixed as sample in preview, task in own work; guided never a target | resolved on `fix/web-checklist-target` | target unit test and offline browser shown failing |
