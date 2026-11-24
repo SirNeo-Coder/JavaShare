@@ -51,6 +51,11 @@ test("Week 1 three-part: guided lines and answer-key lines sit where they say; t
     const guided = solved(step, "guided"), own = solved(step, "own");
     assert.equal(guided[0].content, answerPage(step.id), `${step.id}: the guided page is the old verified answer`);
     assert.equal(own[0].content, answerPage(step.activity.id), `${step.id}: the own-task answer page`);
+    // Continuity (teacher, 2026-11-24): the own task starts from the guided code still in the editor.
+    const fromGuided = edits[step.id].fromGuided.reduce((text, edit) => {
+      assert.equal(text.split(edit.from).length, 2, `${step.id} fromGuided: ${edit.from} must appear once`); return text.replace(edit.from, edit.to); }, guided[0].content);
+    assert.equal(fromGuided, own[0].content, `${step.id}: changing the guided code as Your task says gives the answer page`);
+    assert.match(step.activity.instruction, /guided example|your repair/, `${step.id}: Your task says what to do with the guided code`);
     const [, from, and] = step.activity.guided.instruction.match(/\*\*lines? (\d+)(?: and (\d+))?\*\*/);
     const code = step.activity.guided.code.split("\n");
     assert.deepEqual(linesOf(guided).slice(from - 1, from - 1 + code.length), code, `${step.id}: guided code is not at line ${from}`);
@@ -90,6 +95,7 @@ test("Week 1 three-part: the printed step pages match the module file and never 
     assert.deepEqual(outputs, [step.activity.guided.expectedOutput, step.activity.expectedOutput], `${step.id}: guided and task outputs`);
     const text = decode(html);
     assert.ok(text.includes(step.activity.guided.code), `${step.id}: guided code`);
+    assert.ok(text.includes(step.activity.instruction.replace(/`|\*\*/g, "")), `${step.id}: Your task wording`);
     const [, ...answer] = step.activity.solution.lines.split("\n");
     const shown = `${step.files[0].content}\n${step.activity.guided.code}`;
     for (const line of answer.map((line) => line.trim()).filter((line) => !shown.includes(line))) {

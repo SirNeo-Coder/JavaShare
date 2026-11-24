@@ -1,5 +1,5 @@
 // .NET 1 Week 1 three-part file in real CodeShare: a student runs every step's sample unchanged, types the guided
-// example, then the own-task answer; each run is checked by the app in the page window. Run it twice: offline
+// example, then changes that guided code as Your task says; each run is checked by the app in the page window. Run it twice: offline
 // classroom settings (LOCAL_JAVA_EXECUTION=true, CODESHARE_LAPTOP=true) and online settings (no laptop runner).
 // Local Supabase only. Env: WEEK1_BASE_URL (default http://localhost:3072), CODESHARE_PLAYWRIGHT_MODULE,
 // PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
@@ -18,6 +18,9 @@ const admin = createClient(local.API_URL, local.SERVICE_ROLE_KEY, { auth: { pers
 const content = JSON.parse(readFileSync(new URL("../docs/modules/dotnet1/week01/DotNet1_Week_01.threepart.codeshare.json", import.meta.url)));
 const answer = (folder) => readFileSync(new URL(`../docs/modules/dotnet1/week01/solutions/${folder}/index.html`, import.meta.url), "utf8");
 const steps = content.lessons.flatMap((lesson) => lesson.blocks).filter((block) => block.type === "step");
+// Your task starts from the guided code still in the editor (teacher, 2026-11-24): the student changes those lines.
+const edits = JSON.parse(readFileSync(new URL("./fixtures/dotnet1-week01-three-part-edits.json", import.meta.url)));
+const fromGuided = (step, text) => edits[step.id].fromGuided.reduce((code, edit) => { assert.ok(code.includes(edit.from), `${step.id}: ${edit.from}`); return code.replace(edit.from, edit.to); }, text);
 
 const closePageWindow = async (where) => {
   const close = where.locator(".page-window").getByRole("button", { name: "Close", exact: true });
@@ -77,8 +80,8 @@ test("Week 1 three-part in CodeShare: every sample, guided example and own task 
         await editor.fill(answer(step.activity.id)); await run("Guided example not verified");
         await editor.fill(answer(step.id)); await run("Guided example verified — now do Your task on your own.");
         assert.equal((await progress()).stepStates[activityStateId(step)], undefined, "the guided example does not complete the step");
-        await editor.fill(answer(step.id)); await run("Still showing the guided example output");
-        await editor.fill(answer(step.activity.id));
+        await run("Still showing the guided example output");
+        await editor.fill(fromGuided(step, await editor.inputValue()));
         await run(step === steps.at(-1) ? "Completed" : "Completed — next activity unlocked");
         const saved = await progress();
         assert.equal(saved.stepStates[activityStateId(step)], "pass"); assert.equal(saved.stepStates[guidedStateId(step)], "pass");
