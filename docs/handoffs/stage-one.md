@@ -4,6 +4,11 @@
 > (`fromGuided`) and the Your-task line-number rule for Weeks 15 and 17; Week 15 three-part runs through the Java bridge.
 > Branch `content/java-own-from-guided`, approved. Week 17 Word plan's five own-task lines updated too (teacher
 > approved; Week 15's plan prints no own tasks). PR #144. Teacher re-uploads the Week 15 and Week 17 three-part files after merge (Week 17 before Nov 30).
+> .NET 1 Week 2 three-part (2026-11-25): `docs/modules/dotnet1/week02/DotNet1_Week_02.threepart.codeshare.json`, branch
+> `content/dotnet1-week02-three-part`, approved (three parts although every step is a media step). Guided examples on
+> media steps tested for the first time: all 9 steps pass on Cloudflare's runtime (8787) with media; offline they are
+> teacher-checked. Reusable prompt saved: `docs/modules/dotnet1/three_part_prompt.md`. Next: teacher reviews Week 2;
+> then its PDF (119-line samples may not fit one sheet) and DLL; upload with media after merge.
 
 > Week 1 line references (2026-11-24, CKB-142): Step 3's "line 16" moved after the guided line; reworded to count in the
 > sample; test rule added. Branch `content/dotnet1-week01-line-refs`, approved. Teacher re-uploads Week 1 after merge.

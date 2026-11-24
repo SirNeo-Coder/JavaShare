@@ -1,0 +1,98 @@
+{
+ "dotnet-1-r02-d1-s1": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>My profile picture is a drawing, not a photo.</p>",
+    "to": "  <p>Picture: a drawing of me, not a photo.</p>"
+   }
+  ]
+ },
+ "dotnet-1-r02-d1-s2": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "      <tr>\n        <td>Elementary</td>\n        <td>Sample Elementary School</td>\n        <td>1 to 6</td>\n      </tr>",
+    "to": "      <tr>\n        <td>Kindergarten</td>\n        <td>Sample Kindergarten School</td>\n        <td>K</td>\n      </tr>"
+   }
+  ]
+ },
+ "dotnet-1-r02-d2-s3": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>I heard three rising notes.</p>",
+    "to": "  <p>Sound: three rising notes.</p>"
+   }
+  ]
+ },
+ "dotnet-1-r02-d2-s4": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>The video runs about 4 seconds and ends with my name.</p>",
+    "to": "  <p>Video: about 4 seconds, ending with my name.</p>"
+   }
+  ]
+ },
+ "dotnet-1-r02-d3-s5": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "        <td colspan=\"3\">Award: Best science poster, Grade 11</td>",
+    "to": "        <td colspan=\"2\">Award: Best science poster</td>\n        <td>Grade 11</td>"
+   }
+  ]
+ },
+ "dotnet-1-r02-d3-s6": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "        <th scope=\"rowgroup\" rowspan=\"3\">Computer</th>",
+    "to": "        <th scope=\"rowgroup\" rowspan=\"2\">Computer</th>"
+   },
+   {
+    "path": "index.html",
+    "from": "      </tr>\n      <tr>\n        <td>Fixing simple computer problems</td>\n        <td>Learning</td>\n",
+    "to": ""
+   },
+   {
+    "path": "index.html",
+    "from": "        <th scope=\"rowgroup\" rowspan=\"2\">Art</th>",
+    "to": "        <th scope=\"rowgroup\" rowspan=\"3\">Art</th>"
+   },
+   {
+    "path": "index.html",
+    "from": "        <td>Painting posters</td>\n        <td>Good</td>\n",
+    "to": "        <td>Painting posters</td>\n        <td>Good</td>\n      </tr>\n      <tr>\n        <td>Making clay models</td>\n        <td>Learning</td>\n"
+   }
+  ]
+ },
+ "dotnet-1-r02-d4-s7": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>Broken: images/Juan_Profile.svg should be images/juan_profile.svg.</p>",
+    "to": "  <p>Broken: audio/greeting.mp3 should be audio/greeting.wav.</p>"
+   }
+  ]
+ },
+ "dotnet-1-r02-d4-s8": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n",
+    "to": "      <tr>\n        <td>Junior high</td>\n        <td>Sample Junior High School</td>\n        <td>7 to 10</td>\n      </tr>\n      <tr>\n        <td>Senior high</td>\n        <td>Sample Senior High School</td>\n        <td>11 to 12</td>\n      </tr>\n"
+   }
+  ]
+ },
+ "dotnet-1-r02-d5-s9": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p><small>Picture, sound and video: made for this module.</small></p>",
+    "to": "  <p><small>Media: all made for this module.</small></p>"
+   }
+  ]
+ }
+}
