@@ -8,7 +8,7 @@ import { useJavaConsole } from "./useJavaConsole";
 import JavaRunnerBrand from "./JavaRunnerBrand";
 import { Markdown, ModuleMediaFiles, PerformanceTaskSteps, copyText, moduleCode, type CourseModule, type ModuleFile, type Progress, type StepBlock } from "./ModuleViewer";
 import { JAVA_PATH, JAVA_PATH_MAX_LENGTH, fileLanguage, javaProjectPath, moduleWebPathError, projectPathError } from "../backend/src/file-paths";
-import { checkModuleRun, checkStdin, guidedPending, guidedStateId, matchesActivityOutput, matchesSample, mergeProjectFiles, samplePending, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep } from "../backend/src/module-activities";
+import { checkModuleRun, checkStdin, guidedPending, guidedStateId, matchesActivityOutput, matchesSample, samplePending, sampleProject, sampleStateId, sourcePath, teacherCheckedStep, webPerformanceTask, webStep, withoutMediaChecks } from "../backend/src/module-activities";
 import { WebCheckList, WebConsole, useWebPageRun, type WebRunResult } from "./WebStepRun";
 import { moduleRecordKey, readDeviceRecord, restoreModuleDraft, writeDeviceRecord, type ModuleDeviceDraft } from "./moduleDeviceStore";
 import { listModuleMedia, loadModuleMedia, loadPersonalMedia } from "./moduleMedia";
@@ -268,7 +268,7 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
       if (!active) return;
       if (step) {
         const needsSample = samplePending(activity.module, step, activity.progress.stepStates);
-        const draft = restoreModuleDraft(saved, { files: needsSample ? mergeProjectFiles(activity.progress.projectFiles, step.files) : activity.progress.projectFiles,
+        const draft = restoreModuleDraft(saved, { files: needsSample ? sampleProject(activity.progress.projectFiles, step) : activity.progress.projectFiles,
           moduleVersion: activity.progress.moduleVersion, stateId: activity.stateId }, step, needsSample);
         await writeDeviceRecord(localKey, draft);
         if (!active) return;
@@ -394,8 +394,10 @@ export default function StudentModuleActivity({ activity, ref, onChecked, onPrac
           const page = runner ? undefined : result as WebRunResult;
           const pageReport = page ? { checks: page.checks, media: page.media } : {};
           if (!runner) setWebResult(result as WebRunResult);
-          if (teacherChecked) { setStatus("Checked by your teacher for now"); return; }
-          const check = checkModuleRun(activity.module, { ...step!, activity: step!.activity ? { ...step!.activity, stdin: step!.activity.stdin ?? "" } : undefined } as Parameters<typeof checkModuleRun>[1], stepStates, files, result);
+          // Without uploaded media, the sample and guided example are checked by page text; the teacher marks the task done (CKB-147).
+          const checkStep = teacherChecked ? withoutMediaChecks(step!) : step!;
+          const check = checkModuleRun(activity.module, { ...checkStep, activity: checkStep.activity ? { ...checkStep.activity, stdin: checkStep.activity.stdin ?? "" } : undefined } as Parameters<typeof checkModuleRun>[1], stepStates, files, result);
+          if (teacherChecked && check.check === "task") { setStatus("Checked by your teacher for now"); return; }
           setOutput(result.output); setLastCheck({ ...check, success: result.success, syncPending: check.check === "task" && check.passed });
           if (check.check === "sample" && check.passed) {
             draftRef.current.sample = { files, success: result.success, output: result.output, ...pageReport };

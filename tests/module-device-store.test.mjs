@@ -53,3 +53,20 @@ test("module drafts: invalid sample evidence resets safely while valid pending c
   assert.deepEqual(restoreModuleDraft(null, current, step, true), current);
   assert.deepEqual(restoreModuleDraft({ ...current, files: files("offline edits") }, current, step, false).files, files("offline edits"));
 });
+
+test("module drafts: a still-locked sample drops a leftover .txt saved on the device; a verified one keeps its files (CKB-146)", () => {
+  const leftover = [...current.files, { path: "fleet.txt", content: "old Step 3 data" }];
+  assert.deepEqual(restoreModuleDraft({ ...current, files: leftover }, current, step, true).files, current.files);
+  const sample = { files: current.files, success: true, output: "sample" };
+  assert.deepEqual(restoreModuleDraft({ ...current, files: leftover, sample }, current, step, true).files, leftover);
+});
+
+test("module drafts: a media step's sample verified by page text alone survives reload; a wrong text does not (CKB-147)", () => {
+  const media = { ...step, expectedOutput: "Juan\nMedia checks:\nimages/juan.svg: image decoded", activity: { guided: { expectedOutput: "Guided\nMedia checks:\nimages/juan.svg: image decoded" } } };
+  const sample = { files: current.files, success: true, output: "Juan" };
+  const guided = { files: current.files, success: true, output: "Guided" };
+  const restored = restoreModuleDraft({ ...current, sample, guided }, current, media, true);
+  assert.deepEqual(restored.sample, sample);
+  assert.deepEqual(restored.guided, guided);
+  assert.equal(restoreModuleDraft({ ...current, sample: { ...sample, output: "Maria" } }, current, media, true).sample, undefined);
+});

@@ -1,7 +1,7 @@
 import { paperPerformanceTask, personalProjectFiles, type PersonalMedia, type PersonalSubmission } from "./personal-performance.ts";
 import { moduleAccessBlock, type ModuleAccessBlock, type ModuleAccessSummary } from "./module-prerequisites.ts";
 import { createHash, randomBytes } from "node:crypto";
-import { activityStateId, activityTask, activityAccess, checkModuleRun, checkStateId, checkStdin, checkableStep, guidedStateId, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles, mediaLinesPass, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
+import { activityStateId, activityTask, activityAccess, checkModuleRun, checkStateId, checkStdin, checkableStep, guidedStateId, findActivity, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles, mediaLinesPass, sampleProject, teacherCheckedStep, webChecksPass, webPerformanceTask, webStep, type ActivityStep, type WebCheckSeen, type ModuleFile, type ActivityProjects } from "./module-activities.ts";
 import { courseModule, type CourseModule } from "./course-module-schema.ts";
 import { onlyWordingChanged } from "./module-wording.ts";
 import { createSupabaseAuthClient, getSupabaseAdmin } from "./database.ts";
@@ -1695,8 +1695,9 @@ export async function prepareSupabaseModuleActivity(user: SupabaseSessionUser, c
       const drafts = { ...history.drafts };
       if (history.activeKey) drafts[history.activeKey] = row.project_files;
       const beforeSampleFiles = history.beforeSampleFiles ?? (!history.activeKey && row.project_files.length ? row.project_files : undefined);
-      project = drafts[key] ?? (row.step_states[key] === "pass" && !history.activeKey && row.project_files.length
-        ? row.project_files : mergeProjectFiles(content.starterFiles, previous, row.project_files, step.files));
+      // An unverified sample is still locked, so its draft holds no edits: rebuild it without leftover data files (CKB-146).
+      project = (samplePending(content, step, row.step_states) ? undefined : drafts[key]) ?? (row.step_states[key] === "pass" && !history.activeKey && row.project_files.length
+        ? row.project_files : sampleProject(mergeProjectFiles(content.starterFiles, previous, row.project_files), step));
       drafts[key] = project;
       projects = { activeKey: key, drafts, ...(beforeSampleFiles ? { beforeSampleFiles } : {}) };
     }

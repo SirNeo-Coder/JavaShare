@@ -133,7 +133,9 @@ What teachers and students can do today. Keep this page current when their use o
   files** stores a module's pictures, sound and video once (Cloudflare R2), shared by the teacher's
   classes in that subject; **Remove** deletes one. Once a module has media files, its media steps
   are checked automatically with one checklist line per picture, sound or video; before that, and
-  offline, they stay **Checked by your teacher for now** with **Mark done**. Each device keeps the
+  offline, they stay **Checked by your teacher for now** with **Mark done**. Even then the student's
+  unchanged sample and guided example are checked by their page text alone, so the editor unlocks and
+  the student can do Your task; only the task waits for **Mark done** (CKB-147, 2026-11-25). Each device keeps the
   files after the first download. On a media step, **Run** (teacher) and **▶ Run code** (student) say
   **Loading media…** until the files are loaded (CKB-080). Parts, the next week and the
   percentage move as for Java. Steps whose expected output lists **Media checks** show **Checked by
@@ -336,7 +338,8 @@ the three ticks), and their **Actual output**, updated after each run; **No run 
 
 - Revised Week 14 opts into `sampleFirst: true`. **Work in code editor** loads the current step's
   sample on first opening. Supporting classes roll forward; each step's saved working files are
-  kept independently. Reopening resumes those edits. Work present before the update remains
+  kept independently. Reopening resumes those edits; a step whose sample is not yet verified always reopens
+  freshly, with only its own `.txt` data files (a leftover `fleet.txt` from older work is left out, CKB-146). Work present before the update remains
   readable under **Work saved before sample loading**. The previous week and personal drafts and
   submissions are never changed by module sample loading.
 - The sample editor stays read-only until the student presses **Run code** and verifies the

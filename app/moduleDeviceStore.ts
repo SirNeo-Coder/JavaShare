@@ -1,4 +1,4 @@
-import { matchesActivityOutput, matchesSample, unchangedSample, webChecksPass, type ModuleFile, type WebCheck, type WebCheckSeen } from "../backend/src/module-activities.ts";
+import { matchesActivityOutput, matchesSample, teacherCheckedStep, unchangedSample, webChecksPass, withoutMediaChecks, type ModuleFile, type WebCheck, type WebCheckSeen } from "../backend/src/module-activities.ts";
 
 export type ModuleDeviceDraft = {
   files: ModuleFile[]; moduleVersion?: string; stateId?: string;
@@ -12,14 +12,17 @@ export function restoreModuleDraft(draft: ModuleDeviceDraft | null, current: Pic
   step: { files: ModuleFile[]; expectedOutput: string; expectedError?: string; webChecks?: WebCheck[]; activity?: { guided?: { expectedOutput: string } } }, needsSample: boolean): ModuleDeviceDraft {
   if (!draft) return current;
   const sameActivity = Boolean(current.moduleVersion) && draft.moduleVersion === current.moduleVersion && draft.stateId === current.stateId;
-  const sample = sameActivity && draft.sample && matchesSample(draft.sample, step) && webChecksPass(step.webChecks, draft.sample.checks) && unchangedSample(draft.sample.files, step.files) ? draft.sample : undefined;
+  // A media step's sample may have been verified by its page text alone, before the media was uploaded (CKB-147).
+  const steps = teacherCheckedStep({ expectedOutput: step.expectedOutput }) ? [step, withoutMediaChecks(step)] : [step];
+  const sample = sameActivity && draft.sample && steps.some((checked) => matchesSample(draft.sample!, checked)) && webChecksPass(step.webChecks, draft.sample.checks) && unchangedSample(draft.sample.files, step.files) ? draft.sample : undefined;
   if (!sameActivity || (needsSample && !sample && !unchangedSample(draft.files, step.files))) {
     return { ...current, backups: [...(draft.backups ?? []), { files: draft.files, moduleVersion: draft.moduleVersion, stateId: draft.stateId }] };
   }
   // Guided evidence is kept only while it still matches this step's guided output; an old draft without it is unchanged.
   const { guided, ...rest } = draft;
-  const keep = guided && step.activity?.guided && matchesActivityOutput(guided, step.activity.guided.expectedOutput);
-  return { ...rest, sample, ...(keep ? { guided } : {}) };
+  const keep = guided && steps.some((checked) => checked.activity?.guided && matchesActivityOutput(guided, checked.activity.guided.expectedOutput));
+  // A still-locked sample holds no edits: take the freshly built files, without leftover data files (CKB-146).
+  return { ...rest, ...(needsSample && !sample ? { files: current.files } : {}), sample, ...(keep ? { guided } : {}) };
 }
 
 const STORE = "codeshare-module-device-v1";
