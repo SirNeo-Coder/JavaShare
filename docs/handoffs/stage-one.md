@@ -1,3 +1,9 @@
+> Express security update (2026-11-25, CKB-145): `express` ^5.1.0 -> ^5.3.0 in `backend/package.json`; lock has
+> body-parser 2.4.0, proxy-addr 2.0.8, qs 6.17.1. Only the old Render server uses Express; teacher keeps Render for now.
+> Build, lint, 546 tests, the Express server on the laptop and an offline classroom run pass. Branch
+> `fix/express-security-update`, approved; independent of PR #146 (Next.js). Render rebuilds by itself after merge.
+> Remaining audit items are build/dev tools only (wrangler, Cloudflare adapter, typescript-eslint, glob, undici…), not planned.
+
 > .NET 1 Week 2 PDF and DLL (2026-11-25): branch `content/dotnet1-week02-print`. Teacher chose option A: each step page
 > prints the named sample lines with real numbers and "…", outputs side by side; PDF 17 pages; DLL's five activity lines and
 > Friday scaffolding line updated. Prompt updated for long samples. Next: teacher reviews; Week 3 with three_part_prompt.md.
