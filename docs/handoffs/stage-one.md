@@ -2,7 +2,7 @@
 > pp. 9-17 (page name above each excerpt; Steps 1 and 9 print only differing output lines, teacher approved); old page
 > 10's sections kept on page 18 (teacher approved). DLL: 6 paragraphs (five activity lines + Friday scaffolding). Found
 > CKB-146: Weeks 1-2 PDFs lost their self-check/get-ready sections; not fixed (ask teacher). Next: teacher reviews and
-> merges #147 then this PR; upload Week 3 with media.
+> merges #147 then this PR (#149); upload Week 3 with media.
 
 > .NET 1 Week 3 three-part (2026-11-25): `docs/modules/dotnet1/week03/DotNet1_Week_03.threepart.codeshare.json`, branch
 > `content/dotnet1-week03-three-part`, approved (Your task wording for all 9 steps; Step 2 changes label, for, id and name).
