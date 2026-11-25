@@ -1,8 +1,13 @@
 > Express security update (2026-11-25, CKB-145): `express` ^5.1.0 -> ^5.3.0 in `backend/package.json`; lock has
 > body-parser 2.4.0, proxy-addr 2.0.8, qs 6.17.1. Only the old Render server uses Express; teacher keeps Render for now.
 > Build, lint, 546 tests, the Express server on the laptop and an offline classroom run pass. Branch
-> `fix/express-security-update`, approved; independent of PR #146 (Next.js). Render rebuilds by itself after merge.
+> `fix/express-security-update`, approved; includes PR #146 (Next.js) so both merge in any order. Render rebuilds by itself after merge.
 > Remaining audit items are build/dev tools only (wrangler, Cloudflare adapter, typescript-eslint, glob, undici…), not planned.
+
+> Next.js security update (2026-11-25, CKB-144): `next` and `eslint-config-next` 16.4.2 -> 16.4.6 (patch release; only
+> Next.js packages changed). Build, lint, 546 tests, local Cloudflare build and an offline classroom run (sign-in, module,
+> laptop Java) pass. Branch `fix/next-security-update`, approved. Next: Express advisories (proxy-addr critical,
+> body-parser high, qs moderate) as separate work, plan first. After merge the hosted site needs a normal redeploy.
 
 > .NET 1 Week 2 PDF and DLL (2026-11-25): branch `content/dotnet1-week02-print`. Teacher chose option A: each step page
 > prints the named sample lines with real numbers and "…", outputs side by side; PDF 17 pages; DLL's five activity lines and
