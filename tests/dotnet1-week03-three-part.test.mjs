@@ -121,3 +121,52 @@ test("Week 3 three-part: CodeShare's rule takes sample, then guided example, the
     assert.deepEqual([own.check, own.passed], ["task", true], `${step.id}: own task`);
   }
 });
+
+// The printed step guide (source/p9.html to p17.html, build_step_pages.py, option A 2026-11-25): each page prints, per
+// page name, the sample lines the discussion and guided example name with their real numbers, matches the module file
+// and never prints an answer. Steps 1 and 9 (56-line outputs) print only the output lines that differ from the sample's
+// output, with their line numbers (teacher, 2026-11-25); the other steps print both outputs in full.
+test("Week 3 three-part: the printed step pages show every named line of every page with its real number and never print an answer", () => {
+  const decode = (text) => text.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#x27;/g, "'").replace(/&amp;/g, "&");
+  const outLines = (pre) => [...pre.matchAll(/<span class="ln">(.*?)<\/span>/g)].map((l) => decode(l[1]));
+  for (const step of steps(content)) {
+    const html = readFileSync(new URL(`../docs/modules/dotnet1/week03/source/p${8 + step.number}.html`, import.meta.url), "utf8");
+    assert.ok(html.includes(`data-step="${step.id}"`), `${step.id}: printed on page ${8 + step.number}`);
+    const named = {};
+    for (const [, n, file] of step.activity.guided.discussion.matchAll(/Look at line (\d+) of ([\w.]+)\./g)) (named[file] ??= []).push(Number(n));
+    for (const [, from, to, file] of step.activity.guided.instruction.matchAll(/\*\*lines? (\d+)(?: (?:to|and) (\d+))? of ([\w.]+)\*\*/g)) {
+      for (let n = Number(from); n <= Number(to ?? from); n++) if (n <= lines(sampleOf(step, file)).length) (named[file] ??= []).push(n);
+    }
+    const excerpts = [...html.matchAll(/<pre class="code numbered" data-file="([\w.]+)">(.*?)<\/pre>/g)];
+    assert.deepEqual(excerpts.map((m) => m[1]).sort(), Object.keys(named).sort(), `${step.id}: one excerpt per named page`);
+    assert.ok(html.includes(`<b>${excerpts[0][1]}</b>`) && excerpts[0][1] === step.run, `${step.id}: the run page first, with its name above it`);
+    for (const [, file, body] of excerpts) {
+      const sample = lines(sampleOf(step, file));
+      const printed = new Map([...body.matchAll(/<span class="cl" data-n="(\d+)">(.*?)<\/span>/g)].map((m) => [Number(m[1]), decode(m[2])]));
+      for (const [n, text] of printed) assert.equal(text === " " ? "" : text, sample[n - 1], `${step.id}: printed line ${n} of ${file}`);
+      for (const n of named[file]) assert.ok(printed.has(n), `${step.id}: line ${n} of ${file} is named but not printed`);
+    }
+    const [guidedBox, taskBox] = html.split('<div class="outs">')[1].split("</div><div>");
+    const long = lines(step.expectedOutput).length > 30;
+    assert.equal(long, MEDIA_STEPS.includes(step.id), `${step.id}: only Steps 1 and 9 have long outputs`);
+    for (const [box, want] of [[guidedBox, step.activity.guided.expectedOutput], [taskBox, step.activity.expectedOutput]]) {
+      if (!long) { assert.deepEqual(outLines(box), lines(want), `${step.id}: full output`); continue; }
+      const parts = [...box.matchAll(/<pre class="out" data-output-part="[^"]+" data-from="(\d+)">(.*?)<\/pre>/g)];
+      assert.ok(parts.length, `${step.id}: the differing lines are printed`);
+      const shown = new Set();
+      for (const [, from, pre] of parts) outLines(pre).forEach((line, i) => { assert.equal(line, lines(want)[from - 1 + i], `${step.id}: output line ${Number(from) + i}`); shown.add(line); });
+      for (const line of lines(want).filter((line) => !lines(step.expectedOutput).includes(line))) assert.ok(shown.has(line), `${step.id}: the new line ${line} is printed`);
+    }
+    const text = decode(html);
+    assert.ok(text.includes(step.activity.guided.code), `${step.id}: guided code`);
+    assert.ok(text.includes(step.activity.instruction.replace(/`|\*\*/g, "")), `${step.id}: Your task wording`);
+    const shownCode = `${step.files.map((f) => f.content).join("\n")}\n${step.activity.guided.code}`;
+    for (const block of step.activity.solution.lines.split("\n\n")) {
+      for (const line of block.split("\n").slice(1).map((l) => l.trim()).filter((l) => l && !shownCode.includes(l))) assert.ok(!text.includes(line), `${step.id}: the answer line ${line} is printed`);
+    }
+    assert.ok(!text.includes(step.activity.solution.note), `${step.id}: the answer note is printed`);
+  }
+  const last = readFileSync(new URL("../docs/modules/dotnet1/week03/source/p18.html", import.meta.url), "utf8");
+  for (const heading of ["Before you add your pages", "My Resume self-check", "Get ready for Week 4", "Starter pages"]) assert.ok(last.includes(heading), `page 18 keeps ${heading}`);
+  assert.match(readFileSync(new URL("../docs/modules/dotnet1/week03/source/p6.html", import.meta.url), "utf8"), /Starter pages<\/b> for a student with no Week 2 work are on page 18\./);
+});
