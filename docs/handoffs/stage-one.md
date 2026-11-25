@@ -1,3 +1,7 @@
+> .NET 1 Week 2 PDF and DLL (2026-11-25): branch `content/dotnet1-week02-print`. Teacher chose option A: each step page
+> prints the named sample lines with real numbers and "…", outputs side by side; PDF 17 pages; DLL's five activity lines and
+> Friday scaffolding line updated. Prompt updated for long samples. Next: teacher reviews; Week 3 with three_part_prompt.md.
+
 > Java own tasks start from the guided code (2026-11-25, CKB-143): 7 Your task lines reworded (Week 15 Steps 3 and 8;
 > Week 17 Steps 1, 5, 6, 7, 10) so they say what to do with the guided change; Week 16 needed nothing. Outputs, answer
 > keys and ids unchanged. Week 17 PDF pages A-2, A-8, A-9, A-10, A-14 carry the new wording. Tests: continuity
