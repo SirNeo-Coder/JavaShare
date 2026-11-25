@@ -15,7 +15,7 @@ the steps are in `docs/modules/dotnet1/three_part_prompt.md`.
   discussion and guided example still show. You chose three parts anyway (2026-11-25).
 - **New question ids** end in `-alter-v2`. No class uses the .NET subject yet, so nobody's work resets.
 - **Upload it only on a site that has the web guided-example change (#136); it is live.**
-- **The PDF module and the Word DLL are not updated yet.** They follow after you approve this file.
+- **The PDF module and the Word DLL are updated** (2026-11-25): see Printed module and lesson plan.
 - Nothing was uploaded. Week 1, Weeks 3–10, the Java weeks and `Documents/Java 2026` are unchanged.
 
 ## How each step works
@@ -69,6 +69,25 @@ the steps are in `docs/modules/dotnet1/three_part_prompt.md`.
 
 - The hosted site and its real media storage.
 - The teacher's Module preview and class step with this file.
+
+## Printed module and lesson plan
+
+- **PDF (`DotNet1_Multimedia_Tables_Module.pdf`), now 17 pages of 612 × 936 pt.** Pages 1–8 are unchanged except page 1's
+  "How to use this module", each step's "Next: step guide, page N" and the footers ("of 17"). The old task pages 9–11
+  are now the **step guide, pages 9–17, one step per page**. Week 2's samples run to 119 lines, so (your option A,
+  2026-11-25) each page prints only the sample lines the discussion and guided example name, one line either side, with
+  their **real line numbers** and "…" between parts; CodeShare's editor numbers the whole file. Then the discussion, the
+  guided example, Your task, and the two expected outputs side by side. The check-yourself table is on page 9. **No
+  answer is printed.** Week 2's output boxes are 7 pt (Week 1: 7.4 pt) so every page fits one sheet.
+- Built with `build_step_pages.py` and `render_pdf.cjs` in this folder. Rendering the unchanged pages first gave exactly
+  the text of your old PDF.
+- **Word DLL (`DotNet1_ILAW_Week_02.docx`), still 7 pages:** the five Student Activity lines read "Sample, guided example,
+  then your task" with the step-guide pages (9–10, 11–12, 13–14, 15–16, 17) and "starting from the guided code"; Friday's
+  scaffolding line names the guided example and Your task. Nothing else changed. Checked through a LibreOffice PDF, not
+  in Microsoft Word.
+- `tests/dotnet1-week02-three-part.test.mjs` checks every printed step page: each printed line matches the sample at
+  its number, every line the discussion or guided example names is printed, both outputs and Your task's wording match,
+  and no answer is printed (shown failing with one wrong number and with an answer put on page 9).
 
 ## Upload steps (after this pull request is merged)
 

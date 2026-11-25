@@ -86,3 +86,32 @@ test("Week 2 three-part: with its media uploaded, CodeShare's rule takes sample,
     assert.deepEqual([own.check, own.passed], ["task", true], `${step.id}: own task`);
   }
 });
+
+// The printed step guide (source/p9.html onward, build_step_pages.py, option A 2026-11-25): each page prints the sample
+// lines the discussion and guided example name, with their real numbers, matches the module file, and never prints
+// an answer.
+test("Week 2 three-part: the printed step pages show every named line with its real number and never print an answer", () => {
+  const decode = (text) => text.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#x27;/g, "'").replace(/&amp;/g, "&");
+  for (const step of steps(content)) {
+    const html = readFileSync(new URL(`../docs/modules/dotnet1/week02/source/p${8 + step.number}.html`, import.meta.url), "utf8");
+    assert.ok(html.includes(`data-step="${step.id}"`), `${step.id}: printed on page ${8 + step.number}`);
+    const sample = lines(step.files[0].content);
+    const printed = new Map([...html.matchAll(/<span class="cl" data-n="(\d+)">(.*?)<\/span>/g)].map((m) => [Number(m[1]), decode(m[2])]));
+    for (const [n, text] of printed) assert.equal(text === " " ? "" : text, sample[n - 1], `${step.id}: printed line ${n}`);
+    const named = [...step.activity.guided.discussion.matchAll(/Look at line (\d+)\./g)].map((m) => Number(m[1]));
+    for (const [, from, to] of step.activity.guided.instruction.matchAll(/\*\*lines? (\d+)(?: (?:to|and) (\d+))?\*\*/g)) {
+      for (let n = Number(from); n <= Number(to ?? from); n++) if (n <= sample.length) named.push(n);
+    }
+    for (const n of named) assert.ok(printed.has(n), `${step.id}: line ${n} is named but not printed`);
+    const outputs = [...html.matchAll(/<pre class="out">(.*?)<\/pre>/g)].map((m) => [...m[1].matchAll(/<span class="ln">(.*?)<\/span>/g)].map((l) => decode(l[1])).join("\n"));
+    assert.deepEqual(outputs, [step.activity.guided.expectedOutput, step.activity.expectedOutput], `${step.id}: guided and task outputs`);
+    const text = decode(html);
+    assert.ok(text.includes(step.activity.guided.code), `${step.id}: guided code`);
+    assert.ok(text.includes(step.activity.instruction.replace(/`|\*\*/g, "")), `${step.id}: Your task wording`);
+    const shown = `${step.files[0].content}\n${step.activity.guided.code}`;
+    for (const block of step.activity.solution.lines.split("\n\n")) {
+      for (const line of block.split("\n").slice(1).map((l) => l.trim()).filter((l) => l && !shown.includes(l))) assert.ok(!text.includes(line), `${step.id}: the answer line ${line} is printed`);
+    }
+    assert.ok(!text.includes(step.activity.solution.note), `${step.id}: the answer note is printed`);
+  }
+});
