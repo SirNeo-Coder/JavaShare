@@ -1,10 +1,8 @@
-> .NET 1 Week 3 PDF and DLL (2026-11-25, IN PROGRESS): branch `content/dotnet1-week03-print` (stacked on #147, not yet a
-> pull request). Done: PDF is 18 pages, each one sheet: page 1 How to use, "Next: step guide, page N", footers "of 18";
-> step guide pp. 9-17 by `week03/build_step_pages.py` (page name above each excerpt); old page 10's four sections
-> (checklist, self-check, Get ready for Week 4, starter pages) kept on page 18 and page 6 points there (teacher approved);
-> Steps 1 and 9 print only the output lines that differ (teacher approved). Left: printed-page test in
-> tests/dotnet1-week03-three-part.test.mjs (copy Week 2's, per page), check PDF text, DLL activity lines, report section,
-> CKB for Weeks 1-2 printed modules silently losing their self-check / get-ready sections, PR to main after #147 merges.
+> .NET 1 Week 3 PDF and DLL (2026-11-25): branch `content/dotnet1-week03-print`. PDF 18 one-sheet pages: step guide
+> pp. 9-17 (page name above each excerpt; Steps 1 and 9 print only differing output lines, teacher approved); old page
+> 10's sections kept on page 18 (teacher approved). DLL: 6 paragraphs (five activity lines + Friday scaffolding). Found
+> CKB-146: Weeks 1-2 PDFs lost their self-check/get-ready sections; not fixed (ask teacher). Next: teacher reviews and
+> merges #147 then this PR; upload Week 3 with media.
 
 > .NET 1 Week 3 three-part (2026-11-25): `docs/modules/dotnet1/week03/DotNet1_Week_03.threepart.codeshare.json`, branch
 > `content/dotnet1-week03-three-part`, approved (Your task wording for all 9 steps; Step 2 changes label, for, id and name).
