@@ -1,3 +1,10 @@
+> .NET 1 Week 3 three-part (2026-11-25): `docs/modules/dotnet1/week03/DotNet1_Week_03.threepart.codeshare.json`, branch
+> `content/dotnet1-week03-three-part`, approved (Your task wording for all 9 steps; Step 2 changes label, for, id and name).
+> Three pages: every line reference names its page; media on Steps 1 and 9 only. Browser walk passes on 8787 with media
+> (11/11), offline settings (10/10) and online settings (10/10); it also checks the pages a step does not load keep the
+> latest saved work. Prompt gains "Several files". Next: teacher reviews; then Week 3 PDF (week02's build_step_pages.py,
+> page name above each excerpt) and DLL in a separate pull request; upload with media after merge.
+
 > .NET 1 Week 2 PDF and DLL (2026-11-25): branch `content/dotnet1-week02-print`. Teacher chose option A: each step page
 > prints the named sample lines with real numbers and "…", outputs side by side; PDF 17 pages; DLL's five activity lines and
 > Friday scaffolding line updated. Prompt updated for long samples. Next: teacher reviews; Week 3 with three_part_prompt.md.

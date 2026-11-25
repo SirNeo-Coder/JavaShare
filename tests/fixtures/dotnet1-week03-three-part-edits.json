@@ -1,0 +1,83 @@
+{
+ "dotnet-1-r03-d1-s1": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>Read about my school work on my <a href=\"projects.html\">projects page</a>.</p>",
+    "to": "  <p>See my best school work on my <a href=\"projects.html\">projects list</a>.</p>"
+   }
+  ]
+ },
+ "dotnet-1-r03-d1-s2": {
+  "fromGuided": [
+   {
+    "path": "contact.html",
+    "from": "      <label for=\"school\">Your school</label><br>\n      <input type=\"text\" id=\"school\" name=\"school\">",
+    "to": "      <label for=\"section\">Your section</label><br>\n      <input type=\"text\" id=\"section\" name=\"section\">"
+   }
+  ]
+ },
+ "dotnet-1-r03-d2-s3": {
+  "fromGuided": [
+   {
+    "path": "projects.html",
+    "from": "  <p><a href=\"index.html\">Back to my resume</a></p>",
+    "to": "  <p><a href=\"index.html\">Return to my resume</a></p>"
+   }
+  ]
+ },
+ "dotnet-1-r03-d2-s4": {
+  "fromGuided": [
+   {
+    "path": "contact.html",
+    "from": "read <a href=\"index.html\">my resume</a> and <a href=\"projects.html\">my projects</a>.",
+    "to": "read <a href=\"projects.html\">my projects</a> and <a href=\"index.html\">my resume</a>."
+   }
+  ]
+ },
+ "dotnet-1-r03-d3-s5": {
+  "fromGuided": [
+   {
+    "path": "projects.html",
+    "from": "Open the contact form on its own page",
+    "to": "See the contact form on a page of its own"
+   }
+  ]
+ },
+ "dotnet-1-r03-d3-s6": {
+  "fromGuided": [
+   {
+    "path": "contact.html",
+    "from": "        <option>School project</option>\n        <option>Art club</option>\n        <option>Science fair</option>",
+    "to": "        <option>Math quiz bee</option>\n        <option>School project</option>\n        <option>Art club</option>"
+   }
+  ]
+ },
+ "dotnet-1-r03-d4-s7": {
+  "fromGuided": [
+   {
+    "path": "contact.html",
+    "from": "<a href=\"contact.html\">Contact</a>",
+    "to": "<a href=\"contact.html\">Contact me</a>"
+   }
+  ]
+ },
+ "dotnet-1-r03-d4-s8": {
+  "fromGuided": [
+   {
+    "path": "contact.html",
+    "from": "<button type=\"submit\">Send message</button>",
+    "to": "<button type=\"submit\">Send to Juan</button>"
+   }
+  ]
+ },
+ "dotnet-1-r03-d5-s9": {
+  "fromGuided": [
+   {
+    "path": "index.html",
+    "from": "  <p>My contact form is a prototype: it sends nowhere and keeps no one's details.</p>",
+    "to": "  <p>Honest note: my contact form is only a prototype. It sends nowhere and saves nothing.</p>"
+   }
+  ]
+ }
+}
