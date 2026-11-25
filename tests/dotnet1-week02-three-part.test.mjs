@@ -115,3 +115,10 @@ test("Week 2 three-part: the printed step pages show every named line with its r
     assert.ok(!text.includes(step.activity.solution.note), `${step.id}: the answer note is printed`);
   }
 });
+
+// The old task pages' other sections stay in print on page 18 (CKB-146): the step guide had dropped them.
+test("Week 2 three-part: page 18 keeps the old task pages' other sections; every page says of 18", () => {
+  const page = (n) => readFileSync(new URL(`../docs/modules/dotnet1/week02/source/p${n}.html`, import.meta.url), "utf8");
+  for (const heading of ["Before you add your picture", "My Resume self-check", "Get ready for Week 3"]) assert.ok(page(18).includes(heading), `page 18 keeps ${heading}`);
+  for (let n = 1; n <= 18; n++) assert.match(page(n), new RegExp(`Page ${n} of 18`), `page ${n} footer`);
+});

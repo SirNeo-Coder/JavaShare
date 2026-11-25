@@ -72,8 +72,8 @@ the steps are in `docs/modules/dotnet1/three_part_prompt.md`.
 
 ## Printed module and lesson plan
 
-- **PDF (`DotNet1_Multimedia_Tables_Module.pdf`), now 17 pages of 612 × 936 pt.** Pages 1–8 are unchanged except page 1's
-  "How to use this module", each step's "Next: step guide, page N" and the footers ("of 17"). The old task pages 9–11
+- **PDF (`DotNet1_Multimedia_Tables_Module.pdf`), now 18 pages of 612 × 936 pt.** Pages 1–8 are unchanged except page 1's
+  "How to use this module", each step's "Next: step guide, page N" and the footers ("of 18"). The old task pages 9–11
   are now the **step guide, pages 9–17, one step per page**. Week 2's samples run to 119 lines, so (your option A,
   2026-11-25) each page prints only the sample lines the discussion and guided example name, one line either side, with
   their **real line numbers** and "…" between parts; CodeShare's editor numbers the whole file. Then the discussion, the
@@ -88,6 +88,9 @@ the steps are in `docs/modules/dotnet1/three_part_prompt.md`.
 - `tests/dotnet1-week02-three-part.test.mjs` checks every printed step page: each printed line matches the sample at
   its number, every line the discussion or guided example names is printed, both outputs and Your task's wording match,
   and no answer is printed (shown failing with one wrong number and with an answer put on page 9).
+
+- **Page 18, "Week 02: before you submit" (restored 2026-11-25, CKB-146):** the step guide had dropped the old task
+  pages' other sections; page 18 prints them unchanged: Before you add your picture, My Resume self-check and Get ready for Week 3, plus the notes Weeks are linked and Your own media files. Footers now say "of 18".
 
 ## Upload steps (after this pull request is merged)
 

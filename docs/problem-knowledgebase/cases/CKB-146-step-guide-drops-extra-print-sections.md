@@ -1,6 +1,6 @@
 # CKB-146 — .NET 1 printed step guide dropped the self-check, get-ready and starter sections
 
-- Status: Week 3 resolved on `content/dotnet1-week03-print`; Weeks 1 and 2 still missing the sections (teacher to decide)
+- Status: resolved: Week 3 on `content/dotnet1-week03-print`, Weeks 1 and 2 on `content/dotnet1-restore-print-sections`
 - First recorded: 2026-11-25
 - Last verified: 2026-11-25
 - Area: printed modules, `docs/modules/dotnet1/week0N/build_step_pages.py` (step guide, pages 9 onward)
@@ -27,9 +27,13 @@ pages 9–11 held only tasks.
 ## Durable solution
 
 Week 3 (teacher, 2026-11-25): the four sections stay unchanged on page 18 ("Week 03: before you submit"), page 6 points
-to page 18, and the builder rebuilds only pages 9–17. Weeks 1 and 2 are not changed by this case.
+to page 18, and the builder rebuilds only pages 9–17. Weeks 1 and 2 (teacher, 2026-11-25): the same, page 18 "Week 0N:
+before you submit" holds their lost sections copied unchanged from the old pages, footers "of 18", builders rebuild only
+pages 9–17. The prompt now says to list and keep such sections first.
 
 ## Regression proof
 
 `tests/dotnet1-week03-three-part.test.mjs` ("the printed step pages…") checks page 18 keeps all four sections and page 6
-points there. Not shown failing against the old Week 1 and 2 builders.
+points there; `tests/dotnet1-week01-three-part.test.mjs` and `tests/dotnet1-week02-three-part.test.mjs` ("page 18 keeps the
+old task pages' other sections") check page 18 and every footer. Shown failing with Week 1's page 18 removed and with
+Week 2's old footers, then passing.
