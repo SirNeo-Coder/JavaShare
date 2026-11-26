@@ -4,6 +4,12 @@
 > `fix/express-security-update`, approved; includes PR #146 (Next.js) so both merge in any order. Render rebuilds by itself after merge.
 > Remaining audit items are build/dev tools only (wrangler, Cloudflare adapter, typescript-eslint, glob, undici…), not planned.
 
+> .NET 1 Week 3 three-part (2026-11-25): `docs/modules/dotnet1/week03/DotNet1_Week_03.threepart.codeshare.json`, branch
+> `content/dotnet1-week03-three-part`, approved (Your task wording for all 9 steps; Step 2 changes label, for, id and name).
+> Three pages: every line reference names its page; media on Steps 1 and 9 only. Browser walk passes on 8787 with media
+> (11/11), offline settings (10/10) and online settings (10/10); it also checks the pages a step does not load keep the
+> latest saved work. Prompt gains "Several files". Next: teacher reviews; then Week 3 PDF (week02's build_step_pages.py,
+> page name above each excerpt) and DLL in a separate pull request; upload with media after merge. PR #147.
 > Next.js security update (2026-11-25, CKB-144): `next` and `eslint-config-next` 16.4.2 -> 16.4.6 (patch release; only
 > Next.js packages changed). Build, lint, 546 tests, local Cloudflare build and an offline classroom run (sign-in, module,
 > laptop Java) pass. Branch `fix/next-security-update`, approved. Next: Express advisories (proxy-addr critical,
