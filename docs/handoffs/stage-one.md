@@ -4,6 +4,10 @@
 > (11/11), offline settings (10/10) and online settings (10/10); it also checks the pages a step does not load keep the
 > latest saved work. Prompt gains "Several files". Next: teacher reviews; then Week 3 PDF (week02's build_step_pages.py,
 > page name above each excerpt) and DLL in a separate pull request; upload with media after merge. PR #147.
+> Next.js security update (2026-11-25, CKB-144): `next` and `eslint-config-next` 16.4.2 -> 16.4.6 (patch release; only
+> Next.js packages changed). Build, lint, 546 tests, local Cloudflare build and an offline classroom run (sign-in, module,
+> laptop Java) pass. Branch `fix/next-security-update`, approved. Next: Express advisories (proxy-addr critical,
+> body-parser high, qs moderate) as separate work, plan first. After merge the hosted site needs a normal redeploy.
 
 > .NET 1 Week 2 PDF and DLL (2026-11-25): branch `content/dotnet1-week02-print`. Teacher chose option A: each step page
 > prints the named sample lines with real numbers and "…", outputs side by side; PDF 17 pages; DLL's five activity lines and

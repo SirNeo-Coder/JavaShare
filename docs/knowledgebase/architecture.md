@@ -8,7 +8,7 @@ A classroom web app (formerly JavaShare) where a teacher and senior high school 
 
 | Part | Folder | Hosted on (online) | Job |
 | --- | --- | --- | --- |
-| Pages and server routes | `app/` (Next.js 16.4.2, React 19); every `/api` request goes to `app/api/[...path]/route.ts`, which runs the shared routes in `backend/src/routes.ts` | **Cloudflare** (`wrangler.jsonc`, `open-next.config.ts`; since PR c2). Until the teacher confirms Cloudflare: pages on Vercel (`vercel.json`) | Everything students and teachers see; sign-in and sessions, all database access, choosing Java execution (browser online/laptop offline), sending "this changed" live signals through Supabase |
+| Pages and server routes | `app/` (Next.js 16.4.6, React 19); every `/api` request goes to `app/api/[...path]/route.ts`, which runs the shared routes in `backend/src/routes.ts` | **Cloudflare** (`wrangler.jsonc`, `open-next.config.ts`; since PR c2). Until the teacher confirms Cloudflare: pages on Vercel (`vercel.json`) | Everything students and teachers see; sign-in and sessions, all database access, choosing Java execution (browser online/laptop offline), sending "this changed" live signals through Supabase |
 | Old standalone server | `backend/src/server.ts` (Express wrapper around the same routes) | Render (`render.yaml`), kept until Cloudflare is confirmed | Serves Vercel's pages through `NEXT_PUBLIC_API_URL` |
 | Database and live channels | `supabase/` (migrations, `config.toml`) | Hosted Supabase | Users, classes, teams, projects, files, versions, chat, saved work, submissions, photos (Storage bucket `student-photos`); **Supabase Realtime** carries live typing, cursors, live share, and who's online (since PR c1) |
 
