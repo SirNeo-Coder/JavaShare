@@ -23,3 +23,4 @@ border:.6pt solid #aaa;border-left:2.5pt solid #2e7d32;padding:3pt 5pt;margin:2p
 .ticks3{font-size:7.8pt;line-height:1.1;margin-top:4pt}.ticks3 th,.ticks3 td{padding:2pt 4pt}.ticks3 .write{height:auto}
 .disc{font-size:8pt;line-height:1.13}.note{font-size:8.6pt;line-height:1.16}
 .outs .out{font-size:7pt}
+.r3 .grid{grid-template-columns:1fr 1fr 1fr;gap:6pt 7pt}.r3 .out{font-size:7.1pt;line-height:1.08}.r3 .instruction{font-size:8.3pt}.r3 .grid>section:not([data-task]){grid-column:1/-1}.r3 .t th,.r3 .t td{padding:2pt 4pt}.r3 .t .write{height:15pt}

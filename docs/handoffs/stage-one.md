@@ -1,3 +1,7 @@
+> Weeks 1-2 PDFs restored (2026-11-25, CKB-146): branch `content/dotnet1-restore-print-sections` (on top of #149). Page 18
+> "Week 0N: before you submit" brings back the self-check, get-ready and other sections the step guide dropped, copied
+> unchanged; both PDFs now 18 pages, footers "of 18"; DLLs unchanged. PR #150. Merge order: #147, #149, then #150.
+
 > .NET 1 Week 3 PDF and DLL (2026-11-25): branch `content/dotnet1-week03-print`. PDF 18 one-sheet pages: step guide
 > pp. 9-17 (page name above each excerpt; Steps 1 and 9 print only differing output lines, teacher approved); old page
 > 10's sections kept on page 18 (teacher approved). DLL: 6 paragraphs (five activity lines + Friday scaffolding). Found
