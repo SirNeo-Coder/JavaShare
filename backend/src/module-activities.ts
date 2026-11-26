@@ -116,6 +116,19 @@ export function mergeProjectFiles(...groups: ModuleFile[][]) {
   return [...files.values()];
 }
 
+// A step's sample brings its own data files: a .txt left from another step would change its output (CKB-146).
+export function sampleProject(files: ModuleFile[], step: { files: ModuleFile[] }) {
+  return mergeProjectFiles(files.filter((file) => !/\.txt$/i.test(file.path)), step.files);
+}
+
+// Until a module's media is uploaded, its media steps check only the visible page text; the teacher checks the media (CKB-147).
+export function withoutMediaChecks<T extends { expectedOutput: string; activity?: { expectedOutput?: string; guided?: { expectedOutput: string } } }>(step: T): T {
+  const text = (value: string) => value.replace(/(?:^|\n)Media checks:[\s\S]*$/, "");
+  const activity = step.activity && { ...step.activity, ...(step.activity.expectedOutput !== undefined ? { expectedOutput: text(step.activity.expectedOutput) } : {}),
+    ...(step.activity.guided ? { guided: { ...step.activity.guided, expectedOutput: text(step.activity.guided.expectedOutput) } } : {}) };
+  return { ...step, expectedOutput: text(step.expectedOutput), ...(activity ? { activity } : {}) };
+}
+
 export function matchesActivityOutput(result: { success: boolean; output: string }, expected: string) {
   // Ignore platform line endings and one final println terminator, never spaces or blank lines.
   const text = (value: string) => value.replace(/\r\n/g, "\n").replace(/\n$/, "");

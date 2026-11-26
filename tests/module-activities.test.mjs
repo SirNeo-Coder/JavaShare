@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
-import { activityAccess, activityStateId, activityTask, checkModuleRun, checkStdin, guidedPending, guidedStateId, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles } from "../backend/src/module-activities.ts";
+import { activityAccess, activityStateId, activityTask, checkModuleRun, checkStdin, guidedPending, guidedStateId, matchesActivityOutput, matchesSample, unchangedSample, samplePending, sampleStateId, stepWithoutAnswerKey, mergeProjectFiles, sampleProject, withoutMediaChecks } from "../backend/src/module-activities.ts";
 import { courseModule } from "../backend/src/course-module-schema.ts";
 import { restoreModuleDraft } from "../app/moduleDeviceStore.ts";
 
@@ -674,4 +674,27 @@ test("guided example: real offline Java saves guided:<id> only, then the own tas
     const teacherView = await (await request("", undefined, cookies[0], content.id)).json();
     assert.match(teacherView.lessons[0].blocks[0].activity.solution.lines, /GUIDED-ANSWER-KEY/);
   });
+});
+
+test("sample project: a leftover .txt is dropped and the step's own data file kept (CKB-146)", () => {
+  const project = [{ path: "Main.java", content: "old" }, { path: "fleet.txt", content: "Step 3 data" }, { path: "Bus.java", content: "bus" }];
+  assert.deepEqual(sampleProject(project, { files: [{ path: "Main.java", content: "sample" }] }), [{ path: "Main.java", content: "sample" }, { path: "Bus.java", content: "bus" }]);
+  assert.deepEqual(sampleProject(project, { files: [{ path: "fleet.txt", content: "own" }] }).find((file) => file.path === "fleet.txt").content, "own");
+});
+
+test("media steps without uploaded media: the unchanged sample and the guided example pass by page text alone (CKB-147)", () => {
+  const week2 = JSON.parse(readFileSync(new URL("../docs/modules/dotnet1/week02/DotNet1_Week_02.threepart.codeshare.json", import.meta.url)));
+  const step = week2.lessons.flatMap((lesson) => lesson.blocks).find((block) => block.activity);
+  const text = (value) => value.split("\nMedia checks:")[0];
+  // The page still reports its element checks (the picture's alt, width, height) without the picture file.
+  const checks = step.webChecks.map((check) => ({ count: check.count ?? 1, attribute: check.value }));
+  const run = (states, files, output) => checkModuleRun(week2, withoutMediaChecks(step), states, files, { success: true, output, checks });
+  assert.equal(checkModuleRun(week2, step, {}, step.files, { success: true, output: text(step.expectedOutput), checks }).passed, false, "without the rule the sample can never pass");
+  assert.deepEqual([run({}, step.files, text(step.expectedOutput)).check, run({}, step.files, text(step.expectedOutput)).passed], ["sample", true]);
+  assert.equal(run({}, step.files, "something else").passed, false, "a different page text still fails");
+  const edited = step.files.map((file, index) => index ? file : { ...file, content: `${file.content}<!-- edit -->` });
+  assert.equal(run({}, edited, text(step.expectedOutput)).passed, false, "an edited sample still fails");
+  const verified = { [sampleStateId(step)]: "pass" };
+  assert.deepEqual([run(verified, edited, text(step.activity.guided.expectedOutput)).check, run(verified, edited, text(step.activity.guided.expectedOutput)).passed], ["guided", true]);
+  assert.equal(run({ ...verified, [guidedStateId(step)]: "pass" }, edited, "anything").check, "task", "the task stays with the teacher");
 });

@@ -93,9 +93,17 @@ test("Week 2 three-part in CodeShare: sample, guided example and own task on med
     if (!withMedia) {
       await t.test("offline (no media storage): Step 1 is checked by the teacher; the worksheet shows the discussion and guided example", async () => {
         await openNext(steps[0]);
-        await tab.getByRole("button", { name: /Run code/ }).click();
-        await closePageWindow(tab);
-        await tab.getByText("Checked by your teacher for now").first().waitFor();
+        const runFor = async (status) => {
+          await tab.getByRole("button", { name: /Run code/ }).click();
+          await closePageWindow(tab);
+          await tab.locator(".sync", { hasText: status }).first().waitFor({ timeout: 60000 });
+        };
+        // The unchanged sample and the guided example are checked by page text, so the editor opens (CKB-147).
+        await runFor("Sample verified on this device");
+        await tab.waitForFunction(() => !document.querySelector(".student-module-project .editor-card textarea")?.readOnly);
+        await editor.fill(answer(steps[0].id)); await runFor("Guided example verified on this device");
+        await editor.fill(fromGuided(steps[0], await editor.inputValue())); await runFor("Checked by your teacher for now");
+        assert.equal((await progress()).stepStates[activityStateId(steps[0])], undefined, "only the teacher marks the task done");
         const sheet = await tab.locator("#classroom-worksheet .module-step").first().textContent();
         assert.match(sheet, /Look at line 9/); assert.ok(sheet.includes(steps[0].activity.guided.code.trim()), "the guided code is on the worksheet");
         assert.ok(!sheet.includes(steps[0].activity.solution.note), "students never see the answer key");

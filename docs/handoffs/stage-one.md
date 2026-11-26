@@ -1,3 +1,9 @@
+> Sample lock fixes (2026-11-25, CKB-146, CKB-147): branch `fix/sample-lock-leftovers`, approved. Java Week 15 Step 1's
+> sample failed for every student because a leftover `fleet.txt` from older Week 15 work joined the fresh step; a step
+> whose sample is not verified now opens with only its own `.txt` files (server and device). .NET Week 2 media steps
+> without uploaded media stayed Locked; their sample and guided example are now checked by page text, the task still
+> by Mark done. Tests: 551/551, lint 0 errors, build:all, Week 2 browser test offline. Next: teacher merges and deploys;
+> students reopen the step. Uploading Week 2 media still gives full automatic checks.
 > Weeks 1-2 PDFs restored (2026-11-25, CKB-146): branch `content/dotnet1-restore-print-sections` (on top of #149). Page 18
 > "Week 0N: before you submit" brings back the self-check, get-ready and other sections the step guide dropped, copied
 > unchanged; both PDFs now 18 pages, footers "of 18"; DLLs unchanged. PR #150. Merge order: #147, #149, then #150.

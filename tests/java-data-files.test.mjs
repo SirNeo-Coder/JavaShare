@@ -149,3 +149,27 @@ test("data files: a personal Java project keeps a .txt data file through save, r
     assert.deepEqual(review.submission.files, files, "the teacher reviews the frozen files, stock.txt included");
   });
 });
+
+test("data files: a step whose sample is not verified opens without a leftover fleet.txt from older work (CKB-146)", needsLocal, async () => {
+  const content = activityFixture();
+  content.sampleFirst = true;
+  const step = content.lessons[0].blocks[0];
+  step.activity = { id: "leftover-task", instruction: "Change the output.", files: [], expectedOutput: "Changed", stdin: "" };
+  await withClass(content, async ({ call, admin, users, cookies, classroomId, base }) => {
+    assert.equal((await call(`${base}/progress/activity`, cookies[1], "POST", { stepId: step.id })).status, 200);
+    // Older Week 15 work left Step 3's fleet.txt in the saved project and in this step's saved draft.
+    const leftover = { path: "fleet.txt", content: fleet };
+    const row = await admin.from("module_progress").select("project_files, activity_projects").eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", content.id).single();
+    const key = activityStateId(step);
+    const withLeftover = [...row.data.project_files, leftover];
+    assert.equal((await admin.from("module_progress").update({ project_files: withLeftover, activity_projects: { ...row.data.activity_projects, drafts: { [key]: withLeftover } } })
+      .eq("student_id", users[1].id).eq("classroom_id", classroomId).eq("module_id", content.id)).error, null);
+    for (const [method, body, path] of [["GET", undefined, `${base}/progress/activity?stepId=${step.id}`], ["POST", { stepId: step.id }, `${base}/progress/activity`]]) {
+      const opened = await call(path, cookies[1], method, body);
+      assert.equal(opened.status, 200, await opened.clone().text());
+      const progress = await opened.json();
+      assert.equal(progress.projectFiles.some((file) => file.path === "fleet.txt"), false, `${method}: the locked sample opens without the leftover data file`);
+      assert.deepEqual(progress.projectFiles.find((file) => file.path === "Main.java"), step.files[0], `${method}: the sample itself is unchanged`);
+    }
+  });
+});
