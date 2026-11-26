@@ -82,11 +82,13 @@ REPORT AND RECORDS
 - A CKB record for every bug found; problem index, prompt map and handoff updated.
 
 AFTER I APPROVE THE MODULE (separate pull request)
-- PDF: copy week01/build_step_pages.py and render_pdf.cjs. Pages after the exit-slip strips become the step guide, one
+- PDF: first list every non-task section on the old task pages (self-check, get ready, starter pages, notes) and keep
+  them on a page after the step guide (CKB-146). Copy week01/build_step_pages.py and render_pdf.cjs. Pages after the exit-slip strips become the step guide, one
   step per page (numbered full sample, discussion, guided example, Your task, expected outputs, never an answer);
   page 1's "How to use this module", each step's "Next: step guide, page N", footers "of N". Render the unchanged pages
   first and confirm they match the old PDF's text. Every page must print on one sheet. For long samples copy
-  week02/build_step_pages.py instead (option A): print only the lines the discussion and guided example name, with
+  week02/build_step_pages.py instead (option A; several pages: week03's, with the page name above each excerpt; outputs of
+  more than 30 lines print only the lines that differ): print only the lines the discussion and guided example name, with
   their real numbers and "…" between parts, and the two outputs side by side.
 - DLL: only the lines that name the task pages become "Sample, guided example, then your task" with the new pages.
   Edit the Word file's text in place and check it through a LibreOffice PDF.

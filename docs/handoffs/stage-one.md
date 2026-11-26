@@ -1,3 +1,8 @@
+> .NET 1 Week 3 PDF and DLL (2026-11-25): branch `content/dotnet1-week03-print`. PDF 18 one-sheet pages: step guide
+> pp. 9-17 (page name above each excerpt; Steps 1 and 9 print only differing output lines, teacher approved); old page
+> 10's sections kept on page 18 (teacher approved). DLL: 6 paragraphs (five activity lines + Friday scaffolding). Found
+> CKB-146: Weeks 1-2 PDFs lost their self-check/get-ready sections; not fixed (ask teacher). Next: teacher reviews and
+> merges #147 then this PR (#149); upload Week 3 with media.
 > Express security update (2026-11-25, CKB-145): `express` ^5.1.0 -> ^5.3.0 in `backend/package.json`; lock has
 > body-parser 2.4.0, proxy-addr 2.0.8, qs 6.17.1. Only the old Render server uses Express; teacher keeps Render for now.
 > Build, lint, 546 tests, the Express server on the laptop and an offline classroom run pass. Branch

@@ -15,8 +15,8 @@ now with its "Several files" section.
   Week 3's media files, they are checked automatically. Offline they show "Checked by your teacher for now": you mark them
   done from the student's module card. **Steps 2–8 are checked automatically everywhere, online and offline.**
 - **New question ids** end in `-alter-v2`. No class uses the .NET subject yet, so nobody's work resets.
-- Nothing was uploaded. Weeks 1–2, Weeks 4–10, the Java weeks and `Documents/Java 2026` are unchanged. The PDF and the
-  Word DLL are not changed yet (separate pull request after you approve this module).
+- Nothing was uploaded. Weeks 1–2, Weeks 4–10, the Java weeks and `Documents/Java 2026` are unchanged.
+- **The PDF module and the Word DLL are updated** (2026-11-25): see Printed module and lesson plan.
 
 ## How each step works
 
@@ -80,7 +80,29 @@ now with its "Several files" section.
 
 - The hosted site and its real media storage.
 - The teacher's Module preview and class step with this file.
-- The PDF and DLL (next pull request).
+
+## Printed module and lesson plan
+
+- **PDF (`DotNet1_Links_Frames_Forms_Module.pdf`), now 18 pages of 612 × 936 pt, each one sheet.** Pages 1–8 are
+  unchanged except page 1's "How to use this module", each step's "Next: step guide, page N", page 6's "Starter pages …
+  are on page 18" and the footers ("of 18"). Rendering the unchanged pages first gave exactly the text of your old PDF.
+- **Step guide, pages 9–17, one step per page** (`build_step_pages.py`, your option A): the sample lines the discussion
+  and guided example name, one line either side, with their **real line numbers**, **the page name above each excerpt**
+  (the run page first; Step 1 also shows projects.html, Step 9 all three pages), then the discussion, the guided example,
+  Your task and the two expected outputs side by side. The check-yourself table is on page 9. **No answer is printed.**
+- **Steps 1 and 9** (index.html, 56-line outputs) print only the output lines that differ from the sample's output, with
+  their line numbers; every other line is the same (your choice, 2026-11-25). Steps 2–8 print both outputs in full.
+- **Page 18, "Week 03: before you submit"** (your choice, 2026-11-25): old page 10's four sections, unchanged: Before you
+  add your pages, My Resume self-check, Get ready for Week 4, Starter pages; plus the old page 9's two notes (Weeks are
+  linked; Run page). Weeks 1 and 2's PDFs lost their similar sections (CKB-146); they are not changed here.
+- **Word DLL (`DotNet1_ILAW_Week_03.docx`), still 7 pages:** the five "Sample, then your task" lines now read "Sample,
+  guided example, then your task" with the step-guide pages (9–10, 11–12, 13–14, 15–16, 17) and "starting from the guided
+  code"; Friday's scaffolding line names the guided example, Your task and the starter pages on p. 18. Nothing else
+  changed (6 paragraphs). Checked through a LibreOffice PDF, not in Microsoft Word.
+- `tests/dotnet1-week03-three-part.test.mjs` checks every printed step page: each printed line matches its page's sample
+  at its number, every named line is printed, outputs (full or differing lines) match, Your task's wording is printed, no
+  answer is printed, and page 18 keeps its four sections. Shown failing with a wrong printed number, an answer line
+  printed as code, and Step 1's new output line missing.
 
 ## Upload steps (after this pull request is merged)
 
