@@ -1,3 +1,9 @@
+> Express security update (2026-11-25, CKB-145): `express` ^5.1.0 -> ^5.3.0 in `backend/package.json`; lock has
+> body-parser 2.4.0, proxy-addr 2.0.8, qs 6.17.1. Only the old Render server uses Express; teacher keeps Render for now.
+> Build, lint, 546 tests, the Express server on the laptop and an offline classroom run pass. Branch
+> `fix/express-security-update`, approved; includes PR #146 (Next.js) so both merge in any order. Render rebuilds by itself after merge.
+> Remaining audit items are build/dev tools only (wrangler, Cloudflare adapter, typescript-eslint, glob, undici…), not planned.
+
 > .NET 1 Week 3 three-part (2026-11-25): `docs/modules/dotnet1/week03/DotNet1_Week_03.threepart.codeshare.json`, branch
 > `content/dotnet1-week03-three-part`, approved (Your task wording for all 9 steps; Step 2 changes label, for, id and name).
 > Three pages: every line reference names its page; media on Steps 1 and 9 only. Browser walk passes on 8787 with media
