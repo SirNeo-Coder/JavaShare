@@ -4,6 +4,31 @@
 > without uploaded media stayed Locked; their sample and guided example are now checked by page text, the task still
 > by Mark done. Tests: 551/551, lint 0 errors, build:all, Week 2 browser test offline. Next: teacher merges and deploys;
 > students reopen the step. Uploading Week 2 media still gives full automatic checks.
+> Weeks 1-2 PDFs restored (2026-11-25, CKB-146): branch `content/dotnet1-restore-print-sections` (on top of #149). Page 18
+> "Week 0N: before you submit" brings back the self-check, get-ready and other sections the step guide dropped, copied
+> unchanged; both PDFs now 18 pages, footers "of 18"; DLLs unchanged. PR #150. Merge order: #147, #149, then #150.
+
+> .NET 1 Week 3 PDF and DLL (2026-11-25): branch `content/dotnet1-week03-print`. PDF 18 one-sheet pages: step guide
+> pp. 9-17 (page name above each excerpt; Steps 1 and 9 print only differing output lines, teacher approved); old page
+> 10's sections kept on page 18 (teacher approved). DLL: 6 paragraphs (five activity lines + Friday scaffolding). Found
+> CKB-146: Weeks 1-2 PDFs lost their self-check/get-ready sections; not fixed (ask teacher). Next: teacher reviews and
+> merges #147 then this PR (#149); upload Week 3 with media.
+> Express security update (2026-11-25, CKB-145): `express` ^5.1.0 -> ^5.3.0 in `backend/package.json`; lock has
+> body-parser 2.4.0, proxy-addr 2.0.8, qs 6.17.1. Only the old Render server uses Express; teacher keeps Render for now.
+> Build, lint, 546 tests, the Express server on the laptop and an offline classroom run pass. Branch
+> `fix/express-security-update`, approved; includes PR #146 (Next.js) so both merge in any order. Render rebuilds by itself after merge.
+> Remaining audit items are build/dev tools only (wrangler, Cloudflare adapter, typescript-eslint, glob, undici…), not planned.
+
+> .NET 1 Week 3 three-part (2026-11-25): `docs/modules/dotnet1/week03/DotNet1_Week_03.threepart.codeshare.json`, branch
+> `content/dotnet1-week03-three-part`, approved (Your task wording for all 9 steps; Step 2 changes label, for, id and name).
+> Three pages: every line reference names its page; media on Steps 1 and 9 only. Browser walk passes on 8787 with media
+> (11/11), offline settings (10/10) and online settings (10/10); it also checks the pages a step does not load keep the
+> latest saved work. Prompt gains "Several files". Next: teacher reviews; then Week 3 PDF (week02's build_step_pages.py,
+> page name above each excerpt) and DLL in a separate pull request; upload with media after merge. PR #147.
+> Next.js security update (2026-11-25, CKB-144): `next` and `eslint-config-next` 16.4.2 -> 16.4.6 (patch release; only
+> Next.js packages changed). Build, lint, 546 tests, local Cloudflare build and an offline classroom run (sign-in, module,
+> laptop Java) pass. Branch `fix/next-security-update`, approved. Next: Express advisories (proxy-addr critical,
+> body-parser high, qs moderate) as separate work, plan first. After merge the hosted site needs a normal redeploy.
 
 > .NET 1 Week 2 PDF and DLL (2026-11-25): branch `content/dotnet1-week02-print`. Teacher chose option A: each step page
 > prints the named sample lines with real numbers and "…", outputs side by side; PDF 17 pages; DLL's five activity lines and

@@ -72,9 +72,9 @@ The complete solved pages are in `solutions/<step id>/index.html` (guided exampl
 
 ## Printed module and lesson plan
 
-- **PDF (`DotNet1_HTML_Fundamentals_Lists_Module.pdf`), now 17 pages of 612 × 936 pt.** Pages 1–8 are unchanged except:
+- **PDF (`DotNet1_HTML_Fundamentals_Lists_Module.pdf`), now 18 pages of 612 × 936 pt.** Pages 1–8 are unchanged except:
   page 1's "How to use this module" explains the three parts; each step's last line points to its step-guide page;
-  every footer says "of 17". The old task pages 9–11 are now the **step guide, pages 9–17, one step per page**: the
+  every footer says "of 18". The old task pages 9–11 are now the **step guide, pages 9–17, one step per page**: the
   step's full sample with line numbers (pages 1–6 print only parts of it, and the discussion counts lines from the top),
   the discussion, the guided example with its code and expected output, and Your task with its expected output.
   The check-yourself table (now with a Guided example verified column) is on page 9. **No answer is printed.**
@@ -86,6 +86,9 @@ The complete solved pages are in `solutions/<step id>/index.html` (guided exampl
   converting it to PDF with LibreOffice, not in Microsoft Word.
 - `tests/dotnet1-week01-three-part.test.mjs` checks every printed step page against the module file (numbered sample,
   guided code, both outputs) and that no answer line or note is printed (shown failing with an answer put on page 9).
+
+- **Page 18, "Week 01: before you submit" (restored 2026-11-25, CKB-146):** the step guide had dropped the old task
+  pages' other sections; page 18 prints them unchanged: My Resume self-check, My presentation notes (Friday) and Get ready for Week 2. Footers now say "of 18".
 
 ## Correction (2026-11-24, CKB-141)
 

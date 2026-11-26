@@ -1,8 +1,8 @@
 # Three-part .NET 1 weeks: the prompt
 
-How Weeks 1 and 2 were built, with every correction since (CKB-138, CKB-139, CKB-141, CKB-142). Paste the block
+How Weeks 1–3 were built, with every correction since (CKB-138, CKB-139, CKB-141, CKB-142). Paste the block
 below for the next week, changing `NN`. Worked examples: `week01/Week_01_Three_Part_Report.md`,
-`week02/Week_02_Three_Part_Report.md`.
+`week02/Week_02_Three_Part_Report.md`, `week03/Week_03_Three_Part_Report.md` (several pages).
 
 ```text
 Follow AGENTS.md. Plan first and wait for my approval before changing any code or module file. Explain in
@@ -48,14 +48,29 @@ files). Offline every media step is "Checked by your teacher for now". Tell me w
 the media case on Cloudflare's runtime on this laptop (port 8787: copy .dev.vars, npx opennextjs-cloudflare build,
 then preview), which has local media storage.
 
+SEVERAL FILES (a week whose steps load more than one page, e.g. index.html, projects.html, contact.html)
+- A step loads only its own files; the other pages keep the student's latest SAVED work (code is saved only when a task
+  completes, so a teacher-checked media step saves nothing). Check that no step's output, frame, link or page check
+  depends on a page the step does not load; a framed page's text is never page text.
+- Every discussion line, guided line and answer-key heading names its page: "Look at line N of contact.html. `...`",
+  "Put this line on **line N of contact.html**", answer key "contact.html, line N:". Line numbers count in that page.
+- Your task changes only the step's run page; any "line N" in it counts in that page after the guided example (CKB-142),
+  or says "of the sample". Name the page ("line 13 of index.html"); an unnamed "line N" means the run page.
+- Forms: typed text, placeholder, required, input types and for/id/name are not page text; labels, button words and
+  option words are. Prove every own task changes page text with the teacher's checker before writing its wording.
+- Media only on some steps: the others are checked automatically online and offline; say which in the report.
+- Tests (copy Week 3's): every line check reads the page it names; a checker test that puts only each step's run page
+  (so the other pages are the previous steps' own-task answers); a browser walk that, before each step, checks every
+  page the step does not load still holds the latest saved work.
+
 FILES AND TESTS
 - solutions/<step id>-alter-v2/index.html: each solved own-task page.
 - tests/fixtures/dotnet1-weekNN-three-part-edits.json: per step "fromGuided" edits (guided page -> own page).
-- tests/dotnet1-weekNN-three-part.test.mjs (copy Week 2's): upload, ids, unchanged samples, discussion lines, guided
+- tests/dotnet1-weekNN-three-part.test.mjs (copy Week 2's; Week 3's for several pages): upload, ids, unchanged samples, discussion lines, guided
   and answer-key lines, continuity, Your task's line numbers, sample -> guided -> task rule (with media lines).
 - weekNN/test_threepart_checker.py (copy Week 1's; add --media-root project_end for media weeks): the teacher's
   checker passes every sample, guided page and answer; guided pages fail against their own tasks.
-- tests/dotnet1-weekNN-three-part.browser.mjs (copy Week 2's): a student walks every step in real CodeShare (sample;
+- tests/dotnet1-weekNN-three-part.browser.mjs (copy Week 2's; Week 3's for several pages): a student walks every step in real CodeShare (sample;
   own page refused as the guided example; guided verified, not Completed; then the code left in the editor is changed
   as Your task says -> Completed): offline settings, online settings, and port 8787 when there is media.
 - Show each kind of check failing once (a wrong line number, the old wording), then passing.
@@ -67,11 +82,13 @@ REPORT AND RECORDS
 - A CKB record for every bug found; problem index, prompt map and handoff updated.
 
 AFTER I APPROVE THE MODULE (separate pull request)
-- PDF: copy week01/build_step_pages.py and render_pdf.cjs. Pages after the exit-slip strips become the step guide, one
+- PDF: first list every non-task section on the old task pages (self-check, get ready, starter pages, notes) and keep
+  them on a page after the step guide (CKB-146). Copy week01/build_step_pages.py and render_pdf.cjs. Pages after the exit-slip strips become the step guide, one
   step per page (numbered full sample, discussion, guided example, Your task, expected outputs, never an answer);
   page 1's "How to use this module", each step's "Next: step guide, page N", footers "of N". Render the unchanged pages
   first and confirm they match the old PDF's text. Every page must print on one sheet. For long samples copy
-  week02/build_step_pages.py instead (option A): print only the lines the discussion and guided example name, with
+  week02/build_step_pages.py instead (option A; several pages: week03's, with the page name above each excerpt; outputs of
+  more than 30 lines print only the lines that differ): print only the lines the discussion and guided example name, with
   their real numbers and "…" between parts, and the two outputs side by side.
 - DLL: only the lines that name the task pages become "Sample, guided example, then your task" with the new pages.
   Edit the Word file's text in place and check it through a LibreOffice PDF.

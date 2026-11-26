@@ -9,7 +9,8 @@ module = json.loads((HERE / "DotNet1_Week_01.threepart.codeshare.json").read_tex
 steps = {b["number"]: (lesson["dayLabel"], b) for lesson in module["lessons"] for b in lesson["blocks"] if b["type"] == "step"}
 GROUPS = [[n] for n in range(1, 10)]  # one step per page; every page must print on one sheet
 FIRST = 9  # pages 1-8 are the lessons and the exit-slip strips
-LAST = FIRST + len(GROUPS) - 1
+LAST = FIRST + len(GROUPS) - 1  # the last step page
+TOTAL = LAST + 1  # p18: before you submit, the old task pages' other sections (CKB-146), kept as it is
 
 def inline(text):  # the module's small Markdown: `code` and **bold**
     parts = re.split(r"(`[^`]+`)", text)
@@ -44,7 +45,7 @@ TICKS = ('<table class="t ticks3"><tr><th>Check yourself</th><th>Sample verified
          + "</table>")
 
 for old in SRC.glob("p*.html"):
-    if int(old.stem[1:]) >= FIRST: old.unlink()
+    if FIRST <= int(old.stem[1:]) <= LAST: old.unlink()
 for index, group in enumerate(GROUPS):
     number = FIRST + index
     head = ('<h1>Week 01 step guide</h1><p class="sub">.NET 1 · HTML Fundamentals, Paragraphs and Lists · '
@@ -52,5 +53,5 @@ for index, group in enumerate(GROUPS):
     (SRC / f"p{number}.html").write_text(
         f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Week 01 step guide</title><link rel="stylesheet" href="tasks.css"></head>'
         f'<body class="w1"><div class="page">{head}{"".join(step_html(n) for n in group)}'
-        f'<footer class="foot">.NET 1 · Week 01 · Step guide · Page {number} of {LAST} · Keep this page with your module</footer></div></body></html>')
+        f'<footer class="foot">.NET 1 · Week 01 · Step guide · Page {number} of {TOTAL} · Keep this page with your module</footer></div></body></html>')
 print(f"pages {FIRST}-{LAST} written")
